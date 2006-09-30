@@ -23,7 +23,7 @@
 // $Date$
 // $Source$
 
-// Written: fmk
+// Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
 // Created: 09/06
 // Revision: A
 //
