@@ -112,7 +112,8 @@ int addEEChevronBrace(ClientData clientData, Tcl_Interp *interp, int argc,
 			opserr << "expElement chevronBrace element: " << tag << endln;
 			return TCL_ERROR;
 		}
-		for (int i = 6+eleArgStart; i < argc; i++)  {
+		int i;
+		for (i = 6+eleArgStart; i < argc; i++)  {
 			if (strcmp(argv[i], "-iMod") == 0)  {
                 iMod = true;
 			}

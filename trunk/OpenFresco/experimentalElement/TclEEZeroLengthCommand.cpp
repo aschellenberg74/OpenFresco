@@ -113,7 +113,8 @@ int addEEZeroLength(ClientData clientData, Tcl_Interp *interp, int argc,
     ID theDirIDs(numDir);
     argi = 6 + eleArgStart; 	
     // read the act identifiers
-    for (int i=0; i<numDir; i++)  {
+	int i;
+    for (i=0; i<numDir; i++)  {
         if (Tcl_GetInt(interp, argv[argi], &dirID) != TCL_OK)  {
             opserr << "WARNING invalid direction ID\n";
             opserr << "expElement zeroLength element: " << tag << endln;	    
