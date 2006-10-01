@@ -297,9 +297,6 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp, int argc,
             delete theSite; // invoke the destructor, otherwise mem leak
             return TCL_ERROR;
         }
-        
-        // ATTENTION ONLY TEMPORARILY: run server from here
-        theSite->run();
     }
 
     // ----------------------------------------------------------------------------	
