@@ -122,8 +122,10 @@ int ActorExpSite::run()
         //    opserr << "action = " << action << endln;
         switch(action) {
         case OF_RemoteTest_open:
-            opserr << "\nExperimentalSite Tag : " << this->getTag() << endln;
+            opserr << "\nConnected to RemoteExpSite "
+                << msgData(1) << endln;
             msgData(0) = OF_ReturnType_completed;
+            msgData(1) = this->getTag();
             this->sendID(msgData);
             break;
         case OF_RemoteTest_setup:
@@ -193,7 +195,10 @@ int ActorExpSite::run()
             break;
             
         case OF_RemoteTest_DIE:
+            opserr << "\nDisconnected from RemoteExpSite "
+                << msgData(1) << endln << endln;
             msgData(0) = OF_ReturnType_received;
+            msgData(1) = this->getTag();
             this->sendID(msgData);
             exitYet = true;
             break;

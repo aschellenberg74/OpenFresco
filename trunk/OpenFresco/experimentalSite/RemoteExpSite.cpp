@@ -53,10 +53,12 @@ RemoteExpSite::RemoteExpSite(int tag,
     rDisp(0), rVel(0), rAccel(0), rForce(0), rTime(0)
 {
     msgData(0) = OF_RemoteTest_open;
+    msgData(1) = tag;
     this->sendID(msgData);
     this->recvID(msgData);
     
-    opserr << "\nConnected to ActorExpSite.\n";
+    opserr << "\nConnected to ActorExpSite "
+        << msgData(1) << endln;
 }
 
 
@@ -80,10 +82,12 @@ RemoteExpSite::RemoteExpSite(int tag,
         exit(OF_ReturnType_failed);
     }
     msgData(0) = OF_RemoteTest_open;
+    msgData(1) = tag;
     this->sendID(msgData);
     this->recvID(msgData);
     
-    opserr << "\nConnected to ActorExpSite.\n";
+    opserr << "\nConnected to ActorExpSite "
+        << msgData(1) << endln;
 }
 
 
@@ -131,9 +135,11 @@ RemoteExpSite::~RemoteExpSite()
         delete rTime;
     
     msgData(0) = OF_RemoteTest_DIE;
+    msgData(1) = this->getTag();
     this->sendID(msgData);
     this->recvID(msgData);
-    opserr << "\nDisconnected from ActorExpSite.\n";
+    opserr << "\nDisconnected from ActorExpSite "
+        << msgData(1) << endln << endln;
 }
 
 
