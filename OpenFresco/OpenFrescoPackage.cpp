@@ -36,12 +36,15 @@
 #include <OPS_Stream.h>
 #include <Domain.h>
 #include <TclModelBuilder.h>
+#include <ExperimentalSite.h>
+#include <ActorExpSite.h>
 
 #define DllExport _declspec(dllexport)
 
 Domain *theDomain;
 TclModelBuilder *theTclBuilder;
 
+extern ExperimentalSite *getExperimentalSite(int tag);
 
 // experimental control commands
 extern int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
@@ -91,6 +94,37 @@ int openFresco_addExperimentalElement(ClientData clientData,
         theTclBuilder, theDomain);
 }
 
+// start server command
+int openFresco_startServer(ClientData clientData,
+    Tcl_Interp *interp, int argc, TCL_Char **argv)
+{ 
+    if (argc != 2)  {
+        opserr << "WARNING insufficient arguments\n"
+            << "Want: startOpenFrescoServer siteTag\n";
+        return TCL_ERROR;
+    }
+    int siteTag;
+    if (Tcl_GetInt(interp, argv[1], &siteTag) != TCL_OK)  {
+        opserr << "WARNING invalid server siteTag\n";
+        return TCL_ERROR;
+    }
+    ActorExpSite *theSite =
+        dynamic_cast <ActorExpSite*> (getExperimentalSite(siteTag));
+    if (theSite != 0)  {
+        // start server process
+        opserr << "\nActorExpSite " << siteTag
+            << " now running..." << endln;
+        theSite->run();
+
+    } else  {
+        opserr << "WARNING actor experimental site not found\n";
+        opserr << "unable to start expSite: " << siteTag << endln;
+        return TCL_ERROR;
+    }
+
+    return TCL_OK;
+}
+
 
 // This is a package initialization procedure, which is called
 // by Tcl when this package is to be added to an interpreter.
@@ -123,6 +157,9 @@ OpenFresco(ClientData clientData, Tcl_Interp *interp, int argc,
         (ClientData)NULL, NULL);
 
     Tcl_CreateCommand(interp, "expElement", openFresco_addExperimentalElement,
+        (ClientData)NULL, NULL);
+
+    Tcl_CreateCommand(interp, "startOpenFrescoServer", openFresco_startServer,
         (ClientData)NULL, NULL);
 
     return TCL_OK;
