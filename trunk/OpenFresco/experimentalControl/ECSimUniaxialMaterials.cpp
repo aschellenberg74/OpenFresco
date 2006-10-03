@@ -199,7 +199,7 @@ ExperimentalControl* ECSimUniaxialMaterials::getCopy()
 
 int ECSimUniaxialMaterials::addDummySpecimen(UniaxialMaterial *specimen)
 {
-    int result = theSpecimens->addComponent(specimen);
+    int result = theSpecimens->addComponent(specimen->getCopy());
     
     return result;
 }
