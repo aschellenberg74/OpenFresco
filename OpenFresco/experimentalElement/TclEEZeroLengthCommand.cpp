@@ -61,7 +61,7 @@ int addEEZeroLength(ClientData clientData, Tcl_Interp *interp, int argc,
     if ((argc-eleArgStart) < 8)  {
         opserr << "WARNING insufficient arguments\n";
         printCommand(argc, argv);
-        opserr << "Want: expElement zeroLength eleTag iNode jNode siteTag -dir dirs -initStif Kij <-iMod> <-isCopy> <-orient x1 x2 x3 y1 y2 y3>\n";
+        opserr << "Want: expElement zeroLength eleTag iNode jNode siteTag -dir dirs -initStif Kij <-orient x1 x2 x3 y1 y2 y3> <-iMod> <-isCopy> <-mass m>\n";
         return TCL_ERROR;
     }    
     
