@@ -38,7 +38,7 @@
 
 class CrdTransf2d;
 
-#define ELE_TAG_EEBeamColumn2d 9960
+#define ELE_TAG_EEBeamColumn2d 9951
 
 
 class EEBeamColumn2d : public ExperimentalElement
