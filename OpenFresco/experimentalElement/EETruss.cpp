@@ -343,11 +343,11 @@ int EETruss::update(void)
     const Vector &acc2 = theNodes[1]->getTrialAccel();	
     
     static Vector db(1), vb(1), ab(1);
-    db(1) = vb(1) = ab(1) = 0.0;
+    db(0) = vb(0) = ab(0) = 0.0;
     for (int i = 0; i < dimension; i++)  {
-        db(1) += (dsp2(i)-dsp1(i))*cosX[i];
-        vb(1) += (vel2(i)-vel1(i))*cosX[i];
-        ab(1) += (acc2(i)-acc1(i))*cosX[i];
+        db(0) += (dsp2(i)-dsp1(i))*cosX[i];
+        vb(0) += (vel2(i)-vel1(i))*cosX[i];
+        ab(0) += (acc2(i)-acc1(i))*cosX[i];
     }
     
     if (db != targDisp)  {
