@@ -379,7 +379,7 @@ int EETruss::setInitialStiff(const Matrix& kbinit)
     double temp;
     for (int i = 0; i < dimension; i++)  {
         for (int j = 0; j < dimension; j++)  {
-            temp = cosX[i]*cosX[j]*kbInit(1,1);
+            temp = cosX[i]*cosX[j]*kbInit(0,0);
             theInitStif(i,j) = temp;
             theInitStif(i+numDOF2,j) = -temp;
             theInitStif(i,j+numDOF2) = -temp;
@@ -485,8 +485,8 @@ const Vector& EETruss::getResistingForce()
     // determine resisting forces in global system
     int numDOF2 = numDOF/2;
     for (int i = 0; i < dimension; i++)  {
-        (*theVector)(i) = -cosX[i]*q(1);
-        (*theVector)(i+numDOF2) = cosX[i]*q(1);
+        (*theVector)(i) = -cosX[i]*q(0);
+        (*theVector)(i+numDOF2) = cosX[i]*q(0);
     }
     
     // subtract external load
