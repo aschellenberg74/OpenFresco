@@ -116,8 +116,6 @@ private:
     Matrix Tinv;        // inverse of transformation matrix
     
     Node *theNodes[2];
-    
-    FILE *outFile;
 };
 
 #endif

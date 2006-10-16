@@ -112,8 +112,6 @@ private:
     Matrix T;               // transformation matrix
     
     Node *theNodes[3];
-    
-    FILE *outFile;
 };
 
 #endif

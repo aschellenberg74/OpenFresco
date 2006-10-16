@@ -111,14 +111,6 @@ EEZeroLength::EEZeroLength(int tag, int dim, int Nd1, int Nd2,
     // initialize vectors
     q.Zero();
     targDisp.Zero();
-    
-    // open output file
-    //outFile = fopen("elemDisp.out","w");
-    //if (outFile==NULL)  {
-    //	opserr << "EEZeroLength::EEZeroLength() - "
-    //		<< "fopen: could not open output file\n";
-    //  exit(-1);
-    //}
 }
 
 
@@ -126,13 +118,12 @@ EEZeroLength::EEZeroLength(int tag, int dim, int Nd1, int Nd2,
 // and on the experimental object
 EEZeroLength::~EEZeroLength()
 {
-    // close output file
-    //fclose(outFile);
-    
     // invoke the destructor on any objects created by the object
     // that the object still holds a pointer to
-    if (dir != 0 )
+    if (dir)
         delete dir;
+    if (theLoad)
+        delete theLoad;
 }
 
 
@@ -348,15 +339,14 @@ int EEZeroLength::update(void)
 
 int EEZeroLength::setInitialStiff(const Matrix& kbinit)
 {
-    kbInit = kbinit;
-    
-    if (kbInit.noRows() != numDir || kbInit.noCols() != numDir)  {
+    if (kbinit.noRows() != numDir || kbinit.noCols() != numDir)  {
         opserr << "EEZeroLength::setInitialStiff() - " 
             << "matrix size is incorrect for element: "
             << this->getTag() << endln;
         return -1;
     }
-    
+    kbInit = kbinit;
+        
     // transform stiffness matrix from the basic to the global system
     theInitStif.Zero();
     theInitStif.addMatrixTripleProduct(0.0, T, kbInit, 1.0);
@@ -370,16 +360,14 @@ const Matrix& EEZeroLength::getMass(void)
     // zero the matrix
     theMatrix->Zero();
     
-    // check for quick return
-    if (mass == 0.0)  {
-        return *theMatrix;
-    }    
-    
-    double m = 0.5*mass;
-    int numDOF2 = numDOF/2;
-    for (int i = 0; i < dimension; i++)  {
-        (*theMatrix)(i,i) = m;
-        (*theMatrix)(i+numDOF2,i+numDOF2) = m;
+    // form mass matrix
+    if (mass != 0.0)  {
+        double m = 0.5*mass;
+        int numDOF2 = numDOF/2;
+        for (int i = 0; i < dimension; i++)  {
+            (*theMatrix)(i,i) = m;
+            (*theMatrix)(i+numDOF2,i+numDOF2) = m;
+        }
     }
     
     return *theMatrix; 
@@ -492,14 +480,16 @@ int EEZeroLength::sendSelf(int commitTag, Channel &theChannel)
 }
 
 
-int EEZeroLength::recvSelf(int commitTag, Channel &theChannel, FEM_ObjectBroker &theBroker)
+int EEZeroLength::recvSelf(int commitTag, Channel &theChannel,
+    FEM_ObjectBroker &theBroker)
 {
     // has not been implemented yet.....
     return 0;
 }
 
 
-int EEZeroLength::displaySelf(Renderer &theViewer, int displayMode, float fact)
+int EEZeroLength::displaySelf(Renderer &theViewer,
+    int displayMode, float fact)
 {    
     // first determine the end points of the element based on
     // the display factor (a measure of the distorted image)

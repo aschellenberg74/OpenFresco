@@ -97,14 +97,6 @@ EEChevronBrace2d::EEChevronBrace2d(int tag, int Nd1, int Nd2, int Nd3,
     // initialize vectors
     q.Zero();
     targDisp.Zero();
-    
-    // open output file
-    //outFile = fopen("elemDisp.out","w");
-    //if (outFile==NULL)  {
-    //	opserr << "EEChevronBrace2d::EEChevronBrace2d() - "
-    //		<< "fopen: could not open output file\n";
-    //  exit(-1);
-    //}
 }
 
 
@@ -112,9 +104,6 @@ EEChevronBrace2d::EEChevronBrace2d(int tag, int Nd1, int Nd2, int Nd3,
 // and on the experimental object.
 EEChevronBrace2d::~EEChevronBrace2d()
 {
-    // close output file
-    //fclose(outFile);
-    
     // invoke the destructor on any objects created by the object
     // that the object still holds a pointer to
 }
@@ -317,15 +306,14 @@ int EEChevronBrace2d::update(void)
 
 int EEChevronBrace2d::setInitialStiff(const Matrix& kbinit)
 {
-    kbInit = kbinit;
-    
-    if (kbInit.noRows() != 3 || kbInit.noCols() != 3)  {
+    if (kbinit.noRows() != 3 || kbinit.noCols() != 3)  {
         opserr << "EEChevronBrace2d::setInitialStiff() - " 
             << "matrix size is incorrect for element: "
             << this->getTag() << endln;
         return -1;
     }
-    
+    kbInit = kbinit;
+        
     // transform stiffness matrix from the basic to the global system
     theInitStif.Zero();
     theInitStif.addMatrixTripleProduct(0.0, T, kbInit, 1.0);
@@ -339,19 +327,17 @@ const Matrix& EEChevronBrace2d::getMass(void)
     // zero the matrix
     theMatrix.Zero();
     
-    // check for quick return
-    if ((L1 == 0.0 && rho2 == 0) || (L2 == 0 && rho1 == 0.0))  {
-        return theMatrix;
-    }    
-    
-    double m1 = 0.5*rho1*L1;
-    double m2 = 0.5*rho2*L2;
-    theMatrix(0,0) = m1;
-    theMatrix(1,1) = m1;	
-    theMatrix(3,3) = m2;
-    theMatrix(4,4) = m2;
-    theMatrix(6,6) = m1+m2;
-    theMatrix(7,7) = m1+m2;
+    // form mass matrix
+    if ((L1 != 0.0 && rho1 != 0.0) || (L2 != 0 && rho2 != 0.0))  {
+        double m1 = 0.5*rho1*L1;
+        double m2 = 0.5*rho2*L2;
+        theMatrix(0,0) = m1;
+        theMatrix(1,1) = m1;	
+        theMatrix(3,3) = m2;
+        theMatrix(4,4) = m2;
+        theMatrix(6,6) = m1+m2;
+        theMatrix(7,7) = m1+m2;
+    }
     
     return theMatrix; 
 }
@@ -376,7 +362,7 @@ int EEChevronBrace2d::addLoad(ElementalLoad *theLoad, double loadFactor)
 int EEChevronBrace2d::addInertiaLoadToUnbalance(const Vector &accel)
 {
     // check for quick return
-    if ((L1 == 0.0 && rho2 == 0) || (L2 == 0 && rho1 == 0.0))  {
+    if ((L1 == 0.0 || rho1 == 0) && (L2 == 0 || rho2 == 0.0))  {
         return 0;
     }    
     
@@ -512,7 +498,7 @@ int EEChevronBrace2d::sendSelf(int commitTag, Channel &theChannel)
 
 
 int EEChevronBrace2d::recvSelf(int commitTag, Channel &theChannel,
-                               FEM_ObjectBroker &theBroker)
+    FEM_ObjectBroker &theBroker)
 {
     // has not been implemented yet.....
     return 0;
@@ -520,7 +506,7 @@ int EEChevronBrace2d::recvSelf(int commitTag, Channel &theChannel,
 
 
 int EEChevronBrace2d::displaySelf(Renderer &theViewer,
-                                  int displayMode, float fact)
+    int displayMode, float fact)
 {
     // first set the quantity to be displayed at the nodes
     static Vector values(3);

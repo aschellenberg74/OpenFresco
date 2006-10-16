@@ -99,15 +99,7 @@ EETruss::EETruss(int tag, int dim, int Nd1, int Nd2,
     
     // initialize vectors
     q.Zero();
-    targDisp.Zero();
-    
-    // open output file
-    //outFile = fopen("elemDisp.out","w");
-    //if (outFile==NULL)  {
-    //	opserr << "EETruss::EETruss() - "
-    //		<< "fopen: could not open output file\n";
-    //  exit(-1);
-    //}
+    targDisp.Zero();    
 }
 
 
@@ -115,9 +107,6 @@ EETruss::EETruss(int tag, int dim, int Nd1, int Nd2,
 // and on the experimental object
 EETruss::~EETruss()
 {
-    // close output file
-    //fclose(outFile);
-    
     // invoke the destructor on any objects created by the object
     // that the object still holds a pointer to
     if (theLoad)
@@ -364,15 +353,14 @@ int EETruss::update(void)
 
 int EETruss::setInitialStiff(const Matrix& kbinit)
 {
-    kbInit = kbinit;
-    
-    if (kbInit.noRows() != 1 || kbInit.noCols() != 1)  {
+    if (kbinit.noRows() != 1 || kbinit.noCols() != 1)  {
         opserr << "EETruss::setInitialStiff(): " 
             << "matrix size is incorrect for element: "
             << this->getTag() << endln;
         return -1;
     }
-    
+    kbInit = kbinit;
+        
     // transform the stiffness from the basic to the global system
     theInitStif.Zero();
     int numDOF2 = numDOF/2;
@@ -396,16 +384,14 @@ const Matrix& EETruss::getMass(void)
     // zero the matrix
     theMatrix->Zero();    
     
-    // check for quick return
-    if (L == 0.0 || rho == 0.0)  {
-        return *theMatrix;
-    }    
-    
-    double m = 0.5*rho*L;
-    int numDOF2 = numDOF/2;
-    for (int i = 0; i < dimension; i++)  {
-        (*theMatrix)(i,i) = m;
-        (*theMatrix)(i+numDOF2,i+numDOF2) = m;
+    // form mass matrix
+    if (L != 0.0 && rho != 0.0)  {
+        double m = 0.5*rho*L;
+        int numDOF2 = numDOF/2;
+        for (int i = 0; i < dimension; i++)  {
+            (*theMatrix)(i,i) = m;
+            (*theMatrix)(i+numDOF2,i+numDOF2) = m;
+        }
     }
     
     return *theMatrix;
@@ -528,14 +514,16 @@ int EETruss::sendSelf(int commitTag, Channel &theChannel)
 }
 
 
-int EETruss::recvSelf(int commitTag, Channel &theChannel, FEM_ObjectBroker &theBroker)
+int EETruss::recvSelf(int commitTag, Channel &theChannel,
+    FEM_ObjectBroker &theBroker)
 {
     // has not been implemented yet.....
     return 0;
 }
 
 
-int EETruss::displaySelf(Renderer &theViewer, int displayMode, float fact)
+int EETruss::displaySelf(Renderer &theViewer,
+    int displayMode, float fact)
 {
     // first determine the end points of the element based on
     // the display factor (a measure of the distorted image)
@@ -548,7 +536,7 @@ int EETruss::displaySelf(Renderer &theViewer, int displayMode, float fact)
     static Vector v1(3);
     static Vector v2(3);
     
-    for (int i = 0; i < 2; i++)  {
+    for (int i = 0; i < dimension; i++)  {
         v1(i) = end1Crd(i) + end1Disp(i)*fact;
         v2(i) = end2Crd(i) + end2Disp(i)*fact;    
     }
