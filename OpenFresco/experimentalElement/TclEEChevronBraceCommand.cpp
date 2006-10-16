@@ -74,7 +74,7 @@ int addEEChevronBrace(ClientData clientData, Tcl_Interp *interp, int argc,
 		}    
 		
 		// get the id and end nodes
-		int iNode, jNode, kNode, siteTag;
+		int iNode, jNode, kNode, siteTag, i, j, k;
         bool iMod = false;
         bool isCopy = false;
         bool nlFlag = false;
@@ -112,7 +112,6 @@ int addEEChevronBrace(ClientData clientData, Tcl_Interp *interp, int argc,
 			opserr << "expElement chevronBrace element: " << tag << endln;
 			return TCL_ERROR;
 		}
-		int i;
 		for (i = 6+eleArgStart; i < argc; i++)  {
 			if (strcmp(argv[i], "-iMod") == 0)  {
                 iMod = true;
@@ -164,7 +163,7 @@ int addEEChevronBrace(ClientData clientData, Tcl_Interp *interp, int argc,
 
 		// finally check for initial stiffness terms
 		for (i = 6+eleArgStart; i < argc; i++)  {
-			if (i+1 < argc && strcmp(argv[i], "-initStif") == 0)  {
+			if (strcmp(argv[i], "-initStif") == 0)  {
 				if (argc < i+9)  {
 					opserr << "WARNING incorrect number of inital stiffness terms\n";
 					opserr << "expElement chevronBrace element: " << tag << endln;
@@ -172,8 +171,8 @@ int addEEChevronBrace(ClientData clientData, Tcl_Interp *interp, int argc,
 				}
 				Matrix theInitStif(3,3);
 				double stif;
-				for (int j=0; j<3; j++)  {
-					for (int k=0; k<3; k++)  {
+				for (j=0; j<3; j++)  {
+					for (k=0; k<3; k++)  {
 						if (Tcl_GetDouble(interp, argv[i+1+3*j+k], &stif) != TCL_OK)  {
 							opserr << "WARNING invalid initial stiffness term\n";
 							opserr << "expElement chevronBrace element: " << tag << endln;

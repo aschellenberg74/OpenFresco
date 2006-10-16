@@ -64,7 +64,7 @@ int addEETruss(ClientData clientData, Tcl_Interp *interp,  int argc,
 	}    
 	
 	// get the id and end nodes 
-	int tag, iNode, jNode, siteTag;
+	int tag, iNode, jNode, siteTag, i, j, k;
     bool iMod = false;
     bool isCopy = false;
 	double rho = 0.0;
@@ -95,7 +95,6 @@ int addEETruss(ClientData clientData, Tcl_Interp *interp,  int argc,
 		opserr << "expElement truss element: " << tag << endln;
 		return TCL_ERROR;
 	}
-	int i;
     for (i = 5+eleArgStart; i < argc; i++)  {
         if (strcmp(argv[i], "-iMod") == 0)  {
             iMod = true;
@@ -135,7 +134,7 @@ int addEETruss(ClientData clientData, Tcl_Interp *interp,  int argc,
 
 	// finally check for initial stiffness terms
 	for (i = 5+eleArgStart; i < argc; i++)  {
-		if (i+1 < argc && strcmp(argv[i], "-initStif") == 0)  {
+		if (strcmp(argv[i], "-initStif") == 0)  {
 			if (argc < i+1)  {
 				opserr << "WARNING incorrect number of inital stiffness terms\n";
 				opserr << "expElement truss element: " << tag << endln;
@@ -143,8 +142,8 @@ int addEETruss(ClientData clientData, Tcl_Interp *interp,  int argc,
 			}
 			Matrix theInitStif(1,1);
 			double stif;
-			for (int j=0; j<1; j++)  {
-				for (int k=0; k<1; k++)  {
+			for (j=0; j<1; j++)  {
+				for (k=0; k<1; k++)  {
 					if (Tcl_GetDouble(interp, argv[i+1+1*j+k], &stif) != TCL_OK)  {
 						opserr << "WARNING invalid initial stiffness term\n";
 						opserr << "expElement truss element: " << tag << endln;

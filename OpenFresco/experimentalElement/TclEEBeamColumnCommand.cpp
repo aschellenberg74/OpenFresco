@@ -77,7 +77,7 @@ int addEEBeamColumn(ClientData clientData, Tcl_Interp *interp, int argc,
 		}    
 		
 		// get the id and end nodes
-		int iNode, jNode, transId, siteTag;
+		int iNode, jNode, transId, siteTag, i, j, k;
         bool iMod = false;
         bool isCopy = false;
 		double rho = 0.0;
@@ -119,7 +119,6 @@ int addEEBeamColumn(ClientData clientData, Tcl_Interp *interp, int argc,
 	        opserr << "expElement beamColumn element: " << tag << endln;
 			return TCL_ERROR;
 		}
-		int i;
 		for (i = 6+eleArgStart; i < argc; i++)  {
 			if (strcmp(argv[i], "-iMod") == 0)  {
                 iMod = true;
@@ -159,7 +158,7 @@ int addEEBeamColumn(ClientData clientData, Tcl_Interp *interp, int argc,
 		
 		// finally check for initial stiffness terms
 		for (i = 6+eleArgStart; i < argc; i++)  {
-			if (i+1 < argc && strcmp(argv[i], "-initStif") == 0)  {
+			if (strcmp(argv[i], "-initStif") == 0)  {
 				if (argc < i+9)  {
 					opserr << "WARNING incorrect number of inital stiffness terms\n";
 					opserr << "expElement beamColumn element: " << tag << endln;
@@ -167,8 +166,8 @@ int addEEBeamColumn(ClientData clientData, Tcl_Interp *interp, int argc,
 				}
 				Matrix theInitStif(3,3);
 				double stif;
-				for (int j=0; j<3; j++)  {
-					for (int k=0; k<3; k++)  {
+				for (j=0; j<3; j++)  {
+					for (k=0; k<3; k++)  {
 						if (Tcl_GetDouble(interp, argv[i+1+3*j+k], &stif) != TCL_OK)  {
 							opserr << "WARNING invalid initial stiffness term\n";
 							opserr << "expElement beamColumn element: " << tag << endln;
@@ -199,7 +198,7 @@ int addEEBeamColumn(ClientData clientData, Tcl_Interp *interp, int argc,
 		}    
 		
 		// get the id and end nodes
-		int iNode, jNode, transId, siteTag;
+		int iNode, jNode, transId, siteTag, i, j, k;
         bool iMod = false;
         bool isCopy = false;
 		double rho = 0.0;
@@ -241,7 +240,6 @@ int addEEBeamColumn(ClientData clientData, Tcl_Interp *interp, int argc,
 	        opserr << "expElement beamColumn element: " << tag << endln;
 			return TCL_ERROR;
 		}
-		int i;
 		for (i = 6+eleArgStart; i < argc; i++)  {
 			if (strcmp(argv[i], "-iMod") == 0)  {
                 iMod = true;
@@ -281,7 +279,7 @@ int addEEBeamColumn(ClientData clientData, Tcl_Interp *interp, int argc,
 		
 		// finally check for initial stiffness terms
 		for (i = 6+eleArgStart; i < argc; i++)  {
-			if (i+1 < argc && strcmp(argv[i], "-initStif") == 0)  {
+			if (strcmp(argv[i], "-initStif") == 0)  {
 				if (argc < i+36)  {
 					opserr << "WARNING incorrect number of inital stiffness terms\n";
 					opserr << "expElement beamColumn element: " << tag << endln;
@@ -289,8 +287,8 @@ int addEEBeamColumn(ClientData clientData, Tcl_Interp *interp, int argc,
 				}
 				Matrix theInitStif(6,6);
 				double stif;
-				for (int j=0; j<6; j++)  {
-					for (int k=0; k<6; k++)  {
+				for (j=0; j<6; j++)  {
+					for (k=0; k<6; k++)  {
 						if (Tcl_GetDouble(interp, argv[i+1+6*j+k], &stif) != TCL_OK)  {
 							opserr << "WARNING invalid initial stiffness term\n";
 							opserr << "expElement beamColumn element: " << tag << endln;
