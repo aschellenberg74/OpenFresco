@@ -111,14 +111,6 @@ EEBeamColumn3d::EEBeamColumn3d(int tag, int Nd1, int Nd2,
         q0[i] = 0.0;
         p0[i] = 0.0;
     }
-    
-    // open output file
-    //outFile = fopen("elemDisp.out","w");
-    //if (outFile==NULL)  {
-    //	opserr << "EEBeamColumn3d::EEBeamColumn3d() - "
-    //		<< "fopen: could not open output file\n";
-    //  exit(-1);
-    //}
 }
 
 
@@ -126,9 +118,6 @@ EEBeamColumn3d::EEBeamColumn3d(int tag, int Nd1, int Nd2,
 // and on the experimental object.
 EEBeamColumn3d::~EEBeamColumn3d()
 {
-    // close output file
-    //fclose(outFile);
-    
     // invoke the destructor on any objects created by the object
     // that the object still holds a pointer to
     if (theCoordTransf)
@@ -302,15 +291,14 @@ int EEBeamColumn3d::update(void)
 
 int EEBeamColumn3d::setInitialStiff(const Matrix& kbinit)
 {
-    kbInit = kbinit;
-    
-    if (kbInit.noRows() != 6 || kbInit.noCols() != 6)  {
+    if (kbinit.noRows() != 6 || kbinit.noCols() != 6)  {
         opserr << "EEBeamColumn3d::setInitialStiff() - " 
             << "matrix size is incorrect for element: "
             << this->getTag() << endln;
         return -1;
     }
-    
+    kbInit = kbinit;
+        
     // transform the stiffness from basic sys B to basic sys A
     static Matrix kbInitA(6,6);
     kbInitA.addMatrixTripleProduct(0.0, T, kbInit, 1.0);
@@ -328,18 +316,16 @@ const Matrix& EEBeamColumn3d::getMass(void)
     // zero the matrix
     theMatrix.Zero();
     
-    // check for quick return
-    if (L == 0.0 || rho == 0.0)  {
-        return theMatrix;
-    }    
-    
-    double m = 0.5*rho*L;
-    theMatrix(0,0) = m;
-    theMatrix(1,1) = m;
-    theMatrix(2,2) = m;
-    theMatrix(6,6) = m;
-    theMatrix(7,7) = m;
-    theMatrix(8,8) = m;
+    // form mass matrix
+    if (L != 0.0 && rho != 0.0)  {
+        double m = 0.5*rho*L;
+        theMatrix(0,0) = m;
+        theMatrix(1,1) = m;
+        theMatrix(2,2) = m;
+        theMatrix(6,6) = m;
+        theMatrix(7,7) = m;
+        theMatrix(8,8) = m;
+    }
     
     return theMatrix; 
 }
@@ -482,7 +468,7 @@ int EEBeamColumn3d::sendSelf(int commitTag, Channel &theChannel)
 
 
 int EEBeamColumn3d::recvSelf(int commitTag, Channel &theChannel,
-                             FEM_ObjectBroker &theBroker)
+    FEM_ObjectBroker &theBroker)
 {
     // has not been implemented yet.....
     return 0;
@@ -490,7 +476,7 @@ int EEBeamColumn3d::recvSelf(int commitTag, Channel &theChannel,
 
 
 int EEBeamColumn3d::displaySelf(Renderer &theViewer,
-                                int displayMode, float fact)
+    int displayMode, float fact)
 {
     // first determine the end points of the beam based on
     // the display factor (a measure of the distorted image)

@@ -131,8 +131,6 @@ private:
     
     Node *theNodes[2];
     
-    FILE *outFile;
-    
     // static data - single copy for all objects of the class	
     static Matrix EEZeroLengthM2;   // class wide matrix for 2*2
     static Matrix EEZeroLengthM4;   // class wide matrix for 4*4
