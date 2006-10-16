@@ -66,7 +66,7 @@ int addEEZeroLength(ClientData clientData, Tcl_Interp *interp, int argc,
     }    
     
     // get the id and end nodes 
-    int tag, iNode, jNode, siteTag, numDir, dirID, argi;
+    int tag, iNode, jNode, siteTag, numDir, dirID, argi, i, j, k;
     bool iMod = false;
     bool isCopy = false;
 	double mass = 0.0;
@@ -113,7 +113,6 @@ int addEEZeroLength(ClientData clientData, Tcl_Interp *interp, int argc,
     ID theDirIDs(numDir);
     argi = 6 + eleArgStart; 	
     // read the act identifiers
-	int i;
     for (i=0; i<numDir; i++)  {
         if (Tcl_GetInt(interp, argv[argi], &dirID) != TCL_OK)  {
             opserr << "WARNING invalid direction ID\n";
@@ -138,7 +137,7 @@ int addEEZeroLength(ClientData clientData, Tcl_Interp *interp, int argc,
                 argi = i+1;
                 double value;
                 // read the x values
-                for (int i=0; i<3; i++)  {
+                for (i=0; i<3; i++)  {
                     if (Tcl_GetDouble(interp, argv[argi], &value) != TCL_OK)  {
                         opserr << "WARNING invalid -orient value\n";
                         opserr << "expElement zeroLength element: " << tag << endln;
@@ -149,7 +148,7 @@ int addEEZeroLength(ClientData clientData, Tcl_Interp *interp, int argc,
                     }
                 }
                 // read the y values
-                for (int j=0; j<3; j++)  {
+                for (j=0; j<3; j++)  {
                     if (Tcl_GetDouble(interp, argv[argi], &value) != TCL_OK)  {
                         opserr << "WARNING invalid -orient value\n";
                         opserr << "expElement zeroLength element: " << tag << endln;
@@ -201,7 +200,7 @@ int addEEZeroLength(ClientData clientData, Tcl_Interp *interp, int argc,
     
 	// finally check for initial stiffness terms
 	for (i = 7+eleArgStart; i < argc; i++)  {
-		if (i+1 < argc && strcmp(argv[i], "-initStif") == 0)  {
+		if (strcmp(argv[i], "-initStif") == 0)  {
 			if (argc < i+numDir*numDir)  {
 				opserr << "WARNING incorrect number of inital stiffness terms\n";
 				opserr << "expTruss element: " << tag << endln;
@@ -209,8 +208,8 @@ int addEEZeroLength(ClientData clientData, Tcl_Interp *interp, int argc,
 			}
 			Matrix theInitStif(numDir,numDir);
 			double stif;
-			for (int j=0; j<numDir; j++)  {
-				for (int k=0; k<numDir; k++)  {
+			for (j=0; j<numDir; j++)  {
+				for (k=0; k<numDir; k++)  {
 					if (Tcl_GetDouble(interp, argv[i+1+1*j+k], &stif) != TCL_OK)  {
 						opserr << "WARNING invalid initial stiffness term\n";
 						opserr << "expTruss element: " << tag << endln;
