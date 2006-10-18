@@ -41,9 +41,9 @@ class ESAggregator : public ExperimentalSetup
 {
 public:
     // constructors
-    ESAggregator(int tag, 
-        int nSetups,
+    ESAggregator(int tag, int nSetups,
         ExperimentalSetup** setups,
+        ID *sizeTrialAll, ID *sizeOutAll,
         ExperimentalControl* control = 0);
     ESAggregator(const ESAggregator& es);
     
@@ -91,10 +91,10 @@ private:
 
     int numSetups;  // number of setups to aggregate
 
-    ID **sizeTrialAll;
-    ID **sizeCtrlAll;
-    ID **sizeDaqAll;
-    ID **sizeOutAll;
+    ID *sizeTrialAll;
+    ID *sizeCtrlAll;
+    ID *sizeDaqAll;
+    ID *sizeOutAll;
 
     // trial vectors for all setups
     Vector **tDispAll;
