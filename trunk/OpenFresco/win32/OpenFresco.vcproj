@@ -328,6 +328,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\experimentalElement\EEGeneric.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\experimentalElement\EEGeneric.h"
+				>
+			</File>
+			<File
 				RelativePath="..\experimentalElement\EETruss.cpp"
 				>
 			</File>
@@ -360,6 +368,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\experimentalElement\TclEEGenericCommand.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\experimentalElement\TclEETrussCommand.cpp"
 				>
 			</File>
@@ -375,6 +387,14 @@
 		<Filter
 			Name="experimentalSetup"
 			>
+			<File
+				RelativePath="..\experimentalSetup\ESAggregator.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\experimentalSetup\ESAggregator.h"
+				>
+			</File>
 			<File
 				RelativePath="..\experimentalSetup\ESChevronBrace2d.cpp"
 				>
