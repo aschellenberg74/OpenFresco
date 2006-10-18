@@ -47,6 +47,7 @@ ESChevronBraceJntOff2d::ESChevronBraceJntOff2d(int tag,
     L0(rigidLength0), L1(rigidLength1), L2(rigidLength2),
     L3(rigidLength3), L4(rigidLength4), L5(rigidLength5)
 {
+    // call setup method
     this->setup();
 }
 
@@ -64,6 +65,9 @@ ESChevronBraceJntOff2d::ESChevronBraceJntOff2d(const ESChevronBraceJntOff2d& es)
     L3     = es.L3;
     L4     = es.L4;
     L5     = es.L5;
+
+    // call setup method
+    this->setup();
 }
 
 
@@ -90,7 +94,7 @@ int ESChevronBraceJntOff2d::setSize(ID sizeT, ID sizeO)
             opserr << "see User Manual.\n";
             opserr << "sizeT = " << sizeT;
             opserr << "sizeO = " << sizeO;
-            exit(1);
+            return OF_ReturnType_failed;
         }
     }
     if((sizeT[OF_Resp_Force] != 0 && sizeT[OF_Resp_Force] != 3) ||
@@ -99,7 +103,7 @@ int ESChevronBraceJntOff2d::setSize(ID sizeT, ID sizeO)
         opserr << "see User Manual.\n";
         opserr << "sizeT = " << sizeT;
         opserr << "sizeO = " << sizeO;
-        exit(1);
+        return OF_ReturnType_failed;
     }
     if((sizeT[OF_Resp_Time] != 0 && sizeT[OF_Resp_Time] != 1) ||
         (sizeO[OF_Resp_Time] != 0 && sizeO[OF_Resp_Time] != 1)) {
@@ -107,7 +111,7 @@ int ESChevronBraceJntOff2d::setSize(ID sizeT, ID sizeO)
         opserr << "see User Manual.\n";
         opserr << "sizeT = " << sizeT;
         opserr << "sizeO = " << sizeO;
-        exit(1);
+        return OF_ReturnType_failed;
     }
     
     return OF_ReturnType_completed;

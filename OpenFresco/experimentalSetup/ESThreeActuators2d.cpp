@@ -44,6 +44,7 @@ ESThreeActuators2d::ESThreeActuators2d(int tag,
     La0(actLength0), La1(actLength1), La2(actLength2),
     L0(rigidLength0), L1(rigidLength1)
 {
+    // call setup method
     this->setup();
 }
 
@@ -57,6 +58,9 @@ ESThreeActuators2d::ESThreeActuators2d(const ESThreeActuators2d& es)
     La2    = es.La2;
     L0     = es.L0;
     L1     = es.L1;
+
+    // call setup method
+    this->setup();
 }
 
 
@@ -82,7 +86,7 @@ int ESThreeActuators2d::setSize(ID sizeT, ID sizeO)
             opserr << "see User Manual.\n";
             opserr << "sizeT = " << sizeT;
             opserr << "sizeO = " << sizeO;
-            exit(1);
+            return OF_ReturnType_failed;
         }
     }
     if((sizeT[OF_Resp_Time] != 0 && sizeT[OF_Resp_Time] != 1) ||
@@ -91,7 +95,7 @@ int ESThreeActuators2d::setSize(ID sizeT, ID sizeO)
         opserr << "see User Manual.\n";
         opserr << "sizeT = " << sizeT;
         opserr << "sizeO = " << sizeO;
-        exit(1);
+        return OF_ReturnType_failed;
     }
     
     return OF_ReturnType_completed;

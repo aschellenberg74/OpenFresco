@@ -41,6 +41,7 @@ ESOneActuator::ESOneActuator(int tag,
     : ExperimentalSetup(tag, control),
     direction(dir)
 {
+    // call setup method
     this->setup();
 }
 
@@ -49,6 +50,9 @@ ESOneActuator::ESOneActuator(const ESOneActuator& es)
     : ExperimentalSetup(es)
 {
     direction = es.direction;
+
+    // call setup method
+    this->setup();
 }
 
 
@@ -74,7 +78,7 @@ int ESOneActuator::setSize(ID sizeT, ID sizeO)
             opserr << "see User Manual.\n";
             opserr << "sizeT = " << sizeT;
             opserr << "sizeO = " << sizeO;
-            exit(1);
+            return OF_ReturnType_failed;
         }
     }
     if((sizeT[OF_Resp_Time] != 0 && sizeT[OF_Resp_Time] != 1) ||
@@ -83,7 +87,7 @@ int ESOneActuator::setSize(ID sizeT, ID sizeO)
         opserr << "see User Manual.\n";
         opserr << "sizeT = " << sizeT;
         opserr << "sizeO = " << sizeO;
-        exit(1);
+        return OF_ReturnType_failed;
     }
      
     return OF_ReturnType_completed;
