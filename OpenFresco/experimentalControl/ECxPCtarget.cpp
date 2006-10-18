@@ -50,14 +50,14 @@ ECxPCtarget::ECxPCtarget(int tag, int pctype, char *ipaddress,
     //if (outFile==NULL)  {
     //	opserr << "ECxPCtarget::ECxPCtarget()"
     //		<< " - fopen: could not open output file" << endln;
-    //  exit(-1);
+    //  exit(OF_ReturnType_failed);
     //}
     
     // initialize the xPC Target dynamic link library
     if (xPCInitAPI())  {
         opserr << "ECxPCtarget::ECxPCtarget()"
             << " - xPCInitAPI: unable to load xPC Target API" << endln;
-        exit(-1);
+        exit(OF_ReturnType_failed);
     }
     
     // the host application OpenSees needs to access the xPC Target;
@@ -68,7 +68,7 @@ ECxPCtarget::ECxPCtarget(int tag, int pctype, char *ipaddress,
         opserr << "ECxPCtarget::ECxPCtarget()"
             << " - xPCOpenTcpIpPort: error = " << errMsg << endln;
         xPCFreeAPI();
-        exit(-1);
+        exit(OF_ReturnType_failed);
     }
     
     opserr << "*************************************************\n";
@@ -85,7 +85,7 @@ ECxPCtarget::ECxPCtarget(int tag, int pctype, char *ipaddress,
         opserr << "ECxPCtarget::ECxPCtarget() - xPCLoadApp: error = " << errMsg << endln;
         xPCClosePort(port);
         xPCFreeAPI();
-        exit(-1);
+        exit(OF_ReturnType_failed);
     }
     
     // stop the target application on the xPC Target
@@ -95,7 +95,7 @@ ECxPCtarget::ECxPCtarget(int tag, int pctype, char *ipaddress,
         opserr << "ECxPCtarget::ECxPCtarget() - xPCStartApp: error = " << errMsg << endln;
         xPCClosePort(port);
         xPCFreeAPI();
-        exit(-1);
+        exit(OF_ReturnType_failed);
     }
     this->sleep(1000);
     xPCStopApp(port);
@@ -104,7 +104,7 @@ ECxPCtarget::ECxPCtarget(int tag, int pctype, char *ipaddress,
         opserr << "ECxPCtarget::ECxPCtarget() - xPCStopApp: error = " << errMsg << endln;
         xPCClosePort(port);
         xPCFreeAPI();
-        exit(-1);
+        exit(OF_ReturnType_failed);
     }
     
     opserr << "************************************************************************\n";
@@ -181,7 +181,7 @@ int ECxPCtarget::setSize(ID sizeT, ID sizeO)
         sizeO[OF_Resp_Force] == 0) {
         opserr << "ECxPCtarget::setSize - wrong sizeTrial/Out\n"; 
         opserr << "see User Manual.\n";
-        exit(1);
+        exit(OF_ReturnType_failed);
     }
     
     *sizeCtrl = sizeT;
@@ -241,7 +241,7 @@ int ECxPCtarget::setup()
         opserr << "ECxPCtarget::ECxPCtarget() - xPCGetParamIdx - updateFlag: error = " << errMsg << endln;
         xPCClosePort(port);
         xPCFreeAPI();
-        return -1;
+        return OF_ReturnType_failed;
     }
     targetFlagId = xPCGetSignalIdx(port, "xPC HC/targetFlag");
     if (xPCGetLastError())  {
@@ -249,7 +249,7 @@ int ECxPCtarget::setup()
         opserr << "ECxPCtarget::ECxPCtarget() - xPCGetSignalIdx - targetFlag: error = " << errMsg << endln;
         xPCClosePort(port);
         xPCFreeAPI();
-        return -1;
+        return OF_ReturnType_failed;
     }
     targDispId = xPCGetParamIdx(port, "xPC HC/targDsp", "Value");
     if (xPCGetLastError())  {
@@ -257,7 +257,7 @@ int ECxPCtarget::setup()
         opserr << "ECxPCtarget::ECxPCtarget() - xPCGetParamIdx - targDsp: error = " << errMsg << endln;
         xPCClosePort(port);
         xPCFreeAPI();
-        return -1;
+        return OF_ReturnType_failed;
     }
     if (pcType==2 || pcType==3)  {
         targVelId = xPCGetParamIdx(port, "xPC HC/targVel", "Value");
@@ -266,7 +266,7 @@ int ECxPCtarget::setup()
             opserr << "ECxPCtarget::ECxPCtarget() - xPCGetParamIdx - targVel: error = " << errMsg << endln;
             xPCClosePort(port);
             xPCFreeAPI();
-            return -1;
+            return OF_ReturnType_failed;
         }
     }
     if (pcType==3)  {
@@ -276,7 +276,7 @@ int ECxPCtarget::setup()
             opserr << "ECxPCtarget::ECxPCtarget() - xPCGetParamIdx - targAcc: error = " << errMsg << endln;
             xPCClosePort(port);
             xPCFreeAPI();
-            return -1;
+            return OF_ReturnType_failed;
         }
     }
     if ((*sizeDaq)[OF_Resp_Disp]==1)  {
@@ -286,7 +286,7 @@ int ECxPCtarget::setup()
             opserr << "ECxPCtarget::ECxPCtarget() - xPCGetSignalIdx - measDsp: error = " << errMsg << endln;
             xPCClosePort(port);
             xPCFreeAPI();
-            return -1;
+            return OF_ReturnType_failed;
         }
     } else  {
         char dspStr[20], sigStr[3];
@@ -300,7 +300,7 @@ int ECxPCtarget::setup()
                 opserr << "ECxPCtarget::ECxPCtarget() - xPCGetSignalIdx - measDsp: error = " << errMsg << endln;
                 xPCClosePort(port);
                 xPCFreeAPI();
-                return -1;
+                return OF_ReturnType_failed;
             }
         }
     }
@@ -311,7 +311,7 @@ int ECxPCtarget::setup()
             opserr << "ECxPCtarget::ECxPCtarget() - xPCGetSignalIdx - measFrc: error = " << errMsg << endln;
             xPCClosePort(port);
             xPCFreeAPI();
-            return -1;
+            return OF_ReturnType_failed;
         }
     } else  {
         char frcStr[20], sigStr[3];
@@ -325,7 +325,7 @@ int ECxPCtarget::setup()
                 opserr << "ECxPCtarget::ECxPCtarget() - xPCGetSignalIdx - measFrc: error = " << errMsg << endln;
                 xPCClosePort(port);
                 xPCFreeAPI();
-                return -1;
+                return OF_ReturnType_failed;
             }
         }
     }
@@ -343,7 +343,7 @@ int ECxPCtarget::setup()
     if (c == 'c')  {
         xPCClosePort(port);
         xPCFreeAPI();
-        return -1;
+        return OF_ReturnType_failed;
     }
     
     do  {
@@ -354,7 +354,7 @@ int ECxPCtarget::setup()
             opserr << "ECxPCtarget::ECxPCtarget() - xPCStartApp: error = " << errMsg << endln;
             xPCClosePort(port);
             xPCFreeAPI();
-            return -1;
+            return OF_ReturnType_failed;
         }
         
         // reset the updateFlag and targDisp, targVel and targAccel
@@ -365,7 +365,7 @@ int ECxPCtarget::setup()
             opserr << "ECxPCtarget::ECxPCtarget() - xPCSetParam: error = " << errMsg << endln;
             xPCClosePort(port);
             xPCFreeAPI();
-            return -1;
+            return OF_ReturnType_failed;
         }
         xPCSetParam(port, targDispId, targDisp);
         if (xPCGetLastError())  {
@@ -373,7 +373,7 @@ int ECxPCtarget::setup()
             opserr << "ECxPCtarget::ECxPCtarget() - xPCSetParam: error = " << errMsg << endln;
             xPCClosePort(port);
             xPCFreeAPI();
-            return -1;
+            return OF_ReturnType_failed;
         }
         if (pcType==2 || pcType==3)  {
             xPCSetParam(port, targVelId, targVel);
@@ -382,7 +382,7 @@ int ECxPCtarget::setup()
                 opserr << "ECxPCtarget::ECxPCtarget() - xPCSetParam: error = " << errMsg << endln;
                 xPCClosePort(port);
                 xPCFreeAPI();
-                return -1;
+                return OF_ReturnType_failed;
             }
         }
         if (pcType==3)  {
@@ -392,7 +392,7 @@ int ECxPCtarget::setup()
                 opserr << "ECxPCtarget::ECxPCtarget() - xPCSetParam: error = " << errMsg << endln;
                 xPCClosePort(port);
                 xPCFreeAPI();
-                return -1;
+                return OF_ReturnType_failed;
             }
         }
         updateFlag = 1;
@@ -402,7 +402,7 @@ int ECxPCtarget::setup()
             opserr << "ECxPCtarget::ECxPCtarget() - xPCSetParam: error = " << errMsg << endln;
             xPCClosePort(port);
             xPCFreeAPI();
-            return -1;
+            return OF_ReturnType_failed;
         }
         
         // wait until target is reached
@@ -418,7 +418,7 @@ int ECxPCtarget::setup()
                 opserr << "ECxPCtarget::ECxPCtarget() - xPCGetSignal: error = " << errMsg << endln;
                 xPCClosePort(port);
                 xPCFreeAPI();
-                return -1;
+                return OF_ReturnType_failed;
             }
         }
         
@@ -429,7 +429,7 @@ int ECxPCtarget::setup()
             opserr << "ECxPCtarget::ECxPCtarget() - xPCGetSignal: error = " << errMsg << endln;
             xPCClosePort(port);
             xPCFreeAPI();
-            return -1;
+            return OF_ReturnType_failed;
         }
         xPCGetSignals(port, (*sizeDaq)[OF_Resp_Force], measForceId, measForce);
         if (xPCGetLastError())  {
@@ -437,7 +437,7 @@ int ECxPCtarget::setup()
             opserr << "ECxPCtarget::ECxPCtarget() - xPCGetSignal: error = " << errMsg << endln;
             xPCClosePort(port);
             xPCFreeAPI();
-            return -1;
+            return OF_ReturnType_failed;
         }
         
         // reset updateFlag
@@ -448,7 +448,7 @@ int ECxPCtarget::setup()
             opserr << "ECxPCtarget::ECxPCtarget() - xPCSetParam: error = " << errMsg << endln;
             xPCClosePort(port);
             xPCFreeAPI();
-            return -1;
+            return OF_ReturnType_failed;
         }
         // pause for 1msec
         this->sleep(1);
@@ -460,7 +460,7 @@ int ECxPCtarget::setup()
             opserr << "ECxPCtarget::ECxPCtarget() - xPCStopApp: error = " << errMsg << endln;
             xPCClosePort(port);
             xPCFreeAPI();
-            return -1;
+            return OF_ReturnType_failed;
         }
         
         int i;
@@ -485,7 +485,7 @@ int ECxPCtarget::setup()
         if (c == 'c')  {
             xPCClosePort(port);
             xPCFreeAPI();
-            return -1;
+            return OF_ReturnType_failed;
         } else if (c == 'r')  {
             getchar();
         }
@@ -497,7 +497,7 @@ int ECxPCtarget::setup()
             opserr << "ECxPCtarget::ECxPCtarget() - xPCStartApp: error = " << errMsg << endln;
             xPCClosePort(port);
             xPCFreeAPI();
-            return -1;
+            return OF_ReturnType_failed;
         }
         
         opserr << "******************\n";
