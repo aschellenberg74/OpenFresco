@@ -49,6 +49,9 @@ extern int addEEBeamColumn(ClientData clientData, Tcl_Interp *interp,  int argc,
 extern int addEEZeroLength(ClientData clientData, Tcl_Interp *interp,  int argc, 
     TCL_Char **argv, TclModelBuilder*, Domain*, int argStart); 
 
+extern int addEEGeneric(ClientData clientData, Tcl_Interp *interp,  int argc, 
+    TCL_Char **argv, TclModelBuilder*, Domain*, int argStart); 
+
 extern int addEEChevronBrace(ClientData clientData, Tcl_Interp *interp,  int argc, 
     TCL_Char **argv, TclModelBuilder*, Domain*, int argStart); 
 
@@ -76,28 +79,35 @@ int TclExpElementCommand(ClientData clientData, Tcl_Interp *interp, int argc,
     if (strcmp(argv[1],"truss") == 0)  {
         int eleArgStart = 1;
         int result = addEETruss(clientData, interp, argc, argv,
-            theTclBuilder, theTclDomain, eleArgStart);    
+            theTclBuilder, theTclDomain, eleArgStart);
         return result;
     }
     // ----------------------------------------------------------------------------	
     else if (strcmp(argv[1],"beamColumn") == 0) {
         int eleArgStart = 1;
         int result = addEEBeamColumn(clientData, interp, argc, argv,
-            theTclBuilder, theTclDomain, eleArgStart);    
+            theTclBuilder, theTclDomain, eleArgStart);
         return result;
     }
     // ----------------------------------------------------------------------------	
     else if (strcmp(argv[1],"zeroLength") == 0) {
         int eleArgStart = 1;
         int result = addEEZeroLength(clientData, interp, argc, argv,
-            theTclBuilder, theTclDomain, eleArgStart);    
+            theTclBuilder, theTclDomain, eleArgStart);
+        return result;
+    }
+    // ----------------------------------------------------------------------------	
+    else if (strcmp(argv[1],"generic") == 0) {
+        int eleArgStart = 1;
+        int result = addEEGeneric(clientData, interp, argc, argv,
+            theTclBuilder, theTclDomain, eleArgStart);
         return result;
     }
     // ----------------------------------------------------------------------------	
     else if (strcmp(argv[1],"chevronBrace") == 0) {
         int eleArgStart = 1;
         int result = addEEChevronBrace(clientData, interp, argc, argv,
-            theTclBuilder, theTclDomain, eleArgStart);    
+            theTclBuilder, theTclDomain, eleArgStart);
         return result;
     }
     // ----------------------------------------------------------------------------	
