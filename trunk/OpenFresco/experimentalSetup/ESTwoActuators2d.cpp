@@ -43,6 +43,7 @@ ESTwoActuators2d::ESTwoActuators2d(int tag,
     : ExperimentalSetup(tag, control), nlFlag(nlGeomFlag),
     La0(actLength0), La1(actLength1), L(rigidLength)
 {
+    // call setup method
     this->setup();
 }
 
@@ -54,6 +55,9 @@ ESTwoActuators2d::ESTwoActuators2d(const ESTwoActuators2d& es)
     La0    = es.La0;
     La1    = es.La1;
     L      = es.L;
+
+    // call setup method
+    this->setup();
 }
 
 
@@ -79,7 +83,7 @@ int ESTwoActuators2d::setSize(ID sizeT, ID sizeO)
             opserr << "see User Manual.\n";
             opserr << "sizeT = " << sizeT;
             opserr << "sizeO = " << sizeO;
-            exit(1);
+            return OF_ReturnType_failed;
         }
     }
     if((sizeT[OF_Resp_Time] != 0 && sizeT[OF_Resp_Time] != 1) ||
@@ -88,7 +92,7 @@ int ESTwoActuators2d::setSize(ID sizeT, ID sizeO)
         opserr << "see User Manual.\n";
         opserr << "sizeT = " << sizeT;
         opserr << "sizeO = " << sizeO;
-        exit(1);
+        return OF_ReturnType_failed;
     }
     
     return OF_ReturnType_completed;

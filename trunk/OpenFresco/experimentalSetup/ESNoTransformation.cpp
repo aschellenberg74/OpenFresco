@@ -43,7 +43,7 @@ ESNoTransformation::ESNoTransformation(int tag,
     if (!direction)  {
         opserr << "ESNoTransformation::ESNoTransformation()"
             << " - failed to creat direction array\n";
-        exit(-1);
+        exit(OF_ReturnType_failed);
     }
     
     // initialize directions and check for valid values
@@ -56,7 +56,8 @@ ESNoTransformation::ESNoTransformation(int tag,
         }
     }
 
-	this->setup();
+    // call setup method
+    this->setup();
 }
 
 
@@ -67,10 +68,13 @@ ESNoTransformation::ESNoTransformation(const ESNoTransformation& es)
     if (!direction)  {
         opserr << "ESNoTransformation::ESNoTransformation()"
             << " - failed to creat direction array\n";
-        exit(-1);
+        exit(OF_ReturnType_failed);
     }
 
     direction = es.direction;
+
+    // call setup method
+    this->setup();
 }
 
 
@@ -100,7 +104,7 @@ int ESNoTransformation::setSize(ID sizeT, ID sizeO)
                 opserr << "see User Manual.\n";
                 opserr << "sizeT = " << sizeT;
                 opserr << "sizeO = " << sizeO;
-                exit(1);
+                return OF_ReturnType_failed;
             }
         }
     }
@@ -110,7 +114,7 @@ int ESNoTransformation::setSize(ID sizeT, ID sizeO)
         opserr << "see User Manual.\n";
         opserr << "sizeT = " << sizeT;
         opserr << "sizeO = " << sizeO;
-        exit(1);
+        return OF_ReturnType_failed;
     }
 
 	return OF_ReturnType_completed;
