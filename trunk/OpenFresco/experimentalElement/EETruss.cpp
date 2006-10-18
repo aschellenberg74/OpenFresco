@@ -109,7 +109,7 @@ EETruss::~EETruss()
 {
     // invoke the destructor on any objects created by the object
     // that the object still holds a pointer to
-    if (theLoad)
+    if (theLoad != 0)
         delete theLoad;
 }
 
