@@ -251,7 +251,7 @@ int RemoteExpSite::setup()
         msgData(0) = OF_RemoteTest_DIE;
         this->sendID(msgData);
         this->recvID(msgData);
-        exit(1);
+        exit(OF_ReturnType_failed);
     }
 
     return OF_ReturnType_completed;
@@ -477,7 +477,7 @@ int RemoteExpSite::commitState()
         msgData(0) = OF_RemoteTest_DIE;
         this->sendID(msgData);
         this->recvID(msgData);
-        exit(1);
+        exit(OF_ReturnType_failed);
     }
     
     return OF_ReturnType_completed;
