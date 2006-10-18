@@ -120,9 +120,9 @@ EEZeroLength::~EEZeroLength()
 {
     // invoke the destructor on any objects created by the object
     // that the object still holds a pointer to
-    if (dir)
+    if (dir != 0)
         delete dir;
-    if (theLoad)
+    if (theLoad != 0)
         delete theLoad;
 }
 

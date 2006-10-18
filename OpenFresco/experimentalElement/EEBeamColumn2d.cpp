@@ -120,7 +120,7 @@ EEBeamColumn2d::~EEBeamColumn2d()
 {
     // invoke the destructor on any objects created by the object
     // that the object still holds a pointer to
-    if (theCoordTransf)
+    if (theCoordTransf != 0)
         delete theCoordTransf;
 }
 
