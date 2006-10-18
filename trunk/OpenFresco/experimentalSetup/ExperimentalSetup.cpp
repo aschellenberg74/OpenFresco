@@ -275,7 +275,7 @@ int ExperimentalSetup::setDaqResponse(const Vector* disp,
         *dTime = *time;
     }
     
-    return OF_ReturnType_ready;
+    return OF_ReturnType_completed;
 }
 
 

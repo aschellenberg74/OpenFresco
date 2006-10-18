@@ -113,7 +113,6 @@ public:
     
     virtual ID getCtrlSize();
     virtual ID getDaqSize();
-    
     virtual int getCtrlSize(int rType);
     virtual int getDaqSize(int rType);
     
