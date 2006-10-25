@@ -33,8 +33,11 @@
 #include <TclModelBuilder.h>
 #include <ArrayOfTaggedObjects.h>
 
+#ifdef _WIN32
 #include <ECxPCtarget.h>
 #include <ECdSpace.h>
+#endif
+
 #include <ECSimUniaxialMaterials.h>
 
 #include <Vector.h>
@@ -90,6 +93,7 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
 		return TCL_ERROR;
     }
     	
+#ifdef _WIN32
     // ----------------------------------------------------------------------------	
     if (strcmp(argv[1],"xPCtarget") == 0)  {
 		if (argc != 8)  {
@@ -179,6 +183,7 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
             return TCL_ERROR;
         }
     }
+#endif
 
     // ----------------------------------------------------------------------------	
 	else if (strcmp(argv[1],"SimUniaxialMaterials") == 0)  {
