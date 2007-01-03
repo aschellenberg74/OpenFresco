@@ -1,0 +1,16 @@
+#
+# Makefile for eElem
+#
+# Linux
+#
+objects = gElem.o socket.o socketf.o
+#cc = icc
+cc = gcc
+#fc = ifort
+fc = g77
+eElem: $(objects)
+	$(fc) -o gElem $(objects)
+.f.o:
+	$(fc) -c $*.f -o $*.o
+.c.o:
+	$(cc) -c $*.c -o $*.o
