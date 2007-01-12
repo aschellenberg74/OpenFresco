@@ -45,12 +45,12 @@ public:
     // constructors
     EEChevronBrace2d(int tag, int Nd1, int Nd2, int Nd3,
         ExperimentalSite *site,
-        bool iMod = false, bool nlGeomFlag = false,
+        bool iMod = false, bool nlGeom = false,
         double rho1 = 0.0, double rho2 = 0.0);
     EEChevronBrace2d(int tag, int Nd1, int Nd2, int Nd3,
         int port, char *machineInetAddress = 0,
         int dataSize = OF_Network_dataSize,
-        bool iMod = false, bool nlGeomFlag = false,
+        bool iMod = false, bool nlGeom = false,
         double rho1 = 0.0, double rho2 = 0.0);
     
     // destructor
@@ -107,7 +107,7 @@ private:
     ID  connectedExternalNodes;   // contains the tags of the end nodes
     
     bool iMod;          // I-Modification flag
-    bool nlFlag;        // non-linear geometry flag
+    bool nlGeom;        // non-linear geometry flag
     double rho1, rho2;  // masses per unit length
     double L1, L2;      // undeformed length of trusses
     
