@@ -56,10 +56,10 @@ Vector EEChevronBrace2d::theLoad(9);
 // by each object and storing the tags of the end nodes.
 EEChevronBrace2d::EEChevronBrace2d(int tag, int Nd1, int Nd2, int Nd3,
     ExperimentalSite *site,
-    bool iM, bool nlGeomFlag, double r1, double r2)
+    bool iM, bool nlgeom, double r1, double r2)
     : ExperimentalElement(tag, ELE_TAG_EEChevronBrace2d, site),
     connectedExternalNodes(3),
-    iMod(iM), nlFlag(nlGeomFlag),
+    iMod(iM), nlGeom(nlgeom),
     rho1(r1), rho2(r2), L1(0.0), L2(0.0),
     db(0), vb(0), ab(0), t(0),
     dbMeas(0), vbMeas(0), abMeas(0), qMeas(0), tMeas(0),
@@ -126,7 +126,7 @@ EEChevronBrace2d::EEChevronBrace2d(int tag, int Nd1, int Nd2, int Nd3,
     bool iM, bool nlGeomFlag, double r1, double r2)
     : ExperimentalElement(tag, ELE_TAG_EEChevronBrace2d),
     connectedExternalNodes(3),
-    iMod(iM), nlFlag(nlGeomFlag),
+    iMod(iM), nlGeom(nlGeomFlag),
     rho1(r1), rho2(r2), L1(0.0), L2(0.0),
     theSocket(0), sData(0), sendData(0), rData(0), recvData(0),
     db(0), vb(0), ab(0), t(0),
@@ -411,7 +411,7 @@ int EEChevronBrace2d::update()
     (*t)(0) = theDomain->getCurrentTime();
     
     // linear geometry
-    if (nlFlag == false)  {
+    if (nlGeom == false)  {
         // determine global displacements
         const Vector &dsp1 = theNodes[0]->getTrialDisp();
         const Vector &dsp2 = theNodes[1]->getTrialDisp();
