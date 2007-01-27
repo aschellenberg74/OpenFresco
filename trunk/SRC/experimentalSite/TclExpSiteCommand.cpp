@@ -115,19 +115,19 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp, int argc,
         ExperimentalSite *theSite = 0;
 		
 		if (Tcl_GetInt(interp, argv[2], &tag) != TCL_OK)  {
-			opserr << "WARNING invalid LocalSite tag\n";
+			opserr << "WARNING invalid expSite LocalSite tag\n";
 			return TCL_ERROR;		
 		}
 		if (Tcl_GetInt(interp, argv[3], &setupTag) != TCL_OK)  {
 			opserr << "WARNING invalid setupTag\n";
-			opserr << "LocalSite site: " << tag << endln;
+			opserr << "expSite LocalSite " << tag << endln;
 			return TCL_ERROR;	
 		}
 		ExperimentalSetup *theSetup = getExperimentalSetup(setupTag);
 		if (theSetup == 0)  {
 			opserr << "WARNING experimental setup not found\n";
 			opserr << "expSetup: " << setupTag << endln;
-			opserr << "LocalSite site: " << tag << endln;
+			opserr << "expSite LocalSite " << tag << endln;
 			return TCL_ERROR;
 		}
 		
@@ -161,7 +161,7 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp, int argc,
         ExperimentalSite *theSite = 0;
 		
 		if (Tcl_GetInt(interp, argv[2], &tag) != TCL_OK)  {
-			opserr << "WARNING invalid RemoteSite tag\n";
+			opserr << "WARNING invalid expSite RemoteSite tag\n";
 			return TCL_ERROR;		
 		}
 
@@ -170,6 +170,7 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp, int argc,
             strcpy(ipAddr,argv[3]);
             if (Tcl_GetInt(interp, argv[4], &ipPort) != TCL_OK)  {
                 opserr << "WARNING invalid RemoteSite ipPort\n";
+                opserr << "expSite RemoteSite " << tag << endln;
                 return TCL_ERROR;		
             }
             
@@ -180,6 +181,7 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp, int argc,
             if (argc == 6) {
 		        if (Tcl_GetInt(interp, argv[5], &dataSize) != TCL_OK)  {
 			        opserr << "WARNING invalid RemoteSite dataSize\n";
+                    opserr << "expSite RemoteSite " << tag << endln;
 			        return TCL_ERROR;		
 		        }
             }
@@ -190,20 +192,21 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp, int argc,
         if (argc == 7 || argc == 8)  {
             if (Tcl_GetInt(interp, argv[4], &setupTag) != TCL_OK)  {
                 opserr << "WARNING invalid setupTag\n";
-                opserr << "RemoteSite site: " << tag << endln;
+                opserr << "expSite RemoteSite " << tag << endln;
                 return TCL_ERROR;	
             }
             ExperimentalSetup *theSetup = getExperimentalSetup(setupTag);
             if (theSetup == 0)  {
                 opserr << "WARNING experimental setup not found\n";
                 opserr << "expSetup: " << setupTag << endln;
-                opserr << "RemoteSite site: " << tag << endln;
+                opserr << "expSite RemoteSite " << tag << endln;
                 return TCL_ERROR;
             }
             ipAddr = (char *)malloc((strlen(argv[5]) + 1)*sizeof(char));
             strcpy(ipAddr,argv[5]);
             if (Tcl_GetInt(interp, argv[6], &ipPort) != TCL_OK)  {
                 opserr << "WARNING invalid RemoteSite ipPort\n";
+                opserr << "expSite RemoteSite " << tag << endln;
                 return TCL_ERROR;		
             }
 
@@ -214,6 +217,7 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp, int argc,
             if (argc == 8) {
 		        if (Tcl_GetInt(interp, argv[7], &dataSize) != TCL_OK)  {
 			        opserr << "WARNING invalid RemoteSite dataSize\n";
+                    opserr << "expSite RemoteSite " << tag << endln;
 			        return TCL_ERROR;		
 		        }
             }
@@ -249,25 +253,26 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp, int argc,
         ActorExpSite *theSite = 0;
 		
 		if (Tcl_GetInt(interp, argv[2], &tag) != TCL_OK)  {
-			opserr << "WARNING invalid ActorSite tag\n";
+			opserr << "WARNING invalid expSite ActorSite tag\n";
 			return TCL_ERROR;		
 		}
 
         if (strcmp(argv[3], "-setup") == 0)  {
             if (Tcl_GetInt(interp, argv[4], &setupTag) != TCL_OK)  {
                 opserr << "WARNING invalid setupTag\n";
-                opserr << "ActorSite site: " << tag << endln;
+                opserr << "expSite ActorSite " << tag << endln;
                 return TCL_ERROR;	
             }
             ExperimentalSetup *theSetup = getExperimentalSetup(setupTag);
             if (theSetup == 0)  {
                 opserr << "WARNING experimental setup not found\n";
                 opserr << "expSetup: " << setupTag << endln;
-                opserr << "ActorSite site: " << tag << endln;
+                opserr << "expSite ActorSite " << tag << endln;
                 return TCL_ERROR;
             }
             if (Tcl_GetInt(interp, argv[5], &ipPort) != TCL_OK)  {
                 opserr << "WARNING invalid ActorSite ipPort\n";
+                opserr << "expSite ActorSite " << tag << endln;
                 return TCL_ERROR;		
             }
 
@@ -276,6 +281,7 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp, int argc,
             //FEM_ObjectBroker *theBroker = new FEM_ObjectBroker();
             if (theChannel == 0)  {
                 opserr << "WARNING could not create channel\n";
+                opserr << "expSite ActorSite " << tag << endln;
                 return TCL_ERROR;
             }
             else {
@@ -286,6 +292,7 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp, int argc,
             if (argc == 7) {
 		        if (Tcl_GetInt(interp, argv[6], &dataSize) != TCL_OK)  {
 			        opserr << "WARNING invalid ActorSite dataSize\n";
+                    opserr << "expSite ActorSite " << tag << endln;
 			        return TCL_ERROR;		
 		        }
             }
@@ -296,18 +303,19 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp, int argc,
         if (strcmp(argv[3], "-control") == 0)  {
             if (Tcl_GetInt(interp, argv[4], &ctrlTag) != TCL_OK)  {
                 opserr << "WARNING invalid ctrlTag\n";
-                opserr << "ActorSite site: " << tag << endln;
+                opserr << "expSite ActorSite " << tag << endln;
                 return TCL_ERROR;	
             }
             ExperimentalControl *theControl = getExperimentalControl(ctrlTag);
             if (theControl == 0)  {
                 opserr << "WARNING experimental control not found\n";
                 opserr << "expControl: " << ctrlTag << endln;
-                opserr << "ActorSite site: " << tag << endln;
+                opserr << "expSite ActorSite " << tag << endln;
                 return TCL_ERROR;
             }
             if (Tcl_GetInt(interp, argv[5], &ipPort) != TCL_OK)  {
                 opserr << "WARNING invalid ActorSite ipPort\n";
+                opserr << "expSite ActorSite " << tag << endln;
                 return TCL_ERROR;		
             }
             
@@ -316,6 +324,7 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp, int argc,
             //FEM_ObjectBroker *theBroker = new FEM_ObjectBroker();
             if (theChannel == 0)  {
                 opserr << "WARNING could not create channel\n";
+                opserr << "expSite ActorSite " << tag << endln;
                 return TCL_ERROR;
             }
             else {
@@ -326,6 +335,7 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp, int argc,
             if (argc == 7) {
 		        if (Tcl_GetInt(interp, argv[6], &dataSize) != TCL_OK)  {
 			        opserr << "WARNING invalid ActorSite dataSize\n";
+                    opserr << "expSite ActorSite " << tag << endln;
 			        return TCL_ERROR;		
 		        }
             }

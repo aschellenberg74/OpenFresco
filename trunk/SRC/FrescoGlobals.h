@@ -88,6 +88,6 @@ static const int OF_RemoteTest_DIE              = 99;
 static const int OF_RemoteTest_acquire          = 50;
 
 // Network Transmition Data Size
-static const int OF_Network_dataSize = 536; 
+static const int OF_Network_dataSize = 256; //536; 
 
 #endif
