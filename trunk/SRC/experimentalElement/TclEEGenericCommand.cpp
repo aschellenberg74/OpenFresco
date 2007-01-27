@@ -116,7 +116,7 @@ int addEEGeneric(ClientData clientData, Tcl_Interp *interp,  int argc,
         // read the number of dofs per node j
         numDOFj = 0;
         if (strcmp(argv[argi], "-dof") != 0)  {
-		    opserr << "WARNING expect -dof\n";
+		    opserr << "WARNING expect -dof flag\n";
 		    opserr << "expElement generic element: " << tag << endln;
 		    return TCL_ERROR;
 	    }
