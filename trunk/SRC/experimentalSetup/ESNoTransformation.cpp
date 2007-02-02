@@ -64,6 +64,8 @@ ESNoTransformation::ESNoTransformation(int tag,
 ESNoTransformation::ESNoTransformation(const ESNoTransformation& es)
 	: ExperimentalSetup(es)
 {
+    numDir = es.numDir;
+
     direction = new ID(numDir);
     if (!direction)  {
         opserr << "ESNoTransformation::ESNoTransformation()"

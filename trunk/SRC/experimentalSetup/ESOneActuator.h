@@ -57,7 +57,7 @@ public:
     virtual int commitState();
     virtual int setup();
     
-    virtual ExperimentalSetup *getCopy (void);
+    virtual ExperimentalSetup *getCopy();
     
     // public methods for output
     void Print(OPS_Stream &s, int flag = 0);

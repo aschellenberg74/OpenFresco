@@ -36,37 +36,49 @@
 
 
 ESThreeActuators2d::ESThreeActuators2d(int tag,
-    int nlGeomFlag,
     double actLength0, double actLength1, double actLength2,
     double rigidLength0, double rigidLength1,
-    ExperimentalControl* control)
-    : ExperimentalSetup(tag, control), nlFlag(nlGeomFlag),
+    ExperimentalControl* control,
+    int nlgeom, char *posact0, double philocx)
+    : ExperimentalSetup(tag, control),
     La0(actLength0), La1(actLength1), La2(actLength2),
-    L0(rigidLength0), L1(rigidLength1)
+    L0(rigidLength0), L1(rigidLength1),
+    nlGeom(nlgeom), phiLocX(philocx), rotLocX(3,3)
 {
+    strcpy(posAct0,posact0);
+
     // call setup method
     this->setup();
+
+    for (int i=0; i<3; i++)
+        firstWarning[i] = true;
 }
 
 
 ESThreeActuators2d::ESThreeActuators2d(const ESThreeActuators2d& es)
-    : ExperimentalSetup(es)
+    : ExperimentalSetup(es),
+    rotLocX(3,3)
 {
-    nlFlag = es.nlFlag;
-    La0    = es.La0;
-    La1    = es.La1;
-    La2    = es.La2;
-    L0     = es.L0;
-    L1     = es.L1;
+    La0     = es.La0;
+    La1     = es.La1;
+    La2     = es.La2;
+    L0      = es.L0;
+    L1      = es.L1;
+    nlGeom  = es.nlGeom;
+    phiLocX = es.phiLocX;
+    strcpy(posAct0,es.posAct0);
 
     // call setup method
     this->setup();
+
+    for (int i=0; i<3; i++)
+        firstWarning[i] = true;
 }
 
 
 ESThreeActuators2d::~ESThreeActuators2d()
 {
-	// does nothing
+    // does nothing
 }
 
 
@@ -121,6 +133,50 @@ int ESThreeActuators2d::setup()
     (*sizeDaq)[OF_Resp_Time] = 1;
     
     this->setCtrlDaqSize();
+
+    // initialize rotation matrix
+    rotLocX.Zero();
+    double pi = acos(-1.0);
+    rotLocX(0,0) = cos(phiLocX/180.0*pi); rotLocX(0,1) = -sin(phiLocX/180.0*pi);
+    rotLocX(1,0) = sin(phiLocX/180.0*pi); rotLocX(1,1) =  cos(phiLocX/180.0*pi);
+    rotLocX(2,2) = 1.0;
+
+    return OF_ReturnType_completed;
+}
+
+
+int ESThreeActuators2d::transfTrialResponse(const Vector* disp, 
+    const Vector* vel,
+    const Vector* accel,
+    const Vector* force,
+    const Vector* time)
+{
+    // transform data
+    if (disp != 0) {
+        this->transfTrialDisp(disp);
+        for (int i=0; i<(*sizeCtrl)[OF_Resp_Disp]; i++)
+            (*cDisp)[i] *= (*cDispFact)[i];
+    }
+    if (disp != 0 && vel != 0) {
+        this->transfTrialVel(disp,vel);
+        for (int i=0; i<(*sizeCtrl)[OF_Resp_Vel]; i++)
+            (*cVel)[i] *= (*cVelFact)[i];
+    }
+    if (disp != 0 && vel != 0 && accel != 0) {
+        this->transfTrialAccel(disp,vel,accel);
+        for (int i=0; i<(*sizeCtrl)[OF_Resp_Accel]; i++)
+            (*cAccel)[i] *= (*cAccelFact)[i];
+    }
+    if (force != 0) {
+        this->transfTrialForce(force);
+        for (int i=0; i<(*sizeCtrl)[OF_Resp_Force]; i++)
+            (*cForce)[i] *= (*cForceFact)[i];
+    }
+    if (time != 0) {
+        this->transfTrialTime(time);
+        for (int i=0; i<(*sizeCtrl)[OF_Resp_Time]; i++)
+            (*cTime)[i] *= (*cTimeFact)[i];
+    }
     
     return OF_ReturnType_completed;
 }
@@ -129,21 +185,23 @@ int ESThreeActuators2d::setup()
 ExperimentalSetup* ESThreeActuators2d::getCopy()
 {
 	ESThreeActuators2d *theCopy = new ESThreeActuators2d(*this);
-	
-	return theCopy;
+    
+    return theCopy;
 }
 
 
 void ESThreeActuators2d::Print(OPS_Stream &s, int flag)
 {
-	s << "ExperimentalSetup: " << this->getTag(); 
-	s << " type: ESThreeActuators2d\n";
-    s << " nlGeomFlag  : " << nlFlag << endln;
-    s << " actLength0  : " << La0 << endln;
-    s << " actLength1  : " << La1 << endln;
-    s << " actLength2  : " << La2 << endln;
-	s << " rigidLength0: " << L0 << endln;
-	s << " rigidLength1: " << L1 << endln;
+    s << "ExperimentalSetup: " << this->getTag(); 
+    s << " type: ESThreeActuators2d\n";
+    s << " actLength1  : " << La0 << endln;
+    s << " actLength2  : " << La1 << endln;
+    s << " actLength3  : " << La2 << endln;
+    s << " rigidLength1: " << L0 << endln;
+    s << " rigidLength2: " << L1 << endln;
+    s << " nlGeom      : " << nlGeom << endln;
+    s << " posAct1     : " << posAct0 << endln;
+    s << " phiLocX     : " << phiLocX << endln;
     if(theControl != 0)  {
         s << "\tExperimentalControl tag: " << theControl->getTag();
         s << *theControl;
@@ -152,38 +210,46 @@ void ESThreeActuators2d::Print(OPS_Stream &s, int flag)
 
 
 int ESThreeActuators2d::transfTrialDisp(const Vector* disp)
-{  
+{
+    // rotate direction
+    static Vector d(3);
+    d = rotLocX*(*disp);
+
     // linear geometry, horizontal actuator left
-    if (nlFlag == 0)  {
+    if (nlGeom == 0 && strcmp(posAct0,"left") == 0)  {
         // actuator 0
-        (*cDisp)(0) = -(*disp)(1);
+        (*cDisp)(0) = d(0);
         // actuator 1
-        (*cDisp)(1) = (*disp)(0) - L0*(*disp)(2);
+        (*cDisp)(1) = d(1) - L0*d(2);
         // actuator 2
-        (*cDisp)(2) = (*disp)(0) + L1*(*disp)(2);
+        (*cDisp)(2) = d(1) + L1*d(2);
     }
     // linear geometry, horizontal actuator right
-    else if (nlFlag == 1)  {
+    else if (nlGeom == 0 && strcmp(posAct0,"right") == 0)  {
         // actuator 0
-        (*cDisp)(0) = (*disp)(1);
+        (*cDisp)(0) = -d(0);
         // actuator 1
-        (*cDisp)(1) = (*disp)(0) - L0*(*disp)(2);
+        (*cDisp)(1) = d(1) - L0*d(2);
         // actuator 2
-        (*cDisp)(2) = (*disp)(0) + L1*(*disp)(2);
+        (*cDisp)(2) = d(1) + L1*d(2);
     }
     // nonlinear geometry, horizontal actuator left
-    else if (nlFlag == 2)  {
-        opserr << "ESThreeActuators2d::transfTrialDisp() - "
-            << "nonlinear geometry with horizontal actuator left "
-            << "not implemented yet";
-        return OF_ReturnType_failed;
+    else if (nlGeom == 1 && strcmp(posAct0,"left") == 0)  {
+        // actuator 0
+        (*cDisp)(0) = pow(pow(d(0)+L0*(1.0-cos(d(2)))+La0,2.0)+pow(d(1)-L0*sin(d(2)),2.0),0.5)-La0;
+        // actuator 1
+        (*cDisp)(1) = pow(pow(d(0)+L0*(1.0-cos(d(2))),2.0)+pow(d(1)-L0*sin(d(2))+La1,2.0),0.5)-La1;
+        // actuator 2
+        (*cDisp)(2) = pow(pow(d(0)-L1*(1.0-cos(d(2))),2.0)+pow(d(1)+L1*sin(d(2))+La2,2.0),0.5)-La2;
     }
     // nonlinear geometry, horizontal actuator right
-    else if (nlFlag == 3)  {
-        opserr << "ESThreeActuators2d::transfTrialDisp() - "
-            << "nonlinear geometry with horizontal actuator right "
-            << "not implemented yet";
-        return OF_ReturnType_failed;
+    else if (nlGeom == 1 && strcmp(posAct0,"right") == 0)  {
+        // actuator 0
+        (*cDisp)(0) = pow(pow(d(0)-L1*(1.0-cos(d(2)))-La0,2.0)+pow(d(1)+L1*sin(d(2)),2.0),0.5)-La0;
+        // actuator 1
+        (*cDisp)(1) = pow(pow(d(0)+L0*(1.0-cos(d(2))),2.0)+pow(d(1)-L0*sin(d(2))+La1,2.0),0.5)-La1;
+        // actuator 2
+        (*cDisp)(2) = pow(pow(d(0)-L1*(1.0-cos(d(2))),2.0)+pow(d(1)+L1*sin(d(2))+La2,2.0),0.5)-La2;        
     }
     
     return OF_ReturnType_completed;
@@ -191,38 +257,54 @@ int ESThreeActuators2d::transfTrialDisp(const Vector* disp)
 
 
 int ESThreeActuators2d::transfTrialVel(const Vector* vel)
+{
+    return OF_ReturnType_completed;
+}
+
+
+int ESThreeActuators2d::transfTrialVel(const Vector* disp,
+    const Vector* vel)
 {  
+    // rotate direction
+    static Vector d(3), v(3);
+    d = rotLocX*(*disp);
+    v = rotLocX*(*vel);
+
     // linear geometry, horizontal actuator left
-    if (nlFlag == 0)  {
+    if (nlGeom == 0 && strcmp(posAct0,"left") == 0)  {
         // actuator 0
-        (*cVel)(0) = -(*vel)(1);
+        (*cVel)(0) = v(0);
         // actuator 1
-        (*cVel)(1) = (*vel)(0) - L0*(*vel)(2);
+        (*cVel)(1) = v(1) - L0*v(2);
         // actuator 2
-        (*cVel)(2) = (*vel)(0) + L1*(*vel)(2);
+        (*cVel)(2) = v(1) + L1*v(2);
     }
     // linear geometry, horizontal actuator right
-    else if (nlFlag == 1)  {
+    else if (nlGeom == 0 && strcmp(posAct0,"right") == 0)  {
         // actuator 0
-        (*cVel)(0) = (*vel)(1);
+        (*cVel)(0) = -v(0);
         // actuator 1
-        (*cVel)(1) = (*vel)(0) - L0*(*vel)(2);
+        (*cVel)(1) = v(1) - L0*v(2);
         // actuator 2
-        (*cVel)(2) = (*vel)(0) + L1*(*vel)(2);
+        (*cVel)(2) = v(1) + L1*v(2);
     }
     // nonlinear geometry, horizontal actuator left
-    else if (nlFlag == 2)  {
-        opserr << "ESThreeActuators2d::transfTrialVel() - "
-            << "nonlinear geometry with horizontal actuator left "
-            << "not implemented yet";
-        return OF_ReturnType_failed;
+    else if (nlGeom == 1 && strcmp(posAct0,"left") == 0)  {
+        // actuator 0
+        (*cVel)(0) = 0.5*(2.0*(d(0)+L0*(1.0-cos(d(2)))+La0)*(v(0)+L0*sin(d(2))*v(2))+2.0*(d(1)-L0*sin(d(2)))*(v(1)-L0*cos(d(2))*v(2)))/pow(pow(d(0)+L0*(1.0-cos(d(2)))+La0,2.0)+pow(d(1)-L0*sin(d(2)),2.0),0.5);
+        // actuator 1
+        (*cVel)(1) = 0.5*(2.0*(d(0)+L0*(1.0-cos(d(2))))*(v(0)+L0*sin(d(2))*v(2))+2.0*(d(1)-L0*sin(d(2))+La1)*(v(1)-L0*cos(d(2))*v(2)))/pow(pow(d(0)+L0*(1.0-cos(d(2))),2.0)+pow(d(1)-L0*sin(d(2))+La1,2.0),0.5);
+        // actuator 2
+        (*cVel)(2) = 0.5*(2.0*(d(0)-L1*(1.0-cos(d(2))))*(v(0)-L1*sin(d(2))*v(2))+2.0*(d(1)+L1*sin(d(2))+La2)*(v(1)+L1*cos(d(2))*v(2)))/pow(pow(d(0)-L1*(1.0-cos(d(2))),2.0)+pow(d(1)+L1*sin(d(2))+La2,2.0),0.5);
     }
     // nonlinear geometry, horizontal actuator right
-    else if (nlFlag == 3)  {
-        opserr << "ESThreeActuators2d::transfTrialVel() - "
-            << "nonlinear geometry with horizontal actuator right "
-            << "not implemented yet";
-        return OF_ReturnType_failed;
+    else if (nlGeom == 1 && strcmp(posAct0,"right") == 0)  {
+        // actuator 0
+        (*cVel)(0) = 0.5*(2.0*(d(0)-L1*(1.0-cos(d(2)))-La0)*(v(0)-L1*sin(d(2))*v(2))+2.0*(d(1)+L1*sin(d(2)))*(v(1)+L1*cos(d(2))*v(2)))/pow(pow(d(0)-L1*(1.0-cos(d(2)))-La0,2.0)+pow(d(1)+L1*sin(d(2)),2.0),0.5);
+        // actuator 1
+        (*cVel)(1) = 0.5*(2*(d(0)+L0*(1.0-cos(d(2))))*(v(0)+L0*sin(d(2))*v(2))+2*(d(1)-L0*sin(d(2))+La1)*(v(1)-L0*cos(d(2))*v(2)))/pow(pow(d(0)+L0*(1.0-cos(d(2))),2)+pow(d(1)-L0*sin(d(2))+La1,2),0.5);
+        // actuator 2
+        (*cVel)(2) = 0.5*(2.0*(d(0)-L1*(1.0-cos(d(2))))*(v(0)-L1*sin(d(2))*v(2))+2.0*(d(1)+L1*sin(d(2))+La2)*(v(1)+L1*cos(d(2))*v(2)))/pow(pow(d(0)-L1*(1.0-cos(d(2))),2.0)+pow(d(1)+L1*sin(d(2))+La2,2.0),0.5);
     }
     
     return OF_ReturnType_completed;
@@ -230,38 +312,56 @@ int ESThreeActuators2d::transfTrialVel(const Vector* vel)
 
 
 int ESThreeActuators2d::transfTrialAccel(const Vector* accel)
+{
+    return OF_ReturnType_completed;
+}
+
+
+int ESThreeActuators2d::transfTrialAccel(const Vector* disp,
+    const Vector* vel,
+    const Vector* accel)
 {  
+    // rotate direction
+    static Vector d(3), v(3), a(3);
+    d = rotLocX*(*disp);
+    v = rotLocX*(*vel);
+    a = rotLocX*(*accel);
+
     // linear geometry, horizontal actuator left
-    if (nlFlag == 0)  {
+    if (nlGeom == 0 && strcmp(posAct0,"left") == 0)  {
         // actuator 0
-        (*cAccel)(0) = -(*accel)(1);
+        (*cAccel)(0) = a(0);
         // actuator 1
-        (*cAccel)(1) = (*accel)(0) - L0*(*accel)(2);
+        (*cAccel)(1) = a(1) - L0*a(2);
         // actuator 2
-        (*cAccel)(2) = (*accel)(0) + L1*(*accel)(2);
+        (*cAccel)(2) = a(1) + L1*a(2);
     }
     // linear geometry, horizontal actuator right
-    else if (nlFlag == 1)  {
+    else if (nlGeom == 0 && strcmp(posAct0,"right") == 0)  {
         // actuator 0
-        (*cAccel)(0) = (*accel)(1);
+        (*cAccel)(0) = -a(0);
         // actuator 1
-        (*cAccel)(1) = (*accel)(0) - L0*(*accel)(2);
+        (*cAccel)(1) = a(1) - L0*a(2);
         // actuator 2
-        (*cAccel)(2) = (*accel)(0) + L1*(*accel)(2);
+        (*cAccel)(2) = a(1) + L1*a(2);
     }
     // nonlinear geometry, horizontal actuator left
-    else if (nlFlag == 2)  {
-        opserr << "ESThreeActuators2d::transfTrialAccel() - "
-            << "nonlinear geometry with horizontal actuator left "
-            << "not implemented yet";
-        return OF_ReturnType_failed;
+    else if (nlGeom == 1 && strcmp(posAct0,"left") == 0)  {
+        // actuator 0
+        (*cAccel)(0) = -0.25*pow(2.0*(d(0)+L0*(1.0-cos(d(2)))+La0)*(v(0)+L0*sin(d(2))*v(2))+2.0*(d(1)-L0*sin(d(2)))*(v(1)-L0*cos(d(2))*v(2)),2.0)/pow(pow(d(0)+L0*(1.0-cos(d(2)))+La0,2.0)+pow(d(1)-L0*sin(d(2)),2.0),1.5)+0.5*(2.0*pow(v(0)+L0*sin(d(2))*v(2),2.0)+2.0*(d(0)+L0*(1.0-cos(d(2)))+La0)*(a(0)+L0*cos(d(2))*pow(v(2),2.0)+L0*sin(d(2))*a(2))+2.0*pow(v(1)-L0*cos(d(2))*v(2),2.0)+2.0*(d(1)-L0*sin(d(2)))*(a(1)+L0*sin(d(2))*pow(v(2),2.0)-L0*cos(d(2))*a(2)))/pow(pow(d(0)+L0*(1.0-cos(d(2)))+La0,2.0)+pow(d(1)-L0*sin(d(2)),2.0),0.5);
+        // actuator 1
+        (*cAccel)(1) = -0.25*pow(2.0*(d(0)+L0*(1.0-cos(d(2))))*(v(0)+L0*sin(d(2))*v(2))+2.0*(d(1)-L0*sin(d(2))+La1)*(v(1)-L0*cos(d(2))*v(2)),2.0)/pow(pow(d(0)+L0*(1.0-cos(d(2))),2.0)+pow(d(1)-L0*sin(d(2))+La1,2.0),1.5)+0.5*(2.0*pow(v(0)+L0*sin(d(2))*v(2),2.0)+2.0*(d(0)+L0*(1.0-cos(d(2))))*(a(0)+L0*cos(d(2))*pow(v(2),2.0)+L0*sin(d(2))*a(2))+2.0*pow(v(1)-L0*cos(d(2))*v(2),2.0)+2.0*(d(1)-L0*sin(d(2))+La1)*(a(1)+L0*sin(d(2))*pow(v(2),2.0)-L0*cos(d(2))*a(2)))/pow(pow(d(0)+L0*(1.0-cos(d(2))),2.0)+pow(d(1)-L0*sin(d(2))+La1,2.0),0.5);
+        // actuator 2
+        (*cAccel)(2) = -0.25*pow(2.0*(d(0)-L1*(1.0-cos(d(2))))*(v(0)-L1*sin(d(2))*v(2))+2.0*(d(1)+L1*sin(d(2))+La2)*(v(1)+L1*cos(d(2))*v(2)),2.0)/pow(pow(d(0)-L1*(1.0-cos(d(2))),2.0)+pow(d(1)+L1*sin(d(2))+La2,2.0),1.5)+0.5*(2.0*pow(v(0)-L1*sin(d(2))*v(2),2.0)+2.0*(d(0)-L1*(1.0-cos(d(2))))*(a(0)-L1*cos(d(2))*pow(v(2),2.0)-L1*sin(d(2))*a(2))+2.0*pow(v(1)+L1*cos(d(2))*v(2),2.0)+2.0*(d(1)+L1*sin(d(2))+La2)*(a(1)-L1*sin(d(2))*pow(v(2),2.0)+L1*cos(d(2))*a(2)))/pow(pow(d(0)-L1*(1.0-cos(d(2))),2.0)+pow(d(1)+L1*sin(d(2))+La2,2.0),0.5);
     }
     // nonlinear geometry, horizontal actuator right
-    else if (nlFlag == 3)  {
-        opserr << "ESThreeActuators2d::transfTrialAccel() - "
-            << "nonlinear geometry with horizontal actuator right "
-            << "not implemented yet";
-        return OF_ReturnType_failed;
+    else if (nlGeom == 1 && strcmp(posAct0,"right") == 0)  {
+        // actuator 0
+        (*cAccel)(0) = -0.25*pow(2.0*(d(0)-L1*(1.0-cos(d(2)))-La0)*(v(0)-L1*sin(d(2))*v(2))+2.0*(d(1)+L1*sin(d(2)))*(v(1)+L1*cos(d(2))*v(2)),2.0)/pow(pow(d(0)-L1*(1.0-cos(d(2)))-La0,2.0)+pow(d(1)+L1*sin(d(2)),2.0),1.5)+0.5*(2.0*pow(v(0)-L1*sin(d(2))*v(2),2.0)+2.0*(d(0)-L1*(1.0-cos(d(2)))-La0)*(a(0)-L1*cos(d(2))*pow(v(2),2.0)-L1*sin(d(2))*a(2))+2.0*pow(v(1)+L1*cos(d(2))*v(2),2.0)+2.0*(d(1)+L1*sin(d(2)))*(a(1)-L1*sin(d(2))*pow(v(2),2.0)+L1*cos(d(2))*a(2)))/pow(pow(d(0)-L1*(1.0-cos(d(2)))-La0,2.0)+pow(d(1)+L1*sin(d(2)),2.0),0.5);
+        // actuator 1
+        (*cAccel)(1) = -0.25*pow(2.0*(d(0)+L0*(1.0-cos(d(2))))*(v(0)+L0*sin(d(2))*v(2))+2.0*(d(1)-L0*sin(d(2))+La1)*(v(1)-L0*cos(d(2))*v(2)),2.0)/pow(pow(d(0)+L0*(1.0-cos(d(2))),2.0)+pow(d(1)-L0*sin(d(2))+La1,2.0),1.5)+0.5*(2.0*pow(v(0)+L0*sin(d(2))*v(2),2.0)+2.0*(d(0)+L0*(1.0-cos(d(2))))*(a(0)+L0*cos(d(2))*pow(v(2),2.0)+L0*sin(d(2))*a(2))+2.0*pow(v(1)-L0*cos(d(2))*v(2),2.0)+2.0*(d(1)-L0*sin(d(2))+La1)*(a(1)+L0*sin(d(2))*pow(v(2),2.0)-L0*cos(d(2))*a(2)))/pow(pow(d(0)+L0*(1.0-cos(d(2))),2.0)+pow(d(1)-L0*sin(d(2))+La1,2.0),0.5);
+        // actuator 2
+        (*cAccel)(2) = -0.25*pow(2.0*(d(0)-L1*(1.0-cos(d(2))))*(v(0)-L1*sin(d(2))*v(2))+2.0*(d(1)+L1*sin(d(2))+La2)*(v(1)+L1*cos(d(2))*v(2)),2.0)/pow(pow(d(0)-L1*(1.0-cos(d(2))),2.0)+pow(d(1)+L1*sin(d(2))+La2,2.0),1.5)+0.5*(2.0*pow(v(0)-L1*sin(d(2))*v(2),2.0)+2.0*(d(0)-L1*(1.0-cos(d(2))))*(a(0)-L1*cos(d(2))*pow(v(2),2.0)-L1*sin(d(2))*a(2))+2.0*pow(v(1)+L1*cos(d(2))*v(2),2.0)+2.0*(d(1)+L1*sin(d(2))+La2)*(a(1)-L1*sin(d(2))*pow(v(2),2.0)+L1*cos(d(2))*a(2)))/pow(pow(d(0)-L1*(1.0-cos(d(2))),2.0)+pow(d(1)+L1*sin(d(2))+La2,2.0),0.5);
     }
     
     return OF_ReturnType_completed;
@@ -270,37 +370,57 @@ int ESThreeActuators2d::transfTrialAccel(const Vector* accel)
 
 int ESThreeActuators2d::transfTrialForce(const Vector* force)
 {  
+    // rotate direction
+    static Vector f(3);
+    f = rotLocX*(*force);
+
     // linear geometry, horizontal actuator left
-    if (nlFlag == 0)  {
+    if (nlGeom == 0 && strcmp(posAct0,"left") == 0)  {
         // actuator 0
-        (*cForce)(0) = -(*force)(1);
+        (*cForce)(0) = f(0);
         // actuator 1
-        (*cForce)(1) = 1.0/(L0+L1)*(L1*(*force)(0) - (*force)(2));
+        (*cForce)(1) = 1.0/(L0+L1)*(L1*f(1) - f(2));
         // actuator 2
-        (*cForce)(2) = 1.0/(L0+L1)*(L0*(*force)(0) + (*force)(2));
+        (*cForce)(2) = 1.0/(L0+L1)*(L0*f(1) + f(2));
     }
     // linear geometry, horizontal actuator right
-    else if (nlFlag == 1)  {
+    else if (nlGeom == 0 && strcmp(posAct0,"right") == 0)  {
         // actuator 0
-        (*cForce)(0) = (*force)(1);
+        (*cForce)(0) = -f(0);
         // actuator 1
-        (*cForce)(1) = 1.0/(L0+L1)*(L1*(*force)(0) - (*force)(2));
+        (*cForce)(1) = 1.0/(L0+L1)*(L1*f(1) - f(2));
         // actuator 2
-        (*cForce)(2) = 1.0/(L0+L1)*(L0*(*force)(0) + (*force)(2));
+        (*cForce)(2) = 1.0/(L0+L1)*(L0*f(1) + f(2));
     }
     // nonlinear geometry, horizontal actuator left
-    else if (nlFlag == 2)  {
-        opserr << "ESThreeActuators2d::transfTrialForce() - "
-            << "nonlinear geometry with horizontal actuator left "
-            << "not implemented yet";
-        return OF_ReturnType_failed;
+    else if (nlGeom == 1 && strcmp(posAct0,"left") == 0)  {
+        if (firstWarning[0] == true)  {
+            opserr << "WARNING ESThreeActuators2d::transfTrialForce() - "
+                << "nonlinear geometry with horizontal actuator left "
+                << "not implemented yet. Using linear geometry instead.\n\n";
+            firstWarning[0] = false;
+        }
+        // actuator 0
+        (*cForce)(0) = f(0);
+        // actuator 1
+        (*cForce)(1) = 1.0/(L0+L1)*(L1*f(1) - f(2));
+        // actuator 2
+        (*cForce)(2) = 1.0/(L0+L1)*(L0*f(1) + f(2));
     }
     // nonlinear geometry, horizontal actuator right
-    else if (nlFlag == 3)  {
-        opserr << "ESThreeActuators2d::transfTrialForce() - "
-            << "nonlinear geometry with horizontal actuator right "
-            << "not implemented yet";
-        return OF_ReturnType_failed;
+    else if (nlGeom == 1 && strcmp(posAct0,"right") == 0)  {
+        if (firstWarning[0] == true)  {
+            opserr << "WARNING ESThreeActuators2d::transfTrialForce() - "
+                << "nonlinear geometry with horizontal actuator right "
+                << "not implemented yet. Using linear geometry instead.\n\n";
+            firstWarning[0] = false;
+        }
+        // actuator 0
+        (*cForce)(0) = -f(0);
+        // actuator 1
+        (*cForce)(1) = 1.0/(L0+L1)*(L1*f(1) - f(2));
+        // actuator 2
+        (*cForce)(2) = 1.0/(L0+L1)*(L0*f(1) + f(2));
     }
     
     return OF_ReturnType_completed;
@@ -318,32 +438,105 @@ int ESThreeActuators2d::transfTrialTime(const Vector* time)
 int ESThreeActuators2d::transfDaqDisp(Vector* disp)
 {
     // linear geometry, horizontal actuator left
-    if (nlFlag == 0)  {
-        (*disp)(0) = 1.0/(L0+L1)*(L1*(*dDisp)(1) + L0*(*dDisp)(2));
-        (*disp)(1) = -(*dDisp)(0);
+    if (nlGeom == 0 && strcmp(posAct0,"left") == 0)  {
+        (*disp)(0) = (*dDisp)(0);
+        (*disp)(1) = 1.0/(L0+L1)*(L1*(*dDisp)(1) + L0*(*dDisp)(2));
         (*disp)(2) = 1.0/(L0+L1)*(-(*dDisp)(1) + (*dDisp)(2));
     }
     // linear geometry, horizontal actuator right
-    else if (nlFlag == 1)  {
-        (*disp)(0) = 1.0/(L0+L1)*(L1*(*dDisp)(1) + L0*(*dDisp)(2));
-        (*disp)(1) = (*dDisp)(0);
+    else if (nlGeom == 0 && strcmp(posAct0,"right") == 0)  {
+        (*disp)(0) = -(*dDisp)(0);
+        (*disp)(1) = 1.0/(L0+L1)*(L1*(*dDisp)(1) + L0*(*dDisp)(2));
         (*disp)(2) = 1.0/(L0+L1)*(-(*dDisp)(1) + (*dDisp)(2));
     }
     // nonlinear geometry, horizontal actuator left
-    else if (nlFlag == 2)  {
-        opserr << "ESThreeActuators2d::transfDaqDisp() - "
-            << "nonlinear geometry with horizontal actuator left "
-            << "not implemented yet";
-        return OF_ReturnType_failed;
+    else if (nlGeom == 1 && strcmp(posAct0,"left") == 0)  {
+        Vector F(2), theta(2), dTheta(2);
+        Matrix DF(2,2);
+        int iter = 0;
+        int maxIter = 15;
+        double tol = 1E-9;
+        
+        double d0 = La0 + (*dDisp)(0);
+        double d1 = La1 + (*dDisp)(1);
+        double d2 = La2 + (*dDisp)(2);
+        
+        theta(0) = (*dDisp)(0)/La1;
+        theta(1) = (*dDisp)(0)/La2;
+        
+        do  {
+            F(0) = pow(d0,2.0) - pow(d1*sin(theta(0))+La0,2.0) - pow(d1*cos(theta(0))-La1,2.0);
+            F(1) = pow(L0+L1,2.0) - pow(d2*sin(theta(1))+L0+L1-d1*sin(theta(0)),2.0) - pow(d2*cos(theta(1))-d1*cos(theta(0)),2.0);
+            
+            DF(0,0) = -2.0*d1*(La0*cos(theta(0))+La1*sin(theta(0)));
+            DF(0,1) = 0.0;
+            DF(1,0) = 2.0*d1*((L0+L1)*cos(theta(0))-d2*sin(theta(0)-theta(1)));
+            DF(1,1) = 2.0*d2*(-(L0+L1)*cos(theta(1))+d1*sin(theta(0)-theta(1)));
+            
+            // Newton's method
+            dTheta = F/DF;
+            theta -= dTheta;
+            iter++;
+        }  while ((dTheta.Norm() >= tol) && (iter <= maxIter));
+        
+        // issue warning if iteration did not converge
+        if (iter >= maxIter)   {
+            opserr << "WARNING ESThreeActuators2d::transfDaqDisp() - "
+                << "did not find the angle theta after "
+                << iter << " iterations and norm: " << dTheta.Norm() << endln;
+        }
+
+        (*disp)(2) = atan((d2*cos(theta(1))-d1*cos(theta(0)))/(d2*sin(theta(1))+L0+L1-d1*sin(theta(0))));
+        (*disp)(0) = d1*sin(theta(0))+L0*cos((*disp)(2))-L0;
+        (*disp)(1) = d1*cos(theta(0))+L0*sin((*disp)(2))-La1;
     }
     // nonlinear geometry, horizontal actuator right
-    else if (nlFlag == 3)  {
-        opserr << "ESThreeActuators2d::transfDaqDisp() - "
-            << "nonlinear geometry with horizontal actuator right "
-            << "not implemented yet";
-        return OF_ReturnType_failed;
+    else if (nlGeom == 1 && strcmp(posAct0,"right") == 0)  {
+        Vector F(2), theta(2), dTheta(2);
+        Matrix DF(2,2);
+        int iter = 0;
+        int maxIter = 15;
+        double tol = 1E-9;
+        
+        double d0 = La0 + (*dDisp)(0);
+        double d1 = La1 + (*dDisp)(1);
+        double d2 = La2 + (*dDisp)(2);
+        
+        theta(0) = (*dDisp)(0)/La1;
+        theta(1) = (*dDisp)(0)/La2;
+        
+        do  {
+            F(0) = pow(L0+L1,2.0) - pow(-d2*sin(theta(1))+L0+L1+d1*sin(theta(0)),2.0) - pow(d2*cos(theta(1))-d1*cos(theta(0)),2.0);
+            F(1) = pow(d0,2.0) - pow(-d2*sin(theta(1))-La0,2.0) - pow(d2*cos(theta(1))-La1,2.0);
+            
+            DF(0,0) = 2.0*d1*(-(L0+L1)*cos(theta(0))-d2*sin(theta(0)-theta(1)));
+            DF(0,1) = 2.0*d2*((L0+L1)*cos(theta(1))+d1*sin(theta(0)-theta(1)));
+            DF(1,0) = 0.0;
+            DF(1,1) = -2.0*d2*(La0*cos(theta(1))+La1*sin(theta(1)));
+            
+            // Newton’s method
+            dTheta = F/DF;
+            theta -= dTheta;
+            iter++;
+        }  while ((dTheta.Norm() >= tol) && (iter <= maxIter));
+        
+        // issue warning if iteration did not converge
+        if (iter >= maxIter)   {
+            opserr << "WARNING ESThreeActuators2d::transfDaqDisp() - "
+                << "did not find the angle theta after "
+                << iter << " iterations and norm: " << dTheta.Norm() << endln;
+        }
+
+        (*disp)(2) = atan((d2*cos(theta(1))-d1*cos(theta(0)))/(-d2*sin(theta(1))+L0+L1+d1*sin(theta(0))));
+        (*disp)(0) = -d1*sin(theta(0))+L0*cos((*disp)(2))-L0;
+        (*disp)(1) = d1*cos(theta(0))+L0*sin((*disp)(2))-La1;
     }
     
+    // rotate direction if necessary
+    if (phiLocX != 0.0)  {
+        (*disp) = rotLocX^(*disp);
+    }
+
     return OF_ReturnType_completed;
 }
 
@@ -351,32 +544,47 @@ int ESThreeActuators2d::transfDaqDisp(Vector* disp)
 int ESThreeActuators2d::transfDaqVel(Vector* vel)
 {
     // linear geometry, horizontal actuator left
-    if (nlFlag == 0)  {
-        (*vel)(0) = 1.0/(L0+L1)*(L1*(*dVel)(1) + L0*(*dVel)(2));
-        (*vel)(1) = -(*dVel)(0);
+    if (nlGeom == 0 && strcmp(posAct0,"left") == 0)  {
+        (*vel)(0) = (*dVel)(0);
+        (*vel)(1) = 1.0/(L0+L1)*(L1*(*dVel)(1) + L0*(*dVel)(2));
         (*vel)(2) = 1.0/(L0+L1)*(-(*dVel)(1) + (*dVel)(2));
     }
     // linear geometry, horizontal actuator right
-    else if (nlFlag == 1)  {
-        (*vel)(0) = 1.0/(L0+L1)*(L1*(*dVel)(1) + L0*(*dVel)(2));
-        (*vel)(1) = (*dVel)(0);
+    else if (nlGeom == 0 && strcmp(posAct0,"right") == 0)  {
+        (*vel)(0) = -(*dVel)(0);
+        (*vel)(1) = 1.0/(L0+L1)*(L1*(*dVel)(1) + L0*(*dVel)(2));
         (*vel)(2) = 1.0/(L0+L1)*(-(*dVel)(1) + (*dVel)(2));
     }
     // nonlinear geometry, horizontal actuator left
-    else if (nlFlag == 2)  {
-        opserr << "ESThreeActuators2d::transfDaqVel() - "
-            << "nonlinear geometry with horizontal actuator left "
-            << "not implemented yet";
-        return OF_ReturnType_failed;
+    else if (nlGeom == 1 && strcmp(posAct0,"left") == 0)  {
+        if (firstWarning[1] == true)  {
+            opserr << "WARNING ESThreeActuators2d::transfDaqVel() - "
+                << "nonlinear geometry with horizontal actuator left "
+                << "not implemented yet. Using linear geometry instead.\n\n";
+            firstWarning[1] = false;
+        }
+        (*vel)(0) = (*dVel)(0);
+        (*vel)(1) = 1.0/(L0+L1)*(L1*(*dVel)(1) + L0*(*dVel)(2));
+        (*vel)(2) = 1.0/(L0+L1)*(-(*dVel)(1) + (*dVel)(2));
     }
     // nonlinear geometry, horizontal actuator right
-    else if (nlFlag == 3)  {
-        opserr << "ESThreeActuators2d::transfDaqVel() - "
-            << "nonlinear geometry with horizontal actuator right "
-            << "not implemented yet";
-        return OF_ReturnType_failed;
+    else if (nlGeom == 1 && strcmp(posAct0,"right") == 0)  {
+        if (firstWarning[1] == true)  {
+            opserr << "WARNING ESThreeActuators2d::transfDaqVel() - "
+                << "nonlinear geometry with horizontal actuator right "
+                << "not implemented yet. Using linear geometry instead.\n\n";
+            firstWarning[1] = false;
+        }
+        (*vel)(0) = -(*dVel)(0);
+        (*vel)(1) = 1.0/(L0+L1)*(L1*(*dVel)(1) + L0*(*dVel)(2));
+        (*vel)(2) = 1.0/(L0+L1)*(-(*dVel)(1) + (*dVel)(2));
     }
     
+    // rotate direction if necessary
+    if (phiLocX != 0.0)  {
+        (*vel) = rotLocX^(*vel);
+    }
+
     return OF_ReturnType_completed;
 }
 
@@ -384,32 +592,47 @@ int ESThreeActuators2d::transfDaqVel(Vector* vel)
 int ESThreeActuators2d::transfDaqAccel(Vector* accel)
 {
     // linear geometry, horizontal actuator left
-    if (nlFlag == 0)  {
-        (*accel)(0) = 1.0/(L0+L1)*(L1*(*dAccel)(1) + L0*(*dAccel)(2));
-        (*accel)(1) = -(*dAccel)(0);
+    if (nlGeom == 0 && strcmp(posAct0,"left") == 0)  {
+        (*accel)(0) = (*dAccel)(0);
+        (*accel)(1) = 1.0/(L0+L1)*(L1*(*dAccel)(1) + L0*(*dAccel)(2));
         (*accel)(2) = 1.0/(L0+L1)*(-(*dAccel)(1) + (*dAccel)(2));
     }
     // linear geometry, horizontal actuator right
-    else if (nlFlag == 1)  {
-        (*accel)(0) = 1.0/(L0+L1)*(L1*(*dAccel)(1) + L0*(*dAccel)(2));
-        (*accel)(1) = (*dAccel)(0);
+    else if (nlGeom == 0 && strcmp(posAct0,"right") == 0)  {
+        (*accel)(0) = -(*dAccel)(0);
+        (*accel)(1) = 1.0/(L0+L1)*(L1*(*dAccel)(1) + L0*(*dAccel)(2));
         (*accel)(2) = 1.0/(L0+L1)*(-(*dAccel)(1) + (*dAccel)(2));
     }
     // nonlinear geometry, horizontal actuator left
-    else if (nlFlag == 2)  {
-        opserr << "ESThreeActuators2d::transfDaqAccel() - "
-            << "nonlinear geometry with horizontal actuator left "
-            << "not implemented yet";
-        return OF_ReturnType_failed;
+    else if (nlGeom == 1 && strcmp(posAct0,"left") == 0)  {
+        if (firstWarning[2] == true)  {
+            opserr << "WARNING ESThreeActuators2d::transfDaqAccel() - "
+                << "nonlinear geometry with horizontal actuator left "
+                << "not implemented yet. Using linear geometry instead.\n\n";
+            firstWarning[2] = false;
+        }
+        (*accel)(0) = (*dAccel)(0);
+        (*accel)(1) = 1.0/(L0+L1)*(L1*(*dAccel)(1) + L0*(*dAccel)(2));
+        (*accel)(2) = 1.0/(L0+L1)*(-(*dAccel)(1) + (*dAccel)(2));
     }
     // nonlinear geometry, horizontal actuator right
-    else if (nlFlag == 3)  {
-        opserr << "ESThreeActuators2d::transfDaqAccel() - "
-            << "nonlinear geometry with horizontal actuator right "
-            << "not implemented yet";
-        return OF_ReturnType_failed;
+    else if (nlGeom == 1 && strcmp(posAct0,"right") == 0)  {
+        if (firstWarning[2] == true)  {
+            opserr << "WARNING ESThreeActuators2d::transfDaqAccel() - "
+                << "nonlinear geometry with horizontal actuator right "
+                << "not implemented yet. Using linear geometry instead.\n\n";
+            firstWarning[2] = false;
+        }
+        (*accel)(0) = -(*dAccel)(0);
+        (*accel)(1) = 1.0/(L0+L1)*(L1*(*dAccel)(1) + L0*(*dAccel)(2));
+        (*accel)(2) = 1.0/(L0+L1)*(-(*dAccel)(1) + (*dAccel)(2));
     }
     
+    // rotate direction if necessary
+    if (phiLocX != 0.0)  {
+        (*accel) = rotLocX^(*accel);
+    }
+
     return OF_ReturnType_completed;
 }
 
@@ -417,32 +640,125 @@ int ESThreeActuators2d::transfDaqAccel(Vector* accel)
 int ESThreeActuators2d::transfDaqForce(Vector* force)
 {
     // linear geometry, horizontal actuator left
-    if (nlFlag == 0)  {
-        (*force)(0) = (*dForce)(1) + (*dForce)(2);
-        (*force)(1) = -(*dForce)(0);
+    if (nlGeom == 0 && strcmp(posAct0,"left") == 0)  {
+        (*force)(0) = (*dForce)(0);
+        (*force)(1) = (*dForce)(1) + (*dForce)(2);
         (*force)(2) = -L0*(*dForce)(1) + L1*(*dForce)(2);
     }
     // linear geometry, horizontal actuator right
-    else if (nlFlag == 1)  {
-        (*force)(0) = (*dForce)(1) + (*dForce)(2);
-        (*force)(1) = (*dForce)(0);
+    else if (nlGeom == 0 && strcmp(posAct0,"right") == 0)  {
+        (*force)(0) = -(*dForce)(0);
+        (*force)(1) = (*dForce)(1) + (*dForce)(2);
         (*force)(2) = -L0*(*dForce)(1) + L1*(*dForce)(2);
     }
     // nonlinear geometry, horizontal actuator left
-    else if (nlFlag == 2)  {
-        opserr << "ESThreeActuators2d::transfDaqForce() - "
-            << "nonlinear geometry with horizontal actuator left "
-            << "not implemented yet";
-        return OF_ReturnType_failed;
+    else if (nlGeom == 1 && strcmp(posAct0,"left") == 0)  {
+        Vector F(2), theta(2), dTheta(2);
+        Matrix DF(2,2);
+        int iter = 0;
+        int maxIter = 15;
+        double tol = 1E-9;
+        
+        double d0 = La0 + (*dDisp)(0);
+        double d1 = La1 + (*dDisp)(1);
+        double d2 = La2 + (*dDisp)(2);
+        
+        theta(0) = (*dDisp)(0)/La1;
+        theta(1) = (*dDisp)(0)/La2;
+        
+        do  {
+            F(0) = pow(d0,2.0) - pow(d1*sin(theta(0))+La0,2.0) - pow(d1*cos(theta(0))-La1,2.0);
+            F(1) = pow(L0+L1,2.0) - pow(d2*sin(theta(1))+L0+L1-d1*sin(theta(0)),2.0) - pow(d2*cos(theta(1))-d1*cos(theta(0)),2.0);
+            
+            DF(0,0) = -2.0*d1*(La0*cos(theta(0))+La1*sin(theta(0)));
+            DF(0,1) = 0.0;
+            DF(1,0) = 2.0*d1*((L0+L1)*cos(theta(0))-d2*sin(theta(0)-theta(1)));
+            DF(1,1) = 2.0*d2*(-(L0+L1)*cos(theta(1))+d1*sin(theta(0)-theta(1)));
+            
+            // Newton's method
+            dTheta = F/DF;
+            theta -= dTheta;
+            iter++;
+        }  while ((dTheta.Norm() >= tol) && (iter <= maxIter));
+        
+        // issue warning if iteration did not converge
+        if (iter >= maxIter)   {
+            opserr << "WARNING ESThreeActuators2d::transfDaqForce() - "
+                << "did not find the angle theta after "
+                << iter << " iterations and norm: " << dTheta.Norm() << endln;
+        }
+
+        double disp2 = atan((d2*cos(theta(1))-d1*cos(theta(0)))/(-d2*sin(theta(1))+L0+L1+d1*sin(theta(0))));
+
+        static Vector fx(3), fy(3);
+        fx(0) = (*dForce)(0)*(d1*sin(theta(0))+La0)/d0;
+        fx(1) = (*dForce)(1)*sin(theta(0));
+        fx(2) = (*dForce)(2)*sin(theta(1));
+        fy(0) = (*dForce)(0)*(d1*cos(theta(0))-La1)/d0;
+        fy(1) = (*dForce)(1)*cos(theta(0));
+        fy(2) = (*dForce)(2)*cos(theta(1));
+        
+        (*force)(0) = fx(0) + fx(1) + fx(2);
+        (*force)(1) = fy(0) + fy(1) + fy(2);
+        (*force)(2) = ((fx(0)+fx(1))*L0 - fx(2)*L1)*sin(disp2) - ((fy(0)+fy(1))*L0 - fy(2)*L1)*cos(disp2);
     }
     // nonlinear geometry, horizontal actuator right
-    else if (nlFlag == 3)  {
-        opserr << "ESThreeActuators2d::transfDaqForce() - "
-            << "nonlinear geometry with horizontal actuator right "
-            << "not implemented yet";
-        return OF_ReturnType_failed;
+    else if (nlGeom == 1 && strcmp(posAct0,"right") == 0)  {
+        Vector F(2), theta(2), dTheta(2);
+        Matrix DF(2,2);
+        int iter = 0;
+        int maxIter = 15;
+        double tol = 1E-9;
+        
+        double d0 = La0 + (*dDisp)(0);
+        double d1 = La1 + (*dDisp)(1);
+        double d2 = La2 + (*dDisp)(2);
+        
+        theta(0) = (*dDisp)(0)/La1;
+        theta(1) = (*dDisp)(0)/La2;
+        
+        do  {
+            F(0) = pow(L0+L1,2.0) - pow(-d2*sin(theta(1))+L0+L1+d1*sin(theta(0)),2.0) - pow(d2*cos(theta(1))-d1*cos(theta(0)),2.0);
+            F(1) = pow(d0,2.0) - pow(-d2*sin(theta(1))-La0,2.0) - pow(d2*cos(theta(1))-La1,2.0);
+            
+            DF(0,0) = 2.0*d1*(-(L0+L1)*cos(theta(0))-d2*sin(theta(0)-theta(1)));
+            DF(0,1) = 2.0*d2*((L0+L1)*cos(theta(1))+d1*sin(theta(0)-theta(1)));
+            DF(1,0) = 0.0;
+            DF(1,1) = -2.0*d2*(La0*cos(theta(1))+La1*sin(theta(1)));
+            
+            // Newton’s method
+            dTheta = F/DF;
+            theta -= dTheta;
+            iter++;
+        }  while ((dTheta.Norm() >= tol) && (iter <= maxIter));
+        
+        // issue warning if iteration did not converge
+        if (iter >= maxIter)   {
+            opserr << "WARNING ESThreeActuators2d::transfDaqForce() - "
+                << "did not find the angle theta after "
+                << iter << " iterations and norm: " << dTheta.Norm() << endln;
+        }
+
+        double disp2 = atan((d2*cos(theta(1))-d1*cos(theta(0)))/(-d2*sin(theta(1))+L0+L1+d1*sin(theta(0))));
+
+        static Vector fx(3), fy(3);
+        fx(0) = (*dForce)(0)*(d2*sin(theta(1))+La0)/d0;
+        fx(1) = (*dForce)(1)*sin(theta(0));
+        fx(2) = (*dForce)(2)*sin(theta(1));
+        fy(0) = (*dForce)(0)*(d2*cos(theta(1))-La1)/d0;
+        fy(1) = (*dForce)(1)*cos(theta(0));
+        fy(2) = (*dForce)(2)*cos(theta(1));
+
+        (*force)(0) = -fx(0) - fx(1) - fx(2);
+        (*force)(1) = fy(0) + fy(1) + fy(2);
+        (*force)(2) = ((fx(0)+fx(2))*L1 - fx(1)*L0)*sin(disp2) + ((fy(0)+fy(2))*L1 - fy(1)*L0)*cos(disp2);
     }
     
+    // rotate direction if necessary
+    if (phiLocX != 0.0)  {
+        (*force) = rotLocX^(*force);
+    }
+
     return OF_ReturnType_completed;
 }
 
