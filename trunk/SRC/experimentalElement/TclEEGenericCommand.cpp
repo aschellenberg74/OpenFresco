@@ -223,21 +223,17 @@ int addEEGeneric(ClientData clientData, Tcl_Interp *interp,  int argc,
 	// now create the EEGeneric
     if (theSite != 0) {
         if (mass == 0) {
-            opserr << "no mass\n";
 	        theExpElement = new EEGeneric(tag, nodes, dofs, theSite, iMod);
         }
         else {
-            opserr << "got mass " << *mass << endln;
             theExpElement = new EEGeneric(tag, nodes, dofs, theSite, iMod, mass);
         }
     }
     else {
         if (mass == 0) {
-            opserr << "no mass\n";
 	        theExpElement = new EEGeneric(tag, nodes, dofs, ipPort, ipAddr, dataSize, iMod);
         }
         else {
-            opserr << "got mass " << *mass << endln;
             theExpElement = new EEGeneric(tag, nodes, dofs, ipPort, ipAddr, dataSize, iMod, mass);
         }
     }
