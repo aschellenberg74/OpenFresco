@@ -37,16 +37,17 @@
 
 #include "ExperimentalSetup.h"
 #include <ExperimentalControl.h>
+#include <Matrix.h>
 
 class ESTwoActuators2d : public ExperimentalSetup
 {
 public:
     // constructors
     ESTwoActuators2d(int tag,
-        int nlGeomFlag,
         double actLength0, double actLength1,
         double rigidLength,
-        ExperimentalControl* control = 0);
+        ExperimentalControl* control = 0,
+        int nlGeom = 0, double phiLocX = 0.0);
     ESTwoActuators2d(const ESTwoActuators2d& es);
     
     // destructor
@@ -57,7 +58,14 @@ public:
     virtual int commitState();
     virtual int setup();
     
-    virtual ExperimentalSetup *getCopy (void);
+    // public methods to transform the responses
+    virtual int transfTrialResponse(const Vector* disp,
+        const Vector* vel,
+        const Vector* accel,
+        const Vector* force,
+        const Vector* time);
+
+    virtual ExperimentalSetup *getCopy();
     
     // public methods for output
     void Print(OPS_Stream &s, int flag = 0);
@@ -77,10 +85,22 @@ protected:
     virtual int transfDaqTime(Vector* time);
     
 private:
-    int nlFlag;     // non-linear geometry flag
-    double La0;     // length of actuator 0
-    double La1;     // length of actuator 1
-    double L;       // rigid link length
+    // private tranformation methods
+    virtual int transfTrialVel(const Vector* disp,
+        const Vector* vel);
+    virtual int transfTrialAccel(const Vector* disp,
+        const Vector* vel,
+        const Vector* accel);
+
+    double La0;         // length of actuator 0
+    double La1;         // length of actuator 1
+    double L;           // rigid link length
+    int nlGeom;         // non-linear geometry (0: linear, 1: nonlinear)
+    double phiLocX;     // angle of local x axis w.r.t actuator 0 [deg]
+
+    Matrix rotLocX;     // rotation matrix
+
+    bool firstWarning[3];
 };
 
 #endif

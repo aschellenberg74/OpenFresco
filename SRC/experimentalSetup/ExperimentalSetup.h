@@ -97,7 +97,7 @@ public:
     
     virtual int commitState();
     
-    virtual ExperimentalSetup *getCopy (void) = 0;
+    virtual ExperimentalSetup *getCopy() = 0;
     
     void setCtrlDispFactor(const Vector& f);
     void setCtrlVelFactor(const Vector& f);

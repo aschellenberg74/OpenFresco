@@ -152,8 +152,8 @@ ESAggregator::ESAggregator(int tag, int nSetups,
         }
         // control vectors
         cDispAll[i] = 0;
-        if (sizeTrialAll[i](OF_Resp_Disp) != 0) {
-            cDispAll[i] = new Vector(sizeTrialAll[i](OF_Resp_Disp));
+        if (sizeCtrlAll[i](OF_Resp_Disp) != 0) {
+            cDispAll[i] = new Vector(sizeCtrlAll[i](OF_Resp_Disp));
         }
         cVelAll[i] = 0;
         if (sizeCtrlAll[i](OF_Resp_Vel) != 0) {
@@ -249,56 +249,56 @@ ESAggregator::~ESAggregator()
 {
     // invoke the destructor on any objects created by the object
     // that the object still holds a pointer to
-    if(theSetups != 0)
+    if (theSetups != 0)
         delete [] theSetups;
 
-    if(sizeCtrlAll != 0)
+    if (sizeCtrlAll != 0)
         delete [] sizeCtrlAll;
-    if(sizeDaqAll != 0)
+    if (sizeDaqAll != 0)
         delete [] sizeDaqAll;
 
-    if(tDispAll != 0)
+    if (tDispAll != 0)
         delete [] tDispAll;
-    if(tVelAll != 0)
+    if (tVelAll != 0)
         delete [] tVelAll;
-    if(tAccelAll != 0)
+    if (tAccelAll != 0)
         delete [] tAccelAll;
-    if(tForceAll != 0)
+    if (tForceAll != 0)
         delete [] tForceAll;
-    if(tTimeAll != 0)
+    if (tTimeAll != 0)
         delete [] tTimeAll;
 
-    if(cDispAll != 0)
+    if (cDispAll != 0)
         delete [] cDispAll;
-    if(cVelAll != 0)
+    if (cVelAll != 0)
         delete [] cVelAll;
-    if(cAccelAll != 0)
+    if (cAccelAll != 0)
         delete [] cAccelAll;
-    if(cForceAll != 0)
+    if (cForceAll != 0)
         delete [] cForceAll;
-    if(cTimeAll != 0)
+    if (cTimeAll != 0)
         delete [] cTimeAll;
 
-    if(dDispAll != 0)
+    if (dDispAll != 0)
         delete [] dDispAll;
-    if(dVelAll != 0)
+    if (dVelAll != 0)
         delete [] dVelAll;
-    if(dAccelAll != 0)
+    if (dAccelAll != 0)
         delete [] dAccelAll;
-    if(dForceAll != 0)
+    if (dForceAll != 0)
         delete [] dForceAll;
-    if(dTimeAll != 0)
+    if (dTimeAll != 0)
         delete [] dTimeAll;
 
-    if(oDispAll != 0)
+    if (oDispAll != 0)
         delete [] oDispAll;
-    if(oVelAll != 0)
+    if (oVelAll != 0)
         delete [] oVelAll;
-    if(oAccelAll != 0)
+    if (oAccelAll != 0)
         delete [] oAccelAll;
-    if(oForceAll != 0)
+    if (oForceAll != 0)
         delete [] oForceAll;
-    if(oTimeAll != 0)
+    if (oTimeAll != 0)
         delete [] oTimeAll;
 }
 
