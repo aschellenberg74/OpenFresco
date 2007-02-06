@@ -27,9 +27,9 @@
 // Created: 09/06
 // Revision: A
 //
-// Description: This file contains the implementation of the EEChevronBrace2d class.
+// Description: This file contains the implementation of the EEInvertedVBrace2d class.
 
-#include "EEChevronBrace2d.h"
+#include "EEInvertedVBrace2d.h"
 
 #include <ArrayOfTaggedObjects.h>
 #include <Domain.h>
@@ -47,27 +47,28 @@
 
 
 // initialize the class wide variables
-Matrix EEChevronBrace2d::theMatrix(9,9);
-Vector EEChevronBrace2d::theVector(9);
-Vector EEChevronBrace2d::theLoad(9);
+Matrix EEInvertedVBrace2d::theMatrix(9,9);
+Vector EEInvertedVBrace2d::theVector(9);
+Vector EEInvertedVBrace2d::theLoad(9);
 
 
 // responsible for allocating the necessary space needed
 // by each object and storing the tags of the end nodes.
-EEChevronBrace2d::EEChevronBrace2d(int tag, int Nd1, int Nd2, int Nd3,
+EEInvertedVBrace2d::EEInvertedVBrace2d(int tag, int Nd1, int Nd2, int Nd3,
     ExperimentalSite *site,
     bool iM, bool nlgeom, double r1, double r2)
-    : ExperimentalElement(tag, ELE_TAG_EEChevronBrace2d, site),
+    : ExperimentalElement(tag, ELE_TAG_EEInvertedVBrace2d, site),
     connectedExternalNodes(3),
     iMod(iM), nlGeom(nlgeom),
     rho1(r1), rho2(r2), L1(0.0), L2(0.0),
     db(0), vb(0), ab(0), t(0),
     dbMeas(0), vbMeas(0), abMeas(0), qMeas(0), tMeas(0),
-    dbTarg(3), dbPast(3), kbInit(3,3), T(3,9)
+    dbTarg(3), vbTarg(3), abTarg(3),
+    dbPast(3), kbInit(3,3), T(3,9)
 {
     // ensure the connectedExternalNode ID is of correct size & set values
     if (connectedExternalNodes.Size() != 3)  {
-        opserr << "EEChevronBrace2d::EEChevronBrace2d() - element: "
+        opserr << "EEInvertedVBrace2d::EEInvertedVBrace2d() - element: "
             <<  tag << " failed to create an ID of size 3\n";
         exit(-1);
     }
@@ -115,27 +116,30 @@ EEChevronBrace2d::EEChevronBrace2d(int tag, int Nd1, int Nd2, int Nd3,
     
     // initialize additional vectors
     dbTarg.Zero();
+    vbTarg.Zero();
+    abTarg.Zero();
     dbPast.Zero();
 }
 
 
 // responsible for allocating the necessary space needed
 // by each object and storing the tags of the end nodes.
-EEChevronBrace2d::EEChevronBrace2d(int tag, int Nd1, int Nd2, int Nd3,
+EEInvertedVBrace2d::EEInvertedVBrace2d(int tag, int Nd1, int Nd2, int Nd3,
     int port, char *machineInetAddr, int dataSize,
     bool iM, bool nlGeomFlag, double r1, double r2)
-    : ExperimentalElement(tag, ELE_TAG_EEChevronBrace2d),
+    : ExperimentalElement(tag, ELE_TAG_EEInvertedVBrace2d),
     connectedExternalNodes(3),
     iMod(iM), nlGeom(nlGeomFlag),
     rho1(r1), rho2(r2), L1(0.0), L2(0.0),
     theSocket(0), sData(0), sendData(0), rData(0), recvData(0),
     db(0), vb(0), ab(0), t(0),
     dbMeas(0), vbMeas(0), abMeas(0), qMeas(0), tMeas(0),
-    dbTarg(3), dbPast(3), kbInit(3,3), T(3,9)
+    dbTarg(3), vbTarg(3), abTarg(3),
+    dbPast(3), kbInit(3,3), T(3,9)
 {
     // ensure the connectedExternalNode ID is of correct size & set values
     if (connectedExternalNodes.Size() != 3)  {
-        opserr << "EEChevronBrace2d::EEChevronBrace2d() - element: "
+        opserr << "EEInvertedVBrace2d::EEInvertedVBrace2d() - element: "
             <<  tag << " failed to create an ID of size 3\n";
         exit(-1);
     }
@@ -211,12 +215,14 @@ EEChevronBrace2d::EEChevronBrace2d(int tag, int Nd1, int Nd2, int Nd3,
     
     // initialize additional vectors
     dbTarg.Zero();
+    vbTarg.Zero();
+    abTarg.Zero();
     dbPast.Zero();
 }
 
 
 // delete must be invoked on any objects created by the object.
-EEChevronBrace2d::~EEChevronBrace2d()
+EEInvertedVBrace2d::~EEInvertedVBrace2d()
 {
     // invoke the destructor on any objects created by the object
     // that the object still holds a pointer to
@@ -258,38 +264,38 @@ EEChevronBrace2d::~EEChevronBrace2d()
 }
 
 
-int EEChevronBrace2d::getNumExternalNodes() const
+int EEInvertedVBrace2d::getNumExternalNodes() const
 {
     return 3;
 }
 
 
-const ID& EEChevronBrace2d::getExternalNodes() 
+const ID& EEInvertedVBrace2d::getExternalNodes() 
 {
     return connectedExternalNodes;
 }
 
 
-Node** EEChevronBrace2d::getNodePtrs() 
+Node** EEInvertedVBrace2d::getNodePtrs() 
 {
     return theNodes;
 }
 
 
-int EEChevronBrace2d::getNumDOF() 
+int EEInvertedVBrace2d::getNumDOF() 
 {
     return 9;
 }
 
 
-int EEChevronBrace2d::getNumBasicDOF() 
+int EEInvertedVBrace2d::getNumBasicDOF() 
 {
     return 3;
 }
 
 
 // to set a link to the enclosing Domain and to set the node pointers.
-void EEChevronBrace2d::setDomain(Domain *theDomain)
+void EEInvertedVBrace2d::setDomain(Domain *theDomain)
 {
     // check Domain is not null - invoked when object removed from a domain
     if (!theDomain)  {
@@ -311,16 +317,16 @@ void EEChevronBrace2d::setDomain(Domain *theDomain)
     // if can't find all three - send a warning message
     if (!theNodes[0] || !theNodes[1] || !theNodes[2])  {
         if (!theNodes[0])  {
-            opserr << "EEChevronBrace2d::setDomain() - Nd1: " 
+            opserr << "EEInvertedVBrace2d::setDomain() - Nd1: " 
                 << Nd1 << " does not exist in the model for ";
         } else if (!theNodes[1])  {
-            opserr << "EEChevronBrace2d::setDomain() - Nd2: " 
+            opserr << "EEInvertedVBrace2d::setDomain() - Nd2: " 
                 << Nd2 << " does not exist in the model for ";
         } else  {
-            opserr << "EEChevronBrace2d::setDomain() - Nd3: " 
+            opserr << "EEInvertedVBrace2d::setDomain() - Nd3: " 
                 << Nd3 << " does not exist in the model for ";
         }
-        opserr << "EEChevronBrace2d ele: " << this->getTag() << endln;
+        opserr << "EEInvertedVBrace2d ele: " << this->getTag() << endln;
         
         return;
     }
@@ -332,17 +338,17 @@ void EEChevronBrace2d::setDomain(Domain *theDomain)
     
     // if differing dof at the ends - print a warning message
     if (dofNd1 != 3)  {
-        opserr << "EEChevronBrace2d::setDomain() - node 1: "
+        opserr << "EEInvertedVBrace2d::setDomain() - node 1: "
             << connectedExternalNodes(0) << " has incorrect number of DOF (not 3)\n";
         return;
     }
     if (dofNd2 != 3)  {
-        opserr << "EEChevronBrace2d::setDomain() - node 2: "
+        opserr << "EEInvertedVBrace2d::setDomain() - node 2: "
             << connectedExternalNodes(1) << " has incorrect number of DOF (not 3)\n";
         return;
     }
     if (dofNd3 != 3)  {
-        opserr << "EEChevronBrace2d::setDomain() - node 3: "
+        opserr << "EEInvertedVBrace2d::setDomain() - node 3: "
             << connectedExternalNodes(1) << " has incorrect number of DOF (not 3)\n";
         return;
     }
@@ -365,12 +371,12 @@ void EEChevronBrace2d::setDomain(Domain *theDomain)
     L2 = sqrt(dx2[0]*dx2[0] + dx2[1]*dx2[1]);
     
     if (L1 == 0.0)  {
-        opserr <<"EEChevronBrace2d::setDomain() - element: "
+        opserr <<"EEInvertedVBrace2d::setDomain() - element: "
             << this->getTag() << " has diagonal 1 with zero length\n";
         return;
     }
     if (L2 == 0.0)  {
-        opserr <<"EEChevronBrace2d::setDomain() - element: "
+        opserr <<"EEInvertedVBrace2d::setDomain() - element: "
             << this->getTag() << " has diagonal 2 with zero length\n";
         return;
     }
@@ -386,7 +392,7 @@ void EEChevronBrace2d::setDomain(Domain *theDomain)
 }   	 
 
 
-int EEChevronBrace2d::commitState()
+int EEInvertedVBrace2d::commitState()
 {
     int rValue = 0;
     
@@ -402,7 +408,7 @@ int EEChevronBrace2d::commitState()
 }
 
 
-int EEChevronBrace2d::update()
+int EEInvertedVBrace2d::update()
 {
     int rValue = 0;
 
@@ -459,10 +465,10 @@ int EEChevronBrace2d::update()
 }
 
 
-int EEChevronBrace2d::setInitialStiff(const Matrix& kbinit)
+int EEInvertedVBrace2d::setInitialStiff(const Matrix& kbinit)
 {
     if (kbinit.noRows() != 3 || kbinit.noCols() != 3)  {
-        opserr << "EEChevronBrace2d::setInitialStiff() - " 
+        opserr << "EEInvertedVBrace2d::setInitialStiff() - " 
             << "matrix size is incorrect for element: "
             << this->getTag() << endln;
         return -1;
@@ -477,7 +483,7 @@ int EEChevronBrace2d::setInitialStiff(const Matrix& kbinit)
 }
 
 
-const Matrix& EEChevronBrace2d::getMass()
+const Matrix& EEInvertedVBrace2d::getMass()
 {
     // zero the matrix
     theMatrix.Zero();
@@ -498,15 +504,15 @@ const Matrix& EEChevronBrace2d::getMass()
 }
 
 
-void EEChevronBrace2d::zeroLoad()
+void EEInvertedVBrace2d::zeroLoad()
 {
     theLoad.Zero();
 }
 
 
-int EEChevronBrace2d::addLoad(ElementalLoad *theLoad, double loadFactor)
+int EEInvertedVBrace2d::addLoad(ElementalLoad *theLoad, double loadFactor)
 {  
-    opserr <<"EEChevronBrace2d::addLoad() - "
+    opserr <<"EEInvertedVBrace2d::addLoad() - "
         << "load type unknown for element: "
         << this->getTag() << endln;
     
@@ -514,7 +520,7 @@ int EEChevronBrace2d::addLoad(ElementalLoad *theLoad, double loadFactor)
 }
 
 
-int EEChevronBrace2d::addInertiaLoadToUnbalance(const Vector &accel)
+int EEInvertedVBrace2d::addInertiaLoadToUnbalance(const Vector &accel)
 {
     // check for quick return
     if ((L1 == 0.0 || rho1 == 0) && (L2 == 0 || rho2 == 0.0))  {
@@ -527,7 +533,7 @@ int EEChevronBrace2d::addInertiaLoadToUnbalance(const Vector &accel)
     const Vector &Raccel3 = theNodes[2]->getRV(accel);
     
     if (3 != Raccel1.Size() || 3 != Raccel2.Size() || 3 != Raccel3.Size())  {
-        opserr << "EEChevronBrace2d::addInertiaLoadToUnbalance() - "
+        opserr << "EEInvertedVBrace2d::addInertiaLoadToUnbalance() - "
             << "matrix and vector sizes are incompatible\n";
         return -1;
     }
@@ -547,7 +553,7 @@ int EEChevronBrace2d::addInertiaLoadToUnbalance(const Vector &accel)
 }
 
 
-const Vector& EEChevronBrace2d::getResistingForce()
+const Vector& EEInvertedVBrace2d::getResistingForce()
 {
     // get the nodal coordinates
     const Vector &end1Crd = theNodes[0]->getCrds();
@@ -611,6 +617,8 @@ const Vector& EEChevronBrace2d::getResistingForce()
     
     // save corresponding target displacements for recorder
     dbTarg = (*db);
+    vbTarg = (*vb);
+    abTarg = (*ab);
 
     // determine resisting forces in global system and account for load-cell
     // cross-talk by averaging between shear and axial loads
@@ -634,7 +642,7 @@ const Vector& EEChevronBrace2d::getResistingForce()
 }
 
 
-const Vector& EEChevronBrace2d::getResistingForceIncInertia()
+const Vector& EEInvertedVBrace2d::getResistingForceIncInertia()
 {	
     theVector = this->getResistingForce();
     
@@ -662,7 +670,7 @@ const Vector& EEChevronBrace2d::getResistingForceIncInertia()
 }
 
 
-const Vector& EEChevronBrace2d::getTime()
+const Vector& EEInvertedVBrace2d::getTime()
 {	
     if (theSite != 0)  {
         (*tMeas) = theSite->getTime();
@@ -677,7 +685,7 @@ const Vector& EEChevronBrace2d::getTime()
 }
 
 
-const Vector& EEChevronBrace2d::getBasicDisp()
+const Vector& EEInvertedVBrace2d::getBasicDisp()
 {	
     if (theSite != 0)  {
         (*dbMeas) = theSite->getDisp();
@@ -692,7 +700,7 @@ const Vector& EEChevronBrace2d::getBasicDisp()
 }
 
 
-const Vector& EEChevronBrace2d::getBasicVel()
+const Vector& EEInvertedVBrace2d::getBasicVel()
 {	
     if (theSite != 0)  {
         (*vbMeas) = theSite->getVel();
@@ -707,7 +715,7 @@ const Vector& EEChevronBrace2d::getBasicVel()
 }
 
 
-const Vector& EEChevronBrace2d::getBasicAccel()
+const Vector& EEInvertedVBrace2d::getBasicAccel()
 {	
     if (theSite != 0)  {
         (*abMeas) = theSite->getAccel();
@@ -722,14 +730,14 @@ const Vector& EEChevronBrace2d::getBasicAccel()
 }
 
 
-int EEChevronBrace2d::sendSelf(int commitTag, Channel &theChannel)
+int EEInvertedVBrace2d::sendSelf(int commitTag, Channel &theChannel)
 {
     // has not been implemented yet.....
     return 0;
 }
 
 
-int EEChevronBrace2d::recvSelf(int commitTag, Channel &theChannel,
+int EEInvertedVBrace2d::recvSelf(int commitTag, Channel &theChannel,
     FEM_ObjectBroker &theBroker)
 {
     // has not been implemented yet.....
@@ -737,7 +745,7 @@ int EEChevronBrace2d::recvSelf(int commitTag, Channel &theChannel,
 }
 
 
-int EEChevronBrace2d::displaySelf(Renderer &theViewer,
+int EEInvertedVBrace2d::displaySelf(Renderer &theViewer,
     int displayMode, float fact)
 {
     // first set the quantity to be displayed at the nodes
@@ -767,12 +775,12 @@ int EEChevronBrace2d::displaySelf(Renderer &theViewer,
 }
 
 
-void EEChevronBrace2d::Print(OPS_Stream &s, int flag)
+void EEInvertedVBrace2d::Print(OPS_Stream &s, int flag)
 {
     if (flag == 0)  {
         // print everything
         s << "Element: " << this->getTag() << endln;
-        s << "  type: EEChevronBrace2d  iNode: " << connectedExternalNodes(0);
+        s << "  type: EEInvertedVBrace2d  iNode: " << connectedExternalNodes(0);
         s << "  jNode: " << connectedExternalNodes(1); 
         s << "  kNode: " << connectedExternalNodes(2) << endln;
         if (theSite != 0)
@@ -787,13 +795,13 @@ void EEChevronBrace2d::Print(OPS_Stream &s, int flag)
 }
 
 
-Response* EEChevronBrace2d::setResponse(const char **argv, int argc,
+Response* EEInvertedVBrace2d::setResponse(const char **argv, int argc,
     Information &eleInformation, OPS_Stream &output)
 {
     Response *theResponse = 0;
 
     output.tag("ElementOutput");
-    output.attr("eleType","EEChevronBrace2d");
+    output.attr("eleType","EEInvertedVBrace2d");
     output.attr("eleTag",this->getTag());
     output.attr("node1",connectedExternalNodes[0]);
     output.attr("node2",connectedExternalNodes[1]);
@@ -841,7 +849,7 @@ Response* EEChevronBrace2d::setResponse(const char **argv, int argc,
 
         theResponse = new ElementResponse(this, 4, Vector(6));
     }
-    // basic deformations
+    // target basic displacements
     else if (strcmp(argv[0],"deformation") == 0 || strcmp(argv[0],"deformations") == 0 || 
         strcmp(argv[0],"basicDeformation") == 0 || strcmp(argv[0],"basicDeformations") == 0 ||
         strcmp(argv[0],"targetDisplacement") == 0 || strcmp(argv[0],"targetDisplacements") == 0)
@@ -852,6 +860,26 @@ Response* EEChevronBrace2d::setResponse(const char **argv, int argc,
 
         theResponse = new ElementResponse(this, 5, Vector(3));
     }
+    // target basic velocities
+    else if (strcmp(argv[0],"targetVelocity") == 0 ||
+        strcmp(argv[0],"targetVelocities") == 0)
+    {
+        output.tag("ResponseType","vb1");
+        output.tag("ResponseType","vb2");
+        output.tag("ResponseType","vb3");
+
+        theResponse = new ElementResponse(this, 6, Vector(3));
+    }
+    // target basic accelerations
+    else if (strcmp(argv[0],"targetAcceleration") == 0 ||
+        strcmp(argv[0],"targetAccelerations") == 0)
+    {
+        output.tag("ResponseType","ab1");
+        output.tag("ResponseType","ab2");
+        output.tag("ResponseType","ab3");
+
+        theResponse = new ElementResponse(this, 7, Vector(3));
+    }
     // measured basic displacements
     else if (strcmp(argv[0],"measuredDisplacement") == 0 || 
         strcmp(argv[0],"measuredDisplacements") == 0)
@@ -860,7 +888,7 @@ Response* EEChevronBrace2d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","dbm2");
         output.tag("ResponseType","dbm3");
 
-        theResponse = new ElementResponse(this, 6, Vector(3));
+        theResponse = new ElementResponse(this, 8, Vector(3));
     }
     // measured basic velocities
     else if (strcmp(argv[0],"measuredVelocity") == 0 || 
@@ -870,7 +898,7 @@ Response* EEChevronBrace2d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","vbm2");
         output.tag("ResponseType","vbm3");
 
-        theResponse = new ElementResponse(this, 7, Vector(3));
+        theResponse = new ElementResponse(this, 9, Vector(3));
     }
     // measured basic accelerations
     else if (strcmp(argv[0],"measuredAcceleration") == 0 || 
@@ -879,6 +907,8 @@ Response* EEChevronBrace2d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","abm1");
         output.tag("ResponseType","abm2");
         output.tag("ResponseType","abm3");
+
+        theResponse = new ElementResponse(this, 10, Vector(3));
     }
 
     output.endTag(); // ElementOutput
@@ -887,7 +917,7 @@ Response* EEChevronBrace2d::setResponse(const char **argv, int argc,
 }
 
 
-int EEChevronBrace2d::getResponse(int responseID, Information &eleInformation)
+int EEInvertedVBrace2d::getResponse(int responseID, Information &eleInformation)
 {
     switch (responseID)  {
     case -1:
@@ -923,19 +953,31 @@ int EEChevronBrace2d::getResponse(int responseID, Information &eleInformation)
         }
         return 0;
         
-    case 6:  // measured basic displacements
+    case 6:  // target basic velocities
+        if (eleInformation.theVector != 0)  {			
+            *(eleInformation.theVector) = vbTarg;
+        }
+        return 0;
+        
+    case 7:  // target basic accelerations
+        if (eleInformation.theVector != 0)  {			
+            *(eleInformation.theVector) = abTarg;
+        }
+        return 0;
+        
+    case 8:  // measured basic displacements
         if (eleInformation.theVector != 0)  {
             *(eleInformation.theVector) = this->getBasicDisp();
         }
         return 0;
 
-    case 7:  // measured basic velocities
+    case 9:  // measured basic velocities
         if (eleInformation.theVector != 0)  {
             *(eleInformation.theVector) = this->getBasicVel();
         }
         return 0;
 
-    case 8:  // measured basic accelerations
+    case 10:  // measured basic accelerations
         if (eleInformation.theVector != 0)  {
             *(eleInformation.theVector) = this->getBasicAccel();
         }

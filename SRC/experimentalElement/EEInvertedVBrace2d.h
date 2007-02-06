@@ -23,41 +23,41 @@
 // $Date$
 // $URL: $
 
-#ifndef EEChevronBrace2d_h
-#define EEChevronBrace2d_h
+#ifndef EEInvertedVBrace2d_h
+#define EEInvertedVBrace2d_h
 
 // Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
 // Created: 09/06
 // Revision: A
 //
-// Description: This file contains the class definition for EEChevronBrace2d.
-// EEChevronBrace2d is an experimental chevron-brace element defined by three nodes.
+// Description: This file contains the class definition for EEInvertedVBrace2d.
+// EEInvertedVBrace2d is an experimental inverted-V brace element defined by three nodes.
 // Experimental element objects are associated with experimental setup objects.
 
 #include <ExperimentalElement.h>
 
-#define ELE_TAG_EEChevronBrace2d 9954
+#define ELE_TAG_EEInvertedVBrace2d 9954
 
 
-class EEChevronBrace2d : public ExperimentalElement
+class EEInvertedVBrace2d : public ExperimentalElement
 {
 public:
     // constructors
-    EEChevronBrace2d(int tag, int Nd1, int Nd2, int Nd3,
+    EEInvertedVBrace2d(int tag, int Nd1, int Nd2, int Nd3,
         ExperimentalSite *site,
         bool iMod = false, bool nlGeom = false,
         double rho1 = 0.0, double rho2 = 0.0);
-    EEChevronBrace2d(int tag, int Nd1, int Nd2, int Nd3,
+    EEInvertedVBrace2d(int tag, int Nd1, int Nd2, int Nd3,
         int port, char *machineInetAddress = 0,
         int dataSize = OF_Network_dataSize,
         bool iMod = false, bool nlGeom = false,
         double rho1 = 0.0, double rho2 = 0.0);
     
     // destructor
-    ~EEChevronBrace2d();
+    ~EEInvertedVBrace2d();
     
     // method to get class type
-    const char *getClassType() const {return "EEChevronBrace2d";};
+    const char *getClassType() const {return "EEInvertedVBrace2d";};
 
     // public methods to obtain information about dof & connectivity    
     int getNumExternalNodes() const;
@@ -133,6 +133,9 @@ private:
     Vector *tMeas;      // measured time
 
     Vector dbTarg;      // target displacements in basic system
+    Vector vbTarg;      // target velocities in basic system
+    Vector abTarg;      // target accelerations in basic system
+    
     Vector dbPast;      // past displacements in basic system
     Matrix kbInit;      // stiffness matrix in basic system
     
