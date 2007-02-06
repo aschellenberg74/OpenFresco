@@ -48,7 +48,7 @@ extern int addEEZeroLength(ClientData clientData, Tcl_Interp *interp,  int argc,
 extern int addEEGeneric(ClientData clientData, Tcl_Interp *interp,  int argc, 
     TCL_Char **argv, Domain*, TclModelBuilder*, int argStart); 
 
-extern int addEEChevronBrace(ClientData clientData, Tcl_Interp *interp,  int argc, 
+extern int addEEInvertedVBrace(ClientData clientData, Tcl_Interp *interp,  int argc, 
     TCL_Char **argv, Domain*, TclModelBuilder*, int argStart); 
 
 
@@ -106,9 +106,9 @@ int TclExpElementCommand(ClientData clientData, Tcl_Interp *interp, int argc,
         return result;
     }
     // ----------------------------------------------------------------------------	
-    else if (strcmp(argv[1],"chevronBrace") == 0) {
+    else if (strcmp(argv[1],"invertedVBrace") == 0) {
         int eleArgStart = 1;
-        int result = addEEChevronBrace(clientData, interp, argc, argv,
+        int result = addEEInvertedVBrace(clientData, interp, argc, argv,
             theTclDomain, theTclBuilder, eleArgStart);
         return result;
     }
