@@ -28,7 +28,7 @@
 // Revision: A
 //
 // Description: This file contains the function to parse the TCL input
-// for the EEChevronBrace element.
+// for the EEInvertedVBrace element.
 
 #include <TclModelBuilder.h>
 
@@ -36,13 +36,13 @@
 #include <string.h>
 #include <Domain.h>
 
-#include <EEChevronBrace2d.h>
+#include <EEInvertedVBrace2d.h>
 
 extern void printCommand(int argc, TCL_Char **argv);
 extern ExperimentalSite *getExperimentalSite(int tag);
 
 
-int addEEChevronBrace(ClientData clientData, Tcl_Interp *interp, int argc, 
+int addEEInvertedVBrace(ClientData clientData, Tcl_Interp *interp, int argc, 
     TCL_Char **argv, Domain *theTclDomain, TclModelBuilder *theTclBuilder,
     int eleArgStart)
 {
@@ -69,8 +69,8 @@ int addEEChevronBrace(ClientData clientData, Tcl_Interp *interp, int argc,
 		if ((argc-eleArgStart) < 17)  {
 			opserr << "WARNING insufficient arguments\n";
 			printCommand(argc, argv);
-			opserr << "Want: expElement chevronBrace eleTag iNode jNode kNode -site siteTag -initStif Kij <-iMod> <-nlGeom> <-rho1 rho1> <-rho2 rho2>\n";
-			opserr << "  or: expElement chevronBrace eleTag iNode jNode kNode -server ipPort <ipAddr> <-dataSize size> -initStif Kij <-iMod> <-nlGeom> <-rho1 rho1> <-rho2 rho2>\n";
+			opserr << "Want: expElement invertedVBrace eleTag iNode jNode kNode -site siteTag -initStif Kij <-iMod> <-nlGeom> <-rho1 rho1> <-rho2 rho2>\n";
+			opserr << "  or: expElement invertedVBrace eleTag iNode jNode kNode -server ipPort <ipAddr> <-dataSize size> -initStif Kij <-iMod> <-nlGeom> <-rho1 rho1> <-rho2 rho2>\n";
 			return TCL_ERROR;
 		}    
 		
@@ -85,42 +85,42 @@ int addEEChevronBrace(ClientData clientData, Tcl_Interp *interp, int argc,
 		double rho2 = 0.0;
 		
 		if (Tcl_GetInt(interp, argv[1+eleArgStart], &tag) != TCL_OK)  {
-			opserr << "WARNING invalid expElement chevronBrace eleTag\n";
+			opserr << "WARNING invalid expElement invertedVBrace eleTag\n";
 			return TCL_ERROR;
 		}
 		if (Tcl_GetInt(interp, argv[2+eleArgStart], &iNode) != TCL_OK)  {
 			opserr << "WARNING invalid iNode\n";
-			opserr << "expElement chevronBrace element: " << tag << endln;
+			opserr << "expElement invertedVBrace element: " << tag << endln;
 			return TCL_ERROR;
 		}
 		if (Tcl_GetInt(interp, argv[3+eleArgStart], &jNode) != TCL_OK)  {
 			opserr << "WARNING invalid jNode\n";
-			opserr << "expElement chevronBrace element: " << tag << endln;
+			opserr << "expElement invertedVBrace element: " << tag << endln;
 			return TCL_ERROR;
 		}
 		if (Tcl_GetInt(interp, argv[4+eleArgStart], &kNode) != TCL_OK)  {
 			opserr << "WARNING invalid kNode\n";
-			opserr << "expElement chevronBrace element: " << tag << endln;
+			opserr << "expElement invertedVBrace element: " << tag << endln;
 			return TCL_ERROR;
 		}		
         if (strcmp(argv[5+eleArgStart], "-site") == 0)  {
 		    if (Tcl_GetInt(interp, argv[6+eleArgStart], &siteTag) != TCL_OK)  {
 			    opserr << "WARNING invalid siteTag\n";
-			    opserr << "expElement chevronBrace element: " << tag << endln;
+			    opserr << "expElement invertedVBrace element: " << tag << endln;
 			    return TCL_ERROR;
 		    }
 		    theSite = getExperimentalSite(siteTag);
 		    if (theSite == 0)  {
 			    opserr << "WARNING experimental site not found\n";
 			    opserr << "expSite: " << siteTag << endln;
-			    opserr << "expElement chevronBrace element: " << tag << endln;
+			    opserr << "expElement invertedVBrace element: " << tag << endln;
 			    return TCL_ERROR;
 		    }
         }
         else if (strcmp(argv[5+eleArgStart], "-server") == 0)  {
             if (Tcl_GetInt(interp, argv[6+eleArgStart], &ipPort) != TCL_OK)  {
 		        opserr << "WARNING invalid ipPort\n";
-		        opserr << "expElement chevronBrace element: " << tag << endln;
+		        opserr << "expElement invertedVBrace element: " << tag << endln;
 		        return TCL_ERROR;
 	        }
             if (strcmp(argv[7+eleArgStart], "-initStif") != 0 &&
@@ -136,7 +136,7 @@ int addEEChevronBrace(ClientData clientData, Tcl_Interp *interp, int argc,
                 if (strcmp(argv[i], "-dataSize") == 0)  {
                     if (Tcl_GetInt(interp, argv[i+1], &dataSize) != TCL_OK)  {
 		                opserr << "WARNING invalid dataSize\n";
-		                opserr << "expElement chevronBrace element: " << tag << endln;
+		                opserr << "expElement invertedVBrace element: " << tag << endln;
 		                return TCL_ERROR;
 	                }
                 }
@@ -145,7 +145,7 @@ int addEEChevronBrace(ClientData clientData, Tcl_Interp *interp, int argc,
         else  {
             opserr << "WARNING expecting -site or -server string but got ";
             opserr << argv[5+eleArgStart] << endln;
-		    opserr << "expElement chevronBrace element: " << tag << endln;
+		    opserr << "expElement invertedVBrace element: " << tag << endln;
             return TCL_ERROR;
         }
         for (i = 7+eleArgStart; i < argc; i++)  {
@@ -162,35 +162,35 @@ int addEEChevronBrace(ClientData clientData, Tcl_Interp *interp, int argc,
 			if (i+1 < argc && strcmp(argv[i], "-rho1") == 0)  {
 				if (Tcl_GetDouble(interp, argv[i+1], &rho1) != TCL_OK)  {
 					opserr << "WARNING invalid rho1\n";
-					opserr << "expElement chevronBrace element: " << tag << endln;
+					opserr << "expElement invertedVBrace element: " << tag << endln;
 					return TCL_ERROR;
 				}
 			}
 			if (i+1 < argc && strcmp(argv[i], "-rho2") == 0)  {
 				if (Tcl_GetDouble(interp, argv[i+1], &rho2) != TCL_OK)  {
 					opserr << "WARNING invalid rho2\n";
-					opserr << "expElement chevronBrace element: " << tag << endln;
+					opserr << "expElement invertedVBrace element: " << tag << endln;
 					return TCL_ERROR;
 				}
 			}
 		}
 
-		// now create the EEChevronBrace and add it to the Domain
+		// now create the EEInvertedVBrace and add it to the Domain
         if (theSite != 0)
-		    theExpElement = new EEChevronBrace2d(tag, iNode, jNode, kNode, theSite, iMod, nlGeom, rho1, rho2);
+		    theExpElement = new EEInvertedVBrace2d(tag, iNode, jNode, kNode, theSite, iMod, nlGeom, rho1, rho2);
         else
-		    theExpElement = new EEChevronBrace2d(tag, iNode, jNode, kNode, ipPort, ipAddr, dataSize, iMod, nlGeom, rho1, rho2);
+		    theExpElement = new EEInvertedVBrace2d(tag, iNode, jNode, kNode, ipPort, ipAddr, dataSize, iMod, nlGeom, rho1, rho2);
 		
 		if (theExpElement == 0) {
 			opserr << "WARNING ran out of memory creating element\n";
-			opserr << "expElement chevronBrace element:" << tag << endln;
+			opserr << "expElement invertedVBrace element:" << tag << endln;
 			return TCL_ERROR;
 		}
 
-		// then add the EEChevronBrace to the domain
+		// then add the EEInvertedVBrace to the domain
 		if (theTclDomain->addElement(theExpElement) == false)  {
 			opserr << "WARNING could not add element to domain\n";
-			opserr << "expElement chevronBrace element: " << tag << endln;
+			opserr << "expElement invertedVBrace element: " << tag << endln;
 			delete theExpElement; // clean up the memory to avoid leaks
 			return TCL_ERROR;
 		}
@@ -200,7 +200,7 @@ int addEEChevronBrace(ClientData clientData, Tcl_Interp *interp, int argc,
 			if (strcmp(argv[i], "-initStif") == 0)  {
 				if (argc-1 < i+9)  {
 					opserr << "WARNING incorrect number of inital stiffness terms\n";
-					opserr << "expElement chevronBrace element: " << tag << endln;
+					opserr << "expElement invertedVBrace element: " << tag << endln;
 					return TCL_ERROR;      
 				}
 				Matrix theInitStif(3,3);
@@ -209,7 +209,7 @@ int addEEChevronBrace(ClientData clientData, Tcl_Interp *interp, int argc,
 					for (k=0; k<3; k++)  {
 						if (Tcl_GetDouble(interp, argv[i+1 + 3*j+k], &stif) != TCL_OK)  {
 							opserr << "WARNING invalid initial stiffness term\n";
-							opserr << "expElement chevronBrace element: " << tag << endln;
+							opserr << "expElement invertedVBrace element: " << tag << endln;
 							return TCL_ERROR;
 						}
 						theInitStif(j,k) = stif;
@@ -222,16 +222,16 @@ int addEEChevronBrace(ClientData clientData, Tcl_Interp *interp, int argc,
 	
 	else if (ndm == 3)  {
 		// not implemented yet
-		opserr << "WARNING expElement chevronBrace command not implemented yet for ndm = 3\n";
+		opserr << "WARNING expElement invertedVBrace command not implemented yet for ndm = 3\n";
 		return TCL_ERROR;
 	}
 	
 	else  {
-		opserr << "WARNING expElement chevronBrace command only works when ndm is 2 or 3, ndm: ";
+		opserr << "WARNING expElement invertedVBrace command only works when ndm is 2 or 3, ndm: ";
 		opserr << ndm << endln;
 		return TCL_ERROR;
 	}
 	
-	// if get here we have sucessfully created the EEChevronBrace and added it to the domain
+	// if get here we have sucessfully created the EEInvertedVBrace and added it to the domain
 	return TCL_OK;
 }

@@ -28,14 +28,14 @@
 // Revision: A
 //
 // Description: This file contains the implementation of the
-// ESChevronBraceJntOff2d class.
+// ESInvertedVBraceJntOff2d class.
 
-#include "ESChevronBraceJntOff2d.h"
+#include "ESInvertedVBraceJntOff2d.h"
 
 #include <math.h>
 
 
-ESChevronBraceJntOff2d::ESChevronBraceJntOff2d(int tag,
+ESInvertedVBraceJntOff2d::ESInvertedVBraceJntOff2d(int tag,
     double actLength0, double actLength1, double actLength2,
     double rigidLength0, double rigidLength1, double rigidLength2,
     double rigidLength3, double rigidLength4, double rigidLength5,
@@ -57,7 +57,7 @@ ESChevronBraceJntOff2d::ESChevronBraceJntOff2d(int tag,
 }
 
 
-ESChevronBraceJntOff2d::ESChevronBraceJntOff2d(const ESChevronBraceJntOff2d& es)
+ESInvertedVBraceJntOff2d::ESInvertedVBraceJntOff2d(const ESInvertedVBraceJntOff2d& es)
     : ExperimentalSetup(es),
     rotLocX(3,3)
 {
@@ -82,16 +82,16 @@ ESChevronBraceJntOff2d::ESChevronBraceJntOff2d(const ESChevronBraceJntOff2d& es)
 }
 
 
-ESChevronBraceJntOff2d::~ESChevronBraceJntOff2d()
+ESInvertedVBraceJntOff2d::~ESInvertedVBraceJntOff2d()
 {
     // does nothing
 }
 
 
-int ESChevronBraceJntOff2d::setSize(ID sizeT, ID sizeO)
+int ESInvertedVBraceJntOff2d::setSize(ID sizeT, ID sizeO)
 {
     // check sizeTrial and sizeOut
-    // for ESChevronBraceJntOff2d object
+    // for ESInvertedVBraceJntOff2d object
     
     // a component of sizeT must be equal to 3
     // and a component of sizeO must be equal
@@ -101,7 +101,7 @@ int ESChevronBraceJntOff2d::setSize(ID sizeT, ID sizeO)
     for(i=0; i<OF_Resp_Force; i++) {
         if((sizeT[i] != 0 && sizeT[i] != 3) ||
             (sizeO[i] != 0 && sizeO[i] != 3)) {
-            opserr << "ESChevronBraceJntOff2d::setSize - wrong sizeTrial/Out\n"; 
+            opserr << "ESInvertedVBraceJntOff2d::setSize - wrong sizeTrial/Out\n"; 
             opserr << "see User Manual.\n";
             opserr << "sizeT = " << sizeT;
             opserr << "sizeO = " << sizeO;
@@ -110,7 +110,7 @@ int ESChevronBraceJntOff2d::setSize(ID sizeT, ID sizeO)
     }
     if((sizeT[OF_Resp_Force] != 0 && sizeT[OF_Resp_Force] != 3) ||
         (sizeO[OF_Resp_Force] != 0 && sizeO[OF_Resp_Force] != 6)) {
-        opserr << "ESChevronBraceJntOff2d::setSize - wrong sizeTrial/Out\n"; 
+        opserr << "ESInvertedVBraceJntOff2d::setSize - wrong sizeTrial/Out\n"; 
         opserr << "see User Manual.\n";
         opserr << "sizeT = " << sizeT;
         opserr << "sizeO = " << sizeO;
@@ -118,7 +118,7 @@ int ESChevronBraceJntOff2d::setSize(ID sizeT, ID sizeO)
     }
     if((sizeT[OF_Resp_Time] != 0 && sizeT[OF_Resp_Time] != 1) ||
         (sizeO[OF_Resp_Time] != 0 && sizeO[OF_Resp_Time] != 1)) {
-        opserr << "ESChevronBraceJntOff2d::setSize - wrong sizeTrial/Out\n"; 
+        opserr << "ESInvertedVBraceJntOff2d::setSize - wrong sizeTrial/Out\n"; 
         opserr << "see User Manual.\n";
         opserr << "sizeT = " << sizeT;
         opserr << "sizeO = " << sizeO;
@@ -129,15 +129,15 @@ int ESChevronBraceJntOff2d::setSize(ID sizeT, ID sizeO)
 }
 
 
-int ESChevronBraceJntOff2d::commitState()
+int ESInvertedVBraceJntOff2d::commitState()
 {
     return theControl->commitState();
 }
 
 
-int ESChevronBraceJntOff2d::setup()
+int ESInvertedVBraceJntOff2d::setup()
 {
-    // setup for ctrl/daq vectors of ESChevronBraceJntOff2d
+    // setup for ctrl/daq vectors of ESInvertedVBraceJntOff2d
     sizeCtrl->Zero();
     sizeDaq->Zero();
     for(int i=0; i<OF_Resp_Force; i++) {
@@ -162,7 +162,7 @@ int ESChevronBraceJntOff2d::setup()
 }
 
 
-int ESChevronBraceJntOff2d::transfTrialResponse(const Vector* disp, 
+int ESInvertedVBraceJntOff2d::transfTrialResponse(const Vector* disp, 
     const Vector* vel,
     const Vector* accel,
     const Vector* force,
@@ -199,18 +199,18 @@ int ESChevronBraceJntOff2d::transfTrialResponse(const Vector* disp,
 }
 
 
-ExperimentalSetup* ESChevronBraceJntOff2d::getCopy()
+ExperimentalSetup* ESInvertedVBraceJntOff2d::getCopy()
 {
-    ESChevronBraceJntOff2d *theCopy = new ESChevronBraceJntOff2d(*this);
+    ESInvertedVBraceJntOff2d *theCopy = new ESInvertedVBraceJntOff2d(*this);
     
     return theCopy;
 }
 
 
-void ESChevronBraceJntOff2d::Print(OPS_Stream &s, int flag)
+void ESInvertedVBraceJntOff2d::Print(OPS_Stream &s, int flag)
 {
     s << "ExperimentalSetup: " << this->getTag(); 
-    s << " type: ESChevronBraceJntOff2d\n";
+    s << " type: ESInvertedVBraceJntOff2d\n";
     s << " actLength1  : " << La0 << endln;
     s << " actLength2  : " << La1 << endln;
     s << " actLength3  : " << La2 << endln;
@@ -229,7 +229,7 @@ void ESChevronBraceJntOff2d::Print(OPS_Stream &s, int flag)
     }}
 
 
-int ESChevronBraceJntOff2d::transfTrialDisp(const Vector* disp)
+int ESInvertedVBraceJntOff2d::transfTrialDisp(const Vector* disp)
 {  
     // rotate direction
     static Vector d(3);
@@ -286,13 +286,13 @@ int ESChevronBraceJntOff2d::transfTrialDisp(const Vector* disp)
 }
 
 
-int ESChevronBraceJntOff2d::transfTrialVel(const Vector* vel)
+int ESInvertedVBraceJntOff2d::transfTrialVel(const Vector* vel)
 {
     return OF_ReturnType_completed;
 }
 
 
-int ESChevronBraceJntOff2d::transfTrialVel(const Vector* disp,
+int ESInvertedVBraceJntOff2d::transfTrialVel(const Vector* disp,
     const Vector* vel)
 {  
     // rotate direction
@@ -351,13 +351,13 @@ int ESChevronBraceJntOff2d::transfTrialVel(const Vector* disp,
 }
 
 
-int ESChevronBraceJntOff2d::transfTrialAccel(const Vector* accel)
+int ESInvertedVBraceJntOff2d::transfTrialAccel(const Vector* accel)
 {
     return OF_ReturnType_completed;
 }
 
 
-int ESChevronBraceJntOff2d::transfTrialAccel(const Vector* disp,
+int ESInvertedVBraceJntOff2d::transfTrialAccel(const Vector* disp,
     const Vector* vel,
     const Vector* accel)
 {  
@@ -418,7 +418,7 @@ int ESChevronBraceJntOff2d::transfTrialAccel(const Vector* disp,
 }
 
 
-int ESChevronBraceJntOff2d::transfTrialForce(const Vector* force)
+int ESInvertedVBraceJntOff2d::transfTrialForce(const Vector* force)
 {  
     // rotate direction
     static Vector f(3);
@@ -445,7 +445,7 @@ int ESChevronBraceJntOff2d::transfTrialForce(const Vector* force)
     // nonlinear geometry, horizontal actuator left
     else if (nlGeom == 1 && strcmp(posAct0,"left") == 0)  {
         if (firstWarning[0] == true)  {
-            opserr << "WARNING ESChevronBraceJntOff2d::transfTrialForce() - "
+            opserr << "WARNING ESInvertedVBraceJntOff2d::transfTrialForce() - "
                 << "nonlinear geometry with horizontal actuator left "
                 << "not implemented yet. Using linear geometry instead.\n\n";
             firstWarning[0] = false;
@@ -460,7 +460,7 @@ int ESChevronBraceJntOff2d::transfTrialForce(const Vector* force)
     // nonlinear geometry, horizontal actuator right
     else if (nlGeom == 1 && strcmp(posAct0,"right") == 0)  {
         if (firstWarning[0] == true)  {
-            opserr << "WARNING ESChevronBraceJntOff2d::transfTrialForce() - "
+            opserr << "WARNING ESInvertedVBraceJntOff2d::transfTrialForce() - "
                 << "nonlinear geometry with horizontal actuator right "
                 << "not implemented yet. Using linear geometry instead.\n\n";
             firstWarning[0] = false;
@@ -477,14 +477,14 @@ int ESChevronBraceJntOff2d::transfTrialForce(const Vector* force)
 }
 
 
-int ESChevronBraceJntOff2d::transfTrialTime(const Vector* time)
+int ESInvertedVBraceJntOff2d::transfTrialTime(const Vector* time)
 {
     *cTime = *time;
     
     return OF_ReturnType_completed;
 }
 
-int ESChevronBraceJntOff2d::transfDaqDisp(Vector* disp)
+int ESInvertedVBraceJntOff2d::transfDaqDisp(Vector* disp)
 { 
     // linear geometry, horizontal actuator left
     if (nlGeom == 0 && strcmp(posAct0,"left") == 0)  {
@@ -537,7 +537,7 @@ int ESChevronBraceJntOff2d::transfDaqDisp(Vector* disp)
         
         // issue warning if iteration did not converge
         if (iter >= maxIter)   {
-            opserr << "WARNING ESChevronBraceJntOff2d::transfDaqDisp() - "
+            opserr << "WARNING ESInvertedVBraceJntOff2d::transfDaqDisp() - "
                 << "did not find the angle theta after "
                 << iter << " iterations and norm: " << dTheta.Norm() << endln;
         }
@@ -587,7 +587,7 @@ int ESChevronBraceJntOff2d::transfDaqDisp(Vector* disp)
         
         // issue warning if iteration did not converge
         if (iter >= maxIter)   {
-            opserr << "WARNING ESChevronBraceJntOff2d::transfDaqDisp() - "
+            opserr << "WARNING ESInvertedVBraceJntOff2d::transfDaqDisp() - "
                 << "did not find the angle theta after "
                 << iter << " iterations and norm: " << dTheta.Norm() << endln;
         }
@@ -608,7 +608,7 @@ int ESChevronBraceJntOff2d::transfDaqDisp(Vector* disp)
 }
 
 
-int ESChevronBraceJntOff2d::transfDaqVel(Vector* vel)
+int ESInvertedVBraceJntOff2d::transfDaqVel(Vector* vel)
 {
     // linear geometry, horizontal actuator left
     if (nlGeom == 0 && strcmp(posAct0,"left") == 0)  {
@@ -625,7 +625,7 @@ int ESChevronBraceJntOff2d::transfDaqVel(Vector* vel)
     // nonlinear geometry, horizontal actuator left
     else if (nlGeom == 1 && strcmp(posAct0,"left") == 0)  {
         if (firstWarning[1] == true)  {
-            opserr << "WARNING ESChevronBraceJntOff2d::transfDaqVel() - "
+            opserr << "WARNING ESInvertedVBraceJntOff2d::transfDaqVel() - "
                 << "nonlinear geometry with horizontal actuator left "
                 << "not implemented yet. Using linear geometry instead.\n\n";
             firstWarning[1] = false;
@@ -637,7 +637,7 @@ int ESChevronBraceJntOff2d::transfDaqVel(Vector* vel)
     // nonlinear geometry, horizontal actuator right
     else if (nlGeom == 1 && strcmp(posAct0,"right") == 0)  {
         if (firstWarning[1] == true)  {
-            opserr << "WARNING ESChevronBraceJntOff2d::transfDaqVel() - "
+            opserr << "WARNING ESInvertedVBraceJntOff2d::transfDaqVel() - "
                 << "nonlinear geometry with horizontal actuator right "
                 << "not implemented yet. Using linear geometry instead.\n\n";
             firstWarning[1] = false;
@@ -656,7 +656,7 @@ int ESChevronBraceJntOff2d::transfDaqVel(Vector* vel)
 }
 
 
-int ESChevronBraceJntOff2d::transfDaqAccel(Vector* accel)
+int ESInvertedVBraceJntOff2d::transfDaqAccel(Vector* accel)
 {
     // linear geometry, horizontal actuator left
     if (nlGeom == 0 && strcmp(posAct0,"left") == 0)  {
@@ -673,7 +673,7 @@ int ESChevronBraceJntOff2d::transfDaqAccel(Vector* accel)
     // nonlinear geometry, horizontal actuator left
     else if (nlGeom == 1 && strcmp(posAct0,"left") == 0)  {
         if (firstWarning[2] == true)  {
-            opserr << "WARNING ESChevronBraceJntOff2d::transfDaqAccel() - "
+            opserr << "WARNING ESInvertedVBraceJntOff2d::transfDaqAccel() - "
                 << "nonlinear geometry with horizontal actuator left "
                 << "not implemented yet. Using linear geometry instead.\n\n";
             firstWarning[2] = false;
@@ -685,7 +685,7 @@ int ESChevronBraceJntOff2d::transfDaqAccel(Vector* accel)
     // nonlinear geometry, horizontal actuator right
     else if (nlGeom == 1 && strcmp(posAct0,"right") == 0)  {
         if (firstWarning[2] == true)  {
-            opserr << "WARNING ESChevronBraceJntOff2d::transfDaqAccel() - "
+            opserr << "WARNING ESInvertedVBraceJntOff2d::transfDaqAccel() - "
                 << "nonlinear geometry with horizontal actuator right "
                 << "not implemented yet. Using linear geometry instead.\n\n";
             firstWarning[2] = false;
@@ -704,7 +704,7 @@ int ESChevronBraceJntOff2d::transfDaqAccel(Vector* accel)
 }
 
 
-int ESChevronBraceJntOff2d::transfDaqForce(Vector* force)
+int ESInvertedVBraceJntOff2d::transfDaqForce(Vector* force)
 {
     *force = *dForce;
     
@@ -712,7 +712,7 @@ int ESChevronBraceJntOff2d::transfDaqForce(Vector* force)
 }
 
 
-int ESChevronBraceJntOff2d::transfDaqTime(Vector* time)
+int ESInvertedVBraceJntOff2d::transfDaqTime(Vector* time)
 {  
     *time = *dTime;
     

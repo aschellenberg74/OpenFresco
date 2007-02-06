@@ -23,36 +23,38 @@
 // $Date$
 // $URL: $
 
-#ifndef ESChevronBrace2d_h
-#define ESChevronBrace2d_h
+#ifndef ESInvertedVBraceJntOff2d_h
+#define ESInvertedVBraceJntOff2d_h
 
 // Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
 // Created: 09/06
 // Revision: A
 //
 // Description: This file contains the class definition for
-// ESChevronBrace2d. ESChevronBrace2d is an experimental setup
-// class with three actuators which control the specimen
-// deformations and two load cells which measure the six support
-// reactions (resisting forces).
+// ESInvertedVBraceJntOff2d. ESInvertedVBraceJntOff2d is an experimental
+// setup class with three actuators which control the specimen
+// deformations and two load cells which measure the six  support
+// reactions (resisting forces). The setup accounts for the rigid joint
+// offsets between the actuators.
 
 #include "ExperimentalSetup.h"
 #include <ExperimentalControl.h>
 #include <Matrix.h>
 
-class ESChevronBrace2d : public ExperimentalSetup
+class ESInvertedVBraceJntOff2d : public ExperimentalSetup
 {
 public:
     // constructors
-    ESChevronBrace2d(int tag,
+    ESInvertedVBraceJntOff2d(int tag,
         double actLength0, double actLength1, double actLength2,
-        double rigidLength0, double rigidLength1,
+        double rigidLength0, double rigidLength1, double rigidLength2,
+        double rigidLength3, double rigidLength4, double rigidLength5,
         ExperimentalControl* control = 0,
         int nlGeom = 0, char *posAct0 = "left", double phiLocX = 0.0);
-    ESChevronBrace2d(const ESChevronBrace2d& es);
+    ESInvertedVBraceJntOff2d(const ESInvertedVBraceJntOff2d& es);
     
     // destructor
-    virtual ~ESChevronBrace2d();
+    virtual ~ESInvertedVBraceJntOff2d();
     
     // public methods
     virtual int setSize(ID sizeT, ID sizeO);
@@ -98,6 +100,10 @@ private:
     double La2;         // length of actuator 2
     double L0;          // rigid link length 0
     double L1;          // rigid link length 1
+    double L2;          // rigid link length 2
+    double L3;          // rigid link length 3
+    double L4;          // rigid link length 4
+    double L5;          // rigid link length 5
     int nlGeom;         // non-linear geometry (0: linear, 1: nonlinear)
     char posAct0[6];    // position of actuator 0 (left, right)
     double phiLocX;     // angle of local x axis w.r.t rigid link [deg]
