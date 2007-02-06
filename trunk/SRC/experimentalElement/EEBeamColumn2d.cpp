@@ -65,7 +65,8 @@ EEBeamColumn2d::EEBeamColumn2d(int tag, int Nd1, int Nd2,
     iMod(iM), rho(r), L(0.0),
     db(0), vb(0), ab(0), t(0),
     dbMeas(0), vbMeas(0), abMeas(0), qMeas(0), tMeas(0),
-    dbTarg(3), dbPast(3), kbInit(3,3), T(3,3), Tinv(3,3)
+    dbTarg(3), vbTarg(3), abTarg(3),
+    dbPast(3), kbInit(3,3), T(3,3), Tinv(3,3)
 {
     // ensure the connectedExternalNode ID is of correct size & set values
     if (connectedExternalNodes.Size() != 2)  {
@@ -125,6 +126,8 @@ EEBeamColumn2d::EEBeamColumn2d(int tag, int Nd1, int Nd2,
     
     // initialize additional vectors
     dbTarg.Zero();
+    vbTarg.Zero();
+    abTarg.Zero();
     dbPast.Zero();
     for (i=0; i<3; i++)  {
         qA0[i] = 0.0;
@@ -145,7 +148,8 @@ EEBeamColumn2d::EEBeamColumn2d(int tag, int Nd1, int Nd2,
     theSocket(0), sData(0), sendData(0), rData(0), recvData(0),
     db(0), vb(0), ab(0), t(0),
     dbMeas(0), vbMeas(0), abMeas(0), qMeas(0), tMeas(0),
-    dbTarg(3), dbPast(3), kbInit(3,3), T(3,3), Tinv(3,3)
+    dbTarg(3), vbTarg(3), abTarg(3),
+    dbPast(3), kbInit(3,3), T(3,3), Tinv(3,3)
 {
     // ensure the connectedExternalNode ID is of correct size & set values
     if (connectedExternalNodes.Size() != 2)  {
@@ -233,6 +237,8 @@ EEBeamColumn2d::EEBeamColumn2d(int tag, int Nd1, int Nd2,
     
     // initialize additional vectors
     dbTarg.Zero();
+    vbTarg.Zero();
+    abTarg.Zero();
     dbPast.Zero();
     for (i=0; i<3; i++)  {
         qA0[i] = 0.0;
@@ -631,8 +637,10 @@ const Vector& EEBeamColumn2d::getResistingForce()
             (*qMeas)(0) = kbInit(0,0) * (*db)(0);
     }
     
-    // save corresponding target displacements for recorder
+    // save corresponding target response for recorder
     dbTarg = (*db);
+    vbTarg = (*vb);
+    abTarg = (*ab);
 
     // transform from basic sys B to basic sys A
     static Vector qA(3);
@@ -842,7 +850,7 @@ Response* EEBeamColumn2d::setResponse(const char **argv, int argc,
 
         theResponse = new ElementResponse(this, 4, Vector(3));
     }
-    // deformations in basic system B
+    // target displacements in basic system B
     else if (strcmp(argv[0],"deformation") == 0 || strcmp(argv[0],"deformations") == 0 || 
         strcmp(argv[0],"basicDeformation") == 0 || strcmp(argv[0],"basicDeformations") == 0 ||
         strcmp(argv[0],"targetDisplacement") == 0 || strcmp(argv[0],"targetDisplacements") == 0)
@@ -853,6 +861,26 @@ Response* EEBeamColumn2d::setResponse(const char **argv, int argc,
 
         theResponse = new ElementResponse(this, 5, Vector(3));
     }
+    // target velocities in basic system B
+    else if (strcmp(argv[0],"targetVelocity") == 0 ||
+        strcmp(argv[0],"targetVelocities") == 0)
+    {
+        output.tag("ResponseType","vb1");
+        output.tag("ResponseType","vb2");
+        output.tag("ResponseType","vb3");
+
+        theResponse = new ElementResponse(this, 6, Vector(3));
+    }
+    // target accelerations in basic system B
+    else if (strcmp(argv[0],"targetAcceleration") == 0 ||
+        strcmp(argv[0],"targetAccelerations") == 0)
+    {
+        output.tag("ResponseType","ab1");
+        output.tag("ResponseType","ab2");
+        output.tag("ResponseType","ab3");
+
+        theResponse = new ElementResponse(this, 7, Vector(3));
+    }
     // measured displacements in basic system B
     else if (strcmp(argv[0],"measuredDisplacement") == 0 || 
         strcmp(argv[0],"measuredDisplacements") == 0)
@@ -861,7 +889,7 @@ Response* EEBeamColumn2d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","dbm2");
         output.tag("ResponseType","dbm3");
 
-        theResponse = new ElementResponse(this, 6, Vector(3));
+        theResponse = new ElementResponse(this, 8, Vector(3));
     }
     // measured velocities in basic system B
     else if (strcmp(argv[0],"measuredVelocity") == 0 || 
@@ -871,7 +899,7 @@ Response* EEBeamColumn2d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","vbm2");
         output.tag("ResponseType","vbm3");
 
-        theResponse = new ElementResponse(this, 7, Vector(3));
+        theResponse = new ElementResponse(this, 9, Vector(3));
     }
     // measured accelerations in basic system B
     else if (strcmp(argv[0],"measuredAcceleration") == 0 || 
@@ -881,7 +909,7 @@ Response* EEBeamColumn2d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","abm2");
         output.tag("ResponseType","abm3");
 
-        theResponse = new ElementResponse(this, 8, Vector(3));
+        theResponse = new ElementResponse(this, 10, Vector(3));
     }
 
     output.endTag(); // ElementOutput
@@ -941,19 +969,31 @@ int EEBeamColumn2d::getResponse(int responseID, Information &eleInformation)
         }
         return 0;      
         
-    case 6:  // measured displacements in basic system B
+    case 6:  // target velocities in basic system B
+        if (eleInformation.theVector != 0)  {
+            *(eleInformation.theVector) = vbTarg;
+        }
+        return 0;      
+        
+    case 7:  // target accelerations in basic system B
+        if (eleInformation.theVector != 0)  {
+            *(eleInformation.theVector) = abTarg;
+        }
+        return 0;      
+        
+    case 8:  // measured displacements in basic system B
         if (eleInformation.theVector != 0)  {
             *(eleInformation.theVector) = this->getBasicDisp();
         }
         return 0;
 
-    case 7:  // measured velocities in basic system B
+    case 9:  // measured velocities in basic system B
         if (eleInformation.theVector != 0)  {
             *(eleInformation.theVector) = this->getBasicVel();
         }
         return 0;
 
-    case 8:  // measured accelerations in basic system B
+    case 10:  // measured accelerations in basic system B
         if (eleInformation.theVector != 0)  {
             *(eleInformation.theVector) = this->getBasicAccel();
         }

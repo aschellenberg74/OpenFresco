@@ -71,7 +71,8 @@ EEZeroLength::EEZeroLength(int tag, int dim, int Nd1, int Nd2,
     theMatrix(0), theVector(0), theLoad(0),
     db(0), vb(0), ab(0), t(0),
     dbMeas(0), vbMeas(0), abMeas(0), qMeas(0), tMeas(0),
-    dbTarg(direction.Size()), dbPast(direction.Size()),
+    dbTarg(direction.Size()), vbTarg(direction.Size()),
+    abTarg(direction.Size()), dbPast(direction.Size()),
     kbInit(direction.Size(), direction.Size()), T(0,0)
 {
     // establish the connected nodes and set up the transformation matrix for orientation
@@ -127,6 +128,8 @@ EEZeroLength::EEZeroLength(int tag, int dim, int Nd1, int Nd2,
 
     // initialize additional vectors
     dbTarg.Zero();
+    vbTarg.Zero();
+    abTarg.Zero();
     dbPast.Zero();
 }
 
@@ -146,7 +149,8 @@ EEZeroLength::EEZeroLength(int tag, int dim, int Nd1, int Nd2,
     theSocket(0), sData(0), sendData(0), rData(0), recvData(0),
     db(0), vb(0), ab(0), t(0),
     dbMeas(0), vbMeas(0), abMeas(0), qMeas(0), tMeas(0),
-    dbTarg(direction.Size()), dbPast(direction.Size()),
+    dbTarg(direction.Size()), vbTarg(direction.Size()),
+    abTarg(direction.Size()), dbPast(direction.Size()),
     kbInit(direction.Size(), direction.Size()), T(0,0)
 {
     // establish the connected nodes and set up the transformation matrix for orientation
@@ -230,6 +234,8 @@ EEZeroLength::EEZeroLength(int tag, int dim, int Nd1, int Nd2,
 
     // initialize additional vectors
     dbTarg.Zero();
+    vbTarg.Zero();
+    abTarg.Zero();
     dbPast.Zero();
 }
 
@@ -611,6 +617,8 @@ const Vector& EEZeroLength::getResistingForce()
     
     // save corresponding target displacements for recorder
     dbTarg = (*db);
+    vbTarg = (*vb);
+    abTarg = (*ab);
 
     // determine resisting forces in global system
     (*theVector) = T^(*qMeas);
@@ -804,7 +812,7 @@ Response* EEZeroLength::setResponse(const char **argv, int argc,
         }
         theResponse = new ElementResponse(this, 4, Vector(numDir));
     }
-    // basic deformations
+    // target basic displacements
     else if (strcmp(argv[0],"deformation") == 0 || strcmp(argv[0],"deformations") == 0 || 
         strcmp(argv[0],"basicDeformation") == 0 || strcmp(argv[0],"basicDeformations") == 0 ||
         strcmp(argv[0],"targetDisplacement") == 0 || strcmp(argv[0],"targetDisplacements") == 0)
@@ -814,6 +822,56 @@ Response* EEZeroLength::setResponse(const char **argv, int argc,
             output.tag("ResponseType",outputData);
         }
         theResponse = new ElementResponse(this, 5, Vector(numDir));
+    }
+    // target basic velocities
+    else if (strcmp(argv[0],"targetVelocity") == 0 || 
+        strcmp(argv[0],"targetVelocities") == 0)
+    {
+        for (int i=0; i<numDir; i++)  {
+            sprintf(outputData,"vb%d",i+1);
+            output.tag("ResponseType",outputData);
+        }
+        theResponse = new ElementResponse(this, 6, Vector(numDir));
+    }
+    // target basic accelerations
+    else if (strcmp(argv[0],"targetAcceleration") == 0 || 
+        strcmp(argv[0],"targetAccelerations") == 0)
+    {
+        for (int i=0; i<numDir; i++)  {
+            sprintf(outputData,"ab%d",i+1);
+            output.tag("ResponseType",outputData);
+        }
+        theResponse = new ElementResponse(this, 7, Vector(numDir));
+    }
+    // measured basic displacements
+    else if (strcmp(argv[0],"measuredDisplacement") == 0 || 
+        strcmp(argv[0],"measuredDisplacements") == 0)
+    {
+        for (int i=0; i<numDir; i++)  {
+            sprintf(outputData,"dbm%d",i+1);
+            output.tag("ResponseType",outputData);
+        }
+        theResponse = new ElementResponse(this, 8, Vector(numDir));
+    }
+    // measured basic velocities
+    else if (strcmp(argv[0],"measuredVelocity") == 0 || 
+        strcmp(argv[0],"measuredVelocities") == 0)
+    {
+        for (int i=0; i<numDir; i++)  {
+            sprintf(outputData,"vbm%d",i+1);
+            output.tag("ResponseType",outputData);
+        }
+        theResponse = new ElementResponse(this, 9, Vector(numDir));
+    }
+    // measured basic accelerations
+    else if (strcmp(argv[0],"measuredAcceleration") == 0 || 
+        strcmp(argv[0],"measuredAccelerations") == 0)
+    {
+        for (int i=0; i<numDir; i++)  {
+            sprintf(outputData,"abm%d",i+1);
+            output.tag("ResponseType",outputData);
+        }
+        theResponse = new ElementResponse(this, 10, Vector(numDir));
     }
     // basic deformations and basic forces
     else if (strcmp(argv[0],"defoANDforce") == 0 || strcmp(argv[0],"deformationANDforces") == 0 ||
@@ -828,37 +886,7 @@ Response* EEZeroLength::setResponse(const char **argv, int argc,
             sprintf(outputData,"q%d",i+1);
             output.tag("ResponseType",outputData);
         }
-        theResponse = new ElementResponse(this, 6, Vector(numDir*2));
-    }
-    // measured basic displacements
-    else if (strcmp(argv[0],"measuredDisplacement") == 0 || 
-        strcmp(argv[0],"measuredDisplacements") == 0)
-    {
-        for (int i=0; i<numDir; i++)  {
-            sprintf(outputData,"dbm%d",i+1);
-            output.tag("ResponseType",outputData);
-        }
-        theResponse = new ElementResponse(this, 7, Vector(numDir));
-    }
-    // measured basic velocities
-    else if (strcmp(argv[0],"measuredVelocity") == 0 || 
-        strcmp(argv[0],"measuredVelocities") == 0)
-    {
-        for (int i=0; i<numDir; i++)  {
-            sprintf(outputData,"vbm%d",i+1);
-            output.tag("ResponseType",outputData);
-        }
-        theResponse = new ElementResponse(this, 8, Vector(numDir));
-    }
-    // measured basic accelerations
-    else if (strcmp(argv[0],"measuredAcceleration") == 0 || 
-        strcmp(argv[0],"measuredAccelerations") == 0)
-    {
-        for (int i=0; i<numDir; i++)  {
-            sprintf(outputData,"abm%d",i+1);
-            output.tag("ResponseType",outputData);
-        }
-        theResponse = new ElementResponse(this, 9, Vector(numDir));
+        theResponse = new ElementResponse(this, 11, Vector(numDir*2));
     }
 
     output.endTag(); // ElementOutput
@@ -910,7 +938,37 @@ int EEZeroLength::getResponse(int responseID, Information &eleInformation)
         }
         return 0;
         
-    case 6:  // basic deformations and basic forces
+    case 6:  // target basic velocities
+        if (eleInformation.theVector != 0)  {
+            *(eleInformation.theVector) = vbTarg;
+        }
+        return 0;
+        
+    case 7:  // target basic accelerations
+        if (eleInformation.theVector != 0)  {
+            *(eleInformation.theVector) = abTarg;
+        }
+        return 0;
+        
+    case 8:  // measured basic displacements
+        if (eleInformation.theVector != 0)  {
+            *(eleInformation.theVector) = this->getBasicDisp();
+        }
+        return 0;
+
+    case 9:  // measured basic velocities
+        if (eleInformation.theVector != 0)  {
+            *(eleInformation.theVector) = this->getBasicVel();
+        }
+        return 0;
+
+    case 10:  // measured basic accelerations
+        if (eleInformation.theVector != 0)  {
+            *(eleInformation.theVector) = this->getBasicAccel();
+        }
+        return 0;
+
+    case 11:  // basic deformations and basic forces
         if (eleInformation.theVector != 0) {
             int i;
             for (i=0; i<numDir; i++) {
@@ -922,24 +980,6 @@ int EEZeroLength::getResponse(int responseID, Information &eleInformation)
         }
         return 0;
         
-    case 7:  // measured basic displacements
-        if (eleInformation.theVector != 0)  {
-            *(eleInformation.theVector) = this->getBasicDisp();
-        }
-        return 0;
-
-    case 8:  // measured basic velocities
-        if (eleInformation.theVector != 0)  {
-            *(eleInformation.theVector) = this->getBasicVel();
-        }
-        return 0;
-
-    case 9:  // measured basic accelerations
-        if (eleInformation.theVector != 0)  {
-            *(eleInformation.theVector) = this->getBasicAccel();
-        }
-        return 0;
-
     default:
         return 0;
     }
