@@ -38,8 +38,8 @@
 #include <ESTwoActuators2d.h>
 #include <ESThreeActuators2d.h>
 #include <ESThreeActuatorsJntOff2d.h>
-#include <ESChevronBrace2d.h>
-#include <ESChevronBraceJntOff2d.h>
+#include <ESInvertedVBrace2d.h>
+#include <ESInvertedVBraceJntOff2d.h>
 #include <ESAggregator.h>
 
 #include <ID.h>
@@ -564,12 +564,12 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp, int argc,
     }
     
     // ----------------------------------------------------------------------------	
-    else if (strcmp(argv[1],"ChevronBrace") == 0)  {
+    else if (strcmp(argv[1],"InvertedVBrace") == 0)  {
         if (ndm == 2 || ndm == 3)  {
             if (argc < 8)  {
                 opserr << "WARNING invalid number of arguments\n";
                 printCommand(argc,argv);
-                opserr << "Want: expSetup ChevronBrace tag <-control ctrlTag> La1 La2 La3 L1 L2 "
+                opserr << "Want: expSetup InvertedVBrace tag <-control ctrlTag> La1 La2 La3 L1 L2 "
                     << "<-nlGeom> <-posAct1 pos> <-phiLocX phi> "
                     << "<-ctrlDispFact f> <-ctrlVelFact f> <-ctrlAccelFact f> "
                     << "<-ctrlForceFact f> <-ctrlTimeFact f> "
@@ -586,7 +586,7 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp, int argc,
             
             argi = 2;
             if (Tcl_GetInt(interp, argv[argi], &tag) != TCL_OK)  {
-                opserr << "WARNING invalid expSetup ChevronBrace tag\n";
+                opserr << "WARNING invalid expSetup InvertedVBrace tag\n";
                 return TCL_ERROR;		
             }
             argi++;
@@ -594,45 +594,45 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp, int argc,
                 argi++;
                 if (Tcl_GetInt(interp, argv[argi], &ctrlTag) != TCL_OK)  {
                     opserr << "WARNING invalid ctrlTag\n";
-                    opserr << "expSetup ChevronBrace " << tag << endln;
+                    opserr << "expSetup InvertedVBrace " << tag << endln;
                     return TCL_ERROR;	
                 }
                 theControl = getExperimentalControl(ctrlTag);
                 if (theControl == 0)  {
                     opserr << "WARNING experimental control not found\n";
                     opserr << "expControl: " << ctrlTag << endln;
-                    opserr << "expSetup ChevronBrace " << tag << endln;
+                    opserr << "expSetup InvertedVBrace " << tag << endln;
                     return TCL_ERROR;
                 }
                 argi++;
             }
             if (Tcl_GetDouble(interp, argv[argi], &La1) != TCL_OK)  {
                 opserr << "WARNING invalid La1\n";
-                opserr << "expSetup ChevronBrace " << tag << endln;
+                opserr << "expSetup InvertedVBrace " << tag << endln;
                 return TCL_ERROR;	
             }
             argi++;
             if (Tcl_GetDouble(interp, argv[argi], &La2) != TCL_OK)  {
                 opserr << "WARNING invalid La2\n";
-                opserr << "expSetup ChevronBrace " << tag << endln;
+                opserr << "expSetup InvertedVBrace " << tag << endln;
                 return TCL_ERROR;	
             }
             argi++;
             if (Tcl_GetDouble(interp, argv[argi], &La3) != TCL_OK)  {
                 opserr << "WARNING invalid La3\n";
-                opserr << "expSetup ChevronBrace " << tag << endln;
+                opserr << "expSetup InvertedVBrace " << tag << endln;
                 return TCL_ERROR;	
             }
             argi++;
             if (Tcl_GetDouble(interp, argv[argi], &L1) != TCL_OK)  {
                 opserr << "WARNING invalid L1\n";
-                opserr << "expSetup ChevronBrace " << tag << endln;
+                opserr << "expSetup InvertedVBrace " << tag << endln;
                 return TCL_ERROR;	
             }
             argi++;
             if (Tcl_GetDouble(interp, argv[argi], &L2) != TCL_OK)  {
                 opserr << "WARNING invalid L2\n";
-                opserr << "expSetup ChevronBrace " << tag << endln;
+                opserr << "expSetup InvertedVBrace " << tag << endln;
                 return TCL_ERROR;	
             }
             argi++;
@@ -653,30 +653,30 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp, int argc,
                 if (strcmp(argv[i], "-phiLocX") == 0)  {
                     if (Tcl_GetDouble(interp, argv[i+1], &phiLocX) != TCL_OK)  {
                         opserr << "WARNING invalid phiLocX\n";
-                        opserr << "expSetup ChevronBrace " << tag << endln;
+                        opserr << "expSetup InvertedVBrace " << tag << endln;
                         return TCL_ERROR;	
                     }                
                 }
             }
             
             // parsing was successful, allocate the setup
-            theSetup = new ESChevronBrace2d(tag, La1, La2, La3, L1, L2, theControl, nlGeom, posAct0, phiLocX);
+            theSetup = new ESInvertedVBrace2d(tag, La1, La2, La3, L1, L2, theControl, nlGeom, posAct0, phiLocX);
         }
         
         else if (ndm == 3)  {
             // not implemented yet
-            opserr << "WARNING expSetup ChevronBrace command not implemented yet for ndm = 3\n";
+            opserr << "WARNING expSetup InvertedVBrace command not implemented yet for ndm = 3\n";
             return TCL_ERROR;
         }
     }
     
     // ----------------------------------------------------------------------------	
-    else if (strcmp(argv[1],"ChevronBraceJntOff") == 0)  {
+    else if (strcmp(argv[1],"InvertedVBraceJntOff") == 0)  {
         if (ndm == 2 || ndm == 3)  {
             if (argc < 12)  {
                 opserr << "WARNING invalid number of arguments\n";
                 printCommand(argc,argv);
-                opserr << "Want: expSetup ChevronBraceJntOff tag <-control ctrlTag> La1 La2 La3 L1 L2 L3 L4 L5 L6 "
+                opserr << "Want: expSetup InvertedVBraceJntOff tag <-control ctrlTag> La1 La2 La3 L1 L2 L3 L4 L5 L6 "
                     << "<-nlGeom> <-posAct1 pos> <-phiLocX phi> "
                     << "<-ctrlDispFact f> <-ctrlVelFact f> <-ctrlAccelFact f> "
                     << "<-ctrlForceFact f> <-ctrlTimeFact f> "
@@ -693,7 +693,7 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp, int argc,
             
             argi = 2;
             if (Tcl_GetInt(interp, argv[argi], &tag) != TCL_OK)  {
-                opserr << "WARNING invalid expSetup ChevronBraceJntOff tag\n";
+                opserr << "WARNING invalid expSetup InvertedVBraceJntOff tag\n";
                 return TCL_ERROR;		
             }
             argi++;
@@ -701,69 +701,69 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp, int argc,
                 argi++;
                 if (Tcl_GetInt(interp, argv[argi], &ctrlTag) != TCL_OK)  {
                     opserr << "WARNING invalid ctrlTag\n";
-                    opserr << "expSetup ChevronBraceJntOff " << tag << endln;
+                    opserr << "expSetup InvertedVBraceJntOff " << tag << endln;
                     return TCL_ERROR;	
                 }
                 theControl = getExperimentalControl(ctrlTag);
                 if (theControl == 0)  {
                     opserr << "WARNING experimental control not found\n";
                     opserr << "expControl: " << ctrlTag << endln;
-                    opserr << "expSetup ChevronBraceJntOff " << tag << endln;
+                    opserr << "expSetup InvertedVBraceJntOff " << tag << endln;
                     return TCL_ERROR;
                 }
                 argi++;
             }
             if (Tcl_GetDouble(interp, argv[argi], &La1) != TCL_OK)  {
                 opserr << "WARNING invalid La1\n";
-                opserr << "expSetup ChevronBraceJntOff " << tag << endln;
+                opserr << "expSetup InvertedVBraceJntOff " << tag << endln;
                 return TCL_ERROR;	
             }
             argi++;
             if (Tcl_GetDouble(interp, argv[argi], &La2) != TCL_OK)  {
                 opserr << "WARNING invalid La2\n";
-                opserr << "expSetup ChevronBraceJntOff " << tag << endln;
+                opserr << "expSetup InvertedVBraceJntOff " << tag << endln;
                 return TCL_ERROR;	
             }
             argi++;
             if (Tcl_GetDouble(interp, argv[argi], &La3) != TCL_OK)  {
                 opserr << "WARNING invalid La3\n";
-                opserr << "expSetup ChevronBraceJntOff " << tag << endln;
+                opserr << "expSetup InvertedVBraceJntOff " << tag << endln;
                 return TCL_ERROR;	
             }
             argi++;
             if (Tcl_GetDouble(interp, argv[argi], &L1) != TCL_OK)  {
                 opserr << "WARNING invalid L1\n";
-                opserr << "expSetup ChevronBraceJntOff " << tag << endln;
+                opserr << "expSetup InvertedVBraceJntOff " << tag << endln;
                 return TCL_ERROR;	
             }
             argi++;
             if (Tcl_GetDouble(interp, argv[argi], &L2) != TCL_OK)  {
                 opserr << "WARNING invalid L2\n";
-                opserr << "expSetup ChevronBraceJntOff " << tag << endln;
+                opserr << "expSetup InvertedVBraceJntOff " << tag << endln;
                 return TCL_ERROR;	
             }
             argi++;
             if (Tcl_GetDouble(interp, argv[argi], &L3) != TCL_OK)  {
                 opserr << "WARNING invalid L3\n";
-                opserr << "expSetup ChevronBraceJntOff " << tag << endln;
+                opserr << "expSetup InvertedVBraceJntOff " << tag << endln;
                 return TCL_ERROR;	
             }
             argi++;
             if (Tcl_GetDouble(interp, argv[argi], &L4) != TCL_OK)  {
                 opserr << "WARNING invalid L4\n";
-                opserr << "expSetup ChevronBraceJntOff " << tag << endln;
+                opserr << "expSetup InvertedVBraceJntOff " << tag << endln;
                 return TCL_ERROR;	
             }
             argi++;
             if (Tcl_GetDouble(interp, argv[argi], &L5) != TCL_OK)  {
                 opserr << "WARNING invalid L5\n";
-                opserr << "expSetup ChevronBraceJntOff " << tag << endln;
+                opserr << "expSetup InvertedVBraceJntOff " << tag << endln;
                 return TCL_ERROR;	
             }
             argi++;
             if (Tcl_GetDouble(interp, argv[argi], &L6) != TCL_OK)  {
                 opserr << "WARNING invalid L6\n";
-                opserr << "expSetup ChevronBraceJntOff " << tag << endln;
+                opserr << "expSetup InvertedVBraceJntOff " << tag << endln;
                 return TCL_ERROR;	
             }
             argi++;
@@ -784,20 +784,20 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp, int argc,
                 if (strcmp(argv[i], "-phiLocX") == 0)  {
                     if (Tcl_GetDouble(interp, argv[i+1], &phiLocX) != TCL_OK)  {
                         opserr << "WARNING invalid phiLocX\n";
-                        opserr << "expSetup ChevronBraceJntOff " << tag << endln;
+                        opserr << "expSetup InvertedVBraceJntOff " << tag << endln;
                         return TCL_ERROR;	
                     }                
                 }
             }
             
             // parsing was successful, allocate the setup
-            theSetup = new ESChevronBraceJntOff2d(tag, La1, La2, La3,
+            theSetup = new ESInvertedVBraceJntOff2d(tag, La1, La2, La3,
                 L1, L2, L3, L4, L5, L6, theControl, nlGeom, posAct0, phiLocX);
         }
         
         else if (ndm == 3)  {
             // not implemented yet
-            opserr << "WARNING expSetup ChevronBraceJntOff command not implemented yet for ndm = 3\n";
+            opserr << "WARNING expSetup InvertedVBraceJntOff command not implemented yet for ndm = 3\n";
             return TCL_ERROR;
         }
     }
