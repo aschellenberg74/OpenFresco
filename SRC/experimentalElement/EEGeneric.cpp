@@ -63,7 +63,8 @@ EEGeneric::EEGeneric(int tag, ID nodes, ID *dof,
     iMod(iM), mass(m),
     db(0), vb(0), ab(0), t(0),
     dbMeas(0), vbMeas(0), abMeas(0), qMeas(0), tMeas(0),
-    dbTarg(1), dbPast(1), kbInit(1,1)
+    dbTarg(1), vbTarg(1), abTarg(1),
+    dbPast(1), kbInit(1,1)
 {    
     // initialize nodes
     numExternalNodes = connectedExternalNodes.Size();
@@ -127,6 +128,10 @@ EEGeneric::EEGeneric(int tag, ID nodes, ID *dof,
     basicDOF.Zero();
     dbTarg.resize(numBasicDOF);
     dbTarg.Zero();
+    vbTarg.resize(numBasicDOF);
+    vbTarg.Zero();
+    abTarg.resize(numBasicDOF);
+    abTarg.Zero();
     dbPast.resize(numBasicDOF);
     dbPast.Zero();
     kbInit.resize(numBasicDOF,numBasicDOF);
@@ -146,7 +151,8 @@ EEGeneric::EEGeneric(int tag, ID nodes, ID *dof,
     theSocket(0), sData(0), sendData(0), rData(0), recvData(0),
     db(0), vb(0), ab(0), t(0),
     dbMeas(0), vbMeas(0), abMeas(0), qMeas(0), tMeas(0),
-    dbTarg(1), dbPast(1), kbInit(1,1)
+    dbTarg(1), vbTarg(1), abTarg(1),
+    dbPast(1), kbInit(1,1)
 {    
     // initialize nodes
     numExternalNodes = connectedExternalNodes.Size();
@@ -237,6 +243,10 @@ EEGeneric::EEGeneric(int tag, ID nodes, ID *dof,
     basicDOF.Zero();
     dbTarg.resize(numBasicDOF);
     dbTarg.Zero();
+    vbTarg.resize(numBasicDOF);
+    vbTarg.Zero();
+    abTarg.resize(numBasicDOF);
+    abTarg.Zero();
     dbPast.resize(numBasicDOF);
     dbPast.Zero();
     kbInit.resize(numBasicDOF,numBasicDOF);
@@ -539,6 +549,8 @@ const Vector& EEGeneric::getResistingForce()
    
     // save corresponding target displacements for recorder
     dbTarg = (*db);
+    vbTarg = (*vb);
+    abTarg = (*ab);
 
     // determine resisting forces in global system
     theVector.Assemble(*qMeas,basicDOF);
@@ -736,7 +748,7 @@ Response* EEGeneric::setResponse(const char **argv, int argc,
         }
         theResponse = new ElementResponse(this, 3, theVector);
     }
-    // forces in basic system
+    // basic forces
     else if (strcmp(argv[0],"basicForce") == 0 || strcmp(argv[0],"basicForces") == 0)
     {
         for (i=0; i<numBasicDOF; i++)  {
@@ -745,7 +757,7 @@ Response* EEGeneric::setResponse(const char **argv, int argc,
         }
         theResponse = new ElementResponse(this, 4, Vector(numBasicDOF));
     }
-    // deformations in basic system
+    // target basic displacements
     else if (strcmp(argv[0],"deformation") == 0 || strcmp(argv[0],"deformations") == 0 || 
         strcmp(argv[0],"basicDeformation") == 0 || strcmp(argv[0],"basicDeformations") == 0 ||
         strcmp(argv[0],"targetDisplacement") == 0 || strcmp(argv[0],"targetDisplacements") == 0)
@@ -756,6 +768,26 @@ Response* EEGeneric::setResponse(const char **argv, int argc,
         }
         theResponse = new ElementResponse(this, 5, Vector(numBasicDOF));
     }
+    // target basic velocities
+    else if (strcmp(argv[0],"targetVelocity") == 0 || 
+        strcmp(argv[0],"targetVelocities") == 0)
+    {
+        for (int i=0; i<numBasicDOF; i++)  {
+            sprintf(outputData,"vb%d",i+1);
+            output.tag("ResponseType",outputData);
+        }
+        theResponse = new ElementResponse(this, 6, Vector(numBasicDOF));
+    }
+    // target basic accelerations
+    else if (strcmp(argv[0],"targetAcceleration") == 0 || 
+        strcmp(argv[0],"targetAccelerations") == 0)
+    {
+        for (int i=0; i<numBasicDOF; i++)  {
+            sprintf(outputData,"ab%d",i+1);
+            output.tag("ResponseType",outputData);
+        }
+        theResponse = new ElementResponse(this, 7, Vector(numBasicDOF));
+    }
     // measured basic displacements
     else if (strcmp(argv[0],"measuredDisplacement") == 0 || 
         strcmp(argv[0],"measuredDisplacements") == 0)
@@ -764,7 +796,7 @@ Response* EEGeneric::setResponse(const char **argv, int argc,
             sprintf(outputData,"dbm%d",i+1);
             output.tag("ResponseType",outputData);
         }
-        theResponse = new ElementResponse(this, 6, Vector(numBasicDOF));
+        theResponse = new ElementResponse(this, 8, Vector(numBasicDOF));
     }
     // measured basic velocities
     else if (strcmp(argv[0],"measuredVelocity") == 0 || 
@@ -774,7 +806,7 @@ Response* EEGeneric::setResponse(const char **argv, int argc,
             sprintf(outputData,"vbm%d",i+1);
             output.tag("ResponseType",outputData);
         }
-        theResponse = new ElementResponse(this, 7, Vector(numBasicDOF));
+        theResponse = new ElementResponse(this, 9, Vector(numBasicDOF));
     }
     // measured basic accelerations
     else if (strcmp(argv[0],"measuredAcceleration") == 0 || 
@@ -784,7 +816,7 @@ Response* EEGeneric::setResponse(const char **argv, int argc,
             sprintf(outputData,"abm%d",i+1);
             output.tag("ResponseType",outputData);
         }
-        theResponse = new ElementResponse(this, 8, Vector(numBasicDOF));
+        theResponse = new ElementResponse(this, 10, Vector(numBasicDOF));
     }
 
     output.endTag(); // ElementOutput
@@ -817,7 +849,7 @@ int EEGeneric::getResponse(int responseID, Information &eleInformation)
         }
         return 0;
         
-    case 4:  // forces in basic system
+    case 4:  // basic forces
         if (eleInformation.theVector != 0)  {
             *(eleInformation.theVector) = (*qMeas);
         }
@@ -829,19 +861,31 @@ int EEGeneric::getResponse(int responseID, Information &eleInformation)
         }
         return 0;      
         
-    case 6:  // measured basic displacements
+    case 6:  // target basic velocities
+        if (eleInformation.theVector != 0)  {
+            *(eleInformation.theVector) = vbTarg;
+        }
+        return 0;      
+        
+    case 7:  // target basic accelerations
+        if (eleInformation.theVector != 0)  {
+            *(eleInformation.theVector) = abTarg;
+        }
+        return 0;      
+        
+    case 8:  // measured basic displacements
         if (eleInformation.theVector != 0)  {
             *(eleInformation.theVector) = this->getBasicDisp();
         }
         return 0;
 
-    case 7:  // measured basic velocities
+    case 9:  // measured basic velocities
         if (eleInformation.theVector != 0)  {
             *(eleInformation.theVector) = this->getBasicVel();
         }
         return 0;
 
-    case 8:  // measured basic accelerations
+    case 10:  // measured basic accelerations
         if (eleInformation.theVector != 0)  {
             *(eleInformation.theVector) = this->getBasicAccel();
         }

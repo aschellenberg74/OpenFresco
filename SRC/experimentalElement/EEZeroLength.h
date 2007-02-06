@@ -150,6 +150,9 @@ private:
     Vector *tMeas;      // measured time
 
     Vector dbTarg;      // target displacements in basic system
+    Vector vbTarg;      // target velocities in basic system
+    Vector abTarg;      // target accelerations in basic system
+    
     Vector dbPast;      // past displacements in basic system
     Matrix kbInit;      // stiffness matrix in basic system
     

@@ -69,7 +69,8 @@ EETruss::EETruss(int tag, int dim, int Nd1, int Nd2,
     theMatrix(0), theVector(0), theLoad(0),
     db(0), vb(0), ab(0), t(0),
     dbMeas(0), vbMeas(0), abMeas(0), qMeas(0), tMeas(0),
-    dbTarg(1), dbPast(1), kbInit(1,1)
+    dbTarg(1), vbTarg(1), abTarg(1),
+    dbPast(1), kbInit(1,1)
 {    
     // ensure the connectedExternalNode ID is of correct size & set values
     if (connectedExternalNodes.Size() != 2)  {
@@ -117,6 +118,8 @@ EETruss::EETruss(int tag, int dim, int Nd1, int Nd2,
 
     // initialize additional vectors
     dbTarg.Zero();
+    vbTarg.Zero();
+    abTarg.Zero();
     dbPast.Zero();
 }
 
@@ -134,7 +137,8 @@ EETruss::EETruss(int tag, int dim, int Nd1, int Nd2,
     theSocket(0), sData(0), sendData(0), rData(0), recvData(0),
     db(0), vb(0), ab(0), t(0),
     dbMeas(0), vbMeas(0), abMeas(0), qMeas(0), tMeas(0),
-    dbTarg(1), dbPast(1), kbInit(1,1)
+    dbTarg(1), vbTarg(1), abTarg(1),
+    dbPast(1), kbInit(1,1)
     
 {    
     // ensure the connectedExternalNode ID is of correct size & set values
@@ -211,6 +215,8 @@ EETruss::EETruss(int tag, int dim, int Nd1, int Nd2,
 
     // initialize additional vectors
     dbTarg.Zero();
+    vbTarg.Zero();
+    abTarg.Zero();
     dbPast.Zero();
 }
 
@@ -637,6 +643,8 @@ const Vector& EETruss::getResistingForce()
     
     // save corresponding target displacements for recorder
     dbTarg = (*db);
+    vbTarg = (*vb);
+    abTarg = (*ab);
 
     // determine resisting forces in global system
     int numDOF2 = numDOF/2;
@@ -825,14 +833,14 @@ Response* EETruss::setResponse(const char **argv, int argc,
         }
         theResponse = new ElementResponse(this, 3, *theVector);
     }
-    // basic forces
+    // basic force
     else if (strcmp(argv[0],"basicForce") == 0 || strcmp(argv[0],"basicForces") == 0)
     {
         output.tag("ResponseType","q1");
 
         theResponse = new ElementResponse(this, 4, Vector(1));
     }
-    // basic deformation
+    // target basic displacement
     else if (strcmp(argv[0],"deformation") == 0 || strcmp(argv[0],"deformations") == 0 || 
         strcmp(argv[0],"basicDeformation") == 0 || strcmp(argv[0],"basicDeformations") == 0 ||
         strcmp(argv[0],"targetDisplacement") == 0 || strcmp(argv[0],"targetDisplacements") == 0)
@@ -841,13 +849,29 @@ Response* EETruss::setResponse(const char **argv, int argc,
 
         theResponse = new ElementResponse(this, 5, Vector(1));
     }
+    // target basic velocity
+    else if (strcmp(argv[0],"targetVelocity") == 0 || 
+        strcmp(argv[0],"targetVelocities") == 0)
+    {
+        output.tag("ResponseType","vb1");
+
+        theResponse = new ElementResponse(this, 6, Vector(1));
+    }
+    // target basic acceleration
+    else if (strcmp(argv[0],"targetAcceleration") == 0 || 
+        strcmp(argv[0],"targetAccelerations") == 0)
+    {
+        output.tag("ResponseType","ab1");
+
+        theResponse = new ElementResponse(this, 7, Vector(1));
+    }    
     // measured basic displacement
     else if (strcmp(argv[0],"measuredDisplacement") == 0 || 
         strcmp(argv[0],"measuredDisplacements") == 0)
     {
         output.tag("ResponseType","dbm1");
 
-        theResponse = new ElementResponse(this, 6, Vector(1));
+        theResponse = new ElementResponse(this, 8, Vector(1));
     }
     // measured basic velocity
     else if (strcmp(argv[0],"measuredVelocity") == 0 || 
@@ -855,7 +879,7 @@ Response* EETruss::setResponse(const char **argv, int argc,
     {
         output.tag("ResponseType","vbm1");
 
-        theResponse = new ElementResponse(this, 7, Vector(1));
+        theResponse = new ElementResponse(this, 9, Vector(1));
     }
     // measured basic acceleration
     else if (strcmp(argv[0],"measuredAcceleration") == 0 || 
@@ -863,7 +887,7 @@ Response* EETruss::setResponse(const char **argv, int argc,
     {
         output.tag("ResponseType","abm1");
 
-        theResponse = new ElementResponse(this, 8, Vector(1));
+        theResponse = new ElementResponse(this, 10, Vector(1));
     }
 
     output.endTag(); // ElementOutput
@@ -901,31 +925,43 @@ int EETruss::getResponse(int responseID, Information &eleInformation)
         }
         return 0;
         
-    case 4:  // basic forces
+    case 4:  // basic force
         if (eleInformation.theVector != 0)  {
             *(eleInformation.theVector) = (*qMeas);
         }
         return 0;
         
-    case 5:  // target basic displacements
+    case 5:  // target basic displacement
         if (eleInformation.theVector != 0)  {
             *(eleInformation.theVector) = dbTarg;
         }
         return 0;
         
-    case 6:  // measured basic displacements
+    case 6:  // target basic velocity
+        if (eleInformation.theVector != 0)  {			
+            *(eleInformation.theVector) = vbTarg;
+        }
+        return 0;
+        
+    case 7:  // target basic acceleration
+        if (eleInformation.theVector != 0)  {			
+            *(eleInformation.theVector) = abTarg;
+        }
+        return 0;
+        
+    case 8:  // measured basic displacement
         if (eleInformation.theVector != 0)  {
             *(eleInformation.theVector) = this->getBasicDisp();
         }
         return 0;
 
-    case 7:  // measured basic velocities
+    case 9:  // measured basic velocitie
         if (eleInformation.theVector != 0)  {
             *(eleInformation.theVector) = this->getBasicVel();
         }
         return 0;
 
-    case 8:  // measured basic accelerations
+    case 10:  // measured basic acceleration
         if (eleInformation.theVector != 0)  {
             *(eleInformation.theVector) = this->getBasicAccel();
         }
