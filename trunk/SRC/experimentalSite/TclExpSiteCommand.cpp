@@ -74,7 +74,7 @@ extern ExperimentalSite *getExperimentalSite(int tag)
     if (mc == 0) 
         return 0;
 
-    // otherweise we do a cast and return
+    // otherwise we do a cast and return
     ExperimentalSite *result = (ExperimentalSite *)mc;
     return result;
 }
