@@ -840,7 +840,7 @@ void EEBeamColumn3d::Print(OPS_Stream &s, int flag)
 
 
 Response* EEBeamColumn3d::setResponse(const char **argv, int argc,
-    Information &eleInformation, OPS_Stream &output)
+    OPS_Stream &output)
 {
     Response *theResponse = 0;
 

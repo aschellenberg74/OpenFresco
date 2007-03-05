@@ -561,7 +561,7 @@ void GenericClient::Print(OPS_Stream &s, int flag)
 
 
 Response* GenericClient::setResponse(const char **argv, int argc,
-    Information &eleInformation, OPS_Stream &output)
+    OPS_Stream &output)
 {
     Response *theResponse = 0;
 
