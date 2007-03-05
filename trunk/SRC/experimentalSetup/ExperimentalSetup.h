@@ -174,8 +174,8 @@ protected:
     
     virtual void setCtrl();
     virtual void setDaq();
-    virtual void setCtrlCPs(ArrayOfTaggedObjects &theCPs);
-    virtual void setDaqCPs(ArrayOfTaggedObjects &theCPs);
+    //virtual void setCtrlCPs(ArrayOfTaggedObjects &theCPs);
+    //virtual void setDaqCPs(ArrayOfTaggedObjects &theCPs);
 };
 
 #endif

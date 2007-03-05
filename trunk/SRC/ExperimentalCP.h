@@ -47,13 +47,10 @@ class ExperimentalCP : public TaggedObject
 public:
     // constructors
     ExperimentalCP();
-    ExperimentalCP(int tag, 
-        int nodeid,
-        int dir,
-        int response,
-        double fact = 1.0);
-    ExperimentalCP(int tag, Vector cp);
-    ExperimentalCP(const ExperimentalCP& ecp);
+    ExperimentalCP(int tag, int nodeTag,
+        const ID &direction, const ID &response,
+        const Vector &factor = 0);
+    ExperimentalCP(const ExperimentalCP &ecp);
     
     // destructor
     virtual ~ExperimentalCP();
@@ -61,22 +58,27 @@ public:
     virtual ExperimentalCP *getCopy (void);
     virtual void Print(OPS_Stream &s, int flag);
     
-    int setData(const Vector& cp);
-    const Vector* getData();
+    int setData(int nodeTag, const ID &direction,
+        const ID &response, const Vector &factor = 0);
     
     int getNodeTag();
-    int getDir();
-    int getResponseType();
-    double getFactor();
-    
-    bool operator == (ExperimentalCP& ecp);
-    bool operator != (ExperimentalCP& ecp);
+    int getNumDir();
+    const ID &getDir();
+    const ID &getResponseType();
+    const Vector &getFactor();
+    int getDir(int dirID);
+    int getResponseType(int dirID);
+    double getFactor(int dirID);
+        
+    bool operator == (ExperimentalCP &ecp);
+    bool operator != (ExperimentalCP &ecp);
     
 protected:
     int nodeTag;    // control node tag
-    int direction;  // direction
-    int response;   // response type
-    double factor;  // factor
+    ID direction;   // directions
+    ID response;    // response types
+    Vector factor;  // factors
+    int numDir;     // number of directions
 };
 
 #endif

@@ -91,8 +91,8 @@ ExperimentalSetup::ExperimentalSetup(const ExperimentalSetup& es)
     }
     
     if(es.cpsCtrl != 0) {
-        this->setCtrlCPs(*(es.cpsCtrl));
-        this->setDaqCPs(*(es.cpsDaq));
+        //this->setCtrlCPs(*(es.cpsCtrl));
+        //this->setDaqCPs(*(es.cpsDaq));
     } else {
         sizeCtrl = new ID(OF_Resp_All);
         sizeDaq = new ID(OF_Resp_All);
@@ -740,7 +740,7 @@ void ExperimentalSetup::setDaq()
 }
 
 
-void ExperimentalSetup::setCtrlCPs(ArrayOfTaggedObjects &theCPs)
+/*void ExperimentalSetup::setCtrlCPs(ArrayOfTaggedObjects &theCPs)
 {
     int nCtrl = theCPs.getNumComponents();
     if(cpsCtrl != 0)
@@ -907,5 +907,4 @@ void ExperimentalSetup::setDaqCPs(ArrayOfTaggedObjects &theCPs)
             break;
         }
     }
-}
-
+}*/

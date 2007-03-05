@@ -165,6 +165,17 @@ int main(int argc, char **argv)
 
 extern ExperimentalSite *getExperimentalSite(int tag);
 
+// experimental control point commands
+extern int TclExpCPCommand(ClientData clientData, Tcl_Interp *interp,
+    int argc, TCL_Char **argv, Domain *theDomain, TclModelBuilder *theTclBuilder);
+
+int openFresco_addExperimentalCP(ClientData clientData,
+    Tcl_Interp *interp, int argc, TCL_Char **argv)
+{ 
+    return TclExpCPCommand(clientData, interp, argc, argv,
+        theDomain, theTclBuilder);
+}
+
 // experimental signal filter commands
 extern int TclExpSignalFilterCommand(ClientData clientData, Tcl_Interp *interp,
     int argc, TCL_Char **argv, Domain *theDomain, TclModelBuilder *theTclBuilder);
@@ -911,6 +922,9 @@ int Tcl_AppInit(Tcl_Interp *interp)
 
     Tcl_CreateCommand(interp, "model", specifyModelBuilder,
         (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);    
+
+    Tcl_CreateCommand(interp, "expControlPoint", openFresco_addExperimentalCP,
+        (ClientData)NULL, NULL);
 
     Tcl_CreateCommand(interp, "expSignalFilter", openFresco_addExperimentalSignalFilter,
         (ClientData)NULL, NULL);

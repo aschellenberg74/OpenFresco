@@ -82,8 +82,8 @@ ExperimentalSite::ExperimentalSite(const ExperimentalSite& site)
     }
     
     if(site.cpsTrial != 0) {
-        this->setTrialCPs(*(site.cpsTrial));
-        this->setOutCPs(*(site.cpsOut));
+        //this->setTrialCPs(*(site.cpsTrial));
+        //this->setOutCPs(*(site.cpsOut));
     } else {
         sizeTrial = new ID(OF_Resp_All);
         sizeOut = new ID(OF_Resp_All);
@@ -526,7 +526,7 @@ void ExperimentalSite::setOut()
 }
 
 
-void ExperimentalSite::setTrialCPs(ArrayOfTaggedObjects &theCPs)
+/*void ExperimentalSite::setTrialCPs(ArrayOfTaggedObjects &theCPs)
 {
     int nTrial = theCPs.getNumComponents();
     if(cpsTrial != 0)
@@ -631,5 +631,4 @@ void ExperimentalSite::setOutCPs(ArrayOfTaggedObjects &theCPs)
     }
     
     this->setOut();
-}
-
+}*/
