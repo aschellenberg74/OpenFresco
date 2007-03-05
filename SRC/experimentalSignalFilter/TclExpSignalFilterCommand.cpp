@@ -28,7 +28,7 @@
 // Revision: A
 //
 // Description: This file contains the function invoked when the user
-// invokes the expControl command in the interpreter. 
+// invokes the expSignalFilter command in the interpreter. 
 
 #include <TclModelBuilder.h>
 #include <ArrayOfTaggedObjects.h>
@@ -67,7 +67,7 @@ extern SignalFilter *getExperimentalSignalFilter(int tag)
     if (mc == 0) 
         return 0;
 
-    // otherweise we do a cast and return
+    // otherwise we do a cast and return
     SignalFilter *result = (SignalFilter *)mc;
     return result;
 }
