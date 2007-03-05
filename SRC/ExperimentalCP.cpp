@@ -39,35 +39,38 @@
 
 ExperimentalCP::ExperimentalCP()
     : TaggedObject(0),
-    nodeTag(0),
-    direction(OF_Dir_None),
-    response(OF_Resp_All),
-    factor(1.0)
+    nodeTag(0), direction(0), response(0),
+    factor(0), numDir(0)
 {
     // does nothing
 }
 
 
-ExperimentalCP::ExperimentalCP(int tag, int nodeid, int dir, 
-    int resp, double fact)
+ExperimentalCP::ExperimentalCP(int tag, int nodetag,
+    const ID &dir, const ID &resp, const Vector &fact)
     : TaggedObject(tag),
-    nodeTag(nodeid),
-    direction(dir),
-    response(resp),
-    factor(fact)
+    nodeTag(nodetag), direction(dir), response(resp),
+    factor(dir.Size()), numDir(dir.Size())
 {
-    // does nothing
-}
-
-
-ExperimentalCP::ExperimentalCP(int tag, Vector cp)
-    : TaggedObject(tag),
-    nodeTag((int)(cp[0])),
-    direction((int)(cp[1])),
-    response((int)(cp[2])),
-    factor(cp[3])
-{
-    // does nothing
+    if (fact != 0)  {
+        if (resp.Size() != numDir || 
+            fact.Size() != numDir)  {
+            opserr << "ExperimentalCP::ExperimentalCP() - "
+                << "direction, response and factor need to "
+                << "have same size\n";
+            exit(OF_ReturnType_failed);
+        }
+        factor = fact;
+    } else  {
+        if (resp.Size() != numDir)  {
+            opserr << "ExperimentalCP::ExperimentalCP() - "
+                << "direction and response need to "
+                << "have same size\n";
+            exit(OF_ReturnType_failed);
+        }
+        for (int i=0; i<numDir; i++)
+            factor(i) = 1.0;
+    }
 }
 
 
@@ -78,6 +81,7 @@ ExperimentalCP::ExperimentalCP(const ExperimentalCP& ecp)
     direction = ecp.direction;
     response = ecp.response;
     factor = ecp.factor;
+    numDir = ecp.numDir;
 }
 
 
@@ -90,34 +94,40 @@ ExperimentalCP::~ExperimentalCP()
 ExperimentalCP* ExperimentalCP::getCopy()
 {
     ExperimentalCP *theCopy = new ExperimentalCP(*this);
+
     return theCopy;
 }
 
 
-int ExperimentalCP::setData(const Vector& cp)
+int ExperimentalCP::setData(int nodetag, const ID &dir,
+    const ID &resp, const Vector &fact)
 {
-    if(cp.Size() != 4) {
-        opserr << "FATAL ExperimentalCP::setData - "
-            << "wrong size of ID" << endln;
+    if (fact != 0)  {
+        if (resp.Size() != dir.Size() || 
+            fact.Size() != dir.Size())  {
+            opserr << "ExperimentalCP::setData() - "
+                << "direction, response and factor need to "
+                << "have same size\n";
+            return OF_ReturnType_failed;
+        }
+        factor = fact;
+    } else  {
+        if (resp.Size() != dir.Size())  {
+            opserr << "ExperimentalCP::setData() - "
+                << "direction and response need to "
+                << "have same size\n";
+            return OF_ReturnType_failed;
+        }
+        for (int i=0; i<numDir; i++)
+            factor(i) = 1.0;
     }
-    nodeTag = (int)(cp[0]);
-    direction = (int)(cp[1]);
-    response = (int)(cp[2]);
-    factor = cp[3];
-    
+
+    nodeTag = nodetag;
+    direction = dir;
+    response = resp;
+    numDir = dir.Size();
+   
     return 0;
-}
-
-
-const Vector* ExperimentalCP::getData()
-{
-    Vector *data = new Vector(4);
-    (*data)[0] = nodeTag;
-    (*data)[1] = direction;
-    (*data)[2] = response;
-    (*data)[3] = factor;
-    
-    return data;
 }
 
 
@@ -127,21 +137,65 @@ int ExperimentalCP::getNodeTag()
 }
 
 
-int ExperimentalCP::getDir()
+int ExperimentalCP::getNumDir()
+{
+    return numDir;
+}
+
+const ID& ExperimentalCP::getDir()
 {
     return direction;
 }
 
 
-int ExperimentalCP::getResponseType()
+const ID& ExperimentalCP::getResponseType()
 {
     return response;
 }
 
 
-double ExperimentalCP::getFactor()
+const Vector& ExperimentalCP::getFactor()
 {
     return factor;
+}
+
+
+int ExperimentalCP::getDir(int dirID)
+{
+    if (dirID>=numDir)  {
+        opserr << "ExperimentalCP::getDir() - "
+            << "direction ID out of bounds, "
+            << "component " << dirID << " does not exist\n";
+        return OF_ReturnType_failed;
+    }
+
+    return direction(dirID);
+}
+
+
+int ExperimentalCP::getResponseType(int dirID)
+{
+    if (dirID>=numDir)  {
+        opserr << "ExperimentalCP::getResponseType() - "
+            << "direction ID out of bounds, "
+            << "component " << dirID << " does not exist\n";
+        return OF_ReturnType_failed;
+    }
+
+    return response(dirID);
+}
+
+
+double ExperimentalCP::getFactor(int dirID)
+{
+    if (dirID>=numDir)  {
+        opserr << "ExperimentalCP::getFactor() - "
+            << "direction ID out of bounds, "
+            << "component " << dirID << " does not exist\n";
+        return OF_ReturnType_failed;
+    }
+
+    return factor(dirID);
 }
 
 
@@ -159,7 +213,7 @@ void ExperimentalCP::Print(OPS_Stream &s, int flag)
 bool ExperimentalCP::operator == (ExperimentalCP& ecp)
 {
     // factor value IS NOT checked!
-    if(nodeTag == ecp.nodeTag 
+    if (nodeTag == ecp.nodeTag 
         && direction == ecp.direction
         && response == ecp.response) {
         return true;
@@ -171,6 +225,13 @@ bool ExperimentalCP::operator == (ExperimentalCP& ecp)
 
 bool ExperimentalCP::operator != (ExperimentalCP& ecp)
 {
-    return !(*this==ecp);
+    // factor value IS NOT checked!
+    if (nodeTag != ecp.nodeTag 
+        || direction != ecp.direction
+        || response != ecp.response) {
+        return true;
+    } else {
+        return false;
+    }
 }
 

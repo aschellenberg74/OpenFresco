@@ -45,6 +45,17 @@ TclModelBuilder *theTclBuilder;
 
 extern ExperimentalSite *getExperimentalSite(int tag);
 
+// experimental control point commands
+extern int TclExpCPCommand(ClientData clientData, Tcl_Interp *interp,
+    int argc, TCL_Char **argv, Domain *theDomain, TclModelBuilder *theTclBuilder);
+
+int openFresco_addExperimentalCP(ClientData clientData,
+    Tcl_Interp *interp, int argc, TCL_Char **argv)
+{ 
+    return TclExpCPCommand(clientData, interp, argc, argv,
+        theDomain, theTclBuilder);
+}
+
 // experimental signal filter commands
 extern int TclExpSignalFilterCommand(ClientData clientData, Tcl_Interp *interp,
     int argc, TCL_Char **argv, Domain *theDomain, TclModelBuilder *theTclBuilder);
@@ -128,10 +139,13 @@ OpenFresco(ClientData clientData, Tcl_Interp *interp, int argc,
     }
 
     // add the package to list of available packages
-    code = Tcl_PkgProvide(interp, "OpenFresco", "1.0");
+    code = Tcl_PkgProvide(interp, "OpenFresco", "2.0");
     if (code != TCL_OK) {
         return code;
     }
+
+    Tcl_CreateCommand(interp, "expControlPoint", openFresco_addExperimentalCP,
+        (ClientData)NULL, NULL);
 
     Tcl_CreateCommand(interp, "expSignalFilter", openFresco_addExperimentalSignalFilter,
         (ClientData)NULL, NULL);

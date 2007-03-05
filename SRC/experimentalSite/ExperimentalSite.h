@@ -141,8 +141,8 @@ protected:
     
     virtual void setTrial();
     virtual void setOut();
-    virtual void setTrialCPs(ArrayOfTaggedObjects &theCPs);
-    virtual void setOutCPs(ArrayOfTaggedObjects &theCPs);
+    //virtual void setTrialCPs(ArrayOfTaggedObjects &theCPs);
+    //virtual void setOutCPs(ArrayOfTaggedObjects &theCPs);
 };
 
 #endif
