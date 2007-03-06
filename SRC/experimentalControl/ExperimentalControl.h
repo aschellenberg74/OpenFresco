@@ -73,7 +73,7 @@ public:
     
     virtual int commitState();
     
-    virtual ExperimentalControl *getCopy (void) = 0;
+    virtual ExperimentalControl *getCopy() = 0;
     
     const ID& getSizeCtrl();
     const ID& getSizeDaq();

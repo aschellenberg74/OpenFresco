@@ -41,7 +41,7 @@ class ECxPCtarget : public ExperimentalControl
 public:
     // constructors
     ECxPCtarget(int tag, int type, char *ipAddress,
-        char *ipPort, char *appName, char *appPath);
+        char *ipPort, char *appName, char *appPath = 0);
     ECxPCtarget(const ECxPCtarget &ec);
     
     // destructor
@@ -64,7 +64,7 @@ public:
     
     virtual int commitState();
     
-    virtual ExperimentalControl *getCopy(void);
+    virtual ExperimentalControl *getCopy();
     
     // public methods for output
     void Print(OPS_Stream &s, int flag = 0);    

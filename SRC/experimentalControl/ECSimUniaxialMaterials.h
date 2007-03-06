@@ -67,7 +67,7 @@ public:
     
     virtual int commitState();
 
-    virtual ExperimentalControl *getCopy (void);
+    virtual ExperimentalControl *getCopy();
     
     int addDummySpecimen(UniaxialMaterial *theSpecimen);
     

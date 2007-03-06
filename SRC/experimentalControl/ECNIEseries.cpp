@@ -30,8 +30,7 @@
 // Created: 11/06
 // Revision: A
 //
-// Description: This file contains the implementation of
-// ECNIEseries.
+// Description: This file contains the implementation of ECNIEseries.
 
 #include "ECNIEseries.h"
 

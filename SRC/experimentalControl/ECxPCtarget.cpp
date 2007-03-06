@@ -67,17 +67,39 @@ ECxPCtarget::ECxPCtarget(int tag, int pctype, char *ipaddress,
     opserr << "* and port: " << ipPort << " has been opened:              *\n";
     opserr << "*************************************************\n";
     opserr << endln;
-    
-    // load the compiled target application to the target
-    // if an application is already on the target it is unloaded first
-    xPCLoadApp(port, appPath, appName);
+
+    // check if target application is already loaded
+    // otherwise load the desired application
+    char *currentAppName = (char*) malloc(256);
+    xPCGetAppName(port, currentAppName);
     if (xPCGetLastError())  {
         xPCErrorMsg(xPCGetLastError(), errMsg);
-        opserr << "ECxPCtarget::ECxPCtarget() - xPCLoadApp: error = " << errMsg << endln;
+        opserr << "ECxPCtarget::ECxPCtarget() - xPCGetAppName: error = " << errMsg << endln;
         xPCClosePort(port);
         xPCFreeAPI();
         exit(OF_ReturnType_failed);
     }
+    if (strcmp(currentAppName,appName) != 0)  {
+        // unload the current application
+        xPCUnloadApp(port);
+        if (xPCGetLastError())  {
+            xPCErrorMsg(xPCGetLastError(), errMsg);
+            opserr << "ECxPCtarget::ECxPCtarget() - xPCUnloadApp: error = " << errMsg << endln;
+            xPCClosePort(port);
+            xPCFreeAPI();
+            exit(OF_ReturnType_failed);
+        }
+        // load the new target application
+        xPCLoadApp(port, appPath, appName);
+        if (xPCGetLastError())  {
+            xPCErrorMsg(xPCGetLastError(), errMsg);
+            opserr << "ECxPCtarget::ECxPCtarget() - xPCLoadApp: error = " << errMsg << endln;
+            xPCClosePort(port);
+            xPCFreeAPI();
+            exit(OF_ReturnType_failed);
+        }
+    }
+    free(currentAppName);
     
     // stop the target application on the xPC Target
     xPCStartApp(port);
@@ -103,7 +125,6 @@ ECxPCtarget::ECxPCtarget(int tag, int pctype, char *ipaddress,
     opserr << "* sample time = " << xPCGetSampleTime(port) << ", stop time = " << xPCGetStopTime(port) << "\n";
     opserr << "****************************************************************\n";
     opserr << endln;
-    
 }
 
 
@@ -169,12 +190,14 @@ int ECxPCtarget::setSize(ID sizeT, ID sizeO)
         sizeO[OF_Resp_Force] == 0) {
         opserr << "ECxPCtarget::setSize - wrong sizeTrial/Out\n"; 
         opserr << "see User Manual.\n";
-        exit(OF_ReturnType_failed);
+        xPCClosePort(port);
+        xPCFreeAPI();
+        return OF_ReturnType_failed;
     }
     
-    (*sizeCtrl) = sizeT;
-    (*sizeDaq)  = sizeO;
-    
+    *sizeCtrl = sizeT;
+    *sizeDaq  = sizeO;
+
     return OF_ReturnType_completed;
 }
 
@@ -188,17 +211,17 @@ int ECxPCtarget::setup()
     if (targAccel != 0)
         delete targAccel;
     
-    if ((*sizeCtrl)[OF_Resp_Disp] =! 0)  {
+    if ((*sizeCtrl)[OF_Resp_Disp] != 0)  {
         targDisp = new double[(*sizeCtrl)[OF_Resp_Disp]];
         for (int i=0; i<(*sizeCtrl)[OF_Resp_Disp]; i++)
             targDisp[i] = 0.0;
     }
-    if ((*sizeCtrl)[OF_Resp_Vel] =! 0  && pcType == 2)  {
+    if ((*sizeCtrl)[OF_Resp_Vel] != 0)  {
         targVel = new double[(*sizeCtrl)[OF_Resp_Vel]];
         for (int i=0; i<(*sizeCtrl)[OF_Resp_Vel]; i++)
             targVel[i] = 0.0;
     }
-    if ((*sizeCtrl)[OF_Resp_Accel] =! 0 && pcType == 3)  {
+    if ((*sizeCtrl)[OF_Resp_Accel] != 0)  {
         targAccel = new double[(*sizeCtrl)[OF_Resp_Accel]];
         for (int i=0; i<(*sizeCtrl)[OF_Resp_Accel]; i++)
             targAccel[i] = 0.0;
@@ -209,17 +232,21 @@ int ECxPCtarget::setup()
     if (measForce != 0)
         delete measForce;
     
-    if ((*sizeDaq)[OF_Resp_Disp] =! 0)  {
+    if ((*sizeDaq)[OF_Resp_Disp] != 0)  {
         measDisp = new double[(*sizeDaq)[OF_Resp_Disp]];
         measDispId = new int[(*sizeDaq)[OF_Resp_Disp]];
-        for (int i=0; i<(*sizeDaq)[OF_Resp_Disp]; i++)
+        for (int i=0; i<(*sizeDaq)[OF_Resp_Disp]; i++)  {
             measDisp[i] = 0.0;
+            measDispId[i] = 0;
+        }
     }
-    if ((*sizeDaq)[OF_Resp_Force] =! 0)  {
+    if ((*sizeDaq)[OF_Resp_Force] != 0)  {
         measForce = new double[(*sizeDaq)[OF_Resp_Force]];
         measForceId = new int[(*sizeDaq)[OF_Resp_Force]];
-        for (int i=0; i<(*sizeDaq)[OF_Resp_Force]; i++)
+        for (int i=0; i<(*sizeDaq)[OF_Resp_Force]; i++)  {
             measForce[i] = 0.0;
+            measForceId[i] = 0;
+        }
     }
     
     // get addresses of the controlled variables on the xPC Target
@@ -346,51 +373,8 @@ int ECxPCtarget::setup()
     this->sleep(1000);
 		
 	do  {
- 		// set updateFlag
-		updateFlag = 1.0;
-		xPCSetParam(port, updateFlagId, &updateFlag);
-		if (xPCGetLastError())  {
-			xPCErrorMsg(xPCGetLastError(), errMsg);
-			opserr << "ECxPCtarget::execute() - xPCSetParam: error = " << errMsg << endln;
-			xPCClosePort(port);
-			xPCFreeAPI();
-			return xPCGetLastError();
-		}
-
-		// wait until target flag has changed as well
-		while (xPCGetSignal(port, targetFlagId) != 1.0) {}
-	
-        // reset updateFlag
-        updateFlag = 0.0;
-        xPCSetParam(port, updateFlagId, &updateFlag);
-        if (xPCGetLastError())  {
-            xPCErrorMsg(xPCGetLastError(), errMsg);
-            opserr << "ECxPCtarget::ECxPCtarget() - xPCSetParam: error = " << errMsg << endln;
-            xPCClosePort(port);
-            xPCFreeAPI();
-            return OF_ReturnType_failed;
-        }
-
-		// wait until target is reached
-		while (xPCGetSignal(port, targetFlagId) != 0.0) {}
-        
-        // read displacements and resisting forces at target
-        xPCGetSignals(port, (*sizeDaq)[OF_Resp_Disp], measDispId, measDisp);
-        if (xPCGetLastError())  {
-            xPCErrorMsg(xPCGetLastError(), errMsg);
-            opserr << "ECxPCtarget::ECxPCtarget() - xPCGetSignal: error = " << errMsg << endln;
-            xPCClosePort(port);
-            xPCFreeAPI();
-            return OF_ReturnType_failed;
-        }
-        xPCGetSignals(port, (*sizeDaq)[OF_Resp_Force], measForceId, measForce);
-        if (xPCGetLastError())  {
-            xPCErrorMsg(xPCGetLastError(), errMsg);
-            opserr << "ECxPCtarget::ECxPCtarget() - xPCGetSignal: error = " << errMsg << endln;
-            xPCClosePort(port);
-            xPCFreeAPI();
-            return OF_ReturnType_failed;
-        }
+        this->control();
+        this->acquire();
         
         int i;
         opserr << "**************************************\n";
@@ -449,7 +433,7 @@ int ECxPCtarget::setTrialResponse(const Vector* disp,
         for (i=0; i<(*sizeCtrl)[OF_Resp_Accel]; i++)
             targAccel[i] = (*accel)(i);
     }
-        
+    
     this->control();
     
     return OF_ReturnType_completed;

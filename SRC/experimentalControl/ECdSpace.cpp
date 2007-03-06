@@ -170,18 +170,19 @@ int ECdSpace::setSize(ID sizeT, ID sizeO)
     // disp and force for output
     // check these are available in sizeT/sizeO.
     
-    if((pcType == 0 && sizeT[OF_Resp_Disp] == 0) || 
+    if ((pcType == 0 && sizeT[OF_Resp_Disp] == 0) || 
         (pcType == 1 && sizeT[OF_Resp_Disp] == 0 && sizeT[OF_Resp_Vel] == 0) ||
         (pcType == 2 && sizeT[OF_Resp_Disp] == 0 && sizeT[OF_Resp_Vel] == 0 && sizeT[OF_Resp_Accel] == 0) ||
         sizeO[OF_Resp_Disp] == 0 ||
         sizeO[OF_Resp_Force] == 0) {
         opserr << "ECdSpace::setSize - wrong sizeTrial/Out\n"; 
         opserr << "see User Manual.\n";
+        DS_unregister_host_app();
         return OF_ReturnType_failed;
     }
     
-    (*sizeCtrl) = sizeT;
-    (*sizeDaq)  = sizeO;
+    *sizeCtrl = sizeT;
+    *sizeDaq  = sizeO;
     
     return OF_ReturnType_completed;
 }
@@ -196,17 +197,17 @@ int ECdSpace::setup()
     if (targAccel != 0)
         delete targAccel;
     
-    if ((*sizeCtrl)[OF_Resp_Disp] =! 0)  {
+    if ((*sizeCtrl)[OF_Resp_Disp] != 0)  {
         targDisp = new double[(*sizeCtrl)[OF_Resp_Disp]];
         for (int i=0; i<(*sizeCtrl)[OF_Resp_Disp]; i++)
             targDisp[i] = 0.0;
     }
-    if ((*sizeCtrl)[OF_Resp_Disp]=!0  && pcType==2)  {
+    if ((*sizeCtrl)[OF_Resp_Disp] != 0)  {
         targVel = new double[(*sizeCtrl)[OF_Resp_Vel]];
         for (int i=0; i<(*sizeCtrl)[OF_Resp_Vel]; i++)
             targVel[i] = 0.0;
     }
-    if ((*sizeCtrl)[OF_Resp_Disp]=!0 && pcType==3)  {
+    if ((*sizeCtrl)[OF_Resp_Disp] != 0)  {
         targAccel = new double[(*sizeCtrl)[OF_Resp_Accel]];
         for (int i=0; i<(*sizeCtrl)[OF_Resp_Accel]; i++)
             targAccel[i] = 0.0;
@@ -217,12 +218,12 @@ int ECdSpace::setup()
     if (measForce != 0)
         delete measForce;
     
-    if ((*sizeDaq)[OF_Resp_Disp] =! 0)  {
+    if ((*sizeDaq)[OF_Resp_Disp] != 0)  {
         measDisp = new double[(*sizeDaq)[OF_Resp_Disp]];
         for (int i=0; i<(*sizeDaq)[OF_Resp_Disp]; i++)
             measDisp[i] = 0.0;
     }
-    if ((*sizeDaq)[OF_Resp_Force] =! 0)  {
+    if ((*sizeDaq)[OF_Resp_Force] != 0)  {
         measForce = new double[(*sizeDaq)[OF_Resp_Force]];
         for (int i=0; i<(*sizeDaq)[OF_Resp_Force]; i++)
             measForce[i] = 0.0;
@@ -302,49 +303,8 @@ int ECdSpace::setup()
     this->sleep(1000);
 	
 	do  {
- 		// set updateFlag
-        updateFlag = 1.0;
-        error = DS_write_64(board_index, updateFlagId, 1, (UInt64 *)&updateFlag);
-        if (error != DS_NO_ERROR)  {
-            opserr << "ECdSpace::ECdSpace() - DS_write_64: error = " << error << endln;
-            DS_unregister_host_app();
-            return OF_ReturnType_failed;
-        }
-
-        // wait until target flag has changed as well
-        targetFlag = 0.0;
-        while (targetFlag != 1.0) {
-            DS_read_64(board_index, targetFlagId, 1, (UInt64 *)&targetFlag);
-        }
-        
-        // reset updateFlag
-        updateFlag = 0.0;
-        error = DS_write_64(board_index, updateFlagId, 1, (UInt64 *)&updateFlag);
-        if (error != DS_NO_ERROR)  {
-            opserr << "ECdSpace::ECdSpace() - DS_write_64: error = " << error << endln;
-            DS_unregister_host_app();
-            return OF_ReturnType_failed;
-        }
-
-        // wait until target is reached
-        targetFlag = 1.0;
-        while (targetFlag != 0.0)  {
-            DS_read_64(board_index, targetFlagId, 1, (UInt64 *)&targetFlag);
-        }
-                
-        // read displacements and resisting forces from board
-        error = DS_read_64(board_index, measDispId, (*sizeDaq)[OF_Resp_Disp], (UInt64 *)measDisp);
-        if (error != DS_NO_ERROR)  {
-            opserr << "ECdSpace::ECdSpace() - DS_read_64: error = " << error << endln;
-            DS_unregister_host_app();
-            return OF_ReturnType_failed;
-        }
-        error = DS_read_64(board_index, measForceId, (*sizeDaq)[OF_Resp_Force], (UInt64 *)measForce);
-        if (error != DS_NO_ERROR)  {
-            opserr << "ECdSpace::ECdSpace() - DS_read_64: error = " << error << endln;
-            DS_unregister_host_app();
-            return OF_ReturnType_failed;
-        }
+        this->control();
+        this->acquire();
         
         int i;
         opserr << "**************************************\n";

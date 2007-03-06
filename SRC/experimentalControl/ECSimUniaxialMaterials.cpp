@@ -107,7 +107,7 @@ int ECSimUniaxialMaterials::setSize(ID sizeT, ID sizeO)
         sizeO[OF_Resp_Force] != numMaterial) {
         opserr << "ECSimUniaxialMaterials::setSize - wrong sizeTrial/Out\n"; 
         opserr << "see User Manual.\n";
-        exit(1);
+        return OF_ReturnType_failed;
     }
     
     *sizeCtrl = sizeT;
