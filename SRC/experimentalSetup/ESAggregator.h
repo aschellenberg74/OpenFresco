@@ -87,14 +87,13 @@ protected:
     virtual int transfDaqTime(Vector* time);
     
 private:
-    ExperimentalSetup **theSetups;
+    int numSetups;                  // number of setups to aggregate
+    ExperimentalSetup **theSetups;  // setups to aggregate
 
-    int numSetups;  // number of setups to aggregate
-
-    ID *sizeTrialAll;
-    ID *sizeCtrlAll;
-    ID *sizeDaqAll;
-    ID *sizeOutAll;
+    ID *sizeTrialAll;       // sum of all setup trial responses
+    ID *sizeCtrlAll;        // sum of all setup control responses
+    ID *sizeDaqAll;         // sum of all setup daq responses
+    ID *sizeOutAll;         // sum of all setup output responses
 
     // trial vectors for all setups
     Vector **tDispAll;
