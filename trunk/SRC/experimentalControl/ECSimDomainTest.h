@@ -79,7 +79,7 @@ public:
         Vector* time);
     
     virtual int commitState();
-    virtual ExperimentalControl *getCopy (void);
+    virtual ExperimentalControl *getCopy();
     
     // public methods for output
     void Print(OPS_Stream &s, int flag = 0);    

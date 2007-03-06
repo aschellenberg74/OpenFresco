@@ -36,6 +36,8 @@
 #ifdef _WIN32
 #include <ECxPCtarget.h>
 #include <ECdSpace.h>
+#include <ECMtsCsi.h>
+#include <ECLabVIEW.h>
 //#include <ECNIEseries.h>
 #endif
 
@@ -45,6 +47,7 @@
 #include <Vector.h>
 #include <string.h>
 
+extern ExperimentalCP *getExperimentalCP(int tag);
 static ArrayOfTaggedObjects *theExperimentalControls(0);
 
 
@@ -105,34 +108,36 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
 #ifdef _WIN32
     // ----------------------------------------------------------------------------	
     if (strcmp(argv[1],"xPCtarget") == 0)  {
-		if (argc != 8)  {
+		if (argc < 7)  {
 			opserr << "WARNING invalid number of arguments\n";
 			printCommand(argc,argv);
-			opserr << "Want: expControl xPCtarget tag type ipAddr ipPort appName appPath\n";
+			opserr << "Want: expControl xPCtarget tag type ipAddr ipPort appName <appPath>\n";
 			return TCL_ERROR;
 		}    
 		
 		int tag, type;
-		char *ipAddr, *ipPort, *appName, *appPath;
+		char *ipAddr, *ipPort, *appName, *appPath = 0;
         ExperimentalControl *theControl = 0;
 		
 		if (Tcl_GetInt(interp, argv[2], &tag) != TCL_OK)  {
-			opserr << "WARNING invalid xPCtarget tag\n";
+			opserr << "WARNING invalid expControl xPCtarget tag\n";
 			return TCL_ERROR;		
 		}
 		if (Tcl_GetInt(interp, argv[3], &type) != TCL_OK)  {
 			opserr << "WARNING invalid type\n";
-			opserr << "xPCtarget control: " << tag << endln;
+			opserr << "expControl xPCtarget " << tag << endln;
 			return TCL_ERROR;	
 		}
-		ipAddr = (char *)malloc((strlen(argv[4]) + 1)*sizeof(char));
+		ipAddr = (char*) calloc(strlen(argv[4])+1, sizeof(char));
 		strcpy(ipAddr,argv[4]);
-		ipPort = (char *)malloc((strlen(argv[5]) + 1)*sizeof(char));		
+		ipPort = (char*) calloc(strlen(argv[5])+1, sizeof(char));
 		strcpy(ipPort,argv[5]);
-		appName = (char *)malloc((strlen(argv[6]) + 1)*sizeof(char));
+		appName = (char*) calloc(strlen(argv[6])+1, sizeof(char));
 		strcpy(appName,argv[6]);
-		appPath = (char *)malloc((strlen(argv[7]) + 1)*sizeof(char));
-		strcpy(appPath,argv[7]);
+        if (argc == 8)  {
+		    appPath = (char*) calloc(strlen(argv[7])+1, sizeof(char));
+		    strcpy(appPath,argv[7]);
+        }
 		
 		// parsing was successful, allocate the control
 		theControl = new ECxPCtarget(tag, type, ipAddr, ipPort, appName, appPath);
@@ -163,15 +168,15 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
         ExperimentalControl *theControl = 0;
 		
 		if (Tcl_GetInt(interp, argv[2], &tag) != TCL_OK)  {
-			opserr << "WARNING invalid dSpace tag\n";
-			return TCL_ERROR;		
+			opserr << "WARNING invalid expControl dSpace tag\n";
+			return TCL_ERROR;
 		}
 		if (Tcl_GetInt(interp, argv[3], &type) != TCL_OK)  {
 			opserr << "WARNING invalid type\n";
-			opserr << "dSpace control: " << tag << endln;
-			return TCL_ERROR;	
+			opserr << "expControl dSpace " << tag << endln;
+			return TCL_ERROR;
 		}
-		boardName = (char *)malloc((strlen(argv[4]) + 1)*sizeof(char));
+		boardName = (char*) calloc(strlen(argv[4])+1, sizeof(char));
 		strcpy(boardName,argv[4]);
 		
 		// parsing was successful, allocate the control
@@ -190,6 +195,169 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
     }
 
     // ----------------------------------------------------------------------------	
+    else if (strcmp(argv[1],"MTSCsi") == 0)  {
+		if (argc < 4)  {
+			opserr << "WARNING invalid number of arguments\n";
+			printCommand(argc,argv);
+			opserr << "Want: expControl MTSCsi tag configFileName <rampTime>\n";
+			return TCL_ERROR;
+		}    
+		
+		int tag;
+        char *cfgFile;
+        double rampTime = 0.02;
+
+		if (Tcl_GetInt(interp, argv[2], &tag) != TCL_OK)  {
+			opserr << "WARNING invalid expControl MTSCsi tag\n";
+			return TCL_ERROR;
+		}
+		cfgFile = (char*) calloc(strlen(argv[3])+1, sizeof(char));
+		strcpy(cfgFile,argv[3]);
+        if (argc == 5) {
+		    if (Tcl_GetDouble(interp, argv[4], &rampTime) != TCL_OK)  {
+			    opserr << "WARNING invalid rampTime\n";
+			    opserr << "expControl MTSCsi " << tag << endln;
+			    return TCL_ERROR;	
+            }
+        }
+		// parsing was successful, allocate the control
+		ExperimentalControl *theControl = new ECMtsCsi(tag, cfgFile, rampTime);
+
+        if (theControl == 0)  {
+            opserr << "WARNING could not create experimental controller " << argv[1] << endln;
+            return TCL_ERROR;
+        }
+        
+        // now add the controller to the modelBuilder
+        if (addExperimentalControl(*theControl) < 0)  {
+            opserr << "WARNING could not add experimental controller to the domain\n";
+            opserr << *theControl << endln;
+            delete theControl; // invoke the destructor, otherwise mem leak
+            return TCL_ERROR;
+        }
+    }
+
+    // ----------------------------------------------------------------------------	
+    else if (strcmp(argv[1],"LabVIEW") == 0)  {
+		if (argc < 8)  {
+			opserr << "WARNING invalid number of arguments\n";
+			printCommand(argc,argv);
+			opserr << "Want: expControl LabVIEW tag ipAddr <ipPort> -trialCP cpTags -outCP cpTags\n";
+			return TCL_ERROR;
+		}
+
+		int tag, cpTag, ipPort = 44000, argi = 2;
+        int numTrialCPs = 0, numOutCPs = 0;
+		char *ipAddr;
+        ExperimentalControl *theControl = 0;
+		
+		if (Tcl_GetInt(interp, argv[argi], &tag) != TCL_OK)  {
+			opserr << "WARNING invalid expControl LabVIEW tag\n";
+			return TCL_ERROR;
+		}
+        argi++;
+		ipAddr = (char*) calloc(strlen(argv[argi])+1, sizeof(char));
+		strcpy(ipAddr,argv[argi]);
+        argi++;
+        if (strcmp(argv[argi],"-trialCP") != 0)  {
+		    if (Tcl_GetInt(interp, argv[argi], &ipPort) != TCL_OK)  {
+			    opserr << "WARNING invalid ipPort\n";
+			    opserr << "expControl LabVIEW " << tag << endln;
+			    return TCL_ERROR;
+		    }
+            argi++;
+        }
+        if (strcmp(argv[argi],"-trialCP") != 0)  {
+		    opserr << "WARNING expecting -trialCP cpTags\n";
+		    opserr << "expControl LabVIEW " << tag << endln;
+		    return TCL_ERROR;
+        }
+        argi++;
+        while (strcmp(argv[argi+numTrialCPs],"-outCP") != 0 &&
+            argi+numTrialCPs < argc)  {
+            numTrialCPs++;
+        }
+        if (numTrialCPs == 0)  {
+		    opserr << "WARNING no trialCPTags specified\n";
+		    opserr << "expControl LabVIEW " << tag << endln;
+		    return TCL_ERROR;
+	    }
+        // create the array to hold the trial control points
+        ExperimentalCP **trialCPs = new ExperimentalCP* [numTrialCPs];
+        if (trialCPs == 0)  {
+		    opserr << "WARNING out of memory\n";
+		    opserr << "expControl LabVIEW " << tag << endln;
+		    return TCL_ERROR;
+	    }
+        for (int i=0; i<numTrialCPs; i++)  {
+            if (Tcl_GetInt(interp, argv[argi], &cpTag) != TCL_OK)  {
+                opserr << "WARNING invalid cpTag\n";
+                opserr << "expControl LabVIEW " << tag << endln;
+                return TCL_ERROR;	
+            }
+            trialCPs[i] = getExperimentalCP(cpTag);
+            if (trialCPs[i] == 0)  {
+                opserr << "WARNING experimental control point not found\n";
+                opserr << "expControlPoint " << cpTag << endln;
+                opserr << "expControl LabVIEW " << tag << endln;
+                return TCL_ERROR;
+            }
+            argi++;
+        }
+        if (strcmp(argv[argi],"-outCP") != 0)  {
+		    opserr << "WARNING expecting -outCP cpTags\n";
+		    opserr << "expControl LabVIEW " << tag << endln;
+		    return TCL_ERROR;		
+        }
+        argi++;
+        while (argi+numOutCPs < argc)  {
+            numOutCPs++;
+        }
+        if (numOutCPs == 0)  {
+		    opserr << "WARNING no outCPTags specified\n";
+		    opserr << "expControl LabVIEW " << tag << endln;
+		    return TCL_ERROR;
+	    }
+        // create the array to hold the output control points
+        ExperimentalCP **outCPs = new ExperimentalCP* [numOutCPs];
+        if (outCPs == 0)  {
+		    opserr << "WARNING out of memory\n";
+		    opserr << "expControl LabVIEW " << tag << endln;
+		    return TCL_ERROR;
+	    }
+        for (int i=0; i<numOutCPs; i++)  {
+            if (Tcl_GetInt(interp, argv[argi], &cpTag) != TCL_OK)  {
+                opserr << "WARNING invalid cpTag\n";
+                opserr << "expControl LabVIEW " << tag << endln;
+                return TCL_ERROR;
+            }
+            outCPs[i] = getExperimentalCP(cpTag);
+            if (outCPs[i] == 0)  {
+                opserr << "WARNING experimental control point not found\n";
+                opserr << "expControlPoint " << cpTag << endln;
+                opserr << "expControl LabVIEW " << tag << endln;
+                return TCL_ERROR;
+            }
+            argi++;
+        }
+		
+		// parsing was successful, allocate the control
+		theControl = new ECLabVIEW(tag, numTrialCPs, trialCPs, numOutCPs, outCPs, ipAddr, ipPort);
+
+        if (theControl == 0)  {
+            opserr << "WARNING could not create experimental control " << argv[1] << endln;
+            return TCL_ERROR;
+        }
+        
+        // now add the control to the modelBuilder
+        if (addExperimentalControl(*theControl) < 0)  {
+            delete theControl; // invoke the destructor, otherwise mem leak
+
+            return TCL_ERROR;
+        }
+    }
+	
+    // ----------------------------------------------------------------------------	
 /*    else if (strcmp(argv[1],"NIEseries") == 0)  {
 		if (argc != 4)  {
 			opserr << "WARNING invalid number of arguments\n";
@@ -202,12 +370,12 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
         ExperimentalControl *theControl = 0;
 		
 		if (Tcl_GetInt(interp, argv[2], &tag) != TCL_OK)  {
-			opserr << "WARNING invalid NIEseries tag\n";
+			opserr << "WARNING invalid expControl NIEseries tag\n";
 			return TCL_ERROR;		
 		}
 		if (Tcl_GetInt(interp, argv[3], &device) != TCL_OK)  {
 			opserr << "WARNING invalid device\n";
-			opserr << "NIEseries control: " << tag << endln;
+			opserr << "expControl NIEseries " << tag << endln;
 			return TCL_ERROR;	
 		}
 		
@@ -240,17 +408,17 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
         ExperimentalControl *theControl = 0;
 		
 		if (Tcl_GetInt(interp, argv[2], &tag) != TCL_OK)  {
-			opserr << "WARNING invalid SCRAMNet tag\n";
+			opserr << "WARNING invalid expControl SCRAMNet tag\n";
 			return TCL_ERROR;		
 		}
 		if (Tcl_GetInt(interp, argv[3], &memOffset) != TCL_OK)  {
 			opserr << "WARNING invalid memOffset\n";
-			opserr << "SCRAMNet control: " << tag << endln;
+			opserr << "expControl SCRAMNet " << tag << endln;
 			return TCL_ERROR;
 		}
 		if (Tcl_GetInt(interp, argv[4], &numActCh) != TCL_OK)  {
 			opserr << "WARNING invalid numActCh\n";
-			opserr << "SCRAMNet control: " << tag << endln;
+			opserr << "expControl SCRAMNet " << tag << endln;
 			return TCL_ERROR;
 		}
         		
@@ -278,32 +446,28 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
 			return TCL_ERROR;
 		}    
 		
-		int tag, numMats, argi;
+		int tag, matTag, numMats = 0, argi = 2;
         ECSimUniaxialMaterials *theControl = 0;
 		
-		if (Tcl_GetInt(interp, argv[2], &tag) != TCL_OK)  {
-			opserr << "WARNING invalid SimUniaxialMaterials tag\n";
+		if (Tcl_GetInt(interp, argv[argi], &tag) != TCL_OK)  {
+			opserr << "WARNING invalid expControl SimUniaxialMaterials tag\n";
 			return TCL_ERROR;		
 		}
+        argi++;
 
 		// parsing was successful, allocate the control
 		theControl = new ECSimUniaxialMaterials(tag);	
 
 		// now read the number of materials
-		numMats = 0;
-		argi = 3; 
-		while (argi < argc)  {
+		while (argi+numMats < argc)  {
 			numMats++;
-			argi++;
 		}
 		// add the materials to the control
-		argi = 3; 
 		for (int i=0; i<numMats; i++)  {
-			int matTag;	
 			// read the material tag
 			if (Tcl_GetInt(interp, argv[argi], &matTag) != TCL_OK)  {
 				opserr << "WARNING invalid matTag\n";
-				opserr << "SimUniaxialMaterials control: " << tag << endln;
+				opserr << "expControl SimUniaxialMaterials " << tag << endln;
 				return TCL_ERROR;
 			} else  {
 				// get a pointer to the material from the modelbuilder	    
@@ -311,7 +475,7 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
 				UniaxialMaterial *theMat = theTclBuilder->getUniaxialMaterial(matTag);
 				if (theMat == 0)  {
 					opserr << "WARNING no material " << matTag << " exists\n";
-					opserr << "SimUniaxialMaterials control: " << tag << endln;
+					opserr << "expControl SimUniaxialMaterials " << tag << endln;
 					return TCL_ERROR;		
 				} else  {
 					// add the material

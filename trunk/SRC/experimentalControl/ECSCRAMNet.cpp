@@ -194,7 +194,9 @@ int ECSCRAMNet::setSize(ID sizeT, ID sizeO)
         sizeO[OF_Resp_Time] > numActCh) {
         opserr << "ECSCRAMNet::setSize - wrong sizeTrial/Out\n"; 
         opserr << "see User Manual.\n";
-        exit(OF_ReturnType_failed);
+        scr_reg_mm(UNMAP);
+        scr_mem_mm(UNMAP);
+        return OF_ReturnType_failed;
     }
     
     (*sizeCtrl) = sizeT;
@@ -223,17 +225,8 @@ int ECSCRAMNet::setup()
     }
     
     do  {
-		// set updateFlag
-        updateFlag[0] = 1.0;
-        
-		// wait until target flag has changed as well
-		while (targetFlag[0] != 1.0) {}
-
-        // reset updateFlag
-        updateFlag[0] = 0.0;
-
-        // wait until target is reached
-        while (targetFlag[0] != 0.0) {}
+        this->control();
+        this->acquire();
         
         int i;
         opserr << "**************************************\n";

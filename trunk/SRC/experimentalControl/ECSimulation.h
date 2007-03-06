@@ -63,7 +63,7 @@ public:
         Vector* force,
         Vector* time) = 0;
     
-    virtual ExperimentalControl *getCopy (void) = 0;
+    virtual ExperimentalControl *getCopy() = 0;
     
 protected:
     // protected methods to set and to get response
