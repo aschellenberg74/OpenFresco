@@ -846,10 +846,9 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp, int argc,
             return TCL_ERROR;	
         }
         argi++;
-        i = argi;
-        while (strcmp(argv[i],"-sizeTrialOut") != 0 && i < argc)  {
+        while (strcmp(argv[argi+numSetups],"-sizeTrialOut") != 0 && 
+            argi+numSetups < argc)  {
             numSetups++;
-            i++;
         }
         if (numSetups == 0)  {
 		    opserr << "WARNING no setups specified\n";
@@ -873,6 +872,12 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp, int argc,
                 return TCL_ERROR;	
             }
             expSetups[i] = getExperimentalSetup(setupTag);
+            if (expSetups[i] == 0)  {
+                opserr << "WARNING experimental setup not found\n";
+                opserr << "expSetup " << setupTag << endln;
+                opserr << "expSetup Aggregator " << tag << endln;
+                return TCL_ERROR;
+            }
             argi++;
         }
         for (j=0; j<numSetups; j++)  {

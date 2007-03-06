@@ -37,7 +37,7 @@ ESAggregator::ESAggregator(int tag, int nSetups,
     ID *sizetrialall, ID *sizeoutall,
     ExperimentalControl* control)
 	: ExperimentalSetup(tag, control),
-    theSetups(0), numSetups(nSetups),
+    numSetups(nSetups), theSetups(0),
     sizeTrialAll(sizetrialall), sizeCtrlAll(0),
     sizeDaqAll(0), sizeOutAll(sizeoutall),
     tDispAll(0), tVelAll(0), tAccelAll(0), tForceAll(0), tTimeAll(0),
@@ -45,30 +45,29 @@ ESAggregator::ESAggregator(int tag, int nSetups,
     dDispAll(0), dVelAll(0), dAccelAll(0), dForceAll(0), dTimeAll(0),
     oDispAll(0), oVelAll(0), oAccelAll(0), oForceAll(0), oTimeAll(0)
 {
-    if (!setups)  {
-      opserr << "ESAggregator::ESAggregator() - "
-          << "null experimental setup array passed\n";
-      exit(OF_ReturnType_failed);
+    if (setups == 0)  {
+        opserr << "ESAggregator::ESAggregator() - "
+            << "null experimental setup array passed\n";
+        exit(OF_ReturnType_failed);
     }
 
     // allocate memory for the experimental setups
     theSetups = new ExperimentalSetup* [numSetups];
-    if (!theSetups)  {
+    if (theSetups == 0)  {
         opserr << "ESAggregator::ESAggregator() - "
             << "failed to allocate pointers\n";
         exit(OF_ReturnType_failed);
     }
 
     // get copies of the setups to be aggregated
-    int i;
-    for (i = 0; i < numSetups; i++)  {
-        if (!setups[i]) {
+    for (int i=0; i<numSetups; i++)  {
+        if (setups[i] == 0) {
             opserr << "ESAggregator::ESAggregator() - "
                 "null experimental setup pointer passed\n";
             exit(OF_ReturnType_failed);
         }
         theSetups[i] = setups[i]->getCopy();
-        if (!theSetups[i]) {
+        if (theSetups[i] == 0) {
             opserr << "ESAggregator::ESAggregator() - "
                 << "failed to copy experimental setup\n";
             exit(OF_ReturnType_failed);
@@ -224,19 +223,23 @@ ESAggregator::ESAggregator(const ESAggregator& es)
         delete theSetups;
 
     // allocate memory for the experimental setups
+    numSetups = es.numSetups;
     theSetups = new ExperimentalSetup* [numSetups];
-    if (!theSetups)  {
+    if (theSetups == 0)  {
         opserr << "ESAggregator::ESAggregator() - "
             << "failed to allocate pointers\n";
         exit(OF_ReturnType_failed);
     }
 
     // get copies of the setups to be aggregated
-    int i;
-    for (i = 0; i < numSetups; i++) {
+    for (int i=0; i<numSetups; i++)  {
+        if (es.theSetups[i] == 0) {
+            opserr << "ESAggregator::ESAggregator() - "
+                "null experimental setup pointer passed\n";
+            exit(OF_ReturnType_failed);
+        }
         theSetups[i] = es.theSetups[i]->getCopy();
-        
-        if (!theSetups[i]) {
+        if (theSetups[i] == 0) {
             opserr << "ESAggregator::ESAggregator() - "
                 << "failed to copy experimental setup\n";
             exit(OF_ReturnType_failed);
