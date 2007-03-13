@@ -3,7 +3,7 @@
  *           functions provided by the xPC Target C API.
  * $Revision$ $Date$
  */
-/* Copyright 1996-2005 The MathWorks, Inc. */
+/* Copyright 1996-2006 The MathWorks, Inc. */
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -71,6 +71,12 @@ int xPCInitAPI(void) {
         return -1;
     if ((xPCTgScGetGrid = (void *)
          GetProcAddress(dllHandle, "xPCTgScGetGrid")) == NULL)
+        return -1;
+    if ((xPCTgScSetSignalFormat = (void *)
+         GetProcAddress(dllHandle, "xPCTgScSetSignalFormat")) == NULL)
+        return -1;
+    if ((xPCTgScGetSignalFormat = (void *)
+         GetProcAddress(dllHandle, "xPCTgScGetSignalFormat")) == NULL)
         return -1;
     if ((xPCGetSignalName = (void *)
          GetProcAddress(dllHandle, "xPCGetSignalName")) == NULL)
@@ -207,7 +213,6 @@ int xPCInitAPI(void) {
     if ((xPCScGetData = (void *)
          GetProcAddress(dllHandle, "xPCScGetData")) == NULL)
         return -1;
-
     if ((xPCScGetAutoRestart = (void *)
          GetProcAddress(dllHandle, "xPCScGetAutoRestart")) == NULL)
         return -1;
@@ -382,6 +387,9 @@ int xPCInitAPI(void) {
     if ((xPCFSDirSize = (void *)
          GetProcAddress(dllHandle, "xPCFSDirSize")) == NULL)
         return -1;
+    if ((xPCFSFileTable = (void *)
+         GetProcAddress(dllHandle, "xPCFSFileTable")) == NULL)
+        return -1;
     if ((xPCFSGetError = (void *)
          GetProcAddress(dllHandle, "xPCFSGetError")) == NULL)
         return -1;
@@ -391,6 +399,13 @@ int xPCInitAPI(void) {
     if ((xPCLoadParamSet = (void *)
          GetProcAddress(dllHandle, "xPCLoadParamSet")) == NULL)
         return -1;
+    if ((xPCReadXML = (void *)
+         GetProcAddress(dllHandle, "xPCReadXML")) == NULL)
+        return -1;
+    if ((xPCFSDiskInfo = (void *)
+         GetProcAddress(dllHandle, "xPCFSDiskInfo")) == NULL)
+        return -1;
+
 
     GETFCNPTR(xPCFSScSetFilename);
     GETFCNPTR(xPCFSScGetFilename);
@@ -418,6 +433,8 @@ void xPCFreeAPI(void) {
     xPCTgScGetViewMode =         NULL;
     xPCTgScGetMode =             NULL;
     xPCTgScGetGrid =             NULL;
+    xPCTgScSetSignalFormat =     NULL;
+    xPCTgScGetSignalFormat =     NULL;
     xPCGetSignalName =           NULL;
     xPCGetParamName =            NULL;
     xPCGetParamType =            NULL;
@@ -521,6 +538,7 @@ void xPCFreeAPI(void) {
     xPCFSRMDIR =                 NULL;
     xPCFSDir =                   NULL;
     xPCFSDirSize =               NULL;
+    xPCFSFileTable =             NULL;
     xPCFSGetError =              NULL;
     xPCSaveParamSet =            NULL;
     xPCLoadParamSet =            NULL;
@@ -530,8 +548,8 @@ void xPCFreeAPI(void) {
     xPCFSScGetWriteMode =        NULL;
     xPCFSScSetWriteSize =        NULL;
     xPCFSScGetWriteSize =        NULL;
-
-
+    xPCReadXML =                 NULL;
+    xPCFSDiskInfo =              NULL;
     return;
 }
 
