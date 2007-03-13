@@ -2,7 +2,7 @@
  * Abstract: Constants defined for use in the xPC Target C API.
  * $Revision$ $Date$
  */
-/* Copyright 2000-2004 The MathWorks, Inc. */
+/* Copyright 2000-2005 The MathWorks, Inc. */
 
 #ifndef _XPCAPICONST_H_
 #define _XPCAPICONST_H_
@@ -140,7 +140,10 @@ typedef enum ErrorValues_tag {
     EFILEWRITE           = 212,
     EFILERENAME          = 213,
 
+
     EINVXPCVERSION       = 801,
+
+    EMALFORMED           = 900,
 
     EINTERNAL            = 999,
 } xPCErrorValue;
