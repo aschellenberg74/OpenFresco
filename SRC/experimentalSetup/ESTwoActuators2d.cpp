@@ -336,7 +336,7 @@ int ESTwoActuators2d::transfDaqDisp(Vector* disp)
     }
     // nonlinear geometry
     else if (nlGeom == 1)  {
-        double d0 = La0 + (*dDisp)(0);
+        double d0 = La1 + (*dDisp)(0);
         double d1 = La1 + (*dDisp)(1);
 
         (*disp)(0) = (*dDisp)(0);
@@ -423,7 +423,7 @@ int ESTwoActuators2d::transfDaqForce(Vector* force)
     }
     // nonlinear geometry
     else if (nlGeom == 1)  {
-        double d0 = La0 + (*dDisp)(0);
+        double d0 = La1 + (*dDisp)(0);
         double d1 = La1 + (*dDisp)(1);
 
         double disp2 = atan(d0/L) - acos((d1*d1-2*L*L-d0*d0)/(-2*L*pow(L*L+d0*d0,0.5)));
