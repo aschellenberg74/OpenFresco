@@ -516,18 +516,18 @@ int ESInvertedVBraceJntOff2d::transfDaqDisp(Vector* disp)
         
         do  {
             F(0) = L0*L0 + L4*L4 - pow(d0*cos(theta(0))-La0-L0-d1*sin(theta(1)),2.0) - pow(d0*sin(theta(0))+La1+L4-d1*cos(theta(1)),2.0);
-            F(1) = pow(L1+L2,2.0) + pow(L4-L5,2.0) - pow(d2*sin(theta(2))+L1+L2-d1*sin(theta(1)),2.0) - pow(d2*cos(theta(2))-d1*cos(theta(1)),2.0);
-            F(2) = pow(L0+L1+L2,2.0) + L5*L5 - pow(d0*cos(theta(0))-La0-L0-d2*sin(theta(2))-L1-L2,2.0) - pow(d0*sin(theta(0))+La1+L4-d2*cos(theta(2)),2.0);
+            F(1) = pow(L1+L2,2.0) + pow(L4-L5,2.0) - pow(d2*sin(theta(2))+L1+L2-d1*sin(theta(1)),2.0) - pow(d2*cos(theta(2))+La1+L4-L5-La2-d1*cos(theta(1)),2.0);
+            F(2) = pow(L0+L1+L2,2.0) + L5*L5 - pow(d0*cos(theta(0))-La0-L0-d2*sin(theta(2))-L1-L2,2.0) - pow(d0*sin(theta(0))+La2+L5-d2*cos(theta(2)),2.0);
             
-            DF(0,0) = -2.0*d0*((L4+La1)*cos(theta(0))-d1*cos(theta(1)+theta(0))+(L0+La0)*sin(theta(0)));
-            DF(0,1) = -2.0*d1*((L0+La0)*cos(theta(1))-d0*cos(theta(1)+theta(0))+(L4+La1)*sin(theta(1)));
+            DF(0,0) = 2.0*d0*(-(L4+La1)*cos(theta(0))+d1*cos(theta(1)+theta(0))-(L0+La0)*sin(theta(0)));
+            DF(0,1) = 2.0*d1*(-(L0+La0)*cos(theta(1))+d0*cos(theta(1)+theta(0))-(L4+La1)*sin(theta(1)));
             DF(0,2) = 0.0;
             DF(1,0) = 0.0;
-            DF(1,1) = 2.0*d1*((L1+L2)*cos(theta(1))-d2*sin(theta(1)-theta(2)));
-            DF(1,2) = 2.0*d2*(-(L1+L2)*cos(theta(2))+d1*sin(theta(1)-theta(2)));
-            DF(2,0) = -2.0*d0*((L4+La1)*cos(theta(0))-d2*cos(theta(2)+theta(0))+(L0+L1+L2+La0)*sin(theta(0)));
+            DF(1,1) = 2.0*d1*((L1+L2)*cos(theta(1))-d2*sin(theta(1)-theta(2))-(L4-L5+La1-La2)*sin(theta(1)));
+            DF(1,2) = 2.0*d2*(-(L1+L2)*cos(theta(2))+d1*sin(theta(1)-theta(2))+(L4-L5+La1-La2)*sin(theta(2)));
+            DF(2,0) = 2.0*d0*(-(L5+La2)*cos(theta(0))+d2*cos(theta(2)+theta(0))-(L0+L1+L2+La0)*sin(theta(0)));
             DF(2,1) = 0.0;
-            DF(2,2) = -2.0*d2*((L0+L1+L2+La0)*cos(theta(2))-d0*cos(theta(2)+theta(0))+(L4+La1)*sin(theta(2)));
+            DF(2,2) = 2.0*d2*(-(L0+L1+L2+La0)*cos(theta(2))+d0*cos(theta(2)+theta(0))-(L5+La2)*sin(theta(2)));
             
             // Newton’s method
             dTheta = F/DF;
@@ -542,11 +542,11 @@ int ESInvertedVBraceJntOff2d::transfDaqDisp(Vector* disp)
                 << iter << " iterations and norm: " << dTheta.Norm() << endln;
         }
 
-        (*disp)(2) = atan((d2*cos(theta(2))-d1*cos(theta(1)))/(d2*sin(theta(2))+L1+L2-d1*sin(theta(1)))) - atan((L4-L5)/(L1+L2));
+        (*disp)(2) = atan((d2*cos(theta(2))+La1+L4-L5-La2-d1*cos(theta(1)))/(d2*sin(theta(2))+L1+L2-d1*sin(theta(1)))) - atan((L4-L5)/(L1+L2));
         double R0 = sqrt(L1*L1 + L4*L4);
         double beta0 = atan(L4/L1) + (*disp)(2);
         (*disp)(0) = d1*sin(theta(1)) + R0*cos(beta0) - L1;
-        (*disp)(1) = d1*cos(theta(1)) + R0*sin(beta0) - La1 - L4;        
+        (*disp)(1) = d1*cos(theta(1)) + R0*sin(beta0) - La1 - L4;
     }
     // nonlinear geometry, horizontal actuator right
     else if (nlGeom == 1 && strcmp(posAct0,"right") == 0)  {
@@ -566,18 +566,18 @@ int ESInvertedVBraceJntOff2d::transfDaqDisp(Vector* disp)
         
         do  {
             F(0) = pow(L1+L2+L3,2.0) + L4*L4 - pow(-d0*cos(theta(0))+La0+L1+L2+L3+d1*sin(theta(1)),2.0) - pow(d0*sin(theta(0))+La1+L4-d1*cos(theta(1)),2.0);
-            F(1) = pow(L1+L2,2.0) + pow(L4-L5,2.0) - pow(-d2*sin(theta(2))+L1+L2+d1*sin(theta(1)),2.0) - pow(d2*cos(theta(2))-d1*cos(theta(1)),2.0);
-            F(2) = L3*L3 + L5*L5 - pow(-d0*cos(theta(0))+La0+L3+d2*sin(theta(2)),2.0) - pow(d0*sin(theta(0))+La1+L4-d2*cos(theta(2)),2.0);
+            F(1) = pow(L1+L2,2.0) + pow(L4-L5,2.0) - pow(-d2*sin(theta(2))+L1+L2+d1*sin(theta(1)),2.0) - pow(d2*cos(theta(2))+La1+L4-L5-La2-d1*cos(theta(1)),2.0);
+            F(2) = L3*L3 + L5*L5 - pow(-d0*cos(theta(0))+La0+L3+d2*sin(theta(2)),2.0) - pow(d0*sin(theta(0))+La2+L5-d2*cos(theta(2)),2.0);
             
-            DF(0,0) = -2.0*d0*((L4+La1)*cos(theta(0))-d1*cos(theta(1)+theta(0))+(L1+L2+L3+La0)*sin(theta(0)));
-            DF(0,1) = -2.0*d1*((L1+L2+L3+La0)*cos(theta(1))-d0*cos(theta(1)+theta(0))+(L4+La1)*sin(theta(1)));
+            DF(0,0) = 2.0*d0*(-(L4+La1)*cos(theta(0))+d1*cos(theta(1)+theta(0))-(L1+L2+L3+La0)*sin(theta(0)));
+            DF(0,1) = 2.0*d1*(-(L1+L2+L3+La0)*cos(theta(1))+d0*cos(theta(1)+theta(0))-(L4+La1)*sin(theta(1)));
             DF(0,2) = 0.0;
             DF(1,0) = 0.0;
-            DF(1,1) = 2.0*d1*(-(L1+L2)*cos(theta(1))-d2*sin(theta(1)-theta(2)));
-            DF(1,2) = 2.0*d2*((L1+L2)*cos(theta(2))+d1*sin(theta(1)-theta(2)));
-            DF(2,0) = -2.0*d0*((L4+La1)*cos(theta(0))-d2*cos(theta(2)+theta(0))+(L3+La0)*sin(theta(0)));
+            DF(1,1) = 2.0*d1*(-(L1+L2)*cos(theta(1))-d2*sin(theta(1)-theta(2))-(L4-L5+La1-La2)*sin(theta(1)));
+            DF(1,2) = 2.0*d2*((L1+L2)*cos(theta(2))+d1*sin(theta(1)-theta(2))+(L4-L5+La1-La2)*sin(theta(2)));
+            DF(2,0) = 2.0*d0*(-(L5+La2)*cos(theta(0))+d2*cos(theta(2)+theta(0))-(L3+La0)*sin(theta(0)));
             DF(2,1) = 0.0;
-            DF(2,2) = -2.0*d2*((L3+La0)*cos(theta(2))-d0*cos(theta(2)+theta(0))+(L4+La1)*sin(theta(2)));
+            DF(2,2) = 2.0*d2*(-(L3+La0)*cos(theta(2))+d0*cos(theta(2)+theta(0))-(L5+La2)*sin(theta(2)));
             
             // Newton’s method
             dTheta = F/DF;
@@ -592,7 +592,7 @@ int ESInvertedVBraceJntOff2d::transfDaqDisp(Vector* disp)
                 << iter << " iterations and norm: " << dTheta.Norm() << endln;
         }
 
-        (*disp)(2) = atan((d2*cos(theta(2))-d1*cos(theta(1)))/(-d2*sin(theta(2))+L1+L2+d1*sin(theta(1)))) - atan((L4-L5)/(L1+L2));
+        (*disp)(2) = atan((d2*cos(theta(2))+La1+L4-L5-La2-d1*cos(theta(1)))/(-d2*sin(theta(2))+L1+L2+d1*sin(theta(1)))) - atan((L4-L5)/(L1+L2));
         double R0 = sqrt(L1*L1 + L4*L4);
         double beta0 = atan(L4/L1) + (*disp)(2);
         (*disp)(0) = -d1*sin(theta(1)) + R0*cos(beta0) - L1;

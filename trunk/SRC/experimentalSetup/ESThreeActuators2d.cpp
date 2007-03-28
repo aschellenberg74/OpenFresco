@@ -466,12 +466,12 @@ int ESThreeActuators2d::transfDaqDisp(Vector* disp)
         
         do  {
             F(0) = pow(d0,2.0) - pow(d1*sin(theta(0))+La0,2.0) - pow(d1*cos(theta(0))-La1,2.0);
-            F(1) = pow(L0+L1,2.0) - pow(d2*sin(theta(1))+L0+L1-d1*sin(theta(0)),2.0) - pow(d2*cos(theta(1))-d1*cos(theta(0)),2.0);
+            F(1) = pow(L0+L1,2.0) - pow(d2*sin(theta(1))+L0+L1-d1*sin(theta(0)),2.0) - pow(d2*cos(theta(1))+La1-La2-d1*cos(theta(0)),2.0);
             
-            DF(0,0) = -2.0*d1*(La0*cos(theta(0))+La1*sin(theta(0)));
+            DF(0,0) = 2.0*d1*(-La0*cos(theta(0))-La1*sin(theta(0)));
             DF(0,1) = 0.0;
-            DF(1,0) = 2.0*d1*((L0+L1)*cos(theta(0))-d2*sin(theta(0)-theta(1)));
-            DF(1,1) = 2.0*d2*(-(L0+L1)*cos(theta(1))+d1*sin(theta(0)-theta(1)));
+            DF(1,0) = 2.0*d1*((L0+L1)*cos(theta(0))-d2*sin(theta(0)-theta(1))-(La1-La2)*sin(theta(0)));
+            DF(1,1) = 2.0*d2*(-(L0+L1)*cos(theta(1))+d1*sin(theta(0)-theta(1))+(La1-La2)*sin(theta(1)));
             
             // Newton's method
             dTheta = F/DF;
@@ -486,7 +486,7 @@ int ESThreeActuators2d::transfDaqDisp(Vector* disp)
                 << iter << " iterations and norm: " << dTheta.Norm() << endln;
         }
 
-        (*disp)(2) = atan((d2*cos(theta(1))-d1*cos(theta(0)))/(d2*sin(theta(1))+L0+L1-d1*sin(theta(0))));
+        (*disp)(2) = atan((d2*cos(theta(1))+La1-La2-d1*cos(theta(0)))/(d2*sin(theta(1))+L0+L1-d1*sin(theta(0))));
         (*disp)(0) = d1*sin(theta(0))+L0*cos((*disp)(2))-L0;
         (*disp)(1) = d1*cos(theta(0))+L0*sin((*disp)(2))-La1;
     }
@@ -506,13 +506,13 @@ int ESThreeActuators2d::transfDaqDisp(Vector* disp)
         theta(1) = (*dDisp)(0)/La2;
         
         do  {
-            F(0) = pow(L0+L1,2.0) - pow(-d2*sin(theta(1))+L0+L1+d1*sin(theta(0)),2.0) - pow(d2*cos(theta(1))-d1*cos(theta(0)),2.0);
-            F(1) = pow(d0,2.0) - pow(-d2*sin(theta(1))-La0,2.0) - pow(d2*cos(theta(1))-La1,2.0);
+            F(0) = pow(L0+L1,2.0) - pow(-d2*sin(theta(1))+L0+L1+d1*sin(theta(0)),2.0) - pow(d2*cos(theta(1))+La1-La2-d1*cos(theta(0)),2.0);
+            F(1) = pow(d0,2.0) - pow(-d2*sin(theta(1))-La0,2.0) - pow(d2*cos(theta(1))-La2,2.0);
             
-            DF(0,0) = 2.0*d1*(-(L0+L1)*cos(theta(0))-d2*sin(theta(0)-theta(1)));
-            DF(0,1) = 2.0*d2*((L0+L1)*cos(theta(1))+d1*sin(theta(0)-theta(1)));
+            DF(0,0) = 2.0*d1*(-(L0+L1)*cos(theta(0))-d2*sin(theta(0)-theta(1))-(La1-La2)*sin(theta(0)));
+            DF(0,1) = 2.0*d2*((L0+L1)*cos(theta(1))+d1*sin(theta(0)-theta(1))+(La1-La2)*sin(theta(1)));
             DF(1,0) = 0.0;
-            DF(1,1) = -2.0*d2*(La0*cos(theta(1))+La1*sin(theta(1)));
+            DF(1,1) = 2.0*d2*(-La0*cos(theta(1))-La2*sin(theta(1)));
             
             // Newton’s method
             dTheta = F/DF;
@@ -527,7 +527,7 @@ int ESThreeActuators2d::transfDaqDisp(Vector* disp)
                 << iter << " iterations and norm: " << dTheta.Norm() << endln;
         }
 
-        (*disp)(2) = atan((d2*cos(theta(1))-d1*cos(theta(0)))/(-d2*sin(theta(1))+L0+L1+d1*sin(theta(0))));
+        (*disp)(2) = atan((d2*cos(theta(1))+La1-La2-d1*cos(theta(0)))/(-d2*sin(theta(1))+L0+L1+d1*sin(theta(0))));
         (*disp)(0) = -d1*sin(theta(0))+L0*cos((*disp)(2))-L0;
         (*disp)(1) = d1*cos(theta(0))+L0*sin((*disp)(2))-La1;
     }
@@ -668,12 +668,12 @@ int ESThreeActuators2d::transfDaqForce(Vector* force)
         
         do  {
             F(0) = pow(d0,2.0) - pow(d1*sin(theta(0))+La0,2.0) - pow(d1*cos(theta(0))-La1,2.0);
-            F(1) = pow(L0+L1,2.0) - pow(d2*sin(theta(1))+L0+L1-d1*sin(theta(0)),2.0) - pow(d2*cos(theta(1))-d1*cos(theta(0)),2.0);
+            F(1) = pow(L0+L1,2.0) - pow(d2*sin(theta(1))+L0+L1-d1*sin(theta(0)),2.0) - pow(d2*cos(theta(1))+La1-La2-d1*cos(theta(0)),2.0);
             
-            DF(0,0) = -2.0*d1*(La0*cos(theta(0))+La1*sin(theta(0)));
+            DF(0,0) = 2.0*d1*(-La0*cos(theta(0))-La1*sin(theta(0)));
             DF(0,1) = 0.0;
-            DF(1,0) = 2.0*d1*((L0+L1)*cos(theta(0))-d2*sin(theta(0)-theta(1)));
-            DF(1,1) = 2.0*d2*(-(L0+L1)*cos(theta(1))+d1*sin(theta(0)-theta(1)));
+            DF(1,0) = 2.0*d1*((L0+L1)*cos(theta(0))-d2*sin(theta(0)-theta(1))-(La1-La2)*sin(theta(0)));
+            DF(1,1) = 2.0*d2*(-(L0+L1)*cos(theta(1))+d1*sin(theta(0)-theta(1))+(La1-La2)*sin(theta(1)));
             
             // Newton's method
             dTheta = F/DF;
@@ -688,7 +688,7 @@ int ESThreeActuators2d::transfDaqForce(Vector* force)
                 << iter << " iterations and norm: " << dTheta.Norm() << endln;
         }
 
-        double disp2 = atan((d2*cos(theta(1))-d1*cos(theta(0)))/(-d2*sin(theta(1))+L0+L1+d1*sin(theta(0))));
+        double disp2 = atan((d2*cos(theta(1))+La1-La2-d1*cos(theta(0)))/(d2*sin(theta(1))+L0+L1-d1*sin(theta(0))));
 
         static Vector fx(3), fy(3);
         fx(0) = (*dForce)(0)*(d1*sin(theta(0))+La0)/d0;
@@ -718,13 +718,13 @@ int ESThreeActuators2d::transfDaqForce(Vector* force)
         theta(1) = (*dDisp)(0)/La2;
         
         do  {
-            F(0) = pow(L0+L1,2.0) - pow(-d2*sin(theta(1))+L0+L1+d1*sin(theta(0)),2.0) - pow(d2*cos(theta(1))-d1*cos(theta(0)),2.0);
-            F(1) = pow(d0,2.0) - pow(-d2*sin(theta(1))-La0,2.0) - pow(d2*cos(theta(1))-La1,2.0);
+            F(0) = pow(L0+L1,2.0) - pow(-d2*sin(theta(1))+L0+L1+d1*sin(theta(0)),2.0) - pow(d2*cos(theta(1))+La1-La2-d1*cos(theta(0)),2.0);
+            F(1) = pow(d0,2.0) - pow(-d2*sin(theta(1))-La0,2.0) - pow(d2*cos(theta(1))-La2,2.0);
             
-            DF(0,0) = 2.0*d1*(-(L0+L1)*cos(theta(0))-d2*sin(theta(0)-theta(1)));
-            DF(0,1) = 2.0*d2*((L0+L1)*cos(theta(1))+d1*sin(theta(0)-theta(1)));
+            DF(0,0) = 2.0*d1*(-(L0+L1)*cos(theta(0))-d2*sin(theta(0)-theta(1))-(La1-La2)*sin(theta(0)));
+            DF(0,1) = 2.0*d2*((L0+L1)*cos(theta(1))+d1*sin(theta(0)-theta(1))+(La1-La2)*sin(theta(1)));
             DF(1,0) = 0.0;
-            DF(1,1) = -2.0*d2*(La0*cos(theta(1))+La1*sin(theta(1)));
+            DF(1,1) = 2.0*d2*(-La0*cos(theta(1))-La2*sin(theta(1)));
             
             // Newton’s method
             dTheta = F/DF;
@@ -739,7 +739,7 @@ int ESThreeActuators2d::transfDaqForce(Vector* force)
                 << iter << " iterations and norm: " << dTheta.Norm() << endln;
         }
 
-        double disp2 = atan((d2*cos(theta(1))-d1*cos(theta(0)))/(-d2*sin(theta(1))+L0+L1+d1*sin(theta(0))));
+        double disp2 = atan((d2*cos(theta(1))+La1-La2-d1*cos(theta(0)))/(-d2*sin(theta(1))+L0+L1+d1*sin(theta(0))));
 
         static Vector fx(3), fy(3);
         fx(0) = (*dForce)(0)*(d2*sin(theta(1))+La0)/d0;
