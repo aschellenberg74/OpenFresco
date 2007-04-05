@@ -88,16 +88,16 @@ int TclExpCPCommand(ClientData clientData, Tcl_Interp *interp, int argc,
         theExperimentalCPs = new ArrayOfTaggedObjects(32);
 
     // make sure there is a minimum number of arguments
-    if (argc < 6)  {
+    if (argc < 5)  {
         opserr << "WARNING invalid number of arguments\n";
         printCommand(argc,argv);
-        opserr << "Want: expControlPoint tag nodeTag dir resp fact <dir resp fact ...>\n";
+        opserr << "Want: expControlPoint tag nodeTag dir resp <-fact f> <-lim l u> ...\n";
         return TCL_ERROR;
     }    
 
 
-    int tag, nodeTag, numDir, argi = 1;
-    double f;
+    int tag, nodeTag, numDir = 0, numLim = 0, argi = 1;
+    double f, lim;
     ExperimentalCP *theCP = 0;
 
     if (Tcl_GetInt(interp, argv[argi], &tag) != TCL_OK)  {
@@ -111,22 +111,38 @@ int TclExpCPCommand(ClientData clientData, Tcl_Interp *interp, int argc,
         return TCL_ERROR;		
     }
     argi++;
-    if (fmod(argc-argi,3.0) != 0.0)  {
-        opserr << "WARNING invalid number of arguments\n";
-        printCommand(argc,argv);
-        opserr << "Want: expControlPoint tag nodeTag dir resp factor <dir resp factor ...>\n";
-        return TCL_ERROR;
+    // count number of directions
+    int i = argi;
+    while (i<argc)  {
+        if (strcmp(argv[i],"-fact") == 0)  {
+            i += 2;
+        }
+        else if (strcmp(argv[i],"-lim") == 0)  {
+            i += 3;
+            numLim++;
+        }
+        else  {
+            i += 2;
+            numDir++;
+        }
     }
-    numDir = (argc-argi)/3;
     if (numDir == 0)  {
         opserr << "WARNING invalid number of arguments\n";
         printCommand(argc,argv);
-        opserr << "Want: expControlPoint tag nodeTag dir resp factor <dir resp factor ...>\n";
+        opserr << "Want: expControlPoint tag nodeTag dir resp <-fact f> <-lim l u> ...\n";
         return TCL_ERROR;
     }
     ID dir(numDir);
     ID resp(numDir);
     Vector fact(numDir);
+    if (numLim > 0 && numLim != numDir)  {
+        opserr << "WARNING invalid number of limits\n";
+        printCommand(argc,argv);
+        opserr << "Want: expControlPoint tag nodeTag dir resp <-fact f> <-lim l u> ...\n";
+        return TCL_ERROR;
+    }
+    Vector lowerLim(numDir);
+    Vector upperLim(numDir);
     for (int i=0; i<numDir; i++)  {
         if (strcmp(argv[argi],"1") == 0 || strcmp(argv[argi],"ux") == 0 
             || strcmp(argv[argi],"UX") == 0)
@@ -171,13 +187,36 @@ int TclExpCPCommand(ClientData clientData, Tcl_Interp *interp, int argc,
             return TCL_ERROR;		
         }
         argi++;
-        if (Tcl_GetDouble(interp, argv[argi], &f) != TCL_OK)  {
-            opserr << "WARNING invalid factor\n";
-            opserr << "control point: " << tag << endln;
-            return TCL_ERROR;	
+        if (argi<argc && strcmp(argv[argi],"-fact") == 0)  {
+            argi++;
+            if (Tcl_GetDouble(interp, argv[argi], &f) != TCL_OK)  {
+                opserr << "WARNING invalid factor\n";
+                opserr << "control point: " << tag << endln;
+                return TCL_ERROR;	
+            }
+            fact(i) = f;
+            argi++;
         }
-        fact(i) = f;
-        argi++;
+        else  {
+            fact(i) = 1.0;
+        }
+        if (argi<argc && strcmp(argv[argi],"-lim") == 0)  {
+            argi++;
+            if (Tcl_GetDouble(interp, argv[argi], &lim) != TCL_OK)  {
+                opserr << "WARNING invalid lower limit\n";
+                opserr << "control point: " << tag << endln;
+                return TCL_ERROR;	
+            }
+            lowerLim(i) = lim;
+            argi++;
+            if (Tcl_GetDouble(interp, argv[argi], &lim) != TCL_OK)  {
+                opserr << "WARNING invalid upper limit\n";
+                opserr << "control point: " << tag << endln;
+                return TCL_ERROR;	
+            }
+            upperLim(i) = lim;
+            argi++;
+        }
     }
 
     // parsing was successful, allocate the control point
@@ -186,6 +225,11 @@ int TclExpCPCommand(ClientData clientData, Tcl_Interp *interp, int argc,
     if (theCP == 0)  {
         opserr << "WARNING could not create experimental control point " << argv[1] << endln;
         return TCL_ERROR;
+    }
+
+    // add limits if available
+    if (numLim > 0)  {
+        theCP->setLimits(lowerLim, upperLim);
     }
 
     // now add the control point to the modelBuilder

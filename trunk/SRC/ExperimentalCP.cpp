@@ -26,8 +26,8 @@
 // $Date$
 // $URL: $
 
-// Written: Yoshi (yos@catfish.dpri.kyoto-u.ac.jp)
-// Created: 09/06
+// Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+// Created: 02/07
 // Revision: A
 //
 // Description: This file contains the implementation of ExperimentalCP.
@@ -40,7 +40,8 @@
 ExperimentalCP::ExperimentalCP()
     : TaggedObject(0),
     nodeTag(0), direction(0), response(0),
-    factor(0), numDir(0)
+    factor(0), lowerLim(0), upperLim(0),
+    numDir(0)
 {
     // does nothing
 }
@@ -50,7 +51,8 @@ ExperimentalCP::ExperimentalCP(int tag, int nodetag,
     const ID &dir, const ID &resp, const Vector &fact)
     : TaggedObject(tag),
     nodeTag(nodetag), direction(dir), response(resp),
-    factor(dir.Size()), numDir(dir.Size())
+    factor(dir.Size()), lowerLim(0), upperLim(0),
+    numDir(dir.Size())
 {
     if (fact != 0)  {
         if (resp.Size() != numDir || 
@@ -77,17 +79,24 @@ ExperimentalCP::ExperimentalCP(int tag, int nodetag,
 ExperimentalCP::ExperimentalCP(const ExperimentalCP& ecp)
     : TaggedObject(ecp)
 {
-    nodeTag = ecp.nodeTag;
+    nodeTag   = ecp.nodeTag;
     direction = ecp.direction;
-    response = ecp.response;
-    factor = ecp.factor;
-    numDir = ecp.numDir;
+    response  = ecp.response;
+    factor    = ecp.factor;
+    if (ecp.lowerLim != 0)
+        (*lowerLim)  = *(ecp.lowerLim);
+    if (ecp.upperLim != 0)
+        (*upperLim)  = *(ecp.upperLim);
+    numDir    = ecp.numDir;
 }
 
 
 ExperimentalCP::~ExperimentalCP()
 {
-    // does nothing
+    if (lowerLim != 0)
+        delete lowerLim;
+    if (upperLim != 0)
+        delete upperLim;
 }
 
 
@@ -122,11 +131,46 @@ int ExperimentalCP::setData(int nodetag, const ID &dir,
             factor(i) = 1.0;
     }
 
-    nodeTag = nodetag;
+    nodeTag   = nodetag;
     direction = dir;
-    response = resp;
-    numDir = dir.Size();
+    response  = resp;
+    numDir    = dir.Size();
    
+    return 0;
+}
+
+
+int ExperimentalCP::setLimits(const Vector &lowerlim,
+    const Vector &upperlim)
+{
+    if (lowerLim == 0 || upperLim == 0)  {
+        // create the new limits
+        lowerLim = new Vector(numDir);
+        upperLim = new Vector(numDir);
+    }
+    else if (lowerLim->Size() != numDir
+        || upperLim->Size() != numDir)  {
+        // delete the old limits
+        if (lowerLim != 0)
+            delete lowerLim;
+        if (upperLim != 0)
+            delete upperLim;
+        // create the new limits
+        lowerLim = new Vector(numDir);
+        upperLim = new Vector(numDir);
+    }
+
+    if (lowerlim.Size() != numDir || 
+        upperlim.Size() != numDir)  {
+            opserr << "ExperimentalCP::setLimits() - "
+                << "lower and upper limits need to be of "
+                << "size: " << numDir << endln;
+            return OF_ReturnType_failed;
+    }
+
+    (*lowerLim) = lowerlim;
+    (*upperLim) = upperlim;
+
     return 0;
 }
 
@@ -160,13 +204,25 @@ const Vector& ExperimentalCP::getFactor()
 }
 
 
+const Vector* ExperimentalCP::getLowerLimit()
+{
+    return lowerLim;
+}
+
+
+const Vector* ExperimentalCP::getUpperLimit()
+{
+    return upperLim;
+}
+
+
 int ExperimentalCP::getDir(int dirID)
 {
-    if (dirID>=numDir)  {
+    if (dirID<0 || dirID>=numDir)  {
         opserr << "ExperimentalCP::getDir() - "
             << "direction ID out of bounds, "
             << "component " << dirID << " does not exist\n";
-        return OF_ReturnType_failed;
+        exit(OF_ReturnType_failed);
     }
 
     return direction(dirID);
@@ -175,11 +231,11 @@ int ExperimentalCP::getDir(int dirID)
 
 int ExperimentalCP::getResponseType(int dirID)
 {
-    if (dirID>=numDir)  {
+    if (dirID<0 || dirID>=numDir)  {
         opserr << "ExperimentalCP::getResponseType() - "
             << "direction ID out of bounds, "
             << "component " << dirID << " does not exist\n";
-        return OF_ReturnType_failed;
+        exit(OF_ReturnType_failed);
     }
 
     return response(dirID);
@@ -188,14 +244,54 @@ int ExperimentalCP::getResponseType(int dirID)
 
 double ExperimentalCP::getFactor(int dirID)
 {
-    if (dirID>=numDir)  {
+    if (dirID<0 || dirID>=numDir)  {
         opserr << "ExperimentalCP::getFactor() - "
             << "direction ID out of bounds, "
             << "component " << dirID << " does not exist\n";
-        return OF_ReturnType_failed;
+        exit(OF_ReturnType_failed);
     }
 
     return factor(dirID);
+}
+
+
+double ExperimentalCP::getLowerLimit(int dirID)
+{
+    if (lowerLim == 0)  {
+        opserr << "ExperimentalCP::getLowerLimit() - "
+            << "this control point has no lower "
+            << "limits assigned\n";
+        exit(OF_ReturnType_failed);
+    }
+
+    if (dirID<0 || dirID>=numDir)  {
+        opserr << "ExperimentalCP::getFactor() - "
+            << "direction ID out of bounds, "
+            << "component " << dirID << " does not exist\n";
+        exit(OF_ReturnType_failed);
+    }
+
+    return (*lowerLim)(dirID);
+}
+
+
+double ExperimentalCP::getUpperLimit(int dirID)
+{
+    if (upperLim == 0)  {
+        opserr << "ExperimentalCP::getUpperLimit() - "
+            << "this control point has no upper "
+            << "limits assigned\n";
+        exit(OF_ReturnType_failed);
+    }
+
+    if (dirID<0 || dirID>=numDir)  {
+        opserr << "ExperimentalCP::getFactor() - "
+            << "direction ID out of bounds, "
+            << "component " << dirID << " does not exist\n";
+        exit(OF_ReturnType_failed);
+    }
+
+    return (*upperLim)(dirID);
 }
 
 
@@ -210,28 +306,27 @@ void ExperimentalCP::Print(OPS_Stream &s, int flag)
 }
 
 
-bool ExperimentalCP::operator == (ExperimentalCP& ecp)
+int ExperimentalCP::operator == (ExperimentalCP& ecp)
 {
     // factor value IS NOT checked!
     if (nodeTag == ecp.nodeTag 
         && direction == ecp.direction
         && response == ecp.response) {
-        return true;
+        return 1;
     } else {
-        return false;
+        return 0;
     }
 }
 
 
-bool ExperimentalCP::operator != (ExperimentalCP& ecp)
+int ExperimentalCP::operator != (ExperimentalCP& ecp)
 {
     // factor value IS NOT checked!
     if (nodeTag != ecp.nodeTag 
         || direction != ecp.direction
         || response != ecp.response) {
-        return true;
+        return 1;
     } else {
-        return false;
+        return 0;
     }
 }
-

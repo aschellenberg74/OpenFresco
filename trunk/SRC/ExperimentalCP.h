@@ -29,8 +29,8 @@
 #ifndef ExperimentalCP_h
 #define ExperimentalCP_h
 
-// Written: Yoshi (yos@catfish.dpri.kyoto-u.ac.jp)
-// Created: 09/06
+// Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+// Created: 02/07
 // Revision: A
 //
 // Description: This file contains the class definition for 
@@ -60,25 +60,35 @@ public:
     
     int setData(int nodeTag, const ID &direction,
         const ID &response, const Vector &factor = 0);
+    int setLimits(const Vector &lowerLimit,
+        const Vector &upperLimit);
     
     int getNodeTag();
     int getNumDir();
+
     const ID &getDir();
     const ID &getResponseType();
     const Vector &getFactor();
+    const Vector *getLowerLimit();
+    const Vector *getUpperLimit();
+
     int getDir(int dirID);
     int getResponseType(int dirID);
     double getFactor(int dirID);
+    double getLowerLimit(int dirID);
+    double getUpperLimit(int dirID);
         
-    bool operator == (ExperimentalCP &ecp);
-    bool operator != (ExperimentalCP &ecp);
+    int operator == (ExperimentalCP &ecp);
+    int operator != (ExperimentalCP &ecp);
     
 protected:
-    int nodeTag;    // control node tag
-    ID direction;   // directions
-    ID response;    // response types
-    Vector factor;  // factors
-    int numDir;     // number of directions
+    int nodeTag;        // control node tag
+    ID direction;       // directions
+    ID response;        // response types
+    Vector factor;      // factors
+    Vector *lowerLim;   // lower limits
+    Vector *upperLim;   // upper limits
+    int numDir;         // number of directions
 };
 
 #endif

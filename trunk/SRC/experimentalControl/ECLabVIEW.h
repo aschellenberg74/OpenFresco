@@ -98,6 +98,8 @@ private:
     struct tm *ptm;
     char OPFTransactionID[30];
     char errMsg[80];
+
+    FILE *logFile;
 };
 
 #endif

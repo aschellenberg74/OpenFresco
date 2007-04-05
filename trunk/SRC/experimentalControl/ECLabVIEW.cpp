@@ -49,6 +49,14 @@ ECLabVIEW::ECLabVIEW(int tag,
     targDisp(0), targForce(0), measDisp(0), measForce(0)
 
 {   
+    // open log file
+    logFile = fopen("ECLabVIEW.log","w");
+    if (logFile == 0)  {
+        opserr << "ECLabVIEW::ECLabVIEW() - "
+            << "fopen: could not open log file\n";
+        exit(OF_ReturnType_failed);
+    }
+
     if (trialcps == 0 || outcps == 0)  {
       opserr << "ECLabVIEW::ECLabVIEW() - "
           << "null trialCPs or outCPs array passed\n";
@@ -83,12 +91,28 @@ ECLabVIEW::ECLabVIEW(int tag,
 
     // open a session with LabVIEW
     sprintf(sData,"open-session\tOpenFresco\n");
+        fprintf(logFile,"%s",sData);
     theSocket->sendMsg(0, 0, *sendData, 0);
-    theSocket->recvMsg(0, 0, *recvData, 0);
+    theSocket->recvMsgUnknownSize(0, 0, *recvData, 0);
+        fprintf(logFile,"%s",rData);
 
-    if (strtok(rData,"\t") != "OK")  {
+    if (strcmp(strtok(rData,"\t"),"OK") != 0)  {
         opserr << "ECLabVIEW::ECLabVIEW() - "
             << "failed to open a session with LabVIEW\n";
+        delete theSocket;
+        exit(OF_ReturnType_failed);
+    }
+
+    // send parameters (needed for NEES-SAM -> remove later)
+    sprintf(sData,"set-parameter\tOPFTransactionNEESSAM\tnstep\t501\n");
+        fprintf(logFile,"%s",sData);
+    theSocket->sendMsg(0, 0, *sendData, 0);
+    theSocket->recvMsgUnknownSize(0, 0, *recvData, 0);
+        fprintf(logFile,"%s",rData);
+
+    if (strcmp(strtok(rData,"\t"),"OK") != 0)  {
+        opserr << "ECLabVIEW::ECLabVIEW() - "
+            << "failed to set parameter with LabVIEW\n";
         delete theSocket;
         exit(OF_ReturnType_failed);
     }
@@ -118,10 +142,12 @@ ECLabVIEW::~ECLabVIEW()
     
     // close the session with LabVIEW
     sprintf(sData,"close-session\tOpenFresco\n");
+        fprintf(logFile,"%s",sData);
     theSocket->sendMsg(0, 0, *sendData, 0);
-    theSocket->recvMsg(0, 0, *recvData, 0);
+    theSocket->recvMsgUnknownSize(0, 0, *recvData, 0);
+        fprintf(logFile,"%s",rData);
 
-    if (strtok(rData,"\t") != "OK")  {
+    if (strcmp(strtok(rData,"\t"),"OK") != 0)  {
         opserr << "ECLabVIEW::~ECLabVIEW() - "
             << "failed to close the current session with LabVIEW\n";
     }
@@ -129,6 +155,9 @@ ECLabVIEW::~ECLabVIEW()
     // close connection by destroying theSocket
     if (theSocket != 0)
         delete theSocket;
+
+    // close output file
+    fclose(logFile);
 }
 
 
@@ -189,12 +218,14 @@ int ECLabVIEW::setup()
     opserr << "* Press 'Enter' to proceed or 'c' to cancel the initialization *\n";
     opserr << "****************************************************************\n";
     opserr << endln;
-    char c = getchar();
+    int c = getchar();
     if (c == 'c')  {
+        getchar();
         sprintf(sData,"close-session\tOpenFresco\n");
+            fprintf(logFile,"%s",sData);
         theSocket->sendMsg(0, 0, *sendData, 0);
         delete theSocket;
-        return OF_ReturnType_failed;
+        exit(OF_ReturnType_failed);
     }
     		
 	do  {
@@ -221,10 +252,12 @@ int ECLabVIEW::setup()
         opserr << endln;
         c = getchar();
         if (c == 'c')  {
+            getchar();
             sprintf(sData,"close-session\tOpenFresco\n");
+                fprintf(logFile,"%s",sData);
             theSocket->sendMsg(0, 0, *sendData, 0);
             delete theSocket;
-            return OF_ReturnType_failed;
+            exit(OF_ReturnType_failed);
         } else if (c == 'r')  {
             getchar();
         }
@@ -304,71 +337,155 @@ int ECLabVIEW::control()
     // get current local time to setup transaction ID
     time(&rawtime);
     ptm = localtime(&rawtime);
-    sprintf(OPFTransactionID,"OPFTransaction_%4d%02d%02d%02d%02d%02d",ptm->tm_year,ptm->tm_mon,ptm->tm_mday,ptm->tm_hour,ptm->tm_min,ptm->tm_sec);
+    sprintf(OPFTransactionID,"OPFTransaction%4d%02d%02d%02d%02d%02d",
+        1900+ptm->tm_year,ptm->tm_mon,ptm->tm_mday,ptm->tm_hour,ptm->tm_min,ptm->tm_sec);
 
     // propose target values
     int dID = 0, fID = 0;
     sprintf(sData,"propose\t%s",OPFTransactionID);
-    
+
     // loop through all the trial control points
     for (int i=0; i<numTrialCPs; i++)  {
         // append trial control point name
         if (i==0)
-            sprintf(sData,"%s\tCPNode_%02d",sData,trialCPs[i]->getNodeTag());
+            sprintf(sData,"%s\tMDL-00-01",sData);
+            //sprintf(sData,"%s\tCPNode%02d",sData,trialCPs[i]->getNodeTag());
         else
-            sprintf(sData,"%s\tcontrol-point\tCPNode_%02d",sData,trialCPs[i]->getNodeTag());
+            sprintf(sData,"%s\tcontrol-point\tCPNode%02d",sData,trialCPs[i]->getNodeTag());
 
         // get trial control point parameters
         int numDir = trialCPs[i]->getNumDir();
         ID dir = trialCPs[i]->getDir();
         ID resp = trialCPs[i]->getResponseType();
         Vector fact = trialCPs[i]->getFactor();
+        const Vector *lowerLim = trialCPs[i]->getLowerLimit();
+        const Vector *upperLim = trialCPs[i]->getUpperLimit();
 
-        // loop through all the trial control point directions
-        for (int j=0; j<numDir; j++)  {
-            // append GeomType
-            if (dir(j) == 0 || dir(j) == 3)  {
-                sprintf(sData,"%s\tx",sData);
+        if (lowerLim == 0 || upperLim == 0)  {
+            // loop through all the trial control point directions
+            // without checking if commands are within bounds
+            for (int j=0; j<numDir; j++)  {
+                // append GeomType
+                if (dir(j) == 0 || dir(j) == 3)  {
+                    sprintf(sData,"%s\tx",sData);
+                }
+                else if (dir(j) == 1 || dir(j) == 4)  {
+                    sprintf(sData,"%s\ty",sData);
+                }
+                else if (dir(j) == 2 || dir(j) == 5)  {
+                    sprintf(sData,"%s\tz",sData);
+                }
+                else {
+                    opserr << "ECLabVIEW::control() - "
+                        << "requested direction is not supported\n";
+                    return OF_ReturnType_failed;
+                }
+                // append ParameterType and Parameter
+                if (dir(j) < 3 && resp(j) == 0)  {
+                    sprintf(sData,"%s\tdisplacement\t%.10E",sData,fact(j)*(*targDisp)(dID));
+                    dID++;
+                }
+                else if (dir(j) < 3 && resp(j) == 3)  {
+                    sprintf(sData,"%s\tforce\t%.10E",sData,fact(j)*(*targForce)(fID));
+                    fID++;
+                }
+                else if (dir(j) > 2 && resp(j) == 0)  {
+                    sprintf(sData,"%s\trotation\t%.10E",sData,fact(j)*(*targDisp)(dID));
+                    dID++;
+                }
+                else if (dir(j) > 2 && resp(j) == 3)  {
+                    sprintf(sData,"%s\tmoment\t%.10E",sData,fact(j)*(*targForce)(fID));
+                    fID++;
+                }
+                else {
+                    opserr << "ECLabVIEW::control() - "
+                        << "requested response type is not supported\n";
+                    return OF_ReturnType_failed;
+                }
             }
-            else if (dir(j) == 1 || dir(j) == 4)  {
-                sprintf(sData,"%s\ty",sData);
-            }
-            else if (dir(j) == 2 || dir(j) == 5)  {
-                sprintf(sData,"%s\tz",sData);
-            }
-            else {
-                opserr << "ECLabVIEW::control() - "
-                    << "requested direction is not supported\n";
-                return OF_ReturnType_failed;
-            }
-            // append ParameterType and Parameter
-            if (dir(j) < 3 && resp(j) == 0)  {
-                sprintf(sData,"%s\tdisplacement\t%.10E",sData,fact(j)*(*targDisp)(dID));
-                dID++;
-            }
-            else if (dir(j) < 3 && resp(j) == 3)  {
-                sprintf(sData,"%s\tforce\t%.10E",sData,fact(j)*(*targForce)(fID));
-                fID++;
-            }
-            else if (dir(j) > 2 && resp(j) == 0)  {
-                sprintf(sData,"%s\trotation\t%.10E",sData,fact(j)*(*targDisp)(dID));
-                dID++;
-            }
-            else if (dir(j) > 2 && resp(j) == 3)  {
-                sprintf(sData,"%s\tmoment\t%.10E",sData,fact(j)*(*targForce)(fID));
-                fID++;
-            }
-            else {
-                opserr << "ECLabVIEW::control() - "
-                    << "requested response type is not supported\n";
-                return OF_ReturnType_failed;
+        }
+        else  {
+            // loop through all the trial control point directions
+            // and check if commands are within given bounds
+            double parameter; int c;
+            for (int j=0; j<numDir; j++)  {
+                // append GeomType
+                if (dir(j) == 0 || dir(j) == 3)  {
+                    sprintf(sData,"%s\tx",sData);
+                }
+                else if (dir(j) == 1 || dir(j) == 4)  {
+                    sprintf(sData,"%s\ty",sData);
+                }
+                else if (dir(j) == 2 || dir(j) == 5)  {
+                    sprintf(sData,"%s\tz",sData);
+                }
+                else {
+                    opserr << "ECLabVIEW::control() - "
+                        << "requested direction is not supported\n";
+                    return OF_ReturnType_failed;
+                }
+                // append ParameterType
+                if (dir(j) < 3 && resp(j) == 0)  {
+                    parameter = fact(j)*(*targDisp)(dID);
+                    sprintf(sData,"%s\tdisplacement",sData);
+                    dID++;
+                }
+                else if (dir(j) < 3 && resp(j) == 3)  {
+                    parameter = fact(j)*(*targForce)(fID);
+                    sprintf(sData,"%s\tforce",sData);
+                    fID++;
+                }
+                else if (dir(j) > 2 && resp(j) == 0)  {
+                    parameter = fact(j)*(*targDisp)(dID);
+                    sprintf(sData,"%s\trotation",sData);
+                    dID++;
+                }
+                else if (dir(j) > 2 && resp(j) == 3)  {
+                    parameter = fact(j)*(*targForce)(fID);
+                    sprintf(sData,"%s\tmoment",sData);
+                    fID++;
+                }
+                else {
+                    opserr << "ECLabVIEW::control() - "
+                        << "requested response type is not supported\n";
+                    return OF_ReturnType_failed;
+                }
+                // check if parameter is within limits and append
+                if (parameter < (*lowerLim)(j) || parameter > (*upperLim)(j))  {
+                    opserr << "*************************************************\n";
+                    opserr << "* WARNING - Control command exceeds the limits: *\n";
+                    opserr << "*                                               *\n";
+                    opserr << "* Limits = [" << (*lowerLim)(j) << "," << (*upperLim)(j) << "]";
+                    opserr << " -> Command = " << parameter << endln;
+                    opserr << "*                                               *\n";
+                    opserr << "* Press 'Enter' to continue the test or         *\n";
+                    opserr << "* 's' to saturate the command at the limits or  *\n";
+                    opserr << "* 'c' to cancel the test                        *\n";
+                    opserr << "*************************************************\n";
+                    opserr << endln;
+                    c = getchar();
+                    if (c == 'c')  {
+                        getchar();
+                        sprintf(sData,"close-session\tOpenFresco\n");
+                            fprintf(logFile,"%s",sData);
+                        theSocket->sendMsg(0, 0, *sendData, 0);
+                        delete theSocket;
+                        exit(OF_ReturnType_failed);
+                    } else if (c == 's')  {
+                        getchar();
+                        parameter = (parameter < (*lowerLim)(j)) ? (*lowerLim)(j) : (*upperLim)(j);
+                    }
+                }
+                sprintf(sData,"%s\t%.10E",sData,parameter);
             }
         }
     }
     sprintf(sData,"%s\n",sData);
+        fprintf(logFile,"%s",sData);
     theSocket->sendMsg(0, 0, *sendData, 0);
-    theSocket->recvMsg(0, 0, *recvData, 0);
-    if (strtok(rData,"\t") != "OK")  {
+    theSocket->recvMsgUnknownSize(0, 0, *recvData, 0);
+        fprintf(logFile,"%s",rData);
+    if (strcmp(strtok(rData,"\t"),"OK") != 0)  {
         opserr << "ECLabVIEW::control() - "
             << "proposed control values were not accepted\n";
         return OF_ReturnType_failed;
@@ -376,9 +493,11 @@ int ECLabVIEW::control()
 
     // execute target values
     sprintf(sData,"execute\t%s\n",OPFTransactionID);
+        fprintf(logFile,"%s",sData);
     theSocket->sendMsg(0, 0, *sendData, 0);
-    theSocket->recvMsg(0, 0, *recvData, 0);
-    if (strtok(rData,"\t") != "OK")  {
+    theSocket->recvMsgUnknownSize(0, 0, *recvData, 0);
+        fprintf(logFile,"%s",rData);
+    if (strcmp(strtok(rData,"\t"),"OK") != 0)  {
         opserr << "ECLabVIEW::control() - "
             << "failed to execute proposed control values\n";
         return OF_ReturnType_failed;
@@ -400,9 +519,11 @@ int ECLabVIEW::acquire()
     sprintf(sData,"get-control-point\t%s",OPFTransactionID);
     for (int i=0; i<numOutCPs; i++)  {
         // append output control point name
-        sprintf(sData,"%s\tCPNode_%02d",sData,outCPs[i]->getNodeTag());
+        sprintf(sData,"%s\tMDL-00-01",sData);
+        //sprintf(sData,"%s\tCPNode%02d",sData,outCPs[i]->getNodeTag());
     }
     sprintf(sData,"%s\n",sData);
+        fprintf(logFile,"%s",sData);
     theSocket->sendMsg(0, 0, *sendData, 0);
 
     // receive output control point daq values
@@ -410,14 +531,15 @@ int ECLabVIEW::acquire()
     int direction, response;
     for (int i=0; i<numOutCPs; i++)  {
         // disaggregate received data
-        theSocket->recvMsg(0, 0, *recvData, 0);
-        if (strcmp(strtok(rData,"\t"),"OK") != 0 &&
-            strcmp(strtok(NULL,"\t"),"0") != 0)  {
+        theSocket->recvMsgUnknownSize(0, 0, *recvData, 0);
+            fprintf(logFile,"%s",rData);
+        if (strcmp(strtok(rData,"\t"),"OK") != 0)  {
             opserr << "ECLabVIEW::acquire() - "
                 << "failed to acquire control-point "
                 << outCPs[i]->getTag() << " values\n";
             return OF_ReturnType_failed;
         }
+        tokenPtr = strtok(NULL,"\t");
         tokenPtr = strtok(NULL,"\t");
         if (strcmp(tokenPtr,OPFTransactionID) != 0)  {
             opserr << "ECLabVIEW::acquire() - "
@@ -426,7 +548,8 @@ int ECLabVIEW::acquire()
             return OF_ReturnType_failed;
         }
         tokenPtr = strtok(NULL,"\t");
-        sprintf(cpName,"CPNode_%02d",outCPs[i]->getNodeTag());
+        sprintf(cpName,"MDL-00-01");
+        //sprintf(cpName,"CPNode%02d",outCPs[i]->getNodeTag());
         if (strcmp(tokenPtr,cpName) != 0)  {
             opserr << "ECLabVIEW::acquire() - "
                 << "received wrong control-point\n"
