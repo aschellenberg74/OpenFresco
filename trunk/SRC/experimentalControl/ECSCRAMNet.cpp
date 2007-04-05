@@ -217,11 +217,12 @@ int ECSCRAMNet::setup()
     opserr << "* Press 'Enter' to proceed or 'c' to cancel the initialization *\n";
     opserr << "****************************************************************\n";
     opserr << endln;
-    char c = getchar();
+    int c = getchar();
     if (c == 'c')  {
+        getchar();
         scr_reg_mm(UNMAP);
         scr_mem_mm(UNMAP);
-        return OF_ReturnType_failed;
+        exit(OF_ReturnType_failed);
     }
     
     do  {
@@ -248,9 +249,10 @@ int ECSCRAMNet::setup()
         opserr << endln;
         c = getchar();
         if (c == 'c')  {
+            getchar();
             scr_reg_mm(UNMAP);
             scr_mem_mm(UNMAP);
-            return OF_ReturnType_failed;
+            exit(OF_ReturnType_failed);
         } else if (c == 'r')  {
             getchar();
         }

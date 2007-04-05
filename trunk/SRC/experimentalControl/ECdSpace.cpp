@@ -286,10 +286,11 @@ int ECdSpace::setup()
     opserr << "* Hit 'Enter' to proceed the initialization                  *\n";
     opserr << "**************************************************************\n";
     opserr << endln;
-    char c = getchar();
+    int c = getchar();
     if (c == 'c')  {
+        getchar();
         DS_unregister_host_app();
-        return OF_ReturnType_failed;
+        exit(OF_ReturnType_failed);
     }
     
     // start the rtp application
@@ -326,8 +327,9 @@ int ECdSpace::setup()
         opserr << endln;
         c = getchar();
         if (c == 'c')  {
+            getchar();
             DS_unregister_host_app();
-            return OF_ReturnType_failed;
+            exit(OF_ReturnType_failed);
         } else if (c == 'r')  {
             getchar();
         }
