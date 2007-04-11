@@ -47,7 +47,7 @@ public:
         double actLength0, double actLength1,
         double rigidLength,
         ExperimentalControl* control = 0,
-        int nlGeom = 0, double phiLocX = 0.0);
+        int nlGeom = 0, char *posAct = "left", double phiLocX = 0.0);
     ESTwoActuators2d(const ESTwoActuators2d& es);
     
     // destructor
@@ -96,6 +96,7 @@ private:
     double La1;         // length of actuator 1
     double L;           // rigid link length
     int nlGeom;         // non-linear geometry (0: linear, 1: nonlinear)
+    char posAct[6];     // position of actuators (left, right)
     double phiLocX;     // angle of local x axis w.r.t actuator 0 [deg]
 
     Matrix rotLocX;     // rotation matrix

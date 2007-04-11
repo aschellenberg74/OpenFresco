@@ -223,7 +223,7 @@ void ESInvertedVBraceJntOff2d::Print(OPS_Stream &s, int flag)
     s << " nlGeom      : " << nlGeom << endln;
     s << " posAct1     : " << posAct0 << endln;
     s << " phiLocX     : " << phiLocX << endln;
-    if(theControl != 0)  {
+    if (theControl != 0)  {
         s << "\tExperimentalControl tag: " << theControl->getTag();
         s << *theControl;
     }}
@@ -257,8 +257,8 @@ int ESInvertedVBraceJntOff2d::transfTrialDisp(const Vector* disp)
     else if (nlGeom == 1 && strcmp(posAct0,"left") == 0)  {
         double R0 = sqrt(L1*L1 + L4*L4);
         double R1 = sqrt(L2*L2 + L5*L5);
-        double alpha0 = atan(L4/L1);
-        double alpha1 = atan(L5/L2);
+        double alpha0 = atan2(L4,L1);
+        double alpha1 = atan2(L5,L2);
         
         // actuator 0
         (*cDisp)(0) = pow(pow(d(0)-(L0+L1)*cos(d(2))+L0+L1+La0,2.0)+pow(d(1)-(L0+L1)*sin(d(2)),2.0),0.5)-La0;
@@ -271,8 +271,8 @@ int ESInvertedVBraceJntOff2d::transfTrialDisp(const Vector* disp)
     else if (nlGeom == 1 && strcmp(posAct0,"right") == 0)  {
         double R0 = sqrt(L1*L1 + L4*L4);
         double R1 = sqrt(L2*L2 + L5*L5);
-        double alpha0 = atan(L4/L1);        
-        double alpha1 = atan(L5/L2);
+        double alpha0 = atan2(L4,L1);        
+        double alpha1 = atan2(L5,L2);
         
         // actuator 0
         (*cDisp)(0) = pow(pow(d(0)+(L2+L3)*cos(d(2))-L2-L3-La0,2.0)+pow(d(1)+(L2+L3)*sin(d(2)),2.0),0.5)-La0;
@@ -322,8 +322,8 @@ int ESInvertedVBraceJntOff2d::transfTrialVel(const Vector* disp,
     else if (nlGeom == 1 && strcmp(posAct0,"left") == 0)  {
         double R0 = sqrt(L1*L1 + L4*L4);
         double R1 = sqrt(L2*L2 + L5*L5);
-        double alpha0 = atan(L4/L1);
-        double alpha1 = atan(L5/L2);
+        double alpha0 = atan2(L4,L1);
+        double alpha1 = atan2(L5,L2);
         
         // actuator 0
         (*cVel)(0) = 0.5*(2.0*(d(0)-(L0+L1)*cos(d(2))+L0+L1+La0)*(v(0)+(L0+L1)*sin(d(2))*v(2))+2.0*(d(1)-(L0+L1)*sin(d(2)))*(v(1)-(L0+L1)*cos(d(2))*v(2)))/pow(pow(d(0)-(L0+L1)*cos(d(2))+L0+L1+La0,2.0)+pow(d(1)-(L0+L1)*sin(d(2)),2.0),0.5);
@@ -336,8 +336,8 @@ int ESInvertedVBraceJntOff2d::transfTrialVel(const Vector* disp,
     else if (nlGeom == 1 && strcmp(posAct0,"right") == 0)  {
         double R0 = sqrt(L1*L1 + L4*L4);
         double R1 = sqrt(L2*L2 + L5*L5);
-        double alpha0 = atan(L4/L1);        
-        double alpha1 = atan(L5/L2);
+        double alpha0 = atan2(L4,L1);        
+        double alpha1 = atan2(L5,L2);
         
         // actuator 0
         (*cVel)(0) = 0.5*(2.0*(d(0)+(L2+L3)*cos(d(2))-L2-L3-La0)*(v(0)-(L2+L3)*sin(d(2))*v(2))+2.0*(d(1)+(L2+L3)*sin(d(2)))*(v(1)+(L2+L3)*cos(d(2))*v(2)))/pow(pow(d(0)+(L2+L3)*cos(d(2))-L2-L3-La0,2.0)+pow(d(1)+(L2+L3)*sin(d(2)),2.0),0.5);
@@ -389,8 +389,8 @@ int ESInvertedVBraceJntOff2d::transfTrialAccel(const Vector* disp,
     else if (nlGeom == 1 && strcmp(posAct0,"left") == 0)  {
         double R0 = sqrt(L1*L1 + L4*L4);
         double R1 = sqrt(L2*L2 + L5*L5);
-        double alpha0 = atan(L4/L1);
-        double alpha1 = atan(L5/L2);
+        double alpha0 = atan2(L4,L1);
+        double alpha1 = atan2(L5,L2);
         
         // actuator 0
         (*cAccel)(0) = -0.25*pow(2.0*(d(0)-(L0+L1)*cos(d(2))+L0+L1+La0)*(v(0)+(L0+L1)*sin(d(2))*v(2))+2.0*(d(1)-(L0+L1)*sin(d(2)))*(v(1)-(L0+L1)*cos(d(2))*v(2)),2.0)/pow(pow(d(0)-(L0+L1)*cos(d(2))+L0+L1+La0,2.0)+pow(d(1)-(L0+L1)*sin(d(2)),2.0),1.5)+0.5*(2.0*pow(v(0)+(L0+L1)*sin(d(2))*v(2),2.0)+2.0*(d(0)-(L0+L1)*cos(d(2))+L0+L1+La0)*(a(0)+(L0+L1)*cos(d(2))*pow(v(2),2.0)+(L0+L1)*sin(d(2))*a(2))+2.0*pow(v(1)-(L0+L1)*cos(d(2))*v(2),2.0)+2.0*(d(1)-(L0+L1)*sin(d(2)))*(a(1)+(L0+L1)*sin(d(2))*pow(v(2),2.0)-(L0+L1)*cos(d(2))*a(2)))/pow(pow(d(0)-(L0+L1)*cos(d(2))+L0+L1+La0,2.0)+pow(d(1)-(L0+L1)*sin(d(2)),2.0),0.5);
@@ -403,8 +403,8 @@ int ESInvertedVBraceJntOff2d::transfTrialAccel(const Vector* disp,
     else if (nlGeom == 1 && strcmp(posAct0,"right") == 0)  {
         double R0 = sqrt(L1*L1 + L4*L4);
         double R1 = sqrt(L2*L2 + L5*L5);
-        double alpha0 = atan(L4/L1);        
-        double alpha1 = atan(L5/L2);
+        double alpha0 = atan2(L4,L1);        
+        double alpha1 = atan2(L5,L2);
         
         // actuator 0
         (*cAccel)(0) = -0.25*pow(2.0*(d(0)+(L2+L3)*cos(d(2))-L2-L3-La0)*(v(0)-(L2+L3)*sin(d(2))*v(2))+2.0*(d(1)+(L2+L3)*sin(d(2)))*(v(1)+(L2+L3)*cos(d(2))*v(2)),2.0)/pow(pow(d(0)+(L2+L3)*cos(d(2))-L2-L3-La0,2.0)+pow(d(1)+(L2+L3)*sin(d(2)),2.0),1.5)+0.5*(2.0*pow(v(0)-(L2+L3)*sin(d(2))*v(2),2.0)+2.0*(d(0)+(L2+L3)*cos(d(2))-L2-L3-La0)*(a(0)-(L2+L3)*cos(d(2))*pow(v(2),2.0)-(L2+L3)*sin(d(2))*a(2))+2.0*pow(v(1)+(L2+L3)*cos(d(2))*v(2),2.0)+2.0*(d(1)+(L2+L3)*sin(d(2)))*(a(1)-(L2+L3)*sin(d(2))*pow(v(2),2.0)+(L2+L3)*cos(d(2))*a(2)))/pow(pow(d(0)+(L2+L3)*cos(d(2))-L2-L3-La0,2.0)+pow(d(1)+(L2+L3)*sin(d(2)),2.0),0.5);
@@ -542,9 +542,9 @@ int ESInvertedVBraceJntOff2d::transfDaqDisp(Vector* disp)
                 << iter << " iterations and norm: " << dTheta.Norm() << endln;
         }
 
-        (*disp)(2) = atan((d2*cos(theta(2))+La1+L4-L5-La2-d1*cos(theta(1)))/(d2*sin(theta(2))+L1+L2-d1*sin(theta(1)))) - atan((L4-L5)/(L1+L2));
+        (*disp)(2) = atan2(d2*cos(theta(2))+La1+L4-L5-La2-d1*cos(theta(1)),d2*sin(theta(2))+L1+L2-d1*sin(theta(1))) - atan2(L4-L5,L1+L2);
         double R0 = sqrt(L1*L1 + L4*L4);
-        double beta0 = atan(L4/L1) + (*disp)(2);
+        double beta0 = atan2(L4,L1) + (*disp)(2);
         (*disp)(0) = d1*sin(theta(1)) + R0*cos(beta0) - L1;
         (*disp)(1) = d1*cos(theta(1)) + R0*sin(beta0) - La1 - L4;
     }
@@ -592,9 +592,9 @@ int ESInvertedVBraceJntOff2d::transfDaqDisp(Vector* disp)
                 << iter << " iterations and norm: " << dTheta.Norm() << endln;
         }
 
-        (*disp)(2) = atan((d2*cos(theta(2))+La1+L4-L5-La2-d1*cos(theta(1)))/(-d2*sin(theta(2))+L1+L2+d1*sin(theta(1)))) - atan((L4-L5)/(L1+L2));
+        (*disp)(2) = atan2(d2*cos(theta(2))+La1+L4-L5-La2-d1*cos(theta(1)),-d2*sin(theta(2))+L1+L2+d1*sin(theta(1))) - atan2(L4-L5,L1+L2);
         double R0 = sqrt(L1*L1 + L4*L4);
-        double beta0 = atan(L4/L1) + (*disp)(2);
+        double beta0 = atan2(L4,L1) + (*disp)(2);
         (*disp)(0) = -d1*sin(theta(1)) + R0*cos(beta0) - L1;
         (*disp)(1) = d1*cos(theta(1)) + R0*sin(beta0) - La1 - L4;
     }

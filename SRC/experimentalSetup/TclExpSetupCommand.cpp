@@ -245,7 +245,7 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp, int argc,
                 opserr << "WARNING invalid number of arguments\n";
                 printCommand(argc,argv);
                 opserr << "Want: expSetup TwoActuators tag <-control ctrlTag> La1 La2 L "
-                    << "<-nlGeom> <-phiLocX phi> "
+                    << "<-nlGeom> <-posAct pos> <-phiLocX phi> "
                     << "<-ctrlDispFact f> <-ctrlVelFact f> <-ctrlAccelFact f> "
                     << "<-ctrlForceFact f> <-ctrlTimeFact f> "
                     << "<-daqDispFact f> <-daqVelFact f> <-ctrlAccelFact f> "
@@ -256,6 +256,7 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp, int argc,
             int ctrlTag, i;
             double La1, La2, L;
             int nlGeom = 0;
+            char posAct[6] = {'l','e','f','t','\0'};
             double phiLocX = 0.0;
             
             argi = 2;
@@ -303,6 +304,14 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp, int argc,
                     nlGeom = 1;
 			    }
 		    }
+		    for (i = argi; i < argc; i++)  {
+			    if (strcmp(argv[i], "-posAct") == 0)  {
+                    if (strcmp(argv[i+1], "left") == 0 || strcmp(argv[i+1], "l") == 0)
+                        strcpy(posAct, "left");
+                    else if (strcmp(argv[i+1], "right") == 0 || strcmp(argv[i+1], "r") == 0)
+                        strcpy(posAct, "right");
+			    }
+		    }
             for (i = argi; i < argc; i++)  {
                 if (strcmp(argv[i], "-phiLocX") == 0)  {
                     if (Tcl_GetDouble(interp, argv[i+1], &phiLocX) != TCL_OK)  {
@@ -314,7 +323,7 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp, int argc,
             }
 
             // parsing was successful, allocate the setup
-            theSetup = new ESTwoActuators2d(tag, La1, La2, L, theControl, nlGeom, phiLocX);
+            theSetup = new ESTwoActuators2d(tag, La1, La2, L, theControl, nlGeom, posAct, phiLocX);
         }
         
         else if (ndm == 3)  {
