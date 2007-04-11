@@ -202,7 +202,7 @@ void ESThreeActuators2d::Print(OPS_Stream &s, int flag)
     s << " nlGeom      : " << nlGeom << endln;
     s << " posAct1     : " << posAct0 << endln;
     s << " phiLocX     : " << phiLocX << endln;
-    if(theControl != 0)  {
+    if (theControl != 0)  {
         s << "\tExperimentalControl tag: " << theControl->getTag();
         s << *theControl;
     }
@@ -486,7 +486,7 @@ int ESThreeActuators2d::transfDaqDisp(Vector* disp)
                 << iter << " iterations and norm: " << dTheta.Norm() << endln;
         }
 
-        (*disp)(2) = atan((d2*cos(theta(1))+La1-La2-d1*cos(theta(0)))/(d2*sin(theta(1))+L0+L1-d1*sin(theta(0))));
+        (*disp)(2) = atan2(d2*cos(theta(1))+La1-La2-d1*cos(theta(0)),d2*sin(theta(1))+L0+L1-d1*sin(theta(0)));
         (*disp)(0) = d1*sin(theta(0))+L0*cos((*disp)(2))-L0;
         (*disp)(1) = d1*cos(theta(0))+L0*sin((*disp)(2))-La1;
     }
@@ -527,7 +527,7 @@ int ESThreeActuators2d::transfDaqDisp(Vector* disp)
                 << iter << " iterations and norm: " << dTheta.Norm() << endln;
         }
 
-        (*disp)(2) = atan((d2*cos(theta(1))+La1-La2-d1*cos(theta(0)))/(-d2*sin(theta(1))+L0+L1+d1*sin(theta(0))));
+        (*disp)(2) = atan2(d2*cos(theta(1))+La1-La2-d1*cos(theta(0)),-d2*sin(theta(1))+L0+L1+d1*sin(theta(0)));
         (*disp)(0) = -d1*sin(theta(0))+L0*cos((*disp)(2))-L0;
         (*disp)(1) = d1*cos(theta(0))+L0*sin((*disp)(2))-La1;
     }
@@ -688,7 +688,7 @@ int ESThreeActuators2d::transfDaqForce(Vector* force)
                 << iter << " iterations and norm: " << dTheta.Norm() << endln;
         }
 
-        double disp2 = atan((d2*cos(theta(1))+La1-La2-d1*cos(theta(0)))/(d2*sin(theta(1))+L0+L1-d1*sin(theta(0))));
+        double disp2 = atan2(d2*cos(theta(1))+La1-La2-d1*cos(theta(0)),d2*sin(theta(1))+L0+L1-d1*sin(theta(0)));
 
         static Vector fx(3), fy(3);
         fx(0) = (*dForce)(0)*(d1*sin(theta(0))+La0)/d0;
@@ -739,7 +739,7 @@ int ESThreeActuators2d::transfDaqForce(Vector* force)
                 << iter << " iterations and norm: " << dTheta.Norm() << endln;
         }
 
-        double disp2 = atan((d2*cos(theta(1))+La1-La2-d1*cos(theta(0)))/(-d2*sin(theta(1))+L0+L1+d1*sin(theta(0))));
+        double disp2 = atan2(d2*cos(theta(1))+La1-La2-d1*cos(theta(0)),-d2*sin(theta(1))+L0+L1+d1*sin(theta(0)));
 
         static Vector fx(3), fy(3);
         fx(0) = (*dForce)(0)*(d2*sin(theta(1))+La0)/d0;

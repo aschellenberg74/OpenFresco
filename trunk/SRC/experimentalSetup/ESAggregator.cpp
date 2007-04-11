@@ -553,7 +553,7 @@ void ESAggregator::Print(OPS_Stream &s, int flag)
     for (int i=0; i<numSetups; i++)
         s << theSetups[i]->getTag() << ", ";
     s << endln;
-	if(theControl != 0) {
+	if (theControl != 0) {
 		s << "\tExperimentalControl tag: " << theControl->getTag();
 		s << *theControl;
     }

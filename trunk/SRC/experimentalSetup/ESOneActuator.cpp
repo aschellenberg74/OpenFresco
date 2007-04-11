@@ -131,7 +131,7 @@ void ESOneActuator::Print(OPS_Stream &s, int flag)
     s << "ExperimentalSetup: " << this->getTag(); 
     s << " type: ESOneActuator\n";
     s << " dir: " << direction << endln;
-    if(theControl != 0)  {
+    if (theControl != 0)  {
         s << "\tExperimentalControl tag: " << theControl->getTag();
         s << *theControl;
     }
@@ -216,4 +216,3 @@ int ESOneActuator::transfDaqTime(Vector* time)
     
     return OF_ReturnType_completed;
 }
-
