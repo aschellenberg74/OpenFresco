@@ -64,7 +64,8 @@ public:
         const Vector &upperLimit);
     
     int getNodeTag();
-    int getNumDir();
+    int getNumParameters();
+    const ID &getSizeRespType();
 
     const ID &getDir();
     const ID &getResponseType();
@@ -88,7 +89,10 @@ protected:
     Vector factor;      // factors
     Vector *lowerLim;   // lower limits
     Vector *upperLim;   // upper limits
-    int numDir;         // number of directions
+
+    int numParam;       // number of parameters
+    ID sizeRespType;    // sizes of response types
+
 };
 
 #endif
