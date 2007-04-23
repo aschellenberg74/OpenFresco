@@ -31,7 +31,6 @@
 
 #include "ECdSpace.h"
 
-#include <clib32.h>
 #include <time.h>
 
 
@@ -40,9 +39,9 @@ ECdSpace::ECdSpace(int tag, int pctype, char *boardname)
     pcType(pctype), boardName(boardname),
     targDisp(0), targVel(0), targAccel(0), measDisp(0), measForce(0)
 {	    
-    // the host application OpenSees needs to access the dSpace board
+    // the host application OpenFresco needs to access the dSpace board
     // OpenSees is therefore registred with the DSP device driver
-    error = DS_register_host_app("OpenSees");
+    error = DS_register_host_app("OpenFresco");
     if (error != DS_NO_ERROR)  {
         opserr << "ECdSpace::ECdSpace()"
             << " - DS_register_host_app: error = " << error << endln;
@@ -230,15 +229,21 @@ int ECdSpace::setup()
     }
     
     // get addresses of the controlled variables on the DSP board		  
-    error = DS_get_var_addr(board_index, "updateFlag", &updateFlagId);
+    error = DS_get_var_addr(board_index, "newTarget", &newTargetId);
     if (error != DS_NO_ERROR)  {
-        opserr << "ECdSpace::ECdSpace() - DS_get_var_addr - updateFlag: error = " << error << endln;
+        opserr << "ECdSpace::ECdSpace() - DS_get_var_addr - newTarget: error = " << error << endln;
         DS_unregister_host_app();
         return OF_ReturnType_failed;
     }
-    error = DS_get_var_addr(board_index, "targetFlag", &targetFlagId);
+    error = DS_get_var_addr(board_index, "atTarget", &atTargetId);
     if (error != DS_NO_ERROR)  {
-        opserr << "ECdSpace::ECdSpace() - DS_get_var_addr - targetFlag: error = " << error << endln;
+        opserr << "ECdSpace::ECdSpace() - DS_get_var_addr - atTarget: error = " << error << endln;
+        DS_unregister_host_app();
+        return OF_ReturnType_failed;
+    }
+    error = DS_get_var_addr(board_index, "switchPC", &switchPCId);
+    if (error != DS_NO_ERROR)  {
+        opserr << "ECdSpace::ECdSpace() - DS_get_var_addr - switchPC: error = " << error << endln;
         DS_unregister_host_app();
         return OF_ReturnType_failed;
     }
@@ -418,7 +423,7 @@ void ECdSpace::Print(OPS_Stream &s, int flag)
 
 int ECdSpace::control()
 {
-    // send targDisp, targVel and targAccel and set updateFlag
+    // send targDisp, targVel and targAccel and set newTarget flag
     error = DS_write_64(board_index, targDispId, (*sizeCtrl)[OF_Resp_Disp], (UInt64 *)targDisp);
     if (error != DS_NO_ERROR)  {
         opserr << "ECdSpace::execute() - DS_write_64: error = " << error << endln;
@@ -442,19 +447,19 @@ int ECdSpace::control()
         }
     }
 
-	// set updateFlag
-    updateFlag = 1.0;
-    error = DS_write_64(board_index, updateFlagId, 1, (UInt64 *)&updateFlag);
+	// set newTarget flag
+    newTarget = 1.0;
+    error = DS_write_64(board_index, newTargetId, 1, (UInt64 *)&newTarget);
     if (error != DS_NO_ERROR)  {
         opserr << "ECdSpace::execute() - DS_write_64: error = " << error << endln;
         DS_unregister_host_app();
         return OF_ReturnType_failed;
     }
     
-    // wait until target flag has changed as well
-    targetFlag = 0.0;
-    while (targetFlag != 1.0) {
-        DS_read_64(board_index, targetFlagId, 1, (UInt64 *)&targetFlag);
+	// wait until switchPC flag has changed as well
+    switchPC = 0.0;
+    while (switchPC != 1.0) {
+        DS_read_64(board_index, switchPCId, 1, (UInt64 *)&switchPC);
     }
 
     return OF_ReturnType_completed;
@@ -463,9 +468,9 @@ int ECdSpace::control()
 
 int ECdSpace::acquire()
 {
-    // reset updateFlag
-    updateFlag = 0.0;
-    error = DS_write_64(board_index, updateFlagId, 1, (UInt64 *)&updateFlag);
+    // reset newTarget flag
+    newTarget = 0.0;
+    error = DS_write_64(board_index, newTargetId, 1, (UInt64 *)&newTarget);
     if (error != DS_NO_ERROR)  {
         opserr << "ECdSpace::acquire() - DS_write_64: error = " << error << endln;
         DS_unregister_host_app();
@@ -473,9 +478,9 @@ int ECdSpace::acquire()
     }
 
     // wait until target is reached
-    targetFlag = 1.0;
-    while (targetFlag != 0.0)  {
-        DS_read_64(board_index, targetFlagId, 1, (UInt64 *)&targetFlag);
+    atTarget = 0.0;
+    while (atTarget != 1.0)  {
+        DS_read_64(board_index, atTargetId, 1, (UInt64 *)&atTarget);
     }
         
     // read displacements and resisting forces at target

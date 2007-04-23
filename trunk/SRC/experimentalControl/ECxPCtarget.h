@@ -40,7 +40,7 @@ class ECxPCtarget : public ExperimentalControl
 {
 public:
     // constructors
-    ECxPCtarget(int tag, int type, char *ipAddress,
+    ECxPCtarget(int tag, int pcType, char *ipAddress,
         char *ipPort, char *appName, char *appPath = 0);
     ECxPCtarget(const ECxPCtarget &ec);
     
@@ -81,11 +81,11 @@ private:
     char *ipAddress, *ipPort, *appName, *appPath;
     char errMsg[80];
 
-    double updateFlag, targetFlag;
+    double newTarget;
     double *targDisp, *targVel, *targAccel;
     double *measDisp, *measForce;
     
-    int updateFlagId, targetFlagId;
+    int newTargetId, atTargetId, switchPCId;
     int targDispId, targVelId, targAccelId;
     int *measDispId, *measForceId;
 };
