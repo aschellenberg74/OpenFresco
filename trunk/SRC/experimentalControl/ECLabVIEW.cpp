@@ -92,6 +92,7 @@ ECLabVIEW::ECLabVIEW(int tag,
     // open a session with LabVIEW
     sprintf(sData,"open-session\tOpenFresco\n");
         fprintf(logFile,"%s",sData);
+    sendData = new Message(sData,(int)strlen(sData));  // needed because of bug in LabVIEW-plugin
     theSocket->sendMsg(0, 0, *sendData, 0);
     theSocket->recvMsgUnknownSize(0, 0, *recvData, 0);
         fprintf(logFile,"%s",rData);
@@ -99,13 +100,15 @@ ECLabVIEW::ECLabVIEW(int tag,
     if (strcmp(strtok(rData,"\t"),"OK") != 0)  {
         opserr << "ECLabVIEW::ECLabVIEW() - "
             << "failed to open a session with LabVIEW\n";
+        opserr << rData << endln;
         delete theSocket;
         exit(OF_ReturnType_failed);
     }
 
-    // send parameters (needed for NEES-SAM -> remove later)
-    sprintf(sData,"set-parameter\tOPFTransactionNEESSAM\tnstep\t501\n");
+    // send parameters (needed for NEES-SAM & MiniMost -> remove later)
+    sprintf(sData,"set-parameter\tOPFTransaction\tnstep\t1\n");
         fprintf(logFile,"%s",sData);
+    sendData = new Message(sData,(int)strlen(sData));  // needed because of bug in LabVIEW-plugin
     theSocket->sendMsg(0, 0, *sendData, 0);
     theSocket->recvMsgUnknownSize(0, 0, *recvData, 0);
         fprintf(logFile,"%s",rData);
@@ -113,6 +116,7 @@ ECLabVIEW::ECLabVIEW(int tag,
     if (strcmp(strtok(rData,"\t"),"OK") != 0)  {
         opserr << "ECLabVIEW::ECLabVIEW() - "
             << "failed to set parameter with LabVIEW\n";
+        opserr << rData << endln;
         delete theSocket;
         exit(OF_ReturnType_failed);
     }
@@ -143,6 +147,7 @@ ECLabVIEW::~ECLabVIEW()
     // close the session with LabVIEW
     sprintf(sData,"close-session\tOpenFresco\n");
         fprintf(logFile,"%s",sData);
+    sendData = new Message(sData,(int)strlen(sData));  // needed because of bug in LabVIEW-plugin
     theSocket->sendMsg(0, 0, *sendData, 0);
     theSocket->recvMsgUnknownSize(0, 0, *recvData, 0);
         fprintf(logFile,"%s",rData);
@@ -150,6 +155,7 @@ ECLabVIEW::~ECLabVIEW()
     if (strcmp(strtok(rData,"\t"),"OK") != 0)  {
         opserr << "ECLabVIEW::~ECLabVIEW() - "
             << "failed to close the current session with LabVIEW\n";
+        opserr << rData << endln;
     }
 
     // close connection by destroying theSocket
@@ -158,6 +164,11 @@ ECLabVIEW::~ECLabVIEW()
 
     // close output file
     fclose(logFile);
+
+    opserr << "********************************************\n";
+    opserr << "* The session with LabVIEW has been closed *\n";
+    opserr << "********************************************\n";
+    opserr << endln;
 }
 
 
@@ -169,12 +180,21 @@ int ECLabVIEW::setSize(ID sizeT, ID sizeO)
     // ECLabVIEW objects only use 
     // disp for trial and disp and force for output
     // check these are available in sizeT/sizeO.
+    int sizeTDisp = 0, sizeODisp = 0, sizeOForce = 0;
+    for (int i=0; i<numTrialCPs; i++)  {
+        sizeTDisp += (trialCPs[i]->getSizeRespType())(OF_Resp_Disp);
+    }
+    for (int i=0; i<numOutCPs; i++)  {
+        sizeODisp += (outCPs[i]->getSizeRespType())(OF_Resp_Disp);
+        sizeOForce += (outCPs[i]->getSizeRespType())(OF_Resp_Force);
+    }
     
-    if (sizeT[OF_Resp_Disp] == 0 ||
-        sizeO[OF_Resp_Disp] == 0 || sizeO[OF_Resp_Force] == 0) {
+    if (sizeT[OF_Resp_Disp] != sizeTDisp ||
+        sizeO[OF_Resp_Disp] != sizeODisp || sizeO[OF_Resp_Force] != sizeOForce) {
         opserr << "ECLabVIEW::setSize - wrong sizeTrial/Out\n"; 
         opserr << "see User Manual.\n";
         sprintf(sData,"close-session\tOpenFresco\n");
+        sendData = new Message(sData,(int)strlen(sData));  // needed because of bug in LabVIEW-plugin
         theSocket->sendMsg(0, 0, *sendData, 0);
         delete theSocket;
         return OF_ReturnType_failed;
@@ -223,6 +243,7 @@ int ECLabVIEW::setup()
         getchar();
         sprintf(sData,"close-session\tOpenFresco\n");
             fprintf(logFile,"%s",sData);
+        sendData = new Message(sData,(int)strlen(sData));  // needed because of bug in LabVIEW-plugin
         theSocket->sendMsg(0, 0, *sendData, 0);
         delete theSocket;
         exit(OF_ReturnType_failed);
@@ -255,6 +276,7 @@ int ECLabVIEW::setup()
             getchar();
             sprintf(sData,"close-session\tOpenFresco\n");
                 fprintf(logFile,"%s",sData);
+            sendData = new Message(sData,(int)strlen(sData));  // needed because of bug in LabVIEW-plugin
             theSocket->sendMsg(0, 0, *sendData, 0);
             delete theSocket;
             exit(OF_ReturnType_failed);
@@ -354,7 +376,7 @@ int ECLabVIEW::control()
             sprintf(sData,"%s\tcontrol-point\tCPNode%02d",sData,trialCPs[i]->getNodeTag());
 
         // get trial control point parameters
-        int numDir = trialCPs[i]->getNumDir();
+        int numParam = trialCPs[i]->getNumParameters();
         ID dir = trialCPs[i]->getDir();
         ID resp = trialCPs[i]->getResponseType();
         Vector fact = trialCPs[i]->getFactor();
@@ -362,17 +384,17 @@ int ECLabVIEW::control()
         const Vector *upperLim = trialCPs[i]->getUpperLimit();
 
         if (lowerLim == 0 || upperLim == 0)  {
-            // loop through all the trial control point directions
-            // without checking if commands are within bounds
-            for (int j=0; j<numDir; j++)  {
+            // loop through all the trial control point parameters
+            // without checking if commands are within limits
+            for (int j=0; j<numParam; j++)  {
                 // append GeomType
-                if (dir(j) == 0 || dir(j) == 3)  {
+                if (dir(j) == OF_Dir_X || dir(j) == OF_Dir_RX)  {
                     sprintf(sData,"%s\tx",sData);
                 }
-                else if (dir(j) == 1 || dir(j) == 4)  {
+                else if (dir(j) == OF_Dir_Y || dir(j) == OF_Dir_RY)  {
                     sprintf(sData,"%s\ty",sData);
                 }
-                else if (dir(j) == 2 || dir(j) == 5)  {
+                else if (dir(j) == OF_Dir_Z || dir(j) == OF_Dir_RZ)  {
                     sprintf(sData,"%s\tz",sData);
                 }
                 else {
@@ -381,19 +403,19 @@ int ECLabVIEW::control()
                     return OF_ReturnType_failed;
                 }
                 // append ParameterType and Parameter
-                if (dir(j) < 3 && resp(j) == 0)  {
+                if (dir(j) < OF_Dir_RX && resp(j) == OF_Resp_Disp)  {
                     sprintf(sData,"%s\tdisplacement\t%.10E",sData,fact(j)*(*targDisp)(dID));
                     dID++;
                 }
-                else if (dir(j) < 3 && resp(j) == 3)  {
+                else if (dir(j) < OF_Dir_RX && resp(j) == OF_Resp_Force)  {
                     sprintf(sData,"%s\tforce\t%.10E",sData,fact(j)*(*targForce)(fID));
                     fID++;
                 }
-                else if (dir(j) > 2 && resp(j) == 0)  {
+                else if (dir(j) > OF_Dir_Z && resp(j) == OF_Resp_Disp)  {
                     sprintf(sData,"%s\trotation\t%.10E",sData,fact(j)*(*targDisp)(dID));
                     dID++;
                 }
-                else if (dir(j) > 2 && resp(j) == 3)  {
+                else if (dir(j) > OF_Dir_Z && resp(j) == OF_Resp_Force)  {
                     sprintf(sData,"%s\tmoment\t%.10E",sData,fact(j)*(*targForce)(fID));
                     fID++;
                 }
@@ -405,18 +427,18 @@ int ECLabVIEW::control()
             }
         }
         else  {
-            // loop through all the trial control point directions
-            // and check if commands are within given bounds
+            // loop through all the trial control point parameters
+            // and check if commands are within given limits
             double parameter; int c;
-            for (int j=0; j<numDir; j++)  {
+            for (int j=0; j<numParam; j++)  {
                 // append GeomType
-                if (dir(j) == 0 || dir(j) == 3)  {
+                if (dir(j) == OF_Dir_X || dir(j) == OF_Dir_RX)  {
                     sprintf(sData,"%s\tx",sData);
                 }
-                else if (dir(j) == 1 || dir(j) == 4)  {
+                else if (dir(j) == OF_Dir_Y || dir(j) == OF_Dir_RY)  {
                     sprintf(sData,"%s\ty",sData);
                 }
-                else if (dir(j) == 2 || dir(j) == 5)  {
+                else if (dir(j) == OF_Dir_Z || dir(j) == OF_Dir_RZ)  {
                     sprintf(sData,"%s\tz",sData);
                 }
                 else {
@@ -425,22 +447,22 @@ int ECLabVIEW::control()
                     return OF_ReturnType_failed;
                 }
                 // append ParameterType
-                if (dir(j) < 3 && resp(j) == 0)  {
+                if (dir(j) < OF_Dir_RX && resp(j) == OF_Resp_Disp)  {
                     parameter = fact(j)*(*targDisp)(dID);
                     sprintf(sData,"%s\tdisplacement",sData);
                     dID++;
                 }
-                else if (dir(j) < 3 && resp(j) == 3)  {
+                else if (dir(j) < OF_Dir_RX && resp(j) == OF_Resp_Force)  {
                     parameter = fact(j)*(*targForce)(fID);
                     sprintf(sData,"%s\tforce",sData);
                     fID++;
                 }
-                else if (dir(j) > 2 && resp(j) == 0)  {
+                else if (dir(j) > OF_Dir_Z && resp(j) == OF_Resp_Disp)  {
                     parameter = fact(j)*(*targDisp)(dID);
                     sprintf(sData,"%s\trotation",sData);
                     dID++;
                 }
-                else if (dir(j) > 2 && resp(j) == 3)  {
+                else if (dir(j) > OF_Dir_Z && resp(j) == OF_Resp_Force)  {
                     parameter = fact(j)*(*targForce)(fID);
                     sprintf(sData,"%s\tmoment",sData);
                     fID++;
@@ -468,6 +490,7 @@ int ECLabVIEW::control()
                         getchar();
                         sprintf(sData,"close-session\tOpenFresco\n");
                             fprintf(logFile,"%s",sData);
+                        sendData = new Message(sData,(int)strlen(sData));  // needed because of bug in LabVIEW-plugin
                         theSocket->sendMsg(0, 0, *sendData, 0);
                         delete theSocket;
                         exit(OF_ReturnType_failed);
@@ -482,24 +505,28 @@ int ECLabVIEW::control()
     }
     sprintf(sData,"%s\n",sData);
         fprintf(logFile,"%s",sData);
+    sendData = new Message(sData,(int)strlen(sData));  // needed because of bug in LabVIEW-plugin
     theSocket->sendMsg(0, 0, *sendData, 0);
     theSocket->recvMsgUnknownSize(0, 0, *recvData, 0);
         fprintf(logFile,"%s",rData);
     if (strcmp(strtok(rData,"\t"),"OK") != 0)  {
         opserr << "ECLabVIEW::control() - "
             << "proposed control values were not accepted\n";
+        opserr << rData << endln;
         return OF_ReturnType_failed;
     }
 
     // execute target values
     sprintf(sData,"execute\t%s\n",OPFTransactionID);
         fprintf(logFile,"%s",sData);
+    sendData = new Message(sData,(int)strlen(sData));  // needed because of bug in LabVIEW-plugin
     theSocket->sendMsg(0, 0, *sendData, 0);
     theSocket->recvMsgUnknownSize(0, 0, *recvData, 0);
         fprintf(logFile,"%s",rData);
     if (strcmp(strtok(rData,"\t"),"OK") != 0)  {
         opserr << "ECLabVIEW::control() - "
             << "failed to execute proposed control values\n";
+        opserr << rData << endln;
         return OF_ReturnType_failed;
     }
 
@@ -524,11 +551,12 @@ int ECLabVIEW::acquire()
     }
     sprintf(sData,"%s\n",sData);
         fprintf(logFile,"%s",sData);
+    sendData = new Message(sData,(int)strlen(sData));  // needed because of bug in LabVIEW-plugin
     theSocket->sendMsg(0, 0, *sendData, 0);
 
     // receive output control point daq values
-    int dID = 0, fID = 0;
     int direction, response;
+    int dID = 0, fID = 0;
     for (int i=0; i<numOutCPs; i++)  {
         // disaggregate received data
         theSocket->recvMsgUnknownSize(0, 0, *recvData, 0);
@@ -537,6 +565,7 @@ int ECLabVIEW::acquire()
             opserr << "ECLabVIEW::acquire() - "
                 << "failed to acquire control-point "
                 << outCPs[i]->getTag() << " values\n";
+            opserr << rData << endln;
             return OF_ReturnType_failed;
         }
         tokenPtr = strtok(NULL,"\t");
@@ -544,7 +573,8 @@ int ECLabVIEW::acquire()
         if (strcmp(tokenPtr,OPFTransactionID) != 0)  {
             opserr << "ECLabVIEW::acquire() - "
                 << "received wrong OPFTransactionID\n"
-                << " want: " << OPFTransactionID << " but got: " << tokenPtr << endln;
+                << " want: " << OPFTransactionID
+                << " but got: " << tokenPtr << endln;
             return OF_ReturnType_failed;
         }
         tokenPtr = strtok(NULL,"\t");
@@ -553,16 +583,19 @@ int ECLabVIEW::acquire()
         if (strcmp(tokenPtr,cpName) != 0)  {
             opserr << "ECLabVIEW::acquire() - "
                 << "received wrong control-point\n"
-                << " want: " << cpName << " but got: " << tokenPtr << endln;
+                << " want: " << cpName
+                << " but got: " << tokenPtr << endln;
             return OF_ReturnType_failed;
         }
         tokenPtr = strtok(NULL,"\t");
 
         // get output control point parameters
-        int numDir = outCPs[i]->getNumDir();
+        int numParam = outCPs[i]->getNumParameters();
         ID dir = outCPs[i]->getDir();
         ID resp = outCPs[i]->getResponseType();
         Vector fact = outCPs[i]->getFactor();
+        ID sizeRespType = outCPs[i]->getSizeRespType();
+        int sizeDisp = 0, sizeForce = 0;
 
         while (tokenPtr != NULL)  {
             strcpy(GeomType,tokenPtr);
@@ -570,64 +603,97 @@ int ECLabVIEW::acquire()
             Parameter = atof(strtok(NULL,"\t"));
             if (strcmp(GeomType,"x") == 0)  {
                 if (strcmp(ParamType,"displacement") == 0)  {
-                    direction = 0; response = 0;
+                    direction = OF_Dir_X;
+                    response  = OF_Resp_Disp;
                 }
                 else if (strcmp(ParamType,"force") == 0)  {
-                    direction = 0; response = 3;
+                    direction = OF_Dir_X;
+                    response  = OF_Resp_Force;
                 }
                 else if (strcmp(ParamType,"rotation") == 0)  {
-                    direction = 3; response = 0;
+                    direction = OF_Dir_RX;
+                    response  = OF_Resp_Disp;
                 }
                 else if (strcmp(ParamType,"moment") == 0)  {
-                    direction = 3; response = 3;
+                    direction = OF_Dir_RX;
+                    response  = OF_Resp_Force;
                 }
             }
             else if (strcmp(GeomType,"y") == 0)  {
                 if (strcmp(ParamType,"displacement") == 0)  {
-                    direction = 1; response = 0;
+                    direction = OF_Dir_Y;
+                    response  = OF_Resp_Disp;
                 }
                 else if (strcmp(ParamType,"force") == 0)  {
-                    direction = 1; response = 3;
+                    direction = OF_Dir_Y;
+                    response  = OF_Resp_Force;
                 }
                 else if (strcmp(ParamType,"rotation") == 0)  {
-                    direction = 4; response = 0;
+                    direction = OF_Dir_RY;
+                    response  = OF_Resp_Disp;
                 }
                 else if (strcmp(ParamType,"moment") == 0)  {
-                    direction = 4; response = 3;
+                    direction = OF_Dir_RY;
+                    response  = OF_Resp_Force;
                 }
             }
             else if (strcmp(GeomType,"z") == 0)  {
                 if (strcmp(ParamType,"displacement") == 0)  {
-                    direction = 2; response = 0;
+                    direction = OF_Dir_Z;
+                    response  = OF_Resp_Disp;
                 }
                 else if (strcmp(ParamType,"force") == 0)  {
-                    direction = 2; response = 3;
+                    direction = OF_Dir_Z;
+                    response  = OF_Resp_Force;
                 }
                 else if (strcmp(ParamType,"rotation") == 0)  {
-                    direction = 5; response = 0;
+                    direction = OF_Dir_RZ;
+                    response  = OF_Resp_Disp;
                 }
                 else if (strcmp(ParamType,"moment") == 0)  {
-                    direction = 5; response = 3;
+                    direction = OF_Dir_RZ;
+                    response  = OF_Resp_Force;
                 }
             }
-            // loop through all the output control point directions
-            int dNumDir = 0, fNumDir = 0;
-            for (int j=0; j<numDir; j++)  {
-                if (dir(j) == direction && resp(j) == response)  {
-                    if (response == 0)  {
-                        (*measDisp)(dID+j) = fact(j)*Parameter;
-                        dNumDir++;
+
+            // assemble displacement and force daq vectors
+            if (response == 0)  {
+                int id = dID;
+                for (int j=0; j<numParam; j++)  {
+                    if (resp(j) == response)  {
+                        if (dir(j) == direction)  {
+                            (*measDisp)(id) = Parameter/fact(j);
+                            sizeDisp++;
+                        }
+                        id++;
                     }
-                    else if (response == 3)  {
-                        (*measForce)(fID+j) = fact(j)*Parameter;
-                        fNumDir++;
+                }
+            }
+            else if (response == 3)  {
+                int id = fID;
+                for (int j=0; j<numParam; j++)  {
+                    if (resp(j) == response)  {
+                        if (dir(j) == direction)  {
+                            (*measForce)(id) = Parameter/fact(j);
+                            sizeForce++;
+                        }
+                        id++;
                     }
                 }
             }
             tokenPtr = strtok(NULL,"\t");
-            dID = dNumDir;
-            fID = fNumDir;
         }
+
+        // check if received number of parameters is correct
+        if (sizeDisp != sizeRespType(0) || sizeForce != sizeRespType(3))  {
+            opserr << "ECLabVIEW::acquire() - "
+                << "received wrong number of displacement or force parameters\n"
+                << " want: " << sizeRespType(0) << " displacements" 
+                << "and " << sizeRespType(3) << " forces\n" << endln;
+             return OF_ReturnType_failed;
+        }
+        dID += sizeRespType(0);
+        fID += sizeRespType(3);
     }
 
     return OF_ReturnType_completed;
