@@ -42,7 +42,7 @@ extern int addEETruss(ClientData clientData, Tcl_Interp *interp,  int argc,
 extern int addEEBeamColumn(ClientData clientData, Tcl_Interp *interp,  int argc, 
     TCL_Char **argv, Domain*, TclModelBuilder*, int argStart); 
 
-extern int addEEZeroLength(ClientData clientData, Tcl_Interp *interp,  int argc, 
+extern int addEETwoNodeLink(ClientData clientData, Tcl_Interp *interp,  int argc, 
     TCL_Char **argv, Domain*, TclModelBuilder*, int argStart); 
 
 extern int addEEGeneric(ClientData clientData, Tcl_Interp *interp,  int argc, 
@@ -92,9 +92,9 @@ int TclExpElementCommand(ClientData clientData, Tcl_Interp *interp, int argc,
         return result;
     }
     // ----------------------------------------------------------------------------	
-    else if (strcmp(argv[1],"zeroLength") == 0) {
+    else if (strcmp(argv[1],"twoNodeLink") == 0) {
         int eleArgStart = 1;
-        int result = addEEZeroLength(clientData, interp, argc, argv,
+        int result = addEETwoNodeLink(clientData, interp, argc, argv,
             theTclDomain, theTclBuilder, eleArgStart);
         return result;
     }

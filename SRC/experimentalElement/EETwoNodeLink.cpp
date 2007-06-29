@@ -27,9 +27,9 @@
 // Created: 09/06
 // Revision: A
 //
-// Description: This file contains the implementation of the EEZeroLength class.
+// Description: This file contains the implementation of the EETwoNodeLink class.
 
-#include "EEZeroLength.h"
+#include "EETwoNodeLink.h"
 
 #include <ArrayOfTaggedObjects.h>
 #include <Domain.h>
@@ -47,23 +47,23 @@
 
 
 // initialise the class wide variables
-Matrix EEZeroLength::EEZeroLengthM2(2,2);
-Matrix EEZeroLength::EEZeroLengthM4(4,4);
-Matrix EEZeroLength::EEZeroLengthM6(6,6);
-Matrix EEZeroLength::EEZeroLengthM12(12,12);
-Vector EEZeroLength::EEZeroLengthV2(2);
-Vector EEZeroLength::EEZeroLengthV4(4);
-Vector EEZeroLength::EEZeroLengthV6(6);
-Vector EEZeroLength::EEZeroLengthV12(12);
+Matrix EETwoNodeLink::EETwoNodeLinkM2(2,2);
+Matrix EETwoNodeLink::EETwoNodeLinkM4(4,4);
+Matrix EETwoNodeLink::EETwoNodeLinkM6(6,6);
+Matrix EETwoNodeLink::EETwoNodeLinkM12(12,12);
+Vector EETwoNodeLink::EETwoNodeLinkV2(2);
+Vector EETwoNodeLink::EETwoNodeLinkV4(4);
+Vector EETwoNodeLink::EETwoNodeLinkV6(6);
+Vector EETwoNodeLink::EETwoNodeLinkV12(12);
 
 
 // responsible for allocating the necessary space needed
 // by each object and storing the tags of the end nodes.
-EEZeroLength::EEZeroLength(int tag, int dim, int Nd1, int Nd2, 
+EETwoNodeLink::EETwoNodeLink(int tag, int dim, int Nd1, int Nd2, 
     const ID &direction, const Vector &x, const Vector &yp,
     ExperimentalSite *site,
     bool iM, double m)
-    : ExperimentalElement(tag, ELE_TAG_EEZeroLength, site),     
+    : ExperimentalElement(tag, ELE_TAG_EETwoNodeLink, site),     
     dimension(dim), numDOF(0),
     connectedExternalNodes(2),
     numDir(direction.Size()), dir(0), transformation(3,3),
@@ -82,7 +82,7 @@ EEZeroLength::EEZeroLength(int tag, int dim, int Nd1, int Nd2,
     dir = new ID(numDir);
     
     if (dir == 0)  {
-        opserr << "EEZeroLength::EEZeroLength() - failed to creat direction array\n";
+        opserr << "EETwoNodeLink::EETwoNodeLink() - failed to creat direction array\n";
         exit(-1);
     }
     
@@ -90,7 +90,7 @@ EEZeroLength::EEZeroLength(int tag, int dim, int Nd1, int Nd2,
     (*dir) = direction;
     for (int i=0; i<numDir; i++)  {
         if ((*dir)(i) < 0 || (*dir)(i) > 5)  {
-            opserr << "EEZeroLength::EEZeroLength() - incorrect direction "
+            opserr << "EETwoNodeLink::EETwoNodeLink() - incorrect direction "
                 << (*dir)(i) << " is set to 0\n";
             (*dir)(i) = 0;
         }
@@ -136,11 +136,11 @@ EEZeroLength::EEZeroLength(int tag, int dim, int Nd1, int Nd2,
 
 // responsible for allocating the necessary space needed
 // by each object and storing the tags of the end nodes.
-EEZeroLength::EEZeroLength(int tag, int dim, int Nd1, int Nd2, 
+EETwoNodeLink::EETwoNodeLink(int tag, int dim, int Nd1, int Nd2, 
     const ID &direction, const Vector &x, const Vector &yp,
     int port, char *machineInetAddr, int dataSize,
     bool iM, double m)
-    : ExperimentalElement(tag, ELE_TAG_EEZeroLength),     
+    : ExperimentalElement(tag, ELE_TAG_EETwoNodeLink),     
     dimension(dim), numDOF(0),
     connectedExternalNodes(2),
     numDir(direction.Size()), dir(0), transformation(3,3),
@@ -160,7 +160,7 @@ EEZeroLength::EEZeroLength(int tag, int dim, int Nd1, int Nd2,
     dir = new ID(numDir);
     
     if (dir == 0)  {
-        opserr << "EEZeroLength::EEZeroLength() - failed to creat direction array\n";
+        opserr << "EETwoNodeLink::EETwoNodeLink() - failed to creat direction array\n";
         exit(-1);
     }
     
@@ -168,7 +168,7 @@ EEZeroLength::EEZeroLength(int tag, int dim, int Nd1, int Nd2,
     (*dir) = direction;
     for (int i=0; i<numDir; i++)  {
         if ((*dir)(i) < 0 || (*dir)(i) > 5)  {
-            opserr << "EEZeroLength::EEZeroLength() - incorrect direction "
+            opserr << "EETwoNodeLink::EETwoNodeLink() - incorrect direction "
                 << (*dir)(i) << " is set to 0\n";
             (*dir)(i) = 0;
         }
@@ -241,7 +241,7 @@ EEZeroLength::EEZeroLength(int tag, int dim, int Nd1, int Nd2,
 
 
 // delete must be invoked on any objects created by the object.
-EEZeroLength::~EEZeroLength()
+EETwoNodeLink::~EETwoNodeLink()
 {
     // invoke the destructor on any objects created by the object
     // that the object still holds a pointer to
@@ -288,38 +288,38 @@ EEZeroLength::~EEZeroLength()
 }
 
 
-int EEZeroLength::getNumExternalNodes() const
+int EETwoNodeLink::getNumExternalNodes() const
 {
     return 2;
 }
 
 
-const ID& EEZeroLength::getExternalNodes() 
+const ID& EETwoNodeLink::getExternalNodes() 
 {
     return connectedExternalNodes;
 }
 
 
-Node** EEZeroLength::getNodePtrs() 
+Node** EETwoNodeLink::getNodePtrs() 
 {
     return theNodes;
 }
 
 
-int EEZeroLength::getNumDOF() 
+int EETwoNodeLink::getNumDOF() 
 {
     return numDOF;
 }
 
 
-int EEZeroLength::getNumBasicDOF() 
+int EETwoNodeLink::getNumBasicDOF() 
 {
     return numDir;
 }
 
 
 // to set a link to the enclosing Domain and to set the node pointers.
-void EEZeroLength::setDomain(Domain *theDomain)
+void EETwoNodeLink::setDomain(Domain *theDomain)
 {
     // check Domain is not null - invoked when object removed from a domain
     if (theDomain == 0)  {
@@ -331,8 +331,8 @@ void EEZeroLength::setDomain(Domain *theDomain)
     
     // set default values for error conditions
     numDOF = 2;
-    theMatrix = &EEZeroLengthM2;
-    theVector = &EEZeroLengthV2;
+    theMatrix = &EETwoNodeLinkM2;
+    theVector = &EETwoNodeLinkV2;
     
     // first set the node pointers
     int Nd1 = connectedExternalNodes(0);
@@ -343,13 +343,13 @@ void EEZeroLength::setDomain(Domain *theDomain)
     // if can't find both - send a warning message
     if (!theNodes[0] || !theNodes[1])  {
         if (!theNodes[0])  { 
-            opserr << "EEZeroLength::setDomain() - Nd1: "
+            opserr << "EETwoNodeLink::setDomain() - Nd1: "
                 << Nd1 << " does not exist in the model for ";
         } else  {
-            opserr << "EEZeroLength::setDomain() - Nd2: " 
+            opserr << "EETwoNodeLink::setDomain() - Nd2: " 
                 << Nd2 << " does not exist in the model for ";
         }
-        opserr << "EEZeroLength ele: " << this->getTag() << endln;
+        opserr << "EETwoNodeLink ele: " << this->getTag() << endln;
         
         return;
     }
@@ -360,7 +360,7 @@ void EEZeroLength::setDomain(Domain *theDomain)
     
     // if differing dof at the ends - print a warning message
     if (dofNd1 != dofNd2)  {
-        opserr << "EEZeroLength::setDomain(): nodes " << Nd1 << " and " << Nd2
+        opserr << "EETwoNodeLink::setDomain(): nodes " << Nd1 << " and " << Nd2
             << "have differing dof at ends for element: " << this->getTag() << endln;
         return;
     }	
@@ -378,36 +378,36 @@ void EEZeroLength::setDomain(Domain *theDomain)
     // now set the number of dof for element and set matrix and vector pointer
     if (dimension == 1 && dofNd1 == 1)  {
         numDOF = 2;    
-        theMatrix = &EEZeroLengthM2;
-        theVector = &EEZeroLengthV2;
+        theMatrix = &EETwoNodeLinkM2;
+        theVector = &EETwoNodeLinkV2;
         elemType  = D1N2;
     }
     else if (dimension == 2 && dofNd1 == 2)  {
         numDOF = 4;
-        theMatrix = &EEZeroLengthM4;
-        theVector = &EEZeroLengthV4;
+        theMatrix = &EETwoNodeLinkM4;
+        theVector = &EETwoNodeLinkV4;
         elemType  = D2N4;
     }
     else if (dimension == 2 && dofNd1 == 3)  {
         numDOF = 6;	
-        theMatrix = &EEZeroLengthM6;
-        theVector = &EEZeroLengthV6;
+        theMatrix = &EETwoNodeLinkM6;
+        theVector = &EETwoNodeLinkV6;
         elemType  = D2N6;
     }
     else if (dimension == 3 && dofNd1 == 3)  {
         numDOF = 6;	
-        theMatrix = &EEZeroLengthM6;
-        theVector = &EEZeroLengthV6;
+        theMatrix = &EETwoNodeLinkM6;
+        theVector = &EETwoNodeLinkV6;
         elemType  = D3N6;
     }
     else if (dimension == 3 && dofNd1 == 6)  {
         numDOF = 12;	    
-        theMatrix = &EEZeroLengthM12;
-        theVector = &EEZeroLengthV12;
+        theMatrix = &EETwoNodeLinkM12;
+        theVector = &EETwoNodeLinkV12;
         elemType  = D3N12;
     }
     else  {
-        opserr << "EEZeroLength::setDomain() can not handle "
+        opserr << "EETwoNodeLink::setDomain() can not handle "
             << dimension << "dofs at nodes in " << dofNd1 << " d problem\n";
         return;
     }
@@ -423,7 +423,7 @@ void EEZeroLength::setDomain(Domain *theDomain)
     }
     
     if (!theLoad)  {
-        opserr << "EEZeroLength::setDomain() - element: " << this->getTag()
+        opserr << "EETwoNodeLink::setDomain() - element: " << this->getTag()
             << " out of memory creating vector of size: " << numDOF << endln;
         return;
     }          
@@ -434,7 +434,7 @@ void EEZeroLength::setDomain(Domain *theDomain)
 }   	 
 
 
-int EEZeroLength::commitState()
+int EETwoNodeLink::commitState()
 {
     int rValue = 0;
     
@@ -450,7 +450,7 @@ int EEZeroLength::commitState()
 }
 
 
-int EEZeroLength::update()
+int EETwoNodeLink::update()
 {
     int rValue = 0;
 
@@ -494,10 +494,10 @@ int EEZeroLength::update()
 }
 
 
-int EEZeroLength::setInitialStiff(const Matrix& kbinit)
+int EETwoNodeLink::setInitialStiff(const Matrix& kbinit)
 {
     if (kbinit.noRows() != numDir || kbinit.noCols() != numDir)  {
-        opserr << "EEZeroLength::setInitialStiff() - " 
+        opserr << "EETwoNodeLink::setInitialStiff() - " 
             << "matrix size is incorrect for element: "
             << this->getTag() << endln;
         return -1;
@@ -512,7 +512,7 @@ int EEZeroLength::setInitialStiff(const Matrix& kbinit)
 }
 
 
-const Matrix& EEZeroLength::getMass()
+const Matrix& EETwoNodeLink::getMass()
 {
     // zero the matrix
     theMatrix->Zero();
@@ -531,15 +531,15 @@ const Matrix& EEZeroLength::getMass()
 }
 
 
-void EEZeroLength::zeroLoad()
+void EETwoNodeLink::zeroLoad()
 {
     theLoad->Zero();
 }
 
 
-int EEZeroLength::addLoad(ElementalLoad *theLoad, double loadFactor)
+int EETwoNodeLink::addLoad(ElementalLoad *theLoad, double loadFactor)
 {
-    opserr <<"EEZeroLength::addLoad() - "
+    opserr <<"EETwoNodeLink::addLoad() - "
         << "load type unknown for element: "
         << this->getTag() << endln;
     
@@ -547,7 +547,7 @@ int EEZeroLength::addLoad(ElementalLoad *theLoad, double loadFactor)
 }
 
 
-int EEZeroLength::addInertiaLoadToUnbalance(const Vector &accel)
+int EETwoNodeLink::addInertiaLoadToUnbalance(const Vector &accel)
 {
     // check for quick return
     if (mass == 0.0)  {
@@ -561,7 +561,7 @@ int EEZeroLength::addInertiaLoadToUnbalance(const Vector &accel)
     int numDOF2 = numDOF/2;
     
     if (numDOF2 != Raccel1.Size() || numDOF2 != Raccel2.Size())  {
-        opserr << "EEZeroLength::addInertiaLoadToUnbalance() - "
+        opserr << "EETwoNodeLink::addInertiaLoadToUnbalance() - "
             << "matrix and vector sizes are incompatible\n";
         return -1;
     }
@@ -578,7 +578,7 @@ int EEZeroLength::addInertiaLoadToUnbalance(const Vector &accel)
 }
 
 
-const Vector& EEZeroLength::getResistingForce()
+const Vector& EETwoNodeLink::getResistingForce()
 {
     // zero the residual
     theVector->Zero();
@@ -630,7 +630,7 @@ const Vector& EEZeroLength::getResistingForce()
 }
 
 
-const Vector& EEZeroLength::getResistingForceIncInertia()
+const Vector& EETwoNodeLink::getResistingForceIncInertia()
 {	
     this->getResistingForce();
     
@@ -655,7 +655,7 @@ const Vector& EEZeroLength::getResistingForceIncInertia()
 }
 
 
-const Vector& EEZeroLength::getTime()
+const Vector& EETwoNodeLink::getTime()
 {	
     if (theSite != 0)  {
         (*tMeas) = theSite->getTime();
@@ -670,7 +670,7 @@ const Vector& EEZeroLength::getTime()
 }
 
 
-const Vector& EEZeroLength::getBasicDisp()
+const Vector& EETwoNodeLink::getBasicDisp()
 {	
     if (theSite != 0)  {
         (*dbMeas) = theSite->getDisp();
@@ -685,7 +685,7 @@ const Vector& EEZeroLength::getBasicDisp()
 }
 
 
-const Vector& EEZeroLength::getBasicVel()
+const Vector& EETwoNodeLink::getBasicVel()
 {	
     if (theSite != 0)  {
         (*vbMeas) = theSite->getVel();
@@ -700,7 +700,7 @@ const Vector& EEZeroLength::getBasicVel()
 }
 
 
-const Vector& EEZeroLength::getBasicAccel()
+const Vector& EETwoNodeLink::getBasicAccel()
 {	
     if (theSite != 0)  {
         (*abMeas) = theSite->getAccel();
@@ -715,14 +715,14 @@ const Vector& EEZeroLength::getBasicAccel()
 }
 
 
-int EEZeroLength::sendSelf(int commitTag, Channel &theChannel)
+int EETwoNodeLink::sendSelf(int commitTag, Channel &theChannel)
 {
     // has not been implemented yet.....
     return 0;
 }
 
 
-int EEZeroLength::recvSelf(int commitTag, Channel &theChannel,
+int EETwoNodeLink::recvSelf(int commitTag, Channel &theChannel,
     FEM_ObjectBroker &theBroker)
 {
     // has not been implemented yet.....
@@ -730,7 +730,7 @@ int EEZeroLength::recvSelf(int commitTag, Channel &theChannel,
 }
 
 
-int EEZeroLength::displaySelf(Renderer &theViewer,
+int EETwoNodeLink::displaySelf(Renderer &theViewer,
     int displayMode, float fact)
 {    
     // first determine the end points of the element based on
@@ -753,12 +753,12 @@ int EEZeroLength::displaySelf(Renderer &theViewer,
 }
 
 
-void EEZeroLength::Print(OPS_Stream &s, int flag)
+void EETwoNodeLink::Print(OPS_Stream &s, int flag)
 {
     if (flag == 0)  {
         // print everything
         s << "Element: " << this->getTag() << endln;
-        s << "  type: EEZeroLength  iNode: " << connectedExternalNodes(0);
+        s << "  type: EETwoNodeLink  iNode: " << connectedExternalNodes(0);
         s << "  jNode: " << connectedExternalNodes(1) << endln;
         if (theSite != 0)
             s << "  ExperimentalSite, tag: " << theSite->getTag() << endln;
@@ -771,13 +771,13 @@ void EEZeroLength::Print(OPS_Stream &s, int flag)
 }
 
 
-Response* EEZeroLength::setResponse(const char **argv, int argc,
+Response* EETwoNodeLink::setResponse(const char **argv, int argc,
     OPS_Stream &output)
 {
     Response *theResponse = 0;
 
     output.tag("ElementOutput");
-    output.attr("eleType","EEZeroLength");
+    output.attr("eleType","EETwoNodeLink");
     output.attr("eleTag",this->getTag());
     output.attr("node1",connectedExternalNodes[0]);
     output.attr("node2",connectedExternalNodes[1]);
@@ -895,7 +895,7 @@ Response* EEZeroLength::setResponse(const char **argv, int argc,
 }
 
 
-int EEZeroLength::getResponse(int responseID, Information &eleInformation)
+int EETwoNodeLink::getResponse(int responseID, Information &eleInformation)
 {
     switch (responseID)  {
     case -1:
@@ -987,11 +987,11 @@ int EEZeroLength::getResponse(int responseID, Information &eleInformation)
 
 
 // Establish the external nodes and set up the transformation matrix for orientation
-void EEZeroLength::setUp(int Nd1, int Nd2, const Vector &x, const Vector &yp)
+void EETwoNodeLink::setUp(int Nd1, int Nd2, const Vector &x, const Vector &yp)
 { 
     // ensure the connectedExternalNode ID is of correct size & set values
     if (connectedExternalNodes.Size() != 2)  {
-        opserr << "EEZeroLength::setUp() - element: "
+        opserr << "EETwoNodeLink::setUp() - element: "
             << this->getTag() << " failed to create an ID of size 2\n";
     }
     
@@ -1005,7 +1005,7 @@ void EEZeroLength::setUp(int Nd1, int Nd2, const Vector &x, const Vector &yp)
     
     // check that vectors for orientation are of correct size
     if ( x.Size() != 3 || yp.Size() != 3 )  {
-        opserr << "EEZeroLength::setUp() - element: "
+        opserr << "EETwoNodeLink::setUp() - element: "
             << this->getTag() << " incorrect dimension of orientation vectors\n";
     }
     
@@ -1029,7 +1029,7 @@ void EEZeroLength::setUp(int Nd1, int Nd2, const Vector &x, const Vector &yp)
     
     // check valid x and y vectors, i.e. not parallel and of zero length
     if (xn == 0 || yn == 0 || zn == 0)  {
-        opserr << "EEZeroLength::setUp() - element: "
+        opserr << "EETwoNodeLink::setUp() - element: "
             << this->getTag() << " invalid orientation vectors\n";
     }
     
@@ -1043,7 +1043,7 @@ void EEZeroLength::setUp(int Nd1, int Nd2, const Vector &x, const Vector &yp)
 
 
 // set basic deformation-displacement transformation matrix
-void EEZeroLength::setTranGlobalBasic(Etype elemType, int numDir)
+void EETwoNodeLink::setTranGlobalBasic(Etype elemType, int numDir)
 {
     enum Dtype { TRANS, ROTATE };
     

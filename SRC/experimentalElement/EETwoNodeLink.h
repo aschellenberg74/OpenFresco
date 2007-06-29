@@ -23,39 +23,39 @@
 // $Date$
 // $URL: $
 
-#ifndef EEZeroLength_h
-#define EEZeroLength_h
+#ifndef EETwoNodeLink_h
+#define EETwoNodeLink_h
 
 // Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
 // Created: 09/06
 // Revision: A
 //
-// Description: This file contains the class definition for EEZeroLength.
-// EEZeroLength is an experimental element defined by two nodes with the same coordinates.
+// Description: This file contains the class definition for EETwoNodeLink.
+// EETwoNodeLink is an experimental element defined by two nodes.
 // Experimental element objects are associated with experimental setup objects.
-// This EEZeroLength element will work in 1d, 2d or 3d problems.
+// This EETwoNodeLink element will work in 1d, 2d or 3d problems.
 
 #include <ExperimentalElement.h>
 
 // Type of dimension of element NxDy has dimension x=1,2,3 and
 // y=2,4,6,12 degrees-of-freedom for the element
-#ifndef ZeroLength_h
+#ifndef TwoNodeLink_h
     enum Etype { D1N2, D2N4, D2N6, D3N6, D3N12 };
 #endif
 
-#define ELE_TAG_EEZeroLength 9953
+#define ELE_TAG_EETwoNodeLink 9953
 
 
-class EEZeroLength : public ExperimentalElement
+class EETwoNodeLink : public ExperimentalElement
 {
 public:
     // constructors
-    EEZeroLength(int tag, int dimension, int Nd1, int Nd2,
+    EETwoNodeLink(int tag, int dimension, int Nd1, int Nd2,
         const ID &direction,
         const Vector &x, const Vector &yprime,
         ExperimentalSite *site,
         bool iMod = false, double mass = 0.0);
-    EEZeroLength(int tag, int dimension, int Nd1, int Nd2,
+    EETwoNodeLink(int tag, int dimension, int Nd1, int Nd2,
         const ID &direction,
         const Vector &x, const Vector &yprime,
         int port, char *machineInetAddress = 0,
@@ -63,10 +63,10 @@ public:
         bool iMod = false, double mass = 0.0);
 
     // destructor
-    ~EEZeroLength();
+    ~EETwoNodeLink();
     
     // method to get class type
-    const char *getClassType() const {return "EEZeroLength";};
+    const char *getClassType() const {return "EETwoNodeLink";};
 
     // public methods to obtain information about dof & connectivity    
     int getNumExternalNodes() const;
@@ -117,7 +117,7 @@ private:
     
     // private attributes - a copy for each object of the class
     int dimension;					// 1, 2, or 3 dimensions
-    int numDOF;						// number of dof for EEZeroLength
+    int numDOF;						// number of dof for EETwoNodeLink
     ID connectedExternalNodes;      // contains the tags of the end nodes
     
     int numDir;             // number of directions
@@ -160,18 +160,14 @@ private:
     Node *theNodes[2];
     
     // static data - single copy for all objects of the class	
-    static Matrix EEZeroLengthM2;   // class wide matrix for 2*2
-    static Matrix EEZeroLengthM4;   // class wide matrix for 4*4
-    static Matrix EEZeroLengthM6;   // class wide matrix for 6*6
-    static Matrix EEZeroLengthM12;  // class wide matrix for 12*12
-    static Vector EEZeroLengthV2;   // class wide Vector for size 2
-    static Vector EEZeroLengthV4;   // class wide Vector for size 4
-    static Vector EEZeroLengthV6;   // class wide Vector for size 6
-    static Vector EEZeroLengthV12;  // class wide Vector for size 12
+    static Matrix EETwoNodeLinkM2;   // class wide matrix for 2*2
+    static Matrix EETwoNodeLinkM4;   // class wide matrix for 4*4
+    static Matrix EETwoNodeLinkM6;   // class wide matrix for 6*6
+    static Matrix EETwoNodeLinkM12;  // class wide matrix for 12*12
+    static Vector EETwoNodeLinkV2;   // class wide Vector for size 2
+    static Vector EETwoNodeLinkV4;   // class wide Vector for size 4
+    static Vector EETwoNodeLinkV6;   // class wide Vector for size 6
+    static Vector EETwoNodeLinkV12;  // class wide Vector for size 12
 };
 
 #endif
-
-
-
-

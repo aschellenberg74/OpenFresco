@@ -626,11 +626,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\SRC\experimentalElement\EEZeroLength.cpp"
+				RelativePath="..\..\..\SRC\experimentalElement\EETwoNodeLink.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\SRC\experimentalElement\EEZeroLength.h"
+				RelativePath="..\..\..\SRC\experimentalElement\EETwoNodeLink.h"
 				>
 			</File>
 			<File
@@ -658,7 +658,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\SRC\experimentalElement\TclEEZeroLengthCommand.cpp"
+				RelativePath="..\..\..\SRC\experimentalElement\TclEETwoNodeLinkCommand.cpp"
 				>
 			</File>
 			<File
