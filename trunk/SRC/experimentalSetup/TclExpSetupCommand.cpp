@@ -119,7 +119,7 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp, int argc,
             opserr << "Want: expSetup NoTransformation tag <-control ctrlTag> -dir dirs "
                 << "<-ctrlDispFact f> <-ctrlVelFact f> <-ctrlAccelFact f> "
                 << "<-ctrlForceFact f> <-ctrlTimeFact f> "
-                << "<-daqDispFact f> <-daqVelFact f> <-ctrlAccelFact f> "
+                << "<-daqDispFact f> <-daqVelFact f> <-daqAccelFact f> "
                 << "<-daqForceFact f> <-daqTimeFact f>\n";
             return TCL_ERROR;
         }    
@@ -199,7 +199,7 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp, int argc,
             opserr << "Want: expSetup OneActuator tag <-control ctrlTag> dir "
                 << "<-ctrlDispFact f> <-ctrlVelFact f> <-ctrlAccelFact f> "
                 << "<-ctrlForceFact f> <-ctrlTimeFact f> "
-                << "<-daqDispFact f> <-daqVelFact f> <-ctrlAccelFact f> "
+                << "<-daqDispFact f> <-daqVelFact f> <-daqAccelFact f> "
                 << "<-daqForceFact f> <-daqTimeFact f>\n";
             return TCL_ERROR;
         }    
@@ -248,7 +248,7 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp, int argc,
                     << "<-nlGeom> <-posAct pos> <-phiLocX phi> "
                     << "<-ctrlDispFact f> <-ctrlVelFact f> <-ctrlAccelFact f> "
                     << "<-ctrlForceFact f> <-ctrlTimeFact f> "
-                    << "<-daqDispFact f> <-daqVelFact f> <-ctrlAccelFact f> "
+                    << "<-daqDispFact f> <-daqVelFact f> <-daqAccelFact f> "
                     << "<-daqForceFact f> <-daqTimeFact f>\n";
                 return TCL_ERROR;
             }    
@@ -343,7 +343,7 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp, int argc,
                     << "<-nlGeom> <-posAct1 pos> <-phiLocX phi> "
                     << "<-ctrlDispFact f> <-ctrlVelFact f> <-ctrlAccelFact f> "
                     << "<-ctrlForceFact f> <-ctrlTimeFact f> "
-                    << "<-daqDispFact f> <-daqVelFact f> <-ctrlAccelFact f> "
+                    << "<-daqDispFact f> <-daqVelFact f> <-daqAccelFact f> "
                     << "<-daqForceFact f> <-daqTimeFact f>\n";
                 return TCL_ERROR;
             }    
@@ -450,7 +450,7 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp, int argc,
                     << "<-nlGeom> <-posAct1 pos> <-phiLocX phi> "
                     << "<-ctrlDispFact f> <-ctrlVelFact f> <-ctrlAccelFact f> "
                     << "<-ctrlForceFact f> <-ctrlTimeFact f> "
-                    << "<-daqDispFact f> <-daqVelFact f> <-ctrlAccelFact f> "
+                    << "<-daqDispFact f> <-daqVelFact f> <-daqAccelFact f> "
                     << "<-daqForceFact f> <-daqTimeFact f>\n";
                 return TCL_ERROR;
             }    
@@ -582,7 +582,7 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp, int argc,
                     << "<-nlGeom> <-posAct1 pos> <-phiLocX phi> "
                     << "<-ctrlDispFact f> <-ctrlVelFact f> <-ctrlAccelFact f> "
                     << "<-ctrlForceFact f> <-ctrlTimeFact f> "
-                    << "<-daqDispFact f> <-daqVelFact f> <-ctrlAccelFact f> "
+                    << "<-daqDispFact f> <-daqVelFact f> <-daqAccelFact f> "
                     << "<-daqForceFact f> <-daqTimeFact f>\n";
                 return TCL_ERROR;
             }    
@@ -689,7 +689,7 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp, int argc,
                     << "<-nlGeom> <-posAct1 pos> <-phiLocX phi> "
                     << "<-ctrlDispFact f> <-ctrlVelFact f> <-ctrlAccelFact f> "
                     << "<-ctrlForceFact f> <-ctrlTimeFact f> "
-                    << "<-daqDispFact f> <-daqVelFact f> <-ctrlAccelFact f> "
+                    << "<-daqDispFact f> <-daqVelFact f> <-daqAccelFact f> "
                     << "<-daqForceFact f> <-daqTimeFact f>\n";
                 return TCL_ERROR;
             }    
@@ -819,7 +819,7 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp, int argc,
             opserr << "Want: expSetup Aggregator tag <-control ctrlTag> -setup setupTagi -sizeTrialOut si -sizeTrialOut sj ... "
                 << "<-ctrlDispFact f> <-ctrlVelFact f> <-ctrlAccelFact f> "
                 << "<-ctrlForceFact f> <-ctrlTimeFact f> "
-                << "<-daqDispFact f> <-daqVelFact f> <-ctrlAccelFact f> "
+                << "<-daqDispFact f> <-daqVelFact f> <-daqAccelFact f> "
                 << "<-daqForceFact f> <-daqTimeFact f>\n";
             return TCL_ERROR;
         }    
