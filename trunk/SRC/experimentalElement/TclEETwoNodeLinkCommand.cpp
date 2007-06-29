@@ -28,7 +28,7 @@
 // Revision: A
 //
 // Description: This file contains the function to parse the TCL input
-// for the EEZeroLength element.
+// for the EETwoNodeLink element.
 
 #include <TclModelBuilder.h>
 
@@ -38,19 +38,19 @@
 #include <ID.h>
 #include <Vector.h>
 
-#include <EEZeroLength.h>
+#include <EETwoNodeLink.h>
 
 extern void printCommand(int argc, TCL_Char **argv);
 extern ExperimentalSite *getExperimentalSite(int tag);
 
 
-int addEEZeroLength(ClientData clientData, Tcl_Interp *interp, int argc,
+int addEETwoNodeLink(ClientData clientData, Tcl_Interp *interp, int argc,
     TCL_Char **argv, Domain *theTclDomain, TclModelBuilder *theTclBuilder,
     int eleArgStart)
 {
     // ensure the destructor has not been called
     if (theTclBuilder == 0)  {
-        opserr << "WARNING builder has been destroyed - expElement zeroLength\n";    
+        opserr << "WARNING builder has been destroyed - expElement twoNodeLink\n";    
         return TCL_ERROR;
     }
     
@@ -61,8 +61,8 @@ int addEEZeroLength(ClientData clientData, Tcl_Interp *interp, int argc,
     if ((argc-eleArgStart) < 10)  {
         opserr << "WARNING insufficient arguments\n";
         printCommand(argc, argv);
-        opserr << "Want: expElement zeroLength eleTag iNode jNode -dir dirs -site siteTag -initStif Kij <-orient x1 x2 x3 y1 y2 y3> <-iMod> <-mass m>\n";
-        opserr << "  or: expElement zeroLength eleTag iNode jNode -dir dirs -server ipPort <ipAddr> <-dataSize size> -initStif Kij <-orient x1 x2 x3 y1 y2 y3> <-iMod> <-mass m>\n";
+        opserr << "Want: expElement twoNodeLink eleTag iNode jNode -dir dirs -site siteTag -initStif Kij <-orient x1 x2 x3 y1 y2 y3> <-iMod> <-mass m>\n";
+        opserr << "  or: expElement twoNodeLink eleTag iNode jNode -dir dirs -server ipPort <ipAddr> <-dataSize size> -initStif Kij <-orient x1 x2 x3 y1 y2 y3> <-iMod> <-mass m>\n";
         return TCL_ERROR;
     }    
     
@@ -75,24 +75,24 @@ int addEEZeroLength(ClientData clientData, Tcl_Interp *interp, int argc,
 	double mass = 0.0;
     
     if (Tcl_GetInt(interp, argv[1+eleArgStart], &tag) != TCL_OK)  {
-        opserr << "WARNING invalid expElement zeroLength eleTag\n";
+        opserr << "WARNING invalid expElement twoNodeLink eleTag\n";
         return TCL_ERROR;
     }
     if (Tcl_GetInt(interp, argv[2+eleArgStart], &iNode) != TCL_OK)  {
         opserr << "WARNING invalid iNode\n";
-        opserr << "expElement zeroLength element: " << tag << endln;
+        opserr << "expElement twoNodeLink element: " << tag << endln;
         return TCL_ERROR;
     }
     if (Tcl_GetInt(interp, argv[3+eleArgStart], &jNode) != TCL_OK)  {
         opserr << "WARNING invalid jNode\n";
-        opserr << "expElement zeroLength element: " << tag << endln;
+        opserr << "expElement twoNodeLink element: " << tag << endln;
         return TCL_ERROR;
     }
     // read the number of directions
     numDir = 0;
     if (strcmp(argv[4+eleArgStart],"-dir") != 0)  {
         opserr << "WARNING expecting -dir flag\n";
-        opserr << "expElement zeroLength element: " << tag << endln;
+        opserr << "expElement twoNodeLink element: " << tag << endln;
         return TCL_ERROR;	
     }
     argi = 5+eleArgStart;
@@ -104,7 +104,7 @@ int addEEZeroLength(ClientData clientData, Tcl_Interp *interp, int argc,
     }
     if (numDir == 0)  {
 		opserr << "WARNING no directions specified\n";
-		opserr << "expElement zeroLength element: " << tag << endln;
+		opserr << "expElement twoNodeLink element: " << tag << endln;
 		return TCL_ERROR;
 	}
     // create the ID array to hold the direction IDs
@@ -113,7 +113,7 @@ int addEEZeroLength(ClientData clientData, Tcl_Interp *interp, int argc,
     for (i=0; i<numDir; i++)  {
         if (Tcl_GetInt(interp, argv[argi], &dirID) != TCL_OK)  {
             opserr << "WARNING invalid direction ID\n";
-            opserr << "expElement zeroLength element: " << tag << endln;	    
+            opserr << "expElement twoNodeLink element: " << tag << endln;	    
             return TCL_ERROR;
         }
         theDirIDs(i) = dirID-1;
@@ -123,7 +123,7 @@ int addEEZeroLength(ClientData clientData, Tcl_Interp *interp, int argc,
         argi++;
 	    if (Tcl_GetInt(interp, argv[argi], &siteTag) != TCL_OK)  {
 		    opserr << "WARNING invalid siteTag\n";
-		    opserr << "expElement zeroLength element: " << tag << endln;
+		    opserr << "expElement twoNodeLink element: " << tag << endln;
 		    return TCL_ERROR;
 	    }
         argi++;
@@ -131,7 +131,7 @@ int addEEZeroLength(ClientData clientData, Tcl_Interp *interp, int argc,
 	    if (theSite == 0)  {
 		    opserr << "WARNING experimental site not found\n";
 		    opserr << "expSite: " << siteTag << endln;
-		    opserr << "expElement zeroLength element: " << tag << endln;
+		    opserr << "expElement twoNodeLink element: " << tag << endln;
 		    return TCL_ERROR;
 	    }
     }
@@ -139,7 +139,7 @@ int addEEZeroLength(ClientData clientData, Tcl_Interp *interp, int argc,
         argi++;
         if (Tcl_GetInt(interp, argv[argi], &ipPort) != TCL_OK)  {
 	        opserr << "WARNING invalid ipPort\n";
-	        opserr << "expElement zeroLength element: " << tag << endln;
+	        opserr << "expElement twoNodeLink element: " << tag << endln;
 	        return TCL_ERROR;
         }
         argi++;
@@ -157,7 +157,7 @@ int addEEZeroLength(ClientData clientData, Tcl_Interp *interp, int argc,
             if (strcmp(argv[i], "-dataSize") == 0)  {
                 if (Tcl_GetInt(interp, argv[i+1], &dataSize) != TCL_OK)  {
 		            opserr << "WARNING invalid dataSize\n";
-		            opserr << "expElement zeroLength element: " << tag << endln;
+		            opserr << "expElement twoNodeLink element: " << tag << endln;
 		            return TCL_ERROR;
 	            }
             }
@@ -166,7 +166,7 @@ int addEEZeroLength(ClientData clientData, Tcl_Interp *interp, int argc,
     else  {
         opserr << "WARNING expecting -site or -server string but got ";
         opserr << argv[argi] << endln;
-	    opserr << "expElement zeroLength element: " << tag << endln;
+	    opserr << "expElement twoNodeLink element: " << tag << endln;
         return TCL_ERROR;
     }
     // check for optional arguments
@@ -176,7 +176,7 @@ int addEEZeroLength(ClientData clientData, Tcl_Interp *interp, int argc,
         if (strcmp(argv[i],"-orient") == 0)  {
             if (argc-1 < i+6)  {
                 opserr << "WARNING not enough paramaters after -orient flag\n";
-                opserr << "expElement zeroLength element: " << tag << endln;
+                opserr << "expElement twoNodeLink element: " << tag << endln;
                 return TCL_ERROR;		
             }
             double value;
@@ -184,7 +184,7 @@ int addEEZeroLength(ClientData clientData, Tcl_Interp *interp, int argc,
             for (j=0; j<3; j++)  {
                 if (Tcl_GetDouble(interp, argv[i+1+j], &value) != TCL_OK)  {
                     opserr << "WARNING invalid -orient value\n";
-                    opserr << "expElement zeroLength element: " << tag << endln;
+                    opserr << "expElement twoNodeLink element: " << tag << endln;
                     return TCL_ERROR;
                 }
                 x(j) = value;
@@ -193,7 +193,7 @@ int addEEZeroLength(ClientData clientData, Tcl_Interp *interp, int argc,
             for (j=0; j<3; j++)  {
                 if (Tcl_GetDouble(interp, argv[i+4+j], &value) != TCL_OK)  {
                     opserr << "WARNING invalid -orient value\n";
-                    opserr << "expElement zeroLength element: " << tag << endln;
+                    opserr << "expElement twoNodeLink element: " << tag << endln;
                     return TCL_ERROR;
                 }
                 y(j) = value;		
@@ -209,27 +209,27 @@ int addEEZeroLength(ClientData clientData, Tcl_Interp *interp, int argc,
 		if (i+1 < argc && strcmp(argv[i], "-mass") == 0)  {
 			if (Tcl_GetDouble(interp, argv[i+1], &mass) != TCL_OK)  {
 				opserr << "WARNING invalid mass\n";
-				opserr << "expElement zeroLength element: " << tag << endln;
+				opserr << "expElement twoNodeLink element: " << tag << endln;
 				return TCL_ERROR;
 			}
 		}
 	}
-    // now create the EEZeroLength
+    // now create the EETwoNodeLink
     if (theSite != 0)
-        theExpElement = new EEZeroLength(tag, ndm, iNode, jNode, theDirIDs, x, y, theSite, iMod, mass);
+        theExpElement = new EETwoNodeLink(tag, ndm, iNode, jNode, theDirIDs, x, y, theSite, iMod, mass);
     else
-        theExpElement = new EEZeroLength(tag, ndm, iNode, jNode, theDirIDs, x, y, ipPort, ipAddr, dataSize, iMod, mass);
+        theExpElement = new EETwoNodeLink(tag, ndm, iNode, jNode, theDirIDs, x, y, ipPort, ipAddr, dataSize, iMod, mass);
     
 	if (theExpElement == 0)  {
 		opserr << "WARNING ran out of memory creating element\n";
-		opserr << "expElement zeroLength element: " << tag << endln;
+		opserr << "expElement twoNodeLink element: " << tag << endln;
 		return TCL_ERROR;
 	}
     
-	// then add the EEZeroLength to the domain
+	// then add the EETwoNodeLink to the domain
 	if (theTclDomain->addElement(theExpElement) == false)  {
 		opserr << "WARNING could not add element to the domain\n";
-		opserr << "expElement zeroLength element: " << tag << endln;
+		opserr << "expElement twoNodeLink element: " << tag << endln;
 		delete theExpElement;
 		return TCL_ERROR;
 	}
@@ -239,7 +239,7 @@ int addEEZeroLength(ClientData clientData, Tcl_Interp *interp, int argc,
 		if (strcmp(argv[i], "-initStif") == 0)  {
 			if (argc-1 < i+numDir*numDir)  {
 				opserr << "WARNING incorrect number of inital stiffness terms\n";
-				opserr << "expElement zeroLength element: " << tag << endln;
+				opserr << "expElement twoNodeLink element: " << tag << endln;
 				return TCL_ERROR;      
 			}
 			Matrix theInitStif(numDir,numDir);
@@ -248,7 +248,7 @@ int addEEZeroLength(ClientData clientData, Tcl_Interp *interp, int argc,
 				for (k=0; k<numDir; k++)  {
 					if (Tcl_GetDouble(interp, argv[i+1 + numDir*j+k], &stif) != TCL_OK)  {
 						opserr << "WARNING invalid initial stiffness term\n";
-						opserr << "expElement zeroLength element: " << tag << endln;
+						opserr << "expElement twoNodeLink element: " << tag << endln;
 						return TCL_ERROR;
 					}
 					theInitStif(j,k) = stif;
@@ -258,6 +258,6 @@ int addEEZeroLength(ClientData clientData, Tcl_Interp *interp, int argc,
 		}
 	}
 
-    // if get here we have sucessfully created the EEZeroLength and added it to the domain
+    // if get here we have sucessfully created the EETwoNodeLink and added it to the domain
 	return TCL_OK;
 }
