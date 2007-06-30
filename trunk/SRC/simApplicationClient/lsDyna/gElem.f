@@ -20,9 +20,9 @@
 ** ****************************************************************** **
 
 ** ****************************************************************** **
-** eeTruss fortran version                                       **
-** Coded by Yuli Huang                                                **
-**          November 2006                                             **
+** genericClient Fortran version                                      **
+** Written: Yuli Huang (yulee@berkeley.edu)                           **
+** Created: 11/06                                                     **
 ** ****************************************************************** **
 **
 ** Description: This file contains the class definition for genericClient.
@@ -30,13 +30,13 @@
 ** the degrees of freedom at those nodes. The element communicates with 
 ** an OpenFresco element trough a tcp/ip connection.
 c
-      subroutine eeTruss(d,ul,uldot,uldotdot,xl,ix,tl,s,r,
-     1                           ndf,ndm,nst,isw,ierr)
+      subroutine genericClient(d,ul,uldot,uldotdot,xl,ix,tl,s,r,
+     1                         ndf,ndm,nst,isw,ierr)
 
       implicit none
 
       integer*4 sizeSendData
-      parameter (sizeSendData=13)
+      parameter (sizeSendData=256)
 
       integer*4 sizeInt, sizeDouble
       parameter (sizeInt=4, sizeDouble=8)
@@ -49,7 +49,7 @@ c
 
       integer*4 i,port
 
-      integer*4 iData(10)
+      integer*4 iData(11)
       real*8    sData(sizeSendData)
 
       integer*4 nleft, dataTypeSize
@@ -125,9 +125,11 @@ c       force
         iData(9)  = nst
 c       time
         iData(10) = 0
+c ...   dataSize
+        iData(11) = sizeSendData
 c
         dataTypeSize = sizeInt
-        nleft        = 10
+        nleft        = 11
         call senddata(socketID, dataTypeSize, iData, nleft, stat)
 c
       elseif (isw .eq. 2) then
@@ -249,8 +251,8 @@ c
 c
 c ... setup
 c
-      call eeTruss(d,disp,vel,accel,coord,nodeNum,temp,s,r,ndf,ndm,nst,
-     1             1,stat)
+      call genericClient(d,disp,vel,accel,coord,nodeNum,temp,s,r,
+     1                   ndf,ndm,nst,1,stat)
 c
 c ... disp, stiff, force
 c
@@ -271,8 +273,8 @@ c
         write(*,*) disp(i), vel(i), accel(i)
    70 continue
 c
-      call eeTruss(d,disp,vel,accel,coord,nodeNum,temp,s,r,ndf,ndm,nst,
-     1             3,stat)
+      call genericClient(d,disp,vel,accel,coord,nodeNum,temp,s,r,
+     1                   ndf,ndm,nst,3,stat)
       do 80, i = 1,4
         write(*,*) disp(i), vel(i), accel(i)
    80 enddo
@@ -284,8 +286,8 @@ c
 c
 c ... shutdown
 c
-      call eeTruss(d,disp,vel,accel,coord,nodeNum,temp,s,r,ndf,ndm,nst,
-     1             10,stat)
+      call genericClient(d,disp,vel,accel,coord,nodeNum,temp,s,r,
+     1                   ndf,ndm,nst,10,stat)
 c
       stop
       end
