@@ -147,8 +147,13 @@ int ECMtsCsi::setup()
 {
     if (targDisp != 0)
         delete targDisp;
+    if (targForce != 0)
+        delete targForce;
 
-    targDisp = new Vector((*sizeCtrl)[OF_Resp_Disp]);
+    if ((*sizeCtrl)[OF_Resp_Disp] != 0)
+        targDisp = new Vector((*sizeCtrl)[OF_Resp_Disp]);
+    if ((*sizeCtrl)[OF_Resp_Force] != 0)
+        targForce = new Vector((*sizeCtrl)[OF_Resp_Force]);
 
     if (measResp != 0)
         delete [] measResp;
@@ -164,8 +169,24 @@ int ECMtsCsi::setup()
     id += (*sizeDaq)[OF_Resp_Disp];
     measForce = new Vector(&measResp[id],(*sizeDaq)[OF_Resp_Force]);
     
-    rampId = -1;
+    // print experimental control information
+    this->Print(opserr);
+    
+    opserr << "****************************************************************\n";
+    opserr << "* Make sure that offset values of controller are set to ZERO   *\n";
+    opserr << "*                                                              *\n";
+    opserr << "* Press 'Enter' to proceed or 'c' to cancel the initialization *\n";
+    opserr << "****************************************************************\n";
+    opserr << endln;
+    int c = getchar();
+    if (c == 'c')  {
+        getchar();
+        CsiController->reset();
+        delete CsiController;
+        exit(OF_ReturnType_failed);
+    }
 
+    // start the csi-controller
     try
     {
         CsiController->startHardware();
@@ -176,6 +197,44 @@ int ECMtsCsi::setup()
         opserr << xcp.what() << endln;
         exit(OF_ReturnType_failed);
     }
+
+	do  {
+        this->control();
+        this->acquire();
+        
+        int i;
+        opserr << "**************************************\n";
+        opserr << "* Initial values of DAQ are:         *\n";
+        opserr << "*                                    *\n";
+        opserr << "* dspDaq = [";
+        for (i=0; i<(*sizeDaq)[OF_Resp_Disp]; i++)
+            opserr << " " << measDisp[i];
+        opserr << " ]\n";
+        opserr << "* frcDaq = [";
+        for (i=0; i<(*sizeDaq)[OF_Resp_Force]; i++)
+            opserr << " " << measForce[i];
+        opserr << " ]\n";
+        opserr << "*                                    *\n";
+        opserr << "* Press 'Enter' to start the test or *\n";
+        opserr << "* 'r' to repeat the measurement or   *\n";
+        opserr << "* 'c' to cancel the initialization   *\n";
+        opserr << "**************************************\n";
+        opserr << endln;
+        c = getchar();
+        if (c == 'c')  {
+            getchar();
+            CsiController->reset();
+            delete CsiController;
+            exit(OF_ReturnType_failed);
+        } else if (c == 'r')  {
+            getchar();
+        }
+    } while (c == 'r');
+    
+    opserr << "******************\n";
+    opserr << "* Running......  *\n";
+    opserr << "******************\n";
+    opserr << endln;
 
     return OF_ReturnType_completed;
 }
@@ -195,8 +254,7 @@ int ECMtsCsi::setTrialResponse(const Vector* disp,
         for (int i=0; i<(*sizeCtrl)[OF_Resp_Disp]; i++)
             (*targDisp)(i) = theFilter->filtering((*targDisp)(i));
     }
-
-    // m_rampTime = 0.02; // seconds (*disp)[0]/(*vel)[0]; 
+    *targForce = *force;
 
     this->control();
 
@@ -262,7 +320,7 @@ int ECMtsCsi::control()
     Mts::ICsiRamp* ramp = Mts::CsiFactory::newRamp();
 
     ramp->setWaitUntilCompletion(true);
-    ramp->setChannelCount(respSize);
+    ramp->setChannelCount((*sizeCtrl)[OF_Resp_Disp]);
     ramp->setRampTime(rampTime);
 
     (*ramp)[0] = (*targDisp)(0);
