@@ -543,23 +543,26 @@ int ECxPCtarget::control()
 	// wait until switchPC flag has changed as well
 	while (xPCGetSignal(port, switchPCId) != 1.0) {}
 
+    // reset newTarget flag
+    newTarget = 0.0;
+    xPCSetParam(port, newTargetId, &newTarget);
+    if (xPCGetLastError())  {
+        xPCErrorMsg(xPCGetLastError(), errMsg);
+        opserr << "ECxPCtarget::execute() - xPCSetParam: error = " << errMsg << endln;
+        xPCClosePort(port);
+        xPCFreeAPI();
+        return xPCGetLastError();
+    }
+
+	// wait until switchPC flag has changed as well
+	while (xPCGetSignal(port, switchPCId) != 0.0) {}
+
     return OF_ReturnType_completed;
 }
 
 
 int ECxPCtarget::acquire()
 {
-    // reset newTarget flag
-    newTarget = 0.0;
-    xPCSetParam(port, newTargetId, &newTarget);
-    if (xPCGetLastError())  {
-        xPCErrorMsg(xPCGetLastError(), errMsg);
-        opserr << "ECxPCtarget::acquire() - xPCSetParam: error = " << errMsg << endln;
-        xPCClosePort(port);
-        xPCFreeAPI();
-        return xPCGetLastError();
-    }
-
     // wait until target is reached
     while (xPCGetSignal(port, atTargetId) != 1.0) {}
     
