@@ -80,7 +80,7 @@ private:
 	double rampTime;
     int	rampId;
 	
-    Vector *targDisp;
+    Vector *targDisp, *targForce;
     double *measResp;
     Vector *measDisp, *measForce;
 
