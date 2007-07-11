@@ -37,6 +37,8 @@
 
 #include <ExperimentalElement.h>
 
+class TCP_Socket;
+
 // Type of dimension of element NxDy has dimension x=1,2,3 and
 // y=2,4,6,12 degrees-of-freedom for the element
 #ifndef TwoNodeLink_h
