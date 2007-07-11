@@ -37,6 +37,7 @@
 #include <ExperimentalElement.h>
 
 class CrdTransf3d;
+class TCP_Socket;
 
 #define ELE_TAG_EEBeamColumn3d 9952
 

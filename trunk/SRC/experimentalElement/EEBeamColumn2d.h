@@ -37,6 +37,7 @@
 #include <ExperimentalElement.h>
 
 class CrdTransf2d;
+class TCP_Socket;
 
 #define ELE_TAG_EEBeamColumn2d 9951
 

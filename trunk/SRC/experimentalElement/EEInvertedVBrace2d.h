@@ -36,6 +36,8 @@
 
 #include <ExperimentalElement.h>
 
+class TCP_Socket;
+
 #define ELE_TAG_EEInvertedVBrace2d 9954
 
 

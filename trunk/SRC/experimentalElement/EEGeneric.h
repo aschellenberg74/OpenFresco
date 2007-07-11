@@ -37,6 +37,8 @@
 
 #include <ExperimentalElement.h>
 
+class TCP_Socket;
+
 #define ELE_TAG_EEGeneric 9955
 
 
