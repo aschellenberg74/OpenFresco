@@ -62,7 +62,7 @@ int addEETwoNodeLink(ClientData clientData, Tcl_Interp *interp, int argc,
         opserr << "WARNING insufficient arguments\n";
         printCommand(argc, argv);
         opserr << "Want: expElement twoNodeLink eleTag iNode jNode -dir dirs -site siteTag -initStif Kij <-orient x1 x2 x3 y1 y2 y3> <-iMod> <-mass m>\n";
-        opserr << "  or: expElement twoNodeLink eleTag iNode jNode -dir dirs -server ipPort <ipAddr> <-dataSize size> -initStif Kij <-orient x1 x2 x3 y1 y2 y3> <-iMod> <-mass m>\n";
+        opserr << "  or: expElement twoNodeLink eleTag iNode jNode -dir dirs -server ipPort <ipAddr> <-ssl> <-dataSize size> -initStif Kij <-orient x1 x2 x3 y1 y2 y3> <-iMod> <-mass m>\n";
         return TCL_ERROR;
     }    
     
@@ -70,6 +70,7 @@ int addEETwoNodeLink(ClientData clientData, Tcl_Interp *interp, int argc,
     int tag, iNode, jNode, siteTag, numDir, dirID, ipPort, argi, i, j, k;
     ExperimentalSite *theSite = 0;
     char *ipAddr = 0;
+    int ssl = 0;
     int dataSize = OF_Network_dataSize;
     bool iMod = false;
 	double mass = 0.0;
@@ -144,6 +145,7 @@ int addEETwoNodeLink(ClientData clientData, Tcl_Interp *interp, int argc,
         }
         argi++;
         if (strcmp(argv[argi], "-initStif") != 0 &&
+            strcmp(argv[argi], "-ssl") != 0 &&
             strcmp(argv[argi], "-dataSize") != 0)  {
             ipAddr = (char *)malloc((strlen(argv[argi]) + 1)*sizeof(char));
             strcpy(ipAddr,argv[argi]);
@@ -154,7 +156,9 @@ int addEETwoNodeLink(ClientData clientData, Tcl_Interp *interp, int argc,
             strcpy(ipAddr,"127.0.0.1");
         }
         for (i = argi; i < argc; i++)  {
-            if (strcmp(argv[i], "-dataSize") == 0)  {
+            if (strcmp(argv[i], "-ssl") == 0)
+                ssl = 1;
+            else if (strcmp(argv[i], "-dataSize") == 0)  {
                 if (Tcl_GetInt(interp, argv[i+1], &dataSize) != TCL_OK)  {
 		            opserr << "WARNING invalid dataSize\n";
 		            opserr << "expElement twoNodeLink element: " << tag << endln;
@@ -218,7 +222,7 @@ int addEETwoNodeLink(ClientData clientData, Tcl_Interp *interp, int argc,
     if (theSite != 0)
         theExpElement = new EETwoNodeLink(tag, ndm, iNode, jNode, theDirIDs, x, y, theSite, iMod, mass);
     else
-        theExpElement = new EETwoNodeLink(tag, ndm, iNode, jNode, theDirIDs, x, y, ipPort, ipAddr, dataSize, iMod, mass);
+        theExpElement = new EETwoNodeLink(tag, ndm, iNode, jNode, theDirIDs, x, y, ipPort, ipAddr, ssl, dataSize, iMod, mass);
     
 	if (theExpElement == 0)  {
 		opserr << "WARNING ran out of memory creating element\n";

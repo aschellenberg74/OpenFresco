@@ -40,6 +40,7 @@
 #include <Information.h>
 #include <ElementResponse.h>
 #include <TCP_Socket.h>
+#include <TCP_SocketSSL.h>
 
 #include <math.h>
 #include <stdlib.h>
@@ -142,13 +143,13 @@ EEGeneric::EEGeneric(int tag, ID nodes, ID *dof,
 // responsible for allocating the necessary space needed
 // by each object and storing the tags of the end nodes.
 EEGeneric::EEGeneric(int tag, ID nodes, ID *dof,
-    int port, char *machineInetAddr, int dataSize,
+    int port, char *machineInetAddr, int ssl, int dataSize,
     bool iM, Matrix *m)
     : ExperimentalElement(tag, ELE_TAG_EEGeneric),
     connectedExternalNodes(nodes), basicDOF(1),
     numExternalNodes(0), numDOF(0), numBasicDOF(0),
     iMod(iM), mass(m),
-    theSocket(0), sData(0), sendData(0), rData(0), recvData(0),
+    theChannel(0), sData(0), sendData(0), rData(0), recvData(0),
     db(0), vb(0), ab(0), t(0),
     dbMeas(0), vbMeas(0), abMeas(0), qMeas(0), tMeas(0),
     dbTarg(1), vbTarg(1), abTarg(1),
@@ -182,11 +183,19 @@ EEGeneric::EEGeneric(int tag, ID nodes, ID *dof,
     }
     
     // setup the connection
-    if (machineInetAddr == 0)
-        theSocket = new TCP_Socket(port, "127.0.0.1");
-    else
-        theSocket = new TCP_Socket(port, machineInetAddr);
-    theSocket->setUpConnection();
+    if (!ssl)  {
+        if (machineInetAddr == 0)
+            theChannel = new TCP_Socket(port, "127.0.0.1");
+        else
+            theChannel = new TCP_Socket(port, machineInetAddr);
+    }
+    else  {
+        if (machineInetAddr == 0)
+            theChannel = new TCP_SocketSSL(port, "127.0.0.1");
+        else
+            theChannel = new TCP_SocketSSL(port, machineInetAddr);
+    }
+    theChannel->setUpConnection();
 
     // set the data size for the experimental site
     int intData[2*OF_Resp_All+1];
@@ -206,9 +215,9 @@ EEGeneric::EEGeneric(int tag, ID nodes, ID *dof,
     (*sizeDaq)[OF_Resp_Force]  = numBasicDOF;
     (*sizeDaq)[OF_Resp_Time]   = 1;
     
-    dataSize = (dataSize<4*numBasicDOF+1) ? 4*numBasicDOF+1 : dataSize;
+    if (dataSize < 4*numBasicDOF+1) dataSize = 4*numBasicDOF+1;
     intData[2*OF_Resp_All] = dataSize;
-    theSocket->sendID(0, 0, idData, 0);
+    theChannel->sendID(0, 0, idData, 0);
     
     // allocate memory for the send vectors
     int id = 1;
@@ -286,7 +295,7 @@ EEGeneric::~EEGeneric()
 
     if (theSite == 0)  {
         sData[0] = OF_RemoteTest_DIE;
-        theSocket->sendVector(0, 0, *sendData, 0);
+        theChannel->sendVector(0, 0, *sendData, 0);
         
         if (sendData != 0)
             delete sendData;
@@ -296,8 +305,8 @@ EEGeneric::~EEGeneric()
             delete recvData;
         if (rData != 0)
             delete [] rData;
-        if (theSocket != 0)
-            delete theSocket;
+        if (theChannel != 0)
+            delete theChannel;
     }
 }
 
@@ -397,7 +406,7 @@ int EEGeneric::commitState()
     }
     else  {
         sData[0] = OF_RemoteTest_commitState;
-        rValue += theSocket->sendVector(0, 0, *sendData, 0);
+        rValue += theChannel->sendVector(0, 0, *sendData, 0);
     }
     
     return rValue;
@@ -435,7 +444,7 @@ int EEGeneric::update()
         }
         else  {
             sData[0] = OF_RemoteTest_setTrialResponse;
-            rValue += theSocket->sendVector(0, 0, *sendData, 0);
+            rValue += theChannel->sendVector(0, 0, *sendData, 0);
         }
     }
     
@@ -527,8 +536,8 @@ const Vector& EEGeneric::getResistingForce()
     }
     else  {
         sData[0] = OF_RemoteTest_getForce;
-        theSocket->sendVector(0, 0, *sendData, 0);
-        theSocket->recvVector(0, 0, *recvData, 0);
+        theChannel->sendVector(0, 0, *sendData, 0);
+        theChannel->recvVector(0, 0, *recvData, 0);
     }
     
     // apply optional initial stiffness modification
@@ -539,8 +548,8 @@ const Vector& EEGeneric::getResistingForce()
         }
         else  {
             sData[0] = OF_RemoteTest_getDisp;
-            theSocket->sendVector(0, 0, *sendData, 0);
-            theSocket->recvVector(0, 0, *recvData, 0);
+            theChannel->sendVector(0, 0, *sendData, 0);
+            theChannel->recvVector(0, 0, *recvData, 0);
         }
 
         // correct for displacement control errors using I-Modification
@@ -598,8 +607,8 @@ const Vector& EEGeneric::getTime()
     }
     else  {
         sData[0] = OF_RemoteTest_getTime;
-        theSocket->sendVector(0, 0, *sendData, 0);
-        theSocket->recvVector(0, 0, *recvData, 0);
+        theChannel->sendVector(0, 0, *sendData, 0);
+        theChannel->recvVector(0, 0, *recvData, 0);
     }
 
     return *tMeas;
@@ -613,8 +622,8 @@ const Vector& EEGeneric::getBasicDisp()
     }
     else  {
         sData[0] = OF_RemoteTest_getDisp;
-        theSocket->sendVector(0, 0, *sendData, 0);
-        theSocket->recvVector(0, 0, *recvData, 0);
+        theChannel->sendVector(0, 0, *sendData, 0);
+        theChannel->recvVector(0, 0, *recvData, 0);
     }
 
     return *dbMeas;
@@ -628,8 +637,8 @@ const Vector& EEGeneric::getBasicVel()
     }
     else  {
         sData[0] = OF_RemoteTest_getVel;
-        theSocket->sendVector(0, 0, *sendData, 0);
-        theSocket->recvVector(0, 0, *recvData, 0);
+        theChannel->sendVector(0, 0, *sendData, 0);
+        theChannel->recvVector(0, 0, *recvData, 0);
     }
 
     return *vbMeas;
@@ -643,8 +652,8 @@ const Vector& EEGeneric::getBasicAccel()
     }
     else  {
         sData[0] = OF_RemoteTest_getAccel;
-        theSocket->sendVector(0, 0, *sendData, 0);
-        theSocket->recvVector(0, 0, *recvData, 0);
+        theChannel->sendVector(0, 0, *sendData, 0);
+        theChannel->recvVector(0, 0, *recvData, 0);
     }
 
     return *abMeas;

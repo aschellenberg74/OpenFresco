@@ -102,6 +102,7 @@ double ops_Dt = 0.0;
 #include <ActorExpSite.h>
 
 #include <TCP_Socket.h>
+#include <TCP_SocketSSL.h>
 #include <Matrix.h>
 
 /*
@@ -272,11 +273,13 @@ int openFresco_startSimAppSiteServer(ClientData clientData,
 { 
     if (argc < 3)  {
         opserr << "WARNING insufficient arguments\n"
-            << "Want: startSimAppSiteServer siteTag ipPort\n";
+            << "Want: startSimAppSiteServer siteTag ipPort <-ssl>\n";
         return TCL_ERROR;
     }
 
     int siteTag, ipPort;
+    int ssl = 0;
+    Channel *theChannel = 0;
 
     if (Tcl_GetInt(interp, argv[1], &siteTag) != TCL_OK)  {
         opserr << "WARNING invalid startSimAppSiteServer siteTag\n";
@@ -292,19 +295,33 @@ int openFresco_startSimAppSiteServer(ClientData clientData,
         opserr << "WARNING invalid startSimAppSiteServer ipPort\n";
         return TCL_ERROR;
     }
+    if (argc == 4)  {
+        if (strcmp(argv[3], "-ssl") == 0)
+            ssl = 1;
+    }
 
     // setup the connection
-    TCP_Socket *theSocket;
-    theSocket = new TCP_Socket(ipPort);
-    if (theSocket == 0)  {
-        opserr << "WARNING could not create socket\n";
-        return TCL_ERROR;
+    if (!ssl)  {
+        theChannel = new TCP_Socket(ipPort);
+        if (theChannel != 0) {
+            opserr << "\nChannel successfully created: "
+                << "Waiting for Simulation Application Client...\n";
+        } else {
+            opserr << "WARNING could not create channel\n";
+            return TCL_ERROR;
+        }
     }
-    else {
-        opserr << "\nSocket successfully created: "
-            << "Waiting for Simulation Application Client...\n";
+    else  {
+        theChannel = new TCP_SocketSSL(ipPort);
+        if (theChannel != 0) {
+            opserr << "\nSSL Channel successfully created: "
+                << "Waiting for Simulation Application Client...\n";
+        } else {
+            opserr << "WARNING could not create SSL channel\n";
+            return TCL_ERROR;
+        }
     }
-    theSocket->setUpConnection();
+    theChannel->setUpConnection();
 
     // get the data size for the experimental site
     int intData[2*OF_Resp_All+1];
@@ -314,17 +331,9 @@ int openFresco_startSimAppSiteServer(ClientData clientData,
     int *dataSize = &intData[2*OF_Resp_All];
     idData.Zero();
 
-    theSocket->recvID(0, 0, idData, 0);
+    theChannel->recvID(0, 0, idData, 0);
     theExperimentalSite->setSize(sizeCtrl, sizeDaq);
     
-    int numCtrl = 0, numDaq = 0;
-    for (int i=0; i<OF_Resp_All; i++) {
-        numCtrl += sizeCtrl(i);
-        numDaq += sizeDaq(i);
-    }
-    *dataSize = (*dataSize<1+numCtrl) ? 1+numCtrl : *dataSize;
-    *dataSize = (*dataSize<numDaq) ? numDaq : *dataSize;
-
     // initialize the receive and send vectors
     Vector *rDisp  = 0, *sDisp  = 0;
     Vector *rVel   = 0, *sVel   = 0;
@@ -387,7 +396,7 @@ int openFresco_startSimAppSiteServer(ClientData clientData,
         << " now running..." << endln;
     bool exitYet = false;
     while (!exitYet) {
-        theSocket->recvVector(0, 0, *recvData, 0);
+        theChannel->recvVector(0, 0, *recvData, 0);
         int action = (int)rData[0];
         //opserr << "\nLOOP action: " << *recvData << endln;
 
@@ -397,30 +406,30 @@ int openFresco_startSimAppSiteServer(ClientData clientData,
             break;
         case OF_RemoteTest_getDaqResponse:
             theExperimentalSite->getDaqResponse(sDisp, sVel, sAccel, sForce, sTime);
-            theSocket->sendVector(0, 0, *sendData, 0);
+            theChannel->sendVector(0, 0, *sendData, 0);
             break;
         case OF_RemoteTest_commitState:
             theExperimentalSite->commitState();
             break;
         case OF_RemoteTest_getDisp:
             (*sDisp) = theExperimentalSite->getDisp();
-            theSocket->sendVector(0, 0, *sendData, 0);
+            theChannel->sendVector(0, 0, *sendData, 0);
             break;
         case OF_RemoteTest_getVel:
             (*sVel) = theExperimentalSite->getVel();
-            theSocket->sendVector(0, 0, *sendData, 0);
+            theChannel->sendVector(0, 0, *sendData, 0);
             break;
         case OF_RemoteTest_getAccel:
             (*sAccel) = theExperimentalSite->getAccel();
-            theSocket->sendVector(0, 0, *sendData, 0);
+            theChannel->sendVector(0, 0, *sendData, 0);
             break;
         case OF_RemoteTest_getForce:
             (*sForce) = theExperimentalSite->getForce();
-            theSocket->sendVector(0, 0, *sendData, 0);
+            theChannel->sendVector(0, 0, *sendData, 0);
             break;
         case OF_RemoteTest_getTime:
             (*sTime) = theExperimentalSite->getTime();
-            theSocket->sendVector(0, 0, *sendData, 0);
+            theChannel->sendVector(0, 0, *sendData, 0);
             break;
         case OF_RemoteTest_DIE:
             exitYet = true;
@@ -436,8 +445,8 @@ int openFresco_startSimAppSiteServer(ClientData clientData,
         << " shutdown\n" << endln;
 
     // delete allocated memory
-    if (theSocket != 0)
-        delete theSocket;
+    if (theChannel != 0)
+        delete theChannel;
 
     if (rDisp != 0)
         delete rDisp;
@@ -475,11 +484,13 @@ int openFresco_startSimAppElemServer(ClientData clientData,
 { 
     if (argc < 3)  {
         opserr << "WARNING insufficient arguments\n"
-            << "Want: startSimAppElemServer eleTag ipPort\n";
+            << "Want: startSimAppElemServer eleTag ipPort <-ssl>\n";
         return TCL_ERROR;
     }
 
     int eleTag, ipPort;
+    int ssl = 0;
+    Channel *theChannel = 0;
 
     if (Tcl_GetInt(interp, argv[1], &eleTag) != TCL_OK)  {
         opserr << "WARNING invalid startSimAppElemServer eleTag\n";
@@ -496,19 +507,33 @@ int openFresco_startSimAppElemServer(ClientData clientData,
         opserr << "WARNING invalid startSimAppElemServer ipPort\n";
         return TCL_ERROR;
     }
+    if (argc == 4)  {
+        if (strcmp(argv[3], "-ssl") == 0)
+            ssl = 1;
+    }
 
     // setup the connection
-    TCP_Socket *theSocket;
-    theSocket = new TCP_Socket(ipPort);
-    if (theSocket == 0)  {
-        opserr << "WARNING could not create socket\n";
-        return TCL_ERROR;
+    if (!ssl)  {
+        theChannel = new TCP_Socket(ipPort);
+        if (theChannel != 0) {
+            opserr << "\nChannel successfully created: "
+                << "Waiting for Simulation Application Client...\n";
+        } else {
+            opserr << "WARNING could not create channel\n";
+            return TCL_ERROR;
+        }
     }
-    else {
-        opserr << "\nSocket successfully created: "
-            << "Waiting for Simulation Application Client...\n";
+    else  {
+        theChannel = new TCP_SocketSSL(ipPort);
+        if (theChannel != 0) {
+            opserr << "\nSSL Channel successfully created: "
+                << "Waiting for Simulation Application Client...\n";
+        } else {
+            opserr << "WARNING could not create SSL channel\n";
+            return TCL_ERROR;
+        }
     }
-    theSocket->setUpConnection();
+    theChannel->setUpConnection();
 
     // get the data size for the experimental element
     int intData[2*OF_Resp_All+1];
@@ -518,7 +543,7 @@ int openFresco_startSimAppElemServer(ClientData clientData,
     int *dataSize = &intData[2*OF_Resp_All];
     idData.Zero();
 
-    theSocket->recvID(0, 0, idData, 0);
+    theChannel->recvID(0, 0, idData, 0);
 
     // check data size of experimental element
     int i, ndf = 0;
@@ -549,15 +574,6 @@ int openFresco_startSimAppElemServer(ClientData clientData,
         return TCL_ERROR;
     }
     
-    int numCtrl = 0, numDaq = 0;
-    for (i=0; i<OF_Resp_All; i++) {
-        numCtrl += sizeCtrl(i);
-        numDaq += sizeDaq(i);
-    }
-    *dataSize = (*dataSize<1+numCtrl) ? 1+numCtrl : *dataSize;
-    *dataSize = (*dataSize<numDaq) ? numDaq : *dataSize;
-    *dataSize = (*dataSize<ndf*ndf) ? ndf*ndf : *dataSize;
-
     // initialize the receive and send vectors
     Vector *rDisp  = 0, *sDisp  = 0;
     Vector *rVel   = 0, *sVel   = 0;
@@ -622,7 +638,7 @@ int openFresco_startSimAppElemServer(ClientData clientData,
     Vector nodeData(1);
     bool exitYet = false;
     while (!exitYet) {
-        theSocket->recvVector(0, 0, *recvData, 0);
+        theChannel->recvVector(0, 0, *recvData, 0);
         int action = (int)rData[0];
         //opserr << "\nLOOP action: " << *recvData << endln;
 
@@ -661,46 +677,46 @@ int openFresco_startSimAppElemServer(ClientData clientData,
                 (*sForce) = theExperimentalElement->getResistingForce();
             if (sTime != 0)
                 (*sTime) = theExperimentalElement->getTime();
-            theSocket->sendVector(0, 0, *sendData, 0);
+            theChannel->sendVector(0, 0, *sendData, 0);
             break;
         case OF_RemoteTest_commitState:
             theDomain->commit();
             break;
         case OF_RemoteTest_getDisp:
             (*sDisp) = theExperimentalElement->getDisp();
-            theSocket->sendVector(0, 0, *sendData, 0);
+            theChannel->sendVector(0, 0, *sendData, 0);
             break;
         case OF_RemoteTest_getVel:
             (*sVel) = theExperimentalElement->getVel();
-            theSocket->sendVector(0, 0, *sendData, 0);
+            theChannel->sendVector(0, 0, *sendData, 0);
             break;
         case OF_RemoteTest_getAccel:
             (*sAccel) = theExperimentalElement->getAccel();
-            theSocket->sendVector(0, 0, *sendData, 0);
+            theChannel->sendVector(0, 0, *sendData, 0);
             break;
         case OF_RemoteTest_getForce:
             (*sForce) = theExperimentalElement->getResistingForce();
-            theSocket->sendVector(0, 0, *sendData, 0);
+            theChannel->sendVector(0, 0, *sendData, 0);
             break;
         case OF_RemoteTest_getTime:
             (*sTime) = theExperimentalElement->getTime();
-            theSocket->sendVector(0, 0, *sendData, 0);
+            theChannel->sendVector(0, 0, *sendData, 0);
             break;
         case OF_RemoteTest_getTangentStiff:
             (*sMatrix) = theExperimentalElement->getTangentStiff();
-            theSocket->sendVector(0, 0, *sendData, 0);
+            theChannel->sendVector(0, 0, *sendData, 0);
             break;
         case OF_RemoteTest_getInitialStiff:
             (*sMatrix) = theExperimentalElement->getInitialStiff();
-            theSocket->sendVector(0, 0, *sendData, 0);
+            theChannel->sendVector(0, 0, *sendData, 0);
             break;
         case OF_RemoteTest_getDamp:
             (*sMatrix) = theExperimentalElement->getDamp();
-            theSocket->sendVector(0, 0, *sendData, 0);
+            theChannel->sendVector(0, 0, *sendData, 0);
             break;
         case OF_RemoteTest_getMass:
             (*sMatrix) = theExperimentalElement->getMass();
-            theSocket->sendVector(0, 0, *sendData, 0);
+            theChannel->sendVector(0, 0, *sendData, 0);
             break;
         case OF_RemoteTest_DIE:
             exitYet = true;
@@ -716,8 +732,8 @@ int openFresco_startSimAppElemServer(ClientData clientData,
         << " shutdown\n" << endln;
 
     // delete allocated memory
-    if (theSocket != 0)
-        delete theSocket;
+    if (theChannel != 0)
+        delete theChannel;
 
     if (rDisp != 0)
         delete rDisp;

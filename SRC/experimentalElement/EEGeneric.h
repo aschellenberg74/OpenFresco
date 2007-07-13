@@ -37,7 +37,7 @@
 
 #include <ExperimentalElement.h>
 
-class TCP_Socket;
+class Channel;
 
 #define ELE_TAG_EEGeneric 9955
 
@@ -51,7 +51,7 @@ public:
         bool iMod = false, Matrix *mass = 0);
     EEGeneric(int tag, ID nodes, ID *dof,
         int port, char *machineInetAddress = 0,
-        int dataSize = OF_Network_dataSize,
+        int ssl = 0, int dataSize = OF_Network_dataSize,
         bool iMod = false, Matrix *mass = 0);
     
     // destructor
@@ -119,7 +119,7 @@ private:
     static Vector theVector;
     static Vector theLoad;
     
-    TCP_Socket *theSocket;      // tcp/ip socket
+    Channel *theChannel;        // channel
     double *sData;              // send data array
     Vector *sendData;           // send vector
     double *rData;              // receive data array

@@ -36,7 +36,7 @@
 
 #include <ExperimentalElement.h>
 
-class TCP_Socket;
+class Channel;
 
 #define ELE_TAG_EEInvertedVBrace2d 9954
 
@@ -51,7 +51,7 @@ public:
         double rho1 = 0.0, double rho2 = 0.0);
     EEInvertedVBrace2d(int tag, int Nd1, int Nd2, int Nd3,
         int port, char *machineInetAddress = 0,
-        int dataSize = OF_Network_dataSize,
+        int ssl = 0, int dataSize = OF_Network_dataSize,
         bool iMod = false, bool nlGeom = false,
         double rho1 = 0.0, double rho2 = 0.0);
     
@@ -116,7 +116,7 @@ private:
     static Vector theVector;
     static Vector theLoad;
     
-    TCP_Socket *theSocket;      // tcp/ip socket
+    Channel *theChannel;        // channel
     double *sData;              // send data array
     Vector *sendData;           // send vector
     double *rData;              // receive data array

@@ -59,7 +59,7 @@ int TclGenericClientCommand(ClientData clientData, Tcl_Interp *interp,  int argc
 	if ((argc-eleArgStart) < 8)  {
 		opserr << "WARNING insufficient arguments\n";
 		printCommand(argc, argv);
-		opserr << "Want: expElement genericClient eleTag -node Ndi -dof dofNdi -dof dofNdj ... -server ipPort <ipAddr> <-dataSize size>\n";
+		opserr << "Want: expElement genericClient eleTag -node Ndi -dof dofNdi -dof dofNdj ... -server ipPort <ipAddr> <-ssl> <-dataSize size>\n";
 		return TCL_ERROR;
 	}    
 	
@@ -67,6 +67,7 @@ int TclGenericClientCommand(ClientData clientData, Tcl_Interp *interp,  int argc
     int tag, node, dof, ipPort, argi, i, j;
     int numNodes = 0, numDOFj = 0, numDOF = 0;
     char *ipAddr = 0;
+    int ssl = 0;
     int dataSize = OF_Network_dataSize;
 
 	if (Tcl_GetInt(interp, argv[1+eleArgStart], &tag) != TCL_OK)  {
@@ -146,7 +147,8 @@ int TclGenericClientCommand(ClientData clientData, Tcl_Interp *interp,  int argc
 	        return TCL_ERROR;
         }
         argi++;
-        if (argi < argc && strcmp(argv[argi], "-dataSize") != 0)  {
+        if (argi < argc && strcmp(argv[argi], "-dataSize") != 0
+            && strcmp(argv[argi], "-ssl") != 0)  {
             ipAddr = (char *)malloc((strlen(argv[argi]) + 1)*sizeof(char));
             strcpy(ipAddr,argv[argi]);
             argi++;
@@ -156,7 +158,9 @@ int TclGenericClientCommand(ClientData clientData, Tcl_Interp *interp,  int argc
             strcpy(ipAddr,"127.0.0.1");
         }
         for (i = argi; i < argc; i++)  {
-            if (strcmp(argv[i], "-dataSize") == 0)  {
+            if (strcmp(argv[i], "-ssl") == 0)
+                ssl = 1;
+            else if (strcmp(argv[i], "-dataSize") == 0)  {
                 if (Tcl_GetInt(interp, argv[i+1], &dataSize) != TCL_OK)  {
 		            opserr << "WARNING invalid dataSize\n";
 		            opserr << "expElement genericClient element: " << tag << endln;
@@ -173,7 +177,7 @@ int TclGenericClientCommand(ClientData clientData, Tcl_Interp *interp,  int argc
     }
  
 	// now create the GenericClient
-    theElement = new GenericClient(tag, nodes, dofs, ipPort, ipAddr, dataSize);
+    theElement = new GenericClient(tag, nodes, dofs, ipPort, ipAddr, ssl, dataSize);
 	
 	if (theElement == 0)  {
 		opserr << "WARNING ran out of memory creating element\n";

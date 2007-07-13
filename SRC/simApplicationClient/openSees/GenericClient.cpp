@@ -40,6 +40,7 @@
 #include <Information.h>
 #include <ElementResponse.h>
 #include <TCP_Socket.h>
+#include <TCP_SocketSSL.h>
 
 #include <math.h>
 #include <stdlib.h>
@@ -53,14 +54,15 @@ Matrix GenericClient::theMass(1,1);
 Vector GenericClient::theVector(1);
 Vector GenericClient::theLoad(1);
 
+
 // responsible for allocating the necessary space needed
 // by each object and storing the tags of the end nodes.
 GenericClient::GenericClient(int tag, ID nodes, ID *dof,
-    int port, char *machineInetAddr, int dataSize)
+    int port, char *machineInetAddr, int ssl, int dataSize)
     : Element(tag, ELE_TAG_GenericClient),
     connectedExternalNodes(nodes), basicDOF(1),
     numExternalNodes(0), numDOF(0), numBasicDOF(0),
-    theSocket(0), sData(0), sendData(0), rData(0), recvData(0),
+    theChannel(0), sData(0), sendData(0), rData(0), recvData(0),
     db(0), vb(0), ab(0), t(0),
     qMeas(0), rMatrix(0),
     dbTarg(1), dbPast(1), initStiffFlag(false), massFlag(false)
@@ -93,11 +95,19 @@ GenericClient::GenericClient(int tag, ID nodes, ID *dof,
     }
     
     // setup the connection
-    if (machineInetAddr == 0)
-        theSocket = new TCP_Socket(port, "127.0.0.1");
-    else
-        theSocket = new TCP_Socket(port, machineInetAddr);
-    theSocket->setUpConnection();
+    if (!ssl)  {
+        if (machineInetAddr == 0)
+            theChannel = new TCP_Socket(port, "127.0.0.1");
+        else
+            theChannel = new TCP_Socket(port, machineInetAddr);
+    }
+    else  {
+        if (machineInetAddr == 0)
+            theChannel = new TCP_SocketSSL(port, "127.0.0.1");
+        else
+            theChannel = new TCP_SocketSSL(port, machineInetAddr);
+    }
+    theChannel->setUpConnection();
 
     // set the data size for the experimental element
     int intData[2*OF_Resp_All+1];
@@ -113,11 +123,11 @@ GenericClient::GenericClient(int tag, ID nodes, ID *dof,
     
     (*sizeDaq)[OF_Resp_Force]  = numBasicDOF;
     
-    dataSize = (dataSize<1+3*numBasicDOF+1) ? 1+3*numBasicDOF+1 : dataSize;
-    dataSize = (dataSize<numBasicDOF*numBasicDOF) ? numBasicDOF*numBasicDOF : dataSize;
+    if (dataSize < 1+3*numBasicDOF+1) dataSize = 1+3*numBasicDOF+1;
+    if (dataSize < numBasicDOF*numBasicDOF) dataSize = numBasicDOF*numBasicDOF;
     intData[2*OF_Resp_All] = dataSize;
 
-    theSocket->sendID(0, 0, idData, 0);
+    theChannel->sendID(0, 0, idData, 0);
     
     // allocate memory for the send vectors
     int id = 1;
@@ -156,7 +166,7 @@ GenericClient::GenericClient(int tag, ID nodes, ID *dof,
 GenericClient::~GenericClient()
 {
     sData[0] = OF_RemoteTest_DIE;
-    theSocket->sendVector(0, 0, *sendData, 0);
+    theChannel->sendVector(0, 0, *sendData, 0);
 
     // invoke the destructor on any objects created by the object
     // that the object still holds a pointer to
@@ -187,8 +197,8 @@ GenericClient::~GenericClient()
         delete recvData;
     if (rData != 0)
         delete [] rData;
-    if (theSocket != 0)
-        delete theSocket;
+    if (theChannel != 0)
+        delete theChannel;
 }
 
 
@@ -279,7 +289,7 @@ int GenericClient::commitState()
     int rValue = 0;
     
     sData[0] = OF_RemoteTest_commitState;
-    rValue += theSocket->sendVector(0, 0, *sendData, 0);
+    rValue += theChannel->sendVector(0, 0, *sendData, 0);
     
     return rValue;
 }
@@ -336,7 +346,7 @@ int GenericClient::update()
         dbPast = (*db);
         // set the trial response at the element
         sData[0] = OF_RemoteTest_setTrialResponse;
-        rValue += theSocket->sendVector(0, 0, *sendData, 0);
+        rValue += theChannel->sendVector(0, 0, *sendData, 0);
     }
     
     return rValue;
@@ -350,8 +360,8 @@ const Matrix& GenericClient::getTangentStiff()
     rMatrix->Zero();
 
     sData[0] = OF_RemoteTest_getTangentStiff;
-    theSocket->sendVector(0, 0, *sendData, 0);
-    theSocket->recvVector(0, 0, *recvData, 0);
+    theChannel->sendVector(0, 0, *sendData, 0);
+    theChannel->recvVector(0, 0, *recvData, 0);
     
     theMatrix.Assemble(*rMatrix,basicDOF,basicDOF);
     
@@ -367,8 +377,8 @@ const Matrix& GenericClient::getInitialStiff()
         rMatrix->Zero();
 
         sData[0] = OF_RemoteTest_getInitialStiff;
-        theSocket->sendVector(0, 0, *sendData, 0);
-        theSocket->recvVector(0, 0, *recvData, 0);
+        theChannel->sendVector(0, 0, *sendData, 0);
+        theChannel->recvVector(0, 0, *recvData, 0);
         
         theInitStiff.Assemble(*rMatrix,basicDOF,basicDOF);        
         initStiffFlag = true;
@@ -385,8 +395,8 @@ const Matrix& GenericClient::getInitialStiff()
     rMatrix->Zero();
 
     sData[0] = OF_RemoteTest_getDamp;
-    theSocket->sendVector(0, 0, *sendData, 0);
-    theSocket->recvVector(0, 0, *recvData, 0);
+    theChannel->sendVector(0, 0, *sendData, 0);
+    theChannel->recvVector(0, 0, *recvData, 0);
     
     theMatrix.Assemble(*rMatrix,basicDOF,basicDOF);
     
@@ -402,8 +412,8 @@ const Matrix& GenericClient::getMass(void)
         rMatrix->Zero();
 
         sData[0] = OF_RemoteTest_getMass;
-        theSocket->sendVector(0, 0, *sendData, 0);
-        theSocket->recvVector(0, 0, *recvData, 0);
+        theChannel->sendVector(0, 0, *sendData, 0);
+        theChannel->recvVector(0, 0, *recvData, 0);
         
         theMass.Assemble(*rMatrix,basicDOF,basicDOF);
         massFlag = true;
@@ -457,8 +467,8 @@ const Vector& GenericClient::getResistingForce()
     
     // get measured resisting forces
     sData[0] = OF_RemoteTest_getForce;
-    theSocket->sendVector(0, 0, *sendData, 0);
-    theSocket->recvVector(0, 0, *recvData, 0);
+    theChannel->sendVector(0, 0, *sendData, 0);
+    theChannel->recvVector(0, 0, *recvData, 0);
    
     // save corresponding target displacements for recorder
     dbTarg = (*db);
@@ -691,8 +701,8 @@ int GenericClient::getResponse(int responseID, Information &eleInformation)
     /*case 6:  // measured basic displacements
         if (eleInformation.theVector != 0)  {
             sData[0] = OF_RemoteTest_getDisp;
-            theSocket->sendVector(0, 0, *sendData, 0);
-            theSocket->recvVector(0, 0, *recvData, 0);
+            theChannel->sendVector(0, 0, *sendData, 0);
+            theChannel->recvVector(0, 0, *recvData, 0);
             *(eleInformation.theVector) = (*dbMeas);
         }
         return 0;
@@ -700,8 +710,8 @@ int GenericClient::getResponse(int responseID, Information &eleInformation)
     case 7:  // measured basic velocities
         if (eleInformation.theVector != 0)  {
             sData[0] = OF_RemoteTest_getVel;
-            theSocket->sendVector(0, 0, *sendData, 0);
-            theSocket->recvVector(0, 0, *recvData, 0);
+            theChannel->sendVector(0, 0, *sendData, 0);
+            theChannel->recvVector(0, 0, *recvData, 0);
             *(eleInformation.theVector) = (*vbMeas);
         }
         return 0;
@@ -709,8 +719,8 @@ int GenericClient::getResponse(int responseID, Information &eleInformation)
     case 8:  // measured basic accelerations
         if (eleInformation.theVector != 0)  {
             sData[0] = OF_RemoteTest_getAccel;
-            theSocket->sendVector(0, 0, *sendData, 0);
-            theSocket->recvVector(0, 0, *recvData, 0);
+            theChannel->sendVector(0, 0, *sendData, 0);
+            theChannel->recvVector(0, 0, *recvData, 0);
             *(eleInformation.theVector) = (*abMeas);
         }
         return 0;*/

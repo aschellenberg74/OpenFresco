@@ -60,7 +60,7 @@ int addEEGeneric(ClientData clientData, Tcl_Interp *interp,  int argc,
 		opserr << "WARNING insufficient arguments\n";
 		printCommand(argc, argv);
 		opserr << "Want: expElement generic eleTag -node Ndi -dof dofNdi -dof dofNdj ... -site siteTag -initStif Kij <-iMod> <-mass Mij>\n";
-		opserr << "  or: expElement generic eleTag -node Ndi -dof dofNdi -dof dofNdj ... -server ipPort <ipAddr> <-dataSize size> -initStif Kij <-iMod> <-mass Mij>\n";
+		opserr << "  or: expElement generic eleTag -node Ndi -dof dofNdi -dof dofNdj ... -server ipPort <ipAddr> <-ssl> <-dataSize size> -initStif Kij <-iMod> <-mass Mij>\n";
 		return TCL_ERROR;
 	}    
 	
@@ -69,6 +69,7 @@ int addEEGeneric(ClientData clientData, Tcl_Interp *interp,  int argc,
     int numNodes = 0, numDOFj = 0, numDOF = 0;
     ExperimentalSite *theSite = 0;
     char *ipAddr = 0;
+    int ssl = 0;
     int dataSize = OF_Network_dataSize;
     bool iMod = false;
     Matrix *mass = 0;
@@ -168,6 +169,7 @@ int addEEGeneric(ClientData clientData, Tcl_Interp *interp,  int argc,
         }
         argi++;
         if (strcmp(argv[argi], "-initStif") != 0 &&
+            strcmp(argv[argi], "-ssl") != 0 &&
             strcmp(argv[argi], "-dataSize") != 0)  {
             ipAddr = (char *)malloc((strlen(argv[argi]) + 1)*sizeof(char));
             strcpy(ipAddr,argv[argi]);
@@ -178,7 +180,9 @@ int addEEGeneric(ClientData clientData, Tcl_Interp *interp,  int argc,
             strcpy(ipAddr,"127.0.0.1");
         }
         for (i = argi; i < argc; i++)  {
-            if (strcmp(argv[i], "-dataSize") == 0)  {
+            if (strcmp(argv[i], "-ssl") == 0)
+                ssl = 1;
+            else if (strcmp(argv[i], "-dataSize") == 0)  {
                 if (Tcl_GetInt(interp, argv[i+1], &dataSize) != TCL_OK)  {
 		            opserr << "WARNING invalid dataSize\n";
 		            opserr << "expElement generic element: " << tag << endln;
@@ -231,10 +235,10 @@ int addEEGeneric(ClientData clientData, Tcl_Interp *interp,  int argc,
     }
     else {
         if (mass == 0) {
-	        theExpElement = new EEGeneric(tag, nodes, dofs, ipPort, ipAddr, dataSize, iMod);
+	        theExpElement = new EEGeneric(tag, nodes, dofs, ipPort, ipAddr, ssl, dataSize, iMod);
         }
         else {
-            theExpElement = new EEGeneric(tag, nodes, dofs, ipPort, ipAddr, dataSize, iMod, mass);
+            theExpElement = new EEGeneric(tag, nodes, dofs, ipPort, ipAddr, ssl, dataSize, iMod, mass);
         }
     }
 	
