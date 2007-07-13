@@ -38,7 +38,7 @@
 #include <ActorExpSite.h>
 
 #include <TCP_Socket.h>
-#include <FEM_ObjectBroker.h>
+#include <TCP_SocketSSL.h>
 
 #include <Vector.h>
 #include <string.h>
@@ -148,83 +148,78 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp, int argc,
 	
     // ----------------------------------------------------------------------------	
     else if (strcmp(argv[1],"RemoteSite") == 0)  {
-		if (5 > argc && argc > 8)  {
+		if (5 > argc && argc > 9)  {
 			opserr << "WARNING invalid number of arguments\n";
 			printCommand(argc,argv);
-			opserr << "Want: expSite RemoteSite tag <-setup setupTag> ipAddr ipPort <dataSize>\n";
+			opserr << "Want: expSite RemoteSite tag <-setup setupTag> ipAddr ipPort <-ssl> <-dataSize size>\n";
 			return TCL_ERROR;
-		}    
+		}
 		
-		int tag, setupTag, ipPort;
-        int dataSize = OF_Network_dataSize;
+		int tag, setupTag, ipPort, argi;
 		char *ipAddr;
-        ExperimentalSite *theSite = 0;
+        int ssl = 0;
+        int dataSize = OF_Network_dataSize;
+        ExperimentalSetup *theSetup = 0;
+        Channel *theChannel = 0;
+        RemoteExpSite *theSite = 0;
 		
 		if (Tcl_GetInt(interp, argv[2], &tag) != TCL_OK)  {
 			opserr << "WARNING invalid expSite RemoteSite tag\n";
 			return TCL_ERROR;		
 		}
-
-        if (argc == 5 || argc == 6)  {
-            ipAddr = (char *)malloc((strlen(argv[3]) + 1)*sizeof(char));
-            strcpy(ipAddr,argv[3]);
-            if (Tcl_GetInt(interp, argv[4], &ipPort) != TCL_OK)  {
-                opserr << "WARNING invalid RemoteSite ipPort\n";
-                opserr << "expSite RemoteSite " << tag << endln;
-                return TCL_ERROR;		
-            }
-            
-            // setup the connection
-            TCP_Socket *theChannel = new TCP_Socket(ipPort,ipAddr);
-            //FEM_ObjectBroker *theBroker = new FEM_ObjectBroker();
-
-            if (argc == 6) {
-		        if (Tcl_GetInt(interp, argv[5], &dataSize) != TCL_OK)  {
-			        opserr << "WARNING invalid RemoteSite dataSize\n";
-                    opserr << "expSite RemoteSite " << tag << endln;
-			        return TCL_ERROR;		
-		        }
-            }
-
-            // parsing was successful, allocate the site
-            theSite = new RemoteExpSite(tag, *theChannel, dataSize);
-        }
-        if (argc == 7 || argc == 8)  {
-            if (Tcl_GetInt(interp, argv[4], &setupTag) != TCL_OK)  {
+        argi = 3;
+        // get the experimental setup if provided
+        if (strcmp(argv[argi], "-setup") == 0)  {
+            argi++;
+            if (Tcl_GetInt(interp, argv[argi], &setupTag) != TCL_OK)  {
                 opserr << "WARNING invalid setupTag\n";
                 opserr << "expSite RemoteSite " << tag << endln;
                 return TCL_ERROR;	
             }
-            ExperimentalSetup *theSetup = getExperimentalSetup(setupTag);
+            theSetup = getExperimentalSetup(setupTag);
             if (theSetup == 0)  {
                 opserr << "WARNING experimental setup not found\n";
                 opserr << "expSetup: " << setupTag << endln;
                 opserr << "expSite RemoteSite " << tag << endln;
                 return TCL_ERROR;
             }
-            ipAddr = (char *)malloc((strlen(argv[5]) + 1)*sizeof(char));
-            strcpy(ipAddr,argv[5]);
-            if (Tcl_GetInt(interp, argv[6], &ipPort) != TCL_OK)  {
-                opserr << "WARNING invalid RemoteSite ipPort\n";
-                opserr << "expSite RemoteSite " << tag << endln;
-                return TCL_ERROR;		
+            argi++;
+        }
+        // get ip-address and ip-port
+        ipAddr = (char *)malloc((strlen(argv[argi]) + 1)*sizeof(char));
+        strcpy(ipAddr,argv[argi]);
+        argi++;
+        if (Tcl_GetInt(interp, argv[argi], &ipPort) != TCL_OK)  {
+            opserr << "WARNING invalid RemoteSite ipPort\n";
+            opserr << "expSite RemoteSite " << tag << endln;
+            return TCL_ERROR;		
+        }
+        argi++;
+        // check for optional arguments
+        for (int i = argi; i < argc; i++)  {
+            if (strcmp(argv[i], "-ssl") == 0)  {
+                ssl = 1;
             }
-
-            // setup the connection            
-            TCP_Socket *theChannel = new TCP_Socket(ipPort,ipAddr);
-            //FEM_ObjectBroker *theBroker = new FEM_ObjectBroker();
-            
-            if (argc == 8) {
-		        if (Tcl_GetInt(interp, argv[7], &dataSize) != TCL_OK)  {
+            else if (strcmp(argv[i], "-dataSize") == 0)  {
+		        if (Tcl_GetInt(interp, argv[i+1], &dataSize) != TCL_OK)  {
 			        opserr << "WARNING invalid RemoteSite dataSize\n";
                     opserr << "expSite RemoteSite " << tag << endln;
 			        return TCL_ERROR;		
 		        }
             }
-
-            // parsing was successful, allocate the site
-            theSite = new RemoteExpSite(tag, theSetup, *theChannel, dataSize);
         }
+
+        // setup the connection
+        if (!ssl)
+            theChannel = new TCP_Socket(ipPort,ipAddr);
+        else
+            theChannel = new TCP_SocketSSL(ipPort,ipAddr);
+
+        // parsing was successful, allocate the site
+        if (theSetup == 0)
+            theSite = new RemoteExpSite(tag, *theChannel, dataSize);
+        else
+            theSite = new RemoteExpSite(tag, theSetup, *theChannel, dataSize);
 
         if (theSite == 0)  {
             opserr << "WARNING could not create experimental site " << argv[1] << endln;
@@ -240,110 +235,101 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp, int argc,
 	
     // ----------------------------------------------------------------------------	
     else if (strcmp(argv[1],"ActorSite") == 0)  {
-		if (6 > argc || argc > 7)  {
+		if (6 > argc || argc > 8)  {
 			opserr << "WARNING invalid number of arguments\n";
 			printCommand(argc,argv);
-			opserr << "Want: expSite ActorSite tag -setup setupTag ipPort <dataSize>\n"
-                << "  or: expSite ActorSite tag -control ctrlTag ipPort <dataSize>\n";
+			opserr << "Want: expSite ActorSite tag -setup setupTag ipPort <-ssl>\n"
+                << "  or: expSite ActorSite tag -control ctrlTag ipPort <-ssl>\n";
 			return TCL_ERROR;
 		}    
 		
-		int tag, setupTag, ctrlTag, ipPort;
-        int dataSize = OF_Network_dataSize;
+		int tag, setupTag, ctrlTag, ipPort, argi;
+        int ssl = 0;
+        ExperimentalSetup *theSetup = 0;
+        ExperimentalControl *theControl = 0;
+        Channel *theChannel = 0;
         ActorExpSite *theSite = 0;
 		
 		if (Tcl_GetInt(interp, argv[2], &tag) != TCL_OK)  {
 			opserr << "WARNING invalid expSite ActorSite tag\n";
 			return TCL_ERROR;		
 		}
-
-        if (strcmp(argv[3], "-setup") == 0)  {
-            if (Tcl_GetInt(interp, argv[4], &setupTag) != TCL_OK)  {
+        argi = 3;
+        if (strcmp(argv[argi], "-setup") == 0)  {
+            argi++;
+            if (Tcl_GetInt(interp, argv[argi], &setupTag) != TCL_OK)  {
                 opserr << "WARNING invalid setupTag\n";
                 opserr << "expSite ActorSite " << tag << endln;
                 return TCL_ERROR;	
             }
-            ExperimentalSetup *theSetup = getExperimentalSetup(setupTag);
+            theSetup = getExperimentalSetup(setupTag);
             if (theSetup == 0)  {
                 opserr << "WARNING experimental setup not found\n";
                 opserr << "expSetup: " << setupTag << endln;
                 opserr << "expSite ActorSite " << tag << endln;
                 return TCL_ERROR;
             }
-            if (Tcl_GetInt(interp, argv[5], &ipPort) != TCL_OK)  {
-                opserr << "WARNING invalid ActorSite ipPort\n";
-                opserr << "expSite ActorSite " << tag << endln;
-                return TCL_ERROR;		
-            }
-
-            // setup the connection
-            TCP_Socket *theChannel = new TCP_Socket(ipPort);
-            //FEM_ObjectBroker *theBroker = new FEM_ObjectBroker();
-            if (theChannel == 0)  {
-                opserr << "WARNING could not create channel\n";
-                opserr << "expSite ActorSite " << tag << endln;
-                return TCL_ERROR;
-            }
-            else {
-                opserr << "\nChannel successfully created: "
-                    << "Waiting for RemoteExpSite...\n";
-            }
-
-            if (argc == 7) {
-		        if (Tcl_GetInt(interp, argv[6], &dataSize) != TCL_OK)  {
-			        opserr << "WARNING invalid ActorSite dataSize\n";
-                    opserr << "expSite ActorSite " << tag << endln;
-			        return TCL_ERROR;		
-		        }
-            }
-
-            // parsing was successful, allocate the site
-            theSite = new ActorExpSite(tag, theSetup, *theChannel, dataSize);
+            argi++;
         }
-        if (strcmp(argv[3], "-control") == 0)  {
-            if (Tcl_GetInt(interp, argv[4], &ctrlTag) != TCL_OK)  {
+        else if (strcmp(argv[argi], "-control") == 0)  {
+            argi++;
+            if (Tcl_GetInt(interp, argv[argi], &ctrlTag) != TCL_OK)  {
                 opserr << "WARNING invalid ctrlTag\n";
                 opserr << "expSite ActorSite " << tag << endln;
                 return TCL_ERROR;	
             }
-            ExperimentalControl *theControl = getExperimentalControl(ctrlTag);
+            theControl = getExperimentalControl(ctrlTag);
             if (theControl == 0)  {
                 opserr << "WARNING experimental control not found\n";
                 opserr << "expControl: " << ctrlTag << endln;
                 opserr << "expSite ActorSite " << tag << endln;
                 return TCL_ERROR;
             }
-            if (Tcl_GetInt(interp, argv[5], &ipPort) != TCL_OK)  {
-                opserr << "WARNING invalid ActorSite ipPort\n";
-                opserr << "expSite ActorSite " << tag << endln;
-                return TCL_ERROR;		
+            argi++;
+        }
+        if (Tcl_GetInt(interp, argv[argi], &ipPort) != TCL_OK)  {
+            opserr << "WARNING invalid ActorSite ipPort\n";
+            opserr << "expSite ActorSite " << tag << endln;
+            return TCL_ERROR;		
+        }
+        argi++;
+        // check for optional arguments
+        for (int i = argi; i < argc; i++)  {
+            if (strcmp(argv[i], "-ssl") == 0)  {
+                ssl = 1;
             }
-            
-            // setup the connection
-            TCP_Socket *theChannel = new TCP_Socket(ipPort);
-            //FEM_ObjectBroker *theBroker = new FEM_ObjectBroker();
-            if (theChannel == 0)  {
+        }
+
+        // parsing was successful, setup the connection and allocate the site
+        if (!ssl)  {
+            theChannel = new TCP_Socket(ipPort);
+            if (theChannel != 0) {
+                opserr << "\nChannel successfully created: "
+                    << "Waiting for RemoteExpSite...\n";
+            } else {
                 opserr << "WARNING could not create channel\n";
                 opserr << "expSite ActorSite " << tag << endln;
                 return TCL_ERROR;
             }
-            else {
-                opserr << "\nChannel successfully created: "
+        }
+        else  {
+            theChannel = new TCP_SocketSSL(ipPort);
+            if (theChannel != 0) {
+                opserr << "\nSSL Channel successfully created: "
                     << "Waiting for RemoteExpSite...\n";
+            } else {
+                opserr << "WARNING could not create SSL channel\n";
+                opserr << "expSite ActorSite " << tag << endln;
+                return TCL_ERROR;
             }
-
-            if (argc == 7) {
-		        if (Tcl_GetInt(interp, argv[6], &dataSize) != TCL_OK)  {
-			        opserr << "WARNING invalid ActorSite dataSize\n";
-                    opserr << "expSite ActorSite " << tag << endln;
-			        return TCL_ERROR;		
-		        }
-            }
-
-            // parsing was successful, allocate the site
-            theSite = new ActorExpSite(tag, theControl, *theChannel, dataSize);
         }
 
+        // parsing was successful, allocate the site
+        if (theControl == 0)
+            theSite = new ActorExpSite(tag, theSetup, *theChannel);
+        else if (theSetup == 0)
+            theSite = new ActorExpSite(tag, theControl, *theChannel);
+        
         if (theSite == 0)  {
             opserr << "WARNING could not create experimental site " << argv[1] << endln;
             return TCL_ERROR;
