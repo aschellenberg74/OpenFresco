@@ -53,12 +53,10 @@ public:
     ActorExpSite(int tag, 
         ExperimentalSetup *setup,
         Channel &theChannel,
-        int dataSize = OF_Network_dataSize,
         FEM_ObjectBroker *theObjectBroker = 0);
     ActorExpSite(int tag, 
         ExperimentalControl *control,
         Channel &theChannel,
-        int dataSize = OF_Network_dataSize,
         FEM_ObjectBroker *theObjectBroker = 0);
     ActorExpSite(const ActorExpSite& es);
     
@@ -78,14 +76,7 @@ public:
         const Vector* force,
         const Vector* time);
     
-    virtual int checkDaqResponse();
-    
-    virtual const Vector& getDisp();
-    virtual const Vector& getVel();
-    virtual const Vector& getAccel();
-    virtual const Vector& getForce();
-    virtual const Vector& getTime();
-    
+    virtual int checkDaqResponse();    
     virtual int setSendDaqResponse();
     
     virtual int commitState();
@@ -102,13 +93,12 @@ protected:
     // for communicating through Channel
     ID msgData;
     
-    // data size of vector through Channel
-    int sendDataSize, recvDataSize;
+    // data size of vectors in Channel
+    int dataSize;
     
-    // vector in Channel
-    Vector *sendV;
-    Vector *recvV;
+    // vectors in Channel
+    Vector sendV;
+    Vector recvV;
 };
-
 
 #endif

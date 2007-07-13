@@ -84,19 +84,15 @@ protected:
     // for communicating through Channel
     ID msgData;
 
-    // data size of vector through Channel
-    int sendDataSize, recvDataSize;
+    // data size of vectors in Channel
+    int dataSize;
 
-    // vector in Channel
-    Vector *sendV;
-    Vector *recvV;
+    // vectors in Channel
+    Vector sendV;
+    Vector recvV;
     
     Vector *bDisp, *bVel, *bAccel, *bForce, *bTime;
     Vector *rDisp, *rVel, *rAccel, *rForce, *rTime;
 };
 
 #endif
-
-
-
-
