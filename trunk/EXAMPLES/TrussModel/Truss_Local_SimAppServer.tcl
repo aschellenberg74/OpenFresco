@@ -59,10 +59,10 @@ expElement truss 3 3 4 -site 1 -initStif [expr 3000.0*5.0/135.76]
 # ------------------------------
 # Start the server process
 # ------------------------------
-# startSimAppSiteServer $siteTag $port
+# startSimAppSiteServer $siteTag $port <-ssl>
 #startSimAppSiteServer 1 8090
 
-# startSimAppElemServer $eleTag $port
+# startSimAppElemServer $eleTag $port <-ssl>
 startSimAppElemServer 3 8090
 # --------------------------------
 # End of analysis

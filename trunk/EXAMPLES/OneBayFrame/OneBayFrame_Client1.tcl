@@ -50,16 +50,16 @@ uniaxialMaterial Elastic 3 [expr 2.0*100.0/1.0]
 
 # Define experimental site
 # ------------------------
-# expSite RemoteSite $tag <-setup $setupTag> $ipAddr $ipPort <$dataSize>
+# expSite RemoteSite $tag <-setup $setupTag> $ipAddr $ipPort <-ssl> <-dataSize $size>
 expSite RemoteSite 1 "127.0.0.1" 8090
 expSite RemoteSite 2 "127.0.0.1" 8091
 
 # Define experimental elements
 # ----------------------------
 # left and right columns
-# expElement zeroLength $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-orient $x1 $x2 $x3 $y1 $y2 $y3> <-iMod> <-mass $m>
-expElement zeroLength 1 1 3 -dir 2 -site 1 -initStif 2.8 -orient 0 1 0 -1 0 0
-expElement zeroLength 2 2 4 -dir 2 -site 2 -initStif 5.6 -orient 0 1 0 -1 0 0
+# expElement twoNodeLink $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-orient $x1 $x2 $x3 $y1 $y2 $y3> <-iMod> <-mass $m>
+expElement twoNodeLink 1 1 3 -dir 2 -site 1 -initStif 2.8 -orient 0 1 0 -1 0 0
+expElement twoNodeLink 2 2 4 -dir 2 -site 2 -initStif 5.6 -orient 0 1 0 -1 0 0
 
 # Define numerical elements
 # -------------------------
@@ -156,8 +156,8 @@ set tTot [time {
     for {set i 1} {$i < 1600} {incr i} {
         set t [time {analyze  1  $dt}]
         puts $outFileID $t
-        }
-    }]
+    }
+}]
 puts "Elapsed Time = $tTot \n"
 # close the output file
 close $outFileID

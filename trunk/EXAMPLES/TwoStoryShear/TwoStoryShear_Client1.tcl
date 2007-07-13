@@ -42,17 +42,17 @@ fix 1   1  1
 
 # Define experimental site
 # ------------------------
-# expSite RemoteSite $tag <-setup $setupTag> $ipAddr $ipPort <$dataSize>
+# expSite RemoteSite $tag <-setup $setupTag> $ipAddr $ipPort <-ssl> <-dataSize $size>
 expSite RemoteSite 1 "127.0.0.1" 8090
 expSite RemoteSite 2 "127.0.0.1" 8091
 
 # Define elments
 # --------------
 # columns of first story S4x7.7
-# expElement zeroLength $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-orient $x1 $x2 $x3 $y1 $y2 $y3> <-iMod> <-mass $m>
-expElement zeroLength 1 1 2 -dir 1 2 -site 1 -initStif 1213 0 0 2.8 -orient 0 1 0 -1 0 0
+# expElement twoNodeLink $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-orient $x1 $x2 $x3 $y1 $y2 $y3> <-iMod> <-mass $m>
+expElement twoNodeLink 1 1 2 -dir 1 2 -site 1 -initStif 1213 0 0 2.8 -orient 0 1 0 -1 0 0
 # columns of second story S4x7.7                                  
-expElement zeroLength 2 2 3 -dir 1 2 -site 2 -initStif 1213 0 0 2.8 -orient 0 1 0 -1 0 0
+expElement twoNodeLink 2 2 3 -dir 1 2 -site 2 -initStif 1213 0 0 2.8 -orient 0 1 0 -1 0 0
 
 # Define dynamic loads
 # --------------------
@@ -149,8 +149,8 @@ set tTot [time {
     for {set i 1} {$i < 4000} {incr i} {
         set t [time {analyze  1  $dt}]
         puts $outFileID $t
-        }
-    }]
+    }
+}]
 puts "Elapsed Time = $tTot \n"
 # close the output file
 close $outFileID

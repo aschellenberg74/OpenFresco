@@ -37,7 +37,7 @@ uniaxialMaterial Steel02 1 1.5 2.8 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0
 # ---------------------------
 # expControl SimUniaxialMaterials $tag $matTags
 expControl SimUniaxialMaterials 1 1
-#expControl xPCtarget 1 1 "192.168.2.20" "22222" "HybridControllerPoly3_1Act" "D:\\PredictorCorrector\\RTActualTestModels\\c&mAPI-xPCTarget-STS\\"
+#expControl xPCtarget 1 1 "192.168.2.20" 22222 HybridControllerPoly3_1Act "D:/PredictorCorrector/RTActualTestModels/c&mAPI-xPCTarget-STS"
 
 # Define experimental setup
 # -------------------------
@@ -52,8 +52,8 @@ expSite LocalSite 1 1
 # Define experimental element
 # ---------------------------
 # left column
-# expElement zeroLength $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-orient $x1 $x2 $x3 $y1 $y2 $y3> <-iMod> <-mass $m>
-expElement zeroLength 1 1 3 -dir 2 -site 1 -initStif 2.8 -orient 0 1 0 -1 0 0
+# expElement twoNodeLink $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-orient $x1 $x2 $x3 $y1 $y2 $y3> <-iMod> <-mass $m>
+expElement twoNodeLink 1 1 3 -dir 2 -site 1 -initStif 2.8 -orient 0 1 0 -1 0 0
 # ------------------------------
 # End of model generation
 # ------------------------------
@@ -62,11 +62,11 @@ expElement zeroLength 1 1 3 -dir 2 -site 1 -initStif 2.8 -orient 0 1 0 -1 0 0
 # ------------------------------
 # Start the server process
 # ------------------------------
-# startSimAppSiteServer $siteTag $port
-startSimAppSiteServer 1 8090
+# startSimAppSiteServer $siteTag $port <-ssl>
+#startSimAppSiteServer 1 8090
 
-# startSimAppElemServer $eleTag $port
-#startSimAppElemServer 1 8090
+# startSimAppElemServer $eleTag $port <-ssl>
+startSimAppElemServer 1 8090
 # --------------------------------
 # End of analysis
 # --------------------------------

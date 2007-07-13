@@ -30,14 +30,14 @@ node  3     0.0  54.00
 
 # Define experimental site
 # ------------------------
-# expSite RemoteSite $tag <-setup $setupTag> $ipAddr $ipPort <$dataSize>
+# expSite RemoteSite $tag <-setup $setupTag> $ipAddr $ipPort <-ssl> <-dataSize $size>
 expSite RemoteSite 1 "127.0.0.1" 8091
 
 # Define experimental element
 # ---------------------------
 # left column
-# expElement zeroLength $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-orient $x1 $x2 $x3 $y1 $y2 $y3> <-iMod> <-mass $m>
-expElement zeroLength 1 1 3 -dir 2 -site 1 -initStif 2.8 -orient 0 1 0 -1 0 0
+# expElement twoNodeLink $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-orient $x1 $x2 $x3 $y1 $y2 $y3> <-iMod> <-mass $m>
+expElement twoNodeLink 1 1 3 -dir 2 -site 1 -initStif 2.8 -orient 0 1 0 -1 0 0
 # ------------------------------
 # End of model generation
 # ------------------------------
@@ -46,10 +46,10 @@ expElement zeroLength 1 1 3 -dir 2 -site 1 -initStif 2.8 -orient 0 1 0 -1 0 0
 # ------------------------------
 # Start the server process
 # ------------------------------
-# startSimAppSiteServer $siteTag $port
+# startSimAppSiteServer $siteTag $port <-ssl>
 #startSimAppSiteServer 1 8090
 
-# startSimAppElemServer $eleTag $port
+# startSimAppElemServer $eleTag $port <-ssl>
 startSimAppElemServer 1 8090
 # --------------------------------
 # End of analysis

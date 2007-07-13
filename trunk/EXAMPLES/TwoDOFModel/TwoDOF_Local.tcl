@@ -83,8 +83,8 @@ element zeroLength 1 1 2 -mat 1 -dir 1 -orient 1 0 0 0 1 0
 
 # Define experimental elements
 # ----------------------------
-# expElement zeroLength $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-orient $x1 $x2 $x3 $y1 $y2 $y3> <-iMod> <-mass $m>
-expElement zeroLength 2 2 3 -dir 1 -site 1 -initStif $E2 -orient 1 0 0 0 1 0
+# expElement twoNodeLink $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-orient $x1 $x2 $x3 $y1 $y2 $y3> <-iMod> <-mass $m>
+expElement twoNodeLink 2 2 3 -dir 1 -site 1 -initStif $E2 -orient 1 0 0 0 1 0
 
 # Define dynamic loads
 # --------------------
@@ -176,8 +176,8 @@ set tTot [time {
     for {set i 1} {$i < 1000} {incr i} {
         set t [time {analyze  1  [expr $dt/2]}]
         puts $outFileID $t
-        }
-    }]
+    }
+}]
 puts "Elapsed Time = $tTot \n"
 # close the output file
 close $outFileID
