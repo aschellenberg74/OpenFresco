@@ -59,7 +59,7 @@ uniaxialMaterial Steel02 2 6.0 12.0 0.05 18.5 0.925 0.15 0.0 1.0 0.0 1.0
 
 # Define experimental site
 # ------------------------
-# expSite RemoteSite $tag <-setup $setupTag> $ipAddr $ipPort <$dataSize>
+# expSite RemoteSite $tag <-setup $setupTag> $ipAddr $ipPort <-ssl> <-dataSize $size>
 expSite RemoteSite 1 "127.0.0.1" 8090
 expSite RemoteSite 2 "127.0.0.1" 8091
 
@@ -187,8 +187,8 @@ set tTot [time {
     for {set i 1} {$i < 4000} {incr i} {
         set t [time {analyze  1  $dt}]
         puts $outFileID $t
-        }
-    }]
+    }
+}]
 puts "Elapsed Time = $tTot \n"
 # close the output file
 close $outFileID

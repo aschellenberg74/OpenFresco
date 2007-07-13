@@ -35,7 +35,7 @@ expControl SimUniaxialMaterials 1 1
 
 # Define experimental site
 # ------------------------
-# expSite ActorSite $tag -control $ctrlTag $ipPort <$dataSize>
+# expSite ActorSite $tag -control $ctrlTag $ipPort <-ssl>
 expSite ActorSite 2 -control 1 8091
 # ------------------------------
 # End of model generation

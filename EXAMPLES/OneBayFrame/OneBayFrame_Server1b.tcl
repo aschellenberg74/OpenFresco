@@ -33,7 +33,7 @@ uniaxialMaterial Elastic 1  5.6;  # UC Berkeley Cantilever Column [kip/in]
 # ---------------------------
 # expControl SimUniaxialMaterials $tag $matTags
 expControl SimUniaxialMaterials 1 1
-#expControl xPCtarget 1 1 "192.168.2.20" "22222" "HybridControllerPoly3_1Act" "D:\\PredictorCorrector\\RTActualTestModels\\c&mAPI-xPCTarget-STS\\"
+#expControl xPCtarget 1 1 "192.168.2.20" 22222 HybridControllerPoly3_1Act "D:/PredictorCorrector/RTActualTestModels/c&mAPI-xPCTarget-STS"
 
 # Define experimental setup
 # -------------------------
@@ -44,7 +44,7 @@ expSetup OneActuator 1 -control 1 1;  # UC Berkeley setup
 
 # Define experimental site
 # ------------------------
-# expSite ActorSite $tag -setup $setupTag $ipPort <$dataSize>
+# expSite ActorSite $tag -setup $setupTag $ipPort <-ssl>
 expSite ActorSite 2 -setup 1 8091
 # ------------------------------
 # End of model generation

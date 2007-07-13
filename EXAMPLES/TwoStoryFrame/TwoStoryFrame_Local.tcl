@@ -181,8 +181,8 @@ set tTot [time {
     for {set i 1} {$i < 3000} {incr i} {
         set t [time {analyze  1  $dt}]
         puts $outFileID $t
-        }
-    }]
+    }
+}]
 puts "Elapsed Time = $tTot \n"
 # close the output file
 close $outFileID

@@ -40,7 +40,7 @@ expSetup OneActuator 1 -control 1 2 -ctrlDispFact 0.5 -daqDispFact 0.5 -daqForce
 
 # Define experimental site
 # ------------------------
-# expSite ActorSite $tag -setup $setupTag $ipPort <$dataSize>
+# expSite ActorSite $tag -setup $setupTag $ipPort <-ssl>
 expSite ActorSite 2 -setup 1 8091
 # ------------------------------
 # End of model generation

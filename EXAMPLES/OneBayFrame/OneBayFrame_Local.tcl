@@ -56,7 +56,7 @@ uniaxialMaterial Elastic 3 [expr 2.0*100.0/1.0]
 # ---------------------------
 # expControl SimUniaxialMaterials $tag $matTags
 expControl SimUniaxialMaterials 1 1
-#expControl xPCtarget 1 1 "192.168.2.20" "22222" "HybridControllerPoly3_1Act" "D:\\PredictorCorrector\\RTActualTestModels\\c&mAPI-xPCTarget-STS\\"
+#expControl xPCtarget 1 1 "192.168.2.20" 22222 HybridControllerPoly3_1Act "D:/PredictorCorrector/RTActualTestModels/c&mAPI-xPCTarget-STS"
 #expControl SCRAMNet 1 381020 8
 expControl SimUniaxialMaterials 2 2
 
@@ -75,9 +75,9 @@ expSite LocalSite 2 2
 # Define experimental elements
 # ----------------------------
 # left and right columns
-# expElement zeroLength $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-orient $x1 $x2 $x3 $y1 $y2 $y3> <-iMod> <-mass $m>
-expElement zeroLength 1 1 3 -dir 2 -site 1 -initStif 2.8 -orient 0 1 0 -1 0 0
-expElement zeroLength 2 2 4 -dir 2 -site 2 -initStif 5.6 -orient 0 1 0 -1 0 0
+# expElement twoNodeLink $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-orient $x1 $x2 $x3 $y1 $y2 $y3> <-iMod> <-mass $m>
+expElement twoNodeLink 1 1 3 -dir 2 -site 1 -initStif 2.8 -orient 0 1 0 -1 0 0
+expElement twoNodeLink 2 2 4 -dir 2 -site 2 -initStif 5.6 -orient 0 1 0 -1 0 0
 
 # Define numerical elements
 # -------------------------
@@ -174,8 +174,8 @@ set tTot [time {
     for {set i 1} {$i < 1600} {incr i} {
         set t [time {analyze  1  $dt}]
         puts $outFileID $t
-        }
-    }]
+    }
+}]
 puts "Elapsed Time = $tTot \n"
 # close the output file
 close $outFileID

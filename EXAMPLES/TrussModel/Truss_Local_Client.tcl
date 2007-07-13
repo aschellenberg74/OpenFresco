@@ -53,7 +53,7 @@ element truss 2 2 4 5.0 1
 
 # Define experimental elements
 # ----------------------------
-# expElement genericClient $eleTag -node $Ndi -dof $dofNdi -dof $dofNdj ... -server $ipPort <$ipAddr> <-dataSize $size>
+# expElement genericClient $eleTag -node $Ndi -dof $dofNdi -dof $dofNdj ... -server $ipPort <$ipAddr> <-ssl> <-dataSize $size>
 expElement genericClient 3 -node 3 4 -dof 1 2 -dof 1 2 -server 8090 "127.0.0.1"
 #expElement truss 3 3 4 -server 8090 -initStif [expr 3000.0*5.0/135.76]
 

@@ -68,9 +68,9 @@ expSite LocalSite 2 2
 # Define experimental elements
 # ----------------------------
 # left column
-# expElement genericClient $eleTag -node $Ndi -dof $dofNdi -dof $dofNdj ... -server $ipPort <$ipAddr>  <-dataSize $size>
+# expElement genericClient $eleTag -node $Ndi -dof $dofNdi -dof $dofNdj ... -server $ipPort <$ipAddr>  <-ssl> <-dataSize $size>
 expElement genericClient 1 -node 1 3 -dof 1 2 -dof 1 2 -server 8090
-#expElement zeroLength 1 1 3 -dir 2 -server 8090 -initStif 2.8 -orient 0 1 0 -1 0 0
+#expElement twoNodeLink 1 1 3 -dir 2 -server 8090 -initStif 2.8 -orient 0 1 0 -1 0 0
 
 # Define numerical elements
 # -------------------------
@@ -79,8 +79,8 @@ expElement genericClient 1 -node 1 3 -dof 1 2 -dof 1 2 -server 8090
 element truss 3 3 4 1.0 3
 
 # right column
-# expElement zeroLength $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-orient $x1 $x2 $x3 $y1 $y2 $y3> <-iMod> <-mass $m>
-expElement zeroLength 2 2 4 -dir 2 -site 2 -initStif 5.6 -orient 0 1 0 -1 0 0
+# expElement twoNodeLink $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-orient $x1 $x2 $x3 $y1 $y2 $y3> <-iMod> <-mass $m>
+expElement twoNodeLink 2 2 4 -dir 2 -site 2 -initStif 5.6 -orient 0 1 0 -1 0 0
 
 # Define dynamic loads
 # --------------------
@@ -171,8 +171,8 @@ set tTot [time {
     for {set i 1} {$i < 1600} {incr i} {
         set t [time {analyze  1  $dt}]
         puts $outFileID $t
-        }
-    }]
+    }
+}]
 puts "Elapsed Time = $tTot \n"
 # close the output file
 close $outFileID
