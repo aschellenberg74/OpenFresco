@@ -40,6 +40,7 @@
 #include <Information.h>
 #include <ElementResponse.h>
 #include <TCP_Socket.h>
+#include <TCP_SocketSSL.h>
 
 #include <math.h>
 #include <stdlib.h>
@@ -125,13 +126,13 @@ EEInvertedVBrace2d::EEInvertedVBrace2d(int tag, int Nd1, int Nd2, int Nd3,
 // responsible for allocating the necessary space needed
 // by each object and storing the tags of the end nodes.
 EEInvertedVBrace2d::EEInvertedVBrace2d(int tag, int Nd1, int Nd2, int Nd3,
-    int port, char *machineInetAddr, int dataSize,
+    int port, char *machineInetAddr, int ssl, int dataSize,
     bool iM, bool nlGeomFlag, double r1, double r2)
     : ExperimentalElement(tag, ELE_TAG_EEInvertedVBrace2d),
     connectedExternalNodes(3),
     iMod(iM), nlGeom(nlGeomFlag),
     rho1(r1), rho2(r2), L1(0.0), L2(0.0),
-    theSocket(0), sData(0), sendData(0), rData(0), recvData(0),
+    theChannel(0), sData(0), sendData(0), rData(0), recvData(0),
     db(0), vb(0), ab(0), t(0),
     dbMeas(0), vbMeas(0), abMeas(0), qMeas(0), tMeas(0),
     dbTarg(3), vbTarg(3), abTarg(3),
@@ -153,11 +154,19 @@ EEInvertedVBrace2d::EEInvertedVBrace2d(int tag, int Nd1, int Nd2, int Nd3,
         theNodes[i] = 0;
     
     // setup the connection
-    if (machineInetAddr == 0)
-        theSocket = new TCP_Socket(port, "127.0.0.1");
-    else
-        theSocket = new TCP_Socket(port, machineInetAddr);
-    theSocket->setUpConnection();
+    if (!ssl)  {
+        if (machineInetAddr == 0)
+            theChannel = new TCP_Socket(port, "127.0.0.1");
+        else
+            theChannel = new TCP_Socket(port, machineInetAddr);
+    }
+    else  {
+        if (machineInetAddr == 0)
+            theChannel = new TCP_SocketSSL(port, "127.0.0.1");
+        else
+            theChannel = new TCP_SocketSSL(port, machineInetAddr);
+    }
+    theChannel->setUpConnection();
 
     // set the data size for the experimental site
     int intData[2*OF_Resp_All+1];
@@ -177,10 +186,10 @@ EEInvertedVBrace2d::EEInvertedVBrace2d(int tag, int Nd1, int Nd2, int Nd3,
     (*sizeDaq)[OF_Resp_Force]  = 6;
     (*sizeDaq)[OF_Resp_Time]   = 1;
     
-    dataSize = (dataSize<16) ? 16 : dataSize;
+    if (dataSize < 16) dataSize = 16;
     intData[2*OF_Resp_All] = dataSize;
 
-    theSocket->sendID(0, 0, idData, 0);
+    theChannel->sendID(0, 0, idData, 0);
     
     // allocate memory for the send vectors
     int id = 1;
@@ -248,7 +257,7 @@ EEInvertedVBrace2d::~EEInvertedVBrace2d()
 
     if (theSite == 0)  {
         sData[0] = OF_RemoteTest_DIE;
-        theSocket->sendVector(0, 0, *sendData, 0);
+        theChannel->sendVector(0, 0, *sendData, 0);
         
         if (sendData != 0)
             delete sendData;
@@ -258,8 +267,8 @@ EEInvertedVBrace2d::~EEInvertedVBrace2d()
             delete recvData;
         if (rData != 0)
             delete [] rData;
-        if (theSocket != 0)
-            delete theSocket;
+        if (theChannel != 0)
+            delete theChannel;
     }
 }
 
@@ -401,7 +410,7 @@ int EEInvertedVBrace2d::commitState()
     }
     else  {
         sData[0] = OF_RemoteTest_commitState;
-        rValue += theSocket->sendVector(0, 0, *sendData, 0);
+        rValue += theChannel->sendVector(0, 0, *sendData, 0);
     }
     
     return rValue;
@@ -452,7 +461,7 @@ int EEInvertedVBrace2d::update()
             }
             else  {
                 sData[0] = OF_RemoteTest_setTrialResponse;
-                rValue += theSocket->sendVector(0, 0, *sendData, 0);
+                rValue += theChannel->sendVector(0, 0, *sendData, 0);
             }
          }
         
@@ -580,8 +589,8 @@ const Vector& EEInvertedVBrace2d::getResistingForce()
     }
     else  {
         sData[0] = OF_RemoteTest_getForce;
-        theSocket->sendVector(0, 0, *sendData, 0);
-        theSocket->recvVector(0, 0, *recvData, 0);
+        theChannel->sendVector(0, 0, *sendData, 0);
+        theChannel->recvVector(0, 0, *recvData, 0);
     }
     
     // apply optional initial stiffness modification
@@ -592,8 +601,8 @@ const Vector& EEInvertedVBrace2d::getResistingForce()
         }
         else  {
             sData[0] = OF_RemoteTest_getDisp;
-            theSocket->sendVector(0, 0, *sendData, 0);
-            theSocket->recvVector(0, 0, *recvData, 0);
+            theChannel->sendVector(0, 0, *sendData, 0);
+            theChannel->recvVector(0, 0, *recvData, 0);
         }
 
         // correct for displacement control errors using I-Modification
@@ -677,8 +686,8 @@ const Vector& EEInvertedVBrace2d::getTime()
     }
     else  {
         sData[0] = OF_RemoteTest_getTime;
-        theSocket->sendVector(0, 0, *sendData, 0);
-        theSocket->recvVector(0, 0, *recvData, 0);
+        theChannel->sendVector(0, 0, *sendData, 0);
+        theChannel->recvVector(0, 0, *recvData, 0);
     }
 
     return *tMeas;
@@ -692,8 +701,8 @@ const Vector& EEInvertedVBrace2d::getBasicDisp()
     }
     else  {
         sData[0] = OF_RemoteTest_getDisp;
-        theSocket->sendVector(0, 0, *sendData, 0);
-        theSocket->recvVector(0, 0, *recvData, 0);
+        theChannel->sendVector(0, 0, *sendData, 0);
+        theChannel->recvVector(0, 0, *recvData, 0);
     }
 
     return *dbMeas;
@@ -707,8 +716,8 @@ const Vector& EEInvertedVBrace2d::getBasicVel()
     }
     else  {
         sData[0] = OF_RemoteTest_getVel;
-        theSocket->sendVector(0, 0, *sendData, 0);
-        theSocket->recvVector(0, 0, *recvData, 0);
+        theChannel->sendVector(0, 0, *sendData, 0);
+        theChannel->recvVector(0, 0, *recvData, 0);
     }
 
     return *vbMeas;
@@ -722,8 +731,8 @@ const Vector& EEInvertedVBrace2d::getBasicAccel()
     }
     else  {
         sData[0] = OF_RemoteTest_getAccel;
-        theSocket->sendVector(0, 0, *sendData, 0);
-        theSocket->recvVector(0, 0, *recvData, 0);
+        theChannel->sendVector(0, 0, *sendData, 0);
+        theChannel->recvVector(0, 0, *recvData, 0);
     }
 
     return *abMeas;

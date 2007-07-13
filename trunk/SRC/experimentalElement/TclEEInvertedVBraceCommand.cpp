@@ -70,7 +70,7 @@ int addEEInvertedVBrace(ClientData clientData, Tcl_Interp *interp, int argc,
 			opserr << "WARNING insufficient arguments\n";
 			printCommand(argc, argv);
 			opserr << "Want: expElement invertedVBrace eleTag iNode jNode kNode -site siteTag -initStif Kij <-iMod> <-nlGeom> <-rho1 rho1> <-rho2 rho2>\n";
-			opserr << "  or: expElement invertedVBrace eleTag iNode jNode kNode -server ipPort <ipAddr> <-dataSize size> -initStif Kij <-iMod> <-nlGeom> <-rho1 rho1> <-rho2 rho2>\n";
+			opserr << "  or: expElement invertedVBrace eleTag iNode jNode kNode -server ipPort <ipAddr> <-ssl> <-dataSize size> -initStif Kij <-iMod> <-nlGeom> <-rho1 rho1> <-rho2 rho2>\n";
 			return TCL_ERROR;
 		}    
 		
@@ -78,6 +78,7 @@ int addEEInvertedVBrace(ClientData clientData, Tcl_Interp *interp, int argc,
 		int iNode, jNode, kNode, siteTag, ipPort, i, j, k;
         ExperimentalSite *theSite = 0;
         char *ipAddr = 0;
+        int ssl = 0;
         int dataSize = OF_Network_dataSize;
         bool iMod = false;
         bool nlGeom = false;
@@ -124,6 +125,7 @@ int addEEInvertedVBrace(ClientData clientData, Tcl_Interp *interp, int argc,
 		        return TCL_ERROR;
 	        }
             if (strcmp(argv[7+eleArgStart], "-initStif") != 0 &&
+                strcmp(argv[7+eleArgStart], "-ssl") != 0 &&
                 strcmp(argv[7+eleArgStart], "-dataSize") != 0)  {
                 ipAddr = (char *)malloc((strlen(argv[7+eleArgStart]) + 1)*sizeof(char));
                 strcpy(ipAddr,argv[7+eleArgStart]);
@@ -133,7 +135,9 @@ int addEEInvertedVBrace(ClientData clientData, Tcl_Interp *interp, int argc,
                 strcpy(ipAddr,"127.0.0.1");
             }
             for (i = 7+eleArgStart; i < argc; i++)  {
-                if (strcmp(argv[i], "-dataSize") == 0)  {
+                if (strcmp(argv[i], "-ssl") == 0)
+                    ssl = 1;
+                else if (strcmp(argv[i], "-dataSize") == 0)  {
                     if (Tcl_GetInt(interp, argv[i+1], &dataSize) != TCL_OK)  {
 		                opserr << "WARNING invalid dataSize\n";
 		                opserr << "expElement invertedVBrace element: " << tag << endln;
@@ -179,7 +183,7 @@ int addEEInvertedVBrace(ClientData clientData, Tcl_Interp *interp, int argc,
         if (theSite != 0)
 		    theExpElement = new EEInvertedVBrace2d(tag, iNode, jNode, kNode, theSite, iMod, nlGeom, rho1, rho2);
         else
-		    theExpElement = new EEInvertedVBrace2d(tag, iNode, jNode, kNode, ipPort, ipAddr, dataSize, iMod, nlGeom, rho1, rho2);
+		    theExpElement = new EEInvertedVBrace2d(tag, iNode, jNode, kNode, ipPort, ipAddr, ssl, dataSize, iMod, nlGeom, rho1, rho2);
 		
 		if (theExpElement == 0) {
 			opserr << "WARNING ran out of memory creating element\n";

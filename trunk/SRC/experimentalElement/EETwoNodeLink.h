@@ -37,7 +37,7 @@
 
 #include <ExperimentalElement.h>
 
-class TCP_Socket;
+class Channel;
 
 // Type of dimension of element NxDy has dimension x=1,2,3 and
 // y=2,4,6,12 degrees-of-freedom for the element
@@ -61,7 +61,7 @@ public:
         const ID &direction,
         const Vector &x, const Vector &yprime,
         int port, char *machineInetAddress = 0,
-        int dataSize = OF_Network_dataSize,
+        int ssl = 0, int dataSize = OF_Network_dataSize,
         bool iMod = false, double mass = 0.0);
 
     // destructor
@@ -133,7 +133,7 @@ private:
     Vector *theVector;  // pointer to objects vector (a class wide Vector)
     Vector *theLoad;    // pointer to the load vector
     
-    TCP_Socket *theSocket;      // tcp/ip socket
+    Channel *theChannel;        // channel
     double *sData;              // send data array
     Vector *sendData;           // send vector
     double *rData;              // receive data array

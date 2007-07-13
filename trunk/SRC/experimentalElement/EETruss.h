@@ -37,7 +37,7 @@
 
 #include <ExperimentalElement.h>
 
-class TCP_Socket;
+class Channel;
 
 #define ELE_TAG_EETruss 9950
 
@@ -51,7 +51,7 @@ public:
         bool iMod = false, double rho = 0.0);
     EETruss(int tag, int dimension, int Nd1, int Nd2, 
 	    int port, char *machineInetAddress = 0,
-        int dataSize = OF_Network_dataSize,
+        int ssl = 0, int dataSize = OF_Network_dataSize,
 	    bool iMod = false, double rho = 0.0);
     
     // destructor
@@ -116,7 +116,7 @@ private:
     Vector *theVector;  // pointer to objects vector (a class wide Vector)
     Vector *theLoad;    // pointer to the load vector
     
-    TCP_Socket *theSocket;      // tcp/ip socket
+    Channel *theChannel;        // channel
     double *sData;              // send data array
     Vector *sendData;           // send vector
     double *rData;              // receive data array

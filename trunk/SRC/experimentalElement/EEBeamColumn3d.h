@@ -37,7 +37,7 @@
 #include <ExperimentalElement.h>
 
 class CrdTransf3d;
-class TCP_Socket;
+class Channel;
 
 #define ELE_TAG_EEBeamColumn3d 9952
 
@@ -53,7 +53,7 @@ public:
     EEBeamColumn3d(int tag, int Nd1, int Nd2,
         CrdTransf3d &coordTransf,
         int port, char *machineInetAddress = 0,
-        int dataSize = OF_Network_dataSize,
+        int ssl = 0, int dataSize = OF_Network_dataSize,
         bool iMod = false, double rho = 0.0);
     
     // destructor
@@ -117,7 +117,7 @@ private:
     static Vector theVector;
     static Vector theLoad;
     
-    TCP_Socket *theSocket;      // tcp/ip socket
+    Channel *theChannel;        // channel
     double *sData;              // send data array
     Vector *sendData;           // send vector
     double *rData;              // receive data array

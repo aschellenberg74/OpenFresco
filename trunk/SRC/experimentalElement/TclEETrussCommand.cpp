@@ -60,7 +60,7 @@ int addEETruss(ClientData clientData, Tcl_Interp *interp,  int argc,
 		opserr << "WARNING insufficient arguments\n";
 		printCommand(argc, argv);
 		opserr << "Want: expElement truss eleTag iNode jNode -site siteTag -initStif Kij <-iMod> <-rho rho>\n";
-		opserr << "  or: expElement truss eleTag iNode jNode -server ipPort <ipAddr> <-dataSize size> -initStif Kij <-iMod> <-rho rho>\n";
+		opserr << "  or: expElement truss eleTag iNode jNode -server ipPort <ipAddr> <-ssl> <-dataSize size> -initStif Kij <-iMod> <-rho rho>\n";
 		return TCL_ERROR;
 	}    
 	
@@ -68,6 +68,7 @@ int addEETruss(ClientData clientData, Tcl_Interp *interp,  int argc,
 	int tag, iNode, jNode, siteTag, ipPort, i;
     ExperimentalSite *theSite = 0;
     char *ipAddr = 0;
+    int ssl = 0;
     int dataSize = OF_Network_dataSize;
     bool iMod = false;
 	double rho = 0.0;
@@ -107,6 +108,7 @@ int addEETruss(ClientData clientData, Tcl_Interp *interp,  int argc,
 		    return TCL_ERROR;
 	    }
         if (strcmp(argv[6+eleArgStart], "-initStif") != 0  &&
+            strcmp(argv[6+eleArgStart], "-ssl") != 0  &&
             strcmp(argv[6+eleArgStart], "-dataSize") != 0)  {
             ipAddr = (char *)malloc((strlen(argv[6+eleArgStart]) + 1)*sizeof(char));
             strcpy(ipAddr,argv[6+eleArgStart]);
@@ -116,7 +118,9 @@ int addEETruss(ClientData clientData, Tcl_Interp *interp,  int argc,
             strcpy(ipAddr,"127.0.0.1");
         }
         for (i = 6+eleArgStart; i < argc; i++)  {
-            if (strcmp(argv[i], "-dataSize") == 0)  {
+            if (strcmp(argv[i], "-ssl") == 0)
+                ssl = 1;
+            else if (strcmp(argv[i], "-dataSize") == 0)  {
                 if (Tcl_GetInt(interp, argv[i+1], &dataSize) != TCL_OK)  {
 		            opserr << "WARNING invalid dataSize\n";
 		            opserr << "expElement truss element: " << tag << endln;
@@ -150,7 +154,7 @@ int addEETruss(ClientData clientData, Tcl_Interp *interp,  int argc,
     if (theSite != 0)
 	    theExpElement = new EETruss(tag, ndm, iNode, jNode, theSite, iMod, rho);
     else
-	    theExpElement = new EETruss(tag, ndm, iNode, jNode, ipPort, ipAddr, dataSize, iMod, rho);
+	    theExpElement = new EETruss(tag, ndm, iNode, jNode, ipPort, ipAddr, ssl, dataSize, iMod, rho);
 	
 	if (theExpElement == 0)  {
 		opserr << "WARNING ran out of memory creating element\n";

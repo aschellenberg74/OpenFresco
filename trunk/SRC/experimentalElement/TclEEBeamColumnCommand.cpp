@@ -73,7 +73,7 @@ int addEEBeamColumn(ClientData clientData, Tcl_Interp *interp, int argc,
 			opserr << "WARNING insufficient arguments\n";
 			printCommand(argc, argv);
 			opserr << "Want: expElement beamColumn eleTag iNode jNode transTag -site siteTag -initStif Kij <-iMod> <-rho rho>\n";
-			opserr << "  or: expElement beamColumn eleTag iNode jNode transTag -server ipPort <ipAddr> <-dataSize size> -initStif Kij <-iMod> <-rho rho>\n";
+			opserr << "  or: expElement beamColumn eleTag iNode jNode transTag -server ipPort <ipAddr> <-ssl> <-dataSize size> -initStif Kij <-iMod> <-rho rho>\n";
 			return TCL_ERROR;
 		}
 		
@@ -81,6 +81,7 @@ int addEEBeamColumn(ClientData clientData, Tcl_Interp *interp, int argc,
 		int iNode, jNode, transId, siteTag, ipPort, i, j, k;
         ExperimentalSite *theSite = 0;
         char *ipAddr = 0;
+        int ssl = 0;
         int dataSize = OF_Network_dataSize;
         bool iMod = false;
 		double rho = 0.0;
@@ -131,6 +132,7 @@ int addEEBeamColumn(ClientData clientData, Tcl_Interp *interp, int argc,
 		        return TCL_ERROR;
 	        }
             if (strcmp(argv[7+eleArgStart], "-initStif") != 0  &&
+                strcmp(argv[7+eleArgStart], "-ssl") != 0  &&
                 strcmp(argv[7+eleArgStart], "-dataSize") != 0)  {
                 ipAddr = (char *)malloc((strlen(argv[7+eleArgStart]) + 1)*sizeof(char));
                 strcpy(ipAddr,argv[7+eleArgStart]);
@@ -140,7 +142,9 @@ int addEEBeamColumn(ClientData clientData, Tcl_Interp *interp, int argc,
                 strcpy(ipAddr,"127.0.0.1");
             }
             for (i = 7+eleArgStart; i < argc; i++)  {
-                if (strcmp(argv[i], "-dataSize") == 0)  {
+                if (strcmp(argv[i], "-ssl") == 0)
+                    ssl = 1;
+                else if (strcmp(argv[i], "-dataSize") == 0)  {
                     if (Tcl_GetInt(interp, argv[i+1], &dataSize) != TCL_OK)  {
 		                opserr << "WARNING invalid dataSize\n";
 		                opserr << "expElement beamColumn element: " << tag << endln;
@@ -174,7 +178,7 @@ int addEEBeamColumn(ClientData clientData, Tcl_Interp *interp, int argc,
         if (theSite != 0)
 		    theExpElement = new EEBeamColumn2d(tag, iNode, jNode, *theTrans, theSite, iMod, rho);
         else
-		    theExpElement = new EEBeamColumn2d(tag, iNode, jNode, *theTrans, ipPort, ipAddr, dataSize, iMod, rho);
+		    theExpElement = new EEBeamColumn2d(tag, iNode, jNode, *theTrans, ipPort, ipAddr, ssl, dataSize, iMod, rho);
 		
 		if (theExpElement == 0) {
 			opserr << "WARNING ran out of memory creating element\n";
@@ -228,7 +232,7 @@ int addEEBeamColumn(ClientData clientData, Tcl_Interp *interp, int argc,
 			opserr << "WARNING insufficient arguments\n";
 			printCommand(argc, argv);
 			opserr << "Want: expElement beamColumn eleTag iNode jNode transTag -site siteTag -initStif Kij <-iMod> <-rho rho>\n";
-			opserr << "  or: expElement beamColumn eleTag iNode jNode transTag -server ipPort <ipAddr> <-dataSize size> -initStif Kij <-iMod> <-rho rho>\n";
+			opserr << "  or: expElement beamColumn eleTag iNode jNode transTag -server ipPort <ipAddr> <-ssl> <-dataSize size> -initStif Kij <-iMod> <-rho rho>\n";
 			return TCL_ERROR;
 		}
 		
@@ -236,6 +240,7 @@ int addEEBeamColumn(ClientData clientData, Tcl_Interp *interp, int argc,
 		int iNode, jNode, transId, siteTag, ipPort, i, j, k;
         ExperimentalSite *theSite = 0;
         char *ipAddr = 0;
+        int ssl = 0;
         int dataSize = OF_Network_dataSize;
         bool iMod = false;
 		double rho = 0.0;
@@ -286,6 +291,7 @@ int addEEBeamColumn(ClientData clientData, Tcl_Interp *interp, int argc,
 		        return TCL_ERROR;
 	        }
             if (strcmp(argv[7+eleArgStart], "-initStif") != 0 &&
+                strcmp(argv[7+eleArgStart], "-ssl") != 0 &&
                 strcmp(argv[7+eleArgStart], "-dataSize") != 0)  {
                 ipAddr = (char *)malloc((strlen(argv[7+eleArgStart]) + 1)*sizeof(char));
                 strcpy(ipAddr,argv[7+eleArgStart]);
@@ -295,7 +301,9 @@ int addEEBeamColumn(ClientData clientData, Tcl_Interp *interp, int argc,
                 strcpy(ipAddr,"127.0.0.1");
             }
             for (i = 7+eleArgStart; i < argc; i++)  {
-                if (strcmp(argv[i], "-dataSize") == 0)  {
+                if (strcmp(argv[i], "-ssl") == 0)
+                    ssl = 1;
+                else if (strcmp(argv[i], "-dataSize") == 0)  {
                     if (Tcl_GetInt(interp, argv[i+1], &dataSize) != TCL_OK)  {
 		                opserr << "WARNING invalid dataSize\n";
 		                opserr << "expElement beamColumn element: " << tag << endln;
@@ -329,7 +337,7 @@ int addEEBeamColumn(ClientData clientData, Tcl_Interp *interp, int argc,
         if (theSite != 0)
 		    theExpElement = new EEBeamColumn3d(tag, iNode, jNode, *theTrans, theSite, iMod, rho);
         else
-		    theExpElement = new EEBeamColumn3d(tag, iNode, jNode, *theTrans, ipPort, ipAddr, dataSize, iMod, rho);
+		    theExpElement = new EEBeamColumn3d(tag, iNode, jNode, *theTrans, ipPort, ipAddr, ssl, dataSize, iMod, rho);
 		
 		if (theExpElement == 0) {
 			opserr << "WARNING ran out of memory creating element\n";

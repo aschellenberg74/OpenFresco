@@ -39,6 +39,8 @@
 #include <Matrix.h>
 #include <FrescoGlobals.h>
 
+class Channel;
+
 #define ELE_TAG_GenericClient 9955
 
 
@@ -48,7 +50,7 @@ public:
     // constructors
     GenericClient(int tag, ID nodes, ID *dof,
         int port, char *machineInetAddress = 0,
-        int dataSize = OF_Network_dataSize);
+        int ssl = 0, int dataSize = OF_Network_dataSize);
     
     // destructor
     ~GenericClient();
@@ -108,7 +110,7 @@ private:
     static Vector theVector;
     static Vector theLoad;
     
-    TCP_Socket *theSocket;      // tcp/ip socket
+    Channel *theChannel;        // channel
     double *sData;              // send data array
     Vector *sendData;           // send vector
     double *rData;              // receive data array
