@@ -48,6 +48,8 @@ extern "C" {
     EXTERN int TclObjCommandComplete _ANSI_ARGS_((Tcl_Obj *cmdPtr));
 }
 
+#include <FrescoGlobals.h>
+
 int Tcl_AppInit _ANSI_ARGS_((Tcl_Interp *interp));
 
 # undef TCL_STORAGE_CLASS
@@ -152,7 +154,7 @@ char *TclGetStartupScriptFileName()
 *
 *----------------------------------------------------------------------
 */
-void g3TclMain(int argc, char **argv, Tcl_AppInitProc * appInitProc)
+void tclMain(int argc, char **argv, Tcl_AppInitProc * appInitProc)
 {
     Tcl_Obj *resultPtr;
     Tcl_Obj *commandPtr = NULL;
@@ -167,7 +169,7 @@ void g3TclMain(int argc, char **argv, Tcl_AppInitProc * appInitProc)
     /* beginning of modifications for OpenFresco */
     fprintf(stderr,"\n\n");
     fprintf(stderr,"\t OpenFresco -- Open Framework for Experimental Setup and Control\n");
-    fprintf(stderr,"\t                           Version 2.0                          \n\n");
+    fprintf(stderr,"\t                           Version %s                          \n\n",OPF_VERSION);
     fprintf(stderr,"\t Copyright (c) 2006 The Regents of the University of California \n");
     fprintf(stderr,"\t                       All Rights Reserved                      \n\n\n");    
 
@@ -357,4 +359,3 @@ void g3TclMain(int argc, char **argv, Tcl_AppInitProc * appInitProc)
 
     return;
 }
-
