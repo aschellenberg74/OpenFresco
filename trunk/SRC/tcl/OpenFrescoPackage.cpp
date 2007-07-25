@@ -31,17 +31,21 @@
 // a function that can be called to set the global pointer variables in 
 // the dll to be the same as those in the existing process address space.
 
-#include <windows.h>
 #include <tcl.h>
 #include <OPS_Stream.h>
 #include <Domain.h>
 #include <TclModelBuilder.h>
+#include <FileStream.h>
+#include <SimulationInformation.h>
 #include <ExperimentalSite.h>
 
 #define DllExport _declspec(dllexport)
 
 Domain *theDomain;
 TclModelBuilder *theTclBuilder;
+
+SimulationInformation simulationInfo;
+char *simulationInfoOutputFilename;
 
 extern ExperimentalSite *getExperimentalSite(int tag);
 
@@ -139,7 +143,7 @@ OpenFresco(ClientData clientData, Tcl_Interp *interp, int argc,
     }
 
     // add the package to list of available packages
-    code = Tcl_PkgProvide(interp, "OpenFresco", "2.0");
+    code = Tcl_PkgProvide(interp, "OpenFresco", OPF_VERSION);
     if (code != TCL_OK) {
         return code;
     }
@@ -166,22 +170,17 @@ OpenFresco(ClientData clientData, Tcl_Interp *interp, int argc,
 }
 
 
-#include <SimulationInformation.h>
-SimulationInformation simulationInfo;
-
-BOOL APIENTRY DllMain( HANDLE hModule, 
-                      DWORD  ul_reason_for_call, 
-                      LPVOID lpReserved
-                      )
+extern "C" DllExport void
+setGlobalPointers(OPS_Stream *theErrorStreamPtr)
 {
-    return TRUE;
+    opserrPtr = theErrorStreamPtr;
 }
+
 
 int  __cdecl
 OpenSeesExit(ClientData clientData, Tcl_Interp *interp,
     int argc, const char **argv)
-{
-    /*
+{    
     if (simulationInfoOutputFilename != 0) {
     simulationInfo.end();
     FileStream simulationInfoOutputFile;
@@ -190,14 +189,7 @@ OpenSeesExit(ClientData clientData, Tcl_Interp *interp,
     simulationInfoOutputFile << simulationInfo;
     simulationInfoOutputFile.close();
     }
-    */
+    
     Tcl_Exit(0);
     return 0;
-}
-
-
-extern "C" DllExport void
-setGlobalPointers(OPS_Stream *theErrorStreamPtr)
-{
-    opserrPtr = theErrorStreamPtr;
 }

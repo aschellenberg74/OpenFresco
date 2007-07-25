@@ -35,6 +35,8 @@
 //
 // Description: This file contains the global values in Fresco
 
+#define OPF_VERSION "2.0"
+
 #ifndef _bool_h
 #include "bool.h"
 #endif

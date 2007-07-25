@@ -47,8 +47,6 @@ extern "C" {
 //#include <tk.h>
 }
 
-#include "commands.h"
-
 /*
 * The following variable is a special hack that is needed in order for
 * Sun shared libraries to be used for Tcl.
@@ -78,23 +76,11 @@ extern void		XtToolkitInitialize _ANSI_ARGS_((void));
 extern int		Tclxttest_Init _ANSI_ARGS_((Tcl_Interp *interp));
 #endif /* TCL_XT_TEST */
 
-#include <FileStream.h>
-#include <StandardStream.h>
-#include <SimulationInformation.h>
-
-SimulationInformation simulationInfo;
-char *simulationInfoOutputFilename;
-
-StandardStream sserr;
-OPS_Stream *opserrPtr = &sserr;
-
-#include <TclModelBuilder.h>
-TclModelBuilder *theTclBuilder = 0;
-
 #include <Domain.h>
-Domain *theDomain = 0;
-Domain *ops_TheActiveDomain = 0;
-double ops_Dt = 0.0;
+#include <TclModelBuilder.h>
+#include <FileStream.h>
+#include <SimulationInformation.h>
+#include <StandardStream.h>
 
 #include <Node.h>
 #include <ExperimentalElement.h>
@@ -104,6 +90,12 @@ double ops_Dt = 0.0;
 #include <TCP_Socket.h>
 #include <TCP_SocketSSL.h>
 #include <Matrix.h>
+
+Domain *theDomain = 0;
+TclModelBuilder *theTclBuilder = 0;
+
+SimulationInformation simulationInfo;
+char *simulationInfoOutputFilename;
 
 /*
 *----------------------------------------------------------------------
@@ -121,7 +113,7 @@ double ops_Dt = 0.0;
 *
 *----------------------------------------------------------------------
 */
-extern void g3TclMain(int argc, char **argv, Tcl_AppInitProc *appInitProc);
+extern void tclMain(int argc, char **argv, Tcl_AppInitProc *appInitProc);
 
 int main(int argc, char **argv)
 {
@@ -158,7 +150,7 @@ int main(int argc, char **argv)
     TCL_LOCAL_MAIN_HOOK(&argc, &argv);
 #endif
 
-    g3TclMain(argc, argv, TCL_LOCAL_APPINIT);
+    tclMain(argc, argv, TCL_LOCAL_APPINIT);
 
     return 0;   /* Needed only to prevent compiler warning. */
 }
@@ -934,7 +926,6 @@ int Tcl_AppInit(Tcl_Interp *interp)
 
     // OpenFresco commands
     theDomain = new Domain();
-    ops_TheActiveDomain = theDomain;
 
     Tcl_CreateCommand(interp, "model", specifyModelBuilder,
         (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);    
@@ -991,4 +982,3 @@ int OpenSeesExit(ClientData clientData, Tcl_Interp *interp, int argc, TCL_Char *
     Tcl_Exit(0);
     return 0;
 }
-
