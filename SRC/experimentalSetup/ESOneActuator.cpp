@@ -69,10 +69,8 @@ int ESOneActuator::setSize(ID sizeT, ID sizeO)
     
     // a component of sizeT/sizeO must be greater 
     // than "direction" if it is non-zero.
-    
-    int i;
-    for(i=0; i<OF_Resp_Time; i++) {
-        if((sizeT[i] != 0 && sizeT[i] <= direction) ||
+    for (int i=0; i<OF_Resp_Time; i++) {
+        if ((sizeT[i] != 0 && sizeT[i] <= direction) ||
             (sizeO[i] != 0 && sizeO[i] <= direction)) {
             opserr << "ESOneActuator::setSize - wrong sizeTrial/Out\n"; 
             opserr << "see User Manual.\n";
@@ -81,7 +79,7 @@ int ESOneActuator::setSize(ID sizeT, ID sizeO)
             return OF_ReturnType_failed;
         }
     }
-    if((sizeT[OF_Resp_Time] != 0 && sizeT[OF_Resp_Time] != 1) ||
+    if ((sizeT[OF_Resp_Time] != 0 && sizeT[OF_Resp_Time] != 1) ||
         (sizeO[OF_Resp_Time] != 0 && sizeO[OF_Resp_Time] != 1)) {
         opserr << "ESOneActuator::setSize - wrong sizeTrial/Out\n"; 
         opserr << "see User Manual.\n";
@@ -105,7 +103,7 @@ int ESOneActuator::setup()
     // setup for ctrl/daq vectors of ESOneActuator
     sizeCtrl->Zero();
     sizeDaq->Zero();
-    for(int i=0; i<OF_Resp_Time; i++) {
+    for (int i=0; i<OF_Resp_Time; i++) {
         (*sizeCtrl)[i] = 1;
         (*sizeDaq)[i] = 1;
     }

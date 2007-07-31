@@ -313,9 +313,7 @@ int ESAggregator::setSize(ID sizeT, ID sizeO)
     
     // a component of sizeT/sizeO must be greater than 
     // the components of "direction" if it is non-zero.
-    
-    /*int i;
-    for (i=0; i<OF_Resp_All; i++) {
+    /*for (int i=0; i<OF_Resp_All; i++) {
         if ((sizeT[i] != 0 && sizeT[i] != (*sizeCtrl)[i]) ||
             (sizeO[i] != 0 && sizeO[i] != (*sizeDaq)[i])) {
             opserr << "ESAggregator::setSize - wrong sizeTrial/Out\n";
