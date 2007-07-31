@@ -98,7 +98,6 @@ int ECSimUniaxialMaterials::setSize(ID sizeT, ID sizeO)
     // disp, vel for trial and
     // disp, vel, force for output
     // check these are available in sizeT/sizeO.
-    
     int numMaterial = theSpecimens->getNumComponents();
     if (sizeT[OF_Resp_Disp] != numMaterial ||
         sizeT[OF_Resp_Vel] != numMaterial ||

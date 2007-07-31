@@ -90,10 +90,8 @@ int ESInvertedVBrace2d::setSize(ID sizeT, ID sizeO)
     // a component of sizeT must be equal to 3
     // and a component of sizeO must be equal
     // to 6 if it is non-zero.
-    
-    int i;
-    for(i=0; i<OF_Resp_Force; i++) {
-        if((sizeT[i] != 0 && sizeT[i] != 3) ||
+    for (int i=0; i<OF_Resp_Force; i++) {
+        if ((sizeT[i] != 0 && sizeT[i] != 3) ||
             (sizeO[i] != 0 && sizeO[i] != 3)) {
             opserr << "ESInvertedVBrace2d::setSize - wrong sizeTrial/Out\n"; 
             opserr << "see User Manual.\n";
@@ -102,7 +100,7 @@ int ESInvertedVBrace2d::setSize(ID sizeT, ID sizeO)
             return OF_ReturnType_failed;
         }
     }
-    if((sizeT[OF_Resp_Force] != 0 && sizeT[OF_Resp_Force] != 3) ||
+    if ((sizeT[OF_Resp_Force] != 0 && sizeT[OF_Resp_Force] != 3) ||
         (sizeO[OF_Resp_Force] != 0 && sizeO[OF_Resp_Force] != 6)) {
         opserr << "ESInvertedVBrace2d::setSize - wrong sizeTrial/Out\n"; 
         opserr << "see User Manual.\n";
@@ -110,7 +108,7 @@ int ESInvertedVBrace2d::setSize(ID sizeT, ID sizeO)
         opserr << "sizeO = " << sizeO;
         return OF_ReturnType_failed;
     }
-    if((sizeT[OF_Resp_Time] != 0 && sizeT[OF_Resp_Time] != 1) ||
+    if ((sizeT[OF_Resp_Time] != 0 && sizeT[OF_Resp_Time] != 1) ||
         (sizeO[OF_Resp_Time] != 0 && sizeO[OF_Resp_Time] != 1)) {
         opserr << "ESInvertedVBrace2d::setSize - wrong sizeTrial/Out\n"; 
         opserr << "see User Manual.\n";
@@ -134,7 +132,7 @@ int ESInvertedVBrace2d::setup()
     // setup for ctrl/daq vectors of ESInvertedVBrace2d
     sizeCtrl->Zero();
     sizeDaq->Zero();
-    for(int i=0; i<OF_Resp_Force; i++) {
+    for (int i=0; i<OF_Resp_Force; i++) {
         (*sizeCtrl)[i] = 3;
         (*sizeDaq)[i] = 3;
     }

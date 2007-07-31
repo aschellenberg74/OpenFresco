@@ -168,7 +168,6 @@ int ECdSpace::setSize(ID sizeT, ID sizeO)
     // disp or disp and vel or disp, vel and accel for trial and
     // disp and force for output
     // check these are available in sizeT/sizeO.
-    
     if ((pcType == 0 && sizeT[OF_Resp_Disp] == 0) || 
         (pcType == 1 && sizeT[OF_Resp_Disp] == 0 && sizeT[OF_Resp_Vel] == 0) ||
         (pcType == 2 && sizeT[OF_Resp_Disp] == 0 && sizeT[OF_Resp_Vel] == 0 && sizeT[OF_Resp_Accel] == 0) ||

@@ -96,11 +96,9 @@ int ESNoTransformation::setSize(ID sizeT, ID sizeO)
     
     // a component of sizeT/sizeO must be greater than 
     // the components of "direction" if it is non-zero.
-    
-    int i,j;
-    for(i=0; i<OF_Resp_Time; i++) {
-        for(j=0; j<numDir; i++) {
-            if((sizeT[i] != 0 && sizeT[i] <= (*direction)(j)) ||
+    for (int i=0; i<OF_Resp_Time; i++) {
+        for (int j=0; j<numDir; j++) {
+            if ((sizeT[i] != 0 && sizeT[i] <= (*direction)(j)) ||
                 (sizeO[i] != 0 && sizeO[i] <= (*direction)(j))) {
                 opserr << "ESNoTransformation::setSize - wrong sizeTrial/Out\n"; 
                 opserr << "see User Manual.\n";
@@ -110,7 +108,7 @@ int ESNoTransformation::setSize(ID sizeT, ID sizeO)
             }
         }
     }
-    if((sizeT[OF_Resp_Time] != 0 && sizeT[OF_Resp_Time] != 1) ||
+    if ((sizeT[OF_Resp_Time] != 0 && sizeT[OF_Resp_Time] != 1) ||
         (sizeO[OF_Resp_Time] != 0 && sizeO[OF_Resp_Time] != 1)) {
         opserr << "ESNoTransformation::setSize - wrong sizeTrial/Out\n"; 
         opserr << "see User Manual.\n";
@@ -134,7 +132,7 @@ int ESNoTransformation::setup()
     // setup for ctrl/daq vectors of ESNoTransformation
     sizeCtrl->Zero();
     sizeDaq->Zero();
-    for(int i=0; i<OF_Resp_Time; i++) {
+    for (int i=0; i<OF_Resp_Time; i++) {
         (*sizeCtrl)[i] = numDir;
         (*sizeDaq)[i] = numDir;
     }
@@ -253,4 +251,3 @@ int ESNoTransformation::transfDaqTime(Vector* time)
 
 	return OF_ReturnType_completed;
 }
-

@@ -185,8 +185,7 @@ int ECSCRAMNet::setSize(ID sizeT, ID sizeO)
     // trial response vectors with size <= numActCh and
     // output response vectors with size <= numActCh
     // check these are available in sizeT/sizeO.
-    
-    if(sizeT[OF_Resp_Disp] > numActCh || sizeT[OF_Resp_Vel] > numActCh ||
+    if (sizeT[OF_Resp_Disp] > numActCh || sizeT[OF_Resp_Vel] > numActCh ||
         sizeT[OF_Resp_Accel] > numActCh || sizeT[OF_Resp_Force] > numActCh ||
         sizeT[OF_Resp_Time] > numActCh ||
         sizeO[OF_Resp_Disp] > numActCh || sizeO[OF_Resp_Vel] > numActCh ||
