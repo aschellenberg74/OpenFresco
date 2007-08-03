@@ -32,15 +32,12 @@
 //
 // Description: This file contains the implementation of ExperimentalSetup.
 
-#include <stdlib.h>
+#include "ExperimentalSetup.h"
+#include <ExperimentalControl.h>
 
+#include <stdlib.h>
 #include <ArrayOfTaggedObjects.h>
 #include <Vector.h>
-
-#include <ExperimentalCP.h>
-#include <ExpCPIter.h>
-#include <ExperimentalControl.h>
-#include "ExperimentalSetup.h"
 
 
 ExperimentalSetup::ExperimentalSetup(int tag,

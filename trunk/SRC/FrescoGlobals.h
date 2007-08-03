@@ -51,15 +51,6 @@ static const int OF_ReturnType_accepted  = 3;
 static const int OF_ReturnType_received  = 4;
 static const int OF_ReturnType_started   = 5;
 
-// Direction Type
-static const int OF_Dir_X    = 0;
-static const int OF_Dir_Y    = 1;
-static const int OF_Dir_Z    = 2;
-static const int OF_Dir_RX   = 3;
-static const int OF_Dir_RY   = 4;
-static const int OF_Dir_RZ   = 5;
-static const int OF_Dir_None = 99;
-
 // Response Type
 static const int OF_Resp_Disp  = 0;
 static const int OF_Resp_Vel   = 1;

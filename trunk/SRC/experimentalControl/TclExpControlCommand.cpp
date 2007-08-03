@@ -43,6 +43,7 @@
 
 #include <ECSCRAMNet.h>
 #include <ECSimUniaxialMaterials.h>
+#include <ECSimDomain.h>
 
 #include <Vector.h>
 #include <string.h>
@@ -496,6 +497,113 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
         }
     }
 	
+    // ----------------------------------------------------------------------------	
+	else if (strcmp(argv[1],"SimDomain") == 0)  {
+		if (argc < 7)  {
+			opserr << "WARNING invalid number of arguments\n";
+			printCommand(argc,argv);
+			opserr << "Want: expControl SimDomain tag -trialCP cpTags -outCP cpTags\n";
+			return TCL_ERROR;
+		}    
+		
+		int tag, cpTag, argi = 2;
+        int numTrialCPs = 0, numOutCPs = 0;
+        ExperimentalControl *theControl = 0;
+		
+		if (Tcl_GetInt(interp, argv[argi], &tag) != TCL_OK)  {
+			opserr << "WARNING invalid expControl SimDomain tag\n";
+			return TCL_ERROR;		
+		}
+        argi++;
+        if (strcmp(argv[argi],"-trialCP") != 0)  {
+		    opserr << "WARNING expecting -trialCP cpTags\n";
+		    opserr << "expControl SimDomain " << tag << endln;
+		    return TCL_ERROR;
+        }
+        argi++;
+        while (strcmp(argv[argi+numTrialCPs],"-outCP") != 0 &&
+            argi+numTrialCPs < argc)  {
+            numTrialCPs++;
+        }
+        if (numTrialCPs == 0)  {
+		    opserr << "WARNING no trialCPTags specified\n";
+		    opserr << "expControl SimDomain " << tag << endln;
+		    return TCL_ERROR;
+	    }
+        // create the array to hold the trial control points
+        ExperimentalCP **trialCPs = new ExperimentalCP* [numTrialCPs];
+        if (trialCPs == 0)  {
+		    opserr << "WARNING out of memory\n";
+		    opserr << "expControl SimDomain " << tag << endln;
+		    return TCL_ERROR;
+	    }
+        for (int i=0; i<numTrialCPs; i++)  {
+            if (Tcl_GetInt(interp, argv[argi], &cpTag) != TCL_OK)  {
+                opserr << "WARNING invalid cpTag\n";
+                opserr << "expControl SimDomain " << tag << endln;
+                return TCL_ERROR;	
+            }
+            trialCPs[i] = getExperimentalCP(cpTag);
+            if (trialCPs[i] == 0)  {
+                opserr << "WARNING experimental control point not found\n";
+                opserr << "expControlPoint " << cpTag << endln;
+                opserr << "expControl SimDomain " << tag << endln;
+                return TCL_ERROR;
+            }
+            argi++;
+        }
+        if (strcmp(argv[argi],"-outCP") != 0)  {
+		    opserr << "WARNING expecting -outCP cpTags\n";
+		    opserr << "expControl SimDomain " << tag << endln;
+		    return TCL_ERROR;		
+        }
+        argi++;
+        while (argi+numOutCPs < argc)  {
+            numOutCPs++;
+        }
+        if (numOutCPs == 0)  {
+		    opserr << "WARNING no outCPTags specified\n";
+		    opserr << "expControl SimDomain " << tag << endln;
+		    return TCL_ERROR;
+	    }
+        // create the array to hold the output control points
+        ExperimentalCP **outCPs = new ExperimentalCP* [numOutCPs];
+        if (outCPs == 0)  {
+		    opserr << "WARNING out of memory\n";
+		    opserr << "expControl SimDomain " << tag << endln;
+		    return TCL_ERROR;
+	    }
+        for (int i=0; i<numOutCPs; i++)  {
+            if (Tcl_GetInt(interp, argv[argi], &cpTag) != TCL_OK)  {
+                opserr << "WARNING invalid cpTag\n";
+                opserr << "expControl SimDomain " << tag << endln;
+                return TCL_ERROR;
+            }
+            outCPs[i] = getExperimentalCP(cpTag);
+            if (outCPs[i] == 0)  {
+                opserr << "WARNING experimental control point not found\n";
+                opserr << "expControlPoint " << cpTag << endln;
+                opserr << "expControl SimDomain " << tag << endln;
+                return TCL_ERROR;
+            }
+            argi++;
+        }
+		
+		// parsing was successful, allocate the control
+		theControl = new ECSimDomain(tag, numTrialCPs, trialCPs, numOutCPs, outCPs, theDomain);	
+
+        if (theControl == 0)  {
+            opserr << "WARNING could not create experimental control " << argv[1] << endln;
+            return TCL_ERROR;
+        }
+        
+        // now add the control to the modelBuilder
+        if (addExperimentalControl(*theControl) < 0)  {
+            delete theControl; // invoke the destructor, otherwise mem leak
+            return TCL_ERROR;
+        }
+    }
+
     // ----------------------------------------------------------------------------	
     else  {
         // experimental control type not recognized
