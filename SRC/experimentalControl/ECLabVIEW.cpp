@@ -177,20 +177,23 @@ int ECLabVIEW::setSize(ID sizeT, ID sizeO)
     // check sizeTrial and sizeOut
     // for ECLabVIEW object
     
-    // ECLabVIEW objects only use 
-    // disp for trial and disp and force for output
+    // ECLabVIEW objects can only use 
+    // disp and force for trial and disp and force for output
     // check these are available in sizeT/sizeO.
-    int sizeTDisp = 0, sizeODisp = 0, sizeOForce = 0;
+    int sizeTDisp = 0, sizeTForce = 0;
+    int sizeODisp = 0, sizeOForce = 0;
     for (int i=0; i<numTrialCPs; i++)  {
         sizeTDisp += (trialCPs[i]->getSizeRespType())(OF_Resp_Disp);
+        sizeTForce += (trialCPs[i]->getSizeRespType())(OF_Resp_Force);
     }
     for (int i=0; i<numOutCPs; i++)  {
         sizeODisp += (outCPs[i]->getSizeRespType())(OF_Resp_Disp);
         sizeOForce += (outCPs[i]->getSizeRespType())(OF_Resp_Force);
     }
-    
-    if (sizeT[OF_Resp_Disp] != sizeTDisp ||
-        sizeO[OF_Resp_Disp] != sizeODisp || sizeO[OF_Resp_Force] != sizeOForce) {
+    if ((sizeTDisp != 0 && sizeTDisp != sizeT[OF_Resp_Disp]) ||
+        (sizeTForce != 0 && sizeTForce != sizeT[OF_Resp_Force]) ||
+        (sizeODisp != 0 && sizeODisp != sizeO[OF_Resp_Disp]) ||
+        (sizeOForce != 0 && sizeOForce != sizeO[OF_Resp_Force]))  {
         opserr << "ECLabVIEW::setSize - wrong sizeTrial/Out\n"; 
         opserr << "see User Manual.\n";
         sprintf(sData,"close-session\tOpenFresco\n");
@@ -376,8 +379,9 @@ int ECLabVIEW::control()
             sprintf(sData,"%s\tcontrol-point\tCPNode%02d",sData,trialCPs[i]->getNodeTag());
 
         // get trial control point parameters
-        int numParam = trialCPs[i]->getNumParameters();
-        ID dir = trialCPs[i]->getDir();
+        int ndm = trialCPs[i]->getNDM();
+        int numDir = trialCPs[i]->getNumDirection();
+        ID dir = trialCPs[i]->getDirection();
         ID resp = trialCPs[i]->getResponseType();
         Vector fact = trialCPs[i]->getFactor();
         const Vector *lowerLim = trialCPs[i]->getLowerLimit();
@@ -386,15 +390,15 @@ int ECLabVIEW::control()
         if (lowerLim == 0 || upperLim == 0)  {
             // loop through all the trial control point parameters
             // without checking if commands are within limits
-            for (int j=0; j<numParam; j++)  {
+            for (int j=0; j<numDir; j++)  {
                 // append GeomType
-                if (dir(j) == OF_Dir_X || dir(j) == OF_Dir_RX)  {
+                if (dir(j) == 0 || dir(j) == 3)  {
                     sprintf(sData,"%s\tx",sData);
                 }
-                else if (dir(j) == OF_Dir_Y || dir(j) == OF_Dir_RY)  {
+                else if (dir(j) == 1 || dir(j) == 4)  {
                     sprintf(sData,"%s\ty",sData);
                 }
-                else if (dir(j) == OF_Dir_Z || dir(j) == OF_Dir_RZ)  {
+                else if (dir(j) == 2 || dir(j) == 5)  {
                     sprintf(sData,"%s\tz",sData);
                 }
                 else {
@@ -403,19 +407,19 @@ int ECLabVIEW::control()
                     return OF_ReturnType_failed;
                 }
                 // append ParameterType and Parameter
-                if (dir(j) < OF_Dir_RX && resp(j) == OF_Resp_Disp)  {
+                if (dir(j) < ndm && resp(j) == OF_Resp_Disp)  {
                     sprintf(sData,"%s\tdisplacement\t%.10E",sData,fact(j)*(*targDisp)(dID));
                     dID++;
                 }
-                else if (dir(j) < OF_Dir_RX && resp(j) == OF_Resp_Force)  {
+                else if (dir(j) < ndm && resp(j) == OF_Resp_Force)  {
                     sprintf(sData,"%s\tforce\t%.10E",sData,fact(j)*(*targForce)(fID));
                     fID++;
                 }
-                else if (dir(j) > OF_Dir_Z && resp(j) == OF_Resp_Disp)  {
+                else if (dir(j) >= ndm && resp(j) == OF_Resp_Disp)  {
                     sprintf(sData,"%s\trotation\t%.10E",sData,fact(j)*(*targDisp)(dID));
                     dID++;
                 }
-                else if (dir(j) > OF_Dir_Z && resp(j) == OF_Resp_Force)  {
+                else if (dir(j) >= ndm && resp(j) == OF_Resp_Force)  {
                     sprintf(sData,"%s\tmoment\t%.10E",sData,fact(j)*(*targForce)(fID));
                     fID++;
                 }
@@ -430,15 +434,15 @@ int ECLabVIEW::control()
             // loop through all the trial control point parameters
             // and check if commands are within given limits
             double parameter; int c;
-            for (int j=0; j<numParam; j++)  {
+            for (int j=0; j<numDir; j++)  {
                 // append GeomType
-                if (dir(j) == OF_Dir_X || dir(j) == OF_Dir_RX)  {
+                if (dir(j) == 0 || dir(j) == 3)  {
                     sprintf(sData,"%s\tx",sData);
                 }
-                else if (dir(j) == OF_Dir_Y || dir(j) == OF_Dir_RY)  {
+                else if (dir(j) == 1 || dir(j) == 4)  {
                     sprintf(sData,"%s\ty",sData);
                 }
-                else if (dir(j) == OF_Dir_Z || dir(j) == OF_Dir_RZ)  {
+                else if (dir(j) == 2 || dir(j) == 5)  {
                     sprintf(sData,"%s\tz",sData);
                 }
                 else {
@@ -447,22 +451,22 @@ int ECLabVIEW::control()
                     return OF_ReturnType_failed;
                 }
                 // append ParameterType
-                if (dir(j) < OF_Dir_RX && resp(j) == OF_Resp_Disp)  {
+                if (dir(j) < ndm && resp(j) == OF_Resp_Disp)  {
                     parameter = fact(j)*(*targDisp)(dID);
                     sprintf(sData,"%s\tdisplacement",sData);
                     dID++;
                 }
-                else if (dir(j) < OF_Dir_RX && resp(j) == OF_Resp_Force)  {
+                else if (dir(j) < ndm && resp(j) == OF_Resp_Force)  {
                     parameter = fact(j)*(*targForce)(fID);
                     sprintf(sData,"%s\tforce",sData);
                     fID++;
                 }
-                else if (dir(j) > OF_Dir_Z && resp(j) == OF_Resp_Disp)  {
+                else if (dir(j) >= ndm && resp(j) == OF_Resp_Disp)  {
                     parameter = fact(j)*(*targDisp)(dID);
                     sprintf(sData,"%s\trotation",sData);
                     dID++;
                 }
-                else if (dir(j) > OF_Dir_Z && resp(j) == OF_Resp_Force)  {
+                else if (dir(j) >= ndm && resp(j) == OF_Resp_Force)  {
                     parameter = fact(j)*(*targForce)(fID);
                     sprintf(sData,"%s\tmoment",sData);
                     fID++;
@@ -590,8 +594,9 @@ int ECLabVIEW::acquire()
         tokenPtr = strtok(NULL,"\t");
 
         // get output control point parameters
-        int numParam = outCPs[i]->getNumParameters();
-        ID dir = outCPs[i]->getDir();
+        int ndf = trialCPs[i]->getNDF();
+        int numDir = outCPs[i]->getNumDirection();
+        ID dir = outCPs[i]->getDirection();
         ID resp = outCPs[i]->getResponseType();
         Vector fact = outCPs[i]->getFactor();
         ID sizeRespType = outCPs[i]->getSizeRespType();
@@ -603,63 +608,70 @@ int ECLabVIEW::acquire()
             Parameter = atof(strtok(NULL,"\t"));
             if (strcmp(GeomType,"x") == 0)  {
                 if (strcmp(ParamType,"displacement") == 0)  {
-                    direction = OF_Dir_X;
+                    direction = 0;
                     response  = OF_Resp_Disp;
                 }
                 else if (strcmp(ParamType,"force") == 0)  {
-                    direction = OF_Dir_X;
+                    direction = 0;
                     response  = OF_Resp_Force;
                 }
                 else if (strcmp(ParamType,"rotation") == 0)  {
-                    direction = OF_Dir_RX;
+                    direction = 3;
                     response  = OF_Resp_Disp;
                 }
                 else if (strcmp(ParamType,"moment") == 0)  {
-                    direction = OF_Dir_RX;
+                    direction = 3;
                     response  = OF_Resp_Force;
                 }
             }
             else if (strcmp(GeomType,"y") == 0)  {
                 if (strcmp(ParamType,"displacement") == 0)  {
-                    direction = OF_Dir_Y;
+                    direction = 1;
                     response  = OF_Resp_Disp;
                 }
                 else if (strcmp(ParamType,"force") == 0)  {
-                    direction = OF_Dir_Y;
+                    direction = 1;
                     response  = OF_Resp_Force;
                 }
                 else if (strcmp(ParamType,"rotation") == 0)  {
-                    direction = OF_Dir_RY;
+                    direction = 4;
                     response  = OF_Resp_Disp;
                 }
                 else if (strcmp(ParamType,"moment") == 0)  {
-                    direction = OF_Dir_RY;
+                    direction = 4;
                     response  = OF_Resp_Force;
                 }
             }
             else if (strcmp(GeomType,"z") == 0)  {
                 if (strcmp(ParamType,"displacement") == 0)  {
-                    direction = OF_Dir_Z;
+                    direction = 2;
                     response  = OF_Resp_Disp;
                 }
                 else if (strcmp(ParamType,"force") == 0)  {
-                    direction = OF_Dir_Z;
+                    direction = 2;
                     response  = OF_Resp_Force;
                 }
                 else if (strcmp(ParamType,"rotation") == 0)  {
-                    direction = OF_Dir_RZ;
+                    direction = ndf-1;
                     response  = OF_Resp_Disp;
                 }
                 else if (strcmp(ParamType,"moment") == 0)  {
-                    direction = OF_Dir_RZ;
+                    direction = ndf-1;
                     response  = OF_Resp_Force;
                 }
+            }
+            if (direction > ndf)  {
+                opserr << "ECLabVIEW::acquire() - "
+                    << "received wrong direction\n"
+                    << " direction <= " << ndf
+                    << " but got: " << direction << endln;
+                return OF_ReturnType_failed;
             }
 
             // assemble displacement and force daq vectors
             if (response == 0)  {
                 int id = dID;
-                for (int j=0; j<numParam; j++)  {
+                for (int j=0; j<numDir; j++)  {
                     if (resp(j) == response)  {
                         if (dir(j) == direction)  {
                             (*measDisp)(id) = Parameter/fact(j);
@@ -671,7 +683,7 @@ int ECLabVIEW::acquire()
             }
             else if (response == 3)  {
                 int id = fID;
-                for (int j=0; j<numParam; j++)  {
+                for (int j=0; j<numDir; j++)  {
                     if (resp(j) == response)  {
                         if (dir(j) == direction)  {
                             (*measForce)(id) = Parameter/fact(j);

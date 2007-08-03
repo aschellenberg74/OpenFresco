@@ -44,9 +44,9 @@ class ExperimentalCP : public TaggedObject
 public:
     // constructors
     ExperimentalCP();
-    ExperimentalCP(int tag, int nodeTag,
-        const ID &direction, const ID &response,
-        const Vector &factor = 0);
+    ExperimentalCP(int tag, int ndm, int ndf,
+        int nodeTag, const ID &direction,
+        const ID &response, const Vector &factor = 0);
     ExperimentalCP(const ExperimentalCP &ecp);
     
     // destructor
@@ -55,22 +55,32 @@ public:
     virtual ExperimentalCP *getCopy (void);
     virtual void Print(OPS_Stream &s, int flag);
     
+    // methods to set control point data
+    int setNDM(int ndm);
+    int setNDF(int ndf);
     int setData(int nodeTag, const ID &direction,
         const ID &response, const Vector &factor = 0);
     int setLimits(const Vector &lowerLimit,
         const Vector &upperLimit);
     
+    // methods to get derived control point data
+    int getNDM();
+    int getNDF();
     int getNodeTag();
-    int getNumParameters();
+    int getNumDirection();
+    int getNumUniqueDir();
     const ID &getSizeRespType();
+    const ID &getDirRespType(int dir);
 
-    const ID &getDir();
+    // methods to get basic control point data
+    const ID &getDirection();
+    const ID &getUniqueDir();
     const ID &getResponseType();
     const Vector &getFactor();
     const Vector *getLowerLimit();
     const Vector *getUpperLimit();
 
-    int getDir(int dirID);
+    int getDirection(int dirID);
     int getResponseType(int dirID);
     double getFactor(int dirID);
     double getLowerLimit(int dirID);
@@ -80,16 +90,20 @@ public:
     int operator != (ExperimentalCP &ecp);
     
 protected:
+    int ndm;            // number of dimensions
+    int ndf;            // number of degrees of freedom
     int nodeTag;        // control node tag
-    ID direction;       // directions
+    ID direction;       // numDirection directions
+    ID uniqueDir;       // numUniqueDir unique directions
     ID response;        // response types
     Vector factor;      // factors
     Vector *lowerLim;   // lower limits
     Vector *upperLim;   // upper limits
 
-    int numParam;       // number of parameters
+    int numDirection;   // number of directions
+    int numUniqueDir;   // number of unique directions
     ID sizeRespType;    // sizes of response types
-
+    ID dirRespType;     // response types for each unique direction
 };
 
 #endif

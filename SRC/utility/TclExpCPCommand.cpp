@@ -95,7 +95,8 @@ int TclExpCPCommand(ClientData clientData, Tcl_Interp *interp, int argc,
         return TCL_ERROR;
     }    
 
-
+	int ndm = theTclBuilder->getNDM();
+	int ndf = theTclBuilder->getNDF();
     int tag, nodeTag, numDir = 0, numLim = 0, argi = 1;
     double f, lim;
     ExperimentalCP *theCP = 0;
@@ -144,28 +145,85 @@ int TclExpCPCommand(ClientData clientData, Tcl_Interp *interp, int argc,
     Vector lowerLim(numDir);
     Vector upperLim(numDir);
     for (int i=0; i<numDir; i++)  {
-        if (strcmp(argv[argi],"1") == 0 || strcmp(argv[argi],"ux") == 0 
-            || strcmp(argv[argi],"UX") == 0)
-            dir(i) = OF_Dir_X;
-        else if (strcmp(argv[argi],"2") == 0 || strcmp(argv[argi],"uy") == 0 
-            || strcmp(argv[argi],"UY") == 0)
-            dir(i) = OF_Dir_Y;
-        else if (strcmp(argv[argi],"3") == 0 || strcmp(argv[argi],"uz") == 0 
-            || strcmp(argv[argi],"UZ") == 0)
-            dir(i) = OF_Dir_Z;
-        else if (strcmp(argv[argi],"4") == 0 || strcmp(argv[argi],"rx") == 0 
-            || strcmp(argv[argi],"RX") == 0)
-            dir(i) = OF_Dir_RX;
-        else if (strcmp(argv[argi],"5") == 0 || strcmp(argv[argi],"ry") == 0 
-            || strcmp(argv[argi],"RY") == 0)
-            dir(i) = OF_Dir_RY;
-        else if (strcmp(argv[argi],"6") == 0 || strcmp(argv[argi],"rz") == 0 
-            || strcmp(argv[argi],"RZ") == 0)
-            dir(i) = OF_Dir_RZ;
-        else  {
-            opserr << "WARNING invalid dir\n";
-            opserr << "control point: " << tag << endln;
-            return TCL_ERROR;		
+        if (ndm == 1 && ndf == 1)  {
+            if (strcmp(argv[argi],"1") == 0 || strcmp(argv[argi],"ux") == 0 
+                || strcmp(argv[argi],"UX") == 0)
+                dir(i) = 0;
+            else  {
+                opserr << "WARNING invalid dir\n";
+                opserr << "control point: " << tag << endln;
+                return TCL_ERROR;		
+            }
+        }
+        else if (ndm == 2 && ndf == 2)  {
+            if (strcmp(argv[argi],"1") == 0 || strcmp(argv[argi],"ux") == 0 
+                || strcmp(argv[argi],"UX") == 0)
+                dir(i) = 0;
+            else if (strcmp(argv[argi],"2") == 0 || strcmp(argv[argi],"uy") == 0 
+                || strcmp(argv[argi],"UY") == 0)
+                dir(i) = 1;
+            else  {
+                opserr << "WARNING invalid dir\n";
+                opserr << "control point: " << tag << endln;
+                return TCL_ERROR;		
+            }
+        }
+        else if (ndm == 2 && ndf == 3)  {
+            if (strcmp(argv[argi],"1") == 0 || strcmp(argv[argi],"ux") == 0 
+                || strcmp(argv[argi],"UX") == 0)
+                dir(i) = 0;
+            else if (strcmp(argv[argi],"2") == 0 || strcmp(argv[argi],"uy") == 0 
+                || strcmp(argv[argi],"UY") == 0)
+                dir(i) = 1;
+            else if (strcmp(argv[argi],"3") == 0 || strcmp(argv[argi],"rz") == 0 
+                || strcmp(argv[argi],"RZ") == 0)
+                dir(i) = 2;
+            else  {
+                opserr << "WARNING invalid dir\n";
+                opserr << "control point: " << tag << endln;
+                return TCL_ERROR;		
+            }
+        }
+        else if (ndm == 3 && ndf == 3)  {
+            if (strcmp(argv[argi],"1") == 0 || strcmp(argv[argi],"ux") == 0 
+                || strcmp(argv[argi],"UX") == 0)
+                dir(i) = 0;
+            else if (strcmp(argv[argi],"2") == 0 || strcmp(argv[argi],"uy") == 0 
+                || strcmp(argv[argi],"UY") == 0)
+                dir(i) = 1;
+            else if (strcmp(argv[argi],"3") == 0 || strcmp(argv[argi],"uz") == 0 
+                || strcmp(argv[argi],"UZ") == 0)
+                dir(i) = 2;
+            else  {
+                opserr << "WARNING invalid dir\n";
+                opserr << "control point: " << tag << endln;
+                return TCL_ERROR;		
+            }
+        }
+        else if (ndm == 3 && ndf == 6)  {
+            if (strcmp(argv[argi],"1") == 0 || strcmp(argv[argi],"ux") == 0 
+                || strcmp(argv[argi],"UX") == 0)
+                dir(i) = 0;
+            else if (strcmp(argv[argi],"2") == 0 || strcmp(argv[argi],"uy") == 0 
+                || strcmp(argv[argi],"UY") == 0)
+                dir(i) = 1;
+            else if (strcmp(argv[argi],"3") == 0 || strcmp(argv[argi],"uz") == 0 
+                || strcmp(argv[argi],"UZ") == 0)
+                dir(i) = 2;
+            else if (strcmp(argv[argi],"4") == 0 || strcmp(argv[argi],"rx") == 0 
+                || strcmp(argv[argi],"RX") == 0)
+                dir(i) = 3;
+            else if (strcmp(argv[argi],"5") == 0 || strcmp(argv[argi],"ry") == 0 
+                || strcmp(argv[argi],"RY") == 0)
+                dir(i) = 4;
+            else if (strcmp(argv[argi],"6") == 0 || strcmp(argv[argi],"rz") == 0 
+                || strcmp(argv[argi],"RZ") == 0)
+                dir(i) = 5;
+            else  {
+                opserr << "WARNING invalid dir\n";
+                opserr << "control point: " << tag << endln;
+                return TCL_ERROR;		
+            }
         }
         argi++;
         if (strcmp(argv[argi],"1") == 0 || strcmp(argv[argi],"disp") == 0 
@@ -220,7 +278,7 @@ int TclExpCPCommand(ClientData clientData, Tcl_Interp *interp, int argc,
     }
 
     // parsing was successful, allocate the control point
-    theCP = new ExperimentalCP(tag, nodeTag, dir, resp, fact);
+    theCP = new ExperimentalCP(tag, ndm, ndf, nodeTag, dir, resp, fact);
 
     if (theCP == 0)  {
         opserr << "WARNING could not create experimental control point " << argv[1] << endln;

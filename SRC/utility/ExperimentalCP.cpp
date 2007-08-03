@@ -35,26 +35,28 @@
 
 
 ExperimentalCP::ExperimentalCP()
-    : TaggedObject(0),
-    nodeTag(0), direction(0), response(0),
+    : TaggedObject(0), ndm(0), ndf(0), nodeTag(0), 
+    direction(0), uniqueDir(0), response(0),
     factor(0), lowerLim(0), upperLim(0),
-    numParam(0), sizeRespType(5)
+    numDirection(0), numUniqueDir(0),
+    sizeRespType(5), dirRespType(5)
 {
     // does nothing
 }
 
 
-ExperimentalCP::ExperimentalCP(int tag, int nodetag,
-    const ID &dir, const ID &resp, const Vector &fact)
-    : TaggedObject(tag),
-    nodeTag(nodetag), direction(dir), response(resp),
+ExperimentalCP::ExperimentalCP(int tag, int NDM, int NDF,
+    int nodetag, const ID &dir, const ID &resp, const Vector &fact)
+    : TaggedObject(tag), ndm(NDM), ndf(NDF), nodeTag(nodetag),
+    direction(dir), uniqueDir(dir), response(resp),
     factor(dir.Size()), lowerLim(0), upperLim(0),
-    numParam(dir.Size()), sizeRespType(5)
+    numDirection(dir.Size()), numUniqueDir(dir.Size()),
+    sizeRespType(5), dirRespType(5)
 {
     // initialize factors
     if (fact != 0)  {
-        if (resp.Size() != numParam || 
-            fact.Size() != numParam)  {
+        if (resp.Size() != numDirection || 
+            fact.Size() != numDirection)  {
             opserr << "ExperimentalCP::ExperimentalCP() - "
                 << "direction, response and factor need to "
                 << "have same size\n";
@@ -62,46 +64,50 @@ ExperimentalCP::ExperimentalCP(int tag, int nodetag,
         }
         factor = fact;
     } else  {
-        if (resp.Size() != numParam)  {
+        if (resp.Size() != numDirection)  {
             opserr << "ExperimentalCP::ExperimentalCP() - "
                 << "direction and response need to "
                 << "have same size\n";
             exit(OF_ReturnType_failed);
         }
-        for (int i=0; i<numParam; i++)
+        for (int i=0; i<numDirection; i++)
             factor(i) = 1.0;
+    }
+
+    // find unique directions and number thereof
+    numUniqueDir = uniqueDir.unique();
+    if (numUniqueDir > ndf)  {
+        opserr << "ExperimentalCP::ExperimentalCP() - "
+            << "more unique directions specified than "
+            << "available degrees of freedom\n";
+        exit(OF_ReturnType_failed);
     }
 
     // set sizes of response types
     sizeRespType.Zero();
-    for (int i=0; i<numParam; i++)  {
-        if (response(i) == 0)
-            sizeRespType(0)++;
-        else if (response(i) == 1)
-            sizeRespType(1)++;
-        else if (response(i) == 2)
-            sizeRespType(2)++;
-        else if (response(i) == 3)
-            sizeRespType(3)++;
-        else if (response(i) == 4)
-            sizeRespType(4)++;
-    }
+    for (int i=0; i<numDirection; i++)
+        sizeRespType(response(i))++;
 }
 
 
 ExperimentalCP::ExperimentalCP(const ExperimentalCP& ecp)
     : TaggedObject(ecp)
 {
+    ndm       = ecp.ndm;
+    ndf       = ecp.ndf;
     nodeTag   = ecp.nodeTag;
     direction = ecp.direction;
+    uniqueDir = ecp.uniqueDir;
     response  = ecp.response;
     factor    = ecp.factor;
     if (ecp.lowerLim != 0)
         (*lowerLim)  = *(ecp.lowerLim);
     if (ecp.upperLim != 0)
         (*upperLim)  = *(ecp.upperLim);
-    numParam     = ecp.numParam;
+    numDirection = ecp.numDirection;
+    numUniqueDir = ecp.numUniqueDir;
     sizeRespType = ecp.sizeRespType;
+    dirRespType  = ecp.dirRespType;
 }
 
 
@@ -122,13 +128,32 @@ ExperimentalCP* ExperimentalCP::getCopy()
 }
 
 
+int ExperimentalCP::setNDM(int NDM)
+{
+    ndm = NDM;
+
+    return 0;
+}
+
+
+int ExperimentalCP::setNDF(int NDF)
+{
+    ndf = NDF;
+
+    return 0;
+}
+
+
 int ExperimentalCP::setData(int nodetag, const ID &dir,
     const ID &resp, const Vector &fact)
 {
+    // save the number of directions
+    numDirection = dir.Size();
+
     // initialize factors
     if (fact != 0)  {
-        if (resp.Size() != dir.Size() || 
-            fact.Size() != dir.Size())  {
+        if (resp.Size() != numDirection || 
+            fact.Size() != numDirection)  {
             opserr << "ExperimentalCP::setData() - "
                 << "direction, response and factor need to "
                 << "have same size\n";
@@ -136,35 +161,35 @@ int ExperimentalCP::setData(int nodetag, const ID &dir,
         }
         factor = fact;
     } else  {
-        if (resp.Size() != dir.Size())  {
+        if (resp.Size() != numDirection)  {
             opserr << "ExperimentalCP::setData() - "
                 << "direction and response need to "
                 << "have same size\n";
             return OF_ReturnType_failed;
         }
-        for (int i=0; i<numParam; i++)
+        for (int i=0; i<numDirection; i++)
             factor(i) = 1.0;
     }
 
+    // assign the remaining variables
     nodeTag   = nodetag;
     direction = dir;
+    uniqueDir = dir;
     response  = resp;
-    numParam  = dir.Size();
    
+    // find unique directions and number thereof
+    numUniqueDir = uniqueDir.unique();
+    if (numUniqueDir > ndf)  {
+        opserr << "ExperimentalCP::ExperimentalCP() - "
+            << "more directions specified than available "
+            << "degrees of freedom\n";
+        exit(OF_ReturnType_failed);
+    }
+
     // set sizes of response types
     sizeRespType.Zero();
-    for (int i=0; i<numParam; i++)  {
-        if (response(i) == 0)
-            sizeRespType(0)++;
-        else if (response(i) == 1)
-            sizeRespType(1)++;
-        else if (response(i) == 2)
-            sizeRespType(2)++;
-        else if (response(i) == 3)
-            sizeRespType(3)++;
-        else if (response(i) == 4)
-            sizeRespType(4)++;
-    }
+    for (int i=0; i<numDirection; i++)
+        sizeRespType(response(i))++;
 
     return 0;
 }
@@ -175,26 +200,26 @@ int ExperimentalCP::setLimits(const Vector &lowerlim,
 {
     if (lowerLim == 0 || upperLim == 0)  {
         // create the new limits
-        lowerLim = new Vector(numParam);
-        upperLim = new Vector(numParam);
+        lowerLim = new Vector(numDirection);
+        upperLim = new Vector(numDirection);
     }
-    else if (lowerLim->Size() != numParam
-        || upperLim->Size() != numParam)  {
+    else if (lowerLim->Size() != numDirection
+        || upperLim->Size() != numDirection)  {
         // delete the old limits
         if (lowerLim != 0)
             delete lowerLim;
         if (upperLim != 0)
             delete upperLim;
         // create the new limits
-        lowerLim = new Vector(numParam);
-        upperLim = new Vector(numParam);
+        lowerLim = new Vector(numDirection);
+        upperLim = new Vector(numDirection);
     }
 
-    if (lowerlim.Size() != numParam || 
-        upperlim.Size() != numParam)  {
+    if (lowerlim.Size() != numDirection || 
+        upperlim.Size() != numDirection)  {
             opserr << "ExperimentalCP::setLimits() - "
                 << "lower and upper limits need to be of "
-                << "size: " << numParam << endln;
+                << "size: " << numDirection << endln;
             return OF_ReturnType_failed;
     }
 
@@ -205,15 +230,33 @@ int ExperimentalCP::setLimits(const Vector &lowerlim,
 }
 
 
+int ExperimentalCP::getNDM()
+{
+    return ndm;
+}
+
+
+int ExperimentalCP::getNDF()
+{
+    return ndf;
+}
+
+
 int ExperimentalCP::getNodeTag()
 {
     return nodeTag;
 }
 
 
-int ExperimentalCP::getNumParameters()
+int ExperimentalCP::getNumDirection()
 {
-    return numParam;
+    return numDirection;
+}
+
+
+int ExperimentalCP::getNumUniqueDir()
+{
+    return numUniqueDir;
 }
 
 
@@ -223,9 +266,34 @@ const ID& ExperimentalCP::getSizeRespType()
 }
 
 
-const ID& ExperimentalCP::getDir()
+const ID& ExperimentalCP::getDirRespType(int dir)
+{
+    if (dir<0 || dir>ndf)  {
+        opserr << "ExperimentalCP::getDirRespType() - "
+            << "direction out of bounds, "
+            << "direction " << dir << " does not exist\n";
+        exit(OF_ReturnType_failed);
+    }
+
+    dirRespType.Zero();
+    for (int i=0; i<numDirection; i++)  {
+        if (direction(i) == dir)
+            dirRespType(response(i)) = 1;
+    }
+
+    return dirRespType;
+}
+
+
+const ID& ExperimentalCP::getDirection()
 {
     return direction;
+}
+
+
+const ID& ExperimentalCP::getUniqueDir()
+{
+    return uniqueDir;
 }
 
 
@@ -253,9 +321,9 @@ const Vector* ExperimentalCP::getUpperLimit()
 }
 
 
-int ExperimentalCP::getDir(int dirID)
+int ExperimentalCP::getDirection(int dirID)
 {
-    if (dirID<0 || dirID>=numParam)  {
+    if (dirID<0 || dirID>=numDirection)  {
         opserr << "ExperimentalCP::getDir() - "
             << "direction ID out of bounds, "
             << "component " << dirID << " does not exist\n";
@@ -268,7 +336,7 @@ int ExperimentalCP::getDir(int dirID)
 
 int ExperimentalCP::getResponseType(int dirID)
 {
-    if (dirID<0 || dirID>=numParam)  {
+    if (dirID<0 || dirID>=numDirection)  {
         opserr << "ExperimentalCP::getResponseType() - "
             << "direction ID out of bounds, "
             << "component " << dirID << " does not exist\n";
@@ -281,7 +349,7 @@ int ExperimentalCP::getResponseType(int dirID)
 
 double ExperimentalCP::getFactor(int dirID)
 {
-    if (dirID<0 || dirID>=numParam)  {
+    if (dirID<0 || dirID>=numDirection)  {
         opserr << "ExperimentalCP::getFactor() - "
             << "direction ID out of bounds, "
             << "component " << dirID << " does not exist\n";
@@ -301,7 +369,7 @@ double ExperimentalCP::getLowerLimit(int dirID)
         exit(OF_ReturnType_failed);
     }
 
-    if (dirID<0 || dirID>=numParam)  {
+    if (dirID<0 || dirID>=numDirection)  {
         opserr << "ExperimentalCP::getFactor() - "
             << "direction ID out of bounds, "
             << "component " << dirID << " does not exist\n";
@@ -321,7 +389,7 @@ double ExperimentalCP::getUpperLimit(int dirID)
         exit(OF_ReturnType_failed);
     }
 
-    if (dirID<0 || dirID>=numParam)  {
+    if (dirID<0 || dirID>=numDirection)  {
         opserr << "ExperimentalCP::getFactor() - "
             << "direction ID out of bounds, "
             << "component " << dirID << " does not exist\n";
@@ -334,8 +402,9 @@ double ExperimentalCP::getUpperLimit(int dirID)
 
 void ExperimentalCP::Print(OPS_Stream &s, int flag)
 {
-    s << "ExperimentalCP: tag: " << this->getTag() 
-        << ", node tag: " << nodeTag
+    s << "ExperimentalCP: tag: " << this->getTag()
+        << ", ndm: " << ndm << ", ndf: " << ndf << endln;
+    s << "    node tag: " << nodeTag
         << ", dir: " << direction
         << ", resp: " << response
         << ", fact: " << factor
