@@ -31,7 +31,6 @@
 
 #include "ECLabVIEW.h"
 
-
 #include <ExperimentalCP.h>
 #include <Message.h>
 #include <TCP_Socket.h>
@@ -85,7 +84,7 @@ ECLabVIEW::ECLabVIEW(int tag,
     sData = new char [dataSize];
     sendData = new Message(sData, dataSize);
 
-    // allocate memory for the receive vectors
+    // allocate memory for the receive messages
     rData = new char [dataSize];
     recvData = new Message(rData, dataSize);
 
@@ -126,7 +125,7 @@ ECLabVIEW::ECLabVIEW(int tag,
 ECLabVIEW::ECLabVIEW(const ECLabVIEW &ec)
     : ExperimentalControl(ec)
 {
-    
+    // temporarily does nothing
 }
 
 
@@ -217,20 +216,28 @@ int ECLabVIEW::setup()
     if (targForce != 0)
         delete targForce;
     
-    if ((*sizeCtrl)[OF_Resp_Disp] != 0)
+    if ((*sizeCtrl)[OF_Resp_Disp] != 0)  {
         targDisp = new Vector((*sizeCtrl)[OF_Resp_Disp]);
-    if ((*sizeCtrl)[OF_Resp_Force] != 0)
+        targDisp->Zero();
+    }
+    if ((*sizeCtrl)[OF_Resp_Force] != 0)  {
         targForce = new Vector((*sizeCtrl)[OF_Resp_Force]);
+        targForce->Zero();
+    }
     
     if (measDisp != 0)
         delete measDisp;
     if (measForce != 0)
         delete measForce;
     
-    if ((*sizeDaq)[OF_Resp_Disp] != 0)
+    if ((*sizeDaq)[OF_Resp_Disp] != 0)  {
         measDisp = new Vector((*sizeDaq)[OF_Resp_Disp]);
-    if ((*sizeDaq)[OF_Resp_Force] != 0)
+        measDisp->Zero();
+    }
+    if ((*sizeDaq)[OF_Resp_Force] != 0)  {
         measForce = new Vector((*sizeDaq)[OF_Resp_Force]);
+        measForce->Zero();
+    }
     
     // print experimental control information
     this->Print(opserr);
