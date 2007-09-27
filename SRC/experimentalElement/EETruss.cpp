@@ -87,6 +87,11 @@ EETruss::EETruss(int tag, int dim, int Nd1, int Nd2,
     for (int i=0; i<2; i++)
         theNodes[i] = 0;
     
+    // zero direction cosines
+    cosX[0] = 0.0;
+    cosX[1] = 0.0;
+    cosX[2] = 0.0;
+
     // set the data size for the experimental site
     sizeCtrl = new ID(OF_Resp_All);
     sizeDaq = new ID(OF_Resp_All);
@@ -140,7 +145,6 @@ EETruss::EETruss(int tag, int dim, int Nd1, int Nd2,
     dbMeas(0), vbMeas(0), abMeas(0), qMeas(0), tMeas(0),
     dbTarg(1), vbTarg(1), abTarg(1),
     dbPast(1), kbInit(1,1)
-    
 {    
     // ensure the connectedExternalNode ID is of correct size & set values
     if (connectedExternalNodes.Size() != 2)  {
@@ -155,6 +159,11 @@ EETruss::EETruss(int tag, int dim, int Nd1, int Nd2,
     // set node pointers to NULL
     for (int i=0; i<2; i++)
         theNodes[i] = 0;
+
+    // zero direction cosines
+    cosX[0] = 0.0;
+    cosX[1] = 0.0;
+    cosX[2] = 0.0;
 
     // setup the connection
     if (!ssl)  {
