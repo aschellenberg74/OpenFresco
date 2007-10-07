@@ -101,7 +101,7 @@ int ECMtsCsi::setSize(ID sizeT, ID sizeO)
     if (sizeT[OF_Resp_Disp] == 0 ||
         sizeO[OF_Resp_Disp] == 0 ||
         sizeO[OF_Resp_Force] == 0) {
-        opserr << "ECMtsCsi::setSize - wrong sizeTrial/Out"; 
+        opserr << "ECMtsCsi::setSize() - wrong sizeTrial/Out"; 
         opserr << "see User Manual.\n";
         exit(OF_ReturnType_failed);
     }
@@ -150,10 +150,14 @@ int ECMtsCsi::setup()
     if (targForce != 0)
         delete targForce;
 
-    if ((*sizeCtrl)[OF_Resp_Disp] != 0)
+    if ((*sizeCtrl)[OF_Resp_Disp] != 0)  {
         targDisp = new Vector((*sizeCtrl)[OF_Resp_Disp]);
-    if ((*sizeCtrl)[OF_Resp_Force] != 0)
+        targDisp->Zero();
+    }
+    if ((*sizeCtrl)[OF_Resp_Force] != 0)  {
         targForce = new Vector((*sizeCtrl)[OF_Resp_Force]);
+        targForce->Zero();
+    }
 
     if (measResp != 0)
         delete [] measResp;

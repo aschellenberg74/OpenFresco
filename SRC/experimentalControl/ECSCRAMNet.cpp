@@ -83,34 +83,39 @@ ECSCRAMNet::ECSCRAMNet(int tag, int memoffset, int numactch)
     // get address for OpenFresco memory on SCRAMNet board
 	// memOffset is given in bytes, so divide by 4
     memPtrOPF = (double*) (memPtrBASE + (memOffset/4));
+    double *memPtr = memPtrOPF;
+
+    // setup pointers to state flags
+    newTarget = memPtr;
+	memPtr++; newTarget[0] = 0.0;
+    atTarget  = memPtr;
+    memPtr++; atTarget[0] = 0.0;
+    switchPC  = memPtr;
+    memPtr++; switchPC[0] = 0.0;
 
     // setup pointers to control memory locations
-    updateFlag = memPtrOPF;
-	updateFlag[0] = 0.0;
-    cDisp  = new Vector(memPtrOPF + 1 + 0*numActCh, numActCh); 
-    cDisp->Zero();
-    cVel   = new Vector(memPtrOPF + 1 + 1*numActCh, numActCh);
-    cVel->Zero();
-    cAccel = new Vector(memPtrOPF + 1 + 2*numActCh, numActCh); 
-    cAccel->Zero();
-    cForce = new Vector(memPtrOPF + 1 + 3*numActCh, numActCh); 
-    cForce->Zero();
-    cTime  = new Vector(memPtrOPF + 1 + 4*numActCh, numActCh); 
-    cTime->Zero();
+    cDisp  = new Vector(memPtr, numActCh); 
+    memPtr += numActCh; cDisp->Zero();
+    cVel   = new Vector(memPtr, numActCh);
+    memPtr += numActCh; cVel->Zero();
+    cAccel = new Vector(memPtr, numActCh); 
+    memPtr += numActCh; cAccel->Zero();
+    cForce = new Vector(memPtr, numActCh); 
+    memPtr += numActCh; cForce->Zero();
+    cTime  = new Vector(memPtr, numActCh); 
+    memPtr += numActCh; cTime->Zero();
 
 	// setup pointers to daq memory locations
-    targetFlag = memPtrOPF + 1 + 5*numActCh;
-    targetFlag[0] = 0.0;
-    dDisp  = new Vector(memPtrOPF + 2 + 5*numActCh, numActCh);
-    dDisp->Zero();
-    dVel   = new Vector(memPtrOPF + 2 + 6*numActCh, numActCh);
-    dVel->Zero();
-    dAccel = new Vector(memPtrOPF + 2 + 7*numActCh, numActCh);
-    dAccel->Zero();
-    dForce = new Vector(memPtrOPF + 2 + 8*numActCh, numActCh);
-    dForce->Zero();
-    dTime  = new Vector(memPtrOPF + 2 + 9*numActCh, numActCh);
-    dTime->Zero();
+    dDisp  = new Vector(memPtr, numActCh);
+    memPtr += numActCh; dDisp->Zero();
+    dVel   = new Vector(memPtr, numActCh);
+    memPtr += numActCh; dVel->Zero();
+    dAccel = new Vector(memPtr, numActCh);
+    memPtr += numActCh; dAccel->Zero();
+    dForce = new Vector(memPtr, numActCh);
+    memPtr += numActCh; dForce->Zero();
+    dTime  = new Vector(memPtr, numActCh);
+    memPtr += numActCh; dTime->Zero();
 
     opserr << "************************************************\n";
     opserr << "* The SCRANNet csr and memory have been mapped *\n";
@@ -191,7 +196,7 @@ int ECSCRAMNet::setSize(ID sizeT, ID sizeO)
         sizeO[OF_Resp_Disp] > numActCh || sizeO[OF_Resp_Vel] > numActCh ||
         sizeO[OF_Resp_Accel] > numActCh || sizeO[OF_Resp_Force] > numActCh ||
         sizeO[OF_Resp_Time] > numActCh) {
-        opserr << "ECSCRAMNet::setSize - wrong sizeTrial/Out\n"; 
+        opserr << "ECSCRAMNet::setSize() - wrong sizeTrial/Out\n"; 
         opserr << "see User Manual.\n";
         scr_reg_mm(UNMAP);
         scr_mem_mm(UNMAP);
@@ -366,11 +371,17 @@ void ECSCRAMNet::Print(OPS_Stream &s, int flag)
 
 int ECSCRAMNet::control()
 {
-    // set updateFlag
-    updateFlag[0] = 1.0;
-
-	// wait until target flag has changed as well
-	while (targetFlag[0] != 1.0) {}
+    // set newTarget flag
+    newTarget[0] = 1.0;
+    
+	// wait until switchPC flag has changed as well
+	while (switchPC[0] != 1.0) {}
+    
+    // reset newTarget flag
+    newTarget[0] = 0.0;
+    
+	// wait until switchPC flag has changed as well
+	while (switchPC[0] != 0.0) {}
     
     return OF_ReturnType_completed;
 }
@@ -378,11 +389,8 @@ int ECSCRAMNet::control()
 
 int ECSCRAMNet::acquire()
 {
-    // reset updateFlag
-    updateFlag[0] = 0.0;
-    
     // wait until target is reached
-    while (targetFlag[0] != 0.0) {}
+    while (atTarget[0] != 1.0) {}
     
     return OF_ReturnType_completed;
 }

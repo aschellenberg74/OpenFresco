@@ -104,7 +104,7 @@ int ECSimUniaxialMaterials::setSize(ID sizeT, ID sizeO)
         sizeO[OF_Resp_Disp] != numMaterial ||
         sizeO[OF_Resp_Vel] != numMaterial ||
         sizeO[OF_Resp_Force] != numMaterial) {
-        opserr << "ECSimUniaxialMaterials::setSize - wrong sizeTrial/Out\n"; 
+        opserr << "ECSimUniaxialMaterials::setSize() - wrong sizeTrial/Out\n"; 
         opserr << "see User Manual.\n";
         return OF_ReturnType_failed;
     }
