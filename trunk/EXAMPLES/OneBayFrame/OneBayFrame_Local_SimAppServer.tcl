@@ -9,8 +9,8 @@
 # Revision: A
 #
 # Purpose: this file contains the tcl input to perform
-# a distributed hybrid simulation of a one bay frame
-# with two experimental zero length elements.
+# a local hybrid simulation of a one bay frame
+# with two experimental twoNodeLink elements.
 # The specimen is simulated using the SimUniaxialMaterials
 # controller.
 
@@ -62,11 +62,11 @@ expElement twoNodeLink 1 1 3 -dir 2 -site 1 -initStif 2.8 -orient 0 1 0 -1 0 0
 # ------------------------------
 # Start the server process
 # ------------------------------
-# startSimAppSiteServer $siteTag $port <-ssl>
-#startSimAppSiteServer 1 8090
-
 # startSimAppElemServer $eleTag $port <-ssl>
-startSimAppElemServer 1 8090
+#startSimAppElemServer 1 8090;  # use with generic client element in FEA
+
+# startSimAppSiteServer $siteTag $port <-ssl>
+startSimAppSiteServer 1 8090;  # use with experimental element in FEA
 # --------------------------------
 # End of analysis
 # --------------------------------

@@ -10,7 +10,7 @@
 #
 # Purpose: this file contains the tcl input to perform
 # a distributed hybrid simulation of a one bay frame
-# with two experimental zero length elements.
+# with two experimental twoNodeLink elements.
 # The specimen is simulated using the SimUniaxialMaterials
 # controller.
 # The experimental setups are on the server sides.
