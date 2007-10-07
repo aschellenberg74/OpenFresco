@@ -44,6 +44,7 @@
 #include <ECSCRAMNet.h>
 #include <ECSimUniaxialMaterials.h>
 #include <ECSimDomain.h>
+#include <ECSimFEAdapter.h>
 
 #include <Vector.h>
 #include <string.h>
@@ -591,6 +592,48 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
 		
 		// parsing was successful, allocate the control
 		theControl = new ECSimDomain(tag, numTrialCPs, trialCPs, numOutCPs, outCPs, theDomain);	
+
+        if (theControl == 0)  {
+            opserr << "WARNING could not create experimental control " << argv[1] << endln;
+            return TCL_ERROR;
+        }
+        
+        // now add the control to the modelBuilder
+        if (addExperimentalControl(*theControl) < 0)  {
+            delete theControl; // invoke the destructor, otherwise mem leak
+            return TCL_ERROR;
+        }
+    }
+
+    // ----------------------------------------------------------------------------	
+	else if (strcmp(argv[1],"SimFEAdapter") == 0)  {
+		if (argc < 5)  {
+			opserr << "WARNING invalid number of arguments\n";
+			printCommand(argc,argv);
+			opserr << "Want: expControl SimFEAdapter tag ipAddr ipPort\n";
+			return TCL_ERROR;
+		}    
+		
+		int tag, ipPort = 44000, argi = 2;
+		char *ipAddr;
+        ExperimentalControl *theControl = 0;
+		
+		if (Tcl_GetInt(interp, argv[argi], &tag) != TCL_OK)  {
+			opserr << "WARNING invalid expControl SimFEAdapter tag\n";
+			return TCL_ERROR;
+		}
+        argi++;
+		ipAddr = (char*) calloc(strlen(argv[argi])+1, sizeof(char));
+		strcpy(ipAddr,argv[argi]);
+        argi++;
+	    if (Tcl_GetInt(interp, argv[argi], &ipPort) != TCL_OK)  {
+		    opserr << "WARNING invalid ipPort\n";
+		    opserr << "expControl SimFEAdapter " << tag << endln;
+		    return TCL_ERROR;
+	    }
+        		
+		// parsing was successful, allocate the control
+		theControl = new ECSimFEAdapter(tag, ipAddr, ipPort);	
 
         if (theControl == 0)  {
             opserr << "WARNING could not create experimental control " << argv[1] << endln;
