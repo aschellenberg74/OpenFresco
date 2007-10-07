@@ -187,7 +187,7 @@ int ECxPCtarget::setSize(ID sizeT, ID sizeO)
         (pcType == 2 && sizeT[OF_Resp_Disp] == 0 && sizeT[OF_Resp_Vel] == 0 && sizeT[OF_Resp_Accel] == 0) ||
         sizeO[OF_Resp_Disp] == 0 ||
         sizeO[OF_Resp_Force] == 0) {
-        opserr << "ECxPCtarget::setSize - wrong sizeTrial/Out\n"; 
+        opserr << "ECxPCtarget::setSize() - wrong sizeTrial/Out\n"; 
         opserr << "see User Manual.\n";
         xPCClosePort(port);
         xPCFreeAPI();
@@ -252,7 +252,7 @@ int ECxPCtarget::setup()
     newTargetId = xPCGetParamIdx(port, "xPC HC/newTarget", "Value");
     if (xPCGetLastError())  {
         xPCErrorMsg(xPCGetLastError(), errMsg);
-        opserr << "ECxPCtarget::ECxPCtarget() - xPCGetParamIdx - newTarget: error = " << errMsg << endln;
+        opserr << "ECxPCtarget::setup() - xPCGetParamIdx - newTarget: error = " << errMsg << endln;
         xPCClosePort(port);
         xPCFreeAPI();
         return OF_ReturnType_failed;
@@ -260,7 +260,7 @@ int ECxPCtarget::setup()
     atTargetId = xPCGetSignalIdx(port, "xPC HC/atTarget");
     if (xPCGetLastError())  {
         xPCErrorMsg(xPCGetLastError(), errMsg);
-        opserr << "ECxPCtarget::ECxPCtarget() - xPCGetSignalIdx - atTarget: error = " << errMsg << endln;
+        opserr << "ECxPCtarget::setup() - xPCGetSignalIdx - atTarget: error = " << errMsg << endln;
         xPCClosePort(port);
         xPCFreeAPI();
         return OF_ReturnType_failed;
@@ -268,7 +268,7 @@ int ECxPCtarget::setup()
     switchPCId = xPCGetSignalIdx(port, "xPC HC/switchPC");
     if (xPCGetLastError())  {
         xPCErrorMsg(xPCGetLastError(), errMsg);
-        opserr << "ECxPCtarget::ECxPCtarget() - xPCGetSignalIdx - switchPC: error = " << errMsg << endln;
+        opserr << "ECxPCtarget::setup() - xPCGetSignalIdx - switchPC: error = " << errMsg << endln;
         xPCClosePort(port);
         xPCFreeAPI();
         return OF_ReturnType_failed;
@@ -276,7 +276,7 @@ int ECxPCtarget::setup()
     targDispId = xPCGetParamIdx(port, "xPC HC/targDsp", "Value");
     if (xPCGetLastError())  {
         xPCErrorMsg(xPCGetLastError(), errMsg);
-        opserr << "ECxPCtarget::ECxPCtarget() - xPCGetParamIdx - targDsp: error = " << errMsg << endln;
+        opserr << "ECxPCtarget::setup() - xPCGetParamIdx - targDsp: error = " << errMsg << endln;
         xPCClosePort(port);
         xPCFreeAPI();
         return OF_ReturnType_failed;
@@ -285,7 +285,7 @@ int ECxPCtarget::setup()
         targVelId = xPCGetParamIdx(port, "xPC HC/targVel", "Value");
         if (xPCGetLastError())  {
             xPCErrorMsg(xPCGetLastError(), errMsg);
-            opserr << "ECxPCtarget::ECxPCtarget() - xPCGetParamIdx - targVel: error = " << errMsg << endln;
+            opserr << "ECxPCtarget::setup() - xPCGetParamIdx - targVel: error = " << errMsg << endln;
             xPCClosePort(port);
             xPCFreeAPI();
             return OF_ReturnType_failed;
@@ -295,7 +295,7 @@ int ECxPCtarget::setup()
         targAccelId = xPCGetParamIdx(port, "xPC HC/targAcc", "Value");
         if (xPCGetLastError())  {
             xPCErrorMsg(xPCGetLastError(), errMsg);
-            opserr << "ECxPCtarget::ECxPCtarget() - xPCGetParamIdx - targAcc: error = " << errMsg << endln;
+            opserr << "ECxPCtarget::setup() - xPCGetParamIdx - targAcc: error = " << errMsg << endln;
             xPCClosePort(port);
             xPCFreeAPI();
             return OF_ReturnType_failed;
@@ -305,7 +305,7 @@ int ECxPCtarget::setup()
         measDispId[0] = xPCGetSignalIdx(port, "xPC HC/measDsp");
         if (xPCGetLastError())  {
             xPCErrorMsg(xPCGetLastError(), errMsg);
-            opserr << "ECxPCtarget::ECxPCtarget() - xPCGetSignalIdx - measDsp: error = " << errMsg << endln;
+            opserr << "ECxPCtarget::setup() - xPCGetSignalIdx - measDsp: error = " << errMsg << endln;
             xPCClosePort(port);
             xPCFreeAPI();
             return OF_ReturnType_failed;
@@ -319,7 +319,7 @@ int ECxPCtarget::setup()
             measDispId[i] = xPCGetSignalIdx(port, dspStr);
             if (xPCGetLastError())  {
                 xPCErrorMsg(xPCGetLastError(), errMsg);
-                opserr << "ECxPCtarget::ECxPCtarget() - xPCGetSignalIdx - measDsp: error = " << errMsg << endln;
+                opserr << "ECxPCtarget::setup() - xPCGetSignalIdx - measDsp: error = " << errMsg << endln;
                 xPCClosePort(port);
                 xPCFreeAPI();
                 return OF_ReturnType_failed;
@@ -330,7 +330,7 @@ int ECxPCtarget::setup()
         measForceId[0] = xPCGetSignalIdx(port, "xPC HC/measFrc");
         if (xPCGetLastError())  {
             xPCErrorMsg(xPCGetLastError(), errMsg);
-            opserr << "ECxPCtarget::ECxPCtarget() - xPCGetSignalIdx - measFrc: error = " << errMsg << endln;
+            opserr << "ECxPCtarget::setup() - xPCGetSignalIdx - measFrc: error = " << errMsg << endln;
             xPCClosePort(port);
             xPCFreeAPI();
             return OF_ReturnType_failed;
@@ -344,7 +344,7 @@ int ECxPCtarget::setup()
             measForceId[i] = xPCGetSignalIdx(port, frcStr);
             if (xPCGetLastError())  {
                 xPCErrorMsg(xPCGetLastError(), errMsg);
-                opserr << "ECxPCtarget::ECxPCtarget() - xPCGetSignalIdx - measFrc: error = " << errMsg << endln;
+                opserr << "ECxPCtarget::setup() - xPCGetSignalIdx - measFrc: error = " << errMsg << endln;
                 xPCClosePort(port);
                 xPCFreeAPI();
                 return OF_ReturnType_failed;
@@ -373,7 +373,7 @@ int ECxPCtarget::setup()
     xPCStartApp(port);
     if (xPCGetLastError())  {
         xPCErrorMsg(xPCGetLastError(), errMsg);
-        opserr << "ECxPCtarget::ECxPCtarget() - xPCStartApp: error = " << errMsg << endln;
+        opserr << "ECxPCtarget::setup() - xPCStartApp: error = " << errMsg << endln;
         xPCClosePort(port);
         xPCFreeAPI();
         return OF_ReturnType_failed;
@@ -502,7 +502,7 @@ int ECxPCtarget::control()
     xPCSetParam(port, targDispId, targDisp);
     if (xPCGetLastError())  {
         xPCErrorMsg(xPCGetLastError(), errMsg);
-        opserr << "ECxPCtarget::execute() - xPCSetParam: error = " << errMsg << endln;
+        opserr << "ECxPCtarget::control() - xPCSetParam: error = " << errMsg << endln;
         xPCClosePort(port);
         xPCFreeAPI();
         return xPCGetLastError();
@@ -511,7 +511,7 @@ int ECxPCtarget::control()
         xPCSetParam(port, targVelId, targVel);
         if (xPCGetLastError())  {
             xPCErrorMsg(xPCGetLastError(), errMsg);
-            opserr << "ECxPCtarget::execute() - xPCSetParam: error = " << errMsg << endln;
+            opserr << "ECxPCtarget::control() - xPCSetParam: error = " << errMsg << endln;
             xPCClosePort(port);
             xPCFreeAPI();
             return xPCGetLastError();
@@ -521,41 +521,41 @@ int ECxPCtarget::control()
         xPCSetParam(port, targAccelId, targAccel);
         if (xPCGetLastError())  {
             xPCErrorMsg(xPCGetLastError(), errMsg);
-            opserr << "ECxPCtarget::execute() - xPCSetParam: error = " << errMsg << endln;
+            opserr << "ECxPCtarget::control() - xPCSetParam: error = " << errMsg << endln;
             xPCClosePort(port);
             xPCFreeAPI();
             return xPCGetLastError();
         }
     }
-
+    
 	// set newTarget flag
 	newTarget = 1.0;
 	xPCSetParam(port, newTargetId, &newTarget);
     if (xPCGetLastError())  {
         xPCErrorMsg(xPCGetLastError(), errMsg);
-        opserr << "ECxPCtarget::execute() - xPCSetParam: error = " << errMsg << endln;
+        opserr << "ECxPCtarget::control() - xPCSetParam: error = " << errMsg << endln;
         xPCClosePort(port);
         xPCFreeAPI();
         return xPCGetLastError();
     }
-
+    
 	// wait until switchPC flag has changed as well
 	while (xPCGetSignal(port, switchPCId) != 1.0) {}
-
+    
     // reset newTarget flag
     newTarget = 0.0;
     xPCSetParam(port, newTargetId, &newTarget);
     if (xPCGetLastError())  {
         xPCErrorMsg(xPCGetLastError(), errMsg);
-        opserr << "ECxPCtarget::execute() - xPCSetParam: error = " << errMsg << endln;
+        opserr << "ECxPCtarget::control() - xPCSetParam: error = " << errMsg << endln;
         xPCClosePort(port);
         xPCFreeAPI();
         return xPCGetLastError();
     }
-
+    
 	// wait until switchPC flag has changed as well
 	while (xPCGetSignal(port, switchPCId) != 0.0) {}
-
+    
     return OF_ReturnType_completed;
 }
 
@@ -582,7 +582,7 @@ int ECxPCtarget::acquire()
         xPCFreeAPI();
         return xPCGetLastError();
     }
-        
+    
     return OF_ReturnType_completed;
 }
 

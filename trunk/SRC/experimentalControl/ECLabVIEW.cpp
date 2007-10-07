@@ -193,7 +193,7 @@ int ECLabVIEW::setSize(ID sizeT, ID sizeO)
         (sizeTForce != 0 && sizeTForce != sizeT[OF_Resp_Force]) ||
         (sizeODisp != 0 && sizeODisp != sizeO[OF_Resp_Disp]) ||
         (sizeOForce != 0 && sizeOForce != sizeO[OF_Resp_Force]))  {
-        opserr << "ECLabVIEW::setSize - wrong sizeTrial/Out\n"; 
+        opserr << "ECLabVIEW::setSize() - wrong sizeTrial/Out\n"; 
         opserr << "see User Manual.\n";
         sprintf(sData,"close-session\tOpenFresco\n");
         sendData = new Message(sData,(int)strlen(sData));  // needed because of bug in LabVIEW-plugin

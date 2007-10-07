@@ -81,7 +81,7 @@ private:
     const int *memPtrBASE;
 	double *memPtrOPF;
 
-    double *updateFlag, *targetFlag;
+    double *newTarget, *atTarget, *switchPC;
     Vector *cDisp,  *dDisp;
     Vector *cVel,   *dVel;
     Vector *cAccel, *dAccel;
