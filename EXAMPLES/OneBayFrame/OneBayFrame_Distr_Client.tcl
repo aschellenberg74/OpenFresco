@@ -10,8 +10,8 @@
 # Revision: A
 #
 # Purpose: this file contains the tcl input to perform
-# a local hybrid simulation of a one bay frame with
-# two experimental zero length elements.
+# a distributed hybrid simulation of a one bay frame with
+# two experimental twoNodeLink elements.
 # The specimens are simulated using the SimUniaxialMaterials
 # controller.
 
@@ -69,9 +69,11 @@ expSite LocalSite 2 2
 # Define experimental elements
 # ----------------------------
 # left column
-# expElement genericClient $eleTag -node $Ndi -dof $dofNdi -dof $dofNdj ... -server $ipPort <$ipAddr> <-ssl> <-dataSize $size>
-expElement genericClient 1 -node 1 3 -dof 1 2 -dof 1 2 -server 8090
-#expElement twoNodeLink 1 1 3 -dir 2 -server 8090 -initStif 2.8 -orient 0 1 0 -1 0 0
+# element genericClient $eleTag -node $Ndi $Ndj ... -dof $dofNdi -dof $dofNdj ... -server $ipPort <$ipAddr> <-ssl> <-dataSize $size>
+#element genericClient 1 -node 1 3 -dof 1 2 -dof 1 2 -server 8090;  # use with SimAppElemServer
+
+# expElement twoNodeLink $eleTag $iNode $jNode -dir $dirs -server $ipPort <ipAddr> <-ssl> <-dataSize $size> -initStif $Kij <-orient $x1 $x2 $x3 $y1 $y2 $y3> <-iMod> <-mass $m>
+expElement twoNodeLink 1 1 3 -dir 2 -server 8090 -initStif 2.8 -orient 0 1 0 -1 0 0;  # use with SimAppSiteServer
 
 # Define numerical elements
 # -------------------------
