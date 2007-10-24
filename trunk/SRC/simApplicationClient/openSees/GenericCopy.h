@@ -1,21 +1,20 @@
 /* ****************************************************************** **
-**    OpenFRESCO - Open Framework                                     **
-**                 for Experimental Setup and Control                 **
+**    OpenSees - Open System for Earthquake Engineering Simulation    **
+**          Pacific Earthquake Engineering Research Center            **
 **                                                                    **
 **                                                                    **
-** Copyright (c) 2006, The Regents of the University of California    **
+** (C) Copyright 1999, The Regents of the University of California    **
 ** All Rights Reserved.                                               **
 **                                                                    **
 ** Commercial use of this program without express permission of the   **
-** University of California, Berkeley, is strictly prohibited. See    **
-** file 'COPYRIGHT_UCB' in main directory for information on usage    **
-** and redistribution, and for a DISCLAIMER OF ALL WARRANTIES.        **
+** University of California, Berkeley, is strictly prohibited.  See   **
+** file 'COPYRIGHT'  in main directory for information on usage and   **
+** redistribution,  and for a DISCLAIMER OF ALL WARRANTIES.           **
 **                                                                    **
 ** Developed by:                                                      **
-**   Andreas Schellenberg (andreas.schellenberg@gmx.net)              **
-**   Yoshikazu Takahashi (yos@catfish.dpri.kyoto-u.ac.jp)             **
-**   Gregory L. Fenves (fenves@berkeley.edu)                          **
-**   Stephen A. Mahin (mahin@berkeley.edu)                            **
+**   Frank McKenna (fmckenna@ce.berkeley.edu)                         **
+**   Gregory L. Fenves (fenves@ce.berkeley.edu)                       **
+**   Filip C. Filippou (filippou@ce.berkeley.edu)                     **
 **                                                                    **
 ** ****************************************************************** */
 
@@ -31,15 +30,13 @@
 // Revision: A
 //
 // Description: This file contains the class definition for GenericCopy.
-// GenericCopy is a generic element defined by any number of nodes and 
-// the degrees of freedom at those nodes. The element communicates with 
-// OpenFresco trough a tcp/ip connection.
+// GenericCopy is an exact copy of an already existing element in the
+// domain. As such it returns the same stiffnesses and resisting forces
+// as the source element. This is useful if the source element is a
+// genericClient element that communicates with an experimental element.
 
 #include <Element.h>
 #include <Matrix.h>
-#include <FrescoGlobals.h>
-
-#define ELE_TAG_GenericCopy 9956
 
 
 class GenericCopy : public Element
@@ -52,32 +49,32 @@ public:
     ~GenericCopy();
     
     // method to get class type
-    const char *getClassType(void) const {return "GenericCopy";};
+    const char *getClassType() const {return "GenericCopy";};
 
     // public methods to obtain information about dof & connectivity    
-    int getNumExternalNodes(void) const;
-    const ID &getExternalNodes(void);
-    Node **getNodePtrs(void);
-    int getNumDOF(void);
+    int getNumExternalNodes() const;
+    const ID &getExternalNodes();
+    Node **getNodePtrs();
+    int getNumDOF();
     void setDomain(Domain *theDomain);
     
     // public methods to set the state of the element    
-    int commitState(void);
-    int revertToLastCommit(void);        
-    int revertToStart(void);
-    int update(void);
+    int commitState();
+    int revertToLastCommit();        
+    int revertToStart();
+    int update();
     
     // public methods to obtain stiffness, mass, damping and residual information    
-    const Matrix &getTangentStiff(void);
-    const Matrix &getInitialStiff(void);
-    //const Matrix &getDamp(void);
-    const Matrix &getMass(void);
+    const Matrix &getTangentStiff();
+    const Matrix &getInitialStiff();
+    //const Matrix &getDamp();
+    const Matrix &getMass();
     
-    void zeroLoad(void);
+    void zeroLoad();
     int addLoad(ElementalLoad *theLoad, double loadFactor);
     int addInertiaLoadToUnbalance(const Vector &accel);
-    const Vector &getResistingForce(void);
-    const Vector &getResistingForceIncInertia(void);
+    const Vector &getResistingForce();
+    const Vector &getResistingForceIncInertia();
     
     // public methods for element output
     int sendSelf(int commitTag, Channel &theChannel);

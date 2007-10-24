@@ -105,25 +105,14 @@ int openFresco_addExperimentalSite(ClientData clientData,
 }
 
 // experimental element commands
-extern int TclGenericClientCommand(ClientData clientData, Tcl_Interp *interp,
-    int argc, TCL_Char **argv, Domain *theDomain, TclModelBuilder *theTclBuilder);
-extern int TclGenericCopyCommand(ClientData clientData, Tcl_Interp *interp,
-    int argc, TCL_Char **argv, Domain *theDomain, TclModelBuilder *theTclBuilder);
 extern int TclExpElementCommand(ClientData clientData, Tcl_Interp *interp,
     int argc, TCL_Char **argv, Domain *theDomain, TclModelBuilder *theTclBuilder);
 
 int openFresco_addExperimentalElement(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
 {
-    if (strcmp(argv[1],"genericClient") == 0)
-        return TclGenericClientCommand(clientData, interp, argc, argv,
-            theDomain, theTclBuilder);
-    else if (strcmp(argv[1],"genericCopy") == 0)
-        return TclGenericCopyCommand(clientData, interp, argc, argv,
-            theDomain, theTclBuilder);
-    else
-        return TclExpElementCommand(clientData, interp, argc, argv,
-            theDomain, theTclBuilder);
+    return TclExpElementCommand(clientData, interp, argc, argv,
+        theDomain, theTclBuilder);
 }
 
 

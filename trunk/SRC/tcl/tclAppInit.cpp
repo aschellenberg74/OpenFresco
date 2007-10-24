@@ -621,8 +621,9 @@ int openFresco_startSimAppElemServer(ClientData clientData,
         sTime = new Vector(&sData[id], sizeDaq(OF_Resp_Time));
         id += sizeDaq(OF_Resp_Time);
     }
-    Matrix *sMatrix = new Matrix(sData, ndf, ndf);
     sendData->Zero();
+    Matrix *sMatrix = new Matrix(sData, ndf, ndf);
+    sMatrix->Zero();
     
     // start server loop
     opserr << "\nSimAppElemServer with ExpElement " << eleTag

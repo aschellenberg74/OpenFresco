@@ -1,21 +1,20 @@
 /* ****************************************************************** **
-**    OpenFRESCO - Open Framework                                     **
-**                 for Experimental Setup and Control                 **
+**    OpenSees - Open System for Earthquake Engineering Simulation    **
+**          Pacific Earthquake Engineering Research Center            **
 **                                                                    **
 **                                                                    **
-** Copyright (c) 2006, The Regents of the University of California    **
+** (C) Copyright 1999, The Regents of the University of California    **
 ** All Rights Reserved.                                               **
 **                                                                    **
 ** Commercial use of this program without express permission of the   **
-** University of California, Berkeley, is strictly prohibited. See    **
-** file 'COPYRIGHT_UCB' in main directory for information on usage    **
-** and redistribution, and for a DISCLAIMER OF ALL WARRANTIES.        **
+** University of California, Berkeley, is strictly prohibited.  See   **
+** file 'COPYRIGHT'  in main directory for information on usage and   **
+** redistribution,  and for a DISCLAIMER OF ALL WARRANTIES.           **
 **                                                                    **
 ** Developed by:                                                      **
-**   Andreas Schellenberg (andreas.schellenberg@gmx.net)              **
-**   Yoshikazu Takahashi (yos@catfish.dpri.kyoto-u.ac.jp)             **
-**   Gregory L. Fenves (fenves@berkeley.edu)                          **
-**   Stephen A. Mahin (mahin@berkeley.edu)                            **
+**   Frank McKenna (fmckenna@ce.berkeley.edu)                         **
+**   Gregory L. Fenves (fenves@ce.berkeley.edu)                       **
+**   Filip C. Filippou (filippou@ce.berkeley.edu)                     **
 **                                                                    **
 ** ****************************************************************** */
 
@@ -31,7 +30,6 @@
 
 #include "GenericClient.h"
 
-#include <ArrayOfTaggedObjects.h>
 #include <Domain.h>
 #include <Node.h>
 #include <Channel.h>
@@ -40,7 +38,9 @@
 #include <Information.h>
 #include <ElementResponse.h>
 #include <TCP_Socket.h>
-#include <TCP_SocketSSL.h>
+#ifdef SSL
+    #include <TCP_SocketSSL.h>
+#endif
 
 #include <math.h>
 #include <stdlib.h>
@@ -63,8 +63,7 @@ GenericClient::GenericClient(int tag, ID nodes, ID *dof,
     connectedExternalNodes(nodes), basicDOF(1),
     numExternalNodes(0), numDOF(0), numBasicDOF(0),
     theChannel(0), sData(0), sendData(0), rData(0), recvData(0),
-    db(0), vb(0), ab(0), t(0),
-    qMeas(0), rMatrix(0),
+    db(0), vb(0), ab(0), t(0), qMeas(0), rMatrix(0),
     dbTarg(1), dbPast(1), initStiffFlag(false), massFlag(false)
 {    
     // initialize nodes
@@ -101,31 +100,33 @@ GenericClient::GenericClient(int tag, ID nodes, ID *dof,
         else
             theChannel = new TCP_Socket(port, machineInetAddr);
     }
+#ifdef SSL
     else  {
         if (machineInetAddr == 0)
             theChannel = new TCP_SocketSSL(port, "127.0.0.1");
         else
             theChannel = new TCP_SocketSSL(port, machineInetAddr);
     }
+#endif
     theChannel->setUpConnection();
 
     // set the data size for the experimental element
-    int intData[2*OF_Resp_All+1];
-    ID idData(intData, 2*OF_Resp_All+1);
-    ID *sizeCtrl = new ID(intData, OF_Resp_All);
-    ID *sizeDaq = new ID(&intData[OF_Resp_All], OF_Resp_All);
+    int intData[2*5+1];
+    ID idData(intData, 2*5+1);
+    ID *sizeCtrl = new ID(intData, 5);
+    ID *sizeDaq = new ID(&intData[5], 5);
     idData.Zero();
         
-    (*sizeCtrl)[OF_Resp_Disp]  = numBasicDOF;
-    (*sizeCtrl)[OF_Resp_Vel]   = numBasicDOF;
-    (*sizeCtrl)[OF_Resp_Accel] = numBasicDOF;
-    (*sizeCtrl)[OF_Resp_Time]  = 1;
+    (*sizeCtrl)[0]  = numBasicDOF;
+    (*sizeCtrl)[1]   = numBasicDOF;
+    (*sizeCtrl)[2] = numBasicDOF;
+    (*sizeCtrl)[4]  = 1;
     
-    (*sizeDaq)[OF_Resp_Force]  = numBasicDOF;
+    (*sizeDaq)[3]  = numBasicDOF;
     
     if (dataSize < 1+3*numBasicDOF+1) dataSize = 1+3*numBasicDOF+1;
     if (dataSize < numBasicDOF*numBasicDOF) dataSize = numBasicDOF*numBasicDOF;
-    intData[2*OF_Resp_All] = dataSize;
+    intData[2*5] = dataSize;
 
     theChannel->sendID(0, 0, idData, 0);
     
@@ -165,7 +166,7 @@ GenericClient::GenericClient(int tag, ID nodes, ID *dof,
 // delete must be invoked on any objects created by the object.
 GenericClient::~GenericClient()
 {
-    sData[0] = OF_RemoteTest_DIE;
+    sData[0] = 99;
     theChannel->sendVector(0, 0, *sendData, 0);
 
     // invoke the destructor on any objects created by the object
@@ -288,7 +289,7 @@ int GenericClient::commitState()
 {
     int rValue = 0;
     
-    sData[0] = OF_RemoteTest_commitState;
+    sData[0] = 6;
     rValue += theChannel->sendVector(0, 0, *sendData, 0);
     
     return rValue;
@@ -345,7 +346,7 @@ int GenericClient::update()
         // save the displacements
         dbPast = (*db);
         // set the trial response at the element
-        sData[0] = OF_RemoteTest_setTrialResponse;
+        sData[0] = 3;
         rValue += theChannel->sendVector(0, 0, *sendData, 0);
     }
     
@@ -359,7 +360,7 @@ const Matrix& GenericClient::getTangentStiff()
     theMatrix.Zero();
     rMatrix->Zero();
 
-    sData[0] = OF_RemoteTest_getTangentStiff;
+    sData[0] = 12;
     theChannel->sendVector(0, 0, *sendData, 0);
     theChannel->recvVector(0, 0, *recvData, 0);
     
@@ -376,7 +377,7 @@ const Matrix& GenericClient::getInitialStiff()
         theInitStiff.Zero();
         rMatrix->Zero();
 
-        sData[0] = OF_RemoteTest_getInitialStiff;
+        sData[0] = 13;
         theChannel->sendVector(0, 0, *sendData, 0);
         theChannel->recvVector(0, 0, *recvData, 0);
         
@@ -388,13 +389,13 @@ const Matrix& GenericClient::getInitialStiff()
 }
 
 
-/*const Matrix& GenericClient::getDamp(void)
+/*const Matrix& GenericClient::getDamp()
 {
     // zero the matrices
     theMatrix.Zero();
     rMatrix->Zero();
 
-    sData[0] = OF_RemoteTest_getDamp;
+    sData[0] = 14;
     theChannel->sendVector(0, 0, *sendData, 0);
     theChannel->recvVector(0, 0, *recvData, 0);
     
@@ -404,14 +405,14 @@ const Matrix& GenericClient::getInitialStiff()
 }*/
 
 
-const Matrix& GenericClient::getMass(void)
+const Matrix& GenericClient::getMass()
 {
     if (massFlag == false)  {
         // zero the matrices
         theMass.Zero();
         rMatrix->Zero();
 
-        sData[0] = OF_RemoteTest_getMass;
+        sData[0] = 15;
         theChannel->sendVector(0, 0, *sendData, 0);
         theChannel->recvVector(0, 0, *recvData, 0);
         
@@ -423,7 +424,7 @@ const Matrix& GenericClient::getMass(void)
 }
 
 
-void GenericClient::zeroLoad(void)
+void GenericClient::zeroLoad()
 {
     theLoad.Zero();
 }
@@ -466,7 +467,7 @@ const Vector& GenericClient::getResistingForce()
     theVector.Zero();
     
     // get measured resisting forces
-    sData[0] = OF_RemoteTest_getForce;
+    sData[0] = 10;
     theChannel->sendVector(0, 0, *sendData, 0);
     theChannel->recvVector(0, 0, *recvData, 0);
    

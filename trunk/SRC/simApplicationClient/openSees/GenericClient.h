@@ -1,21 +1,20 @@
 /* ****************************************************************** **
-**    OpenFRESCO - Open Framework                                     **
-**                 for Experimental Setup and Control                 **
+**    OpenSees - Open System for Earthquake Engineering Simulation    **
+**          Pacific Earthquake Engineering Research Center            **
 **                                                                    **
 **                                                                    **
-** Copyright (c) 2006, The Regents of the University of California    **
+** (C) Copyright 1999, The Regents of the University of California    **
 ** All Rights Reserved.                                               **
 **                                                                    **
 ** Commercial use of this program without express permission of the   **
-** University of California, Berkeley, is strictly prohibited. See    **
-** file 'COPYRIGHT_UCB' in main directory for information on usage    **
-** and redistribution, and for a DISCLAIMER OF ALL WARRANTIES.        **
+** University of California, Berkeley, is strictly prohibited.  See   **
+** file 'COPYRIGHT'  in main directory for information on usage and   **
+** redistribution,  and for a DISCLAIMER OF ALL WARRANTIES.           **
 **                                                                    **
 ** Developed by:                                                      **
-**   Andreas Schellenberg (andreas.schellenberg@gmx.net)              **
-**   Yoshikazu Takahashi (yos@catfish.dpri.kyoto-u.ac.jp)             **
-**   Gregory L. Fenves (fenves@berkeley.edu)                          **
-**   Stephen A. Mahin (mahin@berkeley.edu)                            **
+**   Frank McKenna (fmckenna@ce.berkeley.edu)                         **
+**   Gregory L. Fenves (fenves@ce.berkeley.edu)                       **
+**   Filip C. Filippou (filippou@ce.berkeley.edu)                     **
 **                                                                    **
 ** ****************************************************************** */
 
@@ -37,11 +36,8 @@
 
 #include <Element.h>
 #include <Matrix.h>
-#include <FrescoGlobals.h>
 
 class Channel;
-
-#define ELE_TAG_GenericClient 9955
 
 
 class GenericClient : public Element
@@ -50,38 +46,38 @@ public:
     // constructors
     GenericClient(int tag, ID nodes, ID *dof,
         int port, char *machineInetAddress = 0,
-        int ssl = 0, int dataSize = OF_Network_dataSize);
+        int ssl = 0, int dataSize = 256);
     
     // destructor
     ~GenericClient();
     
     // method to get class type
-    const char *getClassType(void) const {return "GenericClient";};
+    const char *getClassType() const {return "GenericClient";};
 
     // public methods to obtain information about dof & connectivity    
-    int getNumExternalNodes(void) const;
-    const ID &getExternalNodes(void);
-    Node **getNodePtrs(void);
-    int getNumDOF(void);
+    int getNumExternalNodes() const;
+    const ID &getExternalNodes();
+    Node **getNodePtrs();
+    int getNumDOF();
     void setDomain(Domain *theDomain);
     
     // public methods to set the state of the element    
-    int commitState(void);
-    int revertToLastCommit(void);        
-    int revertToStart(void);
-    int update(void);
+    int commitState();
+    int revertToLastCommit();        
+    int revertToStart();
+    int update();
     
     // public methods to obtain stiffness, mass, damping and residual information    
-    const Matrix &getTangentStiff(void);
-    const Matrix &getInitialStiff(void);
-    //const Matrix &getDamp(void);
-    const Matrix &getMass(void);
+    const Matrix &getTangentStiff();
+    const Matrix &getInitialStiff();
+    //const Matrix &getDamp();
+    const Matrix &getMass();
     
-    void zeroLoad(void);
+    void zeroLoad();
     int addLoad(ElementalLoad *theLoad, double loadFactor);
     int addInertiaLoadToUnbalance(const Vector &accel);
-    const Vector &getResistingForce(void);
-    const Vector &getResistingForceIncInertia(void);
+    const Vector &getResistingForce();
+    const Vector &getResistingForceIncInertia();
     
     // public methods for element output
     int sendSelf(int commitTag, Channel &theChannel);
