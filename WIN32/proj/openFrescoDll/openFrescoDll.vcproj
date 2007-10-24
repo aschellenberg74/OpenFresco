@@ -64,7 +64,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=" /FORCE:MULTIPLE"
-				AdditionalDependencies="libeay32MTd.lib ssleay32MTd.lib ws2_32.lib MtsCsiCom.lib CLib32.lib pnpscrd.lib OpenGL32.lib glu32.lib GlAux.lib tcl.lib tcl84.lib tk84.lib damage.lib corotational.lib handler.lib fedeas.lib drain.lib reliability.lib database.lib renderer.lib blas.lib lapack.lib feap.lib arpack.lib umfpack.lib openSeesFortran.lib actor.lib analysis.lib cblas.lib convergence.lib domain.lib element.lib graph.lib material.lib matrix.lib modelbuilder.lib recorder.lib superLU.lib system.lib tagged.lib utility.lib"
+				AdditionalDependencies="libeay32MTd.lib ssleay32MTd.lib ws2_32.lib MtsCsiCom.lib CLib32.lib pnpscrd.lib OpenGL32.lib glu32.lib GlAux.lib tcl.lib tcl84.lib tk84.lib damage.lib handler.lib fedeas.lib drain.lib reliability.lib database.lib renderer.lib blas.lib lapack.lib feap.lib arpack.lib umfpack.lib openSeesFortran.lib actor.lib analysis.lib cblas.lib convergence.lib domain.lib element.lib graph.lib material.lib matrix.lib modelbuilder.lib recorder.lib superLU.lib system.lib tagged.lib utility.lib"
 				OutputFile="$(OutDir)/OpenFresco.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\src\experimentalControl\dSpace;..\..\..\src\experimentalControl\MTSCsi;..\..\..\src\experimentalControl\NIEseries;..\..\..\src\experimentalControl\SCRAMNet;&quot;c:\Program Files\Tcl\lib&quot;;&quot;c:\Program Files\OpenSSL\lib\VC&quot;;&quot;$(OpenSeesDir)\win32\lib&quot;;&quot;$(OpenSeesDir)\win32\lib\debug&quot;"
@@ -153,7 +153,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=" /FORCE:MULTIPLE"
-				AdditionalDependencies="libeay32MT.lib ssleay32MT.lib ws2_32.lib MtsCsiCom.lib CLib32.lib pnpscr.lib OpenGL32.lib glu32.lib GlAux.lib tcl.lib tcl84.lib tk84.lib damage.lib corotational.lib handler.lib fedeas.lib drain.lib reliability.lib database.lib renderer.lib blas.lib lapack.lib feap.lib arpack.lib umfpack.lib openSeesFortran.lib actor.lib analysis.lib cblas.lib convergence.lib domain.lib element.lib graph.lib material.lib matrix.lib modelbuilder.lib recorder.lib superLU.lib system.lib tagged.lib utility.lib"
+				AdditionalDependencies="libeay32MT.lib ssleay32MT.lib ws2_32.lib MtsCsiCom.lib CLib32.lib pnpscr.lib OpenGL32.lib glu32.lib GlAux.lib tcl.lib tcl84.lib tk84.lib damage.lib handler.lib fedeas.lib drain.lib reliability.lib database.lib renderer.lib blas.lib lapack.lib feap.lib arpack.lib umfpack.lib openSeesFortran.lib actor.lib analysis.lib cblas.lib convergence.lib domain.lib element.lib graph.lib material.lib matrix.lib modelbuilder.lib recorder.lib superLU.lib system.lib tagged.lib utility.lib"
 				OutputFile="$(OutDir)/OpenFresco.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\src\experimentalControl\dSpace;..\..\..\src\experimentalControl\MTSCsi;..\..\..\src\experimentalControl\NIEseries;..\..\..\src\experimentalControl\SCRAMNet;&quot;c:\Program Files\Tcl\lib&quot;;&quot;c:\Program Files\OpenSSL\lib\VC&quot;;&quot;$(OpenSeesDir)\win32\lib&quot;;&quot;$(OpenSeesDir)\win32\lib\release&quot;"
@@ -354,6 +354,14 @@
 						Name="VCCustomBuildTool"
 					/>
 				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\..\SRC\experimentalControl\ECSimFEAdapter.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\SRC\experimentalControl\ECSimFEAdapter.h"
+				>
 			</File>
 			<File
 				RelativePath="..\..\..\src\experimentalControl\ECSimulation.cpp"
@@ -559,38 +567,6 @@
 				RelativePath="..\..\..\src\tcl\OpenFrescoPackage.cpp"
 				>
 			</File>
-		</Filter>
-		<Filter
-			Name="simApplicationClient"
-			>
-			<Filter
-				Name="openSees"
-				>
-				<File
-					RelativePath="..\..\..\SRC\simApplicationClient\openSees\GenericClient.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\SRC\simApplicationClient\openSees\GenericClient.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\SRC\simApplicationClient\openSees\GenericCopy.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\SRC\simApplicationClient\openSees\GenericCopy.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\SRC\simApplicationClient\openSees\TclGenericClientCommand.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\SRC\simApplicationClient\openSees\TclGenericCopyCommand.cpp"
-					>
-				</File>
-			</Filter>
 		</Filter>
 		<Filter
 			Name="Resource Files"
