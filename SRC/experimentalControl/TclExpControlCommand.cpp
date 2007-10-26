@@ -456,35 +456,40 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
 			return TCL_ERROR;		
 		}
         argi++;
-
-		// parsing was successful, allocate the control
-		theControl = new ECSimUniaxialMaterials(tag);	
-
 		// now read the number of materials
 		while (argi+numMats < argc)  {
 			numMats++;
 		}
-		// add the materials to the control
-		for (int i=0; i<numMats; i++)  {
-			// read the material tag
-			if (Tcl_GetInt(interp, argv[argi], &matTag) != TCL_OK)  {
-				opserr << "WARNING invalid matTag\n";
-				opserr << "expControl SimUniaxialMaterials " << tag << endln;
-				return TCL_ERROR;
-			} else  {
-				// get a pointer to the material from the modelbuilder	    
-				argi++;
-				UniaxialMaterial *theMat = theTclBuilder->getUniaxialMaterial(matTag);
-				if (theMat == 0)  {
-					opserr << "WARNING no material " << matTag << " exists\n";
-					opserr << "expControl SimUniaxialMaterials " << tag << endln;
-					return TCL_ERROR;		
-				} else  {
-					// add the material
-                    theControl->addDummySpecimen(theMat);
-				}
-			}
-		}
+        if (numMats == 0)  {
+		    opserr << "WARNING no uniaxial materials specified\n";
+		    opserr << "expControl SimUniaxialMaterials " << tag << endln;
+		    return TCL_ERROR;
+	    }
+        // create the array to hold the uniaxial materials
+        UniaxialMaterial **theSpecimen = new UniaxialMaterial* [numMats];
+        if (theSpecimen == 0)  {
+		    opserr << "WARNING out of memory\n";
+		    opserr << "expControl SimUniaxialMaterials " << tag << endln;
+		    return TCL_ERROR;
+	    }
+        for (int i=0; i<numMats; i++)  {
+            if (Tcl_GetInt(interp, argv[argi], &matTag) != TCL_OK)  {
+                opserr << "WARNING invalid matTag\n";
+                opserr << "expControl SimUniaxialMaterials " << tag << endln;
+                return TCL_ERROR;	
+            }
+            theSpecimen[i] = theTclBuilder->getUniaxialMaterial(matTag);
+            if (theSpecimen[i] == 0)  {
+                opserr << "WARNING uniaxial material not found\n";
+                opserr << "uniaxialMaterial " << matTag << endln;
+                opserr << "expControl SimUniaxialMaterials " << tag << endln;
+                return TCL_ERROR;
+            }
+            argi++;
+        }
+
+		// parsing was successful, allocate the control
+		theControl = new ECSimUniaxialMaterials(tag,numMats,theSpecimen);	
 
         if (theControl == 0)  {
             opserr << "WARNING could not create experimental control " << argv[1] << endln;
