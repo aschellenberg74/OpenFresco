@@ -400,20 +400,20 @@ void EEBeamColumn3d::setDomain(Domain *theDomain)
     // set transformation matrix from basic sys A to basic sys B
     T.Zero();
     T(0,0) =  1;
-    T(1,3) =  L;
-    T(2,1) = -L;
-    T(3,5) =  1;
+    T(1,1) = -L;
+    T(2,1) = -1;  T(2,2) = 1;
+    T(3,3) =  L;
     T(4,3) = -1;  T(4,4) = 1;
-    T(5,1) = -1;  T(5,2) = 1;
+    T(5,5) =  1;
     
     // set transformation matrix from basic sys B to basic sys A
-    T.Zero();
-    T(0,0) =  1;
-    T(1,2) = -1/L;
-    T(2,2) = -1/L;  T(2,5) = 1;
-    T(3,1) =  1/L;
-    T(4,1) =  1/L;  T(4,4) = 1;
-    T(5,3) =  1;
+    Tinv.Zero();
+    Tinv(0,0) =  1;
+    Tinv(1,1) = -1/L;
+    Tinv(2,1) = -1/L;  Tinv(2,2) = 1;
+    Tinv(3,3) =  1/L;
+    Tinv(4,3) =  1/L;  Tinv(4,4) = 1;
+    Tinv(5,5) =  1;
 }   	 
 
 
@@ -674,8 +674,8 @@ const Vector& EEBeamColumn3d::getResistingForce()
         if ((*qMeas)(0) == 0.0)
             (*qMeas)(0) = kbInit(0,0) * (*db)(0);
         // use elastic torsion if torsion from test is zero
-        if ((*qMeas)(4) == 0.0)
-            (*qMeas)(4) = kbInit(4,4) * (*db)(4);
+        if ((*qMeas)(5) == 0.0)
+            (*qMeas)(5) = kbInit(5,5) * (*db)(5);
     }
     
     // save corresponding target displacements for recorder

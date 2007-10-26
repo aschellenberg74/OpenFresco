@@ -405,7 +405,7 @@ void EEBeamColumn2d::setDomain(Domain *theDomain)
     Tinv.Zero();
     Tinv(0,0) =  1;
     Tinv(1,1) = -1/L;
-    Tinv(2,1) = -1/L;  T(2,2) = 1;
+    Tinv(2,1) = -1/L;  Tinv(2,2) = 1;
 }   	 
 
 
