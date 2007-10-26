@@ -3,22 +3,19 @@
 **                 for Experimental Setup and Control                 **
 **                                                                    **
 **                                                                    **
-** Copyright (c) 2006, Yoshikazu Takahashi, Kyoto University          **
-** All rights reserved.                                               **
+** Copyright (c) 2006, The Regents of the University of California    **
+** All Rights Reserved.                                               **
 **                                                                    **
-** Licensed under the modified BSD License (the "License");           **
-** you may not use this file except in compliance with the License.   **
-** You may obtain a copy of the License in main directory.            **
-** Unless required by applicable law or agreed to in writing,         **
-** software distributed under the License is distributed on an        **
-** "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,       **
-** either express or implied. See the License for the specific        **
-** language governing permissions and limitations under the License.  **
+** Commercial use of this program without express permission of the   **
+** University of California, Berkeley, is strictly prohibited. See    **
+** file 'COPYRIGHT_UCB' in main directory for information on usage    **
+** and redistribution, and for a DISCLAIMER OF ALL WARRANTIES.        **
 **                                                                    **
 ** Developed by:                                                      **
-**   Yoshikazu Takahashi (yos@catfish.dpri.kyoto-u.ac.jp)             **
 **   Andreas Schellenberg (andreas.schellenberg@gmx.net)              **
+**   Yoshikazu Takahashi (yos@catfish.dpri.kyoto-u.ac.jp)             **
 **   Gregory L. Fenves (fenves@berkeley.edu)                          **
+**   Stephen A. Mahin (mahin@berkeley.edu)                            **
 **                                                                    **
 ** ****************************************************************** */
 
@@ -29,12 +26,14 @@
 #ifndef ECSimUniaxialMaterials_h
 #define ECSimUniaxialMaterials_h
 
-// Written: Yoshi (yos@catfish.dpri.kyoto-u.ac.jp)
-// Created: 09/06
+// Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+// Created: 10/07
 // Revision: A
 //
 // Description: This file contains the class definition for 
-// ECSimUniaxialMaterials.
+// ECSimUniaxialMaterials. ECSimUniaxialMaterials is a controller
+// class for simulating the behavior of a specimen using any number
+// of OpenSees uniaxial material objects. The materials are uncoupled.
 
 #include "ECSimulation.h"
 
@@ -44,7 +43,8 @@ class ECSimUniaxialMaterials : public ECSimulation
 {
 public:
     // constructors
-    ECSimUniaxialMaterials(int tag);
+    ECSimUniaxialMaterials(int tag, int numMat,
+        UniaxialMaterial **theSpecimen);
     ECSimUniaxialMaterials(const ECSimUniaxialMaterials& ec);
     
     // destructor
@@ -68,9 +68,7 @@ public:
     virtual int commitState();
 
     virtual ExperimentalControl *getCopy();
-    
-    int addDummySpecimen(UniaxialMaterial *theSpecimen);
-    
+        
     // public methods for output
     void Print(OPS_Stream &s, int flag = 0);    
     
@@ -80,16 +78,11 @@ protected:
     virtual int acquire();
     
 private:
-    ArrayOfTaggedObjects *theSpecimens;
+    int numMats;                     // number of uniaxial materials
+    UniaxialMaterial **theSpecimen;  // uniaxial materials
     
-    // minimum variable set for UniaxialMaterial
-    Vector *cDispV;
-    Vector *cVelV;
-    
-    Vector *dDispV;
-    Vector *dVelV;
-    Vector *dForceV;
+    Vector *targDisp, *targVel;    
+    Vector *measDisp, *measVel, *measForce;
 };
-
 
 #endif
