@@ -78,9 +78,7 @@ extern int		Tclxttest_Init _ANSI_ARGS_((Tcl_Interp *interp));
 
 #include <Domain.h>
 #include <TclModelBuilder.h>
-#include <FileStream.h>
 #include <SimulationInformation.h>
-#include <StandardStream.h>
 
 #include <Node.h>
 #include <ExperimentalElement.h>
@@ -96,6 +94,10 @@ TclModelBuilder *theTclBuilder = 0;
 
 SimulationInformation simulationInfo;
 char *simulationInfoOutputFilename;
+char *neesCentralProjID;
+char *neesCentralExpID;
+char *neesCentralUser;
+char *neesCentralPasswd;
 
 /*
 *----------------------------------------------------------------------
@@ -966,20 +968,4 @@ int Tcl_AppInit(Tcl_Interp *interp)
     */
     Tcl_SetVar(interp, "tcl_rcFileName", "~/.tclshrc", TCL_GLOBAL_ONLY);
     return TCL_OK;
-}
-
-
-int OpenSeesExit(ClientData clientData, Tcl_Interp *interp, int argc, TCL_Char **argv)
-{
-    if (simulationInfoOutputFilename != 0) {
-        simulationInfo.end();
-        FileStream simulationInfoOutputFile;
-        simulationInfoOutputFile.setFile(simulationInfoOutputFilename);
-        simulationInfoOutputFile.open();
-        simulationInfoOutputFile << simulationInfo;
-        simulationInfoOutputFile.close();
-    }
-
-    Tcl_Exit(0);
-    return 0;
 }
