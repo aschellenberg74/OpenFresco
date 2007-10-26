@@ -32,10 +32,8 @@
 // the dll to be the same as those in the existing process address space.
 
 #include <tcl.h>
-#include <OPS_Stream.h>
 #include <Domain.h>
 #include <TclModelBuilder.h>
-#include <FileStream.h>
 #include <SimulationInformation.h>
 #include <ExperimentalSite.h>
 
@@ -46,6 +44,10 @@ TclModelBuilder *theTclBuilder;
 
 SimulationInformation simulationInfo;
 char *simulationInfoOutputFilename;
+char *neesCentralProjID;
+char *neesCentralExpID;
+char *neesCentralUser;
+char *neesCentralPasswd;
 
 extern ExperimentalSite *getExperimentalSite(int tag);
 
@@ -163,22 +165,4 @@ extern "C" DllExport void
 setGlobalPointers(OPS_Stream *theErrorStreamPtr)
 {
     opserrPtr = theErrorStreamPtr;
-}
-
-
-int  __cdecl
-OpenSeesExit(ClientData clientData, Tcl_Interp *interp,
-    int argc, const char **argv)
-{    
-    if (simulationInfoOutputFilename != 0) {
-    simulationInfo.end();
-    FileStream simulationInfoOutputFile;
-    simulationInfoOutputFile.setFile(simulationInfoOutputFilename);
-    simulationInfoOutputFile.open();
-    simulationInfoOutputFile << simulationInfo;
-    simulationInfoOutputFile.close();
-    }
-    
-    Tcl_Exit(0);
-    return 0;
 }
