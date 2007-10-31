@@ -6,7 +6,7 @@ Model {
     NumRootInports	    0
     NumRootOutports	    0
     ParameterArgumentNames  ""
-    ComputedModelVersion    "1.442"
+    ComputedModelVersion    "1.456"
     NumModelReferences	    0
     NumTestPointedSignals   0
   }
@@ -47,8 +47,8 @@ Model {
   ModifiedByFormat	  "%<Auto>"
   LastModifiedBy	  "user1"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Tue Jun 12 18:48:43 2007"
-  ModelVersionFormat	  "1.%<AutoIncrement:442>"
+  LastModifiedDate	  "Thu Oct 18 14:10:34 2007"
+  ModelVersionFormat	  "1.%<AutoIncrement:456>"
   ConfigurationManager	  "None"
   LinearizationMsg	  "none"
   Profile		  off
@@ -90,7 +90,7 @@ Model {
   ExtModeLogAll		  on
   ExtModeAutoUpdateStatusClock on
   BufferReuse		  off
-  ProdHWDeviceType	  "32-bit Generic"
+  ProdHWDeviceType	  "32-bit xPC Target (Intel Pentium)"
   ShowModelReferenceBlockVersion off
   ShowModelReferenceBlockIO off
   Array {
@@ -138,17 +138,17 @@ Model {
 	  ExternalInput		  "[t, u]"
 	  FinalStateName	  "xFinal"
 	  InitialState		  "xInitial"
-	  LimitDataPoints	  on
+	  LimitDataPoints	  off
 	  MaxDataPoints		  "1000"
 	  LoadExternalInput	  off
 	  LoadInitialState	  off
 	  SaveFinalState	  off
 	  SaveFormat		  "Array"
-	  SaveOutput		  on
+	  SaveOutput		  off
 	  SaveState		  off
-	  SignalLogging		  on
+	  SignalLogging		  off
 	  InspectSignalLogs	  off
-	  SaveTime		  on
+	  SaveTime		  off
 	  StateSaveName		  "xout"
 	  TimeSaveName		  "tout"
 	  OutputSaveName	  "yout"
@@ -174,7 +174,7 @@ Model {
 	  }
 	  Version		  "1.2.0"
 	  BlockReduction	  off
-	  BooleanDataType	  off
+	  BooleanDataType	  on
 	  ConditionallyExecuteInputs on
 	  InlineParams		  off
 	  InlineInvariantSignals  off
@@ -187,9 +187,9 @@ Model {
 	  ParameterPooling	  on
 	  RollThreshold		  5
 	  SystemCodeInlineAuto	  off
-	  StateBitsets		  off
-	  DataBitsets		  off
-	  UseTempVars		  off
+	  StateBitsets		  on
+	  DataBitsets		  on
+	  UseTempVars		  on
 	  ZeroExternalMemoryAtStartup on
 	  ZeroInternalMemoryAtStartup on
 	  InitFltsAndDblsToZero	  on
@@ -214,7 +214,7 @@ Model {
 	  CheckSSInitialOutputMsg on
 	  CheckExecutionContextPreStartOutputMsg off
 	  CheckExecutionContextRuntimeOutputMsg	off
-	  SignalResolutionControl "TryResolveAllWithWarning"
+	  SignalResolutionControl "UseLocalSettings"
 	  BlockPriorityViolationMsg "warning"
 	  MinStepSizeMsg	  "warning"
 	  TimeAdjustmentMsg	  "none"
@@ -223,7 +223,7 @@ Model {
 	  InheritedTsInSrcMsg	  "warning"
 	  DiscreteInheritContinuousMsg "warning"
 	  MultiTaskDSMMsg	  "error"
-	  MultiTaskCondExecSysMsg "none"
+	  MultiTaskCondExecSysMsg "error"
 	  MultiTaskRateTransMsg	  "error"
 	  SingleTaskRateTransMsg  "none"
 	  TasksWithSamePriorityMsg "warning"
@@ -259,7 +259,7 @@ Model {
 	  ModelReferenceDataLoggingMessage "warning"
 	  ModelReferenceSymbolNameMessage "warning"
 	  ModelReferenceExtraNoncontSigs "error"
-	  StrictBusMsg		  "None"
+	  StrictBusMsg		  "ErrorLevel1"
 	}
 	Simulink.HardwareCC {
 	  $ObjectID		  6
@@ -268,25 +268,25 @@ Model {
 	  ProdBitPerShort	  16
 	  ProdBitPerInt		  32
 	  ProdBitPerLong	  32
-	  ProdIntDivRoundTo	  "Undefined"
-	  ProdEndianess		  "Unspecified"
+	  ProdIntDivRoundTo	  "Zero"
+	  ProdEndianess		  "LittleEndian"
 	  ProdWordSize		  32
 	  ProdShiftRightIntArith  on
-	  ProdHWDeviceType	  "32-bit Generic"
+	  ProdHWDeviceType	  "32-bit xPC Target (Intel Pentium)"
 	  TargetBitPerChar	  8
 	  TargetBitPerShort	  16
 	  TargetBitPerInt	  32
 	  TargetBitPerLong	  32
 	  TargetShiftRightIntArith on
-	  TargetIntDivRoundTo	  "Undefined"
-	  TargetEndianess	  "Unspecified"
+	  TargetIntDivRoundTo	  "Zero"
+	  TargetEndianess	  "LittleEndian"
 	  TargetWordSize	  32
 	  TargetTypeEmulationWarnSuppressLevel 0
 	  TargetPreprocMaxBitsSint 32
 	  TargetPreprocMaxBitsUint 32
-	  TargetHWDeviceType	  "32-bit Generic"
+	  TargetHWDeviceType	  "32-bit xPC Target (Intel Pentium)"
 	  TargetUnknown		  off
-	  ProdEqTarget		  off
+	  ProdEqTarget		  on
 	}
 	Simulink.ModelReferenceCC {
 	  $ObjectID		  7
@@ -463,7 +463,7 @@ Model {
       }
       Name		      "Configuration"
       SimulationMode	      "normal"
-      CurrentDlgPage	      "Real-Time Workshop/xPC Target options"
+      CurrentDlgPage	      "Optimization"
     }
     PropName		    "ConfigurationSets"
   }
@@ -2097,6 +2097,7 @@ Model {
 	      CloseFcn		      "tagdialog Close"
 	      GotoTag		      "s"
 	      IconDisplay	      "Signal name"
+	      TagVisibility	      "global"
 	    }
 	    Block {
 	      BlockType		      From
@@ -2106,6 +2107,7 @@ Model {
 	      CloseFcn		      "tagdialog Close"
 	      GotoTag		      "t"
 	      IconDisplay	      "Signal name"
+	      TagVisibility	      "global"
 	    }
 	    Block {
 	      BlockType		      SubSystem
@@ -2119,7 +2121,7 @@ Model {
 	      MaskHideContents	      off
 	      System {
 		Name			"If Action\nSubsystem0"
-		Location		[666, 614, 1022, 893]
+		Location		[954, 636, 1310, 915]
 		Open			off
 		ModelBrowserVisibility	off
 		ModelBrowserWidth	200
@@ -2160,7 +2162,7 @@ Model {
 		  Value			  "0"
 		  VectorParams1D	  on
 		  SamplingMode		  "Sample based"
-		  OutDataTypeMode	  "Inherit from 'Constant value'"
+		  OutDataTypeMode	  "uint32"
 		  OutDataType		  "sfix(16)"
 		  ConRadixGroup		  "Use specified scaling"
 		  OutScaling		  "2^0"
@@ -2174,7 +2176,7 @@ Model {
 		  Value			  "1"
 		  VectorParams1D	  on
 		  SamplingMode		  "Sample based"
-		  OutDataTypeMode	  "Inherit from 'Constant value'"
+		  OutDataTypeMode	  "uint32"
 		  OutDataType		  "sfix(16)"
 		  ConRadixGroup		  "Use specified scaling"
 		  OutScaling		  "2^0"
@@ -2207,7 +2209,7 @@ Model {
 	      MaskHideContents	      off
 	      System {
 		Name			"If Action\nSubsystem1"
-		Location		[666, 614, 1022, 807]
+		Location		[954, 636, 1310, 829]
 		Open			off
 		ModelBrowserVisibility	off
 		ModelBrowserWidth	200
@@ -2241,7 +2243,7 @@ Model {
 		  Value			  "0"
 		  VectorParams1D	  on
 		  SamplingMode		  "Sample based"
-		  OutDataTypeMode	  "Inherit from 'Constant value'"
+		  OutDataTypeMode	  "uint32"
 		  OutDataType		  "sfix(16)"
 		  ConRadixGroup		  "Use specified scaling"
 		  OutScaling		  "2^0"
@@ -2322,8 +2324,8 @@ Model {
 	    Block {
 	      BlockType		      DataTypeConversion
 	      Name		      "typeConv"
-	      Position		      [305, 31, 360, 49]
-	      OutDataTypeMode	      "double"
+	      Position		      [315, 31, 370, 49]
+	      OutDataTypeMode	      "uint32"
 	    }
 	    Block {
 	      BlockType		      Outport
@@ -2388,12 +2390,6 @@ Model {
 	      DstPort		      ifaction
 	    }
 	    Line {
-	      SrcBlock		      "typeConv"
-	      SrcPort		      1
-	      DstBlock		      "Out"
-	      DstPort		      1
-	    }
-	    Line {
 	      SrcBlock		      "Mux1"
 	      SrcPort		      1
 	      DstBlock		      "Scope (xPC) 3"
@@ -2410,6 +2406,12 @@ Model {
 	      SrcPort		      1
 	      DstBlock		      "Mux1"
 	      DstPort		      3
+	    }
+	    Line {
+	      SrcBlock		      "typeConv"
+	      SrcPort		      1
+	      DstBlock		      "Out"
+	      DstPort		      1
 	    }
 	  }
 	}
@@ -2527,7 +2529,7 @@ Model {
 		  Value			  "1"
 		  VectorParams1D	  on
 		  SamplingMode		  "Sample based"
-		  OutDataTypeMode	  "Inherit from 'Constant value'"
+		  OutDataTypeMode	  "uint32"
 		  OutDataType		  "sfix(16)"
 		  ConRadixGroup		  "Use specified scaling"
 		  OutScaling		  "2^0"
@@ -2659,7 +2661,6 @@ Model {
 	  Position		  [80, 180, 110, 210]
 	  ShowName		  off
 	  ParameterDataTypeMode	  "Inherit via internal rule"
-	  OutDataTypeMode	  "Inherit via internal rule"
 	  SaturateOnIntegerOverflow off
 	}
 	Block {
@@ -2685,7 +2686,7 @@ Model {
 	  Value			  "0"
 	  VectorParams1D	  on
 	  SamplingMode		  "Sample based"
-	  OutDataTypeMode	  "Inherit from 'Constant value'"
+	  OutDataTypeMode	  "uint32"
 	  OutDataType		  "sfix(16)"
 	  ConRadixGroup		  "Use specified scaling"
 	  OutScaling		  "2^0"
@@ -2701,6 +2702,7 @@ Model {
 	  RTWStateStorageClass	  "Auto"
 	  VectorParams1D	  on
 	  ShowAdditionalParam	  off
+	  DataType		  "uint32"
 	}
 	Block {
 	  BlockType		  DataStoreRead
@@ -2718,6 +2720,7 @@ Model {
 	  RTWStateStorageClass	  "Auto"
 	  VectorParams1D	  on
 	  ShowAdditionalParam	  off
+	  DataType		  "uint32"
 	}
 	Block {
 	  BlockType		  Constant
@@ -3070,6 +3073,7 @@ Stateflow {
 		decomposition                             		SET_CHART
 		firstData                                 		14
 		chartFileNumber                           		1
+		disableImplicitCasting                    		1
 	}
 
 	state {
@@ -3303,8 +3307,6 @@ Stateflow {
 		dataLimits     		[190.821 251.845 162.993 167.793]
 		subviewer      		2
 		drawStyle      		SMART
-		slide {
-		}
 		executionOrder 		1
 	}
 
@@ -3327,8 +3329,6 @@ Stateflow {
 		dataLimits     		[465.909 470.709 245.872 326.578]
 		subviewer      		2
 		drawStyle      		SMART
-		slide {
-		}
 		executionOrder 		1
 	}
 
@@ -3351,8 +3351,6 @@ Stateflow {
 		dataLimits     		[645.884 650.683 246.408 326.578]
 		subviewer      		2
 		drawStyle      		SMART
-		slide {
-		}
 		executionOrder 		1
 	}
 
@@ -3389,10 +3387,10 @@ Stateflow {
 				size      		"1"
 			}
 			type {
-				primitive 		SF_INT8_TYPE
+				primitive 		SF_UINT32_TYPE
 			}
 		}
-		dataType                      		"int8"
+		dataType                      		"uint32"
 		fixptType {
 			slope   		1
 			baseType		SF_UINT8_TYPE
@@ -3431,10 +3429,10 @@ Stateflow {
 				size      		"1"
 			}
 			type {
-				primitive 		SF_INT8_TYPE
+				primitive 		SF_UINT32_TYPE
 			}
 		}
-		dataType                      		"int8"
+		dataType                      		"uint32"
 		fixptType {
 			slope   		1
 			baseType		SF_UINT8_TYPE
@@ -3498,10 +3496,10 @@ Stateflow {
 				size      		"1"
 			}
 			type {
-				primitive 		SF_INT8_TYPE
+				primitive 		SF_UINT32_TYPE
 			}
 		}
-		dataType                      		"int8"
+		dataType                      		"uint32"
 		fixptType {
 			slope   		1
 			baseType		SF_INT16_TYPE

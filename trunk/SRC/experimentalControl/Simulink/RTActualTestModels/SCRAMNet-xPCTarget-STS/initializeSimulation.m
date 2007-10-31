@@ -1,21 +1,19 @@
-%INITIALIZESIMULATION to initialize the parameters needed to build the Simulink model
+%INITIALIZESIMULATION to initialization the parameters needed to build the Simulink model
 %
 % created by MTS
 % modified by Andreas Schellenberg (andreas.schellenberg@gmx.net) 11/2004
 
 clear;
-%close all;
+close all;
 clc;
 
 %%%%%%%%%% HYBRID CONTROLLER PARAMETERS %%%%%%%%%%
 
 % set time steps
-HybridCtrlParameters.dtInt = 0.02;           % integration time step (sec)
-HybridCtrlParameters.dtSim = 0.02;          % simulation time step (sec)
-HybridCtrlParameters.dtCon = 1/1024;         % controller time step (sec)
-HybridCtrlParameters.delay = 0.0;            % delay due to undershoot (sec)
-%HybridCtrlParameters.delay = 0.0661+0.0275;  % delay due to undershoot (sec)
-%HybridCtrlParameters.delay = 0.0661+0.0488;  % delay due to undershoot (sec)
+HybridCtrlParameters.dtInt = 0.02;        % integration time step (sec)
+HybridCtrlParameters.dtSim = 0.02;        % simulation time step (sec)
+HybridCtrlParameters.dtCon = 1/1024;      % controller time step (sec)
+HybridCtrlParameters.delay = 0;           % delay due to undershoot (sec)
 
 % calculate max number of substeps
 HybridCtrlParameters.N = round(HybridCtrlParameters.dtSim/HybridCtrlParameters.dtCon);
@@ -50,63 +48,62 @@ disp('Model Properties:');
 disp('=================');
 disp(HybridCtrlParameters);
 
-
 %%%%%%%%%% SIGNAL COUNTS %%%%%%%%%%
 
-nAct    = 8;                                  % number of actuators
-nAdcU   = 12;                                 % number of user a/d channels
-nDucU   = 8;                                  % number of user ducs
-nEncU   = 2;                                  % number of user encoders
-nDinp   = 4;                                  % no. of digital inputs written to scramnet
-nDout   = 4;                                  % no. of digital outputs driven by scramnet
-nUDPOut = 1+7*nAct+nAdcU+nDucU+nEncU+nDinp;   % no. of outputs from simulink bridge
-nUDPInp = 1+6*nAct+nAdcU+nDucU+nEncU+nDinp;   % no. of inputs to simulink bridge
+nAct	  = 8;                                    % number of actuators
+nAdcU	  = 12;                                   % number of user a/d channels
+nDucU   = 8;                                    % number of user ducs
+nEncU	  = 2;                                    % number of user encoders
+nDinp	  = 4;                                    % no. of digital inputs written to scramnet
+nDout	  = 4;                                    % no. of digital outputs driven by scramnet
+nUDPOut = 1+7*nAct+nAdcU+nDucU+nEncU+nDinp;     % no. of outputs from simulink bridge
+nUDPInp = 1+6*nAct+nAdcU+nDucU+nEncU+nDinp;     % no. of inputs to simulink bridge
 
 %%%%%%%%%% SAMPLE PERIOD %%%%%%%%%%
 
 samplePeriod = 1/1024;
 
-%%%%%%%%%% SCRAMNET PARTITIONS %%%%%%%%%%
+%%%%%%%%%% START MTS (STS) %%%%%%%%%%
 
 %%%%%%%%%% outputs to scramnet %%%%%%%%%%
 
 % master span
 baseAddress	         = 0;
 partition(1).Address = ['0x', dec2hex(baseAddress*4)];
-partition(1).Type    = 'single';
-partition(1).Size    = '1';
+partition(1).Type	   = 'single';
+partition(1).Size	   = '1';
 
 % control modes
-partition(2).Type = 'uint32';
-partition(2).Size = num2str(nAct);
+partition(2).Type	= 'uint32';
+partition(2).Size	= num2str(nAct);
 
 % displ commands
-partition(3).Type = 'single';
-partition(3).Size = num2str(nAct);
+partition(3).Type	= 'single';
+partition(3).Size	= num2str(nAct);
 
 % force commands
-partition(4).Type = 'single';
-partition(4).Size = num2str(nAct);
+partition(4).Type	= 'single';
+partition(4).Size	= num2str(nAct);
 
 % displ feedbacks (used only in realtime simulation mode)
-partition(5).Type = 'single';
-partition(5).Size = num2str(nAct);
+partition(5).Type	= 'single';
+partition(5).Size	= num2str(nAct);
 
 % force feedbacks (used only in realtime simulation mode)
-partition(6).Type = 'single';
-partition(6).Size = num2str(nAct);
+partition(6).Type	= 'single';
+partition(6).Size	= num2str(nAct);
 
 % deltaP feedbacks (used only in realtime simulation mode)
-partition(7).Type = 'single';
-partition(7).Size = num2str(nAct);
+partition(7).Type	= 'single';
+partition(7).Size	= num2str(nAct);
 
 % user ADCs (used only in realtime simulation mode)
 partition(8).Type = 'single';
-partition(8).Size = num2str(nAdcU);
+partition(8).Size	= num2str(nAdcU);
 
 % user DUCs (used only in realtime simulation mode)
-partition(9).Type = 'single';
-partition(9).Size = num2str(nDucU);
+partition(9).Type	= 'single';
+partition(9).Size	= num2str(nDucU);
 
 % user ENCs (used only in realtime simulation mode)
 partition(10).Type = 'single';
@@ -171,6 +168,81 @@ partition(23).Size = num2str(nDinp);
 partition(24).Type = 'uint32';
 partition(24).Size = '866';
 
+%%%%%%%%%% END MTS (STS) %%%%%%%%%%
+
+
+%%%%%%%%%% START PACIFIC %%%%%%%%%%
+
+% blank space (since it is not used here)
+partition(25).Type = 'uint32';
+partition(25).Size = '866';
+
+%%%%%%%%%% END PACIFIC %%%%%%%%%%
+
+
+%%%%%%%%%% START OPENFRESCO %%%%%%%%%%
+
+%%%%%%%%%% flags from/to scramnet %%%%%%%%%%
+
+% newTarget (from)
+partition(26).Type = 'int32';
+partition(26).Size = '1';
+
+% switchPC (to)
+partition(27).Type = 'int32';
+partition(27).Size = '1';
+
+% atTarget (to)
+partition(28).Type = 'int32';
+partition(28).Size = '1';
+
+%%%%%%%%%% inputs from scramnet %%%%%%%%%%
+
+% disp commands
+partition(29).Type = 'double';
+partition(29).Size = num2str(nAct);
+
+% vel commands
+partition(30).Type = 'double';
+partition(30).Size = num2str(nAct);
+
+% accel commands
+partition(31).Type = 'double';
+partition(31).Size = num2str(nAct);
+
+% force commands
+partition(32).Type = 'double';
+partition(32).Size = num2str(nAct);
+
+% time commands
+partition(33).Type = 'double';
+partition(33).Size = num2str(nAct);
+
+%%%%%%%%%% outputs to scramnet %%%%%%%%%%
+
+% disp feedbacks
+partition(34).Type = 'double';
+partition(34).Size = num2str(nAct);
+
+% vel feedbacks
+partition(35).Type = 'double';
+partition(35).Size = num2str(nAct);
+
+% accel feedbacks
+partition(36).Type = 'double';
+partition(36).Size = num2str(nAct);
+
+% force feedbacks
+partition(37).Type = 'double';
+partition(37).Size = num2str(nAct);
+
+% time feedbacks
+partition(38).Type = 'double';
+partition(38).Size = num2str(nAct);
+
+%%%%%%%%%% END OPENFRESCO %%%%%%%%%%
+
+
 %%%%%%%%%% scramnet interrupt configuration %%%%%%%%%%
 
 % enable scramnet receive interrupt
@@ -192,4 +264,4 @@ node            = completenodestruct(node);
 
 % display interrupt longword location
 irqAddr = node.Partitions(irqPartition).Internal.Address / 4 ...
-    + node.Partitions(irqPartition).Internal.Sizes(1) - 1;
+		+ node.Partitions(irqPartition).Internal.Sizes(1) - 1;

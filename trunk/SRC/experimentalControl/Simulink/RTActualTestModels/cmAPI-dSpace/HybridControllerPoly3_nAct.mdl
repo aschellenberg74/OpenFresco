@@ -1,0 +1,3001 @@
+# $Revision: 1.2 $
+Model {
+  Name			  "HybridControllerPoly3_nAct"
+  Version		  6.2
+  MdlSubVersion		  0
+  GraphicalInterface {
+    NumRootInports	    0
+    NumRootOutports	    0
+    ParameterArgumentNames  ""
+    ComputedModelVersion    "1.584"
+    NumModelReferences	    0
+    NumTestPointedSignals   0
+  }
+  SavedCharacterEncoding  "ibm-5348_P100-1997"
+  PreLoadFcn		  "initializeSimulation"
+  PostLoadFcn		  ",try, rti_mdl_postloadfcn(bdroot, 'UpdateModel', 16"
+"0, 'rti1104'); catch, disp(lasterr); end, "
+  SaveDefaultBlockParams  on
+  SampleTimeColors	  off
+  LibraryLinkDisplay	  "none"
+  WideLines		  off
+  ShowLineDimensions	  off
+  ShowPortDataTypes	  off
+  ShowLoopsOnError	  on
+  IgnoreBidirectionalLines off
+  ShowStorageClass	  off
+  ShowTestPointIcons	  on
+  ShowViewerIcons	  on
+  SortedOrder		  off
+  ExecutionContextIcon	  off
+  ShowLinearizationAnnotations on
+  RecordCoverage	  off
+  CovPath		  "/"
+  CovSaveName		  "covdata"
+  CovMetricSettings	  "dw"
+  CovNameIncrementing	  off
+  CovHtmlReporting	  on
+  covSaveCumulativeToWorkspaceVar on
+  CovSaveSingleToWorkspaceVar on
+  CovCumulativeVarName	  "covCumulativeData"
+  CovCumulativeReport	  off
+  CovReportOnPause	  on
+  ScopeRefreshTime	  0.035000
+  OverrideScopeRefreshTime on
+  DisableAllScopes	  off
+  DataTypeOverride	  "UseLocalSettings"
+  MinMaxOverflowLogging	  "UseLocalSettings"
+  MinMaxOverflowArchiveMode "Overwrite"
+  BlockNameDataTip	  off
+  BlockParametersDataTip  off
+  BlockDescriptionStringDataTip	off
+  ToolBar		  on
+  StatusBar		  on
+  BrowserShowLibraryLinks on
+  BrowserLookUnderMasks	  off
+  CloseFcn		  "rtwprivate ssgencode ModelCloseRequest HybridContro"
+"ller2"
+  Created		  "Mon Oct 15 17:10:45 2001"
+  Creator		  "Andreas Schellenberg"
+  UpdateHistory		  "UpdateHistoryNever"
+  ModifiedByFormat	  "%<Auto>"
+  LastModifiedBy	  "cwhyte"
+  ModifiedDateFormat	  "%<Auto>"
+  LastModifiedDate	  "Thu Oct 18 18:15:22 2007"
+  ModelVersionFormat	  "1.%<AutoIncrement:584>"
+  ConfigurationManager	  "None"
+  LinearizationMsg	  "none"
+  Profile		  off
+  ParamWorkspaceSource	  "MATLABWorkspace"
+  AccelSystemTargetFile	  "accel.tlc"
+  AccelTemplateMakefile	  "accel_default_tmf"
+  AccelMakeCommand	  "make_rtw"
+  TryForcingSFcnDF	  off
+  ExtModeBatchMode	  off
+  ExtModeEnableFloating	  on
+  ExtModeTrigType	  "manual"
+  ExtModeTrigMode	  "normal"
+  ExtModeTrigPort	  "1"
+  ExtModeTrigElement	  "any"
+  ExtModeTrigDuration	  1000
+  ExtModeTrigDurationFloating "auto"
+  ExtModeTrigHoldOff	  0
+  ExtModeTrigDelay	  0
+  ExtModeTrigDirection	  "rising"
+  ExtModeTrigLevel	  0
+  ExtModeArchiveMode	  "off"
+  ExtModeAutoIncOneShot	  off
+  ExtModeIncDirWhenArm	  off
+  ExtModeAddSuffixToVar	  off
+  ExtModeWriteAllDataToWs off
+  ExtModeArmWhenConnect	  on
+  ExtModeSkipDownloadWhenConnect off
+  ExtModeLogAll		  on
+  ExtModeAutoUpdateStatusClock off
+  TunableVars		  "newTarget,targDsp"
+  TunableVarsStorageClass "ExportedGlobal,ExportedGlobal"
+  TunableVarsTypeQualifier "volatile,volatile"
+  BufferReuse		  off
+  StrictBusMsg		  "None"
+  ProdHWDeviceType	  "Specified"
+  ShowModelReferenceBlockVersion off
+  ShowModelReferenceBlockIO off
+  Array {
+    Type		    "Handle"
+    Dimension		    1
+    Simulink.ConfigSet {
+      $ObjectID		      1
+      Version		      "1.1.0"
+      Array {
+	Type			"Handle"
+	Dimension		7
+	Simulink.SolverCC {
+	  $ObjectID		  2
+	  Version		  "1.1.0"
+	  StartTime		  "0.0"
+	  StopTime		  "inf"
+	  AbsTol		  "auto"
+	  FixedStep		  "0.001"
+	  InitialStep		  "auto"
+	  MaxNumMinSteps	  "-1"
+	  MaxOrder		  5
+	  ExtrapolationOrder	  4
+	  NumberNewtonIterations  1
+	  MaxStep		  ".1"
+	  MinStep		  "auto"
+	  RelTol		  "1e-3"
+	  SolverMode		  "Auto"
+	  Solver		  "FixedStepDiscrete"
+	  SolverName		  "FixedStepDiscrete"
+	  ZeroCrossControl	  "UseLocalSettings"
+	  AlgebraicLoopSolver	  "TrustRegion"
+	  SolverResetMethod	  "Fast"
+	  PositivePriorityOrder	  off
+	  AutoInsertRateTranBlk	  off
+	  SampleTimeConstraint	  "Unconstrained"
+	  RateTranMode		  "Deterministic"
+	}
+	Simulink.DataIOCC {
+	  $ObjectID		  3
+	  Version		  "1.1.0"
+	  Decimation		  "1"
+	  ExternalInput		  "[t, u]"
+	  FinalStateName	  "xFinal"
+	  InitialState		  "xInitial"
+	  LimitDataPoints	  off
+	  MaxDataPoints		  "1000"
+	  LoadExternalInput	  off
+	  LoadInitialState	  off
+	  SaveFinalState	  off
+	  SaveFormat		  "Array"
+	  SaveOutput		  off
+	  SaveState		  off
+	  SignalLogging		  off
+	  SaveTime		  off
+	  StateSaveName		  "xout"
+	  TimeSaveName		  "tout"
+	  OutputSaveName	  "yout"
+	  SignalLoggingName	  "sigsOut"
+	  OutputOption		  "RefineOutputTimes"
+	  OutputTimes		  "[]"
+	  Refine		  "1"
+	}
+	Simulink.OptimizationCC {
+	  $ObjectID		  4
+	  Array {
+	    Type		    "Cell"
+	    Dimension		    5
+	    Cell		    "ZeroExternalMemoryAtStartup"
+	    Cell		    "ZeroInternalMemoryAtStartup"
+	    Cell		    "InitFltsAndDblsToZero"
+	    Cell		    "OptimizeModelRefInitCode"
+	    Cell		    "NoFixptDivByZeroProtection"
+	    PropName		    "DisabledProps"
+	  }
+	  Version		  "1.1.0"
+	  BlockReduction	  off
+	  BooleanDataType	  on
+	  ConditionallyExecuteInputs on
+	  InlineParams		  on
+	  InlineInvariantSignals  off
+	  OptimizeBlockIOStorage  off
+	  BufferReuse		  off
+	  EnforceIntegerDowncast  off
+	  ExpressionFolding	  off
+	  FoldNonRolledExpr	  off
+	  LocalBlockOutputs	  off
+	  ParameterPooling	  on
+	  RollThreshold		  5
+	  SystemCodeInlineAuto	  off
+	  StateBitsets		  on
+	  DataBitsets		  on
+	  UseTempVars		  on
+	  ZeroExternalMemoryAtStartup on
+	  ZeroInternalMemoryAtStartup on
+	  InitFltsAndDblsToZero	  on
+	  NoFixptDivByZeroProtection off
+	  EfficientFloat2IntCast  off
+	  OptimizeModelRefInitCode off
+	  LifeSpan		  "inf"
+	  BufferReusableBoundary  on
+	}
+	Simulink.DebuggingCC {
+	  $ObjectID		  5
+	  Version		  "1.1.0"
+	  RTPrefix		  "error"
+	  ConsistencyChecking	  "none"
+	  ArrayBoundsChecking	  "none"
+	  SignalInfNanChecking	  "none"
+	  AlgebraicLoopMsg	  "warning"
+	  ArtificialAlgebraicLoopMsg "warning"
+	  CheckSSInitialOutputMsg on
+	  CheckExecutionContextPreStartOutputMsg off
+	  CheckExecutionContextRuntimeOutputMsg	off
+	  SignalResolutionControl "UseLocalSettings"
+	  BlockPriorityViolationMsg "warning"
+	  MinStepSizeMsg	  "warning"
+	  SolverPrmCheckMsg	  "none"
+	  InheritedTsInSrcMsg	  "warning"
+	  DiscreteInheritContinuousMsg "warning"
+	  MultiTaskDSMMsg	  "warning"
+	  MultiTaskRateTransMsg	  "error"
+	  SingleTaskRateTransMsg  "none"
+	  TasksWithSamePriorityMsg "warning"
+	  CheckMatrixSingularityMsg "none"
+	  IntegerOverflowMsg	  "warning"
+	  Int32ToFloatConvMsg	  "warning"
+	  ParameterDowncastMsg	  "error"
+	  ParameterOverflowMsg	  "error"
+	  ParameterPrecisionLossMsg "warning"
+	  UnderSpecifiedDataTypeMsg "none"
+	  UnnecessaryDatatypeConvMsg "none"
+	  VectorMatrixConversionMsg "none"
+	  InvalidFcnCallConnMsg	  "error"
+	  FcnCallInpInsideContextMsg "Use local settings"
+	  SignalLabelMismatchMsg  "none"
+	  UnconnectedInputMsg	  "warning"
+	  UnconnectedOutputMsg	  "warning"
+	  UnconnectedLineMsg	  "warning"
+	  SFcnCompatibilityMsg	  "none"
+	  UniqueDataStoreMsg	  "none"
+	  BusObjectLabelMismatch  "warning"
+	  RootOutportRequireBusObject "warning"
+	  AssertControl		  "UseLocalSettings"
+	  EnableOverflowDetection off
+	  ModelReferenceIOMsg	  "none"
+	  ModelReferenceVersionMismatchMessage "none"
+	  ModelReferenceIOMismatchMessage "none"
+	  ModelReferenceCSMismatchMessage "none"
+	  ModelReferenceSimTargetVerbose off
+	  UnknownTsInhSupMsg	  "warning"
+	  ModelReferenceDataLoggingMessage "warning"
+	  ModelReferenceSymbolNameMessage "warning"
+	  ModelReferenceExtraNoncontSigs "error"
+	}
+	Simulink.HardwareCC {
+	  $ObjectID		  6
+	  Version		  "1.1.0"
+	  ProdBitPerChar	  8
+	  ProdBitPerShort	  16
+	  ProdBitPerInt		  32
+	  ProdBitPerLong	  32
+	  ProdIntDivRoundTo	  "Zero"
+	  ProdEndianess		  "BigEndian"
+	  ProdWordSize		  32
+	  ProdShiftRightIntArith  on
+	  ProdHWDeviceType	  "Specified"
+	  TargetBitPerChar	  8
+	  TargetBitPerShort	  16
+	  TargetBitPerInt	  32
+	  TargetBitPerLong	  32
+	  TargetShiftRightIntArith on
+	  TargetIntDivRoundTo	  "Zero"
+	  TargetEndianess	  "BigEndian"
+	  TargetWordSize	  32
+	  TargetTypeEmulationWarnSuppressLevel 0
+	  TargetPreprocMaxBitsSint 32
+	  TargetPreprocMaxBitsUint 32
+	  TargetHWDeviceType	  "Specified"
+	  TargetUnknown		  off
+	  ProdEqTarget		  on
+	}
+	Simulink.ModelReferenceCC {
+	  $ObjectID		  7
+	  Version		  "1.1.0"
+	  UpdateModelReferenceTargets "IfOutOfDateOrStructuralChange"
+	  CheckModelReferenceTargetMessage "error"
+	  ModelReferenceNumInstancesAllowed "Multi"
+	  ModelReferencePassRootInputsByReference on
+	  ModelReferenceMinAlgLoopOccurrences off
+	}
+	Simulink.RTWCC {
+	  $BackupClass		  "Simulink.RTWCC"
+	  $ObjectID		  8
+	  Array {
+	    Type		    "Cell"
+	    Dimension		    1
+	    Cell		    "IncludeHyperlinkInReport"
+	    PropName		    "DisabledProps"
+	  }
+	  Version		  "1.1.0"
+	  SystemTargetFile	  "rti1104.tlc"
+	  GenCodeOnly		  off
+	  MakeCommand		  "make_rti"
+	  TemplateMakefile	  "rti1104.tmf"
+	  Description		  "dSPACE DS1104 Hardware Platform"
+	  GenerateReport	  off
+	  SaveLog		  off
+	  RTWVerbose		  on
+	  RetainRTWFile		  off
+	  ProfileTLC		  off
+	  TLCDebug		  off
+	  TLCCoverage		  off
+	  TLCAssert		  off
+	  ProcessScriptMode	  "Default"
+	  ConfigurationMode	  "Optimized"
+	  ProcessScript		  "rti1104_make_rtw_hook"
+	  ConfigAtBuild		  off
+	  CustomHeaderCode	  "#include \"PredictorCorrector.h\""
+	  CustomSource		  "PredictorCorrector.c"
+	  IncludeHyperlinkInReport off
+	  LaunchReport		  off
+	  TargetLang		  "C"
+	  Array {
+	    Type		    "Handle"
+	    Dimension		    2
+	    Simulink.CodeAppCC {
+	      $ObjectID		      9
+	      Array {
+		Type			"Cell"
+		Dimension		9
+		Cell			"IgnoreCustomStorageClasses"
+		Cell			"InsertBlockDesc"
+		Cell			"SFDataObjDesc"
+		Cell			"SimulinkDataObjDesc"
+		Cell			"DefineNamingRule"
+		Cell			"SignalNamingRule"
+		Cell			"ParamNamingRule"
+		Cell			"InlinedPrmAccess"
+		Cell			"CustomSymbolStr"
+		PropName		"DisabledProps"
+	      }
+	      Version		      "1.1.0"
+	      ForceParamTrailComments off
+	      GenerateComments	      on
+	      IgnoreCustomStorageClasses on
+	      IncHierarchyInIds	      off
+	      MaxIdLength	      31
+	      PreserveName	      off
+	      PreserveNameWithParent  off
+	      ShowEliminatedStatement on
+	      IncAutoGenComments      off
+	      SimulinkDataObjDesc     off
+	      SFDataObjDesc	      off
+	      IncDataTypeInIds	      off
+	      PrefixModelToSubsysFcnNames on
+	      CustomSymbolStr	      "$R$N$M"
+	      MangleLength	      1
+	      DefineNamingRule	      "None"
+	      ParamNamingRule	      "None"
+	      SignalNamingRule	      "None"
+	      InsertBlockDesc	      off
+	      SimulinkBlockComments   on
+	      EnableCustomComments    off
+	      InlinedPrmAccess	      "Literals"
+	      ReqsInCode	      off
+	    }
+	    Simulink.STFCustomTargetCC {
+	      $BackupClass	      "Simulink.TargetCC"
+	      $ObjectID		      10
+	      Array {
+		Type			"Cell"
+		Dimension		15
+		Cell			"TimeScaleFactor"
+		Cell			"CCompilerOptimizationOpts"
+		Cell			"BoardName"
+		Cell			"IncludeMdlTerminateFcn"
+		Cell			"CombineOutputUpdateFcns"
+		Cell			"SuppressErrorStatus"
+		Cell			"ERTCustomFileBanners"
+		Cell			"GenerateSampleERTMain"
+		Cell			"MultiInstanceERTCode"
+		Cell			"PurelyIntegerCode"
+		Cell			"SupportNonFinite"
+		Cell			"SupportComplex"
+		Cell			"SupportAbsoluteTime"
+		Cell			"SupportContinuousTime"
+		Cell			"SupportNonInlinedSFcns"
+		PropName		"DisabledProps"
+	      }
+	      Version		      "1.1.0"
+	      TargetFcnLib	      "ansi_tfl_tmw.mat"
+	      TargetLibSuffix	      ""
+	      TargetPreCompLibLocation ""
+	      GenFloatMathFcnCalls    "ANSI_C"
+	      UtilityFuncGeneration   "Auto"
+	      GenerateFullHeader      on
+	      GenerateSampleERTMain   off
+	      IsPILTarget	      off
+	      ModelReferenceCompliant off
+	      IncludeMdlTerminateFcn  on
+	      CombineOutputUpdateFcns off
+	      SuppressErrorStatus     off
+	      IncludeFileDelimiter    "Auto"
+	      ERTCustomFileBanners    off
+	      SupportAbsoluteTime     on
+	      LogVarNameModifier      "none"
+	      MatFileLogging	      on
+	      MultiInstanceERTCode    off
+	      SupportNonFinite	      on
+	      SupportComplex	      on
+	      PurelyIntegerCode	      off
+	      SupportContinuousTime   on
+	      SupportNonInlinedSFcns  on
+	      SystemTargetFile	      "rti1104.tlc"
+	      DialogCategory	      0
+	      Array {
+		Type			"Handle"
+		Dimension		1
+		Simulink.GRTTargetCC {
+		  $BackupClass		  "Simulink.TargetCC"
+		  $ObjectID		  11
+		  Array {
+		    Type		    "Cell"
+		    Dimension		    12
+		    Cell		    "IncludeMdlTerminateFcn"
+		    Cell		    "CombineOutputUpdateFcns"
+		    Cell		    "SuppressErrorStatus"
+		    Cell		    "ERTCustomFileBanners"
+		    Cell		    "GenerateSampleERTMain"
+		    Cell		    "MultiInstanceERTCode"
+		    Cell		    "PurelyIntegerCode"
+		    Cell		    "SupportNonFinite"
+		    Cell		    "SupportComplex"
+		    Cell		    "SupportAbsoluteTime"
+		    Cell		    "SupportContinuousTime"
+		    Cell		    "SupportNonInlinedSFcns"
+		    PropName		    "DisabledProps"
+		  }
+		  Version		  "1.1.0"
+		  TargetFcnLib		  "ansi_tfl_tmw.mat"
+		  TargetLibSuffix	  ""
+		  TargetPreCompLibLocation ""
+		  GenFloatMathFcnCalls	  "ANSI_C"
+		  UtilityFuncGeneration	  "Auto"
+		  GenerateFullHeader	  on
+		  GenerateSampleERTMain	  off
+		  IsPILTarget		  off
+		  ModelReferenceCompliant off
+		  IncludeMdlTerminateFcn  on
+		  CombineOutputUpdateFcns off
+		  SuppressErrorStatus	  off
+		  IncludeFileDelimiter	  "Auto"
+		  ERTCustomFileBanners	  off
+		  SupportAbsoluteTime	  on
+		  LogVarNameModifier	  "none"
+		  MatFileLogging	  on
+		  MultiInstanceERTCode	  off
+		  SupportNonFinite	  on
+		  SupportComplex	  on
+		  PurelyIntegerCode	  off
+		  SupportContinuousTime	  on
+		  SupportNonInlinedSFcns  on
+		  ExtMode		  off
+		  ExtModeStaticAlloc	  off
+		  ExtModeTesting	  off
+		  ExtModeStaticAllocSize  1000000
+		  ExtModeTransport	  0
+		  ExtModeMexFile	  "rti_comm"
+		  RTWCAPISignals	  off
+		  RTWCAPIParams		  off
+		  RTWCAPIStates		  off
+		  GenerateASAP2		  off
+		}
+		PropName		"Components"
+	      }
+	      CustomProperty {
+		DataType		"RTWOptions_EnumType_c__dspace_matlab_"
+"rti1104_tlc_rti1104_InitialSimState"
+		EnumStrPairs {
+		  Value			  0
+		  String		  "RUN"
+		  Value			  1
+		  String		  "PAUSE"
+		  Value			  2
+		  String		  "STOP"
+		}
+		Name			"InitialSimState"
+		Value			"STOP"
+	      }
+	      CustomProperty {
+		DataType		"RTWOptions_EnumType_c__dspace_matlab_"
+"rti1104_tlc_rti1104_ExecutionMode"
+		EnumStrPairs {
+		  Value			  0
+		  String		  "real-time"
+		  Value			  1
+		  String		  "time-scaled"
+		  Value			  2
+		  String		  "as fast as possible"
+		}
+		Name			"ExecutionMode"
+		Value			"real-time"
+	      }
+	      CustomProperty {
+		DataType		"string"
+		Name			"ExecutionModeNonUI"
+		Value			"RTSIM"
+	      }
+	      CustomProperty {
+		DataType		"string"
+		Name			"TimeScaleFactor"
+		Value			"1.0"
+	      }
+	      CustomProperty {
+		DataType		"string"
+		Name			"TimeScaleFactorNonUI"
+		Value			"OPTION_DISABLED"
+	      }
+	      CustomProperty {
+		DataType		"RTWOptions_EnumType_c__dspace_matlab_"
+"rti1104_tlc_rti1104_AssertionMode"
+		EnumStrPairs {
+		  Value			  0
+		  String		  "OFF"
+		  Value			  1
+		  String		  "WARN"
+		  Value			  2
+		  String		  "STOP"
+		}
+		Name			"AssertionMode"
+		Value			"OFF"
+	      }
+	      CustomProperty {
+		DataType		"slbool"
+		Name			"TAStimulusEngineEnable"
+		Value			off
+	      }
+	      CustomProperty {
+		DataType		"RTWOptions_EnumType_c__dspace_matlab_"
+"rti1104_tlc_rti1104_CCompilerOptimizationOptsPopup"
+		EnumStrPairs {
+		  Value			  0
+		  String		  "Default (-O5 -D_INLINE)"
+		  Value			  1
+		  String		  "User-defined"
+		}
+		Name			"CCompilerOptimizationOptsPopup"
+		Value			"Default (-O5 -D_INLINE)"
+	      }
+	      CustomProperty {
+		DataType		"string"
+		Name			"CCompilerOptimizationOptsNonUI"
+		Value			"USE_DEFAULT"
+	      }
+	      CustomProperty {
+		DataType		"slbool"
+		Name			"LoadAfterBuild"
+		Value			on
+	      }
+	      CustomProperty {
+		DataType		"slbool"
+		Name			"LoadToFlash"
+		Value			off
+	      }
+	      CustomProperty {
+		DataType		"string"
+		Name			"LoadApplNonUI"
+		Value			"ON"
+	      }
+	      CustomProperty {
+		DataType		"RTWOptions_EnumType_c__dspace_matlab_"
+"rti1104_tlc_rti1104_PlatformSelectionPopup"
+		EnumStrPairs {
+		  Value			  0
+		  String		  "Auto"
+		  Value			  1
+		  String		  "User-defined (bus)"
+		}
+		Name			"PlatformSelectionPopup"
+		Value			"Auto"
+	      }
+	      CustomProperty {
+		DataType		"string"
+		Name			"BoardNameNonUI"
+		Value			"OPTION_DISABLED"
+	      }
+	      CustomProperty {
+		DataType		"slbool"
+		Name			"TRCMaskParameters"
+		Value			off
+	      }
+	      CustomProperty {
+		DataType		"slbool"
+		Name			"TRCGenerateLabels"
+		Value			on
+	      }
+	      CustomProperty {
+		DataType		"slbool"
+		Name			"TRCGenerateVirtualBlocks"
+		Value			on
+	      }
+	      CustomProperty {
+		DataType		"slbool"
+		Name			"TRCGenerateStates"
+		Value			off
+	      }
+	      CustomProperty {
+		DataType		"slbool"
+		Name			"TRCGenerateDerivatives"
+		Value			off
+	      }
+	      CustomProperty {
+		DataType		"slbool"
+		Name			"TRCApplySubsystemPermissions"
+		Value			off
+	      }
+	      CustomProperty {
+		DataType		"slbool"
+		Name			"TRCGenerateParamValues"
+		Value			off
+	      }
+	    }
+	    PropName		    "Components"
+	  }
+	}
+	PropName		"Components"
+      }
+      Name		      "Configuration"
+      SimulationMode	      "normal"
+      CurrentDlgPage	      "Optimization"
+    }
+    PropName		    "ConfigurationSets"
+  }
+  Simulink.ConfigSet {
+    $PropName		    "ActiveConfigurationSet"
+    $ObjectID		    1
+  }
+  BlockDefaults {
+    Orientation		    "right"
+    ForegroundColor	    "black"
+    BackgroundColor	    "white"
+    DropShadow		    off
+    NamePlacement	    "normal"
+    FontName		    "Helvetica"
+    FontSize		    10
+    FontWeight		    "normal"
+    FontAngle		    "normal"
+    ShowName		    on
+  }
+  BlockParameterDefaults {
+    Block {
+      BlockType		      ActionPort
+      InitializeStates	      "held"
+      ActionType	      "unset"
+    }
+    Block {
+      BlockType		      Clock
+      DisplayTime	      off
+    }
+    Block {
+      BlockType		      Constant
+      Value		      "1"
+      VectorParams1D	      on
+      OutDataTypeMode	      "Inherit from 'Constant value'"
+      OutDataType	      "sfix(16)"
+      ConRadixGroup	      "Use specified scaling"
+      OutScaling	      "2^0"
+      SampleTime	      "inf"
+    }
+    Block {
+      BlockType		      DataStoreMemory
+      StateMustResolveToSignalObject off
+      ShowAdditionalParam     off
+      DataType		      "auto"
+      OutDataType	      "sfix(16)"
+      OutScaling	      "2^0"
+      SignalType	      "auto"
+    }
+    Block {
+      BlockType		      DataStoreRead
+    }
+    Block {
+      BlockType		      DataStoreWrite
+    }
+    Block {
+      BlockType		      DataTypeConversion
+      OutDataTypeMode	      "Inherit via back propagation"
+      OutDataType	      "sfix(16)"
+      OutScaling	      "2^0"
+      LockScale		      off
+      ConvertRealWorld	      "Real World Value (RWV)"
+      RndMeth		      "Zero"
+      SaturateOnIntegerOverflow	on
+      SampleTime	      "-1"
+    }
+    Block {
+      BlockType		      Demux
+      Outputs		      "4"
+      DisplayOption	      "none"
+      BusSelectionMode	      off
+    }
+    Block {
+      BlockType		      Gain
+      Gain		      "1"
+      Multiplication	      "Element-wise(K.*u)"
+      ParameterDataTypeMode   "Same as input"
+      ParameterDataType	      "sfix(16)"
+      ParameterScalingMode    "Best Precision: Matrix-wise"
+      ParameterScaling	      "2^0"
+      OutDataTypeMode	      "Same as input"
+      OutDataType	      "sfix(16)"
+      OutScaling	      "2^0"
+      LockScale		      off
+      RndMeth		      "Floor"
+      SaturateOnIntegerOverflow	on
+      SampleTime	      "-1"
+    }
+    Block {
+      BlockType		      Ground
+    }
+    Block {
+      BlockType		      HitCross
+      HitCrossingOffset	      "0"
+      HitCrossingDirection    "either"
+      ShowOutputPort	      on
+      ZeroCross		      on
+      SampleTime	      "-1"
+    }
+    Block {
+      BlockType		      If
+      NumInputs		      "1"
+      IfExpression	      "u1 > 0"
+      ShowElse		      on
+      ZeroCross		      on
+      SampleTime	      "-1"
+    }
+    Block {
+      BlockType		      Inport
+      UseBusObject	      off
+      BusObject		      "BusObject"
+      BusOutputAsStruct	      off
+      PortDimensions	      "-1"
+      SampleTime	      "-1"
+      DataType		      "auto"
+      OutDataType	      "sfix(16)"
+      OutScaling	      "2^0"
+      SignalType	      "auto"
+      SamplingMode	      "auto"
+      Interpolate	      on
+    }
+    Block {
+      BlockType		      Outport
+      Port		      "1"
+      UseBusObject	      off
+      BusObject		      "BusObject"
+      BusOutputAsStruct	      off
+      PortDimensions	      "-1"
+      SampleTime	      "-1"
+      DataType		      "auto"
+      OutDataType	      "sfix(16)"
+      OutScaling	      "2^0"
+      SignalType	      "auto"
+      SamplingMode	      "auto"
+      OutputWhenDisabled      "held"
+      InitialOutput	      "[]"
+    }
+    Block {
+      BlockType		      Product
+      Inputs		      "2"
+      Multiplication	      "Element-wise(.*)"
+      InputSameDT	      on
+      OutDataTypeMode	      "Same as first input"
+      OutDataType	      "sfix(16)"
+      OutScaling	      "2^0"
+      LockScale		      off
+      RndMeth		      "Zero"
+      SaturateOnIntegerOverflow	on
+      SampleTime	      "-1"
+    }
+    Block {
+      BlockType		      RateLimiter
+      RisingSlewLimit	      "1"
+      FallingSlewLimit	      "-1"
+      SampleTimeMode	      "continuous"
+      InitialCondition	      "0"
+      LinearizeAsGain	      on
+    }
+    Block {
+      BlockType		      RelationalOperator
+      Operator		      ">="
+      InputSameDT	      on
+      LogicOutDataTypeMode    "Logical (see Configuration Parameters: Optimiza"
+"tion)"
+      LogicDataType	      "uint(8)"
+      ZeroCross		      on
+      SampleTime	      "-1"
+    }
+    Block {
+      BlockType		      Saturate
+      UpperLimit	      "0.5"
+      LowerLimit	      "-0.5"
+      LinearizeAsGain	      on
+      ZeroCross		      on
+      SampleTime	      "-1"
+    }
+    Block {
+      BlockType		      "S-Function"
+      FunctionName	      "system"
+      SFunctionModules	      "''"
+      PortCounts	      "[]"
+    }
+    Block {
+      BlockType		      Step
+      Time		      "1"
+      Before		      "0"
+      After		      "1"
+      SampleTime	      "-1"
+      VectorParams1D	      on
+      ZeroCross		      on
+    }
+    Block {
+      BlockType		      SubSystem
+      ShowPortLabels	      on
+      Permissions	      "ReadWrite"
+      PermitHierarchicalResolution "All"
+      SystemSampleTime	      "-1"
+      RTWFcnNameOpts	      "Auto"
+      RTWFileNameOpts	      "Auto"
+      SimViewingDevice	      off
+      DataTypeOverride	      "UseLocalSettings"
+      MinMaxOverflowLogging   "UseLocalSettings"
+    }
+    Block {
+      BlockType		      Sum
+      IconShape		      "rectangular"
+      Inputs		      "++"
+      InputSameDT	      on
+      OutDataTypeMode	      "Same as first input"
+      OutDataType	      "sfix(16)"
+      OutScaling	      "2^0"
+      LockScale		      off
+      RndMeth		      "Floor"
+      SaturateOnIntegerOverflow	on
+      SampleTime	      "-1"
+    }
+    Block {
+      BlockType		      Switch
+      Criteria		      "u2 >= Threshold"
+      Threshold		      "0"
+      InputSameDT	      on
+      OutDataTypeMode	      "Inherit via internal rule"
+      RndMeth		      "Floor"
+      SaturateOnIntegerOverflow	on
+      ZeroCross		      on
+      SampleTime	      "-1"
+    }
+    Block {
+      BlockType		      Terminator
+    }
+    Block {
+      BlockType		      TriggerPort
+      TriggerType	      "rising"
+      StatesWhenEnabling      "inherit"
+      ShowOutputPort	      off
+      OutputDataType	      "auto"
+      SampleTimeType	      "triggered"
+      SampleTime	      "1"
+      ZeroCross		      on
+    }
+    Block {
+      BlockType		      UnitDelay
+      X0		      "0"
+      SampleTime	      "1"
+      StateMustResolveToSignalObject off
+      RTWStateStorageClass    "Auto"
+    }
+    Block {
+      BlockType		      ZeroOrderHold
+      SampleTime	      "1"
+    }
+  }
+  AnnotationDefaults {
+    HorizontalAlignment	    "center"
+    VerticalAlignment	    "middle"
+    ForegroundColor	    "black"
+    BackgroundColor	    "white"
+    DropShadow		    off
+    FontName		    "Helvetica"
+    FontSize		    10
+    FontWeight		    "normal"
+    FontAngle		    "normal"
+  }
+  LineDefaults {
+    FontName		    "Helvetica"
+    FontSize		    9
+    FontWeight		    "normal"
+    FontAngle		    "normal"
+  }
+  System {
+    Name		    "HybridControllerPoly3_nAct"
+    Location		    [6, 82, 730, 339]
+    Open		    on
+    ModelBrowserVisibility  off
+    ModelBrowserWidth	    200
+    ScreenColor		    "white"
+    PaperOrientation	    "landscape"
+    PaperPositionMode	    "auto"
+    PaperType		    "usletter"
+    PaperUnits		    "inches"
+    ZoomFactor		    "100"
+    ReportName		    "simulink-default.rpt"
+    Block {
+      BlockType		      Reference
+      Name		      "DS1104DAC_C1"
+      Ports		      [1]
+      Position		      [600, 67, 690, 103]
+      SourceBlock	      "rtilib1104/DS1104 MASTER PPC/DS1104DAC_C1"
+      SourceType	      "RTI"
+      ShowPortLabels	      on
+      ChannelNo		      "1"
+      InitValue		      "0"
+      TermMode		      "0"
+      TermValue		      "0"
+      Reserved1		      "[]"
+      Reserved2		      "[]"
+      Reserved3		      "[]"
+      Reserved4		      "[]"
+      DialogFcn		      "gui1104dac"
+      UnitName		      "{ 'DS1104DAC_C'}"
+      UnitValues	      "{ 1 }"
+      DSProperties	      "struct('RTI',struct('Version',uint32(1),'BlockT"
+"ype',struct('isSLSource',uint8(0),'isSLSink',uint8(1),'isHWSource',uint8(0),'"
+"isHWSink',uint8(1),'isSetup',uint8(0),'isInline',uint8(1),'isNonInline',uint8"
+"(0),'isInterrupt',uint8(0),'isChannelwise',uint8(1)),'IOBoardType','DS1104MAS"
+"TER','UnitType','DAC','Identifier','DAC','DialogType','ML','BlockSet','NONE',"
+"'SlaveProcessor','NONE'))"
+    }
+    Block {
+      BlockType		      Reference
+      Name		      "DS1104DAC_C2"
+      Ports		      [1]
+      Position		      [600, 127, 690, 163]
+      SourceBlock	      "rtilib1104/DS1104 MASTER PPC/DS1104DAC_C1"
+      SourceType	      "RTI"
+      ShowPortLabels	      on
+      ChannelNo		      "2"
+      InitValue		      "0"
+      TermMode		      "0"
+      TermValue		      "0"
+      Reserved1		      "[]"
+      Reserved2		      "[]"
+      Reserved3		      "[]"
+      Reserved4		      "[]"
+      DialogFcn		      "gui1104dac"
+      UnitName		      "{ 'DS1104DAC_C'}"
+      UnitValues	      "{2}"
+      DSProperties	      "struct('RTI',struct('Version',uint32(1),'BlockT"
+"ype',struct('isSLSource',uint8(0),'isSLSink',uint8(1),'isHWSource',uint8(0),'"
+"isHWSink',uint8(1),'isSetup',uint8(0),'isInline',uint8(1),'isNonInline',uint8"
+"(0),'isInterrupt',uint8(0),'isChannelwise',uint8(1)),'IOBoardType','DS1104MAS"
+"TER','UnitType','DAC','Identifier','DAC','DialogType','ML','BlockSet','NONE',"
+"'SlaveProcessor','NONE'))"
+    }
+    Block {
+      BlockType		      Reference
+      Name		      "DS1104MUX_ADC"
+      Ports		      [0, 1]
+      Position		      [30, 96, 120, 134]
+      SourceBlock	      "rtilib1104/DS1104 MASTER PPC/DS1104MUX_ADC"
+      SourceType	      "RTI"
+      ShowPortLabels	      on
+      ChannelNos	      "[1 2 3 4]"
+      TriggerMode	      "0"
+      Reserved1		      "[]"
+      Reserved2		      "[]"
+      Reserved3		      "[]"
+      Reserved4		      "[]"
+      DialogFcn		      "gui1104mux_adc"
+      UnitName		      "{ 'DS1104MUX_ADC' }"
+      UnitValues	      "{ [] }"
+      DSProperties	      "struct('RTI',struct('Version',uint32(1),'BlockT"
+"ype',struct('isSLSource',uint8(1),'isSLSink',uint8(0),'isHWSource',uint8(1),'"
+"isHWSink',uint8(0),'isSetup',uint8(0),'isInline',uint8(1),'isNonInline',uint8"
+"(0),'isInterrupt',uint8(0),'isChannelwise',uint8(0)),'IOBoardType','DS1104MAS"
+"TER','UnitType','ADC','Identifier','ADCMUX','DialogType','ML','BlockSet','NON"
+"E','SlaveProcessor','NONE'))"
+    }
+    Block {
+      BlockType		      Demux
+      Name		      "Demux"
+      Ports		      [1, 2]
+      Position		      [175, 79, 180, 146]
+      BackgroundColor	      "black"
+      ShowName		      off
+      Outputs		      "2"
+    }
+    Block {
+      BlockType		      Demux
+      Name		      "Demux1"
+      Ports		      [1, 2]
+      Position		      [550, 96, 555, 134]
+      BackgroundColor	      "black"
+      ShowName		      off
+      Outputs		      "2"
+      DisplayOption	      "bar"
+    }
+    Block {
+      BlockType		      Gain
+      Name		      "Gain"
+      Position		      [230, 80, 260, 110]
+      ShowName		      off
+    }
+    Block {
+      BlockType		      Gain
+      Name		      "Gain1"
+      Position		      [230, 115, 260, 145]
+      ShowName		      off
+    }
+    Block {
+      BlockType		      Gain
+      Name		      "Gain2"
+      Position		      [475, 100, 505, 130]
+      ShowName		      off
+    }
+    Block {
+      BlockType		      SubSystem
+      Name		      "Logo"
+      Ports		      []
+      Position		      [618, 195, 691, 227]
+      ForegroundColor	      "white"
+      ShowName		      off
+      OpenFcn		      ";"
+      FontSize		      12
+      TreatAsAtomicUnit	      off
+      MinAlgLoopOccurrences   off
+      RTWSystemCode	      "Auto"
+      MaskType		      "dSPACE"
+      MaskPromptString	      "Mask Parameter 1:"
+      MaskStyleString	      "edit"
+      MaskTunableValueString  "on"
+      MaskEnableString	      "on"
+      MaskVisibilityString    "off"
+      MaskToolTipString	      "on"
+      MaskVariables	      "EmptyParameter=&1;"
+      MaskDisplay	      "image(imread('rti_mdl_dslogo.tif'));"
+      MaskIconFrame	      on
+      MaskIconOpaque	      on
+      MaskIconRotate	      "none"
+      MaskIconUnits	      "autoscale"
+      System {
+	Name			"Logo"
+	Location		[466, 560, 697, 621]
+	Open			off
+	ModelBrowserVisibility	off
+	ModelBrowserWidth	200
+	ScreenColor		"white"
+	PaperOrientation	"landscape"
+	PaperPositionMode	"auto"
+	PaperType		"usletter"
+	PaperUnits		"inches"
+	ZoomFactor		"100"
+	Annotation {
+	  Name			  "$Workfile: demo1104_analog.mdl $ "
+	  Position		  [11, 11]
+	  HorizontalAlignment	  "left"
+	}
+	Annotation {
+	  Name			  "$Date: 15.05.01 13:54 $ "
+	  Position		  [11, 26]
+	  HorizontalAlignment	  "left"
+	}
+	Annotation {
+	  Name			  "$Revision: 3 $ "
+	  Position		  [11, 41]
+	  HorizontalAlignment	  "left"
+	}
+      }
+    }
+    Block {
+      BlockType		      SubSystem
+      Name		      "RTI Data"
+      Tag		      "struct('RTIDataServer',struct('RTIDataServerVs'"
+",'2','RTIModelDescription','struct(''main'',''HybridControllerPoly3_nAct'',''"
+"sub'','''',''isMp'',0)'))"
+      Ports		      []
+      Position		      [30, 210, 81, 222]
+      ForegroundColor	      "[0.501961, 0.501961, 0.501961]"
+      BackgroundColor	      "[0.752941, 0.752941, 0.752941]"
+      DropShadow	      on
+      ShowName		      off
+      CopyFcn		      "if exist('rtidc'), try,  rtidc('DataHostBlockCl"
+"bCopy', gcbh); catch, disp(['Warning: ''CopyFcn'' for RTI Data block failed: "
+"' lasterr]); end, end, "
+      DeleteFcn		      "if exist('rtidc'), try,  rtidc('DataHostBlockCl"
+"bDelete', gcbh); catch, disp(['Warning: ''DeleteFcn'' for RTI Data block fail"
+"ed: ' lasterr]); end, end, "
+      LoadFcn		      "if exist('rtidc'), try,  rtidc('DataHostBlockCl"
+"bLoad', gcbh); catch, disp(['Warning: ''LoadFcn'' for RTI Data block failed: "
+"' lasterr]); end, end, "
+      ModelCloseFcn	      "if exist('rtidc'), try,  rtidc('DataHostBlockCl"
+"bModelClose', gcbh); catch, disp(['Warning: ''ModelCloseFcn'' for RTI Data bl"
+"ock failed: ' lasterr]); end, end, "
+      PreSaveFcn	      "if exist('rtidc'), try,  rtidc('DataHostBlockCl"
+"bPreSave', gcbh); catch, disp(['Warning: ''PreSaveFcn'' for RTI Data block fa"
+"iled: ' lasterr]); end, end, "
+      PostSaveFcn	      "if exist('rtidc'), try,  rtidc('DataHostBlockCl"
+"bPostSave', gcbh); catch, disp(['Warning: ''PostSaveFcn'' for RTI Data block "
+"failed: ' lasterr]); end, end, "
+      NameChangeFcn	      "if exist('rtidc'), try,  rtidc('DataHostBlockCl"
+"bNameChange', gcbh); catch, disp(['Warning: ''NameChangeFcn'' for RTI Data bl"
+"ock failed: ' lasterr]); end, end, "
+      TreatAsAtomicUnit	      off
+      MinAlgLoopOccurrences   off
+      RTWSystemCode	      "Auto"
+      MaskType		      "RTI_DATA_HOST"
+      MaskDescription	      "RTI Data Block.\nThis block is used by RTI to s"
+"tore internal model-dependent data.\nPlease keep this block on the root level"
+" of the model. Deleting this block will result in data loss.\n\nNEVER DELETE "
+"OR COPY THIS BLOCK!"
+      MaskHelp		      "RTI Data Block.\nThis block is used by RTI to s"
+"tore internal model-dependent data.\nPlease keep this block on the root level"
+" of the model. Deleting this block will result in data loss.\n\nNEVER DELETE "
+"OR COPY THIS BLOCK!"
+      MaskDisplay	      "text(0.5, 0.5, 'RTI Data', 'HorizontalAlignment"
+"', 'center');\nplot([1 0]);"
+      MaskIconFrame	      on
+      MaskIconOpaque	      on
+      MaskIconRotate	      "none"
+      MaskIconUnits	      "normalized"
+      System {
+	Name			"RTI Data"
+	Location		[450, 250, 640, 300]
+	Open			off
+	ModelBrowserVisibility	off
+	ModelBrowserWidth	200
+	ScreenColor		"white"
+	PaperOrientation	"landscape"
+	PaperPositionMode	"auto"
+	PaperType		"usletter"
+	PaperUnits		"inches"
+	ZoomFactor		"100"
+	Block {
+	  BlockType		  SubSystem
+	  Name			  "RTI Data Store"
+	  Tag			  "struct('private',struct('version',struct('d"
+"sVer',uint32(2),'dsVerCreation',uint32(2),'RTI',struct('ver','4.1a3','type','"
+"RTI1104')),'access',struct('type','Model','isPerm',1,'created',['13-Feb-2001 "
+"14:58:17'],'modified',['18-Oct-2007 18:15:22'],'location','')),'public',struc"
+"t('main',struct('data',[]),'sub',struct('name',{{'HybridControllerPoly3_nAct'"
+"}},'data',{{struct('TH',struct('thTaskInfo',struct('taskType',{'TIMER','HWINT"
+"','TMRINT','SWINT'},'tasksNumOf',{1,0,0,0},'srcIds',{{'TIMERA'},{},{},{}},'ta"
+"skNames',{{['Timer Task 1']},{},{},{}})),'th_tc',struct('dataType','TASK','ta"
+"skGroupId','','taskGroupList',{{}},'taskSchedulingPolicy','FCFS','taskType','"
+"TIMER','blkh',-1,'srcId','TIMERA','srcSgnName',['Timer A interrupt'],'srcCpuN"
+"ame','','taskName',['Timer Task 1  [0.001] s'],'taskNameDisplayExt','','smplT"
+"ime',0.001,'smplTimeOffs',0,'hasFixedPriority',0,'priority',1,'hasFixedOvc',0"
+",'ovcType',1,'ovcMax',0),'tc_th',struct('dataType','TASK','taskGroupId','','t"
+"askGroupList',{{}},'taskSchedulingPolicy','FCFS','taskType','TIMER','blkh',-1"
+",'srcId','TIMERA','srcSgnName',['Timer A interrupt'],'srcCpuName','','taskNam"
+"e',['Timer Task 1  [0.001] s'],'taskNameDisplayExt','','smplTime',0.001,'smpl"
+"TimeOffs',0,'hasFixedPriority',0,'priority',1,'hasFixedOvc',0,'ovcType',1,'ov"
+"cMax',0))}})))"
+	  Ports			  []
+	  Position		  [146, 15, 181, 28]
+	  ForegroundColor	  "white"
+	  ShowName		  off
+	  TreatAsAtomicUnit	  off
+	  MinAlgLoopOccurrences	  off
+	  RTWSystemCode		  "Auto"
+	  MaskType		  "RTI_DATA_STORE"
+	  MaskDescription	  "RTI Data Store Block. This block is used by"
+" RTI to store internal model dependent data. Deleting this block will result "
+"in data loss.\n\nNEVER DELETE, COPY, OR MODIFY THIS BLOCK!"
+	  MaskHelp		  "RTI Data Store Block. This block is used by"
+" RTI to store internal model dependent data. Deleting this block will result "
+"in data loss.\n\nNEVER DELETE, COPY, OR MODIFY THIS BLOCK!"
+	  MaskDisplay		  "text(0.5, 0.5, ' ', 'HorizontalAlignment', "
+"'center');"
+	  MaskIconFrame		  off
+	  MaskIconOpaque	  on
+	  MaskIconRotate	  "none"
+	  MaskIconUnits		  "normalized"
+	  System {
+	    Name		    "RTI Data Store"
+	    Location		    [450, 250, 640, 300]
+	    Open		    off
+	    ModelBrowserVisibility  off
+	    ModelBrowserWidth	    200
+	    ScreenColor		    "white"
+	    PaperOrientation	    "landscape"
+	    PaperPositionMode	    "auto"
+	    PaperType		    "usletter"
+	    PaperUnits		    "inches"
+	    ZoomFactor		    "100"
+	    Block {
+	      BlockType		      SubSystem
+	      Name		      "RTI Data Store"
+	      Ports		      []
+	      Position		      [146, 15, 181, 28]
+	      ForegroundColor	      "white"
+	      ShowName		      off
+	      TreatAsAtomicUnit	      off
+	      MinAlgLoopOccurrences   off
+	      RTWSystemCode	      "Auto"
+	      MaskType		      "RTI_DATA_STORE"
+	      MaskDescription	      "RTI Data Store Block. This block is use"
+"d by RTI to store internal model dependent data. Deleting this block will res"
+"ult in data loss.\n\nNEVER DELETE, COPY, OR MODIFY THIS BLOCK!"
+	      MaskHelp		      "RTI Data Store Block. This block is use"
+"d by RTI to store internal model dependent data. Deleting this block will res"
+"ult in data loss.\n\nNEVER DELETE, COPY, OR MODIFY THIS BLOCK!"
+	      MaskDisplay	      "text(0.5, 0.5, ' ', 'HorizontalAlignmen"
+"t', 'center');"
+	      MaskIconFrame	      off
+	      MaskIconOpaque	      on
+	      MaskIconRotate	      "none"
+	      MaskIconUnits	      "normalized"
+	      System {
+		Name			"RTI Data Store"
+		Location		[450, 250, 640, 300]
+		Open			off
+		ModelBrowserVisibility	off
+		ModelBrowserWidth	200
+		ScreenColor		"white"
+		PaperOrientation	"landscape"
+		PaperPositionMode	"auto"
+		PaperType		"usletter"
+		PaperUnits		"inches"
+		ZoomFactor		"100"
+		Block {
+		  BlockType		  SubSystem
+		  Name			  "RTI Data Store"
+		  Ports			  []
+		  Position		  [146, 15, 181, 28]
+		  ForegroundColor	  "white"
+		  ShowName		  off
+		  TreatAsAtomicUnit	  off
+		  MinAlgLoopOccurrences	  off
+		  RTWSystemCode		  "Auto"
+		  MaskType		  "RTI_DATA_STORE"
+		  MaskDescription	  "RTI Data Store Block. This block is"
+" used by RTI to store internal model dependent data. Deleting this block will"
+" result in data loss.\n\nNEVER DELETE, COPY, OR MODIFY THIS BLOCK!"
+		  MaskHelp		  "RTI Data Store Block. This block is"
+" used by RTI to store internal model dependent data. Deleting this block will"
+" result in data loss.\n\nNEVER DELETE, COPY, OR MODIFY THIS BLOCK!"
+		  MaskDisplay		  "text(0.5, 0.5, ' ', 'HorizontalAlig"
+"nment', 'center');"
+		  MaskIconFrame		  off
+		  MaskIconOpaque	  on
+		  MaskIconRotate	  "none"
+		  MaskIconUnits		  "normalized"
+		  System {
+		    Name		    "RTI Data Store"
+		    Location		    [450, 250, 640, 300]
+		    Open		    off
+		    ModelBrowserVisibility  off
+		    ModelBrowserWidth	    200
+		    ScreenColor		    "white"
+		    PaperOrientation	    "landscape"
+		    PaperPositionMode	    "auto"
+		    PaperType		    "usletter"
+		    PaperUnits		    "inches"
+		    ZoomFactor		    "100"
+		    Block {
+		    BlockType		    SubSystem
+		    Name		    "RTI Data Store"
+		    Ports		    []
+		    Position		    [146, 15, 181, 28]
+		    ForegroundColor	    "white"
+		    ShowName		    off
+		    TreatAsAtomicUnit	    off
+		    MinAlgLoopOccurrences   off
+		    RTWSystemCode	    "Auto"
+		    MaskType		    "RTI_DATA_STORE"
+		    MaskDescription	    "RTI Data Store Block. This block "
+"is used by RTI to store internal model dependent data. Deleting this block wi"
+"ll result in data loss.\n\nNEVER DELETE, COPY, OR MODIFY THIS BLOCK!"
+		    MaskHelp		    "RTI Data Store Block. This block "
+"is used by RTI to store internal model dependent data. Deleting this block wi"
+"ll result in data loss.\n\nNEVER DELETE, COPY, OR MODIFY THIS BLOCK!"
+		    MaskDisplay		    "text(0.5, 0.5, ' ', 'HorizontalAl"
+"ignment', 'center');"
+		    MaskIconFrame	    off
+		    MaskIconOpaque	    on
+		    MaskIconRotate	    "none"
+		    MaskIconUnits	    "normalized"
+		    System {
+		    Name		    "RTI Data Store"
+		    Location		    [450, 250, 640, 300]
+		    Open		    off
+		    ModelBrowserVisibility  off
+		    ModelBrowserWidth	    200
+		    ScreenColor		    "white"
+		    PaperOrientation	    "landscape"
+		    PaperPositionMode	    "auto"
+		    PaperType		    "usletter"
+		    PaperUnits		    "inches"
+		    ZoomFactor		    "100"
+		    }
+		    }
+		  }
+		}
+	      }
+	    }
+	  }
+	}
+      }
+    }
+    Block {
+      BlockType		      SubSystem
+      Name		      "dSpace HC"
+      Ports		      [2, 1]
+      Position		      [310, 77, 420, 148]
+      AncestorBlock	      "HybridSimLib/xPC\nTarget/xPC HC1"
+      TreatAsAtomicUnit	      off
+      MinAlgLoopOccurrences   off
+      RTWSystemCode	      "Auto"
+      MaskType		      "Hybrid Controller: Poly3"
+      MaskDescription	      "Hybrid Controller using cubic Lagrange interpol"
+"ation for prediction and correction"
+      MaskPromptString	      "Number of Actuators: nAct|Integration time step"
+": dtInt|Simulation time step: dtSim|Controller time step: dtCon|Maximum numbe"
+"r of substeps: N|Number of delay steps: iDelay|Displacement limit: dspLim|Vel"
+"ocity limit: velLim"
+      MaskStyleString	      "edit,edit,edit,edit,edit,edit,edit,edit"
+      MaskTunableValueString  "off,on,on,on,on,on,on,on"
+      MaskCallbackString      "|||||||"
+      MaskEnableString	      "on,on,on,on,on,on,on,on"
+      MaskVisibilityString    "on,on,on,on,on,on,on,on"
+      MaskToolTipString	      "on,on,on,on,on,on,on,on"
+      MaskVarAliasString      ",,,,,,,"
+      MaskVariables	      "nAct=@1;dtInt=@2;dtSim=@3;dtCon=@4;N=@5;iDelay="
+"@6;dspLim=@7;velLim=@8;"
+      MaskDisplay	      "disp('dSpace\\nHybrid Controller\\n(Poly3)')"
+      MaskIconFrame	      on
+      MaskIconOpaque	      on
+      MaskIconRotate	      "none"
+      MaskIconUnits	      "autoscale"
+      MaskValueString	      "2|HybridCtrlParameters.dtInt|HybridCtrlParamete"
+"rs.dtSim|HybridCtrlParameters.dtCon|HybridCtrlParameters.N|HybridCtrlParamete"
+"rs.iDelay|HybridCtrlParameters.dspLim|HybridCtrlParameters.velLim"
+      MaskTabNameString	      ",,,,,,,"
+      System {
+	Name			"dSpace HC"
+	Location		[6, 83, 712, 481]
+	Open			off
+	ModelBrowserVisibility	off
+	ModelBrowserWidth	200
+	ScreenColor		"white"
+	PaperOrientation	"landscape"
+	PaperPositionMode	"auto"
+	PaperType		"usletter"
+	PaperUnits		"inches"
+	ZoomFactor		"100"
+	Block {
+	  BlockType		  Inport
+	  Name			  "dspIn"
+	  Position		  [25, 283, 55, 297]
+	  Port			  "1"
+	  IconDisplay		  "Port number"
+	  LatchInput		  off
+	}
+	Block {
+	  BlockType		  Inport
+	  Name			  "frcIn"
+	  Position		  [25, 343, 55, 357]
+	  Port			  "2"
+	  IconDisplay		  "Port number"
+	  LatchInput		  off
+	}
+	Block {
+	  BlockType		  DataStoreRead
+	  Name			  "Data Store\nRead"
+	  Position		  [135, 15, 165, 45]
+	  ShowName		  off
+	  DataStoreName		  "sFlag"
+	  SampleTime		  "dtCon"
+	  Port {
+	    PortNumber		    1
+	    Name		    "switchPC"
+	    RTWStorageClass	    "ExportedGlobal"
+	    RTWStorageTypeQualifier "volatile"
+	    DataLoggingNameMode	    "SignalName"
+	    ShowSigGenPortName	    on
+	  }
+	}
+	Block {
+	  BlockType		  DataStoreRead
+	  Name			  "Data Store\nRead1"
+	  Position		  [265, 15, 295, 45]
+	  ShowName		  off
+	  DataStoreName		  "tFlag"
+	  SampleTime		  "dtCon"
+	  Port {
+	    PortNumber		    1
+	    Name		    "atTarget"
+	    RTWStorageClass	    "ExportedGlobal"
+	    RTWStorageTypeQualifier "volatile"
+	    DataLoggingNameMode	    "SignalName"
+	    ShowSigGenPortName	    on
+	  }
+	}
+	Block {
+	  BlockType		  Gain
+	  Name			  "Gain1"
+	  Position		  [105, 334, 135, 366]
+	  ShowName		  off
+	  Gain			  "10"
+	}
+	Block {
+	  BlockType		  Gain
+	  Name			  "Gain3"
+	  Position		  [570, 99, 610, 131]
+	  ShowName		  off
+	  Gain			  "0.1"
+	}
+	Block {
+	  BlockType		  Gain
+	  Name			  "Gain4"
+	  Position		  [105, 274, 135, 306]
+	  ShowName		  off
+	  Gain			  "10"
+	}
+	Block {
+	  BlockType		  Reference
+	  Name			  "Offset"
+	  Ports			  [1, 1]
+	  Position		  [180, 274, 235, 306]
+	  ShowName		  off
+	  SourceBlock		  "HybridSimLib/Signal\nRouting/Offset"
+	  SourceType		  "Signal Offset"
+	  ShowPortLabels	  on
+	  nS			  "nAct"
+	  nOffset		  "1024"
+	  dt			  "dtCon"
+	}
+	Block {
+	  BlockType		  Reference
+	  Name			  "Offset1"
+	  Ports			  [1, 1]
+	  Position		  [180, 334, 235, 366]
+	  ShowName		  off
+	  SourceBlock		  "HybridSimLib/Signal\nRouting/Offset"
+	  SourceType		  "Signal Offset"
+	  ShowPortLabels	  on
+	  nS			  "nAct"
+	  nOffset		  "1024"
+	  dt			  "dtCon"
+	}
+	Block {
+	  BlockType		  SubSystem
+	  Name			  "Predictor-Corrector"
+	  Ports			  [2, 3]
+	  Position		  [215, 92, 355, 228]
+	  TreatAsAtomicUnit	  off
+	  MinAlgLoopOccurrences	  off
+	  RTWSystemCode		  "Auto"
+	  MaskType		  "Stateflow"
+	  MaskDisplay		  "plot(sf('Private','sfblk','xIcon'),sf('Priv"
+"ate','sfblk','yIcon'));text(0.5,0,sf('Private', 'sfblk', 'tIcon'),'Horizontal"
+"Al','Center','VerticalAl','Bottom');"
+	  MaskSelfModifiable	  on
+	  MaskIconFrame		  off
+	  MaskIconOpaque	  off
+	  MaskIconRotate	  "none"
+	  MaskIconUnits		  "autoscale"
+	  Port {
+	    PortNumber		    2
+	    Name		    "state"
+	    PropagatedSignals	    "state"
+	    RTWStorageClass	    "Auto"
+	    DataLoggingNameMode	    "SignalName"
+	    ShowSigGenPortName	    on
+	  }
+	  Port {
+	    PortNumber		    3
+	    Name		    "counter"
+	    PropagatedSignals	    "i"
+	    RTWStorageClass	    "Auto"
+	    DataLoggingNameMode	    "SignalName"
+	    ShowSigGenPortName	    on
+	  }
+	  System {
+	    Name		    "Predictor-Corrector"
+	    Location		    [480, 85, 980, 386]
+	    Open		    off
+	    ModelBrowserVisibility  off
+	    ModelBrowserWidth	    200
+	    ScreenColor		    "white"
+	    PaperOrientation	    "landscape"
+	    PaperPositionMode	    "auto"
+	    PaperType		    "usletter"
+	    PaperUnits		    "inches"
+	    ZoomFactor		    "100"
+	    Block {
+	      BlockType		      Inport
+	      Name		      "dsp"
+	      Position		      [20, 101, 40, 119]
+	      Port		      "1"
+	      IconDisplay	      "Port number"
+	      LatchInput	      off
+	    }
+	    Block {
+	      BlockType		      Inport
+	      Name		      "flag"
+	      Position		      [20, 136, 40, 154]
+	      Port		      "2"
+	      IconDisplay	      "Port number"
+	      LatchInput	      off
+	    }
+	    Block {
+	      BlockType		      Demux
+	      Name		      " Demux "
+	      Ports		      [1, 1]
+	      Position		      [270, 210, 320, 250]
+	      Outputs		      "1"
+	    }
+	    Block {
+	      BlockType		      "S-Function"
+	      Name		      " SFunction "
+	      Tag		      "Stateflow S-Function HybridControllerPo"
+"ly3_nAct 1"
+	      Ports		      [2, 4]
+	      Position		      [180, 102, 230, 203]
+	      FunctionName	      "sf_sfun"
+	      Parameters	      "N,iDelay,nAct"
+	      PortCounts	      "[2 4]"
+	      Port {
+		PortNumber		2
+		Name			"com"
+		RTWStorageClass		"Auto"
+		DataLoggingNameMode	"SignalName"
+		ShowSigGenPortName	on
+	      }
+	      Port {
+		PortNumber		3
+		Name			"state"
+		RTWStorageClass		"Auto"
+		DataLoggingNameMode	"SignalName"
+		ShowSigGenPortName	on
+	      }
+	      Port {
+		PortNumber		4
+		Name			"i"
+		RTWStorageClass		"Auto"
+		DataLoggingNameMode	"SignalName"
+		ShowSigGenPortName	on
+	      }
+	    }
+	    Block {
+	      BlockType		      Terminator
+	      Name		      " Terminator "
+	      Position		      [460, 221, 480, 239]
+	    }
+	    Block {
+	      BlockType		      Outport
+	      Name		      "com"
+	      Position		      [460, 101, 480, 119]
+	      IconDisplay	      "Port number"
+	      BusOutputAsStruct	      off
+	    }
+	    Block {
+	      BlockType		      Outport
+	      Name		      "state"
+	      Position		      [460, 136, 480, 154]
+	      Port		      "2"
+	      IconDisplay	      "Port number"
+	      BusOutputAsStruct	      off
+	    }
+	    Block {
+	      BlockType		      Outport
+	      Name		      "i"
+	      Position		      [460, 171, 480, 189]
+	      Port		      "3"
+	      IconDisplay	      "Port number"
+	      BusOutputAsStruct	      off
+	    }
+	    Line {
+	      SrcBlock		      " SFunction "
+	      SrcPort		      1
+	      Points		      [0, 115]
+	      DstBlock		      " Demux "
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      " Demux "
+	      SrcPort		      1
+	      DstBlock		      " Terminator "
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "dsp"
+	      SrcPort		      1
+	      DstBlock		      " SFunction "
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "flag"
+	      SrcPort		      1
+	      Points		      [120, 0]
+	      DstBlock		      " SFunction "
+	      DstPort		      2
+	    }
+	    Line {
+	      Name		      "com"
+	      Labels		      [0, 0]
+	      SrcBlock		      " SFunction "
+	      SrcPort		      2
+	      DstBlock		      "com"
+	      DstPort		      1
+	    }
+	    Line {
+	      Name		      "state"
+	      Labels		      [0, 0]
+	      SrcBlock		      " SFunction "
+	      SrcPort		      3
+	      DstBlock		      "state"
+	      DstPort		      1
+	    }
+	    Line {
+	      Name		      "i"
+	      Labels		      [0, 0]
+	      SrcBlock		      " SFunction "
+	      SrcPort		      4
+	      DstBlock		      "i"
+	      DstPort		      1
+	    }
+	  }
+	}
+	Block {
+	  BlockType		  SubSystem
+	  Name			  "SubSystem0"
+	  Ports			  [1, 1]
+	  Position		  [135, 179, 170, 211]
+	  ShowName		  off
+	  TreatAsAtomicUnit	  off
+	  MinAlgLoopOccurrences	  off
+	  RTWSystemCode		  "Auto"
+	  System {
+	    Name		    "SubSystem0"
+	    Location		    [725, 83, 1259, 430]
+	    Open		    off
+	    ModelBrowserVisibility  off
+	    ModelBrowserWidth	    200
+	    ScreenColor		    "white"
+	    PaperOrientation	    "landscape"
+	    PaperPositionMode	    "auto"
+	    PaperType		    "usletter"
+	    PaperUnits		    "inches"
+	    ZoomFactor		    "100"
+	    Block {
+	      BlockType		      Inport
+	      Name		      "In"
+	      Position		      [50, 103, 80, 117]
+	      Port		      "1"
+	      IconDisplay	      "Port number"
+	      LatchInput	      off
+	      Port {
+		PortNumber		1
+		Name			"newTarget"
+		RTWStorageClass		"Auto"
+		DataLoggingNameMode	"SignalName"
+		ShowSigGenPortName	on
+	      }
+	    }
+	    Block {
+	      BlockType		      Reference
+	      Name		      "Detect Fall\nNonpositive"
+	      Ports		      [1, 1]
+	      Position		      [170, 200, 230, 250]
+	      SourceBlock	      "simulink/Logic and Bit\nOperations/Dete"
+"ct Fall\nNonpositive"
+	      SourceType	      "Detect Fall Nonpositive"
+	      ShowPortLabels	      on
+	      vinit		      "0"
+	    }
+	    Block {
+	      BlockType		      Reference
+	      Name		      "Detect Rise\nPositive"
+	      Ports		      [1, 1]
+	      Position		      [170, 85, 230, 135]
+	      SourceBlock	      "simulink/Logic and Bit\nOperations/Dete"
+"ct Rise\nPositive"
+	      SourceType	      "Detect Rise Positive"
+	      ShowPortLabels	      on
+	      vinit		      "0"
+	    }
+	    Block {
+	      BlockType		      SubSystem
+	      Name		      "If Action\nSubsystem0"
+	      Ports		      [0, 0, 0, 0, 0, 0, 0, 1]
+	      Position		      [415, 137, 485, 173]
+	      TreatAsAtomicUnit	      on
+	      MinAlgLoopOccurrences   off
+	      RTWSystemCode	      "Auto"
+	      System {
+		Name			"If Action\nSubsystem0"
+		Location		[666, 614, 1022, 893]
+		Open			off
+		ModelBrowserVisibility	off
+		ModelBrowserWidth	200
+		ScreenColor		"white"
+		PaperOrientation	"landscape"
+		PaperPositionMode	"auto"
+		PaperType		"usletter"
+		PaperUnits		"inches"
+		ZoomFactor		"100"
+		Block {
+		  BlockType		  ActionPort
+		  Name			  "Action Port"
+		  Position		  [150, 20, 209, 48]
+		  ActionType		  "then"
+		}
+		Block {
+		  BlockType		  DataStoreWrite
+		  Name			  "Data Store\nWrite0"
+		  Position		  [270, 100, 300, 130]
+		  DataStoreName		  "sFlag"
+		  SampleTime		  "-1"
+		}
+		Block {
+		  BlockType		  DataStoreWrite
+		  Name			  "Data Store\nWrite1"
+		  Position		  [270, 190, 300, 220]
+		  DataStoreName		  "tFlag"
+		  SampleTime		  "-1"
+		}
+		Block {
+		  BlockType		  Constant
+		  Name			  "atTargetFlag"
+		  Position		  [55, 190, 85, 220]
+		  Value			  "0"
+		  OutDataTypeMode	  "uint32"
+		  SampleTime		  "dtCon"
+		}
+		Block {
+		  BlockType		  Constant
+		  Name			  "switchFlag"
+		  Position		  [55, 100, 85, 130]
+		  OutDataTypeMode	  "uint32"
+		  SampleTime		  "dtCon"
+		}
+		Line {
+		  SrcBlock		  "atTargetFlag"
+		  SrcPort		  1
+		  DstBlock		  "Data Store\nWrite1"
+		  DstPort		  1
+		}
+		Line {
+		  SrcBlock		  "switchFlag"
+		  SrcPort		  1
+		  DstBlock		  "Data Store\nWrite0"
+		  DstPort		  1
+		}
+	      }
+	    }
+	    Block {
+	      BlockType		      SubSystem
+	      Name		      "If Action\nSubsystem1"
+	      Ports		      [0, 0, 0, 0, 0, 0, 0, 1]
+	      Position		      [415, 252, 485, 288]
+	      TreatAsAtomicUnit	      on
+	      MinAlgLoopOccurrences   off
+	      RTWSystemCode	      "Auto"
+	      System {
+		Name			"If Action\nSubsystem1"
+		Location		[666, 614, 1022, 807]
+		Open			off
+		ModelBrowserVisibility	off
+		ModelBrowserWidth	200
+		ScreenColor		"white"
+		PaperOrientation	"landscape"
+		PaperPositionMode	"auto"
+		PaperType		"usletter"
+		PaperUnits		"inches"
+		ZoomFactor		"100"
+		Block {
+		  BlockType		  ActionPort
+		  Name			  "Action Port"
+		  Position		  [150, 20, 209, 48]
+		  ActionType		  "then"
+		}
+		Block {
+		  BlockType		  DataStoreWrite
+		  Name			  "Data Store\nWrite0"
+		  Position		  [270, 100, 300, 130]
+		  DataStoreName		  "sFlag"
+		  SampleTime		  "-1"
+		}
+		Block {
+		  BlockType		  Constant
+		  Name			  "switchFlag"
+		  Position		  [55, 100, 85, 130]
+		  Value			  "0"
+		  OutDataTypeMode	  "uint32"
+		  SampleTime		  "dtCon"
+		}
+		Line {
+		  SrcBlock		  "switchFlag"
+		  SrcPort		  1
+		  DstBlock		  "Data Store\nWrite0"
+		  DstPort		  1
+		}
+	      }
+	    }
+	    Block {
+	      BlockType		      If
+	      Name		      "If0"
+	      Ports		      [1, 1]
+	      Position		      [280, 91, 380, 129]
+	      IfExpression	      "u1 == 1"
+	      ShowElse		      off
+	    }
+	    Block {
+	      BlockType		      If
+	      Name		      "If1"
+	      Ports		      [1, 1]
+	      Position		      [280, 206, 380, 244]
+	      IfExpression	      "u1 == 1"
+	      ShowElse		      off
+	    }
+	    Block {
+	      BlockType		      DataTypeConversion
+	      Name		      "typeConv"
+	      Position		      [305, 31, 360, 49]
+	      OutDataTypeMode	      "uint32"
+	    }
+	    Block {
+	      BlockType		      Outport
+	      Name		      "Out"
+	      Position		      [435, 33, 465, 47]
+	      IconDisplay	      "Port number"
+	      BusOutputAsStruct	      off
+	    }
+	    Line {
+	      Name		      "newTarget"
+	      SrcBlock		      "In"
+	      SrcPort		      1
+	      Points		      [35, 0]
+	      Branch {
+		DstBlock		"Detect Rise\nPositive"
+		DstPort			1
+	      }
+	      Branch {
+		Points			[0, 115]
+		DstBlock		"Detect Fall\nNonpositive"
+		DstPort			1
+	      }
+	    }
+	    Line {
+	      SrcBlock		      "Detect Rise\nPositive"
+	      SrcPort		      1
+	      Points		      [15, 0]
+	      Branch {
+		DstBlock		"If0"
+		DstPort			1
+	      }
+	      Branch {
+		Points			[0, -70]
+		DstBlock		"typeConv"
+		DstPort			1
+	      }
+	    }
+	    Line {
+	      SrcBlock		      "Detect Fall\nNonpositive"
+	      SrcPort		      1
+	      DstBlock		      "If1"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "If1"
+	      SrcPort		      1
+	      Points		      [65, 0]
+	      DstBlock		      "If Action\nSubsystem1"
+	      DstPort		      ifaction
+	    }
+	    Line {
+	      SrcBlock		      "If0"
+	      SrcPort		      1
+	      Points		      [65, 0]
+	      DstBlock		      "If Action\nSubsystem0"
+	      DstPort		      ifaction
+	    }
+	    Line {
+	      SrcBlock		      "typeConv"
+	      SrcPort		      1
+	      DstBlock		      "Out"
+	      DstPort		      1
+	    }
+	  }
+	}
+	Block {
+	  BlockType		  SubSystem
+	  Name			  "SubSystem1"
+	  Ports			  [3, 2]
+	  Position		  [430, 236, 565, 364]
+	  ShowName		  off
+	  TreatAsAtomicUnit	  off
+	  MinAlgLoopOccurrences	  off
+	  RTWSystemCode		  "Auto"
+	  Port {
+	    PortNumber		    1
+	    Name		    "measDsp"
+	    RTWStorageClass	    "ExportedGlobal"
+	    RTWStorageTypeQualifier "volatile"
+	    DataLoggingNameMode	    "SignalName"
+	    ShowSigGenPortName	    on
+	  }
+	  Port {
+	    PortNumber		    2
+	    Name		    "measFrc"
+	    RTWStorageClass	    "ExportedGlobal"
+	    RTWStorageTypeQualifier "volatile"
+	    DataLoggingNameMode	    "SignalName"
+	    ShowSigGenPortName	    on
+	  }
+	  System {
+	    Name		    "SubSystem1"
+	    Location		    [7, 635, 587, 895]
+	    Open		    off
+	    ModelBrowserVisibility  off
+	    ModelBrowserWidth	    200
+	    ScreenColor		    "white"
+	    PaperOrientation	    "landscape"
+	    PaperPositionMode	    "auto"
+	    PaperType		    "usletter"
+	    PaperUnits		    "inches"
+	    ZoomFactor		    "100"
+	    Block {
+	      BlockType		      Inport
+	      Name		      "counter"
+	      Position		      [70, 48, 100, 62]
+	      Port		      "1"
+	      IconDisplay	      "Port number"
+	      LatchInput	      off
+	    }
+	    Block {
+	      BlockType		      Inport
+	      Name		      "measDsp In"
+	      Position		      [70, 128, 100, 142]
+	      Port		      "2"
+	      IconDisplay	      "Port number"
+	      LatchInput	      off
+	    }
+	    Block {
+	      BlockType		      Inport
+	      Name		      "measFrc In"
+	      Position		      [70, 173, 100, 187]
+	      Port		      "3"
+	      IconDisplay	      "Port number"
+	      LatchInput	      off
+	    }
+	    Block {
+	      BlockType		      HitCross
+	      Name		      "Hit \nCrossing"
+	      Ports		      [1, 1]
+	      Position		      [180, 40, 210, 70]
+	      HitCrossingOffset	      "iDelay"
+	      HitCrossingDirection    "either"
+	    }
+	    Block {
+	      BlockType		      SubSystem
+	      Name		      "SubSystem"
+	      Ports		      [2, 2, 0, 1]
+	      Position		      [210, 111, 350, 204]
+	      ShowName		      off
+	      TreatAsAtomicUnit	      on
+	      MinAlgLoopOccurrences   off
+	      RTWSystemCode	      "Auto"
+	      System {
+		Name			"SubSystem"
+		Location		[600, 635, 942, 895]
+		Open			off
+		ModelBrowserVisibility	off
+		ModelBrowserWidth	200
+		ScreenColor		"white"
+		PaperOrientation	"landscape"
+		PaperPositionMode	"auto"
+		PaperType		"usletter"
+		PaperUnits		"inches"
+		ZoomFactor		"100"
+		Block {
+		  BlockType		  Inport
+		  Name			  "measDsp In"
+		  Position		  [75, 78, 105, 92]
+		  Port			  "1"
+		  IconDisplay		  "Port number"
+		  LatchInput		  off
+		}
+		Block {
+		  BlockType		  Inport
+		  Name			  "measFrc In"
+		  Position		  [75, 128, 105, 142]
+		  Port			  "2"
+		  IconDisplay		  "Port number"
+		  LatchInput		  off
+		}
+		Block {
+		  BlockType		  TriggerPort
+		  Name			  "Trigger"
+		  Ports			  []
+		  Position		  [155, 25, 175, 45]
+		  StatesWhenEnabling	  "held"
+		}
+		Block {
+		  BlockType		  DataStoreWrite
+		  Name			  "Data Store\nWrite"
+		  Position		  [230, 185, 260, 215]
+		  DataStoreName		  "tFlag"
+		  SampleTime		  "-1"
+		}
+		Block {
+		  BlockType		  Constant
+		  Name			  "atTargetFlag"
+		  Position		  [75, 185, 105, 215]
+		  OutDataTypeMode	  "uint32"
+		  SampleTime		  "-1"
+		}
+		Block {
+		  BlockType		  Outport
+		  Name			  "measDsp Out"
+		  Position		  [230, 78, 260, 92]
+		  IconDisplay		  "Port number"
+		  BusOutputAsStruct	  off
+		  InitialOutput		  "[0]"
+		}
+		Block {
+		  BlockType		  Outport
+		  Name			  "measFrc Out"
+		  Position		  [230, 128, 260, 142]
+		  Port			  "2"
+		  IconDisplay		  "Port number"
+		  BusOutputAsStruct	  off
+		  InitialOutput		  "[0]"
+		}
+		Line {
+		  SrcBlock		  "atTargetFlag"
+		  SrcPort		  1
+		  DstBlock		  "Data Store\nWrite"
+		  DstPort		  1
+		}
+		Line {
+		  SrcBlock		  "measFrc In"
+		  SrcPort		  1
+		  DstBlock		  "measFrc Out"
+		  DstPort		  1
+		}
+		Line {
+		  SrcBlock		  "measDsp In"
+		  SrcPort		  1
+		  DstBlock		  "measDsp Out"
+		  DstPort		  1
+		}
+	      }
+	    }
+	    Block {
+	      BlockType		      Outport
+	      Name		      "measDsp Out"
+	      Position		      [470, 128, 500, 142]
+	      IconDisplay	      "Port number"
+	      BusOutputAsStruct	      off
+	    }
+	    Block {
+	      BlockType		      Outport
+	      Name		      "measFrc Out"
+	      Position		      [470, 173, 500, 187]
+	      Port		      "2"
+	      IconDisplay	      "Port number"
+	      BusOutputAsStruct	      off
+	    }
+	    Line {
+	      SrcBlock		      "SubSystem"
+	      SrcPort		      2
+	      DstBlock		      "measFrc Out"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "measFrc In"
+	      SrcPort		      1
+	      DstBlock		      "SubSystem"
+	      DstPort		      2
+	    }
+	    Line {
+	      SrcBlock		      "SubSystem"
+	      SrcPort		      1
+	      DstBlock		      "measDsp Out"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "measDsp In"
+	      SrcPort		      1
+	      DstBlock		      "SubSystem"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "counter"
+	      SrcPort		      1
+	      DstBlock		      "Hit \nCrossing"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "Hit \nCrossing"
+	      SrcPort		      1
+	      Points		      [65, 0]
+	      DstBlock		      "SubSystem"
+	      DstPort		      trigger
+	    }
+	  }
+	}
+	Block {
+	  BlockType		  Terminator
+	  Name			  "Terminator1"
+	  Position		  [655, 260, 675, 280]
+	  ShowName		  off
+	}
+	Block {
+	  BlockType		  Terminator
+	  Name			  "Terminator2"
+	  Position		  [655, 325, 675, 345]
+	  ShowName		  off
+	}
+	Block {
+	  BlockType		  Terminator
+	  Name			  "Terminator3"
+	  Position		  [525, 150, 545, 170]
+	  ShowName		  off
+	}
+	Block {
+	  BlockType		  Terminator
+	  Name			  "Terminator4"
+	  Position		  [225, 20, 245, 40]
+	  ShowName		  off
+	}
+	Block {
+	  BlockType		  Terminator
+	  Name			  "Terminator5"
+	  Position		  [350, 20, 370, 40]
+	  ShowName		  off
+	}
+	Block {
+	  BlockType		  Saturate
+	  Name			  "disp_limit"
+	  Position		  [400, 100, 430, 130]
+	  UpperLimit		  "dspLim"
+	  LowerLimit		  "-dspLim"
+	}
+	Block {
+	  BlockType		  Constant
+	  Name			  "newTarget"
+	  Position		  [25, 179, 90, 211]
+	  Value			  "newTarget"
+	  OutDataTypeMode	  "uint32"
+	  SampleTime		  "dtCon"
+	}
+	Block {
+	  BlockType		  DataStoreMemory
+	  Name			  "sMem"
+	  Position		  [25, 15, 57, 45]
+	  DataStoreName		  "sFlag"
+	  InitialValue		  "0"
+	  RTWStateStorageClass	  "Auto"
+	  VectorParams1D	  on
+	  ShowAdditionalParam	  off
+	  DataType		  "uint32"
+	}
+	Block {
+	  BlockType		  DataStoreMemory
+	  Name			  "tMem"
+	  Position		  [80, 15, 112, 45]
+	  DataStoreName		  "tFlag"
+	  InitialValue		  "0"
+	  RTWStateStorageClass	  "Auto"
+	  VectorParams1D	  on
+	  ShowAdditionalParam	  off
+	  DataType		  "uint32"
+	}
+	Block {
+	  BlockType		  Constant
+	  Name			  "targDsp"
+	  Position		  [25, 109, 90, 141]
+	  Value			  "targDsp"
+	  SampleTime		  "dtCon"
+	}
+	Block {
+	  BlockType		  RateLimiter
+	  Name			  "vel_limit"
+	  Position		  [470, 100, 500, 130]
+	  RisingSlewLimit	  "velLim"
+	  FallingSlewLimit	  "-velLim"
+	  Port {
+	    PortNumber		    1
+	    Name		    "commDsp"
+	    RTWStorageClass	    "Auto"
+	    DataLoggingNameMode	    "SignalName"
+	    ShowSigGenPortName	    on
+	  }
+	}
+	Block {
+	  BlockType		  Outport
+	  Name			  "dspOut"
+	  Position		  [645, 108, 675, 122]
+	  IconDisplay		  "Port number"
+	  BusOutputAsStruct	  off
+	}
+	Line {
+	  SrcBlock		  "frcIn"
+	  SrcPort		  1
+	  DstBlock		  "Gain1"
+	  DstPort		  1
+	}
+	Line {
+	  SrcBlock		  "dspIn"
+	  SrcPort		  1
+	  DstBlock		  "Gain4"
+	  DstPort		  1
+	}
+	Line {
+	  Name			  "measFrc"
+	  Labels		  [1, 1]
+	  SrcBlock		  "SubSystem1"
+	  SrcPort		  2
+	  DstBlock		  "Terminator2"
+	  DstPort		  1
+	}
+	Line {
+	  Name			  "measDsp"
+	  Labels		  [1, 1]
+	  SrcBlock		  "SubSystem1"
+	  SrcPort		  1
+	  DstBlock		  "Terminator1"
+	  DstPort		  1
+	}
+	Line {
+	  Name			  "counter"
+	  Labels		  [2, 1]
+	  SrcBlock		  "Predictor-Corrector"
+	  SrcPort		  3
+	  Points		  [35, 0; 0, 55]
+	  DstBlock		  "SubSystem1"
+	  DstPort		  1
+	}
+	Line {
+	  Name			  "state"
+	  Labels		  [1, 1]
+	  SrcBlock		  "Predictor-Corrector"
+	  SrcPort		  2
+	  DstBlock		  "Terminator3"
+	  DstPort		  1
+	}
+	Line {
+	  SrcBlock		  "Offset"
+	  SrcPort		  1
+	  Points		  [155, 0; 0, 10]
+	  DstBlock		  "SubSystem1"
+	  DstPort		  2
+	}
+	Line {
+	  SrcBlock		  "SubSystem0"
+	  SrcPort		  1
+	  DstBlock		  "Predictor-Corrector"
+	  DstPort		  2
+	}
+	Line {
+	  SrcBlock		  "newTarget"
+	  SrcPort		  1
+	  DstBlock		  "SubSystem0"
+	  DstPort		  1
+	}
+	Line {
+	  SrcBlock		  "targDsp"
+	  SrcPort		  1
+	  DstBlock		  "Predictor-Corrector"
+	  DstPort		  1
+	}
+	Line {
+	  SrcBlock		  "Offset1"
+	  SrcPort		  1
+	  Points		  [155, 0; 0, -10]
+	  DstBlock		  "SubSystem1"
+	  DstPort		  3
+	}
+	Line {
+	  SrcBlock		  "disp_limit"
+	  SrcPort		  1
+	  DstBlock		  "vel_limit"
+	  DstPort		  1
+	}
+	Line {
+	  Name			  "commDsp"
+	  Labels		  [-1, 0]
+	  SrcBlock		  "vel_limit"
+	  SrcPort		  1
+	  DstBlock		  "Gain3"
+	  DstPort		  1
+	}
+	Line {
+	  SrcBlock		  "Predictor-Corrector"
+	  SrcPort		  1
+	  DstBlock		  "disp_limit"
+	  DstPort		  1
+	}
+	Line {
+	  SrcBlock		  "Gain3"
+	  SrcPort		  1
+	  DstBlock		  "dspOut"
+	  DstPort		  1
+	}
+	Line {
+	  SrcBlock		  "Gain4"
+	  SrcPort		  1
+	  DstBlock		  "Offset"
+	  DstPort		  1
+	}
+	Line {
+	  SrcBlock		  "Gain1"
+	  SrcPort		  1
+	  DstBlock		  "Offset1"
+	  DstPort		  1
+	}
+	Line {
+	  Name			  "switchPC"
+	  Labels		  [0, 0]
+	  SrcBlock		  "Data Store\nRead"
+	  SrcPort		  1
+	  DstBlock		  "Terminator4"
+	  DstPort		  1
+	}
+	Line {
+	  Name			  "atTarget"
+	  Labels		  [0, 0]
+	  SrcBlock		  "Data Store\nRead1"
+	  SrcPort		  1
+	  Points		  [0, 0]
+	  DstBlock		  "Terminator5"
+	  DstPort		  1
+	}
+      }
+    }
+    Line {
+      SrcBlock		      "dSpace HC"
+      SrcPort		      1
+      DstBlock		      "Gain2"
+      DstPort		      1
+    }
+    Line {
+      SrcBlock		      "Gain"
+      SrcPort		      1
+      DstBlock		      "dSpace HC"
+      DstPort		      1
+    }
+    Line {
+      SrcBlock		      "Gain1"
+      SrcPort		      1
+      DstBlock		      "dSpace HC"
+      DstPort		      2
+    }
+    Line {
+      SrcBlock		      "DS1104MUX_ADC"
+      SrcPort		      1
+      DstBlock		      "Demux"
+      DstPort		      1
+    }
+    Line {
+      SrcBlock		      "Demux"
+      SrcPort		      1
+      DstBlock		      "Gain"
+      DstPort		      1
+    }
+    Line {
+      SrcBlock		      "Demux"
+      SrcPort		      2
+      DstBlock		      "Gain1"
+      DstPort		      1
+    }
+    Line {
+      SrcBlock		      "Gain2"
+      SrcPort		      1
+      DstBlock		      "Demux1"
+      DstPort		      1
+    }
+    Line {
+      SrcBlock		      "Demux1"
+      SrcPort		      2
+      Points		      [0, 20]
+      DstBlock		      "DS1104DAC_C2"
+      DstPort		      1
+    }
+    Line {
+      SrcBlock		      "Demux1"
+      SrcPort		      1
+      Points		      [0, -20]
+      DstBlock		      "DS1104DAC_C1"
+      DstPort		      1
+    }
+    Annotation {
+      Name		      "Hybrid Controller (Poly3)"
+      Position		      [146, 28]
+      FontName		      "Arial"
+      FontSize		      20
+      FontWeight	      "bold"
+    }
+  }
+}
+
+# Finite State Machines
+#
+#    Stateflow Version 6.2 (R14SP2) dated Jan 27 2005, 19:24:42
+#
+#
+
+Stateflow {
+
+	machine {
+		id                   		1
+		name                 		"HybridControllerPoly3_nAct"
+		created              		"15-Oct-2001 17:10:46"
+		isLibrary            		0
+		firstTarget          		27
+		debug {
+			breakOn              		[0 0 1]
+		}
+		sfVersion            		62014000
+	}
+
+	chart {
+		id                                        		2
+		name                                      		"dSpace HC/Predictor-Corrector"
+		windowPosition                            		[18.75 176.25 886.5 532.5]
+		viewLimits                                		[3.153 844.467 1.042 496.549]
+		zoomFactor                                		0.998
+		screen                                    		[1 1 1280 1024 1.333333333333333]
+		treeNode                                  		[0 6 0 0]
+		viewObj                                   		2
+		machine                                   		1
+		subviewS {
+			x1        		3.153
+			y1        		1.042
+			zoomFactor		0.998
+		}
+		decomposition                             		SET_CHART
+		firstData                                 		14
+		chartFileNumber                           		1
+		disableImplicitCasting                    		1
+	}
+
+	state {
+		id                  		3
+		labelString         		"Predict\n"
+						"en: state = 1;\n"
+						"en: diSD = 1;\n"
+						"en: i = 1; iSD = 0;\n"
+						"en: predictP3(com,i/N);\n"
+						"du: i++;\n"
+						"du: predictP3(com,i/N);"
+		position            		[576.6762 91.2101 214.8435 155.1983]
+		fontSize            		12
+		chart               		2
+		treeNode            		[6 0 7 4]
+		subviewer           		2
+		type                		OR_STATE
+		decomposition       		CLUSTER_STATE
+	}
+
+	state {
+		id                  		4
+		labelString         		"Initialize\n"
+						"en: i = 1; iSD = 0;\n"
+						"en: diSD = 1;\n"
+						"en: initData(nAct,dtCon);\n"
+						"en: zeroDsp(com);"
+		position            		[51.0855 132.1864 139.7353 82.9349]
+		fontSize            		12
+		chart               		2
+		treeNode            		[6 0 3 5]
+		subviewer           		2
+		type                		OR_STATE
+		decomposition       		CLUSTER_STATE
+	}
+
+	state {
+		id                  		5
+		labelString         		"AutoSlowDown\n"
+						"en: state = 2;\n"
+						"en: diSD = 4-i/(0.2*N);\n"
+						"en: i += diSD; iSD = i;\n"
+						"en: predictP3(com,i/N);\n"
+						"du: diSD = 4-i/(0.2*N);\n"
+						"du: i += diSD; iSD = i;\n"
+						"du: predictP3(com,i/N);"
+		position            		[428.7069 326.5783 258.0199 124.1012]
+		fontSize            		12
+		chart               		2
+		treeNode            		[6 0 4 0]
+		subviewer           		2
+		type                		OR_STATE
+		decomposition       		CLUSTER_STATE
+	}
+
+	state {
+		id                  		6
+		labelString         		"HybridController"
+		position            		[24.2944 19.0518 799.0304 459.4882]
+		fontSize            		12
+		chart               		2
+		treeNode            		[2 7 0 0]
+		firstTransition     		8
+		subviewer           		2
+		type                		AND_STATE
+		decomposition       		CLUSTER_STATE
+	}
+
+	state {
+		id                  		7
+		labelString         		"Correct\n"
+						"en: state = 0;\n"
+						"en: setCurDsp(com,i/N);\n"
+						"en: dspLocal = dsp; setNewDsp(dspLocal);\n"
+						"en: di = min(max(diSD+1/(0.2*N)*(i-iSD),0.001),1.0);\n"
+						"en: i = min(i+di,N);\n"
+						"en: correctP3(com,i/N);\n"
+						"du: di = min(max(diSD+1/(0.2*N)*(i-iSD),0.001),1.0);\n"
+						"du: i = min(i+di,N);\n"
+						"du: correctP3(com,i/N);"
+		position            		[251.8451 90.6156 292.0842 155.2563]
+		fontSize            		12
+		chart               		2
+		treeNode            		[6 0 0 3]
+		subviewer           		2
+		type                		OR_STATE
+		decomposition       		CLUSTER_STATE
+	}
+
+	transition {
+		id             		8
+		labelString    		"[i>=N]"
+		labelPosition  		[542.511 32.711 32.157 14.947]
+		fontSize       		12
+		src {
+			id          		7
+			intersection		[1 0 -1 0.8743 507.2111 90.6156 0 -114.9119]
+		}
+		dst {
+			id          		3
+			intersection		[1 0 -1 0.1433 607.4704 91.2101 0 108.3933]
+		}
+		midPoint       		[524.9561 60.2552]
+		chart          		2
+		linkNode       		[6 0 9]
+		dataLimits     		[507.211 609.87 49.744 91.21]
+		subviewer      		2
+		drawStyle      		SMART
+		slide {
+			mode          		MIRROR_SLIDE
+			sticky        		BOTH_STICK
+			midPointSticky		1
+		}
+		executionOrder 		1
+	}
+
+	transition {
+		id             		9
+		labelPosition  		[120.209 111.899 8.226 14.947]
+		fontSize       		12
+		src {
+			intersection		[0 0 1 0 120.1986 108.5441 0 0]
+		}
+		dst {
+			id          		4
+			intersection		[1 0 -1 0.4946 120.1986 132.1864 0 0]
+		}
+		midPoint       		[120.1986 116.6185]
+		chart          		2
+		linkNode       		[6 8 11]
+		dataLimits     		[117.799 122.599 108.544 132.186]
+		subviewer      		2
+		drawStyle      		SMART
+		executionOrder 		1
+	}
+
+	transition {
+		id             		10
+		labelString    		"[flag==1]"
+		labelPosition  		[536.984 291.12 46.366 14.947]
+		fontSize       		12
+		src {
+			id          		3
+			intersection		[3 0 1 0.8401 611.0194 246.4084 0 -111.9424]
+		}
+		dst {
+			id          		7
+			intersection		[3 0 1 0.1342 504.7349 245.872 0 116.2571]
+		}
+		midPoint       		[564.8824 288.2785]
+		chart          		2
+		linkNode       		[6 12 13]
+		dataLimits     		[502.335 611.019 245.872 288.866]
+		subviewer      		2
+		drawStyle      		SMART
+		slide {
+			mode          		MIRROR_SLIDE
+			sticky        		BOTH_STICK
+			midPointSticky		1
+		}
+		executionOrder 		2
+	}
+
+	transition {
+		id             		11
+		labelString    		"[flag==1]"
+		labelPosition  		[197.98 144.817 46.366 14.947]
+		fontSize       		12
+		src {
+			id          		4
+			intersection		[2 1 0 0.4004 190.8208 165.3935 0 0.1]
+		}
+		dst {
+			id          		7
+			intersection		[4 -1 0 0.5184 251.8451 165.3935 0 -0.1]
+		}
+		midPoint       		[218.3989 165.3897]
+		chart          		2
+		linkNode       		[6 9 12]
+		dataLimits     		[190.821 251.845 162.993 167.793]
+		subviewer      		2
+		drawStyle      		SMART
+		executionOrder 		1
+	}
+
+	transition {
+		id             		12
+		labelString    		"[flag==1]"
+		labelPosition  		[417.878 280.286 46.366 14.947]
+		fontSize       		12
+		src {
+			id          		5
+			intersection		[1 0 -1 0.1535 468.3087 326.5783 0 -82.8552]
+		}
+		dst {
+			id          		7
+			intersection		[3 0 1 0.2589 468.3087 245.8719 0 82.8552]
+		}
+		midPoint       		[468.32 288.7314]
+		chart          		2
+		linkNode       		[6 11 10]
+		dataLimits     		[465.909 470.709 245.872 326.578]
+		subviewer      		2
+		drawStyle      		SMART
+		executionOrder 		1
+	}
+
+	transition {
+		id             		13
+		labelString    		"[i>=0.6*N && flag~=1]"
+		labelPosition  		[653.062 274.575 114.419 14.947]
+		fontSize       		12
+		src {
+			id          		3
+			intersection		[3 0 1 0.6667 648.2835 246.4084 0 35.8141]
+		}
+		dst {
+			id          		5
+			intersection		[1 0 -1 0.851 648.2835 326.5783 0 -35.8141]
+		}
+		midPoint       		[648.2839 283.9755]
+		chart          		2
+		linkNode       		[6 10 0]
+		dataLimits     		[645.884 650.683 246.408 326.578]
+		subviewer      		2
+		drawStyle      		SMART
+		executionOrder 		1
+	}
+
+	data {
+		id                            		14
+		name                          		"dsp"
+		linkNode                      		[2 0 15]
+		scope                         		INPUT_DATA
+		machine                       		1
+		dataType                      		"double"
+		fixptType {
+			bias    		0
+			slope   		1
+			exponent		0
+			baseType		SF_INT16_TYPE
+			lock    		0
+		}
+		dlgFixptMode                  		1
+		props {
+			range {
+				minimum		""
+				maximum		""
+			}
+			array {
+				size      		"nAct"
+			}
+		}
+	}
+
+	data {
+		id                            		15
+		name                          		"flag"
+		linkNode                      		[2 14 16]
+		scope                         		INPUT_DATA
+		machine                       		1
+		dataType                      		"uint32"
+		fixptType {
+			bias    		0
+			slope   		1
+			exponent		0
+			baseType		SF_UINT8_TYPE
+			lock    		0
+		}
+		dlgFixptMode                  		0
+		props {
+			range {
+				minimum		""
+				maximum		""
+			}
+		}
+	}
+
+	data {
+		id                            		16
+		name                          		"com"
+		linkNode                      		[2 15 17]
+		scope                         		OUTPUT_DATA
+		machine                       		1
+		dataType                      		"double"
+		fixptType {
+			bias    		0
+			slope   		1
+			exponent		0
+			baseType		SF_UINT8_TYPE
+			lock    		0
+		}
+		dlgFixptMode                  		0
+		props {
+			range {
+				minimum		""
+				maximum		""
+			}
+			array {
+				size      		"nAct"
+			}
+		}
+	}
+
+	data {
+		id                            		17
+		name                          		"state"
+		linkNode                      		[2 16 18]
+		scope                         		OUTPUT_DATA
+		machine                       		1
+		dataType                      		"uint32"
+		fixptType {
+			bias    		0
+			slope   		1
+			exponent		0
+			baseType		SF_UINT8_TYPE
+			lock    		0
+		}
+		dlgFixptMode                  		0
+		props {
+			range {
+				minimum		""
+				maximum		""
+			}
+		}
+	}
+
+	data {
+		id                            		18
+		name                          		"i"
+		linkNode                      		[2 17 19]
+		scope                         		OUTPUT_DATA
+		machine                       		1
+		dataType                      		"double"
+		fixptType {
+			bias    		0
+			slope   		1
+			exponent		0
+			baseType		SF_INT16_TYPE
+			lock    		0
+		}
+		dlgFixptMode                  		0
+		props {
+			range {
+				minimum		""
+				maximum		""
+			}
+		}
+	}
+
+	data {
+		id                            		19
+		name                          		"N"
+		linkNode                      		[2 18 20]
+		scope                         		LOCAL_DATA
+		initFromWorkspace             		1
+		machine                       		1
+		dataType                      		"double"
+		fixptType {
+			bias    		0
+			slope   		1
+			exponent		0
+			baseType		SF_INT16_TYPE
+			lock    		0
+		}
+		dlgFixptMode                  		0
+		props {
+			range {
+				minimum		""
+				maximum		""
+			}
+		}
+	}
+
+	data {
+		id                            		20
+		name                          		"nAct"
+		linkNode                      		[2 19 21]
+		scope                         		PARAMETER_DATA
+		initFromWorkspace             		1
+		paramIndexForInitFromWorkspace		2
+		machine                       		1
+		dataType                      		"uint32"
+		fixptType {
+			bias    		0
+			slope   		1
+			exponent		0
+			baseType		SF_INT16_TYPE
+			lock    		0
+		}
+		dlgFixptMode                  		0
+		props {
+			range {
+				minimum		""
+				maximum		""
+			}
+			initialValue		"1"
+		}
+	}
+
+	data {
+		id                            		21
+		name                          		"iDelay"
+		linkNode                      		[2 20 22]
+		scope                         		LOCAL_DATA
+		initFromWorkspace             		1
+		paramIndexForInitFromWorkspace		1
+		machine                       		1
+		dataType                      		"double"
+		fixptType {
+			bias    		0
+			slope   		1
+			exponent		0
+			baseType		SF_INT16_TYPE
+			lock    		0
+		}
+		dlgFixptMode                  		0
+		props {
+			range {
+				minimum		""
+				maximum		""
+			}
+		}
+	}
+
+	data {
+		id                            		22
+		name                          		"di"
+		linkNode                      		[2 21 23]
+		scope                         		LOCAL_DATA
+		machine                       		1
+		dataType                      		"double"
+		fixptType {
+			bias    		0
+			slope   		1
+			exponent		0
+			baseType		SF_INT16_TYPE
+			lock    		0
+		}
+		dlgFixptMode                  		0
+		props {
+			range {
+				minimum		""
+				maximum		""
+			}
+		}
+	}
+
+	data {
+		id                            		23
+		name                          		"diSD"
+		linkNode                      		[2 22 24]
+		scope                         		LOCAL_DATA
+		machine                       		1
+		dataType                      		"double"
+		fixptType {
+			bias    		0
+			slope   		1
+			exponent		0
+			baseType		SF_INT16_TYPE
+			lock    		0
+		}
+		dlgFixptMode                  		0
+		props {
+			range {
+				minimum		""
+				maximum		""
+			}
+		}
+	}
+
+	data {
+		id                            		24
+		name                          		"iSD"
+		linkNode                      		[2 23 25]
+		scope                         		LOCAL_DATA
+		machine                       		1
+		dataType                      		"double"
+		fixptType {
+			bias    		0
+			slope   		1
+			exponent		0
+			baseType		SF_INT16_TYPE
+			lock    		0
+		}
+		dlgFixptMode                  		0
+		props {
+			range {
+				minimum		""
+				maximum		""
+			}
+		}
+	}
+
+	data {
+		id                            		25
+		name                          		"dspLocal"
+		linkNode                      		[2 24 0]
+		scope                         		LOCAL_DATA
+		machine                       		1
+		dataType                      		"double"
+		fixptType {
+			bias    		0
+			slope   		1
+			exponent		0
+			baseType		SF_INT16_TYPE
+			lock    		0
+		}
+		dlgFixptMode                  		0
+		props {
+			range {
+				minimum		""
+				maximum		""
+			}
+			array {
+				size      		"nAct"
+			}
+		}
+	}
+
+	instance {
+		id     		26
+		name   		"dSpace HC/Predictor-Corrector"
+		machine		1
+		chart  		2
+	}
+
+	target {
+		id                        		27
+		name                      		"sfun"
+		description               		"Default Simulink S-Function Target."
+		customCode                		"#include \"PredictorCorrector.h\""
+		codeFlags                 		" debug=1 overflow=1 echo=1"
+		machine                   		1
+		linkNode                  		[1 0 28]
+		userSources               		"PredictorCorrector.c"
+	}
+
+	target {
+		id                        		28
+		codeFlags                 		" comments=1 statebitsets=1 databitsets=1 emitlogicalops=1 el"
+						"seifdetection=1 constantfolding=1 redundantloadelimination=0"
+						" preservenames=0 preservenameswithparent=0 exportcharts=0 io"
+						"format=0 initializer=0 multiinstanced=0 ppcomments=0"
+		machine                   		1
+		linkNode                  		[1 27 29]
+	}
+
+	target {
+		id                        		29
+		name                      		"rtw"
+		codeFlags                 		" comments=1 preservenames=0 preservenameswithparent=0 export"
+						"charts=0 statebitsets=1 databitsets=1"
+		machine                   		1
+		linkNode                  		[1 28 0]
+	}
+}
