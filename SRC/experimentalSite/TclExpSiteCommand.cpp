@@ -211,9 +211,9 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp, int argc,
 
         // setup the connection
         if (!ssl)
-            theChannel = new TCP_Socket(ipPort,ipAddr,1);
+            theChannel = new TCP_Socket(ipPort,ipAddr,true);
         else
-            theChannel = new TCP_SocketSSL(ipPort,ipAddr,1);
+            theChannel = new TCP_SocketSSL(ipPort,ipAddr,true);
 
         // parsing was successful, allocate the site
         if (theSetup == 0)
@@ -302,7 +302,7 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp, int argc,
 
         // parsing was successful, setup the connection and allocate the site
         if (!ssl)  {
-            theChannel = new TCP_Socket(ipPort,1);
+            theChannel = new TCP_Socket(ipPort,true);
             if (theChannel != 0) {
                 opserr << "\nChannel successfully created: "
                     << "Waiting for RemoteExpSite...\n";
@@ -313,7 +313,7 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp, int argc,
             }
         }
         else  {
-            theChannel = new TCP_SocketSSL(ipPort,1);
+            theChannel = new TCP_SocketSSL(ipPort,true);
             if (theChannel != 0) {
                 opserr << "\nSSL Channel successfully created: "
                     << "Waiting for RemoteExpSite...\n";
