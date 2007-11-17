@@ -53,7 +53,7 @@ ExperimentalSite::ExperimentalSite(int tag,
 {
     sizeTrial = new ID(OF_Resp_All);
     sizeOut = new ID(OF_Resp_All);
-    if(sizeTrial == 0 || sizeOut == 0) {
+    if (sizeTrial == 0 || sizeOut == 0) {
         opserr << "ExperimentalSite::ExperimentalSite() - "
             << "fail to create ID"
             << endln;
@@ -71,9 +71,9 @@ ExperimentalSite::ExperimentalSite(const ExperimentalSite& site)
     cpsTrial(0), cpsOut(0),
     daqFlag(false)
 {
-    if(site.theSetup != 0) {
+    if (site.theSetup != 0) {
         theSetup = (site.theSetup)->getCopy();
-        if(theSetup == 0) {
+        if (theSetup == 0) {
             opserr << "ExperimentalSite::ExperimentalSite() - "
                 << "failed to get a copy of setup"
                 << endln;
@@ -81,13 +81,13 @@ ExperimentalSite::ExperimentalSite(const ExperimentalSite& site)
         }
     }
     
-    if(site.cpsTrial != 0) {
+    if (site.cpsTrial != 0) {
         //this->setTrialCPs(*(site.cpsTrial));
         //this->setOutCPs(*(site.cpsOut));
     } else {
         sizeTrial = new ID(OF_Resp_All);
         sizeOut = new ID(OF_Resp_All);
-        if(sizeTrial == 0 || sizeOut == 0) {
+        if (sizeTrial == 0 || sizeOut == 0) {
             opserr << "ExperimentalSite::ExperimentalSite() - "
                 << "failed to create IDs" << endln;
             exit(OF_ReturnType_failed);
@@ -103,39 +103,39 @@ ExperimentalSite::ExperimentalSite(const ExperimentalSite& site)
 
 ExperimentalSite::~ExperimentalSite()
 {
-    if(theSetup != 0) 
+    if (theSetup != 0) 
         delete theSetup;
     
-    if(Disp != 0) 
+    if (Disp != 0) 
         delete Disp;
-    if(Vel != 0) 
+    if (Vel != 0) 
         delete Vel;
-    if(Accel != 0) 
+    if (Accel != 0) 
         delete Accel;
-    if(Force != 0) 
+    if (Force != 0) 
         delete Force;
-    if(Time != 0)
+    if (Time != 0)
         delete Time;
     
-    if(tDisp != 0) 
+    if (tDisp != 0) 
         delete tDisp;
-    if(tVel != 0) 
+    if (tVel != 0) 
         delete tVel;
-    if(tAccel != 0) 
+    if (tAccel != 0) 
         delete tAccel;
-    if(tForce != 0) 
+    if (tForce != 0) 
         delete tForce;
-    if(tTime != 0)
+    if (tTime != 0)
         delete tTime;
     
-    if(sizeTrial != 0)
+    if (sizeTrial != 0)
         delete sizeTrial;
-    if(sizeOut != 0)
+    if (sizeOut != 0)
         delete sizeOut;
     
-    if(cpsTrial != 0)
+    if (cpsTrial != 0)
         delete cpsTrial;
-    if(cpsOut != 0)
+    if (cpsOut != 0)
         delete cpsOut;
 }
 
@@ -158,26 +158,21 @@ int ExperimentalSite::setTrialResponse(const Vector* disp,
     const Vector* force,
     const Vector* time)
 {
-    // save data in basic sys
-    if(tDisp != 0) {
+    if (tDisp != 0) {
         *tDisp = *disp;
     }
-    if(tVel != 0) {
+    if (tVel != 0) {
         *tVel = *vel;
     }
-    if(tAccel != 0) {
+    if (tAccel != 0) {
         *tAccel = *accel;
     }
-    if(tForce != 0) {
+    if (tForce != 0) {
         *tForce = *force;
     } 
-    if(tTime != 0) {
+    if (tTime != 0) {
         *tTime = *time;
     } 
-    /*  opserr << "tDisp : " << *tDisp;
-    opserr << "tDispFact : " << *tDispFact;
-    opserr << "disp : " << *disp;
-    */
 
     return OF_ReturnType_completed;
 }
@@ -266,24 +261,20 @@ int ExperimentalSite::getDaqResponse(Vector* disp,
     Vector* time)
 {
     this->checkDaqResponse();
-    /*  opserr << "Disp : " << *Disp;
-    opserr << "disp : " << *disp;
-    opserr << "Force : " << *Force;
-    opserr << "force : " << *force;
-    */
-    if(Disp != 0) {
+
+    if (Disp != 0) {
         *disp = *Disp;
     }
-    if(Vel != 0) {
+    if (Vel != 0) {
         *vel = *Vel;
     }
-    if(Accel != 0) {
+    if (Accel != 0) {
         *accel = *Accel;
     }
-    if(Force != 0) {
+    if (Force != 0) {
         *force = *Force;
     }
-    if(Time != 0) {
+    if (Time != 0) {
         *time = *Time;
     }
     
@@ -297,22 +288,19 @@ int ExperimentalSite::setDaqResponse(const Vector* disp,
     const Vector* force,
     const Vector* time)
 {
-/*  opserr << "   disp : " << *disp;
-opserr << "   force : " << *force;
-    */
-    if(Disp != 0) {
+    if (Disp != 0) {
         *Disp = *disp;
     }
-    if(Vel != 0) {
+    if (Vel != 0) {
         *Vel = *vel;
     }
-    if(Accel != 0) {
+    if (Accel != 0) {
         *Accel = *accel;
     }
-    if(Force != 0) {
+    if (Force != 0) {
         *Force = *force;
     }
-    if(Time != 0) {
+    if (Time != 0) {
         *Time = *time;
     }
     
@@ -340,7 +328,7 @@ int ExperimentalSite::getOutSize(int rType)
 
 int ExperimentalSite::getCtrlSize(int rType)
 {
-    if(theSetup == 0) {
+    if (theSetup == 0) {
         return (*sizeTrial)[rType];
     } else {
         return theSetup->getCtrlSize(rType);
@@ -350,7 +338,7 @@ int ExperimentalSite::getCtrlSize(int rType)
 
 int ExperimentalSite::getDaqSize(int rType)
 {
-    if(theSetup == 0) {
+    if (theSetup == 0) {
         return (*sizeOut)[rType];
     } else {
         return theSetup->getDaqSize(rType);
@@ -384,68 +372,68 @@ ArrayOfTaggedObjects* ExperimentalSite::getCPsDaq()
 
 void ExperimentalSite::setTrial()
 {
-    if(tDisp != 0) {
+    if (tDisp != 0) {
         delete tDisp;
         tDisp = 0;
     }
-    if(tVel != 0) {
+    if (tVel != 0) {
         delete tVel;
         tVel = 0;
     }
-    if(tAccel != 0) {
+    if (tAccel != 0) {
         delete tAccel;
         tAccel = 0;
     }
-    if(tForce != 0) {
+    if (tForce != 0) {
         delete tForce;
         tForce = 0;
     }
-    if(tTime != 0) {
+    if (tTime != 0) {
         delete tTime;
         tTime = 0;
     }
     
     int size;
     size = (*sizeTrial)[OF_Resp_Disp];
-    if(size != 0) {
+    if (size != 0) {
         tDisp = new Vector(size);
-        if(tDisp == 0) {
+        if (tDisp == 0) {
             opserr << "ExperimentalSite::setTrial() - "
                 << "failed to create tDisp Vector\n";
             exit(OF_ReturnType_failed);
         }
     }
     size = (*sizeTrial)[OF_Resp_Vel];
-    if(size != 0) {
+    if (size != 0) {
         tVel = new Vector(size);
-        if(tVel == 0) {
+        if (tVel == 0) {
             opserr << "ExperimentalSite::setTrial() - "
                 << "failed to create tVel Vector\n";
             exit(OF_ReturnType_failed);
         }
     }
     size = (*sizeTrial)[OF_Resp_Accel];
-    if(size != 0) {
+    if (size != 0) {
         tAccel = new Vector(size);
-        if(tAccel == 0) {
+        if (tAccel == 0) {
             opserr << "ExperimentalSite::setTrial() - "
                 << "failed to create tAccel Vector\n";
             exit(OF_ReturnType_failed);
         }
     }
     size = (*sizeTrial)[OF_Resp_Force];
-    if(size != 0) {
+    if (size != 0) {
         tForce = new Vector(size);
-        if(tForce == 0) {
+        if (tForce == 0) {
             opserr << "ExperimentalSite::setTrial() - "
                 << "failed to create tForce Vector\n";
             exit(OF_ReturnType_failed);
         }
     }
     size = (*sizeTrial)[OF_Resp_Time];
-    if(size != 0) {
+    if (size != 0) {
         tTime = new Vector(size);
-        if(tTime == 0) {
+        if (tTime == 0) {
             opserr << "ExperimentalSite::setTrial() - "
                 << "failed to create tTime Vector\n";
             exit(OF_ReturnType_failed);
@@ -456,68 +444,68 @@ void ExperimentalSite::setTrial()
 
 void ExperimentalSite::setOut()
 {
-    if(Disp != 0) {
+    if (Disp != 0) {
         delete Disp;
         Disp = 0;
     }
-    if(Vel != 0) {
+    if (Vel != 0) {
         delete Vel;
         Vel = 0;
     }
-    if(Accel != 0) {
+    if (Accel != 0) {
         delete Accel;
         Accel = 0;
     }
-    if(Force != 0) {
+    if (Force != 0) {
         delete Force;
         Force = 0;
     }
-    if(Time != 0) {
+    if (Time != 0) {
         delete Time;
         Time = 0;
     }
     
     int size;
     size = (*sizeOut)[OF_Resp_Disp];
-    if(size != 0) {
+    if (size != 0) {
         Disp = new Vector(size);
-        if(Disp == 0) {
+        if (Disp == 0) {
             opserr << "ExperimentalSite::setOut() - "
                 << "failed to create Disp Vector\n";
             exit(OF_ReturnType_failed);
         }
     }
     size = (*sizeOut)[OF_Resp_Vel];
-    if(size != 0) {
+    if (size != 0) {
         Vel = new Vector(size);
-        if(Vel == 0) {
+        if (Vel == 0) {
             opserr << "ExperimentalSite::setOut() - "
                 << "failed to create Vel Vector\n";
             exit(OF_ReturnType_failed);
         }
     }
     size = (*sizeOut)[OF_Resp_Accel];
-    if(size != 0) {
+    if (size != 0) {
         Accel = new Vector(size);
-        if(Accel == 0) {
+        if (Accel == 0) {
             opserr << "ExperimentalSite::setOut() - "
                 << "failed to create Accel Vector\n";
             exit(OF_ReturnType_failed);
         }
     }
     size = (*sizeOut)[OF_Resp_Force];
-    if(size != 0) {
+    if (size != 0) {
         Force = new Vector(size);
-        if(Force == 0) {
+        if (Force == 0) {
             opserr << "ExperimentalSite::setOut() - "
                 << "failed to create Force Vector\n";
             exit(OF_ReturnType_failed);
         }
     }
     size = (*sizeOut)[OF_Resp_Time];
-    if(size != 0) {
+    if (size != 0) {
         Time = new Vector(size);
-        if(Time == 0) {
+        if (Time == 0) {
             opserr << "ExperimentalSite::setOut() - "
                 << "failed to create Time Vector\n";
             exit(OF_ReturnType_failed);
@@ -529,22 +517,22 @@ void ExperimentalSite::setOut()
 /*void ExperimentalSite::setTrialCPs(ArrayOfTaggedObjects &theCPs)
 {
     int nTrial = theCPs.getNumComponents();
-    if(cpsTrial != 0)
+    if (cpsTrial != 0)
         delete cpsTrial;
-    if(nTrial == 0) {
+    if (nTrial == 0) {
         opserr << "ExperimentalSite::setTrialCPs() - "
             << "invalid size of cpsTrial";
     }
     cpsTrial = new ArrayOfTaggedObjects(nTrial*OF_Resp_All);
     
-    if(sizeTrial != 0)
+    if (sizeTrial != 0)
         delete [] sizeTrial;
     sizeTrial = new ID[OF_Resp_All];
     sizeTrial->Zero();
     
     for(int i=1; i<=nTrial; i++) {
         TaggedObject *mc = theCPs.getComponentPtr(i);
-        if(mc == 0) {
+        if (mc == 0) {
             opserr << "ExperimentalSite::setTrialCPs() - "
                 << "failed to get ExperimentalCP\n";
             exit(OF_ReturnType_failed);
@@ -583,22 +571,22 @@ void ExperimentalSite::setOut()
 void ExperimentalSite::setOutCPs(ArrayOfTaggedObjects &theCPs)
 {
     int nOutput = theCPs.getNumComponents();
-    if(cpsOut != 0)
+    if (cpsOut != 0)
         delete cpsOut;
-    if(nOutput == 0) {
+    if (nOutput == 0) {
         opserr << "ExperimentalSite::setOutCPs() - "
             << "invalid size of cpsOut";
     }
     cpsOut = new ArrayOfTaggedObjects(nOutput*OF_Resp_All);
     
-    if(sizeOut != 0)
+    if (sizeOut != 0)
         delete [] sizeOut;
     sizeOut = new ID(OF_Resp_All);
     sizeOut->Zero();
     
     for(int i=1; i<=nOutput; i++) {
         TaggedObject *mc = theCPs.getComponentPtr(i);
-        if(mc == 0) {
+        if (mc == 0) {
             opserr << "ExperimentalSite::setOutCPs() - "
                 << "failed to get ExperimentalCP\n";
             exit(OF_ReturnType_failed);
