@@ -883,7 +883,7 @@ Response* EETwoNodeLink::setResponse(const char **argv, int argc,
         theResponse = new ElementResponse(this, 10, Vector(numDir));
     }
     // basic deformations and basic forces
-    else if (strcmp(argv[0],"defoANDforce") == 0 || strcmp(argv[0],"deformationANDforces") == 0 ||
+    else if (strcmp(argv[0],"defoANDforce") == 0 || strcmp(argv[0],"deformationANDforce") == 0 ||
         strcmp(argv[0],"deformationsANDforces") == 0)
     {
         int i;
