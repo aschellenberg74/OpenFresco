@@ -387,23 +387,30 @@ int openFresco_startSimAppSiteServer(ClientData clientData,
     
     // start server loop
     opserr << "\nSimAppSiteServer with ExpSite " << siteTag
-        << " now running..." << endln;
+        << " now running...\n";
     bool exitYet = false;
     while (!exitYet) {
         theChannel->recvVector(0, 0, *recvData, 0);
         int action = (int)rData[0];
-        //opserr << "\nLOOP action: " << *recvData << endln;
 
+        //opserr << "\nLOOP action: " << *recvData << endln;
         switch(action) {
+        case OF_RemoteTest_open:
+            opserr << "\nConnected to Experimental Element\n";
+            break;
+        case OF_RemoteTest_setup:
+            opserr << "WARNING SimAppSiteServer action setup "
+                << "received which does nothing, continuing execution\n";
+            break;
         case OF_RemoteTest_setTrialResponse:
             theExperimentalSite->setTrialResponse(rDisp, rVel, rAccel, rForce, rTime);
+            break;
+        case OF_RemoteTest_commitState:
+            theExperimentalSite->commitState();
             break;
         case OF_RemoteTest_getDaqResponse:
             theExperimentalSite->getDaqResponse(sDisp, sVel, sAccel, sForce, sTime);
             theChannel->sendVector(0, 0, *sendData, 0);
-            break;
-        case OF_RemoteTest_commitState:
-            theExperimentalSite->commitState();
             break;
         case OF_RemoteTest_getDisp:
             (*sDisp) = theExperimentalSite->getDisp();
@@ -431,12 +438,12 @@ int openFresco_startSimAppSiteServer(ClientData clientData,
             break;
         default:
             opserr << "WARNING SimAppSiteServer invalid action "
-                << action << " received" << endln;
+                << action << " received\n";
             break;
         }
     }
     opserr << "\nSimAppSiteServer with ExpSite " << siteTag
-        << " shutdown\n" << endln;
+        << " shutdown\n\n";
 
     // delete allocated memory
     if (theChannel != 0)
@@ -629,15 +636,22 @@ int openFresco_startSimAppElemServer(ClientData clientData,
     
     // start server loop
     opserr << "\nSimAppElemServer with ExpElement " << eleTag
-        << " now running..." << endln;
+        << " now running...\n";
     Vector nodeData(1);
     bool exitYet = false;
     while (!exitYet) {
         theChannel->recvVector(0, 0, *recvData, 0);
         int action = (int)rData[0];
-        //opserr << "\nLOOP action: " << *recvData << endln;
 
+        //opserr << "\nLOOP action: " << *recvData << endln;
         switch(action) {
+        case OF_RemoteTest_open:
+            opserr << "\nConnected to GenericClient Element\n";
+            break;
+        case OF_RemoteTest_setup:
+            opserr << "WARNING SimAppElemServer action setup "
+                << "received which does nothing, continuing execution\n";
+            break;
         case OF_RemoteTest_setTrialResponse:
             id = 0;
             for (i=0; i<numNodes; i++) {
@@ -661,6 +675,9 @@ int openFresco_startSimAppElemServer(ClientData clientData,
                 theDomain->setCurrentTime((*rTime)(0));
             theDomain->update();
             break;
+        case OF_RemoteTest_commitState:
+            theDomain->commit();
+            break;
         case OF_RemoteTest_getDaqResponse:
             if (sDisp != 0)
                 (*sDisp) = theExperimentalElement->getDisp();
@@ -673,9 +690,6 @@ int openFresco_startSimAppElemServer(ClientData clientData,
             if (sTime != 0)
                 (*sTime) = theExperimentalElement->getTime();
             theChannel->sendVector(0, 0, *sendData, 0);
-            break;
-        case OF_RemoteTest_commitState:
-            theDomain->commit();
             break;
         case OF_RemoteTest_getDisp:
             (*sDisp) = theExperimentalElement->getDisp();
@@ -697,12 +711,12 @@ int openFresco_startSimAppElemServer(ClientData clientData,
             (*sTime) = theExperimentalElement->getTime();
             theChannel->sendVector(0, 0, *sendData, 0);
             break;
-        case OF_RemoteTest_getTangentStiff:
-            (*sMatrix) = theExperimentalElement->getTangentStiff();
-            theChannel->sendVector(0, 0, *sendData, 0);
-            break;
         case OF_RemoteTest_getInitialStiff:
             (*sMatrix) = theExperimentalElement->getInitialStiff();
+            theChannel->sendVector(0, 0, *sendData, 0);
+            break;
+        case OF_RemoteTest_getTangentStiff:
+            (*sMatrix) = theExperimentalElement->getTangentStiff();
             theChannel->sendVector(0, 0, *sendData, 0);
             break;
         case OF_RemoteTest_getDamp:
@@ -719,12 +733,12 @@ int openFresco_startSimAppElemServer(ClientData clientData,
             break;
         default:
             opserr << "WARNING SimAppElemServer invalid action "
-                << action << " received" << endln;
+                << action << " received\n";
             break;
         }
     }
     opserr << "\nSimAppElemServer with ExpElement " << eleTag
-        << " shutdown\n" << endln;
+        << " shutdown\n\n";
 
     // delete allocated memory
     if (theChannel != 0)
