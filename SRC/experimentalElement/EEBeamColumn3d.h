@@ -77,6 +77,7 @@ public:
     // public methods to set and to obtain stiffness, 
     // and to obtain mass, damping and residual information    
     int setInitialStiff(const Matrix& stiff);
+    const Matrix &getTangentStiff();
     const Matrix &getMass();
     
     void zeroLoad();
@@ -147,6 +148,8 @@ private:
     Matrix Tinv;        // inverse of transformation matrix
     
     Node *theNodes[2];
+
+    bool firstWarning;
 };
 
 #endif
