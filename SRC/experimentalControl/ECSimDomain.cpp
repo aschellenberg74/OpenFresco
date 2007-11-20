@@ -51,25 +51,30 @@
 
 // includes for the analysis classes
 #include <AnalysisModel.h>
-#include <ConvergenceTest.h>
+//#include <ConvergenceTest.h>
 #include <CTestNormDispIncr.h>
 #include <CTestNormUnbalance.h>
 #include <CTestEnergyIncr.h>
-#include <Linear.h>
 #include <NewtonRaphson.h>
-#include <StaticIntegrator.h>
+//#include <StaticIntegrator.h>
 #include <LoadControl.h>
 #include <DisplacementControl.h>
-#include <PlainHandler.h>
+
 #include <TransformationConstraintHandler.h>
 #include <PenaltyConstraintHandler.h>
 #include <LagrangeConstraintHandler.h>
+
 #include <PlainNumberer.h>
 #include <RCM.h>
+
 #include <BandSPDLinSOE.h>
 #include <BandSPDLinLapackSolver.h>
 #include <BandGenLinSOE.h>
 #include <BandGenLinLapackSolver.h>
+#include <ProfileSPDLinSOE.h>
+#include <ProfileSPDLinDirectSolver.h>
+#include <SymSparseLinSOE.h>
+#include <SymSparseLinSolver.h>
 #include <UmfpackGenLinSOE.h>
 #include <UmfpackGenLinSolver.h>
 #include <StaticAnalysis.h>
@@ -90,7 +95,7 @@ ECSimDomain::ECSimDomain(int tag,
     measDisp(0), measVel(0), measAccel(0), measForce(0)
 {    
     if (trialcps == 0 || outcps == 0)  {
-      opserr << "ECLabVIEW::ECLabVIEW() - "
+      opserr << "ECSimDomain::ECSimDomain() - "
           << "null trialCPs or outCPs array passed\n";
       exit(OF_ReturnType_failed);
     }
@@ -162,9 +167,9 @@ int ECSimDomain::setSize(ID sizeT, ID sizeO)
         (sizeTForce != 0 && sizeTForce != sizeT[OF_Resp_Force]) ||
         (sizeODisp != 0 && sizeODisp != sizeO[OF_Resp_Disp]) ||
         (sizeOForce != 0 && sizeOForce != sizeO[OF_Resp_Force]))  {
-        opserr << "ECSimDomain::setSize - wrong sizeTrial/Out\n"; 
+        opserr << "ECSimDomain::setSize() - wrong sizeTrial/Out\n"; 
         opserr << "see User Manual.\n";
-        return OF_ReturnType_failed;
+        exit(OF_ReturnType_failed);
     }
 
     *sizeCtrl = sizeT;
@@ -279,10 +284,13 @@ int ECSimDomain::setup()
     theIntegrator = new LoadControl(1.0, 1, 1.0, 1.0);
     //theHandler    = new TransformationConstraintHandler();
     theHandler    = new PenaltyConstraintHandler(1.0E12, 1.0E12);
-    RCM *theRCM = new RCM(false);
-    theNumberer   = new DOF_Numberer(*theRCM);
-    BandGenLinSolver *theSolver = new BandGenLinLapackSolver();
-    theSOE        = new BandGenLinSOE(*theSolver);
+    theNumberer   = new PlainNumberer();
+    //RCM *theRCM = new RCM(false);
+    //theNumberer   = new DOF_Numberer(*theRCM);
+    //BandGenLinSolver *theSolver = new BandGenLinLapackSolver();
+    //theSOE        = new BandGenLinSOE(*theSolver);
+    ProfileSPDLinSolver *theSolver = new ProfileSPDLinDirectSolver();
+    theSOE        = new ProfileSPDLinSOE(*theSolver);
 
     theAnalysis = new StaticAnalysis(*theDomain, *theHandler, *theNumberer,
                                      *theModel, *theAlgorithm, *theSOE,

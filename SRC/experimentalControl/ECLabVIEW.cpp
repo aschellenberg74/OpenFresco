@@ -199,7 +199,7 @@ int ECLabVIEW::setSize(ID sizeT, ID sizeO)
         sendData = new Message(sData,(int)strlen(sData));  // needed because of bug in LabVIEW-plugin
         theSocket->sendMsg(0, 0, *sendData, 0);
         delete theSocket;
-        return OF_ReturnType_failed;
+        exit(OF_ReturnType_failed);
     }
     
     *sizeCtrl = sizeT;
@@ -411,7 +411,7 @@ int ECLabVIEW::control()
                 else {
                     opserr << "ECLabVIEW::control() - "
                         << "requested direction is not supported\n";
-                    return OF_ReturnType_failed;
+                    exit(OF_ReturnType_failed);
                 }
                 // append ParameterType and Parameter
                 if (dir(j) < ndm && resp(j) == OF_Resp_Disp)  {
@@ -433,7 +433,7 @@ int ECLabVIEW::control()
                 else {
                     opserr << "ECLabVIEW::control() - "
                         << "requested response type is not supported\n";
-                    return OF_ReturnType_failed;
+                    exit(OF_ReturnType_failed);
                 }
             }
         }
@@ -455,7 +455,7 @@ int ECLabVIEW::control()
                 else {
                     opserr << "ECLabVIEW::control() - "
                         << "requested direction is not supported\n";
-                    return OF_ReturnType_failed;
+                    exit(OF_ReturnType_failed);
                 }
                 // append ParameterType
                 if (dir(j) < ndm && resp(j) == OF_Resp_Disp)  {
@@ -481,7 +481,7 @@ int ECLabVIEW::control()
                 else {
                     opserr << "ECLabVIEW::control() - "
                         << "requested response type is not supported\n";
-                    return OF_ReturnType_failed;
+                    exit(OF_ReturnType_failed);
                 }
                 // check if parameter is within limits and append
                 if (parameter < (*lowerLim)(j) || parameter > (*upperLim)(j))  {
@@ -524,7 +524,7 @@ int ECLabVIEW::control()
         opserr << "ECLabVIEW::control() - "
             << "proposed control values were not accepted\n";
         opserr << rData << endln;
-        return OF_ReturnType_failed;
+        exit(OF_ReturnType_failed);
     }
 
     // execute target values
@@ -538,7 +538,7 @@ int ECLabVIEW::control()
         opserr << "ECLabVIEW::control() - "
             << "failed to execute proposed control values\n";
         opserr << rData << endln;
-        return OF_ReturnType_failed;
+        exit(OF_ReturnType_failed);
     }
 
     return OF_ReturnType_completed;
@@ -577,7 +577,7 @@ int ECLabVIEW::acquire()
                 << "failed to acquire control-point "
                 << outCPs[i]->getTag() << " values\n";
             opserr << rData << endln;
-            return OF_ReturnType_failed;
+            exit(OF_ReturnType_failed);
         }
         tokenPtr = strtok(NULL,"\t");
         tokenPtr = strtok(NULL,"\t");
@@ -586,7 +586,7 @@ int ECLabVIEW::acquire()
                 << "received wrong OPFTransactionID\n"
                 << " want: " << OPFTransactionID
                 << " but got: " << tokenPtr << endln;
-            return OF_ReturnType_failed;
+            exit(OF_ReturnType_failed);
         }
         tokenPtr = strtok(NULL,"\t");
         sprintf(cpName,"MDL-00-01");
@@ -596,7 +596,7 @@ int ECLabVIEW::acquire()
                 << "received wrong control-point\n"
                 << " want: " << cpName
                 << " but got: " << tokenPtr << endln;
-            return OF_ReturnType_failed;
+            exit(OF_ReturnType_failed);
         }
         tokenPtr = strtok(NULL,"\t");
 
@@ -672,7 +672,7 @@ int ECLabVIEW::acquire()
                     << "received wrong direction\n"
                     << " direction <= " << ndf
                     << " but got: " << direction << endln;
-                return OF_ReturnType_failed;
+                exit(OF_ReturnType_failed);
             }
 
             // assemble displacement and force daq vectors
@@ -709,7 +709,7 @@ int ECLabVIEW::acquire()
                 << "received wrong number of displacement or force parameters\n"
                 << " want: " << sizeRespType(0) << " displacements" 
                 << "and " << sizeRespType(3) << " forces\n" << endln;
-             return OF_ReturnType_failed;
+             exit(OF_ReturnType_failed);
         }
         dID += sizeRespType(0);
         fID += sizeRespType(3);
