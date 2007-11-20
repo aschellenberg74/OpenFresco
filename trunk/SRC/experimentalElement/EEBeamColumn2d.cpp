@@ -67,7 +67,8 @@ EEBeamColumn2d::EEBeamColumn2d(int tag, int Nd1, int Nd2,
     db(0), vb(0), ab(0), t(0),
     dbMeas(0), vbMeas(0), abMeas(0), qMeas(0), tMeas(0),
     dbTarg(3), vbTarg(3), abTarg(3),
-    dbPast(3), kbInit(3,3), T(3,3), Tinv(3,3)
+    dbPast(3), kbInit(3,3), T(3,3), Tinv(3,3),
+    firstWarning(true)
 {
     // ensure the connectedExternalNode ID is of correct size & set values
     if (connectedExternalNodes.Size() != 2)  {
@@ -150,7 +151,8 @@ EEBeamColumn2d::EEBeamColumn2d(int tag, int Nd1, int Nd2,
     db(0), vb(0), ab(0), t(0),
     dbMeas(0), vbMeas(0), abMeas(0), qMeas(0), tMeas(0),
     dbTarg(3), vbTarg(3), abTarg(3),
-    dbPast(3), kbInit(3,3), T(3,3), Tinv(3,3)
+    dbPast(3), kbInit(3,3), T(3,3), Tinv(3,3),
+    firstWarning(true)
 {
     // ensure the connectedExternalNode ID is of correct size & set values
     if (connectedExternalNodes.Size() != 2)  {
@@ -483,6 +485,67 @@ int EEBeamColumn2d::setInitialStiff(const Matrix &kbinit)
     theInitStiff = theCoordTransf->getInitialGlobalStiffMatrix(kbAInit);
     
     return 0;
+}
+
+
+const Matrix& EEBeamColumn2d::getTangentStiff()
+{
+    if (firstWarning == true)  {
+        opserr << "\nWARNING EEBeamColumn2d::getTangentStiff() - "
+            << "Element: " << this->getTag() << endln
+            << "TangentStiff cannot be calculated." << endln
+            << "Return InitialStiff including GeometricStiff instead." 
+            << endln;
+        opserr << "Subsequent getTangentStiff warnings will be suppressed." 
+            << endln;
+        
+        firstWarning = false;
+    }
+
+    // get measured resisting forces
+    if (theSite != 0)  {
+        (*qMeas) = theSite->getForce();
+    }
+    else  {
+        sData[0] = OF_RemoteTest_getForce;
+        theChannel->sendVector(0, 0, *sendData, 0);
+        theChannel->recvVector(0, 0, *recvData, 0);
+    }
+
+    // apply optional initial stiffness modification
+    if (iMod == true)  {
+        // get measured displacements
+        if (theSite != 0)  {
+            (*dbMeas) = theSite->getDisp();
+        }
+        else  {
+            sData[0] = OF_RemoteTest_getDisp;
+            theChannel->sendVector(0, 0, *sendData, 0);
+            theChannel->recvVector(0, 0, *recvData, 0);
+        }
+
+        // correct for displacement control errors using I-Modification
+        (*qMeas) -= kbInit*((*dbMeas) - (*db));
+    } else  {
+        // use elastic axial force if axial force from test is zero
+        if ((*qMeas)(0) == 0.0)
+            (*qMeas)(0) = kbInit(0,0) * (*db)(0);
+    }
+    
+    // transform the forces from basic sys B to basic sys A
+    static Vector qA(3);
+    qA = T^(*qMeas);
+    
+    // add fixed end forces
+    for (int i=0; i<3; i++)  {
+        qA(i) += qA0[i];
+    }
+
+    // transform the stiffness from basic sys B to basic sys A
+    static Matrix kbAInit(3,3);
+    kbAInit.addMatrixTripleProduct(0.0, T, kbInit, 1.0);
+
+    return theCoordTransf->getGlobalStiffMatrix(kbAInit, qA);
 }
 
 
