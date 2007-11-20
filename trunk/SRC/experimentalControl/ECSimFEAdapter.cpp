@@ -121,7 +121,7 @@ int ECSimFEAdapter::setSize(ID sizeT, ID sizeO)
         opserr << "ECSimFEAdapter::setSize() - wrong sizeTrial/Out\n"; 
         opserr << "see User Manual.\n";
         delete theChannel;
-        return OF_ReturnType_failed;
+        exit(OF_ReturnType_failed);
     }
     
     *sizeCtrl = sizeT;
