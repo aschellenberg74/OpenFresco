@@ -52,7 +52,7 @@ function varargout = EEFrame3d(action,el_no,ndm,ElemData,xyz,ElemState,varargin)
 % contributed by Andreas Schellenberg 10/2006
 %
 % Element Properties
-% ElemData.kInit  : initial stiffness in basic system B
+% ElemData.kInit  : initial stiffness in cantilever basic system
 %         .ipPort : ip port
 %         .ipAddr : ip address
 %         .yornt  : y-axis orientation in global reference system
@@ -61,12 +61,12 @@ function varargout = EEFrame3d(action,el_no,ndm,ElemData,xyz,ElemState,varargin)
 %         .Geom   : geometry formulation (linear, P-Delta, corotational)
 %         .jntoff : rigid joint offsets in global X, Y and Z at element ends
 %
-%   See also TCPSOCKET, GENERICCLIENT2D, EETRUSS, EEFRAME2D, EEZEROLENGTH2D
+%   See also TCPSOCKET, GENERICCLIENT2D, EETRUSS, EEFRAME2D, EETWONODELINK2D
 
 % GLOBAL VARIABLES
 global IOW;          % output file number
 global HEAD_PR;      % header print indicator
-global MAGF;         % magnification factor for deformed shape
+%global MAGF;         % magnification factor for deformed shape
 
 % persistent (static) variables
 persistent socketID;  % tcp/ip socket identifier
@@ -111,7 +111,7 @@ switch action
       dataSize = 1+3*ndf;
       sData = zeros(1,dataSize);
       if isempty(socketID)
-         socketID = TCPSocket('openConnection',ipPort,ipAddr);
+         socketID = TCPSocket('openConnection',ipAddr,ipPort);
          % set the data size for the experimental site
          dataSizes = int32([ndf ndf ndf 0 0, ndf 0 0 ndf 0, dataSize]);
          TCPSocket('sendData',socketID,dataSizes,11);
@@ -259,7 +259,7 @@ switch action
    % =========================================================================
    case 'mass'
       % determine element length and orientation (direction cosines)
-      [L, dx] = ElmLenOr(xyz);
+      L = ElmLenOr(xyz);
 
       tm = rho*L;    % total mass of frame element
       % lumped mass matrix

@@ -1,6 +1,6 @@
-function varargout = EEZeroLength2d(action,el_no,ndm,ElemData,xyz,ElemState,varargin)
-%EEZEROLENGTH2D 2d experimental zero-length element
-% varargout = EEZeroLength2d(action,el_no,ndm,ElemData,xyz,ElemState,varargin)
+function varargout = EETwoNodeLink2d(action,el_no,ndm,ElemData,xyz,ElemState,varargin)
+%EETWONODELINK2D 2d experimental link element defined by two nodes
+% varargout = EETwoNodeLink2d(action,el_no,ndm,ElemData,xyz,ElemState,varargin)
 %
 % varargout : variable return argument list
 %  varargout = arsz       for action 'size'
@@ -105,7 +105,7 @@ switch action
       dataSize = 1+3*numDir;
       sData = zeros(1,dataSize);
       if isempty(socketID)
-         socketID = TCPSocket('openConnection',ipPort,ipAddr);
+         socketID = TCPSocket('openConnection',ipAddr,ipPort);
          % set the data size for the experimental site
          dataSizes = int32([numDir numDir numDir 0 0, numDir 0 0 numDir 0, dataSize]);
          TCPSocket('sendData',socketID,dataSizes,11);
@@ -118,7 +118,7 @@ switch action
    % =========================================================================
    case 'data'
       if (HEAD_PR)
-         fprintf (IOW,strcat('\n\n Properties for EEZeroLength2d Element'));
+         fprintf (IOW,strcat('\n\n Properties for EETwoNodeLink2d Element'));
          fprintf (IOW,'\n Elem     kInit     ipPort    ipAddr      dir         x          yp            m');
       end
       fprintf (IOW,'\n%4d  %11.3e  %7d  %s  [%s]  [%s]  [%s]  %11.3e', el_no,kInit,ipPort,ipAddr,num2str(dir),num2str(x'),num2str(yp'),m);
@@ -192,7 +192,7 @@ switch action
    case 'stre'
       q = ElemState.Pres.q;
       if (HEAD_PR)
-         fprintf(IOW,'\n End Forces for EEZeroLength2d Element');
+         fprintf(IOW,'\n End Forces for EETwoNodeLink2d Element');
          fprintf(IOW,'\n Elem      Ni           Vi           Mi           Nj           Vj           Mj');
       end
       fprintf(IOW,'\n%4d  %11.3e  %11.3e  %11.3e  %11.3e  %11.3e  %11.3e', el_no,-q,q);

@@ -65,8 +65,8 @@ expControl SimUniaxialMaterials 1 1
 #expControl xPCtarget 1 1 "192.168.2.20" 22222 HybridControllerPoly3_1Act "D:/PredictorCorrector/RTActualTestModels/c&mAPI-xPCTarget-STS"
 
 # expControl LabVIEW tag ipAddr <ipPort> -trialCP cpTags -outCP cpTags
-expControl LabVIEW 1 "127.0.0.1" 11997  -trialCP 1  -outCP 2;  # use with NEES-SAM
-#expControl LabVIEW 1 "130.126.242.175" 44000  -trialCP 1  -outCP 2;  # use with Mini-Most at UIUC
+expControl LabVIEW 2 "127.0.0.1" 11997  -trialCP 1  -outCP 2;  # use with NEES-SAM
+#expControl LabVIEW 2 "130.126.242.175" 44000  -trialCP 1  -outCP 2;  # use with Mini-Most at UIUC
 #expControl SimUniaxialMaterials 2 2;  # use for simulation
 
 # Define experimental setup

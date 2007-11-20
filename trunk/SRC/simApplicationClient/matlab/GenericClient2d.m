@@ -56,7 +56,7 @@ function varargout = GenericClient2d(action,el_no,ndm,ElemData,xyz,ElemState,var
 %         .ipPort   : ip port
 %         .ipAddr   : ip address
 %
-%   See also TCPSOCKET, EETRUSS, EEFRAME2D, EEFRAME3D, EEZEROLENGTH2D
+%   See also TCPSOCKET, EETRUSS, EEFRAME2D, EEFRAME3D, EETWONODELINK2D
 
 % GLOBAL VARIABLES
 global IOW;       % output file number
@@ -92,7 +92,7 @@ switch action
       dataSize = max(1+3*numDOF,numDOF^2);
       sData = zeros(1,dataSize);
       if isempty(socketID)
-         socketID = TCPSocket('openConnection',ipPort,ipAddr);
+         socketID = TCPSocket('openConnection',ipAddr,ipPort);
          % set the data size for the experimental site
          dataSizes = int32([numDOF numDOF numDOF 0 0, numDOF 0 0 numDOF 0, dataSize]);
          TCPSocket('sendData',socketID,dataSizes,11);
@@ -126,7 +126,7 @@ switch action
       TCPSocket('sendData',socketID,sData,dataSize);
 
       % obtain stiffness matrix from experimental element
-      sData(1) = 12;
+      sData(1) = 13;
       TCPSocket('sendData',socketID,sData,dataSize);
       rData = TCPSocket('recvData',socketID,dataSize);
       kh = reshape(rData(1:numDOF^2)',numDOF,numDOF);

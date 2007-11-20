@@ -38,9 +38,9 @@
 #include <string.h>
 
 int socketID;
-int dataSize = 1;
+int dataSize = 256;
 
-void establishconnection(unsigned int *port, const char machineInetAddr[], int *lengthInet, int *socketID);
+void setupconnectionclient(unsigned int *port, const char inetAddr[], int *lengthInet, int *socketID);
 void senddata(const int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr);
 void recvdata(const int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr);
 void closeconnection(int *socketID, int *ierr);
@@ -100,7 +100,7 @@ int eeTruss(double *d,
         // setup the connection
         port = (int)d[1];
         sizeMachineInet = 9+1;
-        establishconnection(&port, "127.0.0.1", &sizeMachineInet, &socketID);
+        setupconnectionclient(&port, "127.0.0.1", &sizeMachineInet, &socketID);
         if (socketID < 0)
             return -1;
 

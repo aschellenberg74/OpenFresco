@@ -52,7 +52,7 @@ function varargout = EETruss(action,el_no,ndm,ElemData,xyz,ElemState,varargin)
 % contributed by Andreas Schellenberg 10/2006
 %
 % Element Properties
-% ElemData.kInit  : initial stiffness
+% ElemData.kInit  : initial stiffness in cantilever basic system
 %         .ipPort : ip port
 %         .ipAddr : ip address
 %         .rho    : mass per unit length
@@ -60,7 +60,7 @@ function varargout = EETruss(action,el_no,ndm,ElemData,xyz,ElemState,varargin)
 %         .Geom   : geometry formulation (linear, P-Delta, corotational)
 %         .jntoff : rigid joint offsets in global X and Y at element ends
 %
-%   See also TCPSOCKET, GENERICCLIENT2D, EEFRAME2D, EEFRAME3D, EEZEROLENGTH2D
+%   See also TCPSOCKET, GENERICCLIENT2D, EEFRAME2D, EEFRAME3D, EETWONODELINK2D
 
 % GLOBAL VARIABLES
 global IOW;          % output file number
@@ -112,7 +112,7 @@ switch action
       dataSize = 4;
       sData = zeros(1,dataSize);
       if isempty(socketID)
-         socketID = TCPSocket('openConnection',ipPort,ipAddr);
+         socketID = TCPSocket('openConnection',ipAddr,ipPort);
          % set the data size for the experimental site
          dataSizes = int32([1 1 1 0 0, 1 0 0 1 0, dataSize]);
          TCPSocket('sendData',socketID,dataSizes,11);
@@ -231,7 +231,7 @@ switch action
    % =========================================================================
    case 'mass'
       % determine element length and orientation (direction cosines)
-      [L, dx] = ElmLenOr(xyz);
+      L = ElmLenOr(xyz);
 
       tm = rho*L;  % total mass of truss element
       % lumped mass matrix

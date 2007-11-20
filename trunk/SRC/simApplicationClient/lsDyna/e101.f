@@ -20,13 +20,22 @@
 ** ****************************************************************** **
 
 ** ****************************************************************** **
-** Written: Yuli Huang (yulee@berkeley.edu)                           **
-** Created: 11/06                                                     **
+**  LS-DYNA (R) is a registered trademark of                          **
+**  Livermore Software Technology Corporation in the United States.   **
+**                                                                    **
 ** ****************************************************************** **
-**
-** Description: This file contains the class definition for e101.
-** e101 is a LS-DYNA element. The element communicates with 
-** an OpenFresco element trough a tcp/ip connection.
+
+** $Revision: $
+** $Date: $
+** $Source: $
+
+** Written: Yuli Huang (yulee@berkeley.edu)
+** Created: 11/06
+** Revision: A
+
+** Description: This file contains the implementation of e101.
+** e101 is a LS-DYNA (R) client element. The element communicates with
+** the OpenFresco middle-tier server trough a tcp/ip connection.
 c
       subroutine ushl_e101(force,stiff,ndtot,istif,
      .     x1,x2,x3,x4,y1,y2,y3,y4,z1,z2,z3,z4,
@@ -68,7 +77,7 @@ c
       dimension x(2),y(2),z(2),dx(2),dy(2),dz(2),cs(3)
 
       integer*4 sizeSendData
-      parameter (sizeSendData=5)
+      parameter (sizeSendData=256)
 
       integer*4 sizeInt, sizeDouble
       parameter (sizeInt=4, sizeDouble=8)
@@ -87,10 +96,10 @@ c
          if (nint(hsv(i,1)) .eq. 0) then
             port=nint(cm(1))
             sizeMachineInet = 9+1
-            call establishconnection(port,
-     1                               '127.0.0.1'//char(0),
-     2                               sizeMachineInet,
-     3                               socketID)
+            call setupconnectionclient(port,
+     1                                 '127.0.0.1'//char(0),
+     2                                 sizeMachineInet,
+     3                                 socketID)
             if (socketID .le. 0) then
                write(*,*) 'Warning: cannot connect'
             else

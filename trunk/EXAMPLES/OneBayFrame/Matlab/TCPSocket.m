@@ -1,32 +1,32 @@
-%TCPSOCKET to communicate with an experimental site through a TCP/IP socket
+%TCPSOCKET to communicate between two processes through a TCP/IP socket
 % varargout = TCPSocket(action,varargin)
 % 
 % varargout : variable output argument list
 %  varargout = socketID  for action 'openConnection'
-%  varargout = socketID  for action 'getSocketID'
+%  varargout = rValue    for action 'closeConnection'
 %  varargout = rValue    for action 'sendData'
 %  varargout = data      for action 'recvData'
-%  varargout = rValue    for action 'closeConnection'
+%  varargout = socketID  for action 'getSocketID'
 %   socketID : socket identifier, or <0 if action failed
 %   rValue   : 0 if action successful and <0 if action failed
-%   data     : data vector that is requested from experimental site
+%   data     : data vector that is requested from other side
 %
 % action : switch with following possible values
 %  'openConnection'   open a connection to an experimental site
-%  'getSocketID'      get socketID of an open connection
+%  'closeConnection'  close the connection to an experimental site
 %  'sendData'         send data to an experimental site
 %  'recvData'         receive data from an experimental site
-%  'closeConnection'  close the connection to an experimental site
+%  'getSocketID'      get socketID of an open connection
 %
 % varargin : variable input argument list
-%  varargin = ipPort, <ipAddr>                for action 'openConnection'
-%  varargin = ipPort, <ipAddr>                for action 'getSocketID'
+%  varargin = ipAddr, ipPort                  for client action 'openConnection'
+%  varargin = ipPort                          for server action 'openConnection'
+%  varargin = socketID                        for action 'closeConnection'
 %  varargin = socketID, data, dataSize        for action 'sendData'
 %  varargin = socketID, dataSize, <dataType>  for action 'recvData'
-%  varargin = socketID                        for action 'closeConnection'
-%   ipPort   : ip port of simulation application server
-%   ipAddr   : ip address of simulation application server
-%              (optional, default: 127.0.0.1)
+%  varargin = ipPort, ipAddr                  for action 'getSocketID'
+%   ipAddr   : ip address of server
+%   ipPort   : ip port of server
 %   socketID : socket identifier created by action 'openConnection'
 %   data     : data vector to be sent to the experimental site
 %   dataSize : size of data vector to be received
@@ -34,9 +34,9 @@
 %              (optional, default: double)
 %   
 %
-% Examples:
-%  1) setting up a connection
-%       socketID = TCPSocket('openConnection',8090);
+% Client Example:
+%  1) setting up a connection to server
+%       socketID = TCPSocket('openConnection','127.0.0.1',8090);
 %  2) setting the data sizes for the experimental site
 %       dataSize = 2;
 %       sData = zeros(1,dataSize);
@@ -56,7 +56,7 @@
 %       TCPSocket('closeConnection',socketID);
 %
 %
-%   See also GENERICCLIENT2D, EETRUSS, EEFRAME2D, EEFRAME3D, EEZEROLENGTH2D
+%   See also GENERICCLIENT2D, EETRUSS, EEFRAME2D, EEFRAME3D, EETWONODELINK2D
 
 %/* ****************************************************************** **
 %**    OpenFRESCO - Open Framework                                     **

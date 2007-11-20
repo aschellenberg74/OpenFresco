@@ -1,7 +1,10 @@
+% use with ..\EXAMPLES\TrussModel\Truss_Local_SimAppServer.tcl
+% make sure that SimAppSiteServer is used and not SimAppElemServer
+
 clear all;
 
-% setup connection
-socketID = TCPSocket('openConnection',8090);
+% setup connection to server
+socketID = TCPSocket('openConnection','127.0.0.1',8090);
 if (socketID<0)
    errordlg('Unable to setup connection.');
    return;

@@ -61,7 +61,7 @@ TCPSocket('sendData',socketID,sData,dataSize);
 rData = TCPSocket('recvData',socketID,dataSize);
 
 % commit state
-sData(1) = 6;
+sData(1) = 5;
 TCPSocket('sendData',socketID,sData,dataSize);
 
 % Set resisting force

@@ -19,12 +19,14 @@
 **                                                                    **
 ** ****************************************************************** **
 
-** ****************************************************************** **
-** genericClient Fortran version                                      **
-** Written: Yuli Huang (yulee@berkeley.edu)                           **
-** Created: 11/06                                                     **
-** ****************************************************************** **
-**
+** $Revision: $
+** $Date: $
+** $Source: $
+
+** Written: Yuli Huang (yulee@berkeley.edu)
+** Created: 11/06
+** Revision: A
+
 ** Description: This file contains the class definition for genericClient.
 ** genericClient is a generic element defined by any number of nodes and 
 ** the degrees of freedom at those nodes. The element communicates with 
@@ -92,10 +94,10 @@ c ...   setup the connection
 c
         port = nint(d(2))
         sizeMachineInet = 9+1
-        call establishconnection(port,
-     1                           '127.0.0.1'//char(0),
-     2                           sizeMachineInet,
-     3                           socketID)
+        call setupconnectionclient(port,
+     1                             '127.0.0.1'//char(0),
+     2                             sizeMachineInet,
+     3                             socketID)
         if (socketID .le. 0) then
           ierr = -1;
           go to 55
@@ -161,7 +163,7 @@ c
 c
 c ...     add stiffness portion to matrix
 c
-          sData(1) = 12
+          sData(1) = 13
 c
           dataTypeSize = sizeDouble
           nleft        = sizeSendData
