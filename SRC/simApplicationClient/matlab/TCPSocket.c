@@ -28,17 +28,18 @@
 // Revision: A
 //
 // Description: This file contains the Matlab gateway function for 
-// the c tcp/ip socket.
+// the tcp/ip socket.c.
 
 #include "mex.h"
 #include <string.h>
 
 
 // functions defined in socket.c
+void setupconnectionserver(unsigned int *port, int *socketID);
+void setupconnectionclient(unsigned int *port, const char machineInetAddr[], int *lengthInet, int *socketID);
+void closeconnection(int *socketID, int *ierr);
 void senddata(const int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr);
 void recvdata(const int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr);
-void establishconnection(unsigned int *port, const char machineInetAddr[], int *lengthInet, int *socketID);
-void closeconnection(int *socketID, int *ierr);
 void getsocketid(unsigned int *port, const char machineInetAddr[], int *lengthInet, int *socketID);
 
 
@@ -55,15 +56,15 @@ void mexFunction(int nlhs, mxArray *plhs[],
 
     // check for proper number of arguments
     if (nrhs<2)
-        mexErrMsgTxt("TCPSocket::mexFunction - WARNING insufficient input arguments \nWant: varargout = TCPSocket(action,varargin);");
+        mexErrMsgTxt("TCPSocket::mexFunction - WARNING insufficient input arguments \nWant: varargout = TCPSocket(action,varargin);\n");
     if (nlhs>1)
-        mexErrMsgTxt("TCPSocket::mexFunction - WARNING to many output arguments \nWant: varargout = TCPSocket(action,varargin);");
+        mexErrMsgTxt("TCPSocket::mexFunction - WARNING to many output arguments \nWant: varargout = TCPSocket(action,varargin);\n");
 
     // first input must be a row vector string 
     if (mxIsChar(prhs[0]) != 1)
-        mexErrMsgTxt("TCPSocket::mexFunction - WARNING first input parameter, action, must be a string");
+        mexErrMsgTxt("TCPSocket::mexFunction - WARNING first input parameter, action, must be a string.\n");
     if (mxGetM(prhs[0]) != 1)
-        mexErrMsgTxt("TCPSocket::mexFunction - WARNING first input parameter, action, must be a row vector");
+        mexErrMsgTxt("TCPSocket::mexFunction - WARNING first input parameter, action, must be a row vector.\n");
 
     // get the action
     action = mxArrayToString(prhs[0]);
@@ -76,7 +77,7 @@ void mexFunction(int nlhs, mxArray *plhs[],
         
         // check if data has correct size
         if (nleft != (int)(mxGetM(prhs[2])*mxGetN(prhs[2])))
-            mexErrMsgTxt("TCPSocket::mexFunction - WARNING size of data does not agree with specified dataSize");
+            mexErrMsgTxt("TCPSocket::mexFunction - WARNING size of data does not agree with specified dataSize.\n");
         
         if (mxIsInt32(prhs[2]) == 1) {
             int *data;
@@ -149,23 +150,23 @@ void mexFunction(int nlhs, mxArray *plhs[],
     else if (strcmp(action,"openConnection") == 0) {
         
         int sizeAddr;
-
-        ipPort = (int)mxGetScalar(prhs[1]);
-        if (nrhs<3) {
-            ipAddr = "127.0.0.1";
-            sizeAddr = 10;
+        
+        if (nrhs==2) {
+            ipPort = (int)mxGetScalar(prhs[1]);
+            setupconnectionserver(&ipPort, &socketID);
+        }
+        else if (nrhs==3) {
+            ipAddr = mxArrayToString(prhs[1]);
+            sizeAddr = (int)mxGetN(prhs[1]) + 1;
+            ipPort = (int)mxGetScalar(prhs[2]);
+            setupconnectionclient(&ipPort, ipAddr, &sizeAddr, &socketID);
+            mxFree(ipAddr);
         }
         else {
-            ipAddr = mxArrayToString(prhs[2]);
-            sizeAddr = (int)mxGetN(prhs[2]) + 1;
+            mexErrMsgTxt("TCPSocket::mexFunction - WARNING wrong number of input arguments received.\n");
         }
-        
-        establishconnection(&ipPort, ipAddr, &sizeAddr, &socketID);
 
         plhs[0] = mxCreateDoubleScalar(socketID);
-
-        if (nrhs>=3)
-            mxFree(ipAddr);
     }
     else if (strcmp(action,"closeConnection") == 0) {
 
@@ -180,23 +181,16 @@ void mexFunction(int nlhs, mxArray *plhs[],
         int sizeAddr;
 
         ipPort = (int)mxGetScalar(prhs[1]);
-        if (nrhs<3) {
-            ipAddr = "127.0.0.1";
-            sizeAddr = 10;
-        }
-        else {
-            ipAddr = mxArrayToString(prhs[2]);
-            sizeAddr = (int)mxGetN(prhs[2]) + 1;
-        }
+        ipAddr = mxArrayToString(prhs[2]);
+        sizeAddr = (int)mxGetN(prhs[2]) + 1;
 
         getsocketid(&ipPort, ipAddr, &sizeAddr, &socketID);
 
         plhs[0] = mxCreateDoubleScalar(socketID);
 
-        if (nrhs>=3)
-            mxFree(ipAddr);
+        mxFree(ipAddr);
     }
     else {
-        mexErrMsgTxt("TCPSocket::mexFunction - WARNING invalid action received");        
+        mexErrMsgTxt("TCPSocket::mexFunction - WARNING invalid action received.\n");        
     }
 }
