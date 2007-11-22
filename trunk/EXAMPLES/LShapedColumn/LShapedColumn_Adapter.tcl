@@ -112,7 +112,7 @@ recorder Element -file Adap_Elmt_mDef.out -time -ele   2 measuredDisplacements
 # ------------------------------
 # Finally perform the analysis
 # ------------------------------
-analyze 1600
+analyze 16000
 # --------------------------------
 # End of analysis
 # --------------------------------

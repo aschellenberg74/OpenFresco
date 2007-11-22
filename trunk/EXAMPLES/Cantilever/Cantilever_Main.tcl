@@ -1,4 +1,5 @@
-# File: Cantilever_Main.tcl (use with Cantilever_Adapter.tcl)
+# File: Cantilever_Main.tcl
+# (use with Cantilever_Adapter.tcl)
 #
 # $Revision: $
 # $Date: $
@@ -46,7 +47,7 @@ expControl SimFEAdapter 1 "127.0.0.1" 44000
 # Define experimental setup
 # -------------------------
 # expSetup OneActuator $tag <-control $ctrlTag> $dir <-ctrlDispFact $f> ...
-expSetup OneActuator 1 -control 1 2
+expSetup OneActuator 1 -control 1 2 -ctrlDispFact -1.0 -daqDispFact -1.0 -daqForceFact -1.0
 
 # Define experimental site
 # ------------------------
@@ -100,15 +101,15 @@ numberer Plain
 constraints Plain
 
 # create the convergence test
-test EnergyIncr 1.0e-6 10
+test EnergyIncr 1.0e-12 10
 
 # create the integration scheme
-#integrator Newmark 0.5 0.25
+integrator Newmark 0.5 0.25
 #integrator NewmarkExplicit 0.5
-integrator AlphaOS 1.0
+#integrator AlphaOS 1.0
 
 # create the solution algorithm
-algorithm Linear
+algorithm Newton
 
 # create the analysis object 
 analysis Transient
@@ -128,6 +129,13 @@ recorder Node -file Node_Acc.out -time -node 2 -dof 1 2 3 accel
 recorder Element -file Elmt_Frc.out  -time -ele 1 forces
 recorder Element -file Elmt_tDef.out -time -ele 1 targetDisplacements
 recorder Element -file Elmt_mDef.out -time -ele 1 measuredDisplacements
+
+#recorder plot Node_Dsp.out Left_Column_Displacements 100 20 700 500 -columns 1 2
+
+#recorder display OneBayFrame_DefoShape 200 520 500 500 -wipe
+#vup 0 1 0        
+#prp 0 0 10000    
+#display 1 0 5
 # --------------------------------
 # End of recorder generation
 # --------------------------------

@@ -1,4 +1,5 @@
-# File: Cantilever_Adapter.tcl (use with Cantilever_Main.tcl)
+# File: Cantilever_Adapter.tcl
+# (use with Cantilever_Main.tcl)
 #
 # $Revision: $
 # $Date: $
@@ -59,10 +60,10 @@ geomTransf Linear 1
 element nonlinearBeamColumn 1 1 2 5 1 1
 
 # element actuator $eleTag $iNode $jNode EA ipPort <-rho rho>
-element actuator 2 3 2 1000000 44000
+#element actuator 2 3 2 1000000 44000
 
 # element adapter eleTag -node Ndi Ndj ... -dof dofNdi -dof dofNdj ... -stif Kij ipPort <-mass Mij>
-#element adapter 2 -node 2 -dof 1 -stif 100000 44000
+element adapter 2 -node 2 -dof 1 -stif 100000 44000
 # ------------------------------
 # End of model generation
 # ------------------------------
@@ -81,8 +82,8 @@ numberer Plain
 constraints Plain
 
 # create the convergence test
-test NormDispIncr 1.0e-8 25
-#test NormUnbalance 1.0e-8 25
+#test NormDispIncr 1.0e-8 25
+test NormUnbalance 1.0e-8 25
 #test EnergyIncr 1.0e-8 25
 
 
@@ -118,7 +119,7 @@ recorder Element -file Adap_Elmt_mDef.out -time -ele   2 measuredDisplacements
 # ------------------------------
 # Finally perform the analysis
 # ------------------------------
-analyze 1600
+analyze 16000
 # --------------------------------
 # End of analysis
 # --------------------------------
