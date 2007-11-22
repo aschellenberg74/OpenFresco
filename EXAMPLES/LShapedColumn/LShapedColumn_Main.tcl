@@ -108,15 +108,15 @@ numberer Plain
 constraints Plain
 
 # create the convergence test
-test EnergyIncr 1.0e-6 10
+test EnergyIncr 1.0e-12 25
 
 # create the integration scheme
-#integrator Newmark 0.5 0.25
+integrator Newmark 0.5 0.25
 #integrator NewmarkExplicit 0.5
-integrator AlphaOS 1.0
+#integrator AlphaOS 1.0
 
 # create the solution algorithm
-algorithm Linear
+algorithm Newton
 
 # create the analysis object 
 analysis Transient
@@ -152,7 +152,7 @@ puts "lambda         omega          period"
 foreach lambda $lambda {
    set omega [expr pow($lambda,0.5)]
    set period [expr 2*$pi/pow($lambda,0.5)]
-   puts "$lambda  $omega  $period \n"}
+   puts "$lambda  $omega  $period"}
 
 # open output file for writing
 set outFileID [open elapsedTime.txt w]
@@ -164,7 +164,7 @@ set tTot [time {
 #	    puts "step $i"
     }
 }]
-puts "Elapsed Time = $tTot \n"
+puts "\nElapsed Time = $tTot \n"
 # close the output file
 close $outFileID
 

@@ -56,7 +56,7 @@ uniaxialMaterial Elastic 3 [expr 2.0*100.0/1.0]
 # ---------------------
 # expControlPoint tag nodeTag dir resp <-fact f> <-lim l u> ...
 expControlPoint 1 3  ux disp -fact 0.003 -lim -0.01 0.01
-expControlPoint 2 3  ux disp -fact 0.003 ux force -fact [expr 18.0/7.0]
+expControlPoint 2 3  ux disp -fact [expr 1.0/0.003] ux force -fact [expr 7.0/18.0]
 
 # Define experimental control
 # ---------------------------

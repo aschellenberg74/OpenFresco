@@ -681,7 +681,7 @@ int ECLabVIEW::acquire()
                 for (int j=0; j<numDir; j++)  {
                     if (resp(j) == response)  {
                         if (dir(j) == direction)  {
-                            (*measDisp)(id) = Parameter/fact(j);
+                            (*measDisp)(id) = fact(j)*Parameter;
                             sizeDisp++;
                         }
                         id++;
@@ -693,7 +693,7 @@ int ECLabVIEW::acquire()
                 for (int j=0; j<numDir; j++)  {
                     if (resp(j) == response)  {
                         if (dir(j) == direction)  {
-                            (*measForce)(id) = Parameter/fact(j);
+                            (*measForce)(id) = fact(j)*Parameter;
                             sizeForce++;
                         }
                         id++;
