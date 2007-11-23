@@ -58,7 +58,7 @@ nsteps = length (accel)-1;       % number of steps
 
 %%%%%%%%%%%%%%%%%%%%%%%%% Setup Connection %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-socketID = TCPSocket('openConnection',8090);
+socketID = TCPSocket('openConnection','127.0.0.1',8090);
 if (socketID<0)
    errordlg('Unable to setup connection.');
    return;
@@ -243,11 +243,11 @@ U_max(2) = max(abs(U(2,:)));
 
 % Plot element force vs. element deformation
 figure(1) ;
-plot(u_elem(1,:),p_elem(1,:),':r')
+plot(u_elem(1,:),p_elem(1,:),'r','LineWidth',1.2)
 hold on
-plot(u_elem(2,:),p_elem(2,:))
-ylabel('p_elem [kips]')
-xlabel('displacement [in]')
+plot(u_elem(2,:),p_elem(2,:),'b','LineWidth',1.2)
+ylabel('p_e_l_e_m [kip]')
+xlabel('Displacement [in.]')
 legend('Element 1','Element 2',2)
 title(['Explicit Newmark: Hysteresis beta = ', num2str(beta), ' and gamma = ', num2str(gamma)])
 grid on
@@ -255,11 +255,11 @@ hold off
 
 % Plot displacement vs. time at each DoF
 figure(2) ;
-plot(t,U(1,:),':r')
+plot(t,U(1,:),'r','LineWidth',1.2)
 hold on
-plot(t,U(2,:))
-ylabel('Displacement [in ]')
-xlabel('t [sec]')
+plot(t,U(2,:),'b','LineWidth',1.2)
+ylabel('Displacement [in.]')
+xlabel('Time [sec]')
 legend('DOF 1','DOF 2',1)
 title(['Explicit Newmark: Displacement vs. Time beta = ', num2str(beta), ' and gamma = ', num2str(gamma)])
 grid on
