@@ -58,7 +58,7 @@ nsteps = length (accel)-1;       % number of steps
 
 %%%%%%%%%%%%%%%%%%%%%%%%% Setup Connection %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-socketID = TCPSocket('openConnection',8090);
+socketID = TCPSocket('openConnection','127.0.0.1',8090);
 if (socketID<0)
    errordlg('Unable to setup connection.');
    return;
@@ -254,11 +254,11 @@ TCPSocket('closeConnection',socketID);
 
 % Plot element force vs. element deformation
 figure(1) ;
-plot(U_pred(1,:),p_r(1,:),':r')
+plot(U_pred(1,:),p_r(1,:),'r','LineWidth',1.2)
 hold on
-plot(U_pred(2,:),p_r(2,:))
-ylabel('p_elem [kips]')
-xlabel('displacement [in]')
+plot(U_pred(2,:),p_r(2,:),'b','LineWidth',1.2)
+ylabel('p_elem [kip]')
+xlabel('Displacement [in.]')
 legend('Element 1','Element 2',2)
 title('Alpha OS')
 grid on
@@ -266,11 +266,11 @@ hold off
 
 % Plot displacement vs. time at each DoF
 figure(2) ;
-plot(t,U(1,:),':r')
+plot(t,U(1,:),'r','LineWidth',1.2)
 hold on
-plot(t,U(2,:))
-ylabel('Displacement [in ]')
-xlabel('t [sec]')
+plot(t,U(2,:),'b','LineWidth',1.2)
+ylabel('Displacement [in.]')
+xlabel('Time [sec]')
 legend('DOF 1','DOF 2',1)
 title('Alpha OS')
 grid on
