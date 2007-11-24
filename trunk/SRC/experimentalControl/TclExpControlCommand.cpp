@@ -395,7 +395,6 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
             return TCL_ERROR;
         }
     }*/
-#endif
 
     // ----------------------------------------------------------------------------	
     else if (strcmp(argv[1],"SCRAMNet") == 0)  {
@@ -438,6 +437,7 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
             return TCL_ERROR;
         }
     }
+#endif
 
     // ----------------------------------------------------------------------------	
 	else if (strcmp(argv[1],"SimUniaxialMaterials") == 0)  {
