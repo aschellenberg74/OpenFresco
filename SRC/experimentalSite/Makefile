@@ -1,4 +1,4 @@
-include ../Makefile.def
+include ../../Makefile.def
 
 OBJS       = ExperimentalSite.o \
 	     LocalExpSite.o \
