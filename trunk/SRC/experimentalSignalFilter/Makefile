@@ -5,6 +5,8 @@ OBJS       = SignalFilter.o ErrorFilter.o UndershootErrorFilter.o \
 
 all:         $(OBJS)
 
+tcl: 	TclExpSignalFilterCommand.o
+
 # Miscellaneous
 tidy:	
 	@$(RM) $(RMFLAGS) Makefile.bak *~ #*# core example main.o
