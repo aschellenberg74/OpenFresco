@@ -1,18 +1,20 @@
 include ../Makefile.def
 
 OBJS       = ExperimentalElement.o \
-	     EEZeroLength.o \
+	     EETwoNodeLink.o \
 	     EETruss.o \
+	     EEGeneric.o \
 	     EEBeamColumn2d.o \
 	     EEBeamColumn3d.o \
-             EEChevronBrace2d.o
+             EEInvertedVBrace2d.o
 
 all:         $(OBJS)
 
 tcl: 	TclEEBeamColumnCommand.o \
-	TclEEChevronBraceCommand.o \
+	TclEEGenericCommand.o \
+	TclEEInvertedVBraceCommand.o \
 	TclEETrussCommand.o \
-	TclEEZeroLengthCommand.o \
+	TclEETwoNodeLinkCommand.o \
 	TclExpElementCommands.o 
 
 

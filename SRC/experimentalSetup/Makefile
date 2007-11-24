@@ -2,11 +2,13 @@ include ../Makefile.def
 
 OBJS       = ExperimentalSetup.o \
 	     ESNoTransformation.o \
+	     ESAggregator.o \
 	     ESOneActuator.o \
 	     ESTwoActuators2d.o \
 	     ESThreeActuators2d.o \
-	     ESChevronBrace2d.o \
-	     ESChevronBraceJntOff2d.o 
+	     ESThreeActuatorsJntOff2d.o \
+	     ESInvertedVBrace2d.o \
+	     ESInvertedVBraceJntOff2d.o 
 
 all:         $(OBJS)
 

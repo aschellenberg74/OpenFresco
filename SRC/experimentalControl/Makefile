@@ -2,8 +2,9 @@ include ../Makefile.def
 
 OBJS       = ExperimentalControl.o \
 	     ECSimulation.o \
-	     ECSimUniaxialMaterials.o
-#	     ECSimDomain.o
+	     ECSimUniaxialMaterials.o \
+	     ECSimDomain.o \
+	     ECSimFEAdapter.o
 #	     ECNIEseries.o nidaqex.o \
 #	     EquipmentSpec.o
 
