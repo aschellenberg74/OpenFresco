@@ -1,4 +1,4 @@
-include ../Makefile.def
+include ../../Makefile.def
 
 OBJS       = ExperimentalElement.o \
 	     EETwoNodeLink.o \

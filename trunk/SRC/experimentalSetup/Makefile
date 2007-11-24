@@ -1,4 +1,4 @@
-include ../Makefile.def
+include ../../Makefile.def
 
 OBJS       = ExperimentalSetup.o \
 	     ESNoTransformation.o \

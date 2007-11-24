@@ -1,4 +1,4 @@
-include ../Makefile.def
+include ../../Makefile.def
 
 OBJS       = tclMain.o tclAppInit.o
 

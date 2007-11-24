@@ -1,4 +1,4 @@
-include ../Makefile.def
+include ../../Makefile.def
 
 OBJS       = SignalFilter.o ErrorFilter.o UndershootErrorFilter.o \
 	     RandomErrorFilter.o

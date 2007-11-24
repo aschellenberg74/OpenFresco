@@ -1,4 +1,4 @@
-include ../Makefile.def
+include ../../Makefile.def
 
 OBJS       = ExperimentalControl.o \
 	     ECSimulation.o \
