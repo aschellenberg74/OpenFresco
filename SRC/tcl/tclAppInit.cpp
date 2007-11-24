@@ -78,6 +78,7 @@ extern int		Tclxttest_Init _ANSI_ARGS_((Tcl_Interp *interp));
 
 #include <Domain.h>
 #include <TclModelBuilder.h>
+#include <StandardStream.h>
 #include <SimulationInformation.h>
 
 #include <Node.h>
@@ -91,6 +92,13 @@ extern int		Tclxttest_Init _ANSI_ARGS_((Tcl_Interp *interp));
 
 Domain *theDomain = 0;
 TclModelBuilder *theTclBuilder = 0;
+
+#ifndef _WIN32
+Domain *ops_TheActiveDomain = 0;
+double ops_Dt = 0.0;
+StandardStream sserr;
+OPS_Stream *opserrPtr = &sserr;
+#endif
 
 SimulationInformation simulationInfo;
 char *simulationInfoOutputFilename;
