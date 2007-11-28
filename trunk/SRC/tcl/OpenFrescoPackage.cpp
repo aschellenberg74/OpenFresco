@@ -34,10 +34,19 @@
 #include <tcl.h>
 #include <Domain.h>
 #include <TclModelBuilder.h>
+#include <StandardStream.h>
 #include <SimulationInformation.h>
 #include <ExperimentalSite.h>
 
+#ifdef _WIN32
 #define DllExport _declspec(dllexport)
+#else
+#define DllExport
+Domain *ops_TheActiveDomain = 0;
+double ops_Dt = 0.0;
+StandardStream sserr;
+OPS_Stream *opserrPtr = &sserr;
+#endif
 
 Domain *theDomain;
 TclModelBuilder *theTclBuilder;
