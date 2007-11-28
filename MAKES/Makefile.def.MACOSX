@@ -3,12 +3,15 @@
 #  Program:  OpenFresco
 #
 #  Purpose:  A Top-level Makefile to create the libraries needed
-#	     to use the OpenSees framework.
+#	     to use the OpenFresco framework on Mac OS X.
 #
 #  Written: yos
 #  Created: 09/07
 #
 #  Send bug reports, comments or suggestions to yos@catfish.dpri.kyoto-u.ac.jp
+#
+#  To make shared-library, -fno-common option is needed when compile of
+#  not only OpenFresco but also OpenSees.
 #
 ############################################################################
 
@@ -79,6 +82,7 @@ TCL_LIBRARY	= $(NET_LIBRARY) -framework Tcl -framework Tk
 BLITZ_LIBRARY = $(HOME)/blitz/lib/libblitz.a
 
 OPENFRESCO_LIBRARY = $(HOME)/lib/libOpenFresco.a
+OPENFRESCO_DYLIBRARY = $(HOME)/lib/OpenFresco.so
 
 # WATCH OUT .. These libraries are removed when 'make wipe' is invoked.
 WIPE_LIBS	= $(FE_LIBRARY) \
@@ -100,14 +104,14 @@ WIPE_LIBS	= $(FE_LIBRARY) \
 # %---------------------------------------------------------%
 
 # Compilers
-CC++	= icc
-CC      = icc
-FC	= ifort
+CC++	= g++
+CC      = gcc
+FC	= g95
 
 AR		= ar 
 ARFLAGS		= cqls
 RANLIB		= ranlib
-RANLIBFLAGS     =
+RANLIBFLAGS     = 
 
 # Compiler Flags
 #
@@ -117,15 +121,14 @@ RANLIBFLAGS     =
 #    C FLAGS used -DUSE_VENDOR_BLAS (needed in SuperLU) if UNIX in C++ FLAGS
 #
 
-C++FLAGS        = -w1 -O2 -D_UNIX -D_TCL84 -ftemplate-depth-30 -D_MACOSX
-# C++FLAGS        = -Wall -pg -O2 -D_UNIX -ftemplate-depth-30 -D_MACOSX
-CFLAGS          = -w1 -O2
+C++FLAGS        = -fno-common -Wall -O2 -D_UNIX -D_TCL84 -ftemplate-depth-30 -D_MACOSX
+CFLAGS          = -fno-common -Wall -O2
 # CFLAGS          = -Wall -pg -O2
 FFLAGS          = -W1 -O
 
 # Linker
 LINKER          = $(CC++)
-LINKFLAGS       = 
+LINKFLAGS       = -bundle
 # LINKFLAGS       =  -pg
 
 # Misc
@@ -182,18 +185,16 @@ SHELL           = /bin/sh
 # %---------------------------------------------------------%
 MACHINE_LINKLIBS  = -L$(BASE)/lib \
 		-L$(HOME)/lib \
-		-L/usr/lib \
-		-L/opt/intel/fc/9.1.035/lib
+		-L/usr/lib 
 
-MACHINE_NUMERICAL_LIBS  = -lm \
+MACHINE_NUMERICAL_LIBS  = \
 		$(ARPACK_LIBRARY) \
 		$(SUPERLU_LIBRARY) \
 		$(UMFPACK_LIBRARY) \
 	        $(LAPACK_LIBRARY) $(BLAS_LIBRARY) $(CBLAS_LIBRARY) \
 		-L/usr/X11R6/lib -lX11 -lGL -lGLU -lssl -lcrypto \
 		$(FE_LIBRARY) \
-		/opt/intel/fc/9.1.035/lib/libifcore.a \
-		-lc -lf2c -ldl -lpng -lstdc++ 
+		-lc -lg95 -ldl -lpng -lstdc++ 
 
 MACHINE_SPECIFIC_LIBS = $(NET_LIBRARY)
 
