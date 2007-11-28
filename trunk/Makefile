@@ -55,7 +55,7 @@ tcl:
 	@$(ECHO) Building OpenFresco Program ..;
 	@$(CD) $(OPENFRESCO)/tcl;  $(MAKE);
 
-libs:
+lib:
 	@( \
 	for f in $(OPENFRESCO); \
 	do \

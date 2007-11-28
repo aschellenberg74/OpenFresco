@@ -1,6 +1,39 @@
 include ../../Makefile.def
 
-OBJS       = tclMain.o tclAppInit.o
+OBJS       = tclMain.o tclAppInit.o 
+DYLIBOBJS  = OpenFrescoPackage.o
+
+EXPERIMENTALTEST_OBJS = $(OPENFRESCO)/utility/ExperimentalCP.o \
+	   $(OPENFRESCO)/utility/ExpControlSP.o \
+	   $(OPENFRESCO)/experimentalElement/ExperimentalElement.o \
+	   $(OPENFRESCO)/experimentalElement/EETruss.o \
+	   $(OPENFRESCO)/experimentalElement/EEBeamColumn2d.o \
+	   $(OPENFRESCO)/experimentalElement/EEBeamColumn3d.o \
+	   $(OPENFRESCO)/experimentalElement/EEInvertedVBrace2d.o \
+	   $(OPENFRESCO)/experimentalElement/EETwoNodeLink.o \
+	   $(OPENFRESCO)/experimentalElement/EEGeneric.o \
+	   $(OPENFRESCO)/experimentalSite/ExperimentalSite.o \
+	   $(OPENFRESCO)/experimentalSetup/ExperimentalSetup.o \
+	   $(OPENFRESCO)/experimentalSetup/ESNoTransformation.o \
+	   $(OPENFRESCO)/experimentalSetup/ESAggregator.o \
+	   $(OPENFRESCO)/experimentalSetup/ESOneActuator.o \
+	   $(OPENFRESCO)/experimentalSetup/ESTwoActuators2d.o \
+	   $(OPENFRESCO)/experimentalSetup/ESThreeActuators2d.o \
+	   $(OPENFRESCO)/experimentalSetup/ESThreeActuatorsJntOff2d.o \
+	   $(OPENFRESCO)/experimentalSetup/ESInvertedVBrace2d.o \
+	   $(OPENFRESCO)/experimentalSetup/ESInvertedVBraceJntOff2d.o \
+	   $(OPENFRESCO)/experimentalControl/ExperimentalControl.o \
+	   $(OPENFRESCO)/experimentalSite/LocalExpSite.o \
+	   $(OPENFRESCO)/experimentalSite/RemoteExpSite.o \
+	   $(OPENFRESCO)/experimentalSite/ActorExpSite.o \
+	   $(OPENFRESCO)/experimentalControl/ECSimulation.o \
+	   $(OPENFRESCO)/experimentalControl/ECSimUniaxialMaterials.o \
+	   $(OPENFRESCO)/experimentalControl/ECSimDomain.o \
+	   $(OPENFRESCO)/experimentalControl/ECSimFEAdapter.o \
+	   $(OPENFRESCO)/experimentalSignalFilter/SignalFilter.o \
+	   $(OPENFRESCO)/experimentalSignalFilter/ErrorFilter.o \
+	   $(OPENFRESCO)/experimentalSignalFilter/UndershootErrorFilter.o \
+	   $(OPENFRESCO)/experimentalSignalFilter/RandomErrorFilter.o
 
 OPENFRESCO_TCLFILES = \
 	$(OPENFRESCO)/utility/TclExpCPCommand.o \
@@ -15,7 +48,7 @@ OPENFRESCO_TCLFILES = \
 	$(OPENFRESCO)/experimentalSignalFilter/TclExpSignalFilterCommand.o \
 	$(OPENFRESCO)/experimentalSetup/TclExpSetupCommand.o
 
-all: $(OBJS)
+all: $(OBJS) $(DYLIBOBJS)
 	@$(CD) $(OPENFRESCO)/utility; $(MAKE) tcl;
 	@$(CD) $(OPENFRESCO)/experimentalSetup; $(MAKE) tcl;
 	@$(CD) $(OPENFRESCO)/experimentalSite; $(MAKE) tcl;
@@ -23,11 +56,18 @@ all: $(OBJS)
 	@$(CD) $(OPENFRESCO)/experimentalElement; $(MAKE) tcl;
 	@$(CD) $(OPENFRESCO)/experimentalSignalFilter; $(MAKE) tcl;
 	echo $(TCL_LIBRARY)
-	@$(LINKER) $(LINKFLAGS) $(OBJS) $(OPENFRESCO_TCLFILES) \
+	@$(LINKER) $(OBJS) $(OPENFRESCO_TCLFILES) \
 	$(OPENFRESCO_LIBRARY) $(FE_LIBRARY) $(MACHINE_LINKLIBS) \
-	$(MACHINE_NUMERICAL_LIBS) $(TCL_LIBRARY)  \
-	$(MACHINE_SPECIFIC_LIBS) \
+	$(MACHINE_NUMERICAL_LIBS)  \
+	$(MACHINE_SPECIFIC_LIBS) $(TCL_LIBRARY) \
 	-o $(OPENFRESCO_SERVERPROGRAM)
+	@$(LINKER) $(LINKFLAGS) $(DYLIBOBJS) $(OPENFRESCO_TCLFILES) \
+	$(EXPERIMENTALTEST_OBJS) \
+	$(FE_LIBRARY) $(MACHINE_LINKLIBS) \
+	$(MACHINE_NUMERICAL_LIBS)  \
+	$(MACHINE_SPECIFIC_LIBS) $(TCL_LIBRARY) \
+	-o $(OPENFRESCO_DYLIBRARY)
+	@$(ECHO) DYNAMIC LIBRARIES BUILT ...
 
 
 # Miscellaneous

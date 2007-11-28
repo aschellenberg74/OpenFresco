@@ -34,6 +34,7 @@ EXPERIMENTALTEST_OBJS = $(OPENFRESCO)/utility/ExperimentalCP.o \
 	   $(OPENFRESCO)/experimentalSignalFilter/UndershootErrorFilter.o \
 	   $(OPENFRESCO)/experimentalSignalFilter/RandomErrorFilter.o
 
+
 # Compilation control
 
 all: FrescoGlobals.h
@@ -44,8 +45,6 @@ all: FrescoGlobals.h
 	@$(CD) $(OPENFRESCO)/experimentalElement; $(MAKE);
 	@$(CD) $(OPENFRESCO)/experimentalSignalFilter; $(MAKE);
 	$(AR) $(ARFLAGS) $(OPENFRESCO_LIBRARY) $(EXPERIMENTALTEST_OBJS)
-	@$(RANLIB) $(RANLIBFLAGS) $(OPENFRESCO_LIBRARY)
-#	@$(CD) $(OPENFRESCO)/tcl; $(MAKE);
 
 # Miscellaneous
 tidy:	
