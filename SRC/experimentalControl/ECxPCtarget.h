@@ -85,7 +85,7 @@ private:
     double *targDisp, *targVel, *targAccel;
     double *measDisp, *measForce;
     
-    int newTargetId, atTargetId, switchPCId;
+    int newTargetId, switchPCId, atTargetId;
     int targDispId, targVelId, targAccelId;
     int *measDispId, *measForceId;
 };
