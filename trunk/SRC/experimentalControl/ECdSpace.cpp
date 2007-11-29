@@ -176,7 +176,7 @@ int ECdSpace::setSize(ID sizeT, ID sizeO)
         opserr << "ECdSpace::setSize() - wrong sizeTrial/Out\n"; 
         opserr << "see User Manual.\n";
         DS_unregister_host_app();
-        return OF_ReturnType_failed;
+        exit(OF_ReturnType_failed);
     }
     
     *sizeCtrl = sizeT;
@@ -232,32 +232,32 @@ int ECdSpace::setup()
     if (error != DS_NO_ERROR)  {
         opserr << "ECdSpace::setup() - DS_get_var_addr - newTarget: error = " << error << endln;
         DS_unregister_host_app();
-        return OF_ReturnType_failed;
-    }
-    error = DS_get_var_addr(board_index, "atTarget", &atTargetId);
-    if (error != DS_NO_ERROR)  {
-        opserr << "ECdSpace::setup() - DS_get_var_addr - atTarget: error = " << error << endln;
-        DS_unregister_host_app();
-        return OF_ReturnType_failed;
+        exit(OF_ReturnType_failed);
     }
     error = DS_get_var_addr(board_index, "switchPC", &switchPCId);
     if (error != DS_NO_ERROR)  {
         opserr << "ECdSpace::setup() - DS_get_var_addr - switchPC: error = " << error << endln;
         DS_unregister_host_app();
-        return OF_ReturnType_failed;
+        exit(OF_ReturnType_failed);
+    }
+    error = DS_get_var_addr(board_index, "atTarget", &atTargetId);
+    if (error != DS_NO_ERROR)  {
+        opserr << "ECdSpace::setup() - DS_get_var_addr - atTarget: error = " << error << endln;
+        DS_unregister_host_app();
+        exit(OF_ReturnType_failed);
     }
     error = DS_get_var_addr(board_index, "targDsp", &targDispId);
     if (error != DS_NO_ERROR)  {
         opserr << "ECdSpace::setup() - DS_get_var_addr - targDsp: error = " << error << endln;
         DS_unregister_host_app();
-        return OF_ReturnType_failed;
+        exit(OF_ReturnType_failed);
     }
     if (pcType==2 || pcType==3)  {
         error = DS_get_var_addr(board_index, "targVel", &targVelId);
         if (error != DS_NO_ERROR)  {
             opserr << "ECdSpace::setup() - DS_get_var_addr - targVel: error = " << error << endln;
             DS_unregister_host_app();
-            return OF_ReturnType_failed;
+            exit(OF_ReturnType_failed);
         }
     }
     if (pcType==3)  {
@@ -265,20 +265,20 @@ int ECdSpace::setup()
         if (error != DS_NO_ERROR)  {
             opserr << "ECdSpace::setup() - DS_get_var_addr - targAcc: error = " << error << endln;
             DS_unregister_host_app();
-            return OF_ReturnType_failed;
+            exit(OF_ReturnType_failed);
         }
     }
     error = DS_get_var_addr(board_index, "measDsp", &measDispId);
     if (error != DS_NO_ERROR)  {
         opserr << "ECdSpace::setup() - DS_get_var_addr - measDsp: error = " << error << endln;
         DS_unregister_host_app();
-        return OF_ReturnType_failed;
+        exit(OF_ReturnType_failed);
     }
     error = DS_get_var_addr(board_index, "measFrc", &measForceId);
     if (error != DS_NO_ERROR)  {
         opserr << "ECdSpace::setup() - DS_get_var_addr - measFrc: error = " << error << endln;
         DS_unregister_host_app();
-        return OF_ReturnType_failed;
+        exit(OF_ReturnType_failed);
     }
     
     // print experimental control information
@@ -303,7 +303,7 @@ int ECdSpace::setup()
     if (error != DS_NO_ERROR)  {
         opserr << "ECdSpace::setup() - DS_write_32: error = " << error << endln;
         DS_unregister_host_app();
-        return OF_ReturnType_failed;
+        exit(OF_ReturnType_failed);
     }
     this->sleep(1000);
 	
@@ -427,14 +427,14 @@ int ECdSpace::control()
     if (error != DS_NO_ERROR)  {
         opserr << "ECdSpace::control() - DS_write_64: error = " << error << endln;
         DS_unregister_host_app();
-        return OF_ReturnType_failed;
+        exit(OF_ReturnType_failed);
     }
     if (pcType==2 || pcType==3)  {
         error = DS_write_64(board_index, targVelId, (*sizeCtrl)[OF_Resp_Vel], (UInt64 *)targVel);
         if (error != DS_NO_ERROR)  {
             opserr << "ECdSpace::control() - DS_write_64: error = " << error << endln;
             DS_unregister_host_app();
-            return OF_ReturnType_failed;
+            exit(OF_ReturnType_failed);
         }
     }
     if (pcType==3)  {
@@ -442,38 +442,48 @@ int ECdSpace::control()
         if (error != DS_NO_ERROR)  {
             opserr << "ECdSpace::control() - DS_write_64: error = " << error << endln;
             DS_unregister_host_app();
-            return OF_ReturnType_failed;
+            exit(OF_ReturnType_failed);
         }
     }
     
 	// set newTarget flag
-    newTarget = 1.0;
-    error = DS_write_64(board_index, newTargetId, 1, (UInt64 *)&newTarget);
+    newTarget = 1;
+    error = DS_write_32(board_index, newTargetId, 1, (UInt32 *)&newTarget);
     if (error != DS_NO_ERROR)  {
-        opserr << "ECdSpace::control() - DS_write_64: error = " << error << endln;
+        opserr << "ECdSpace::control() - DS_write_32: error = " << error << endln;
         DS_unregister_host_app();
-        return OF_ReturnType_failed;
+        exit(OF_ReturnType_failed);
     }
     
 	// wait until switchPC flag has changed as well
-    switchPC = 0.0;
-    while (switchPC != 1.0) {
-        DS_read_64(board_index, switchPCId, 1, (UInt64 *)&switchPC);
+    switchPC = 0;
+    while (switchPC != 1) {
+        error = DS_read_32(board_index, switchPCId, 1, (UInt32 *)&switchPC);
+        if (error != DS_NO_ERROR)	{
+            opserr << "ECdSpace::control() - DS_read_32: error = " << error << endln;
+            DS_unregister_host_app();
+            exit(OF_ReturnType_failed);
+        }
     }
     
 	// reset newTarget flag
-    newTarget = 0.0;
-    error = DS_write_64(board_index, newTargetId, 1, (UInt64 *)&newTarget);
+    newTarget = 0;
+    error = DS_write_32(board_index, newTargetId, 1, (UInt32 *)&newTarget);
     if (error != DS_NO_ERROR)  {
-        opserr << "ECdSpace::control() - DS_write_64: error = " << error << endln;
+        opserr << "ECdSpace::control() - DS_write_32: error = " << error << endln;
         DS_unregister_host_app();
-        return OF_ReturnType_failed;
+        exit(OF_ReturnType_failed);
     }
     
 	// wait until switchPC flag has changed as well
-    switchPC = 1.0;
-    while (switchPC != 0.0) {
-        DS_read_64(board_index, switchPCId, 1, (UInt64 *)&switchPC);
+    switchPC = 1;
+    while (switchPC != 0) {
+        error = DS_read_32(board_index, switchPCId, 1, (UInt32 *)&switchPC);
+        if (error != DS_NO_ERROR)	{
+            opserr << "ECdSpace::control() - DS_read_32: error = " << error << endln;
+            DS_unregister_host_app();
+            exit(OF_ReturnType_failed);
+        }
     }
     
     return OF_ReturnType_completed;
@@ -483,9 +493,14 @@ int ECdSpace::control()
 int ECdSpace::acquire()
 {
     // wait until target is reached
-    atTarget = 0.0;
-    while (atTarget != 1.0)  {
-        DS_read_64(board_index, atTargetId, 1, (UInt64 *)&atTarget);
+    atTarget = 0;
+    while (atTarget != 1)  {
+        error = DS_read_32(board_index, atTargetId, 1, (UInt32 *)&atTarget);
+        if (error != DS_NO_ERROR)	{
+            opserr << "ECdSpace::acquire() - DS_read_32: error = " << error << endln;
+            DS_unregister_host_app();
+            exit(OF_ReturnType_failed);
+        }
     }
     
     // read displacements and resisting forces at target
@@ -493,13 +508,13 @@ int ECdSpace::acquire()
     if (error != DS_NO_ERROR)	{
         opserr << "ECdSpace::acquire() - DS_read_64: error = " << error << endln;
         DS_unregister_host_app();
-        return OF_ReturnType_failed;
+        exit(OF_ReturnType_failed);
     }
     error = DS_read_64(board_index, measForceId, (*sizeDaq)[OF_Resp_Force], (UInt64 *)measForce);
     if (error != DS_NO_ERROR)	{
         opserr << "ECdSpace::acquire() - DS_read_64: error = " << error << endln;
         DS_unregister_host_app();
-        return OF_ReturnType_failed;
+        exit(OF_ReturnType_failed);
     }
     
     return OF_ReturnType_completed;
