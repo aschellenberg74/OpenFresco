@@ -801,7 +801,8 @@ int specifyModelBuilder(ClientData clientData, Tcl_Interp *interp,
     }
 
     // check argv[1] for type of ModelBuilder and create the object 
-    if (strcmp(argv[1],"basicBuilder") == 0 ||
+    if (strcmp(argv[1],"basic") == 0 ||
+        strcmp(argv[1],"basicBuilder") == 0 ||
         strcmp(argv[1],"BasicBuilder") == 0) {
         int ndm = 0;
         int ndf = 0;
