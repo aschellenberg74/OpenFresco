@@ -49,7 +49,7 @@ ActorExpSite::ActorExpSite(int tag,
     FEM_ObjectBroker *theObjectBroker)
     : ExperimentalSite(tag, setup), 
     Actor(theChannel, *theObjectBroker, 0),
-    theControl(0), msgData(2), dataSize(0),
+    theControl(0), dataSize(0),
     sendV(OF_Network_dataSize), recvV(OF_Network_dataSize)
 { 
     if (theSetup == 0) {
@@ -68,7 +68,7 @@ ActorExpSite::ActorExpSite(int tag,
     FEM_ObjectBroker *theObjectBroker)
     : ExperimentalSite(tag, (ExperimentalSetup*)0), 
     Actor(theChannel, *theObjectBroker, 0),
-    theControl(control), msgData(2), dataSize(0),
+    theControl(control), dataSize(0),
     sendV(OF_Network_dataSize), recvV(OF_Network_dataSize)
 { 
     if (theControl == 0) {
@@ -83,7 +83,7 @@ ActorExpSite::ActorExpSite(int tag,
 
 ActorExpSite::ActorExpSite(const ActorExpSite& es)
     : ExperimentalSite(es), Actor(es), 
-    theControl(es.theControl), msgData(2), dataSize(0),
+    theControl(es.theControl), dataSize(0),
     sendV(OF_Network_dataSize), recvV(OF_Network_dataSize)
 {  
     dataSize = es.dataSize;
@@ -115,7 +115,14 @@ int ActorExpSite::run()
                 << recvV(1) << endln;
             sendV(0) = OF_ReturnType_completed;
             sendV(1) = this->getTag();
+            sendV(2) = atof(OPF_VERSION);
             this->sendVector(sendV);
+            if (recvV(2) != atof(OPF_VERSION)) {
+                opserr << "ActorExpSite::run() - OpenFresco Version "
+                    << "mismatch:\nActorExpSite Version " << atof(OPF_VERSION)
+                    << " != RemoteExpSite Version " << recvV(2) << endln;
+                exit(OF_ReturnType_failed);
+            }
             break;
         case OF_RemoteTest_setup:
             dataSize = (int)recvV(1);
