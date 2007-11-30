@@ -45,16 +45,23 @@ RemoteExpSite::RemoteExpSite(int tag,
     Channel& theChannel, int datasize,
     FEM_ObjectBroker *theObjectBroker)
     : ExperimentalSite(tag, (ExperimentalSetup*)0),
-    Shadow(theChannel, *theObjectBroker),
-    msgData(2), dataSize(datasize),
+    Shadow(theChannel, *theObjectBroker), dataSize(datasize),
     sendV(OF_Network_dataSize), recvV(OF_Network_dataSize),
     bDisp(0), bVel(0), bAccel(0), bForce(0), bTime(0),
     rDisp(0), rVel(0), rAccel(0), rForce(0), rTime(0)
 {
     sendV(0) = OF_RemoteTest_open;
     sendV(1) = tag;
+    sendV(2) = atof(OPF_VERSION);
     this->sendVector(sendV);
     this->recvVector(recvV);
+
+    if (recvV(2) != atof(OPF_VERSION)) {
+        opserr << "RemoteExpSite::RemoteExpSite() - OpenFresco Version "
+            << "mismatch:\nRemoteExpSite Version " << atof(OPF_VERSION)
+            << " != ActorExpSite Version " << recvV(2) << endln;
+        exit(OF_ReturnType_failed);
+    }
 
     opserr << "\nConnected to ActorExpSite "
         << recvV(1) << endln;
@@ -66,8 +73,7 @@ RemoteExpSite::RemoteExpSite(int tag,
     Channel &theChannel, int datasize,
     FEM_ObjectBroker *theObjectBroker)
     : ExperimentalSite(tag, setup),
-    Shadow(theChannel, *theObjectBroker),
-    msgData(2), dataSize(datasize),
+    Shadow(theChannel, *theObjectBroker), dataSize(datasize),
     sendV(OF_Network_dataSize), recvV(OF_Network_dataSize),
     bDisp(0), bVel(0), bAccel(0), bForce(0), bTime(0),
     rDisp(0), rVel(0), rAccel(0), rForce(0), rTime(0)
@@ -82,8 +88,16 @@ RemoteExpSite::RemoteExpSite(int tag,
 
     sendV(0) = OF_RemoteTest_open;
     sendV(1) = tag;
+    sendV(2) = atof(OPF_VERSION);
     this->sendVector(sendV);
     this->recvVector(recvV);
+
+    if (recvV(2) != atof(OPF_VERSION)) {
+        opserr << "RemoteExpSite::RemoteExpSite() - OpenFresco Version "
+            << "mismatch:\nRemoteExpSite Version " << atof(OPF_VERSION)
+            << " != ActorExpSite Version " << recvV(2) << endln;
+        exit(OF_ReturnType_failed);
+    }
 
     opserr << "\nConnected to ActorExpSite "
         << recvV(1) << endln;
@@ -91,8 +105,7 @@ RemoteExpSite::RemoteExpSite(int tag,
 
 
 RemoteExpSite::RemoteExpSite(const RemoteExpSite& es)
-    : ExperimentalSite(es), Shadow(es),
-    msgData(2), dataSize(0),
+    : ExperimentalSite(es), Shadow(es), dataSize(0),
     sendV(OF_Network_dataSize), recvV(OF_Network_dataSize),
     bDisp(0), bVel(0), bAccel(0), bForce(0), bTime(0),
     rDisp(0), rVel(0), rAccel(0), rForce(0), rTime(0)

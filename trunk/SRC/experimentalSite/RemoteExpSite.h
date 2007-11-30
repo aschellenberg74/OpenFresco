@@ -81,9 +81,6 @@ public:
     void Print(OPS_Stream &s, int flag);
     
 protected:
-    // for communicating through Channel
-    ID msgData;
-
     // data size of vectors in Channel
     int dataSize;
 

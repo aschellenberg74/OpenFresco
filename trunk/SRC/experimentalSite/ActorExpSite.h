@@ -89,10 +89,7 @@ public:
 protected:
     // pointer of ExperimentalControl
     ExperimentalControl* theControl;
-    
-    // for communicating through Channel
-    ID msgData;
-    
+        
     // data size of vectors in Channel
     int dataSize;
     
