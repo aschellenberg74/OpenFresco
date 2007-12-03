@@ -30,25 +30,7 @@
 /* Description: This file contains the Fortran interface for the socket.*/
 
 
-/*#define G77*/
-
-#ifdef _WIN32
-#  ifndef G77
-#    define F77_NAME_UPPER
-#  else
-     /* use lower case function name*/
-#    define F77_NAME_LOWER_USCORE
-     /* use upper case function name*/
-     /* #define F77_NAME_LOWER_2USCORE */
-#  endif
-#else
-/* use lower case function name*/
-#define F77_NAME_LOWER_USCORE
-/* use upper case function name*/
-/* #define F77_NAME_LOWER_2USCORE */
-#endif
-
-/* Support Windows extension to specify calling convention */
+/* Adjust calling conventions */
 #ifdef USE_FORT_CDECL
 #define FORT_CALL __cdecl
 #elif defined (USE_FORT_STDCALL)
@@ -57,6 +39,7 @@
 #define FORT_CALL
 #endif
 
+/* Adjust naming conventions */
 #ifdef F77_NAME_UPPER
 #define setupconnectionserver_ SETUPCONNECTIONSERVER
 #define setupconnectionclient_ SETUPCONNECTIONCLIENT
@@ -75,9 +58,11 @@
 #define closeconnection_ closeconnection
 #define senddata_ senddata
 #define recvdata_ recvdata
+/* F77_NAME_LOWER_USCORE */
 /* Else leave name alone */
 #endif
 
+/* Functions defined in socket.c */
 void setupconnectionserver(unsigned int *port, int *socketID);
 void setupconnectionclient(unsigned int *other_Port, const char other_InetAddr[], int *lengthInet, int *socketID);
 void closeconnection(int *socketID, int *ierr);
