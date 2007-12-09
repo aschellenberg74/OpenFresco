@@ -70,6 +70,7 @@ global HEAD_PR;      % header print indicator
 
 % persistent (static) variables
 persistent socketID;  % tcp/ip socket identifier
+persistent Time;      % current analysis time
 
 % specify element array size, check element data and retrieve them
 % =========================================================================
@@ -134,6 +135,8 @@ switch action
       feval(GeomTran,'data',Data);
    % =========================================================================
    case 'init'
+      % set initial time
+      Time = 0;
       % history information
       ElemState.Pres.v  = zeros(ndf,1);
       ElemState.Pres.q  = zeros(ndf,1);
@@ -142,6 +145,14 @@ switch action
       varargout  = {ElemState};
    % =========================================================================
    case 'stif'
+      if (Time < ElemState.Time)
+         % commit state
+         sData(1) = 5;
+         TCPSocket('sendData',socketID,sData,dataSize);
+         % save current time
+         Time = ElemState.Time;
+      end
+
       % transform end displacements from global reference to basic system
       vh = ElemState.vh;
       Data.yornt  = ElemData.yornt;
@@ -192,6 +203,14 @@ switch action
       varargout = {ElemState};
    % =========================================================================
    case 'forc'
+      if (Time < ElemState.Time)
+         % commit state
+         sData(1) = 5;
+         TCPSocket('sendData',socketID,sData,dataSize);
+         % save current time
+         Time = ElemState.Time;
+      end
+
       % transform end displacements from global reference to basic system
       vh = ElemState.vh;
       Data.yornt  = ElemData.yornt;

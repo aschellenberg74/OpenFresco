@@ -64,7 +64,8 @@ global HEAD_PR;   % header print indicator
 global MAGF;      % magnification factor for deformed shape
 
 % persistent (static) variables
-persistent socketID;    % tcp/ip socket identifier
+persistent socketID;  % tcp/ip socket identifier
+persistent Time;      % current analysis time
 
 % report size of element arrays, check element data or retrieve data
 % =========================================================================
@@ -111,12 +112,22 @@ switch action
       fprintf (IOW,'\n%4d  %7d      %7d    %s', el_no,numNodes,ipPort,ipAddr);
    % =========================================================================
    case 'init'
+      % set initial time
+      Time = 0;
       % history information
       ElemState.Pres.vh = zeros(numDOF,1);
       ElemState.Pres.qh = zeros(numDOF,1);
       varargout = {ElemState};
    % =========================================================================
    case 'stif'
+      if (Time < ElemState.Time)
+         % commit state
+         sData(1) = 5;
+         TCPSocket('sendData',socketID,sData,dataSize);
+         % save current time
+         Time = ElemState.Time;
+      end
+
       % transform end displacements from global reference to basic system
       vh = ElemState.vh;       % extract end displacements from ElemState
 
@@ -147,6 +158,14 @@ switch action
       varargout = {ElemState};
    % =========================================================================
    case 'forc'
+      if (Time < ElemState.Time)
+         % commit state
+         sData(1) = 5;
+         TCPSocket('sendData',socketID,sData,dataSize);
+         % save current time
+         Time = ElemState.Time;
+      end
+
       % transform end displacements from global reference to basic system
       vh = ElemState.vh;       % extract end displacements from ElemState
 

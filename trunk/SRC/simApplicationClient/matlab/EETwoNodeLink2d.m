@@ -68,8 +68,9 @@ global HEAD_PR;   % header print indicator
 global MAGF;      % magnification factor for deformed shape
 
 % persistent (static) variables
-persistent T;           % transformation matrix
-persistent socketID;    % tcp/ip socket identifier
+persistent T;         % transformation matrix
+persistent socketID;  % tcp/ip socket identifier
+persistent Time;      % current analysis time
 
 % report size of element arrays, check element data or retrieve data
 % =========================================================================
@@ -106,6 +107,9 @@ switch action
       sData = zeros(1,dataSize);
       if isempty(socketID)
          socketID = TCPSocket('openConnection',ipAddr,ipPort);
+         if (socketID<0)
+            error('TCPSocket() - unable to setup connection.');
+         end
          % set the data size for the experimental site
          dataSizes = int32([numDir numDir numDir 0 0, numDir 0 0 numDir 0, dataSize]);
          TCPSocket('sendData',socketID,dataSizes,11);
@@ -126,13 +130,22 @@ switch action
    case 'init'
       % get transformation matrix
       T = getTranGlobalBasic(ndm,ndf,dir,x,yp);
-
+      % set initial time
+      Time = 0;
       % history information
       ElemState.Pres.v = zeros(numDir,1);
       ElemState.Pres.q = zeros(numDir,1);
       varargout = {ElemState};
    % =========================================================================
    case 'stif'
+      if (Time < ElemState.Time)
+         % commit state
+         sData(1) = 5;
+         TCPSocket('sendData',socketID,sData,dataSize);
+         % save current time
+         Time = ElemState.Time;
+      end
+      
       % transform end displacements from global reference to basic system
       vh = ElemState.vh;       % extract end displacements from ElemState
       v = T*vh;
@@ -160,6 +173,14 @@ switch action
       varargout = {ElemState};
    % =========================================================================
    case 'forc'
+      if (Time < ElemState.Time)
+         % commit state
+         sData(1) = 5;
+         TCPSocket('sendData',socketID,sData,dataSize);
+         % save current time
+         Time = ElemState.Time;
+      end
+
       % transform end displacements from global reference to basic system
       vh = ElemState.vh;       % extract end displacements from ElemState
       v = T*vh;
