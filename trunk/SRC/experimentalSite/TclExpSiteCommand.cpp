@@ -210,10 +210,22 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp, int argc,
         }
 
         // setup the connection
-        if (!ssl)
+        if (!ssl)  {
             theChannel = new TCP_Socket(ipPort,ipAddr,true);
-        else
+            if (!theChannel) {
+                opserr << "WARNING could not create channel\n";
+                opserr << "expSite RemoteSite " << tag << endln;
+                return TCL_ERROR;
+            }
+        }
+        else  {
             theChannel = new TCP_SocketSSL(ipPort,ipAddr,true);
+            if (!theChannel) {
+                opserr << "WARNING could not create SSL channel\n";
+                opserr << "expSite RemoteSite " << tag << endln;
+                return TCL_ERROR;
+            }
+        }
 
         // parsing was successful, allocate the site
         if (theSetup == 0)
