@@ -323,7 +323,10 @@ int openFresco_startSimAppSiteServer(ClientData clientData,
             return TCL_ERROR;
         }
     }
-    theChannel->setUpConnection();
+    if (theChannel->setUpConnection() != 0)  {
+        opserr << "WARNING could not setup connection\n";
+        return TCL_ERROR;
+    }
 
     // get the data size for the experimental site
     int intData[2*OF_Resp_All+1];
@@ -542,7 +545,10 @@ int openFresco_startSimAppElemServer(ClientData clientData,
             return TCL_ERROR;
         }
     }
-    theChannel->setUpConnection();
+    if (theChannel->setUpConnection() != 0)  {
+        opserr << "WARNING could not setup connection\n";
+        return TCL_ERROR;
+    }
 
     // get the data size for the experimental element
     int intData[2*OF_Resp_All+1];

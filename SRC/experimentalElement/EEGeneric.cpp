@@ -195,7 +195,16 @@ EEGeneric::EEGeneric(int tag, ID nodes, ID *dof,
         else
             theChannel = new TCP_SocketSSL(port, machineInetAddr);
     }
-    theChannel->setUpConnection();
+    if (!theChannel)  {
+        opserr << "EEGeneric::EEGeneric() "
+            << "- failed to create channel\n";
+        exit(-1);
+    }
+    if (theChannel->setUpConnection() != 0)  {
+        opserr << "EEGeneric::EEGeneric() "
+            << "- failed to setup connection\n";
+        exit(-1);
+    }
 
     // set the data size for the experimental site
     int intData[2*OF_Resp_All+1];

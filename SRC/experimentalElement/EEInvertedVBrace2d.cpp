@@ -166,7 +166,16 @@ EEInvertedVBrace2d::EEInvertedVBrace2d(int tag, int Nd1, int Nd2, int Nd3,
         else
             theChannel = new TCP_SocketSSL(port, machineInetAddr);
     }
-    theChannel->setUpConnection();
+    if (!theChannel)  {
+        opserr << "EEInvertedVBrace2d::EEInvertedVBrace2d() "
+            << "- failed to create channel\n";
+        exit(-1);
+    }
+    if (theChannel->setUpConnection() != 0)  {
+        opserr << "EEInvertedVBrace2d::EEInvertedVBrace2d() "
+            << "- failed to setup connection\n";
+        exit(-1);
+    }
 
     // set the data size for the experimental site
     int intData[2*OF_Resp_All+1];
