@@ -36,6 +36,8 @@
 
 #include "ECSimulation.h"
 
+class ExperimentalCP;
+
 class Domain;
 class AnalysisModel;
 class ConvergenceTest;
@@ -45,7 +47,6 @@ class ConstraintHandler;
 class DOF_Numberer;
 class LinearSOE;
 class StaticAnalysis;
-
 class TimeSeries;
 class LoadPattern;
 class SP_Constraint;

@@ -39,14 +39,11 @@
 // communicating between computational and experimental sites.
 
 #include <FrescoGlobals.h>
+#include <ExperimentalSetup.h>
+
 #include <TaggedObject.h>
-
-class ArrayOfTaggedObjects;
-class Vector;
-class ID;
-
-class ExperimentalCP;
-class ExperimentalSetup;
+#include <ID.h>
+#include <Vector.h>
 
 class ExperimentalSite : public TaggedObject
 {
@@ -102,12 +99,7 @@ public:
     virtual int getOutSize(int rType);
     virtual int getCtrlSize(int rType);
     virtual int getDaqSize(int rType);
-    
-    virtual ArrayOfTaggedObjects* getCPsTrial();
-    virtual ArrayOfTaggedObjects* getCPsOut();
-    virtual ArrayOfTaggedObjects* getCPsCtrl();
-    virtual ArrayOfTaggedObjects* getCPsDaq();
-    
+        
 protected:
     // pointer of ExperimentalSetup
     ExperimentalSetup* theSetup;
@@ -130,19 +122,12 @@ protected:
     // sizeTrial/Out[0]:disp, [1]:vel, [2]:accel, [3]:force, [4]:time
     ID* sizeTrial;
     ID* sizeOut;
-    
-    // Array of ExperimentalCP objects for trial and output:
-    // if unused, the pointers are set to NULL.
-    ArrayOfTaggedObjects* cpsTrial;
-    ArrayOfTaggedObjects* cpsOut;
-    
+        
     // daqFlag = false (first time) / true (NOT first time)
     bool daqFlag;
     
     virtual void setTrial();
     virtual void setOut();
-    //virtual void setTrialCPs(ArrayOfTaggedObjects &theCPs);
-    //virtual void setOutCPs(ArrayOfTaggedObjects &theCPs);
 };
 
 #endif

@@ -81,7 +81,7 @@ private:
     char *ipAddress, *ipPort, *appName, *appPath;
     char errMsg[80];
 
-    double newTarget;
+    double newTarget, switchPC, atTarget;
     double *targDisp, *targVel, *targAccel;
     double *measDisp, *measForce;
     

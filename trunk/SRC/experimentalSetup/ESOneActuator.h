@@ -37,8 +37,7 @@
 // ESOneActuator. There is only one actuator, which is set
 // in direction to the specimen
 
-#include <ExperimentalSetup.h>
-#include <ExperimentalControl.h>
+#include "ExperimentalSetup.h"
 
 class ESOneActuator : public ExperimentalSetup
 {

@@ -29,9 +29,9 @@
 //
 // Description: This file contains the implementation of ExperimentalCP.
 
-#include <stdlib.h>
-
 #include "ExperimentalCP.h"
+
+#include <stdlib.h>
 
 
 ExperimentalCP::ExperimentalCP()

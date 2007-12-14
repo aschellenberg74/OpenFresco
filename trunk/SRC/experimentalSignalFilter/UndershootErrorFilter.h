@@ -37,7 +37,6 @@
 // UndershootErrorFilter.
 
 #include "ErrorFilter.h"
-#include <OPS_Globals.h>
 
 class UndershootErrorFilter : public ErrorFilter
 {

@@ -34,9 +34,6 @@
 
 #include "ECNIEseries.h"
 
-#include <ArrayOfTaggedObjectsIter.h>
-#include <UniaxialMaterial.h>
-
 
 ECNIEseries::ECNIEseries(int tag ,int device)//, bool rtest)
     : ExperimentalControl(tag),//realtest(rtest),

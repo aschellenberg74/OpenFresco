@@ -34,8 +34,7 @@
 // ESAggregator. ESAggregator combines differnt experimental
 // setups into one.
 
-#include <ExperimentalSetup.h>
-#include <ExperimentalControl.h>
+#include "ExperimentalSetup.h"
 
 class ESAggregator : public ExperimentalSetup
 {

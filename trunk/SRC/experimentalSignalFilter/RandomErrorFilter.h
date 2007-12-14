@@ -40,8 +40,6 @@
 // in Numerical Recipes in C++, 2nd Ed.
 
 #include "ErrorFilter.h"
-#include <OPS_Globals.h>
-#include <stdlib.h>
 
 class RandomErrorFilter : public ErrorFilter
 {

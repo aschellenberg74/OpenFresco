@@ -36,6 +36,12 @@
 
 #include "ExperimentalControl.h"
 
+#include <time.h>
+
+class ExperimentalCP;
+class TCP_Socket;
+class Message;
+
 class ECLabVIEW : public ExperimentalControl
 {
 public:

@@ -36,15 +36,12 @@
 // Description: This file contains the class definition for 
 // ExperimentalControl.
 
-#include <DomainComponent.h>
-#include <Vector.h>
-#include <ID.h>
-#include <ArrayOfTaggedObjects.h>
-
 #include <FrescoGlobals.h>
 #include <SignalFilter.h>
 
-class ExperimentalCP;
+#include <TaggedObject.h>
+#include <ID.h>
+#include <Vector.h>
 
 class ExperimentalControl : public TaggedObject
 {

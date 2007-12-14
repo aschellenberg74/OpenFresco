@@ -37,14 +37,11 @@
 // ExperimentalSetup. 
 
 #include <FrescoGlobals.h>
+#include <ExperimentalControl.h>
+
 #include <TaggedObject.h>
-
-class ArrayOfTaggedObjects;
-class Vector;
-class ID;
-
-class ExperimentalCP;
-class ExperimentalControl;
+#include <ID.h>
+#include <Vector.h>
 
 class ExperimentalSetup : public TaggedObject
 {
@@ -116,9 +113,6 @@ public:
     virtual int getCtrlSize(int rType);
     virtual int getDaqSize(int rType);
     
-    virtual ArrayOfTaggedObjects* getCPsCtrl();
-    virtual ArrayOfTaggedObjects* getCPsDaq();
-    
 protected:
     // pointer to experimental control
     ExperimentalControl *theControl;
@@ -152,13 +146,8 @@ protected:
     // size of ctrl/daq data
     // sizeCtrl/Daq[0]:disp, [1]:vel, [2]:accel, [3]:force, [4]:time
     ID *sizeCtrl; // size of ctrlV
-    ID *sizeDaq; // size of daqV
-    
-    // Array of ExperimentalCP objects for trial and output:
-    // if unused, the pointers are set to NULL.
-    ArrayOfTaggedObjects *cpsCtrl;
-    ArrayOfTaggedObjects *cpsDaq;
-    
+    ID *sizeDaq;  // size of daqV
+        
     // protected tranformation methods 
     virtual int transfTrialDisp(const Vector* disp) = 0;
     virtual int transfTrialVel(const Vector* vel) = 0;
@@ -174,8 +163,6 @@ protected:
     
     virtual void setCtrl();
     virtual void setDaq();
-    //virtual void setCtrlCPs(ArrayOfTaggedObjects &theCPs);
-    //virtual void setDaqCPs(ArrayOfTaggedObjects &theCPs);
 };
 
 #endif

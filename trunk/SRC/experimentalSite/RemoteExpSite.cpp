@@ -32,13 +32,7 @@
 //
 // Description: This file contains the implementation of RemoteExpSite.
 
-#include <ID.h>
-#include <Vector.h>
-#include <ArrayOfTaggedObjects.h>
-
-#include <ExperimentalCP.h>
-#include <ExperimentalSetup.h>
-#include <RemoteExpSite.h>
+#include "RemoteExpSite.h"
 
 
 RemoteExpSite::RemoteExpSite(int tag,

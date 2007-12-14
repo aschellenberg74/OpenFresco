@@ -38,8 +38,7 @@
 // for OpenFresco and responsible for managing data and 
 // communicating between computational and experimental sites.
 
-#include <ExperimentalSite.h>
-#include <ExperimentalSetup.h>
+#include "ExperimentalSite.h"
 
 class LocalExpSite : public ExperimentalSite
 {

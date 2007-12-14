@@ -37,7 +37,7 @@
 // reactions (resisting forces).
 
 #include "ExperimentalSetup.h"
-#include <ExperimentalControl.h>
+
 #include <Matrix.h>
 
 class ESInvertedVBrace2d : public ExperimentalSetup

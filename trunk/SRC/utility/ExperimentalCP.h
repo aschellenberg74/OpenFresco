@@ -34,10 +34,10 @@
 // ExperimentalCP. This object possess control point data, i.e.
 // control node tag, direction, and response.
 
+#include <FrescoGlobals.h>
+
 #include <DomainComponent.h>
 #include <ID.h>
-
-#include <FrescoGlobals.h>
 
 class ExperimentalCP : public TaggedObject
 {

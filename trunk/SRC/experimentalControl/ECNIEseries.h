@@ -37,9 +37,8 @@
 // ECNIEseries.
 
 #include "ExperimentalControl.h"
-#include "nidaqex.h"
 
-class UniaxialMaterial;
+#include <nidaqex.h>
 
 class ECNIEseries : public ExperimentalControl
 {

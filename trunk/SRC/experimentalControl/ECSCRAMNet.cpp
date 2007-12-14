@@ -39,13 +39,15 @@ extern "C" {
 ECSCRAMNet::ECSCRAMNet(int tag, int memoffset, int numactch)
     : ExperimentalControl(tag),
     memOffset(memoffset), numActCh(numactch),
-    cDisp(0), cVel(0), cAccel(0), cForce(0), cTime(0),
-    dDisp(0), dVel(0), dAccel(0), dForce(0), dTime(0)
+    memPtrBASE(0), memPtrOPF(0),
+    newTarget(0), switchPC(0), atTarget(0),
+    targDisp(0), targVel(0), targAccel(0), targForce(0), targTime(0),
+    measDisp(0), measVel(0), measAccel(0), measForce(0), measTime(0)
 {
 #ifdef _WIN32
     // map the SCRAMNet control status registers (CSRs)
 	// and the SCRAMNet physical memory
-	rValue = sp_scram_init();
+	int rValue = sp_scram_init();
     if (rValue != 0) {
         opserr << "ECSCRAMNet::ECSCRAMNet() - sp_scram_init:";
 		if (rValue == -4)
@@ -77,45 +79,48 @@ ECSCRAMNet::ECSCRAMNet(int tag, int memoffset, int numactch)
     }
 #endif
 
+    // set CSR0 bits so node can receive and transmit data
+    unsigned short csrValue = 0x8003;
+    scr_csr_write(SCR_CSR0,csrValue);
+
     // get the pointer to the base memory address
     memPtrBASE = (int*) get_base_mem();
 
     // get address for OpenFresco memory on SCRAMNet board
 	// memOffset is given in bytes, so divide by 4
-    memPtrOPF = (double*) (memPtrBASE + (memOffset/4));
-    double *memPtr = memPtrOPF;
+    memPtrOPF = (float*) (memPtrBASE + (memOffset/4));
+    float *memPtr = memPtrOPF;
 
     // setup pointers to state flags
-    newTarget = memPtr;
-	memPtr++; newTarget[0] = 0.0;
-    atTarget  = memPtr;
-    memPtr++; atTarget[0] = 0.0;
-    switchPC  = memPtr;
-    memPtr++; switchPC[0] = 0.0;
+    newTarget = (unsigned int*) memPtr;  memPtr++;
+    switchPC  = (unsigned int*) memPtr;  memPtr++;
+    atTarget  = (unsigned int*) memPtr;  memPtr++;
 
     // setup pointers to control memory locations
-    cDisp  = new Vector(memPtr, numActCh); 
-    memPtr += numActCh; cDisp->Zero();
-    cVel   = new Vector(memPtr, numActCh);
-    memPtr += numActCh; cVel->Zero();
-    cAccel = new Vector(memPtr, numActCh); 
-    memPtr += numActCh; cAccel->Zero();
-    cForce = new Vector(memPtr, numActCh); 
-    memPtr += numActCh; cForce->Zero();
-    cTime  = new Vector(memPtr, numActCh); 
-    memPtr += numActCh; cTime->Zero();
+    targDisp  = memPtr;  memPtr += numActCh;
+    targVel   = memPtr;  memPtr += numActCh;
+    targAccel = memPtr;  memPtr += numActCh;
+    targForce = memPtr;  memPtr += numActCh;
+    targTime  = memPtr;  memPtr += numActCh;
 
 	// setup pointers to daq memory locations
-    dDisp  = new Vector(memPtr, numActCh);
-    memPtr += numActCh; dDisp->Zero();
-    dVel   = new Vector(memPtr, numActCh);
-    memPtr += numActCh; dVel->Zero();
-    dAccel = new Vector(memPtr, numActCh);
-    memPtr += numActCh; dAccel->Zero();
-    dForce = new Vector(memPtr, numActCh);
-    memPtr += numActCh; dForce->Zero();
-    dTime  = new Vector(memPtr, numActCh);
-    memPtr += numActCh; dTime->Zero();
+    measDisp  = memPtr;  memPtr += numActCh;
+    measVel   = memPtr;  memPtr += numActCh;
+    measAccel = memPtr;  memPtr += numActCh;
+    measForce = memPtr;  memPtr += numActCh;
+    measTime  = memPtr;  memPtr += numActCh;
+
+    // initialize everything to zero
+	newTarget[0] = 0;
+    switchPC[0]  = 0;
+    atTarget[0]  = 0;
+    for (int i=0; i<numActCh; i++)  {
+        targDisp[i]  = 0.0;  measDisp[i]  = 0.0;
+        targVel[i]   = 0.0;  measVel[i]   = 0.0;
+        targAccel[i] = 0.0;  measAccel[i] = 0.0;
+        targForce[i] = 0.0;  measForce[i] = 0.0;
+        targTime[i]  = 0.0;  measTime[i]  = 0.0;
+    }
 
     opserr << "************************************************\n";
     opserr << "* The SCRANNet csr and memory have been mapped *\n";
@@ -128,38 +133,14 @@ ECSCRAMNet::ECSCRAMNet(const ECSCRAMNet &ec)
     : ExperimentalControl(ec),
     memOffset(ec.memOffset), numActCh(ec.numActCh)
 {
-    
+    // temporarily does nothing
 }
 
 
 ECSCRAMNet::~ECSCRAMNet()
 {
-    // delete memory of control vectors
-    if (cDisp != 0)
-        delete cDisp;
-    if (cVel != 0)
-        delete cVel;
-    if (cAccel != 0)
-        delete cAccel;
-    if (cForce != 0)
-        delete cForce;
-    if (cTime != 0)
-        delete cTime;
-    
-    // delete memory of daq vectors
-    if (dDisp != 0)
-        delete dDisp;
-    if (dVel != 0)
-        delete dVel;
-    if (dAccel != 0)
-        delete dAccel;
-    if (dForce != 0)
-        delete dForce;
-    if (dTime != 0)
-        delete dTime;
-    
     // unmap the SCRAMNet control status registers (CSRs)
-    rValue = scr_reg_mm(UNMAP);
+    int rValue = scr_reg_mm(UNMAP);
     if (rValue != 0) {
         opserr << "ECSCRAMNet::~ECSCRAMNet() - scr_reg_mm(UNMAP):"
             << " could not unmap CSRs" << endln;
@@ -200,7 +181,7 @@ int ECSCRAMNet::setSize(ID sizeT, ID sizeO)
         opserr << "see User Manual.\n";
         scr_reg_mm(UNMAP);
         scr_mem_mm(UNMAP);
-        return OF_ReturnType_failed;
+        exit(OF_ReturnType_failed);
     }
     
     (*sizeCtrl) = sizeT;
@@ -239,11 +220,11 @@ int ECSCRAMNet::setup()
         opserr << "*                                    *\n";
         opserr << "* dspDaq = [";
         for (i=0; i<(*sizeDaq)[OF_Resp_Disp]; i++)
-            opserr << " " << (*dDisp)(i);
+            opserr << " " << measDisp[i];
         opserr << " ]\n";
         opserr << "* frcDaq = [";
         for (i=0; i<(*sizeDaq)[OF_Resp_Force]; i++)
-            opserr << " " << (*dForce)(i);
+            opserr << " " << measForce[i];
         opserr << " ]\n";
         opserr << "*                                    *\n";
         opserr << "* Press 'Enter' to start the test or *\n";
@@ -280,26 +261,26 @@ int ECSCRAMNet::setTrialResponse(const Vector* disp,
     int i;
     if (disp != 0) {
         for (i=0; i<(*sizeCtrl)[OF_Resp_Disp]; i++) {
-            (*cDisp)(i) = (*disp)(i);
+            targDisp[i] = float((*disp)(i));
             if (theFilter != 0)
-                (*cDisp)(i) = theFilter->filtering((*cDisp)(i));
+                targDisp[i] = float(theFilter->filtering(targDisp[i]));
         }
     }
     if (vel != 0) {
         for (i=0; i<(*sizeCtrl)[OF_Resp_Vel]; i++)
-            (*cVel)(i) = (*vel)(i);
+            targVel[i] = (float) (*vel)(i);
     }
     if (accel != 0) {
         for (i=0; i<(*sizeCtrl)[OF_Resp_Accel]; i++)
-            (*cAccel)(i) = (*accel)(i);
+            targAccel[i] = (float) (*accel)(i);
     }
     if (force != 0) {
         for (i=0; i<(*sizeCtrl)[OF_Resp_Force]; i++)
-            (*cForce)(i) = (*force)(i);
+            targForce[i] = (float) (*force)(i);
     }
     if (time != 0) {
         for (i=0; i<(*sizeCtrl)[OF_Resp_Time]; i++)
-            (*cTime)(i) = (*time)(i);
+            targTime[i] = (float) (*time)(i);
     }
     
     this->control();
@@ -319,23 +300,23 @@ int ECSCRAMNet::getDaqResponse(Vector* disp,
     int i;
     if (disp != 0) {
         for (i=0; i<(*sizeDaq)[OF_Resp_Disp]; i++)
-            (*disp)(i) = (*dDisp)(i);
+            (*disp)(i) = measDisp[i];
     }
     if (vel != 0) {
         for (i=0; i<(*sizeDaq)[OF_Resp_Vel]; i++)
-            (*vel)(i) = (*dVel)(i);
+            (*vel)(i) = measVel[i];
     }
     if (accel != 0) {
         for (i=0; i<(*sizeDaq)[OF_Resp_Accel]; i++)
-            (*accel)(i) = (*dAccel)(i);
+            (*accel)(i) = measAccel[i];
     }
     if (force != 0) {
         for (i=0; i<(*sizeDaq)[OF_Resp_Force]; i++)
-            (*force)(i) = (*dForce)(i);
+            (*force)(i) = measForce[i];
     }
     if (time != 0) {
         for (i=0; i<(*sizeDaq)[OF_Resp_Time]; i++)
-            (*time)(i) = (*dTime)(i);
+            (*time)(i) = measTime[i];
     }
     
     return OF_ReturnType_completed;
@@ -370,18 +351,26 @@ void ECSCRAMNet::Print(OPS_Stream &s, int flag)
 
 
 int ECSCRAMNet::control()
-{
+{    
     // set newTarget flag
-    newTarget[0] = 1.0;
-    
-	// wait until switchPC flag has changed as well
-	while (switchPC[0] != 1.0) {}
+    newTarget[0] = 1;
+
+    // wait until switchPC flag has changed as well
+    flag = 0;
+	while (flag != 1) {
+        // read switchPC flag
+        flag = switchPC[0];
+    }
     
     // reset newTarget flag
-    newTarget[0] = 0.0;
+    newTarget[0] = 0;
     
 	// wait until switchPC flag has changed as well
-	while (switchPC[0] != 0.0) {}
+    flag = 1;
+	while (flag != 0) {
+        // read switchPC flag
+        flag = switchPC[0];
+    }
     
     return OF_ReturnType_completed;
 }
@@ -390,7 +379,19 @@ int ECSCRAMNet::control()
 int ECSCRAMNet::acquire()
 {
     // wait until target is reached
-    while (atTarget[0] != 1.0) {}
+    flag = 0;
+    while (flag != 1) {
+        // read atTarget flag
+        flag = atTarget[0];
+    }
     
     return OF_ReturnType_completed;
+}
+
+
+void ECSCRAMNet::sleep(const clock_t wait)
+{
+    clock_t goal;
+    goal = wait + clock();
+    while (goal>clock());
 }

@@ -37,11 +37,10 @@
 // An ExperimentalElement element is an abstract class for conducting experimental tests.
 // ExperimentalElement objects are associated with experimental site objects.
 
+#include <ExperimentalSite.h>
+
 #include <Element.h>
 #include <Matrix.h>
-#include <ArrayOfTaggedObjects.h>
-
-#include <ExperimentalSite.h>
 
 class ExperimentalElement : public Element
 {
@@ -77,12 +76,7 @@ protected:
     // sizeCtrl/Daq[0]:disp, [1]:vel, [2]:accel, [3]:force, [4]:time
     ID* sizeCtrl;
     ID* sizeDaq;
-    
-    // Array of ExperimentalCP objects for trial and output:
-    // if unused, the pointers are set to NULL.
-    ArrayOfTaggedObjects *cpsCtrl;
-    ArrayOfTaggedObjects *cpsDaq;
-    
+        
     // initial stiffness matrix
     Matrix theInitStiff;
 
@@ -96,7 +90,3 @@ private:
 };
 
 #endif
-
-
-
-

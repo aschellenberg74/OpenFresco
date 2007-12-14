@@ -54,5 +54,3 @@ ErrorFilter::~ErrorFilter()
 {
     // does nothing
 }
-
-

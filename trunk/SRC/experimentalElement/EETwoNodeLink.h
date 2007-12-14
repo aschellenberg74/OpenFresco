@@ -35,7 +35,7 @@
 // Experimental element objects are associated with experimental setup objects.
 // This EETwoNodeLink element will work in 1d, 2d or 3d problems.
 
-#include <ExperimentalElement.h>
+#include "ExperimentalElement.h"
 
 class Channel;
 
