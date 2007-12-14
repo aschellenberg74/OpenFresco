@@ -175,7 +175,7 @@ partition(24).Size = '866';
 
 % blank space (since it is not used here)
 partition(25).Type = 'uint32';
-partition(25).Size = '866';
+partition(25).Size = '94231';
 
 %%%%%%%%%% END PACIFIC %%%%%%%%%%
 
@@ -185,59 +185,59 @@ partition(25).Size = '866';
 %%%%%%%%%% flags from/to scramnet %%%%%%%%%%
 
 % newTarget (from)
-partition(26).Type = 'int32';
+partition(26).Type = 'uint32';
 partition(26).Size = '1';
 
 % switchPC (to)
-partition(27).Type = 'int32';
+partition(27).Type = 'uint32';
 partition(27).Size = '1';
 
 % atTarget (to)
-partition(28).Type = 'int32';
+partition(28).Type = 'uint32';
 partition(28).Size = '1';
 
 %%%%%%%%%% inputs from scramnet %%%%%%%%%%
 
 % disp commands
-partition(29).Type = 'double';
+partition(29).Type = 'single';
 partition(29).Size = num2str(nAct);
 
 % vel commands
-partition(30).Type = 'double';
+partition(30).Type = 'single';
 partition(30).Size = num2str(nAct);
 
 % accel commands
-partition(31).Type = 'double';
+partition(31).Type = 'single';
 partition(31).Size = num2str(nAct);
 
 % force commands
-partition(32).Type = 'double';
+partition(32).Type = 'single';
 partition(32).Size = num2str(nAct);
 
 % time commands
-partition(33).Type = 'double';
+partition(33).Type = 'single';
 partition(33).Size = num2str(nAct);
 
 %%%%%%%%%% outputs to scramnet %%%%%%%%%%
 
 % disp feedbacks
-partition(34).Type = 'double';
+partition(34).Type = 'single';
 partition(34).Size = num2str(nAct);
 
 % vel feedbacks
-partition(35).Type = 'double';
+partition(35).Type = 'single';
 partition(35).Size = num2str(nAct);
 
 % accel feedbacks
-partition(36).Type = 'double';
+partition(36).Type = 'single';
 partition(36).Size = num2str(nAct);
 
 % force feedbacks
-partition(37).Type = 'double';
+partition(37).Type = 'single';
 partition(37).Size = num2str(nAct);
 
 % time feedbacks
-partition(38).Type = 'double';
+partition(38).Type = 'single';
 partition(38).Size = num2str(nAct);
 
 %%%%%%%%%% END OPENFRESCO %%%%%%%%%%

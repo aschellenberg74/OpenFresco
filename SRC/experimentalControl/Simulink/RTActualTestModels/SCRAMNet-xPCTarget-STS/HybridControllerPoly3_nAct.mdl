@@ -1,12 +1,12 @@
 Model {
-  Name			  "HybridControllerPoly3_1Act"
+  Name			  "HybridControllerPoly3_nAct"
   Version		  6.5
   MdlSubVersion		  0
   GraphicalInterface {
     NumRootInports	    0
     NumRootOutports	    0
     ParameterArgumentNames  ""
-    ComputedModelVersion    "1.406"
+    ComputedModelVersion    "1.409"
     NumModelReferences	    0
     NumTestPointedSignals   0
   }
@@ -47,8 +47,8 @@ Model {
   ModifiedByFormat	  "%<Auto>"
   LastModifiedBy	  "user1"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Thu Dec 13 20:49:32 2007"
-  ModelVersionFormat	  "1.%<AutoIncrement:406>"
+  LastModifiedDate	  "Thu Dec 13 21:01:20 2007"
+  ModelVersionFormat	  "1.%<AutoIncrement:409>"
   ConfigurationManager	  "None"
   LinearizationMsg	  "none"
   Profile		  off
@@ -764,7 +764,7 @@ Model {
     FontAngle		    "normal"
   }
   System {
-    Name		    "HybridControllerPoly3_1Act"
+    Name		    "HybridControllerPoly3_nAct"
     Location		    [6, 86, 772, 924]
     Open		    on
     ModelBrowserVisibility  off
@@ -806,7 +806,7 @@ Model {
       RTWMemSecDataConstants  "Inherit from model"
       RTWMemSecDataInternal   "Inherit from model"
       RTWMemSecDataParameters "Inherit from model"
-      id		      "1"
+      id		      "[2 3 4 1 5 6]"
       size		      "nAct"
     }
     Block {
@@ -825,7 +825,7 @@ Model {
       RTWMemSecDataConstants  "Inherit from model"
       RTWMemSecDataInternal   "Inherit from model"
       RTWMemSecDataParameters "Inherit from model"
-      id		      "1"
+      id		      "[2 3 4 1 5 6]"
       size		      "nAct"
     }
     Block {
@@ -844,7 +844,7 @@ Model {
       RTWMemSecDataConstants  "Inherit from model"
       RTWMemSecDataInternal   "Inherit from model"
       RTWMemSecDataParameters "Inherit from model"
-      id		      "1"
+      id		      "[2 3 4 1 5 6]"
       size		      "nAct"
     }
     Block {
@@ -933,7 +933,7 @@ Model {
       RTWMemSecDataConstants  "Inherit from model"
       RTWMemSecDataInternal   "Inherit from model"
       RTWMemSecDataParameters "Inherit from model"
-      id		      "1"
+      id		      "[2 3 4 1 5 6]"
       size		      "nAct"
     }
     Block {
@@ -952,7 +952,7 @@ Model {
       RTWMemSecDataConstants  "Inherit from model"
       RTWMemSecDataInternal   "Inherit from model"
       RTWMemSecDataParameters "Inherit from model"
-      id		      "1"
+      id		      "[2 3 4 1 5 6]"
       size		      "nAct"
     }
     Block {
@@ -971,7 +971,7 @@ Model {
       RTWMemSecDataConstants  "Inherit from model"
       RTWMemSecDataInternal   "Inherit from model"
       RTWMemSecDataParameters "Inherit from model"
-      id		      "1"
+      id		      "[2 3 4 1 5 6]"
       size		      "nAct"
     }
     Block {
@@ -2170,7 +2170,7 @@ Model {
       MaskIconOpaque	      on
       MaskIconRotate	      "none"
       MaskIconUnits	      "autoscale"
-      MaskValueString	      "1|HybridCtrlParameters.dtInt|HybridCtrlParamete"
+      MaskValueString	      "6|HybridCtrlParameters.dtInt|HybridCtrlParamete"
 "rs.dtSim|HybridCtrlParameters.dtCon|HybridCtrlParameters.N|HybridCtrlParamete"
 "rs.iDelay"
       MaskTabNameString	      ",,,,,"
@@ -2349,7 +2349,7 @@ Model {
 	      BlockType		      "S-Function"
 	      Name		      " SFunction "
 	      Tag		      "Stateflow S-Function HybridControllerPo"
-"ly3_1Act 2"
+"ly3_nAct 2"
 	      Ports		      [2, 4]
 	      Position		      [180, 102, 230, 203]
 	      FunctionName	      "sf_sfun"
@@ -3795,7 +3795,7 @@ Stateflow {
 
 	machine {
 		id                   		1
-		name                 		"HybridControllerPoly3_1Act"
+		name                 		"HybridControllerPoly3_nAct"
 		created              		"21-May-2004 09:28:42"
 		isLibrary            		0
 		firstTarget          		27
@@ -3829,9 +3829,9 @@ Stateflow {
 						"en: state = 1;\n"
 						"en: diSD = 1;\n"
 						"en: i = 1; iSD = 0;\n"
-						"en: predictP3(&com,i/N);\n"
+						"en: predictP3(com,i/N);\n"
 						"du: i++;\n"
-						"du: predictP3(&com,i/N);"
+						"du: predictP3(com,i/N);"
 		position                     		[576.6762 91.2101 214.8435 155.1983]
 		fontSize                     		12
 		chart                        		2
@@ -3857,7 +3857,7 @@ Stateflow {
 						"en: i = 1; iSD = 0;\n"
 						"en: diSD = 1;\n"
 						"en: initData(nAct,dtCon);\n"
-						"en: zeroDsp(&com);"
+						"en: zeroDsp(com);"
 		position                     		[51.0855 132.1864 139.7353 82.9349]
 		fontSize                     		12
 		chart                        		2
@@ -3883,10 +3883,10 @@ Stateflow {
 						"en: state = 2;\n"
 						"en: diSD = 4-i/(0.2*N);\n"
 						"en: i += diSD; iSD = i;\n"
-						"en: predictP3(&com,i/N);\n"
+						"en: predictP3(com,i/N);\n"
 						"du: diSD = 4-i/(0.2*N);\n"
 						"du: i += diSD; iSD = i;\n"
-						"du: predictP3(&com,i/N);"
+						"du: predictP3(com,i/N);"
 		position                     		[428.7069 326.5783 258.0199 124.1012]
 		fontSize                     		12
 		chart                        		2
@@ -3934,14 +3934,14 @@ Stateflow {
 		id                           		7
 		labelString                  		"Correct\n"
 						"en: state = 0;\n"
-						"en: setCurDsp(&com,i/N);\n"
-						"en: dspLocal = dsp; setNewDsp(&dspLocal);\n"
+						"en: setCurDsp(com,i/N);\n"
+						"en: dspLocal = dsp; setNewDsp(dspLocal);\n"
 						"en: di = min(max(diSD+1/(0.2*N)*(i-iSD),0.001),1.0);\n"
 						"en: i = min(i+di,N);\n"
-						"en: correctP3(&com,i/N);\n"
+						"en: correctP3(com,i/N);\n"
 						"du: di = min(max(diSD+1/(0.2*N)*(i-iSD),0.001),1.0);\n"
 						"du: i = min(i+di,N);\n"
-						"du: correctP3(&com,i/N);"
+						"du: correctP3(com,i/N);"
 		position                     		[251.8451 90.6156 292.0842 155.2563]
 		fontSize                     		12
 		chart                        		2
@@ -4054,6 +4054,8 @@ Stateflow {
 		dataLimits     		[190.821 251.845 162.993 167.793]
 		subviewer      		2
 		drawStyle      		SMART
+		slide {
+		}
 		executionOrder 		1
 	}
 
@@ -4076,6 +4078,8 @@ Stateflow {
 		dataLimits     		[465.909 470.709 245.872 326.578]
 		subviewer      		2
 		drawStyle      		SMART
+		slide {
+		}
 		executionOrder 		1
 	}
 
@@ -4098,6 +4102,8 @@ Stateflow {
 		dataLimits     		[645.884 650.683 246.408 326.578]
 		subviewer      		2
 		drawStyle      		SMART
+		slide {
+		}
 		executionOrder 		1
 	}
 
