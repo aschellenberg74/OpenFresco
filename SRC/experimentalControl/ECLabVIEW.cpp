@@ -30,11 +30,10 @@
 // Description: This file contains the implementation of the ECLabVIEW class.
 
 #include "ECLabVIEW.h"
-
 #include <ExperimentalCP.h>
+
 #include <Message.h>
 #include <TCP_Socket.h>
-#include <time.h>
 
 
 ECLabVIEW::ECLabVIEW(int tag,

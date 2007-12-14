@@ -36,7 +36,7 @@
 // the rotational degree of freedom of a specimen.
 
 #include "ExperimentalSetup.h"
-#include <ExperimentalControl.h>
+
 #include <Matrix.h>
 
 class ESTwoActuators2d : public ExperimentalSetup

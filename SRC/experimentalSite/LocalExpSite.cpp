@@ -33,20 +33,14 @@
 // Description: This file contains the implementation of  
 // LocalExpSite.
 
-#include <ID.h>
-#include <Vector.h>
-#include <ArrayOfTaggedObjects.h>
-
-#include <LocalExpSite.h>
-#include <ExperimentalSite.h>
-#include <ExperimentalSetup.h>
+#include "LocalExpSite.h"
 
 
 LocalExpSite::LocalExpSite(int tag, 
     ExperimentalSetup *setup)
     : ExperimentalSite(tag, setup)
 {
-    if(theSetup == 0) {
+    if (theSetup == 0) {
         opserr << "LocalExpSite::LocalExpSite() - "
             << "must have an instance of ExperimentalSetup"
             << endln;
@@ -102,7 +96,7 @@ int LocalExpSite::setTrialResponse(const Vector* disp,
     int rValue;
     // set trial response at the setup
     rValue = theSetup->setTrialResponse(tDisp, tVel, tAccel, tForce, tTime);
-    if(rValue != OF_ReturnType_completed) {
+    if (rValue != OF_ReturnType_completed) {
         opserr << "LocalExpSite::setTrialResponse() - "
             << "failed to set trial response at the setup.";
         exit(OF_ReturnType_failed);
@@ -122,7 +116,7 @@ int LocalExpSite::setTrialResponse(const Vector* disp,
 
 int LocalExpSite::checkDaqResponse()
 {
-    if(daqFlag == false) {
+    if (daqFlag == false) {
         // get daq response into output response
         theSetup->getDaqResponse(Disp, Vel, Accel, Force, Time);
         
@@ -152,4 +146,3 @@ void LocalExpSite::Print(OPS_Stream &s, int flag)
         << endln;
     s << *theSetup;
 }
-

@@ -74,25 +74,19 @@ protected:
     virtual int acquire();
     
 private:
+    void sleep(const clock_t wait);
+    
     const int memOffset;
     const int numActCh;
-    int rValue;
 
     const int *memPtrBASE;
-	double *memPtrOPF;
+	float *memPtrOPF;
 
-    double *newTarget, *atTarget, *switchPC;
-    Vector *cDisp,  *dDisp;
-    Vector *cVel,   *dVel;
-    Vector *cAccel, *dAccel;
-    Vector *cForce, *dForce;
-    Vector *cTime,  *dTime;
-    
-    double *targDisp, *targVel, *targAccel;
-    double *measDisp, *measForce;
-    
-    int updateFlagId, targetFlagId, targDispId, targVelId, targAccelId;
-    int *measDispId, *measForceId;
+    unsigned int *newTarget, *switchPC, *atTarget;
+    float *targDisp, *targVel, *targAccel, *targForce, *targTime;
+    float *measDisp, *measVel, *measAccel, *measForce, *measTime;
+
+    unsigned int flag;
 };
 
 #endif

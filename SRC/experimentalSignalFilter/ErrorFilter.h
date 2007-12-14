@@ -36,7 +36,7 @@
 // Description: This file contains the class definition for 
 // ErrorFilter.
 
-#include <SignalFilter.h>
+#include "SignalFilter.h"
 
 class ErrorFilter : public SignalFilter
 {

@@ -36,6 +36,8 @@
 
 #include "ECSimulation.h"
 
+class Channel;
+
 class ECSimFEAdapter : public ECSimulation
 {
 public:

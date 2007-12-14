@@ -37,11 +37,9 @@
 // RemoteExpSite. A RemoteExpSite can communicate to an ActorExpSite.
 // This object inherits from Shadow, and runs on the client program.
 
-#include <ID.h>
+#include "ExperimentalSite.h"
+
 #include <Shadow.h>
-#include <ExperimentalSite.h>
-#include <ExperimentalSetup.h>
-#include <ExperimentalControl.h>
 
 class RemoteExpSite : public ExperimentalSite, public Shadow
 {

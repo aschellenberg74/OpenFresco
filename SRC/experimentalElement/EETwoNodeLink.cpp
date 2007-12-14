@@ -31,7 +31,6 @@
 
 #include "EETwoNodeLink.h"
 
-#include <ArrayOfTaggedObjects.h>
 #include <Domain.h>
 #include <Node.h>
 #include <Channel.h>

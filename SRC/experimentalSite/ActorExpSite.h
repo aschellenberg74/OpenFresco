@@ -37,14 +37,11 @@
 // ActorExpSite. An ActorExpSite can communicate with a RemoteExpSite.
 // This object inherits from Actor, and runs on the server program.
 
-#ifndef _bool_h
-#include "bool.h"
-#endif
+#include "ExperimentalSite.h"
 
-#include <ID.h>
 #include <Actor.h>
-#include <ExperimentalSite.h>
-#include <ExperimentalSetup.h>
+
+class ExperimentalControl;
 
 class ActorExpSite : public ExperimentalSite, public Actor
 {

@@ -33,11 +33,6 @@
 // Description: This file contains the implementation of ExperimentalSetup.
 
 #include "ExperimentalSetup.h"
-#include <ExperimentalControl.h>
-
-#include <stdlib.h>
-#include <ArrayOfTaggedObjects.h>
-#include <Vector.h>
 
 
 ExperimentalSetup::ExperimentalSetup(int tag,
@@ -50,8 +45,7 @@ ExperimentalSetup::ExperimentalSetup(int tag,
     cForceFact(0), cTimeFact(0),
     dDispFact(0), dVelFact(0), dAccelFact(0), 
     dForceFact(0), dTimeFact(0),
-    sizeCtrl(0), sizeDaq(0),
-    cpsCtrl(0), cpsDaq(0)
+    sizeCtrl(0), sizeDaq(0)
 {
     sizeCtrl = new ID(OF_Resp_All);
     sizeDaq = new ID(OF_Resp_All);
@@ -73,8 +67,7 @@ ExperimentalSetup::ExperimentalSetup(const ExperimentalSetup& es)
     cForceFact(0), cTimeFact(0),
     dDispFact(0), dVelFact(0), dAccelFact(0), 
     dForceFact(0), dTimeFact(0),
-    sizeCtrl(0), sizeDaq(0),
-    cpsCtrl(0), cpsDaq(0)
+    sizeCtrl(0), sizeDaq(0)
 {
     if (es.theControl != 0) {
         theControl = (es.theControl)->getCopy();
@@ -87,45 +80,40 @@ ExperimentalSetup::ExperimentalSetup(const ExperimentalSetup& es)
         theControl->setup();
     }
     
-    if (es.cpsCtrl != 0) {
-        //this->setCtrlCPs(*(es.cpsCtrl));
-        //this->setDaqCPs(*(es.cpsDaq));
-    } else {
-        sizeCtrl = new ID(OF_Resp_All);
-        sizeDaq = new ID(OF_Resp_All);
-        if (sizeCtrl == 0 || sizeDaq == 0) {
-            opserr << "FATAL ExperimentalSetup::ExperimentalSetup - "
-                << "fail to create ID."
-                << endln;
-            exit(OF_ReturnType_failed);
-        }
-        *sizeCtrl = *(es.sizeCtrl);
-        *sizeDaq = *(es.sizeDaq);
-        
-        this->setCtrl();
-        this->setDaq();
-        
-        if (es.cDispFact != 0)
-            *cDispFact = *(es.cDispFact);
-        if (es.cVelFact != 0)
-            *cVelFact = *(es.cVelFact);
-        if (es.cAccelFact != 0)
-            *cAccelFact = *(es.cAccelFact);
-        if (es.cForceFact != 0)
-            *cForceFact = *(es.cForceFact);
-        if (es.cTimeFact != 0)
-            *cTimeFact = *(es.cTimeFact);
-        if (es.dDispFact != 0)
-            *dDispFact = *(es.dDispFact);
-        if (es.dVelFact != 0)
-            *dVelFact = *(es.dVelFact);
-        if (es.dAccelFact != 0)
-            *dAccelFact = *(es.dAccelFact);
-        if (es.dForceFact != 0)
-            *dForceFact = *(es.dForceFact);
-        if (es.dTimeFact != 0)
-            *dTimeFact = *(es.dTimeFact);
+    sizeCtrl = new ID(OF_Resp_All);
+    sizeDaq = new ID(OF_Resp_All);
+    if (sizeCtrl == 0 || sizeDaq == 0) {
+        opserr << "FATAL ExperimentalSetup::ExperimentalSetup - "
+            << "fail to create ID."
+            << endln;
+        exit(OF_ReturnType_failed);
     }
+    *sizeCtrl = *(es.sizeCtrl);
+    *sizeDaq = *(es.sizeDaq);
+
+    this->setCtrl();
+    this->setDaq();
+
+    if (es.cDispFact != 0)
+        *cDispFact = *(es.cDispFact);
+    if (es.cVelFact != 0)
+        *cVelFact = *(es.cVelFact);
+    if (es.cAccelFact != 0)
+        *cAccelFact = *(es.cAccelFact);
+    if (es.cForceFact != 0)
+        *cForceFact = *(es.cForceFact);
+    if (es.cTimeFact != 0)
+        *cTimeFact = *(es.cTimeFact);
+    if (es.dDispFact != 0)
+        *dDispFact = *(es.dDispFact);
+    if (es.dVelFact != 0)
+        *dVelFact = *(es.dVelFact);
+    if (es.dAccelFact != 0)
+        *dAccelFact = *(es.dAccelFact);
+    if (es.dForceFact != 0)
+        *dForceFact = *(es.dForceFact);
+    if (es.dTimeFact != 0)
+        *dTimeFact = *(es.dTimeFact);
 }
 
 
@@ -182,11 +170,6 @@ ExperimentalSetup::~ExperimentalSetup()
         delete sizeCtrl;
     if (sizeDaq != 0)
         delete sizeDaq;
-    
-    if (cpsCtrl != 0)
-        delete cpsCtrl;
-    if (cpsDaq != 0)
-        delete cpsDaq;
 }
 
 
@@ -507,18 +490,6 @@ int ExperimentalSetup::getCtrlSize(int rType)
 int ExperimentalSetup::getDaqSize(int rType)
 {
     return (*sizeDaq)[rType];
-}
-
-
-ArrayOfTaggedObjects* ExperimentalSetup::getCPsCtrl()
-{
-    return cpsCtrl;
-}
-
-
-ArrayOfTaggedObjects* ExperimentalSetup::getCPsDaq()
-{
-    return cpsDaq;
 }
 
 

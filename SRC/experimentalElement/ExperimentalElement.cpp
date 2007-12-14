@@ -32,6 +32,8 @@
 //
 // Description: This file contains the implementation of the ExperimentalElement class.
 
+#include "ExperimentalElement.h"
+
 #include <Domain.h>
 #include <Information.h>
 #include <ElementResponse.h>
@@ -42,10 +44,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <ExperimentalElement.h>
-#include <ExperimentalSite.h>
-#include <Matrix.h>
-
 
 ExperimentalElement::ExperimentalElement(int tag, 
     int classTag,
@@ -53,7 +51,6 @@ ExperimentalElement::ExperimentalElement(int tag,
     : Element(tag,classTag),
     theSite(site),
     sizeCtrl(0), sizeDaq(0),
-    cpsCtrl(0), cpsDaq(0),
     theInitStiff(1,1),
     firstWarning(true)
 {
@@ -69,12 +66,7 @@ ExperimentalElement::~ExperimentalElement()
     if (sizeCtrl != 0)
         delete sizeCtrl;
     if (sizeDaq != 0)
-        delete sizeDaq;
-    
-    if (cpsCtrl != 0)
-        delete cpsCtrl;
-    if (cpsDaq != 0)
-        delete cpsDaq;
+        delete sizeDaq;    
 }
 
 

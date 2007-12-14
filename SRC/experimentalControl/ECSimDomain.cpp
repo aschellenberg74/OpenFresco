@@ -32,7 +32,6 @@
 #include "ECSimDomain.h"
 #include <ExperimentalCP.h>
 
-// standard includes
 #include <stdlib.h>
 #include <iostream>
 #include <fstream>
@@ -40,7 +39,6 @@
 #include <StandardStream.h>
 #include <ArrayOfTaggedObjects.h>
 
-// includes for the domain classes
 #include <Domain.h>
 #include <Node.h>
 #include <LinearSeries.h>
@@ -49,7 +47,6 @@
 #include <ExpControlSP.h>
 #include <NodalLoad.h>
 
-// includes for the analysis classes
 #include <AnalysisModel.h>
 //#include <ConvergenceTest.h>
 #include <CTestNormDispIncr.h>

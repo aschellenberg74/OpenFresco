@@ -32,15 +32,7 @@
 //
 // Description: This file contains the implementation of ActorExpSite.
 
-#include <ID.h>
-#include <Vector.h>
-#include <Matrix.h>
-#include <stdlib.h>
-
-#include <ExperimentalCP.h>
-#include <ExperimentalSetup.h>
-#include <ExperimentalControl.h>
-#include <ActorExpSite.h>
+#include "ActorExpSite.h"
 
 
 ActorExpSite::ActorExpSite(int tag, 

@@ -38,7 +38,7 @@
 // offsets between the actuators.
 
 #include "ExperimentalSetup.h"
-#include <ExperimentalControl.h>
+
 #include <Matrix.h>
 
 class ESInvertedVBraceJntOff2d : public ExperimentalSetup

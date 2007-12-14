@@ -33,12 +33,7 @@
 // Description: This file contains the implementation of  
 // ExperimentalSite.
 
-#include <Vector.h>
-#include <ArrayOfTaggedObjects.h>
-
 #include "ExperimentalSite.h"
-#include <ExperimentalCP.h>
-#include <ExperimentalSetup.h>
 
 
 ExperimentalSite::ExperimentalSite(int tag, 
@@ -48,7 +43,6 @@ ExperimentalSite::ExperimentalSite(int tag,
     Disp(0), Vel(0), Accel(0), Force(0), Time(0),
     tDisp(0), tVel(0), tAccel(0), tForce(0), tTime(0),
     sizeTrial(0), sizeOut(0),
-    cpsTrial(0), cpsOut(0),
     daqFlag(false)
 {
     sizeTrial = new ID(OF_Resp_All);
@@ -68,7 +62,6 @@ ExperimentalSite::ExperimentalSite(const ExperimentalSite& site)
     Disp(0), Vel(0), Accel(0), Force(0), Time(0),
     tDisp(0), tVel(0), tAccel(0), tForce(0), tTime(0),
     sizeTrial(0), sizeOut(0),
-    cpsTrial(0), cpsOut(0),
     daqFlag(false)
 {
     if (site.theSetup != 0) {
@@ -81,23 +74,18 @@ ExperimentalSite::ExperimentalSite(const ExperimentalSite& site)
         }
     }
     
-    if (site.cpsTrial != 0) {
-        //this->setTrialCPs(*(site.cpsTrial));
-        //this->setOutCPs(*(site.cpsOut));
-    } else {
-        sizeTrial = new ID(OF_Resp_All);
-        sizeOut = new ID(OF_Resp_All);
-        if (sizeTrial == 0 || sizeOut == 0) {
-            opserr << "ExperimentalSite::ExperimentalSite() - "
-                << "failed to create IDs" << endln;
-            exit(OF_ReturnType_failed);
-        }
-        *sizeTrial = *(site.sizeTrial);
-        *sizeOut = *(site.sizeOut);
-        
-        this->setTrial();
-        this->setOut();
+    sizeTrial = new ID(OF_Resp_All);
+    sizeOut = new ID(OF_Resp_All);
+    if (sizeTrial == 0 || sizeOut == 0) {
+        opserr << "ExperimentalSite::ExperimentalSite() - "
+            << "failed to create IDs" << endln;
+        exit(OF_ReturnType_failed);
     }
+    *sizeTrial = *(site.sizeTrial);
+    *sizeOut = *(site.sizeOut);
+
+    this->setTrial();
+    this->setOut();
 }
 
 
@@ -132,11 +120,6 @@ ExperimentalSite::~ExperimentalSite()
         delete sizeTrial;
     if (sizeOut != 0)
         delete sizeOut;
-    
-    if (cpsTrial != 0)
-        delete cpsTrial;
-    if (cpsOut != 0)
-        delete cpsOut;
 }
 
 
@@ -346,30 +329,6 @@ int ExperimentalSite::getDaqSize(int rType)
 }
 
 
-ArrayOfTaggedObjects* ExperimentalSite::getCPsTrial()
-{
-    return cpsTrial;
-}
-
-
-ArrayOfTaggedObjects* ExperimentalSite::getCPsOut()
-{
-    return cpsOut;
-}
-
-
-ArrayOfTaggedObjects* ExperimentalSite::getCPsCtrl()
-{
-    return theSetup->getCPsCtrl();
-}
-
-
-ArrayOfTaggedObjects* ExperimentalSite::getCPsDaq()
-{
-    return theSetup->getCPsDaq();
-}
-
-
 void ExperimentalSite::setTrial()
 {
     if (tDisp != 0) {
@@ -530,7 +489,7 @@ void ExperimentalSite::setOut()
     sizeTrial = new ID[OF_Resp_All];
     sizeTrial->Zero();
     
-    for(int i=1; i<=nTrial; i++) {
+    for (int i=1; i<=nTrial; i++) {
         TaggedObject *mc = theCPs.getComponentPtr(i);
         if (mc == 0) {
             opserr << "ExperimentalSite::setTrialCPs() - "
@@ -558,7 +517,7 @@ void ExperimentalSite::setOut()
             (*sizeTrial)[OF_Resp_Time]++;
             break;
         case OF_Resp_All:
-            for(int i=0; i<OF_Resp_All; i++)
+            for (int i=0; i<OF_Resp_All; i++)
                 (*sizeTrial)[i]++;
             break;
         }
@@ -584,7 +543,7 @@ void ExperimentalSite::setOutCPs(ArrayOfTaggedObjects &theCPs)
     sizeOut = new ID(OF_Resp_All);
     sizeOut->Zero();
     
-    for(int i=1; i<=nOutput; i++) {
+    for (int i=1; i<=nOutput; i++) {
         TaggedObject *mc = theCPs.getComponentPtr(i);
         if (mc == 0) {
             opserr << "ExperimentalSite::setOutCPs() - "
@@ -612,7 +571,7 @@ void ExperimentalSite::setOutCPs(ArrayOfTaggedObjects &theCPs)
             (*sizeOut)[OF_Resp_Time]++;
             break;
         case OF_Resp_All:
-            for(int i=0; i<OF_Resp_All; i++)
+            for (int i=0; i<OF_Resp_All; i++)
                 (*sizeOut)[i]++;
             break;
         }

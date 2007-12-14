@@ -37,6 +37,7 @@
 // SignalFilter.
 
 #include <TaggedObject.h>
+#include <OPS_Globals.h>
 
 class SignalFilter : public TaggedObject
 {

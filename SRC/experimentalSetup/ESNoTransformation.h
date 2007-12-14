@@ -35,9 +35,7 @@
 // setup class with up to six actuators which are set to control
 // any of the basic degrees of freedom of a specimen.
 
-#include <ExperimentalSetup.h>
-#include <ExperimentalControl.h>
-#include <ID.h>
+#include "ExperimentalSetup.h"
 
 class ESNoTransformation : public ExperimentalSetup
 {

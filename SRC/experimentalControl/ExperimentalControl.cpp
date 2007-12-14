@@ -42,7 +42,7 @@ ExperimentalControl::ExperimentalControl(int tag)
 {
     sizeCtrl = new ID(OF_Resp_All);
     sizeDaq = new ID(OF_Resp_All);
-    if(sizeCtrl == 0 || sizeDaq == 0) {
+    if (sizeCtrl == 0 || sizeDaq == 0) {
         opserr << "FATAL ExperimentalControl::ExperimentalControl - "
             << "fail to create ID."
             << endln;
@@ -56,7 +56,7 @@ ExperimentalControl::ExperimentalControl(const ExperimentalControl& ec)
 {
     sizeCtrl = new ID(OF_Resp_All);
     sizeDaq = new ID(OF_Resp_All);
-    if(sizeCtrl == 0 || sizeDaq == 0) {
+    if (sizeCtrl == 0 || sizeDaq == 0) {
         opserr << "FATAL copy constructor of ExperimentalControl - "
             << "fail to create ID."
             << endln;
@@ -65,7 +65,7 @@ ExperimentalControl::ExperimentalControl(const ExperimentalControl& ec)
     *sizeCtrl = *(ec.sizeCtrl);
     *sizeDaq = *(ec.sizeDaq);
     
-    if(ec.theFilter != 0) 
+    if (ec.theFilter != 0) 
         theFilter = ec.theFilter->getCopy();
     else
         theFilter = 0;
@@ -74,9 +74,9 @@ ExperimentalControl::ExperimentalControl(const ExperimentalControl& ec)
 
 ExperimentalControl::~ExperimentalControl()
 {
-    if(sizeCtrl != 0)
+    if (sizeCtrl != 0)
         delete sizeCtrl;
-    if(sizeDaq != 0)
+    if (sizeDaq != 0)
         delete sizeDaq;
 }
 

@@ -31,7 +31,6 @@
 
 #include "EEGeneric.h"
 
-#include <ArrayOfTaggedObjects.h>
 #include <Domain.h>
 #include <Node.h>
 #include <Channel.h>
