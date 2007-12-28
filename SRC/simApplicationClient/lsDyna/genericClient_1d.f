@@ -162,11 +162,11 @@ c
          sData(1) = 10
          dataTypeSize = sizeDouble
          nleft        = sizeSendData
-         call sendData(socketID, dataTypeSize, sData, nleft, stat)
+         call senddata(socketID, dataTypeSize, sData, nleft, stat)
 
          dataTypeSize = sizeDouble
          nleft        = 4
-         call recvData(socketID, dataTypeSize, r, nleft, stat)
+         call recvdata(socketID, dataTypeSize, r, nleft, stat)
 c
          do j=1,2
             force(i,j)   = r(j)
