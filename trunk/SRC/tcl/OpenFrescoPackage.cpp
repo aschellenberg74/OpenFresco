@@ -148,6 +148,13 @@ OpenFresco(ClientData clientData, Tcl_Interp *interp, int argc,
         return code;
     }
 
+    // beginning of OpenFresco additions
+    fprintf(stderr,"\n\n");
+    fprintf(stderr,"\t OpenFresco -- Open Framework for Experimental Setup and Control\n");
+    fprintf(stderr,"\t                           Version %s                          \n\n",OPF_VERSION);
+    fprintf(stderr,"\t Copyright (c) 2006 The Regents of the University of California \n");
+    fprintf(stderr,"\t                       All Rights Reserved                      \n\n\n");    
+
     Tcl_CreateCommand(interp, "expControlPoint", openFresco_addExperimentalCP,
         (ClientData)NULL, NULL);
 
