@@ -314,7 +314,7 @@ int ECdSpace::setup()
     error = DS_write_32(board_index, simStateId, 1, (UInt32 *)&simState);
     if (error != DS_NO_ERROR)  {
         opserr << "ECdSpace::setup() - "
-            << "DS_write_32: error = " << error << endln;
+            << "DS_write_32(simState): error = " << error << endln;
         DS_unregister_host_app();
         exit(OF_ReturnType_failed);
     }
@@ -517,7 +517,8 @@ int ECdSpace::acquire()
     while (atTarget != 1)  {
         error = DS_read_32(board_index, atTargetId, 1, (UInt32 *)&atTarget);
         if (error != DS_NO_ERROR)	{
-            opserr << "ECdSpace::acquire() - DS_read_32: error = " << error << endln;
+            opserr << "ECdSpace::acquire() - "
+                << "DS_read_32(atTarget): error = " << error << endln;
             DS_unregister_host_app();
             exit(OF_ReturnType_failed);
         }
