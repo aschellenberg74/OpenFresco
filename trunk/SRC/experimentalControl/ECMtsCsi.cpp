@@ -17,11 +17,11 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision: $
-// $Date: $
+// $Revision: 133 $
+// $Date: 2008-02-06 09:25:00 -0800 (Wed, 06 Feb 2008) $
 // $Source: $
 
-// Written: 
+// Written: MTS Systems Corporation
 // Created: 01/07
 // Revision: A
 //
@@ -41,12 +41,10 @@ ECMtsCsi::ECMtsCsi(int tag, char *cfgfile, double ramptime)
     targDisp(0), measResp(0), measDisp(0), measForce(0),
     respSize(0)
 {
-    try
-    {
+    try  {
         CsiController->loadConfiguration(cfgFile);
     }
-    catch (const Mts::ICsiException& xcp)
-    {
+    catch (const Mts::ICsiException& xcp)  {
         opserr << xcp.what() << endln;
         exit(OF_ReturnType_failed);
     }
@@ -60,12 +58,10 @@ ECMtsCsi::ECMtsCsi(const ECMtsCsi& ec)
 {
     rampTime = ec.rampTime;
 
-    try
-    {
+    try  {
         CsiController->loadConfiguration(ec.CsiController->getConfiguration().getFileName());
     }
-    catch (const Mts::ICsiException& xcp)
-    {
+    catch (const Mts::ICsiException& xcp)  {
         opserr << xcp.what() << endln;
         exit(OF_ReturnType_failed);
     }
@@ -101,47 +97,77 @@ int ECMtsCsi::setSize(ID sizeT, ID sizeO)
     if (sizeT[OF_Resp_Disp] == 0 ||
         sizeO[OF_Resp_Disp] == 0 ||
         sizeO[OF_Resp_Force] == 0) {
-        opserr << "ECMtsCsi::setSize() - wrong sizeTrial/Out"; 
-        opserr << "see User Manual.\n";
-        exit(OF_ReturnType_failed);
+            opserr << "ECMtsCsi::setSize() - wrong sizeTrial/Out"; 
+            opserr << "see User Manual.\n";
+            exit(OF_ReturnType_failed);
     }
 
     *sizeCtrl = sizeT;
     *sizeDaq  = sizeO;
 
     // the loaded configuration must contain:
-    //		1 control point
-    //		1 degree of freedom (defining a displacement control channel)
-    //		2 feedback signals (defining a displacement and force signal, respectively)
-    
+    //		at least 1 control point
+    //		at least 1 degree of freedom (defining a displacement control channel)
+    //         in each control point
+    //		and 2 feedback signals (defining a displacement and force signal, respectively)
+    //		   per degree of freedom (all displacement signals must be first in the array
+    //         followed by all force signals)
+
     Mts::ICsiConfiguration& cfg = CsiController->getConfiguration();
 
-    if (cfg.getControlPoints().count() != 1)
-    {
-        opserr << "ECMtsCsi::setSize() - configuration must only "
-            << "define one control point" << endln;
+    opserr << "using MtsCsi configuration file '" << cfg.getFileName() << "'" << endln;
+
+    if (cfg.getControlPoints().count() < 1)  {
+        opserr << "ECMtsCsi::setSize() - configuration must "
+            << "define at least one control point" << endln;
         exit(OF_ReturnType_failed);
     }
 
-    Mts::ICsiControlPoint& ctrlPt = cfg.getControlPoints()[0];
+    int numDoFs = 0;
+    int numFdbkSigs = 0;
 
-    if (ctrlPt.getDegreesOfFreedom().count() != 1)
-    {
-        opserr << "ECMtsCsi::setSize() - configuration must only "
-            << "define one degree of freedom" << endln;
-        exit(OF_ReturnType_failed);
+    for (int i=0; i<cfg.getControlPoints().count(); i++)  {
+
+        Mts::ICsiControlPoint& ctrlPt = cfg.getControlPoints()[i];
+
+        if (ctrlPt.getDegreesOfFreedom().count() < 1)  {
+            opserr << "ECMtsCsi::setSize() - configuration define "
+                << "at least one degree of freedom per control point" << endln;
+            exit(OF_ReturnType_failed);
+        }
+
+        numDoFs += ctrlPt.getDegreesOfFreedom().count();
+
+        if (ctrlPt.getFeedbackSignals().count() != (ctrlPt.getDegreesOfFreedom().count() * 2))  {
+            opserr << "ECMtsCsi::setSize() - configuration must define "
+                << "at least two feedback signals (displacement and force) " 
+                << "per degree of freedom" << endln;
+            exit(OF_ReturnType_failed);
+        }
+
+        numFdbkSigs += ctrlPt.getFeedbackSignals().count();
     }
 
-    if (ctrlPt.getFeedbackSignals().count() != 2)
-    {
-        opserr << "ECMtsCsi::setSize() - configuration must only "
-            << "define two feedback signals (displacement and force)" << endln;
-        exit(OF_ReturnType_failed);
+    opserr << "MtsCsi configuration: " << numDoFs << " degrees of freedom; " 
+        << numFdbkSigs << " feedback signals" << endln;
+
+    int numTrial  = sizeT[OF_Resp_Disp];
+    int numOutput = sizeO[OF_Resp_Disp] + sizeO[OF_Resp_Force];
+
+    if (numTrial != numDoFs)  {
+        opserr << "warning: ECMtsCsi::setSize() - specified trial size (" << numTrial << ") does not "
+            << "match total number of degrees of freedom (" << numDoFs << ") defined in the "
+            << "configuration" << endln;
+    }
+
+    if (numOutput != numFdbkSigs)  {
+        opserr << "warning: ECMtsCsi::setSize() - specified output size (" << numOutput << ") does not "
+            << "match total number of feedback signals (" << numFdbkSigs << ") defined in the "
+            << "configuration" << endln;
     }
 
     return OF_ReturnType_completed;
 }
-
 
 int ECMtsCsi::setup()
 {
@@ -191,13 +217,11 @@ int ECMtsCsi::setup()
     }
 
     // start the csi-controller
-    try
-    {
+    try  {
         CsiController->startHardware();
         CsiController->startTest();
     }
-    catch (const Mts::ICsiException& xcp)
-    {
+    catch (const Mts::ICsiException& xcp)  {
         opserr << xcp.what() << endln;
         exit(OF_ReturnType_failed);
     }
@@ -327,14 +351,13 @@ int ECMtsCsi::control()
     ramp->setChannelCount((*sizeCtrl)[OF_Resp_Disp]);
     ramp->setRampTime(rampTime);
 
-    (*ramp)[0] = (*targDisp)(0);
+    for (int i=0; i<(*sizeCtrl)[OF_Resp_Disp]; i++)
+		(*ramp)[i] = (*targDisp)(i);
 
-    try 
-    {
+    try  {
         rampId = CsiController->runRamp(ramp);
     }
-    catch (const Mts::ICsiException& xcp)
-    {
+    catch (const Mts::ICsiException& xcp)  {
         opserr << xcp.what() << endln;
         exit(OF_ReturnType_failed);
     }
@@ -347,12 +370,10 @@ int ECMtsCsi::control()
 // pre-defined in the MTS FlexTest Computer Simulation Interface configuration.
 int ECMtsCsi::acquire()
 {
-    try
-    {
+    try  {
         CsiController->acquireFeedback(rampId, measResp);
     }
-    catch (const Mts::ICsiException& xcp)
-    {
+    catch (const Mts::ICsiException& xcp)  {
         opserr << xcp.what() << endln;
         exit(OF_ReturnType_failed);
     }
