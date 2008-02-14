@@ -17,14 +17,14 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision: $
-// $Date: $
+// $Revision: 133 $
+// $Date: 2008-02-06 09:25:00 -0800 (Wed, 06 Feb 2008) $
 // $Source: $
 
 #ifndef ECMtsCsi_h
 #define ECMtsCsi_h
 
-// Written: 
+// Written: MTS Systems Corporation
 // Created: 01/07
 // Revision: A
 //
