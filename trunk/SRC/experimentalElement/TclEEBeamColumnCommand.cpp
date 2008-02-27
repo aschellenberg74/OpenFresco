@@ -228,7 +228,7 @@ int addEEBeamColumn(ClientData clientData, Tcl_Interp *interp, int argc,
 		}
 
 		// check the number of arguments
-        if ((argc-eleArgStart) < 46)  {
+        if ((argc-eleArgStart) < 44)  {
 			opserr << "WARNING insufficient arguments\n";
 			printCommand(argc, argv);
 			opserr << "Want: expElement beamColumn eleTag iNode jNode transTag -site siteTag -initStif Kij <-iMod> <-rho rho>\n";
