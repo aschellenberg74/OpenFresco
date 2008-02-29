@@ -189,8 +189,7 @@ int ECxPCtarget::setSize(ID sizeT, ID sizeO)
     if ((pcType == 0 && sizeT[OF_Resp_Disp] == 0) || 
         (pcType == 1 && sizeT[OF_Resp_Disp] == 0 && sizeT[OF_Resp_Vel] == 0) ||
         (pcType == 2 && sizeT[OF_Resp_Disp] == 0 && sizeT[OF_Resp_Vel] == 0 && sizeT[OF_Resp_Accel] == 0) ||
-        sizeO[OF_Resp_Disp] == 0 ||
-        sizeO[OF_Resp_Force] == 0) {
+        (sizeO[OF_Resp_Disp] == 0 && sizeO[OF_Resp_Force] == 0))  {
         opserr << "ECxPCtarget::setSize() - wrong sizeTrial/Out\n"; 
         opserr << "see User Manual.\n";
         xPCClosePort(port);
@@ -618,23 +617,27 @@ int ECxPCtarget::acquire()
     }
     
     // read displacements and resisting forces at target
-    xPCGetSignals(port, (*sizeDaq)[OF_Resp_Disp], measDispId, measDisp);
-    if (xPCGetLastError())  {
-        xPCErrorMsg(xPCGetLastError(), errMsg);
-        opserr << "ECxPCtarget::acquire() - "
-            << "xPCGetSignal(measDisp): error = " << errMsg << endln;
-        xPCClosePort(port);
-        xPCFreeAPI();
-        exit(OF_ReturnType_failed);
+    if ((*sizeDaq)[OF_Resp_Disp] != 0)  {
+        xPCGetSignals(port, (*sizeDaq)[OF_Resp_Disp], measDispId, measDisp);
+        if (xPCGetLastError())  {
+            xPCErrorMsg(xPCGetLastError(), errMsg);
+            opserr << "ECxPCtarget::acquire() - "
+                << "xPCGetSignal(measDisp): error = " << errMsg << endln;
+            xPCClosePort(port);
+            xPCFreeAPI();
+            exit(OF_ReturnType_failed);
+        }
     }
-    xPCGetSignals(port, (*sizeDaq)[OF_Resp_Force], measForceId, measForce);
-    if (xPCGetLastError())  {
-        xPCErrorMsg(xPCGetLastError(), errMsg);
-        opserr << "ECxPCtarget::acquire() - "
-            << "xPCGetSignal(measForce): error = " << errMsg << endln;
-        xPCClosePort(port);
-        xPCFreeAPI();
-        exit(OF_ReturnType_failed);
+    if ((*sizeDaq)[OF_Resp_Force] != 0)  {
+        xPCGetSignals(port, (*sizeDaq)[OF_Resp_Force], measForceId, measForce);
+        if (xPCGetLastError())  {
+            xPCErrorMsg(xPCGetLastError(), errMsg);
+            opserr << "ECxPCtarget::acquire() - "
+                << "xPCGetSignal(measForce): error = " << errMsg << endln;
+            xPCClosePort(port);
+            xPCFreeAPI();
+            exit(OF_ReturnType_failed);
+        }
     }
     
     return OF_ReturnType_completed;
