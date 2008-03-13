@@ -265,7 +265,7 @@ void CALL_CONV setupconnectionclient(unsigned int *other_Port, const char other_
 #ifdef _WIN32
     other_Addr.addr_in.sin_addr.S_un.S_addr = inet_addr(other_InetAddr);
 #else
-    other_Addr.addr_in.sin_addr.s_addr = inet_aton(other_InetAddr);
+    other_Addr.addr_in.sin_addr.s_addr = inet_addr(other_InetAddr);
 #endif
 
     // set up my_Addr.addr_in
