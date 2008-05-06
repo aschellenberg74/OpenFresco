@@ -4,7 +4,7 @@
 // Created: 11/04
 // Revision: A
 //
-// Description: This file contains the implementation of the PredictorCorrector
+// Description: This file contains the implementation of the Predictor-Corrector
 
 #include "PredictorCorrector.h"
 #include <math.h>
@@ -284,9 +284,6 @@ int correctD1(double *dsp, double x)
 int predictD2(double *dsp, double x)
 {
     for (i=0; i<nAct; i++)  {
-//        dsp[i] = dsp1[i]*(1.0+x)*(2.0+x)/(2.0)
-//            - dsp2[i]*(x)*(2.0+x)
-//            + dsp3[i]*(x)*(1.0+x)/(2.0);
         dsp[i] = dspXi[i]*(1.0+x)*(2.0+x)/(xi)/(1.0+xi)
             - dsp2[i]*(2.0+x)*(1.0+x-xi)/(xi)
             + dsp3[i]*(1.0+x)*(1.0+x-xi)/(1.0+xi);
@@ -311,14 +308,10 @@ int correctD2(double *dsp, double x)
 int predictD3(double *dsp, double x)
 {
     for (i=0; i<nAct; i++)  {
-//        dsp[i] = dsp1[i]*(1.0+x)*(2.0+x)*(3.0+x)/(6.0)
-//            - dsp2[i]*(x)*(2.0+x)*(3.0+x)/(2.0)
-//            + dsp3[i]*(x)*(1.0+x)*(3.0+x)/(2.0)
-//            - dsp4[i]*(x)*(1.0+x)*(2.0+x)/(6.0);
         dsp[i] = dspXi[i]*(1.0+x)*(2.0+x)*(3.0+x)/(xi)/(1.0+xi)/(2.0+xi)
-            - dsp2[i]*(x)*(2.0+x)*(3.0+x)*(1.0+x-xi)/(2.0*xi)
-            + dsp3[i]*(x)*(1.0+x)*(3.0+x)*(1.0+x-xi)/(1.0+xi)
-            - dsp4[i]*(x)*(1.0+x)*(2.0+x)*(1.0+x-xi)/(2.0)/(2.0+xi);
+            - dsp2[i]*(2.0+x)*(3.0+x)*(1.0+x-xi)/(2.0*xi)
+            + dsp3[i]*(1.0+x)*(3.0+x)*(1.0+x-xi)/(1.0+xi)
+            - dsp4[i]*(1.0+x)*(2.0+x)*(1.0+x-xi)/(2.0)/(2.0+xi);
     }
 
     return 0;
