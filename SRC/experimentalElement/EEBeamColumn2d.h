@@ -61,7 +61,7 @@ public:
     
     // method to get class type
     const char *getClassType() const {return "EEBeamColumn2d";};
-
+    
     // public methods to obtain information about dof & connectivity    
     int getNumExternalNodes() const;
     const ID &getExternalNodes();
@@ -88,12 +88,12 @@ public:
     
     // public methods to obtain the daq response in global system
     const Vector &getTime();
-
+    
     // public methods to obtain the daq response in basic system
     const Vector &getBasicDisp();
     const Vector &getBasicVel();
     const Vector &getBasicAccel();
-
+    
     // public methods for element output
     int sendSelf(int commitTag, Channel &theChannel);
     int recvSelf(int commitTag, Channel &theChannel, FEM_ObjectBroker &theBroker);
@@ -123,32 +123,29 @@ private:
     Vector *sendData;           // send vector
     double *rData;              // receive data array
     Vector *recvData;           // receive vector
-
+    
     Vector *db;         // trial displacements in basic system B
     Vector *vb;         // trial velocities in basic system B
     Vector *ab;         // trial accelerations in basic system B
     Vector *t;          // trial time
-
+    
     Vector *dbMeas;     // measured displacements in basic system B
     Vector *vbMeas;     // measured velocities in basic system B
     Vector *abMeas;     // measured accelerations in basic system B
     Vector *qMeas;      // measured forces in basic system B
     Vector *tMeas;      // measured time
-
+    
     Vector dbTarg;      // target displacements in basic system B
     Vector vbTarg;      // target velocities in basic system B
     Vector abTarg;      // target accelerations in basic system B
-
+    
     Vector dbPast;      // past displacements in basic system B
     Matrix kbInit;      // stiffness matrix in basic system B
     double qA0[3];      // fixed end forces in basic system A
     double pA0[3];      // reactions in basic system A
     
-    Matrix T;           // transformation matrix
-    Matrix Tinv;        // inverse of transformation matrix
-    
     Node *theNodes[2];
-
+    
     bool firstWarning;
 };
 
