@@ -66,7 +66,7 @@ EEBeamColumn2d::EEBeamColumn2d(int tag, int Nd1, int Nd2,
     db(0), vb(0), ab(0), t(0),
     dbMeas(0), vbMeas(0), abMeas(0), qMeas(0), tMeas(0),
     dbTarg(3), vbTarg(3), abTarg(3),
-    dbPast(3), kbInit(3,3), T(3,3), Tinv(3,3),
+    dbPast(3), kbInit(3,3),
     firstWarning(true)
 {
     // ensure the connectedExternalNode ID is of correct size & set values
@@ -150,7 +150,7 @@ EEBeamColumn2d::EEBeamColumn2d(int tag, int Nd1, int Nd2,
     db(0), vb(0), ab(0), t(0),
     dbMeas(0), vbMeas(0), abMeas(0), qMeas(0), tMeas(0),
     dbTarg(3), vbTarg(3), abTarg(3),
-    dbPast(3), kbInit(3,3), T(3,3), Tinv(3,3),
+    dbPast(3), kbInit(3,3),
     firstWarning(true)
 {
     // ensure the connectedExternalNode ID is of correct size & set values
@@ -398,25 +398,13 @@ void EEBeamColumn2d::setDomain(Domain *theDomain)
     }
     
     // get initial element length
-    double L = theCoordTransf->getInitialLength();
+    L = theCoordTransf->getInitialLength();
     if (L == 0.0)  {
         opserr << "EEBeamColumn2d::setDomain() - element: " 
             << this->getTag() << " has zero length\n";
         return;
     }
-    
-    // set transformation matrix from basic sys A to basic sys B
-    T.Zero();
-    T(0,0) =  1;
-    T(1,1) = -L;
-    T(2,1) = -1;  T(2,2) = 1;
-    
-    // set transformation matrix from basic sys B to basic sys A
-    Tinv.Zero();
-    Tinv(0,0) =  1;
-    Tinv(1,1) = -1/L;
-    Tinv(2,1) = -1/L;  Tinv(2,2) = 1;
-}   	 
+}
 
 
 int EEBeamColumn2d::commitState()
@@ -452,10 +440,27 @@ int EEBeamColumn2d::update()
     const Vector &vbA = theCoordTransf->getBasicTrialVel();
     const Vector &abA = theCoordTransf->getBasicTrialAccel();
     
-    // transform displacements from basic sys A to basic sys B
-    (*db) = T*dbA;
-    (*vb) = T*vbA;
-    (*ab) = T*abA;
+    /* transform displacements from basic sys A to basic sys B (linear)
+    (*db)[0] = dbA(0);
+    (*db)[1] = -L*dbA(1);
+    (*db)[2] = -dbA(1)+dbA(2);
+    (*vb)[0] = vbA(0);
+    (*vb)[1] = -L*vbA(1);
+    (*vb)[2] = -vbA(1)+vbA(2);
+    (*ab)[0] = abA(0);
+    (*ab)[1] = -L*abA(1);
+    (*ab)[2] = -abA(1)+abA(2);*/
+
+    // transform displacements from basic sys A to basic sys B (nonlinear)
+    (*db)[0] = (L+dbA(0))*cos(dbA(1))-L;
+    (*db)[1] = -(L+dbA(0))*sin(dbA(1));
+    (*db)[2] = -dbA(1)+dbA(2);
+    (*vb)[0] = vbA(0)*cos(dbA(1))-(L+dbA(0))*sin(dbA(1))*vbA(1);
+    (*vb)[1] = -vbA(0)*sin(dbA(1))-(L+dbA(0))*cos(dbA(1))*vbA(1);
+    (*vb)[2] = -vbA(1)+vbA(2);
+    (*ab)[0] = abA(0)*cos(dbA(1))-2*vbA(0)*sin(dbA(1))*vbA(1)-(L+dbA(0))*cos(dbA(1))*pow(vbA(1),2)-(L+dbA(0))*sin(dbA(1))*abA(1);
+    (*ab)[1] = -abA(0)*sin(dbA(1))-2*vbA(0)*cos(dbA(1))*vbA(1)+(L+dbA(0))*sin(dbA(1))*pow(vbA(1),2)-(L+dbA(0))*cos(dbA(1))*abA(1);
+    (*ab)[2] = -abA(1)+abA(2);
     
     if ((*db) != dbPast)  {
         // save the displacements
@@ -486,7 +491,11 @@ int EEBeamColumn2d::setInitialStiff(const Matrix &kbinit)
         
     // transform the stiffness from basic sys B to basic sys A
     static Matrix kbAInit(3,3);
-    kbAInit.addMatrixTripleProduct(0.0, T, kbInit, 1.0);
+    kbAInit(0,0) = kbInit(0,0);
+    kbAInit(1,1) = L*L*kbInit(1,1) + L*(kbInit(1,2)+kbInit(2,1)) + kbInit(2,2);
+    kbAInit(1,2) = -L*kbInit(1,2) - kbInit(2,2);
+    kbAInit(2,1) = -L*kbInit(2,1) - kbInit(2,2);
+    kbAInit(2,2) = kbInit(2,2);
     
     // transform the stiffness from the basic to the global system
     theInitStiff.Zero();
@@ -520,6 +529,9 @@ const Matrix& EEBeamColumn2d::getTangentStiff()
         theChannel->recvVector(0, 0, *recvData, 0);
     }
 
+    // get chord rotation from basic sys A to B
+    double alpha = atan2((*db)[1],L+(*db)[0]);
+
     // apply optional initial stiffness modification
     if (iMod == true)  {
         // get measured displacements
@@ -533,17 +545,38 @@ const Matrix& EEBeamColumn2d::getTangentStiff()
         }
 
         // correct for displacement control errors using I-Modification
-        (*qMeas) -= kbInit*((*dbMeas) - (*db));
-    } else  {
-        // use elastic axial force if axial force from test is zero
-        if ((*qMeas)(0) == 0.0)
-            (*qMeas)(0) = kbInit(0,0) * (*db)(0);
+        if ((*dbMeas)[0] != 0.0)  {
+            (*qMeas)[0] -= kbInit(0,0)*((*dbMeas)[0] - (*db)[0]);
+        }
+        if ((*dbMeas)[1] != 0.0)  {
+            (*qMeas)[1] -= kbInit(1,1)*((*dbMeas)[1] - (*db)[1]);
+            (*qMeas)[2] -= kbInit(2,1)*((*dbMeas)[1] - (*db)[1]);
+        }
+        if ((*dbMeas)[2] != 0.0)  {
+            (*qMeas)[1] -= kbInit(1,2)*((*dbMeas)[2] - (*db)[2]);
+            (*qMeas)[2] -= kbInit(2,2)*((*dbMeas)[2] - (*db)[2]);
+        }
     }
     
-    // transform the forces from basic sys B to basic sys A
-    static Vector qA(3);
-    qA = T^(*qMeas);
+    // use elastic axial force if axial force from test is zero
+    if ((*qMeas)(0) == 0.0)  {
+        double qA0 = kbInit(0,0)*(sqrt(pow(L+(*db)[0],2)+pow((*db)[1],2))-L);
+        (*qMeas)(0) = cos(alpha)*qA0;
+        (*qMeas)(1) += sin(alpha)*qA0;
+    }
     
+    /* transform the forces from basic sys B to basic sys A (linear)
+    static Vector qA(3);
+    qA(0) = (*qMeas)[0];
+    qA(1) = -L*(*qMeas)[1] - (*qMeas)[2];
+    qA(2) = (*qMeas)[2];*/
+
+    // transform the forces from basic sys B to basic sys A (nonlinear)
+    static Vector qA(3);
+    qA(0) = cos(alpha)*(*qMeas)[0] + sin(alpha)*(*qMeas)[1];
+    qA(1) = (*db)[1]*(*qMeas)[0] - (L+(*db)[0])*(*qMeas)[1] - (*qMeas)[2];
+    qA(2) = (*qMeas)[2];
+
     // add fixed end forces
     for (int i=0; i<3; i++)  {
         qA(i) += qA0[i];
@@ -551,7 +584,11 @@ const Matrix& EEBeamColumn2d::getTangentStiff()
 
     // transform the stiffness from basic sys B to basic sys A
     static Matrix kbAInit(3,3);
-    kbAInit.addMatrixTripleProduct(0.0, T, kbInit, 1.0);
+    kbAInit(0,0) = kbInit(0,0);
+    kbAInit(1,1) = L*L*kbInit(1,1) + L*(kbInit(1,2)+kbInit(2,1)) + kbInit(2,2);
+    kbAInit(1,2) = -L*kbInit(1,2) - kbInit(2,2);
+    kbAInit(2,1) = -L*kbInit(2,1) - kbInit(2,2);
+    kbAInit(2,2) = kbInit(2,2);
 
     return theCoordTransf->getGlobalStiffMatrix(kbAInit, qA);
 }
@@ -697,6 +734,9 @@ const Vector& EEBeamColumn2d::getResistingForce()
         theChannel->recvVector(0, 0, *recvData, 0);
     }
 
+    // get chord rotation from basic sys A to B
+    double alpha = atan2((*db)[1],L+(*db)[0]);
+
     // apply optional initial stiffness modification
     if (iMod == true)  {
         // get measured displacements
@@ -710,11 +750,24 @@ const Vector& EEBeamColumn2d::getResistingForce()
         }
 
         // correct for displacement control errors using I-Modification
-        (*qMeas) -= kbInit*((*dbMeas) - (*db));
-    } else  {
-        // use elastic axial force if axial force from test is zero
-        if ((*qMeas)(0) == 0.0)
-            (*qMeas)(0) = kbInit(0,0) * (*db)(0);
+        if ((*dbMeas)[0] != 0.0)  {
+            (*qMeas)[0] -= kbInit(0,0)*((*dbMeas)[0] - (*db)[0]);
+        }
+        if ((*dbMeas)[1] != 0.0)  {
+            (*qMeas)[1] -= kbInit(1,1)*((*dbMeas)[1] - (*db)[1]);
+            (*qMeas)[2] -= kbInit(2,1)*((*dbMeas)[1] - (*db)[1]);
+        }
+        if ((*dbMeas)[2] != 0.0)  {
+            (*qMeas)[1] -= kbInit(1,2)*((*dbMeas)[2] - (*db)[2]);
+            (*qMeas)[2] -= kbInit(2,2)*((*dbMeas)[2] - (*db)[2]);
+        }
+    }
+    
+    // use elastic axial force if axial force from test is zero
+    if ((*qMeas)[0] == 0.0)  {
+        double qA0 = kbInit(0,0)*(sqrt(pow(L+(*db)[0],2)+pow((*db)[1],2))-L);
+        (*qMeas)[0] = cos(alpha)*qA0;
+        (*qMeas)[1] += sin(alpha)*qA0;
     }
     
     // save corresponding target response for recorder
@@ -722,9 +775,17 @@ const Vector& EEBeamColumn2d::getResistingForce()
     vbTarg = (*vb);
     abTarg = (*ab);
 
-    // transform from basic sys B to basic sys A
+    /* transform from basic sys B to basic sys A (linear)
     static Vector qA(3);
-    qA = T^(*qMeas);
+    qA(0) = (*qMeas)[0];
+    qA(1) = -L*(*qMeas)[1] - (*qMeas)[2];
+    qA(2) = (*qMeas)[2];*/
+
+    // transform from basic sys B to basic sys A (nonlinear)
+    static Vector qA(3);
+    qA(0) = cos(alpha)*(*qMeas)[0] + sin(alpha)*(*qMeas)[1];
+    qA(1) = (*db)[1]*(*qMeas)[0] - (L+(*db)[0])*(*qMeas)[1] - (*qMeas)[2];
+    qA(2) = (*qMeas)[2];
     
     // add fixed end forces
     for (int i=0; i<3; i++)  {
@@ -1020,9 +1081,19 @@ int EEBeamColumn2d::getResponse(int responseID, Information &eleInformation)
         
     case 3:  // local forces
         if (eleInformation.theVector != 0)  {
-            // transform from basic sys B to basic sys A
+            /* transform from basic sys B to basic sys A (linear)
             static Vector qA(3);
-            qA = T^(*qMeas);
+            qA(0) = (*qMeas)[0];
+            qA(1) = -L*(*qMeas)[1] - (*qMeas)[2];
+            qA(2) = (*qMeas)[2];*/
+
+            // transform from basic sys B to basic sys A (nonlinear)
+            static Vector qA(3);
+            double alpha = atan2((*db)[1],L+(*db)[0]);
+            qA(0) = cos(alpha)*(*qMeas)[0] + sin(alpha)*(*qMeas)[1];
+            qA(1) = (*db)[1]*(*qMeas)[0] - (L+(*db)[0])*(*qMeas)[1] - (*qMeas)[2];
+            qA(2) = (*qMeas)[2];
+
             // Axial
             theVector(0) = -qA(0) + pA0[0];
             theVector(3) =  qA(0);
