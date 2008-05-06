@@ -114,6 +114,10 @@ switch action
       sData = zeros(1,dataSize);
       if isempty(socketID)
          socketID = TCPSocket('openConnection',ipAddr,ipPort);
+         if (socketID<0)
+            error('TCPSocket:openConnection',['Unable to setup connection to ',...
+               ipAddr,' : ',num2str(ipPort)]);
+         end
          % set the data size for the experimental site
          dataSizes = int32([1 1 1 0 0, 1 0 0 1 0, dataSize]);
          TCPSocket('sendData',socketID,dataSizes,11);
@@ -163,7 +167,7 @@ switch action
       % set up initial element force vector in basic system
       q0 = -w(1)*L/2;
 
-      % send trial response to experimental element
+      % send trial response to experimental site
       sData(1) = 3;
       sData(2:4) = v([1,4,5]);
       TCPSocket('sendData',socketID,sData,dataSize);
@@ -208,7 +212,7 @@ switch action
       % set up initial element force vector in basic system
       q0 = -w(1)*L/2;
 
-      % send trial response to experimental element
+      % send trial response to experimental site
       sData(1) = 3;
       sData(2:4) = v([1,4,5]);
       TCPSocket('sendData',socketID,sData,dataSize);

@@ -108,7 +108,8 @@ switch action
       if isempty(socketID)
          socketID = TCPSocket('openConnection',ipAddr,ipPort);
          if (socketID<0)
-            error('TCPSocket() - unable to setup connection.');
+            error('TCPSocket:openConnection',['Unable to setup connection to ',...
+               ipAddr,' : ',num2str(ipPort)]);
          end
          % set the data size for the experimental site
          dataSizes = int32([numDir numDir numDir 0 0, numDir 0 0 numDir 0, dataSize]);
@@ -150,7 +151,7 @@ switch action
       vh = ElemState.vh;       % extract end displacements from ElemState
       v = T*vh;
 
-      % send trial response to experimental element
+      % send trial response to experimental site
       sData(1) = 3;
       sData(2:1+3*numDir) = v(:,[1,4,5]);
       TCPSocket('sendData',socketID,sData,dataSize);
@@ -185,7 +186,7 @@ switch action
       vh = ElemState.vh;       % extract end displacements from ElemState
       v = T*vh;
 
-      % send trial response to experimental element
+      % send trial response to experimental site
       sData(1) = 3;
       sData(2:1+3*numDir) = v(:,[1,4,5]);
       TCPSocket('sendData',socketID,sData,dataSize);

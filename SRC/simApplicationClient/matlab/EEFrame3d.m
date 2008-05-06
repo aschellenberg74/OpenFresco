@@ -113,6 +113,10 @@ switch action
       sData = zeros(1,dataSize);
       if isempty(socketID)
          socketID = TCPSocket('openConnection',ipAddr,ipPort);
+         if (socketID<0)
+            error('TCPSocket:openConnection',['Unable to setup connection to ',...
+               ipAddr,' : ',num2str(ipPort)]);
+         end
          % set the data size for the experimental site
          dataSizes = int32([ndf ndf ndf 0 0, ndf 0 0 ndf 0, dataSize]);
          TCPSocket('sendData',socketID,dataSizes,11);
@@ -172,7 +176,7 @@ switch action
       a = TranBA(ndm,ndf,L);
       v = a*v;
 
-      % send trial response to experimental element
+      % send trial response to experimental site
       sData(1) = 3;
       sData(2:1+3*ndf) = v(:,[1,4,5]);
       TCPSocket('sendData',socketID,sData,dataSize);
@@ -230,7 +234,7 @@ switch action
       a = TranBA (ndm,ndf,L);
       v = a*v;
 
-      % send trial response to experimental element
+      % send trial response to experimental site
       sData(1) = 3;
       sData(2:1+3*ndf) = v(:,[1,4,5]);
       TCPSocket('sendData',socketID,sData,dataSize);
@@ -285,12 +289,12 @@ switch action
       lm = zeros(2*ndf,1);
       lm ([1:3 7:9]) = 0.5*tm.*ones(2*ndm,1);
       % consistent mass matrix
-      warning('consistent mass not implemented yet');
+      warning('EEFrame3d:mass','consistent mass not implemented yet');
       cmh = zeros(2*ndf,2*ndf);
       varargout = {lm cmh};
    % =========================================================================
    case 'defo'
-      warning('deformed shape of 3d frame element not implemented yet');
+      warning('EEFrame3d:defo','deformed shape of 3d frame element not implemented yet');
    % =========================================================================
    otherwise
       % add further actions
