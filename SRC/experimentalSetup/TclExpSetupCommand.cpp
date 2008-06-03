@@ -41,6 +41,7 @@
 #include <ESInvertedVBrace2d.h>
 #include <ESInvertedVBraceJntOff2d.h>
 #include <ESAggregator.h>
+#include <ESFourActuators3d.h>
 
 #include <ID.h>
 #include <Vector.h>
@@ -925,7 +926,164 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp, int argc,
         // parsing was successful, allocate the setup
         theSetup = new ESAggregator(tag, numSetups, expSetups, sizeTrialAll, sizeOutAll, theControl);
     }
-    
+    // ----------------------------------------------------------------------------	
+    else if (strcmp(argv[1],"FourActuators") == 0)  {
+        if (ndm == 3)  {
+            if (argc < 18)  {
+                opserr << "WARNING invalid number of arguments\n";
+                printCommand(argc,argv);
+                opserr << "Want: expSetup FourActuators tag <-control ctrlTag> L1 L2 L3 L4 a1 a2 a3 a4 h h1 h2 arlN arlS LrodN LrodS "
+                    << " <-nlGeom> <-phiLocX phi> "
+                    << "<-ctrlDispFact f> <-ctrlVelFact f> <-ctrlAccelFact f> "
+                    << "<-ctrlForceFact f> <-ctrlTimeFact f> "
+                    << "<-daqDispFact f> <-daqVelFact f> <-daqAccelFact f> "
+                    << "<-daqForceFact f> <-daqTimeFact f>\n";
+                return TCL_ERROR;
+            }    
+            
+            int ctrlTag, i;
+            double L1, L2, L3, L4, a1, a2, a3, a4, h, h1, h2, arlN, arlS, LrodN, LrodS;
+            int nlGeom = 0;
+            double phiLocX = 45.0;
+            
+            argi = 2;
+            if (Tcl_GetInt(interp, argv[argi], &tag) != TCL_OK)  {
+                opserr << "WARNING invalid expSetup FourActuators tag\n";
+                return TCL_ERROR;		
+            }
+            argi++;
+            if (strcmp(argv[argi],"-control") == 0)  {
+                argi++;
+                if (Tcl_GetInt(interp, argv[argi], &ctrlTag) != TCL_OK)  {
+                    opserr << "WARNING invalid ctrlTag\n";
+                    opserr << "expSetup FourActuators " << tag << endln;
+                    return TCL_ERROR;	
+                }
+                theControl = getExperimentalControl(ctrlTag);
+                if (theControl == 0)  {
+                    opserr << "WARNING experimental control not found\n";
+                    opserr << "expControl: " << ctrlTag << endln;
+                    opserr << "expSetup FourActuators " << tag << endln;
+                    return TCL_ERROR;
+                }
+                argi++;
+            }
+            if (Tcl_GetDouble(interp, argv[argi], &L1) != TCL_OK)  {
+                opserr << "WARNING invalid L1\n";
+                opserr << "expSetup FourActuators " << tag << endln;
+                return TCL_ERROR;	
+            }
+            argi++;
+            if (Tcl_GetDouble(interp, argv[argi], &L2) != TCL_OK)  {
+                opserr << "WARNING invalid L2\n";
+                opserr << "expSetup FourActuators " << tag << endln;
+                return TCL_ERROR;	
+            }
+            argi++;
+            if (Tcl_GetDouble(interp, argv[argi], &L3) != TCL_OK)  {
+                opserr << "WARNING invalid L3\n";
+                opserr << "expSetup FourActuators " << tag << endln;
+                return TCL_ERROR;	
+            }
+            argi++;
+            if (Tcl_GetDouble(interp, argv[argi], &L4) != TCL_OK)  {
+                opserr << "WARNING invalid L4\n";
+                opserr << "expSetup FourActuators " << tag << endln;
+                return TCL_ERROR;	
+            }
+            argi++;
+            if (Tcl_GetDouble(interp, argv[argi], &a1) != TCL_OK)  {
+                opserr << "WARNING invalid a1\n";
+                opserr << "expSetup FourActuators " << tag << endln;
+                return TCL_ERROR;	
+            }
+            argi++;
+            if (Tcl_GetDouble(interp, argv[argi], &a2) != TCL_OK)  {
+                opserr << "WARNING invalid a2\n";
+                opserr << "expSetup FourActuators " << tag << endln;
+                return TCL_ERROR;	
+            }
+            argi++;
+            if (Tcl_GetDouble(interp, argv[argi], &a3) != TCL_OK)  {
+                opserr << "WARNING invalid a3\n";
+                opserr << "expSetup FourActuators " << tag << endln;
+                return TCL_ERROR;	
+            }
+            argi++;
+            if (Tcl_GetDouble(interp, argv[argi], &a4) != TCL_OK)  {
+                opserr << "WARNING invalid a4\n";
+                opserr << "expSetup FourActuators " << tag << endln;
+                return TCL_ERROR;	
+            }
+            argi++;
+            if (Tcl_GetDouble(interp, argv[argi], &h) != TCL_OK)  {
+                opserr << "WARNING invalid h\n";
+                opserr << "expSetup FourActuators " << tag << endln;
+                return TCL_ERROR;	
+            }
+            argi++;
+            if (Tcl_GetDouble(interp, argv[argi], &h1) != TCL_OK)  {
+                opserr << "WARNING invalid h1\n";
+                opserr << "expSetup FourActuators " << tag << endln;
+                return TCL_ERROR;	
+            }
+            argi++;
+            if (Tcl_GetDouble(interp, argv[argi], &h2) != TCL_OK)  {
+                opserr << "WARNING invalid h2\n";
+                opserr << "expSetup FourActuators " << tag << endln;
+                return TCL_ERROR;	
+            }
+            argi++;
+            if (Tcl_GetDouble(interp, argv[argi], &arlN) != TCL_OK)  {
+                opserr << "WARNING invalid arlN\n";
+                opserr << "expSetup FourActuators " << tag << endln;
+                return TCL_ERROR;	
+            }
+            argi++;
+            if (Tcl_GetDouble(interp, argv[argi], &arlS) != TCL_OK)  {
+                opserr << "WARNING invalid arlS\n";
+                opserr << "expSetup FourActuators " << tag << endln;
+                return TCL_ERROR;	
+            }
+            argi++;
+            if (Tcl_GetDouble(interp, argv[argi], &LrodN) != TCL_OK)  {
+                opserr << "WARNING invalid LrodN\n";
+                opserr << "expSetup FourActuators " << tag << endln;
+                return TCL_ERROR;	
+            }
+            argi++;
+            if (Tcl_GetDouble(interp, argv[argi], &LrodS) != TCL_OK)  {
+                opserr << "WARNING invalid LrodS\n";
+                opserr << "expSetup FourActuators " << tag << endln;
+                return TCL_ERROR;	
+            }
+            argi++;
+			for (i = argi; i < argc; i++)  {
+			    if (strcmp(argv[i], "-nlGeom") == 0)  {
+                    nlGeom = 1;
+			    }
+		    }
+            for (i = argi; i < argc; i++)  {
+                if (strcmp(argv[i], "-phiLocX") == 0)  {
+                    if (Tcl_GetDouble(interp, argv[i+1], &phiLocX) != TCL_OK)  {
+                        opserr << "WARNING invalid phiLocX\n";
+                        opserr << "expSetup FourActuators " << tag << endln;
+                        return TCL_ERROR;	
+                    }                
+                }
+            }
+			
+            // parsing was successful, allocate the setup
+            theSetup = new ESFourActuators3d(tag, L1, L2, L3, L4, a1, a2, a3, a4, h, h1, h2, arlN, arlS, LrodN, LrodS, theControl, nlGeom, phiLocX);
+        }
+        
+        else {
+            // it has to be in 3D
+            opserr << "WARNING expSetup FourActuators command works only in 3D domain\n";
+            return TCL_ERROR;
+        }
+    }
+     
     // ----------------------------------------------------------------------------	
     else  {
         // experimental setup type not recognized
