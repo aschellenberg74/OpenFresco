@@ -30,12 +30,12 @@
 // Created: 09/06
 // Revision: A
 //
-// Description: This file contains the implementation of RemoteExpSite.
+// Description: This file contains the implementation of ShadowExpSite.
 
-#include "RemoteExpSite.h"
+#include "ShadowExpSite.h"
 
 
-RemoteExpSite::RemoteExpSite(int tag,
+ShadowExpSite::ShadowExpSite(int tag,
     Channel& theChannel, int datasize,
     FEM_ObjectBroker *theObjectBroker)
     : ExperimentalSite(tag, (ExperimentalSetup*)0),
@@ -49,20 +49,20 @@ RemoteExpSite::RemoteExpSite(int tag,
     sendV(2) = atof(OPF_VERSION);
     this->sendVector(sendV);
     this->recvVector(recvV);
-
+    
     if (recvV(2) != atof(OPF_VERSION)) {
-        opserr << "RemoteExpSite::RemoteExpSite() - OpenFresco Version "
-            << "mismatch:\nRemoteExpSite Version " << atof(OPF_VERSION)
+        opserr << "ShadowExpSite::ShadowExpSite() - OpenFresco Version "
+            << "mismatch:\nShadowExpSite Version " << atof(OPF_VERSION)
             << " != ActorExpSite Version " << recvV(2) << endln;
         exit(OF_ReturnType_failed);
     }
-
+    
     opserr << "\nConnected to ActorExpSite "
         << recvV(1) << endln;
 }
 
 
-RemoteExpSite::RemoteExpSite(int tag, 
+ShadowExpSite::ShadowExpSite(int tag, 
     ExperimentalSetup *setup,
     Channel &theChannel, int datasize,
     FEM_ObjectBroker *theObjectBroker)
@@ -73,32 +73,32 @@ RemoteExpSite::RemoteExpSite(int tag,
     rDisp(0), rVel(0), rAccel(0), rForce(0), rTime(0)
 {
     if (theSetup == 0) {
-        opserr << "RemoteExpSite::RemoteExpSite() - "
+        opserr << "ShadowExpSite::ShadowExpSite() - "
             << "if you want to use it without an ExperimentalSetup, "
             << "use another constructor"
             << endln;
         exit(OF_ReturnType_failed);
     }
-
+    
     sendV(0) = OF_RemoteTest_open;
     sendV(1) = tag;
     sendV(2) = atof(OPF_VERSION);
     this->sendVector(sendV);
     this->recvVector(recvV);
-
+    
     if (recvV(2) != atof(OPF_VERSION)) {
-        opserr << "RemoteExpSite::RemoteExpSite() - OpenFresco Version "
-            << "mismatch:\nRemoteExpSite Version " << atof(OPF_VERSION)
+        opserr << "ShadowExpSite::ShadowExpSite() - OpenFresco Version "
+            << "mismatch:\nShadowExpSite Version " << atof(OPF_VERSION)
             << " != ActorExpSite Version " << recvV(2) << endln;
         exit(OF_ReturnType_failed);
     }
-
+    
     opserr << "\nConnected to ActorExpSite "
         << recvV(1) << endln;
 }
 
 
-RemoteExpSite::RemoteExpSite(const RemoteExpSite& es)
+ShadowExpSite::ShadowExpSite(const ShadowExpSite& es)
     : ExperimentalSite(es), Shadow(es), dataSize(0),
     sendV(OF_Network_dataSize), recvV(OF_Network_dataSize),
     bDisp(0), bVel(0), bAccel(0), bForce(0), bTime(0),
@@ -111,7 +111,7 @@ RemoteExpSite::RemoteExpSite(const RemoteExpSite& es)
 }
 
 
-RemoteExpSite::~RemoteExpSite()
+ShadowExpSite::~ShadowExpSite()
 {
     if (bDisp != 0)
         delete bDisp;
@@ -138,13 +138,13 @@ RemoteExpSite::~RemoteExpSite()
     sendV(1) = this->getTag();
     this->sendVector(sendV);
     this->recvVector(recvV);
-
+    
     opserr << "\nDisconnected from ActorExpSite "
         << recvV(1) << endln << endln;
 }
 
 
-int RemoteExpSite::setSize(ID sizeT, ID sizeO) 
+int ShadowExpSite::setSize(ID sizeT, ID sizeO) 
 {
     this->ExperimentalSite::setSize(sizeT, sizeO);
     
@@ -166,19 +166,19 @@ int RemoteExpSite::setSize(ID sizeT, ID sizeO)
         if (dataSize < 1+nInput) dataSize = 1+nInput;
         if (dataSize < nOutput) dataSize = nOutput;
     }
-        
+    
     // send experimental setup to remote
     this->setup();
     
     // resize channel Vectors
     sendV.resize(dataSize);
     recvV.resize(dataSize);
-
+    
     return OF_ReturnType_completed;
 }
 
 
-int RemoteExpSite::setup()
+int ShadowExpSite::setup()
 {    
     sendV(0) = OF_RemoteTest_setup;
     sendV(1) = dataSize;
@@ -195,12 +195,12 @@ int RemoteExpSite::setup()
         // send sizeOut
         this->sendID(*sizeOut);
     }
-
+    
     return OF_ReturnType_completed;
 }
 
 
-int RemoteExpSite::setTrialResponse(const Vector* disp, 
+int ShadowExpSite::setTrialResponse(const Vector* disp, 
     const Vector* vel,
     const Vector* accel,
     const Vector* force,
@@ -217,7 +217,7 @@ int RemoteExpSite::setTrialResponse(const Vector* disp,
         // set trial response at the setup
         rValue = theSetup->transfTrialResponse(tDisp, tVel, tAccel, tForce, tTime);
         if (rValue != OF_ReturnType_completed) {
-            opserr << "RemoteExpSite::setTrialResponse() - "
+            opserr << "ShadowExpSite::setTrialResponse() - "
                 << "failed to set trial response at the setup";
             exit(OF_ReturnType_failed);
         }
@@ -234,11 +234,11 @@ int RemoteExpSite::setTrialResponse(const Vector* disp,
             if (getCtrlSize(OF_Resp_Time) != 0)
                 bTime = new Vector(getCtrlSize(OF_Resp_Time));
         }
-
+        
         // get trial response from the setup
         rValue = theSetup->getTrialResponse(bDisp, bVel, bAccel, bForce, bTime);
         if (rValue != OF_ReturnType_completed) {
-            opserr << "RemoteExpSite::setTrialResponse() - "
+            opserr << "ShadowExpSite::setTrialResponse() - "
                 << "failed to get trial response from the setup.";
             exit(OF_ReturnType_failed);
         }
@@ -301,12 +301,12 @@ int RemoteExpSite::setTrialResponse(const Vector* disp,
     // set trial response
     sendV(0) = OF_RemoteTest_setTrialResponse;
     this->sendVector(sendV);
-        
+    
     return OF_ReturnType_completed;
 }
 
 
-int RemoteExpSite::checkDaqResponse()
+int ShadowExpSite::checkDaqResponse()
 {
     if (daqFlag == false) {
         sendV(0) = OF_RemoteTest_getDaqResponse;
@@ -325,7 +325,7 @@ int RemoteExpSite::checkDaqResponse()
                 rTime = new Vector(getDaqSize(OF_Resp_Time));
         }
         this->recvVector(recvV);
-                
+        
         int ndim = 0;
         if (rDisp != 0) {
             rDisp->Extract(recvV, 0);
@@ -374,7 +374,7 @@ int RemoteExpSite::checkDaqResponse()
 }
 
 
-int RemoteExpSite::commitState()
+int ShadowExpSite::commitState()
 {
     sendV(0) = OF_RemoteTest_commitState;
     this->sendVector(sendV);
@@ -383,18 +383,18 @@ int RemoteExpSite::commitState()
 }
 
 
-ExperimentalSite* RemoteExpSite::getCopy()
+ExperimentalSite* ShadowExpSite::getCopy()
 {
-    RemoteExpSite *theCopy = new RemoteExpSite(*this);
-
+    ShadowExpSite *theCopy = new ShadowExpSite(*this);
+    
     return theCopy;
 }
 
 
-void RemoteExpSite::Print(OPS_Stream &s, int flag)
+void ShadowExpSite::Print(OPS_Stream &s, int flag)
 {
     s << "ExperimentalSite: " << this->getTag(); 
-    s << " type: RemoteExpSite\n";
+    s << " type: ShadowExpSite\n";
     if (theSetup != 0) {
         s << "\tExperimentalSetup tag: " << theSetup->getTag()
             << endln;
