@@ -40,8 +40,8 @@ ExperimentalSite::ExperimentalSite(int tag,
     ExperimentalSetup *setup)
     : TaggedObject(tag),
     theSetup(setup),
-    Disp(0), Vel(0), Accel(0), Force(0), Time(0),
     tDisp(0), tVel(0), tAccel(0), tForce(0), tTime(0),
+    Disp(0), Vel(0), Accel(0), Force(0), Time(0),
     sizeTrial(0), sizeOut(0),
     daqFlag(false)
 {
@@ -59,8 +59,8 @@ ExperimentalSite::ExperimentalSite(int tag,
 ExperimentalSite::ExperimentalSite(const ExperimentalSite& site)
     : TaggedObject(site.getTag()),
     theSetup(0),
-    Disp(0), Vel(0), Accel(0), Force(0), Time(0),
     tDisp(0), tVel(0), tAccel(0), tForce(0), tTime(0),
+    Disp(0), Vel(0), Accel(0), Force(0), Time(0),
     sizeTrial(0), sizeOut(0),
     daqFlag(false)
 {
@@ -94,17 +94,6 @@ ExperimentalSite::~ExperimentalSite()
     if (theSetup != 0) 
         delete theSetup;
     
-    if (Disp != 0) 
-        delete Disp;
-    if (Vel != 0) 
-        delete Vel;
-    if (Accel != 0) 
-        delete Accel;
-    if (Force != 0) 
-        delete Force;
-    if (Time != 0)
-        delete Time;
-    
     if (tDisp != 0) 
         delete tDisp;
     if (tVel != 0) 
@@ -115,6 +104,17 @@ ExperimentalSite::~ExperimentalSite()
         delete tForce;
     if (tTime != 0)
         delete tTime;
+    
+    if (Disp != 0) 
+        delete Disp;
+    if (Vel != 0) 
+        delete Vel;
+    if (Accel != 0) 
+        delete Accel;
+    if (Force != 0) 
+        delete Force;
+    if (Time != 0)
+        delete Time;
     
     if (sizeTrial != 0)
         delete sizeTrial;
@@ -156,7 +156,7 @@ int ExperimentalSite::setTrialResponse(const Vector* disp,
     if (tTime != 0) {
         *tTime = *time;
     } 
-
+    
     return OF_ReturnType_completed;
 }
 
@@ -167,76 +167,6 @@ int ExperimentalSite::setTrialDisp(const Vector* disp)
 }
 
 
-const Vector& ExperimentalSite::getDisp()
-{
-    this->checkDaqResponse();
-    
-    return *Disp;
-}
-
-
-const Vector& ExperimentalSite::getVel()
-{
-    this->checkDaqResponse();
-    
-    return *Vel;
-}
-
-
-const Vector& ExperimentalSite::getAccel()
-{
-    this->checkDaqResponse();
-    
-    return *Accel;
-}
-
-
-const Vector& ExperimentalSite::getForce()
-{
-    this->checkDaqResponse();
-    
-    return *Force;
-}
-
-
-const Vector& ExperimentalSite::getTime()
-{
-    this->checkDaqResponse();
-    
-    return *Time;
-}
-
-
-const Vector& ExperimentalSite::getTrialDisp()
-{
-    return *tDisp;
-}
-
-
-const Vector& ExperimentalSite::getTrialVel()
-{
-    return *tVel;
-}
-
-
-const Vector& ExperimentalSite::getTrialAccel()
-{
-    return *tAccel;
-}
-
-
-const Vector& ExperimentalSite::getTrialForce()
-{
-    return *tForce;
-}
-
-
-const Vector& ExperimentalSite::getTrialTime()
-{
-    return *tTime;
-}
-
-
 int ExperimentalSite::getDaqResponse(Vector* disp,
     Vector* vel,
     Vector* accel,
@@ -244,7 +174,7 @@ int ExperimentalSite::getDaqResponse(Vector* disp,
     Vector* time)
 {
     this->checkDaqResponse();
-
+    
     if (Disp != 0) {
         *disp = *Disp;
     }
@@ -288,6 +218,76 @@ int ExperimentalSite::setDaqResponse(const Vector* disp,
     }
     
     return OF_ReturnType_completed;
+}
+
+
+const Vector& ExperimentalSite::getTrialDisp()
+{
+    return *tDisp;
+}
+
+
+const Vector& ExperimentalSite::getTrialVel()
+{
+    return *tVel;
+}
+
+
+const Vector& ExperimentalSite::getTrialAccel()
+{
+    return *tAccel;
+}
+
+
+const Vector& ExperimentalSite::getTrialForce()
+{
+    return *tForce;
+}
+
+
+const Vector& ExperimentalSite::getTrialTime()
+{
+    return *tTime;
+}
+
+
+const Vector& ExperimentalSite::getDisp()
+{
+    this->checkDaqResponse();
+    
+    return *Disp;
+}
+
+
+const Vector& ExperimentalSite::getVel()
+{
+    this->checkDaqResponse();
+    
+    return *Vel;
+}
+
+
+const Vector& ExperimentalSite::getAccel()
+{
+    this->checkDaqResponse();
+    
+    return *Accel;
+}
+
+
+const Vector& ExperimentalSite::getForce()
+{
+    this->checkDaqResponse();
+    
+    return *Force;
+}
+
+
+const Vector& ExperimentalSite::getTime()
+{
+    this->checkDaqResponse();
+    
+    return *Time;
 }
 
 

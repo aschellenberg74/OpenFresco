@@ -79,17 +79,17 @@ public:
         const Vector* time);
     virtual int checkDaqResponse() = 0;
     
-    virtual const Vector& getDisp();
-    virtual const Vector& getVel();
-    virtual const Vector& getAccel();
-    virtual const Vector& getForce();
-    virtual const Vector& getTime();
-    
     virtual const Vector& getTrialDisp();
     virtual const Vector& getTrialVel();
     virtual const Vector& getTrialAccel();
     virtual const Vector& getTrialForce();
     virtual const Vector& getTrialTime();
+    
+    virtual const Vector& getDisp();
+    virtual const Vector& getVel();
+    virtual const Vector& getAccel();
+    virtual const Vector& getForce();
+    virtual const Vector& getTime();
     
     virtual int commitState();
     
@@ -104,13 +104,6 @@ protected:
     // pointer of ExperimentalSetup
     ExperimentalSetup* theSetup;
     
-    // output data
-    Vector* Disp;
-    Vector* Vel;
-    Vector* Accel;
-    Vector* Force;
-    Vector* Time;
-    
     // trial data
     Vector* tDisp;
     Vector* tVel;
@@ -118,8 +111,15 @@ protected:
     Vector* tForce;
     Vector* tTime;
     
+    // output data
+    Vector* Disp;
+    Vector* Vel;
+    Vector* Accel;
+    Vector* Force;
+    Vector* Time;
+    
     // size of trial/out data
-    // sizeTrial/Out[0]:disp, [1]:vel, [2]:accel, [3]:force, [4]:time
+    // [0]:disp, [1]:vel, [2]:accel, [3]:force, [4]:time
     ID* sizeTrial;
     ID* sizeOut;
         

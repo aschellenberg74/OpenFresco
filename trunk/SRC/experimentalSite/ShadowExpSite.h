@@ -26,38 +26,38 @@
 // $Date$
 // $URL: $
 
-#ifndef RemoteExpSite_h
-#define RemoteExpSite_h
+#ifndef ShadowExpSite_h
+#define ShadowExpSite_h
 
 // Written: Yoshi (yos@catfish.dpri.kyoto-u.ac.jp)
 // Created: 09/06
 // Revision: A
 //
 // Description: This file contains the class definition for 
-// RemoteExpSite. A RemoteExpSite can communicate to an ActorExpSite.
+// ShadowExpSite. A ShadowExpSite can communicate to an ActorExpSite.
 // This object inherits from Shadow, and runs on the client program.
 
 #include "ExperimentalSite.h"
 
 #include <Shadow.h>
 
-class RemoteExpSite : public ExperimentalSite, public Shadow
+class ShadowExpSite : public ExperimentalSite, public Shadow
 {
 public:
     // constructors
-    RemoteExpSite(int tag, 
+    ShadowExpSite(int tag, 
         Channel &theChannel,
         int dataSize = OF_Network_dataSize,
         FEM_ObjectBroker *theObjectBroker = 0);
-    RemoteExpSite(int tag, 
+    ShadowExpSite(int tag, 
         ExperimentalSetup *setup,
         Channel &theChannel,
         int dataSize = OF_Network_dataSize,
         FEM_ObjectBroker *theObjectBroker = 0); 
-    RemoteExpSite(const RemoteExpSite& es);
-
+    ShadowExpSite(const ShadowExpSite& es);
+    
     // destructor
-    virtual ~RemoteExpSite();
+    virtual ~ShadowExpSite();
     
     // public methods to set and to obtain responses
     virtual int setSize(ID sizeT, ID sizeO);
@@ -81,7 +81,7 @@ public:
 protected:
     // data size of vectors in Channel
     int dataSize;
-
+    
     // vectors in Channel
     Vector sendV;
     Vector recvV;

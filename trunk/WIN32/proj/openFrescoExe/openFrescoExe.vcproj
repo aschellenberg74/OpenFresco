@@ -418,6 +418,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\SRC\experimentalSetup\ESFourActuators3d.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\SRC\experimentalSetup\ESFourActuators3d.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\SRC\experimentalSetup\ESInvertedVBrace2d.cpp"
 				>
 			</File>
@@ -554,11 +562,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\SRC\experimentalSite\RemoteExpSite.cpp"
+				RelativePath="..\..\..\SRC\experimentalSite\ShadowExpSite.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\SRC\experimentalSite\RemoteExpSite.h"
+				RelativePath="..\..\..\SRC\experimentalSite\ShadowExpSite.h"
 				>
 			</File>
 			<File

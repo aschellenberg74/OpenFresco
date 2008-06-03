@@ -34,7 +34,7 @@
 #include <ArrayOfTaggedObjects.h>
 
 #include <LocalExpSite.h>
-#include <RemoteExpSite.h>
+#include <ShadowExpSite.h>
 #include <ActorExpSite.h>
 
 #include <TCP_Socket.h>
@@ -147,11 +147,11 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp, int argc,
     }
 	
     // ----------------------------------------------------------------------------	
-    else if (strcmp(argv[1],"RemoteSite") == 0)  {
+    else if (strcmp(argv[1],"ShadowSite") == 0 || strcmp(argv[1],"RemoteSite") == 0)  {
 		if (5 > argc && argc > 9)  {
 			opserr << "WARNING invalid number of arguments\n";
 			printCommand(argc,argv);
-			opserr << "Want: expSite RemoteSite tag <-setup setupTag> ipAddr ipPort <-ssl> <-dataSize size>\n";
+			opserr << "Want: expSite ShadowSite tag <-setup setupTag> ipAddr ipPort <-ssl> <-dataSize size>\n";
 			return TCL_ERROR;
 		}
 		
@@ -161,10 +161,10 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp, int argc,
         int dataSize = OF_Network_dataSize;
         ExperimentalSetup *theSetup = 0;
         Channel *theChannel = 0;
-        RemoteExpSite *theSite = 0;
+        ShadowExpSite *theSite = 0;
 		
 		if (Tcl_GetInt(interp, argv[2], &tag) != TCL_OK)  {
-			opserr << "WARNING invalid expSite RemoteSite tag\n";
+			opserr << "WARNING invalid expSite ShadowSite tag\n";
 			return TCL_ERROR;		
 		}
         argi = 3;
@@ -173,14 +173,14 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp, int argc,
             argi++;
             if (Tcl_GetInt(interp, argv[argi], &setupTag) != TCL_OK)  {
                 opserr << "WARNING invalid setupTag\n";
-                opserr << "expSite RemoteSite " << tag << endln;
+                opserr << "expSite ShadowSite " << tag << endln;
                 return TCL_ERROR;	
             }
             theSetup = getExperimentalSetup(setupTag);
             if (theSetup == 0)  {
                 opserr << "WARNING experimental setup not found\n";
                 opserr << "expSetup: " << setupTag << endln;
-                opserr << "expSite RemoteSite " << tag << endln;
+                opserr << "expSite ShadowSite " << tag << endln;
                 return TCL_ERROR;
             }
             argi++;
@@ -191,7 +191,7 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp, int argc,
         argi++;
         if (Tcl_GetInt(interp, argv[argi], &ipPort) != TCL_OK)  {
             opserr << "WARNING invalid RemoteSite ipPort\n";
-            opserr << "expSite RemoteSite " << tag << endln;
+            opserr << "expSite ShadowSite " << tag << endln;
             return TCL_ERROR;		
         }
         argi++;
@@ -202,8 +202,8 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp, int argc,
             }
             else if (strcmp(argv[i], "-dataSize") == 0)  {
 		        if (Tcl_GetInt(interp, argv[i+1], &dataSize) != TCL_OK)  {
-			        opserr << "WARNING invalid RemoteSite dataSize\n";
-                    opserr << "expSite RemoteSite " << tag << endln;
+			        opserr << "WARNING invalid ShadowSite dataSize\n";
+                    opserr << "expSite ShadowSite " << tag << endln;
 			        return TCL_ERROR;		
 		        }
             }
@@ -214,7 +214,7 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp, int argc,
             theChannel = new TCP_Socket(ipPort,ipAddr,true);
             if (!theChannel) {
                 opserr << "WARNING could not create channel\n";
-                opserr << "expSite RemoteSite " << tag << endln;
+                opserr << "expSite ShadowSite " << tag << endln;
                 return TCL_ERROR;
             }
         }
@@ -222,16 +222,16 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp, int argc,
             theChannel = new TCP_SocketSSL(ipPort,ipAddr,true);
             if (!theChannel) {
                 opserr << "WARNING could not create SSL channel\n";
-                opserr << "expSite RemoteSite " << tag << endln;
+                opserr << "expSite ShadowSite " << tag << endln;
                 return TCL_ERROR;
             }
         }
 
         // parsing was successful, allocate the site
         if (theSetup == 0)
-            theSite = new RemoteExpSite(tag, *theChannel, dataSize);
+            theSite = new ShadowExpSite(tag, *theChannel, dataSize);
         else
-            theSite = new RemoteExpSite(tag, theSetup, *theChannel, dataSize);
+            theSite = new ShadowExpSite(tag, theSetup, *theChannel, dataSize);
 
         if (theSite == 0)  {
             opserr << "WARNING could not create experimental site " << argv[1] << endln;
