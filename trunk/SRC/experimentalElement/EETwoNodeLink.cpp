@@ -355,11 +355,11 @@ void EETwoNodeLink::setDomain(Domain *theDomain)
     int Nd1 = connectedExternalNodes(0);
     int Nd2 = connectedExternalNodes(1);
     theNodes[0] = theDomain->getNode(Nd1);
-    theNodes[1] = theDomain->getNode(Nd2);	
+    theNodes[1] = theDomain->getNode(Nd2);
     
     // if can't find both - send a warning message
     if (!theNodes[0] || !theNodes[1])  {
-        if (!theNodes[0])  { 
+        if (!theNodes[0])  {
             opserr << "EETwoNodeLink::setDomain() - Nd1: "
                 << Nd1 << " does not exist in the model for ";
         } else  {
@@ -371,9 +371,9 @@ void EETwoNodeLink::setDomain(Domain *theDomain)
         return;
     }
     
-    // now determine the number of dof and the dimension    
+    // now determine the number of dof and the dimension
     int dofNd1 = theNodes[0]->getNumberDOF();
-    int dofNd2 = theNodes[1]->getNumberDOF();	
+    int dofNd2 = theNodes[1]->getNumberDOF();
     
     // if differing dof at the ends - print a warning message
     if (dofNd1 != dofNd2)  {
@@ -382,19 +382,19 @@ void EETwoNodeLink::setDomain(Domain *theDomain)
         return;
     }	
     
-    // do NOT check on length, so that element can
+    /* do NOT check on length, so that element can
     // also be used if nodes are not in same location
     const Vector &end1Crd = theNodes[0]->getCrds();
     const Vector &end2Crd = theNodes[1]->getCrds();	
     Vector diff = end1Crd - end2Crd;
-    double L  = diff.Norm();
+    double L  = diff.Norm();*/
     
     // call the base class method
     this->DomainComponent::setDomain(theDomain);
     
     // now set the number of dof for element and set matrix and vector pointer
     if (dimension == 1 && dofNd1 == 1)  {
-        numDOF = 2;    
+        numDOF = 2;
         theMatrix = &EETwoNodeLinkM2;
         theVector = &EETwoNodeLinkV2;
         elemType  = D1N2;
@@ -406,19 +406,19 @@ void EETwoNodeLink::setDomain(Domain *theDomain)
         elemType  = D2N4;
     }
     else if (dimension == 2 && dofNd1 == 3)  {
-        numDOF = 6;	
+        numDOF = 6;
         theMatrix = &EETwoNodeLinkM6;
         theVector = &EETwoNodeLinkV6;
         elemType  = D2N6;
     }
     else if (dimension == 3 && dofNd1 == 3)  {
-        numDOF = 6;	
+        numDOF = 6;
         theMatrix = &EETwoNodeLinkM6;
         theVector = &EETwoNodeLinkV6;
         elemType  = D3N6;
     }
     else if (dimension == 3 && dofNd1 == 6)  {
-        numDOF = 12;	    
+        numDOF = 12;
         theMatrix = &EETwoNodeLinkM12;
         theVector = &EETwoNodeLinkV12;
         elemType  = D3N12;
@@ -448,7 +448,7 @@ void EETwoNodeLink::setDomain(Domain *theDomain)
     // set transformation matrix from global to basic
     if (numDir > 0)
         this->setTranGlobalBasic(elemType, numDir);
-}   	 
+}
 
 
 int EETwoNodeLink::commitState()
