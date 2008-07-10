@@ -72,8 +72,8 @@ protected:
     // pointer of ExperimentalSite
     ExperimentalSite* theSite;
     
-    // size of trial/out data
-    // sizeCtrl/Daq[0]:disp, [1]:vel, [2]:accel, [3]:force, [4]:time
+    // sizeCtrl/Daq
+    // [0]:disp, [1]:vel, [2]:accel, [3]:force, [4]:time
     ID* sizeCtrl;
     ID* sizeDaq;
         

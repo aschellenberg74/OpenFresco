@@ -106,6 +106,8 @@ public:
 protected:
     
 private:
+    void applyIMod();
+    
     // private attributes - a copy for each object of the class
     ID connectedExternalNodes;      // contains the tags of the end nodes
     CrdTransf2d *theCoordTransf;
