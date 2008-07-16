@@ -106,6 +106,18 @@ typedef struct {
     unsigned int  LargestFreeChain;
 } diskinfo;
 
+typedef struct {
+    char			Name[8];
+    char			Ext[3];
+    int		        Day;
+    int             Month;
+    int             Year;
+    int             Hour;
+    int             Min;
+    int             isDir;
+    unsigned long   Size;
+}dirStruct;
+
 
 /* --------------------------------------------------- */
 XPCAPIFUNC(int, xPCReOpenPort)(int port);
@@ -120,6 +132,8 @@ XPCAPIFUNC(void, xPCSetSampleTime)(int port, double ts);
 XPCAPIFUNC(double, xPCGetSampleTime)(int port);
 XPCAPIFUNC(void, xPCSetEcho)(int port, int mode);
 XPCAPIFUNC(int, xPCGetEcho)(int port);
+XPCAPIFUNC(void, xPCSetHiddenScopeEcho)(int port, int mode);
+XPCAPIFUNC(int, xPCGetHiddenScopeEcho)(int port);
 XPCAPIFUNC(double, xPCAverageTET)(int port);
 XPCAPIFUNC(int, xPCGetNumParams)(int port);
 XPCAPIFUNC(int, xPCGetNumSignals)(int port);
@@ -161,8 +175,10 @@ XPCAPIFUNC(void, xPCScRemSignal)(int port, int scNum, int sigNum);
 XPCAPIFUNC(void, xPCScSetAutoRestart)(int port, int scNum, int autorestart);
 XPCAPIFUNC(int,  xPCScGetAutoRestart)(int port, int scNum);
 XPCAPIFUNC(void, xPCGetScopes)(int port, int *data);
+XPCAPIFUNC(void, xPCGetHiddenScopes)(int port, int *data);
 XPCAPIFUNC(void, xPCScGetSignals)(int port, int scNum, int *data);
 XPCAPIFUNC(void, xPCScSetDecimation)(int port, int scNum, int decimation);
+XPCAPIFUNC(int,  xPCScGetNumSignals)(int port, int scNum);
 XPCAPIFUNC(int, xPCScGetDecimation)(int port, int scNum);
 XPCAPIFUNC(void, xPCScSetNumSamples)(int port, int scNum, int samples);
 XPCAPIFUNC(int, xPCScGetNumSamples)(int port, int scNum);
@@ -191,8 +207,14 @@ XPCAPIFUNC(void, xPCSetScope)(int port, scopedata state);
 XPCAPIFUNC(void, xPCLoadApp)(int port, const char* pathstr,
                              const char* filename);
 XPCAPIFUNC(void, xPCGetParamDims)(int port, int parIdx, int *dims);
+XPCAPIFUNC(int , xPCGetParamDimsSize)(int port, int parIdx);
 XPCAPIFUNC(int, xPCGetSignalWidth)(int port, int sigIdx);
 XPCAPIFUNC(int, xPCGetSignalIdx)(int port, const char *sigName );
+
+XPCAPIFUNC(int, xPCGetSigLabelWidth)(int port, const char *sigName);
+XPCAPIFUNC(int, xPCGetSigIdxfromLabel)(int port, const char *sigName, int *sigIds);
+XPCAPIFUNC(char *, xPCGetSignalLabel)(int port, int sigIdx, char *sigLabel);
+
 XPCAPIFUNC(int, xPCGetParamIdx)(int port, const char *block,
                                 const char *parameter);
 XPCAPIFUNC(void, xPCGetParamName)(int port, int parIdx, char *block, char *param);
@@ -219,6 +241,7 @@ XPCAPIFUNC(int, xPCRegisterTarget)(int commType, const char *ipAddress,
                                    const char *ipPort,
                                    int comPort, int baudRate);
 XPCAPIFUNC(void, xPCDeRegisterTarget)(int port);
+XPCAPIFUNC(const char *, xPCGetAPIVersion)(void);
 XPCAPIFUNC(void, xPCGetTargetVersion)(int port, char *ver);
 XPCAPIFUNC(int, xPCTargetPing)(int port);
 XPCAPIFUNC(void, xPCFSReadFile)(int port, int fileHandle, int start,
@@ -259,12 +282,13 @@ XPCAPIFUNC(unsigned int, xPCFSScGetWriteSize)(int port, int scopeId);
 XPCAPIFUNC(void, xPCReadXML)(int port, int numbytes, unsigned char *data);
 XPCAPIFUNC(diskinfo, xPCFSDiskInfo)(int port, const char *driveLetter);
 XPCAPIFUNC(const char *, xPCFSFileTable)(int port, char *tableBuffer);
-
+XPCAPIFUNC(void, xPCFSDirItems)(int port, const char *path, dirStruct *dirs, int numDirItems);
+XPCAPIFUNC(int, xPCFSDirStructSize)(int port, const char *path);
 /* --------------------------------------------------- */
 
 int  xPCInitAPI(void);
 void xPCFreeAPI(void);
-
+int  xPCResolveAPI(HMODULE);
 
 #ifndef BUILDDLL
 #ifdef  __cplusplus
