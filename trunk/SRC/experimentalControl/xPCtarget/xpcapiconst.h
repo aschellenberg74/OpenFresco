@@ -2,7 +2,7 @@
  * Abstract: Constants defined for use in the xPC Target C API.
  * $Revision$ $Date$
  */
-/* Copyright 2000-2005 The MathWorks, Inc. */
+/* Copyright 2000-2006 The MathWorks, Inc. */
 
 #ifndef _XPCAPICONST_H_
 #define _XPCAPICONST_H_
@@ -20,6 +20,8 @@
 #define SCTYPE_HOST        1
 #define SCTYPE_TARGET      2
 #define SCTYPE_FILE        3
+//hide this definition
+#define SCTYPE_HIDDEN      4
 
 #define TRIGMD_FREERUN     0
 #define TRIGMD_SOFTWARE    1
@@ -127,6 +129,10 @@ typedef enum ErrorValues_tag {
     EMEMALLOC            =  59,
     ETGTMEMALLOC         =  60,
     EPARSIZMISMATCH      =  61,
+
+    ESIGLABELNOTUNIQUE   =  62,
+    ESIGLABELNOTFOUND    =  63,
+    ETOOMANYSIGNALS      =  64,
 
     ELOADAPPFIRST        = 101,
     EUNLOADAPPFIRST      = 102,

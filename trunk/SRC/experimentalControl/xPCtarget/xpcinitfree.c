@@ -34,6 +34,10 @@ int xPCInitAPI(void) {
         if ((dllHandle = LoadLibrary("xpcapi.dll")) == NULL) {
             return -1;
         }
+    return (xPCResolveAPI(dllHandle));
+}
+
+int xPCResolveAPI(HMODULE dllHandle) {
 
     /* Repeating the GetProcAddress calls is benign. */
     if ((xPCErrorMsg = (void *)
@@ -98,6 +102,9 @@ int xPCInitAPI(void) {
         return -1;
     if ((xPCGetParamDims = (void *)
          GetProcAddress(dllHandle, "xPCGetParamDims")) == NULL)
+        return -1;
+    if ((xPCGetParamDimsSize = (void *)
+         GetProcAddress(dllHandle, "xPCGetParamDimsSize")) == NULL)
         return -1;
     if ((xPCLoadApp = (void *)
          GetProcAddress(dllHandle, "xPCLoadApp")) == NULL)
@@ -185,6 +192,9 @@ int xPCInitAPI(void) {
         return -1;
     if ((xPCGetScopes = (void *)
          GetProcAddress(dllHandle, "xPCGetScopes")) == NULL)
+        return -1;
+    if ((xPCGetHiddenScopes = (void *)
+         GetProcAddress(dllHandle, "xPCGetHiddenScopes")) == NULL)
         return -1;
     if ((xPCScRemSignal = (void *)
          GetProcAddress(dllHandle, "xPCScRemSignal")) == NULL)
@@ -339,6 +349,9 @@ int xPCInitAPI(void) {
     if ((xPCDeRegisterTarget = (void *)
          GetProcAddress(dllHandle, "xPCDeRegisterTarget")) == NULL)
         return -1;
+    if ((xPCGetAPIVersion = (void *)
+         GetProcAddress(dllHandle, "xPCGetAPIVersion")) == NULL)
+        return -1;
     if ((xPCGetTargetVersion = (void *)
          GetProcAddress(dllHandle, "xPCGetTargetVersion")) == NULL)
         return -1;
@@ -405,8 +418,30 @@ int xPCInitAPI(void) {
     if ((xPCFSDiskInfo = (void *)
          GetProcAddress(dllHandle, "xPCFSDiskInfo")) == NULL)
         return -1;
-
-
+    if ((xPCFSDirItems = (void *)
+         GetProcAddress(dllHandle, "xPCFSDirItems")) == NULL)
+        return -1;
+    if ((xPCFSDirStructSize = (void *)
+         GetProcAddress(dllHandle, "xPCFSDirStructSize")) == NULL)
+        return -1;
+    if ((xPCGetSigLabelWidth = (void *)
+         GetProcAddress(dllHandle, "xPCGetSigLabelWidth")) == NULL)
+        return -1;
+    if ((xPCGetSigIdxfromLabel = (void *)
+         GetProcAddress(dllHandle, "xPCGetSigIdxfromLabel")) == NULL)
+        return -1;
+    if ((xPCGetSignalLabel = (void *)
+         GetProcAddress(dllHandle, "xPCGetSignalLabel")) == NULL)
+        return -1;
+    if ((xPCScGetNumSignals = (void *)
+         GetProcAddress(dllHandle, "xPCScGetNumSignals")) == NULL)
+        return -1;
+    if ((xPCSetHiddenScopeEcho = (void *)
+         GetProcAddress(dllHandle, "xPCSetHiddenScopeEcho")) == NULL)
+        return -1;
+    if ((xPCGetHiddenScopeEcho = (void *)
+         GetProcAddress(dllHandle, "xPCGetHiddenScopeEcho")) == NULL)
+        return -1;
     GETFCNPTR(xPCFSScSetFilename);
     GETFCNPTR(xPCFSScGetFilename);
     GETFCNPTR(xPCFSScSetWriteMode);
@@ -442,6 +477,7 @@ void xPCFreeAPI(void) {
     xPCGetSignalIdx =            NULL;
     xPCGetSignalWidth =          NULL;
     xPCGetParamDims =            NULL;
+    xPCGetParamDimsSize =        NULL;
     xPCLoadApp =                 NULL;
     xPCSetScope =                NULL;
     xPCGetScope =                NULL;
@@ -473,6 +509,7 @@ void xPCFreeAPI(void) {
     xPCScGetAutoRestart =        NULL;
     xPCScSetAutoRestart =        NULL;
     xPCGetScopes =               NULL;
+    xPCGetHiddenScopes =         NULL;
     xPCScRemSignal =             NULL;
     xPCScAddSignal =             NULL;
     xPCRemScope =                NULL;
@@ -522,6 +559,7 @@ void xPCFreeAPI(void) {
     xPCCloseConnection =         NULL;
     xPCRegisterTarget =          NULL;
     xPCDeRegisterTarget =        NULL;
+    xPCGetAPIVersion =           NULL;
     xPCGetTargetVersion =        NULL;
     xPCTargetPing =              NULL;
     xPCFSReadFile =              NULL;
@@ -550,6 +588,14 @@ void xPCFreeAPI(void) {
     xPCFSScGetWriteSize =        NULL;
     xPCReadXML =                 NULL;
     xPCFSDiskInfo =              NULL;
+    xPCFSDirItems =              NULL;
+    xPCFSDirStructSize =         NULL;
+    xPCGetSigLabelWidth  =       NULL;
+    xPCGetSigIdxfromLabel=       NULL;
+    xPCGetSignalLabel =          NULL;
+    xPCScGetNumSignals=          NULL;
+    xPCGetHiddenScopeEcho=       NULL;
+    xPCSetHiddenScopeEcho=       NULL;
     return;
 }
 
