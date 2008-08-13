@@ -45,9 +45,9 @@ class LocalExpSite : public ExperimentalSite
 public:
     // constructors
     LocalExpSite(int tag, 
-        ExperimentalSetup* setup); 
+        ExperimentalSetup* setup);
     LocalExpSite(const LocalExpSite &site);
-
+    
     // destructor
     virtual ~LocalExpSite();
     

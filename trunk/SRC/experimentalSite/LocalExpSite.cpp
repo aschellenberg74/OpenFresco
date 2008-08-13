@@ -40,10 +40,9 @@ LocalExpSite::LocalExpSite(int tag,
     ExperimentalSetup *setup)
     : ExperimentalSite(tag, setup)
 {
-    if (theSetup == 0) {
+    if (theSetup == 0)  {
         opserr << "LocalExpSite::LocalExpSite() - "
-            << "must have an instance of ExperimentalSetup"
-            << endln;
+            << "must have an instance of ExperimentalSetup.\n";
         exit(OF_ReturnType_failed);
     }
 }
@@ -74,9 +73,6 @@ int LocalExpSite::setSize(ID sizeT, ID sizeO)
 
 int LocalExpSite::setup()
 {
-    // does nothing
-    //theSetup->setup();
-    
     return OF_ReturnType_completed;
 }
 
@@ -96,19 +92,11 @@ int LocalExpSite::setTrialResponse(const Vector* disp,
     int rValue;
     // set trial response at the setup
     rValue = theSetup->setTrialResponse(tDisp, tVel, tAccel, tForce, tTime);
-    if (rValue != OF_ReturnType_completed) {
+    if (rValue != OF_ReturnType_completed)  {
         opserr << "LocalExpSite::setTrialResponse() - "
-            << "failed to set trial response at the setup.";
+            << "failed to set trial response at the setup.\n";
         exit(OF_ReturnType_failed);
     }
-    
-    // transform daq response into output response
-    theSetup->transfDaqResponse(Disp, Vel, Accel, Force, Time);
-    
-    this->ExperimentalSite::setDaqResponse(Disp, Vel, Accel, Force, Time);
-    
-    // set daq flag
-    daqFlag = true;
     
     return OF_ReturnType_completed;
 }
@@ -116,10 +104,17 @@ int LocalExpSite::setTrialResponse(const Vector* disp,
 
 int LocalExpSite::checkDaqResponse()
 {
-    if (daqFlag == false) {
-        // get daq response into output response
-        theSetup->getDaqResponse(Disp, Vel, Accel, Force, Time);
+    if (daqFlag == false)  {
+        int rValue;
+        // get daq response from the setup
+        rValue = theSetup->getDaqResponse(Disp, Vel, Accel, Force, Time);
+        if (rValue != OF_ReturnType_completed)  {
+            opserr << "LocalExpSite::checkDaqResponse() - "
+                << "failed to get daq response from the setup.\n";
+            exit(OF_ReturnType_failed);
+        }
         
+        // save data in basic sys
         this->ExperimentalSite::setDaqResponse(Disp, Vel, Accel, Force, Time);
         
         // set daq flag
@@ -133,7 +128,7 @@ int LocalExpSite::checkDaqResponse()
 ExperimentalSite* LocalExpSite::getCopy()
 {
     LocalExpSite *theCopy = new LocalExpSite(*this);
-
+    
     return theCopy;
 }
 
@@ -142,7 +137,6 @@ void LocalExpSite::Print(OPS_Stream &s, int flag)
 {
     s << "ExperimentalSite: " << this->getTag(); 
     s << " type: LocalExpSite\n";
-    s << "\tExperimentalSetup tag: " << theSetup->getTag() 
-        << endln;
+    s << "\tExperimentalSetup tag: " << theSetup->getTag() << endln;
     s << *theSetup;
 }

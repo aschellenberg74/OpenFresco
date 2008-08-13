@@ -53,7 +53,7 @@ int addExperimentalSite(ExperimentalSite &theSite)
     bool result = theExperimentalSites->addComponent(&theSite);
     if (result == true)
         return 0;
-    else {
+    else  {
         opserr << "addExperimentalSite() - "
             << "failed to add experimental site: " << theSite;
         return -1;
@@ -63,7 +63,7 @@ int addExperimentalSite(ExperimentalSite &theSite)
 
 extern ExperimentalSite *getExperimentalSite(int tag)
 {
-    if (theExperimentalSites == 0) {
+    if (theExperimentalSites == 0)  {
         opserr << "getExperimentalSite() - "
             << "failed to get experimental site: " << tag << endln
             << "no experimental site objects have been defined\n";

@@ -44,11 +44,10 @@ ActorExpSite::ActorExpSite(int tag,
     theControl(0), dataSize(0),
     sendV(OF_Network_dataSize), recvV(OF_Network_dataSize)
 { 
-    if (theSetup == 0) {
+    if (theSetup == 0)  {
         opserr << "ActorExpSite::ActorExpSite() - "
             << "if you want to use it without an ExperimentalSetup, "
-            << "use another constructor"
-            << endln;
+            << "use another constructor.\n";
         exit(OF_ReturnType_failed);
     }
 }
@@ -63,11 +62,10 @@ ActorExpSite::ActorExpSite(int tag,
     theControl(control), dataSize(0),
     sendV(OF_Network_dataSize), recvV(OF_Network_dataSize)
 { 
-    if (theControl == 0) {
+    if (theControl == 0)  {
         opserr << "ActorExpSite::ActorExpSite() - "
             << "if you want to use it without an ExperimentalControl, "
-            << "use another constructor"
-            << endln;
+            << "use another constructor.\n";
         exit(OF_ReturnType_failed);
     }
 }
@@ -96,12 +94,11 @@ int ActorExpSite::run()
 {
     bool exitYet = false;
     int ndim;
-    while (exitYet == false) {
+    while (exitYet == false)  {
         this->recvVector(recvV);
         int action = (int)recvV(0);
         
-        // opserr << "action = " << action << endln;
-        switch(action) {
+        switch(action)  {
         case OF_RemoteTest_open:
             opserr << "\nConnected to RemoteExpSite "
                 << recvV(1) << endln;
@@ -109,7 +106,7 @@ int ActorExpSite::run()
             sendV(1) = this->getTag();
             sendV(2) = atof(OPF_VERSION);
             this->sendVector(sendV);
-            if (recvV(2) != atof(OPF_VERSION)) {
+            if (recvV(2) != atof(OPF_VERSION))  {
                 opserr << "ActorExpSite::run() - OpenFresco Version "
                     << "mismatch:\nActorExpSite Version " << atof(OPF_VERSION)
                     << " != RemoteExpSite Version " << recvV(2) << endln;
@@ -122,23 +119,23 @@ int ActorExpSite::run()
             break;
         case OF_RemoteTest_setTrialResponse:
             ndim = 1;
-            if (tDisp != 0) {
+            if (tDisp != 0)  {
                 tDisp->Extract(recvV, ndim);
                 ndim += getTrialSize(OF_Resp_Disp);
             }
-            if (tVel != 0) {
+            if (tVel != 0)  {
                 tVel->Extract(recvV, ndim);
                 ndim += getTrialSize(OF_Resp_Vel);
             }
-            if (tAccel != 0) {
+            if (tAccel != 0)  {
                 tAccel->Extract(recvV, ndim);
                 ndim += getTrialSize(OF_Resp_Accel);
             }
-            if (tForce != 0) {
+            if (tForce != 0)  {
                 tForce->Extract(recvV, ndim);
                 ndim += getTrialSize(OF_Resp_Force);
             }
-            if (tTime != 0) {
+            if (tTime != 0)  {
                 tTime->Extract(recvV, ndim);
             }            
             this->setTrialResponse(tDisp, tVel, tAccel, tForce, tTime);
@@ -174,15 +171,15 @@ int ActorExpSite::setSize(ID sizeT, ID sizeO)
 {
     this->ExperimentalSite::setSize(sizeT, sizeO);
     
-    if (theSetup != 0) {
+    if (theSetup != 0)  {
         theSetup->setSize(sizeT, sizeO);
-    } else if (theControl != 0) {
+    } else if (theControl != 0)  {
         theControl->setSize(sizeT, sizeO);
         theControl->setup();
     }
     
     int nTrial = 0, nOutput = 0;
-    for (int i=0; i<OF_Resp_All; i++) {
+    for (int i=0; i<OF_Resp_All; i++)  {
         nTrial += sizeT[i];
         nOutput += sizeO[i];
     }
@@ -199,9 +196,9 @@ int ActorExpSite::setup()
 {
     this->recvID(*sizeTrial);    
     this->recvID(*sizeOut);
-        
+    
     this->setSize(*sizeTrial, *sizeOut);
-        
+    
     return OF_ReturnType_completed;
 }
 
@@ -220,22 +217,41 @@ int ActorExpSite::setTrialResponse(const Vector* disp,
     
     int rValue;
     // set trial response at the setup
-    if (theSetup != 0) {
+    if (theSetup != 0)  {
         rValue = theSetup->setTrialResponse(tDisp, tVel, tAccel, tForce, tTime);
-        if (rValue != OF_ReturnType_completed) {
+        if (rValue != OF_ReturnType_completed)  {
             opserr << "ActorExpSite::setTrialResponse() - "
-                << "failed to set trial response at the setup";
+                << "failed to set trial response at the setup.\n";
             exit(OF_ReturnType_failed);
         }
         
-        // transform daq response into output response
-        theSetup->transfDaqResponse(Disp, Vel, Accel, Force, Time);
+        // get daq response from the setup
+        rValue = theSetup->getDaqResponse(Disp, Vel, Accel, Force, Time);
+        if (rValue != OF_ReturnType_completed)  {
+            opserr << "ActorExpSite::setTrialResponse() - "
+                << "failed to get daq response from the setup.\n";
+            exit(OF_ReturnType_failed);
+        }
+    
+    // set trial response at the control
+    } else if (theControl != 0)  {
+        rValue = theControl->setTrialResponse(tDisp, tVel, tAccel, tForce, tTime);
+        if (rValue != OF_ReturnType_completed)  {
+            opserr << "ActorExpSite::setTrialResponse() - "
+                << "failed to set trial response at the control.\n";
+            exit(OF_ReturnType_failed);
+        }
         
-    } else if (theControl != 0) {
-        theControl->setTrialResponse(tDisp, tVel, tAccel, tForce, tTime);
-        
-        theControl->getDaqResponse(Disp, Vel, Accel, Force, Time);
+        // get daq response from the control
+        rValue = theControl->getDaqResponse(Disp, Vel, Accel, Force, Time);
+        if (rValue != OF_ReturnType_completed)  {
+            opserr << "ActorExpSite::setTrialResponse() - "
+                << "failed to get daq response from the control.\n";
+            exit(OF_ReturnType_failed);
+        }
     }
+    
+    // save data
     this->ExperimentalSite::setDaqResponse(Disp, Vel, Accel, Force, Time); 
     
     // set daq flag
@@ -247,14 +263,30 @@ int ActorExpSite::setTrialResponse(const Vector* disp,
 
 int ActorExpSite::checkDaqResponse()
 {
-    // don't use arguments in this method. only save daq data into sendV
-    if (daqFlag == false) {
-        if (theSetup != 0) {
-            theSetup->getDaqResponse(Disp, Vel, Accel, Force, Time);
-        } else if (theControl != 0) {
-            theControl->getDaqResponse(Disp, Vel, Accel, Force, Time);
+    if (daqFlag == false)  {
+        int rValue;
+        // get daq response from the setup
+        if (theSetup != 0)  {
+            rValue = theSetup->getDaqResponse(Disp, Vel, Accel, Force, Time);
+            if (rValue != OF_ReturnType_completed)  {
+                opserr << "ActorExpSite::checkDaqResponse() - "
+                    << "failed to get daq response from the setup.\n";
+                exit(OF_ReturnType_failed);
+            }
+        
+        // get daq response from the control
+        } else if (theControl != 0)  {
+            rValue = theControl->getDaqResponse(Disp, Vel, Accel, Force, Time);
+            if (rValue != OF_ReturnType_completed)  {
+                opserr << "ActorExpSite::checkDaqResponse() - "
+                    << "failed to get daq response from the control.\n";
+                exit(OF_ReturnType_failed);
+            }
         }
+        
+        // save data
         this->ExperimentalSite::setDaqResponse(Disp, Vel, Accel, Force, Time);
+        
         // set daq flag
         daqFlag = true;
     }
@@ -268,27 +300,27 @@ int ActorExpSite::setSendDaqResponse()
     int ndim = 0, size;
     sendV.Zero();
     size = getOutSize(OF_Resp_Disp);
-    if (size != 0) {
+    if (size != 0)  {
         sendV.Assemble(*Disp, ndim);
         ndim += size;
     }
     size = getOutSize(OF_Resp_Vel);
-    if (size != 0) {
+    if (size != 0)  {
         sendV.Assemble(*Vel, ndim);
         ndim += size;
     }
     size = getOutSize(OF_Resp_Accel);
-    if (size != 0) {
+    if (size != 0)  {
         sendV.Assemble(*Accel, ndim);
         ndim += size;
     }
     size = getOutSize(OF_Resp_Force);
-    if (size != 0) {
+    if (size != 0)  {
         sendV.Assemble(*Force, ndim);
         ndim += size;
     }
     size = getOutSize(OF_Resp_Time);
-    if (size != 0) {
+    if (size != 0)  {
         sendV.Assemble(*Time, ndim);
     }
     
@@ -299,10 +331,20 @@ int ActorExpSite::setSendDaqResponse()
 int ActorExpSite::commitState()
 {
     int rValue;
-    if (theSetup != 0) {
+    if (theSetup != 0)  {
         rValue = theSetup->commitState();
-    } else if (theControl != 0) {
+        if (rValue != OF_ReturnType_completed)  {
+            opserr << "ActorExpSite::commitState() - "
+                << "failed to commit state for the setup.\n";
+            exit(OF_ReturnType_failed);
+        }
+    } else if (theControl != 0)  {
         rValue = theControl->commitState();
+        if (rValue != OF_ReturnType_completed)  {
+            opserr << "ActorExpSite::commitState() - "
+                << "failed to commit state for the control.\n";
+            exit(OF_ReturnType_failed);
+        }
     }
     
     return rValue;
@@ -320,13 +362,11 @@ ExperimentalSite* ActorExpSite::getCopy()
 void ActorExpSite::Print(OPS_Stream &s, int flag)
 {
     s << "ActorExpSite: " << this->getTag(); 
-    if (theSetup != 0) {
-        s << "\tExperimentalSetup tag: " << theSetup->getTag()
-            << endln;
+    if (theSetup != 0)  {
+        s << "\tExperimentalSetup tag: " << theSetup->getTag() << endln;
         s << *theSetup;
-    } else if (theControl != 0) {
-        s << "\tExperimentalControl tag: " << theControl->getTag()
-            << endln;
+    } else if (theControl != 0)  {
+        s << "\tExperimentalControl tag: " << theControl->getTag() << endln;
         s << *theControl;
     }
 }

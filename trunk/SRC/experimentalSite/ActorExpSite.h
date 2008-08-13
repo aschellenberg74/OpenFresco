@@ -73,7 +73,7 @@ public:
         const Vector* force,
         const Vector* time);
     
-    virtual int checkDaqResponse();    
+    virtual int checkDaqResponse();
     virtual int setSendDaqResponse();
     
     virtual int commitState();
@@ -86,7 +86,7 @@ public:
 protected:
     // pointer of ExperimentalControl
     ExperimentalControl* theControl;
-        
+    
     // data size of vectors in Channel
     int dataSize;
     
