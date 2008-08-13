@@ -147,8 +147,8 @@ protected:
     // sizeCtrl/Daq[0]:disp, [1]:vel, [2]:accel, [3]:force, [4]:time
     ID *sizeCtrl; // size of ctrlV
     ID *sizeDaq;  // size of daqV
-        
-    // protected tranformation methods 
+    
+    // protected tranformation methods
     virtual int transfTrialDisp(const Vector* disp) = 0;
     virtual int transfTrialVel(const Vector* vel) = 0;
     virtual int transfTrialAccel(const Vector* accel) = 0;

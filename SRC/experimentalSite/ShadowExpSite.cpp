@@ -50,7 +50,7 @@ ShadowExpSite::ShadowExpSite(int tag,
     this->sendVector(sendV);
     this->recvVector(recvV);
     
-    if (recvV(2) != atof(OPF_VERSION)) {
+    if (recvV(2) != atof(OPF_VERSION))  {
         opserr << "ShadowExpSite::ShadowExpSite() - OpenFresco Version "
             << "mismatch:\nShadowExpSite Version " << atof(OPF_VERSION)
             << " != ActorExpSite Version " << recvV(2) << endln;
@@ -72,11 +72,10 @@ ShadowExpSite::ShadowExpSite(int tag,
     bDisp(0), bVel(0), bAccel(0), bForce(0), bTime(0),
     rDisp(0), rVel(0), rAccel(0), rForce(0), rTime(0)
 {
-    if (theSetup == 0) {
+    if (theSetup == 0)  {
         opserr << "ShadowExpSite::ShadowExpSite() - "
             << "if you want to use it without an ExperimentalSetup, "
-            << "use another constructor"
-            << endln;
+            << "use another constructor.\n";
         exit(OF_ReturnType_failed);
     }
     
@@ -86,7 +85,7 @@ ShadowExpSite::ShadowExpSite(int tag,
     this->sendVector(sendV);
     this->recvVector(recvV);
     
-    if (recvV(2) != atof(OPF_VERSION)) {
+    if (recvV(2) != atof(OPF_VERSION))  {
         opserr << "ShadowExpSite::ShadowExpSite() - OpenFresco Version "
             << "mismatch:\nShadowExpSite Version " << atof(OPF_VERSION)
             << " != ActorExpSite Version " << recvV(2) << endln;
@@ -148,23 +147,23 @@ int ShadowExpSite::setSize(ID sizeT, ID sizeO)
 {
     this->ExperimentalSite::setSize(sizeT, sizeO);
     
-    if (theSetup != 0) {
+    if (theSetup != 0)  {
         theSetup->setSize(sizeT, sizeO);
         int nCtrl = 0, nDaq = 0;
-        for (int i=0; i<OF_Resp_All; i++) {
+        for (int i=0; i<OF_Resp_All; i++)  {
             nCtrl += getCtrlSize(i);
-            nDaq += getDaqSize(i);
+            nDaq  += getDaqSize(i);
         }
         if (dataSize < 1+nCtrl) dataSize = 1+nCtrl;
-        if (dataSize < nDaq) dataSize = nDaq;
-    } else {
+        if (dataSize < nDaq)    dataSize = nDaq;
+    } else  {
         int nInput = 0, nOutput = 0;
-        for (int i=0; i<OF_Resp_All; i++) {
-            nInput += sizeT[i];
+        for (int i=0; i<OF_Resp_All; i++)  {
+            nInput  += sizeT[i];
             nOutput += sizeO[i];
         }
         if (dataSize < 1+nInput) dataSize = 1+nInput;
-        if (dataSize < nOutput) dataSize = nOutput;
+        if (dataSize < nOutput)  dataSize = nOutput;
     }
     
     // send experimental setup to remote
@@ -184,12 +183,12 @@ int ShadowExpSite::setup()
     sendV(1) = dataSize;
     this->sendVector(sendV);
     
-    if (theSetup != 0) {
+    if (theSetup != 0)  {
         // send sizeCtrl
         this->sendID(theSetup->getCtrlSize());
         // send sizeDaq
         this->sendID(theSetup->getDaqSize());
-    } else {
+    } else  {
         // send sizeTrial
         this->sendID(*sizeTrial);
         // send sizeOut
@@ -213,16 +212,16 @@ int ShadowExpSite::setTrialResponse(const Vector* disp,
     daqFlag = false;
     
     int rValue;
-    if (theSetup != 0) {
-        // set trial response at the setup
+    if (theSetup != 0)  {
+        // transform trial response
         rValue = theSetup->transfTrialResponse(tDisp, tVel, tAccel, tForce, tTime);
-        if (rValue != OF_ReturnType_completed) {
+        if (rValue != OF_ReturnType_completed)  {
             opserr << "ShadowExpSite::setTrialResponse() - "
-                << "failed to set trial response at the setup";
+                << "failed to set trial response at the setup.\n";
             exit(OF_ReturnType_failed);
         }
         
-        if (bDisp == 0) {
+        if (bDisp == 0)  {
             if (getCtrlSize(OF_Resp_Disp) != 0)
                 bDisp = new Vector(getCtrlSize(OF_Resp_Disp));
             if (getCtrlSize(OF_Resp_Vel) != 0)
@@ -237,63 +236,63 @@ int ShadowExpSite::setTrialResponse(const Vector* disp,
         
         // get trial response from the setup
         rValue = theSetup->getTrialResponse(bDisp, bVel, bAccel, bForce, bTime);
-        if (rValue != OF_ReturnType_completed) {
+        if (rValue != OF_ReturnType_completed)  {
             opserr << "ShadowExpSite::setTrialResponse() - "
-                << "failed to get trial response from the setup.";
+                << "failed to get trial response from the setup.\n";
             exit(OF_ReturnType_failed);
         }
         
         int ndim = 1, size;
         sendV.Zero();
         size = getCtrlSize(OF_Resp_Disp);
-        if (size != 0) {
+        if (size != 0)  {
             sendV.Assemble(*bDisp, ndim);
             ndim += size;
         }
         size = getCtrlSize(OF_Resp_Vel);
-        if (size != 0) {
+        if (size != 0)  {
             sendV.Assemble(*bVel, ndim);
             ndim += size;
         }
         size = getCtrlSize(OF_Resp_Accel);
-        if (size != 0) {
+        if (size != 0)  {
             sendV.Assemble(*bAccel, ndim);
             ndim += size;
         }
         size = getCtrlSize(OF_Resp_Force);
-        if (size != 0) {
+        if (size != 0)  {
             sendV.Assemble(*bForce, ndim);
             ndim += size;
         }
         size = getCtrlSize(OF_Resp_Time);
-        if (size != 0) {
+        if (size != 0)  {
             sendV.Assemble(*bTime, ndim);
         }
-    } else {
+    } else  {
         int ndim = 1, size;
         sendV.Zero();
         size = getTrialSize(OF_Resp_Disp);
-        if (size != 0) {
+        if (size != 0)  {
             sendV.Assemble(*tDisp, ndim);
             ndim += size;
         }
         size = getTrialSize(OF_Resp_Vel);
-        if (size != 0) {
+        if (size != 0)  {
             sendV.Assemble(*tVel, ndim);
             ndim += size;
         }
         size = getTrialSize(OF_Resp_Accel);
-        if (size != 0) {
+        if (size != 0)  {
             sendV.Assemble(*tAccel, ndim);
             ndim += size;
         }
         size = getTrialSize(OF_Resp_Force);
-        if (size != 0) {
+        if (size != 0)  {
             sendV.Assemble(*tForce, ndim);
             ndim += size;
         }
         size = getTrialSize(OF_Resp_Time);
-        if (size != 0) {
+        if (size != 0)  {
             sendV.Assemble(*tTime, ndim);
         }
     }
@@ -308,11 +307,11 @@ int ShadowExpSite::setTrialResponse(const Vector* disp,
 
 int ShadowExpSite::checkDaqResponse()
 {
-    if (daqFlag == false) {
+    if (daqFlag == false)  {
         sendV(0) = OF_RemoteTest_getDaqResponse;
         this->sendVector(sendV);
         
-        if (rDisp == 0) {
+        if (rDisp == 0)  {
             if (getDaqSize(OF_Resp_Disp) != 0)
                 rDisp = new Vector(getDaqSize(OF_Resp_Disp));
             if (getDaqSize(OF_Resp_Vel) != 0)
@@ -327,32 +326,32 @@ int ShadowExpSite::checkDaqResponse()
         this->recvVector(recvV);
         
         int ndim = 0;
-        if (rDisp != 0) {
+        if (rDisp != 0)  {
             rDisp->Extract(recvV, 0);
             ndim += getDaqSize(OF_Resp_Disp);
         }
-        if (rVel != 0) {
+        if (rVel != 0)  {
             rVel->Extract(recvV, ndim);
             ndim += getDaqSize(OF_Resp_Vel);
         }
-        if (rAccel != 0) {
+        if (rAccel != 0)  {
             rAccel->Extract(recvV, ndim);
             ndim += getDaqSize(OF_Resp_Accel);
         }
-        if (rForce != 0) {
+        if (rForce != 0)  {
             rForce->Extract(recvV, ndim);
             ndim += getDaqSize(OF_Resp_Force);
         }
-        if (rTime != 0) {
+        if (rTime != 0)  {
             rTime->Extract(recvV, ndim);
         }
         
-        if (theSetup != 0) {
-            // set daq response into ExperimentalSetup
+        if (theSetup != 0)  {
+            // set daq response at the setup
             theSetup->setDaqResponse(rDisp, rVel, rAccel, rForce, rTime);
-            // transform daq response into output response
+            // transform daq response
             theSetup->transfDaqResponse(Disp, Vel, Accel, Force, Time);
-        } else {
+        } else  {
             if (Disp != 0) 
                 *Disp = *rDisp;
             if (Vel != 0) 
@@ -364,6 +363,8 @@ int ShadowExpSite::checkDaqResponse()
             if (Time != 0) 
                 *Time = *rTime;
         }
+        
+        // save data in basic sys
         this->ExperimentalSite::setDaqResponse(Disp, Vel, Accel, Force, Time); 
         
         // set daq flag
@@ -395,9 +396,8 @@ void ShadowExpSite::Print(OPS_Stream &s, int flag)
 {
     s << "ExperimentalSite: " << this->getTag(); 
     s << " type: ShadowExpSite\n";
-    if (theSetup != 0) {
-        s << "\tExperimentalSetup tag: " << theSetup->getTag()
-            << endln;
+    if (theSetup != 0)  {
+        s << "\tExperimentalSetup tag: " << theSetup->getTag() << endln;
         s << *theSetup;
     }
 }

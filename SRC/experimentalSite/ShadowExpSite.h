@@ -53,7 +53,7 @@ public:
         ExperimentalSetup *setup,
         Channel &theChannel,
         int dataSize = OF_Network_dataSize,
-        FEM_ObjectBroker *theObjectBroker = 0); 
+        FEM_ObjectBroker *theObjectBroker = 0);
     ShadowExpSite(const ShadowExpSite& es);
     
     // destructor

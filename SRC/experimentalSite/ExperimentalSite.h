@@ -122,7 +122,7 @@ protected:
     // [0]:disp, [1]:vel, [2]:accel, [3]:force, [4]:time
     ID* sizeTrial;
     ID* sizeOut;
-        
+    
     // daqFlag = false (first time) / true (NOT first time)
     bool daqFlag;
     

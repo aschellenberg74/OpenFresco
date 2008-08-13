@@ -49,10 +49,9 @@ ExperimentalSetup::ExperimentalSetup(int tag,
 {
     sizeCtrl = new ID(OF_Resp_All);
     sizeDaq = new ID(OF_Resp_All);
-    if (sizeCtrl == 0 || sizeDaq == 0) {
-        opserr << "FATAL ExperimentalSetup::ExperimentalSetup - "
-            << "fail to create ID."
-            << endln;
+    if (sizeCtrl == 0 || sizeDaq == 0)  {
+        opserr << "ExperimentalSetup::ExperimentalSetup() - "
+            << "failed to create ID.\n";
         exit(OF_ReturnType_failed);
     }
 }
@@ -69,12 +68,11 @@ ExperimentalSetup::ExperimentalSetup(const ExperimentalSetup& es)
     dForceFact(0), dTimeFact(0),
     sizeCtrl(0), sizeDaq(0)
 {
-    if (es.theControl != 0) {
+    if (es.theControl != 0)  {
         theControl = (es.theControl)->getCopy();
-        if (theControl == 0) {
-            opserr << "FATAL ExperimentalSetup::ExperimentalSetup - "
-                << "fail to get a copy of control system."
-                << endln;
+        if (theControl == 0)  {
+            opserr << "ExperimentalSetup::ExperimentalSetup() - "
+                << "failed to get a copy of control system.\n";
             exit(OF_ReturnType_failed);
         }
         theControl->setup();
@@ -82,18 +80,17 @@ ExperimentalSetup::ExperimentalSetup(const ExperimentalSetup& es)
     
     sizeCtrl = new ID(OF_Resp_All);
     sizeDaq = new ID(OF_Resp_All);
-    if (sizeCtrl == 0 || sizeDaq == 0) {
-        opserr << "FATAL ExperimentalSetup::ExperimentalSetup - "
-            << "fail to create ID."
-            << endln;
+    if (sizeCtrl == 0 || sizeDaq == 0)  {
+        opserr << "ExperimentalSetup::ExperimentalSetup() - "
+            << "failed to create ID.\n";
         exit(OF_ReturnType_failed);
     }
     *sizeCtrl = *(es.sizeCtrl);
     *sizeDaq = *(es.sizeDaq);
-
+    
     this->setCtrl();
     this->setDaq();
-
+    
     if (es.cDispFact != 0)
         *cDispFact = *(es.cDispFact);
     if (es.cVelFact != 0)
@@ -179,7 +176,7 @@ int ExperimentalSetup::setCtrlDaqSize()
     this->setCtrl();
     this->setDaq();
     
-    if (theControl != 0) {
+    if (theControl != 0)  {
         theControl->setSize(*sizeCtrl, *sizeDaq);
         theControl->setup();
     }
@@ -196,11 +193,16 @@ int ExperimentalSetup::setTrialResponse(const Vector* disp,
 {
     // transform data
     this->transfTrialResponse(disp, vel, accel, force, time);
-
-    if (theControl != 0) {
-        theControl->setTrialResponse(cDisp, cVel, cAccel, cForce, cTime);
-        
-        theControl->getDaqResponse(dDisp, dVel, dAccel, dForce, dTime);
+    
+    if (theControl != 0)  {
+        int rValue;
+        // set trial response at the control
+        rValue = theControl->setTrialResponse(cDisp, cVel, cAccel, cForce, cTime);
+        if (rValue != OF_ReturnType_completed)  {
+            opserr << "ExperimentalSetup::setTrialResponse() - "
+                << "failed to set trial response at the control.\n";
+            exit(OF_ReturnType_failed);
+        }
     }
     
     return OF_ReturnType_completed;
@@ -213,21 +215,16 @@ int ExperimentalSetup::getTrialResponse(Vector* disp,
     Vector* force,
     Vector* time)
 {
-    if (cDisp != 0) {
+    if (cDisp != 0)
         *disp = *cDisp;
-    }
-    if (cVel != 0) {
+    if (cVel != 0)
         *vel = *cVel;
-    }
-    if (cAccel != 0) {
+    if (cAccel != 0)
         *accel = *cAccel;
-    }
-    if (cForce != 0) {
+    if (cForce != 0)
         *force = *cForce;
-    }
-    if (cTime != 0) {
+    if (cTime != 0)
         *time = *cTime;
-    }
     
     return OF_ReturnType_completed;
 }
@@ -239,21 +236,16 @@ int ExperimentalSetup::setDaqResponse(const Vector* disp,
     const Vector* force,
     const Vector* time)
 {
-    if (dDisp != 0) {
+    if (dDisp != 0)
         *dDisp = *disp;
-    }
-    if (dVel != 0) {
+    if (dVel != 0)
         *dVel = *vel;
-    }
-    if (dAccel != 0) {
+    if (dAccel != 0)
         *dAccel = *accel;
-    }
-    if (dForce != 0) {
+    if (dForce != 0)
         *dForce = *force;
-    }
-    if (dTime != 0) {
+    if (dTime != 0)
         *dTime = *time;
-    }
     
     return OF_ReturnType_completed;
 }
@@ -265,8 +257,16 @@ int ExperimentalSetup::getDaqResponse(Vector* disp,
     Vector* force,
     Vector* time)
 {
-    if (theControl != 0)
-        theControl->getDaqResponse(dDisp, dVel, dAccel, dForce, dTime);
+    if (theControl != 0)  {
+        int rValue;
+        // get daq response from the control
+        rValue = theControl->getDaqResponse(dDisp, dVel, dAccel, dForce, dTime);
+        if (rValue != OF_ReturnType_completed)  {
+            opserr << "ExperimentalSetup::getDaqResponse() - "
+                << "failed to get daq response from the control.\n";
+            exit(OF_ReturnType_failed);
+        }
+    }
     
     // transform data
     this->transfDaqResponse(disp, vel, accel, force, time);
@@ -282,27 +282,27 @@ int ExperimentalSetup::transfTrialResponse(const Vector* disp,
     const Vector* time)
 {
     // transform data
-    if (disp != 0) {
+    if (disp != 0)  {
         this->transfTrialDisp(disp);
         for (int i=0; i<(*sizeCtrl)[OF_Resp_Disp]; i++)
             (*cDisp)[i] *= (*cDispFact)[i];
     }
-    if (vel != 0) {
+    if (vel != 0)  {
         this->transfTrialVel(vel);
         for (int i=0; i<(*sizeCtrl)[OF_Resp_Vel]; i++)
             (*cVel)[i] *= (*cVelFact)[i];
     }
-    if (accel != 0) {
+    if (accel != 0)  {
         this->transfTrialAccel(accel);
         for (int i=0; i<(*sizeCtrl)[OF_Resp_Accel]; i++)
             (*cAccel)[i] *= (*cAccelFact)[i];
     }
-    if (force != 0) {
+    if (force != 0)  {
         this->transfTrialForce(force);
         for (int i=0; i<(*sizeCtrl)[OF_Resp_Force]; i++)
             (*cForce)[i] *= (*cForceFact)[i];
     }
-    if (time != 0) {
+    if (time != 0)  {
         this->transfTrialTime(time);
         for (int i=0; i<(*sizeCtrl)[OF_Resp_Time]; i++)
             (*cTime)[i] *= (*cTimeFact)[i];
@@ -319,27 +319,27 @@ int ExperimentalSetup::transfDaqResponse(Vector* disp,
     Vector* time)
 {
     // transform data
-    if (disp != 0) {
+    if (disp != 0)  {
         for (int i=0; i<(*sizeDaq)[OF_Resp_Disp]; i++)
             (*dDisp)[i] *= (*dDispFact)[i];
         this->transfDaqDisp(disp);
     }
-    if (vel != 0) {
+    if (vel != 0)  {
         for (int i=0; i<(*sizeDaq)[OF_Resp_Vel]; i++)
             (*dVel)[i]  *= (*dVelFact)[i];
         this->transfDaqVel(vel);
     }
-    if (accel != 0) {
+    if (accel != 0)  {
         for (int i=0; i<(*sizeDaq)[OF_Resp_Accel]; i++)
             (*dAccel)[i] *= (*dAccelFact)[i];
         this->transfDaqAccel(accel);
     }
-    if (force != 0) {
+    if (force != 0)  {
         for (int i=0; i<(*sizeDaq)[OF_Resp_Force]; i++)
             (*dForce)[i] *= (*dForceFact)[i];
         this->transfDaqForce(force);
     }
-    if (time != 0) {
+    if (time != 0)  {
         for (int i=0; i<(*sizeDaq)[OF_Resp_Time]; i++)
             (*dTime)[i] *= (*dTimeFact)[i];
         this->transfDaqTime(time);
@@ -351,8 +351,14 @@ int ExperimentalSetup::transfDaqResponse(Vector* disp,
 
 int ExperimentalSetup::commitState()
 {
-    if (theControl != 0) {
-        theControl->commitState();
+    if (theControl != 0)  {
+        int rValue;
+        rValue = theControl->commitState();
+        if (rValue != OF_ReturnType_completed)  {
+            opserr << "ExperimentalSetup::commitState() - "
+                << "failed to commit state for the control.\n";
+            exit(OF_ReturnType_failed);
+        }
     }
     
     return OF_ReturnType_completed;
@@ -361,9 +367,9 @@ int ExperimentalSetup::commitState()
 
 void ExperimentalSetup::setCtrlDispFactor(const Vector& f)
 {
-    if (f.Size() != getCtrlSize(OF_Resp_Disp)) {
-        opserr << "FATAL ExperimentalSetup::setCtrlDispFactor - "
-            << "invalid size\n";
+    if (f.Size() != getCtrlSize(OF_Resp_Disp))  {
+        opserr << "ExperimentalSetup::setCtrlDispFactor() - "
+            << "invalid size.\n";
         exit(OF_ReturnType_failed);
     }
     *cDispFact = f;
@@ -372,9 +378,9 @@ void ExperimentalSetup::setCtrlDispFactor(const Vector& f)
 
 void ExperimentalSetup::setCtrlVelFactor(const Vector& f)
 {
-    if (f.Size() != getCtrlSize(OF_Resp_Vel)) {
-        opserr << "FATAL ExperimentalSetup::setCtrlVelFactor - "
-            << "invalid size\n";
+    if (f.Size() != getCtrlSize(OF_Resp_Vel))  {
+        opserr << "ExperimentalSetup::setCtrlVelFactor() - "
+            << "invalid size.\n";
         exit(OF_ReturnType_failed);
     }
     *cVelFact = f;
@@ -383,9 +389,9 @@ void ExperimentalSetup::setCtrlVelFactor(const Vector& f)
 
 void ExperimentalSetup::setCtrlAccelFactor(const Vector& f)
 {
-    if (f.Size() != getCtrlSize(OF_Resp_Accel)) {
-        opserr << "FATAL ExperimentalSetup::setCtrlAccelFactor - "
-            << "invalid size\n";
+    if (f.Size() != getCtrlSize(OF_Resp_Accel))  {
+        opserr << "ExperimentalSetup::setCtrlAccelFactor() - "
+            << "invalid size.\n";
         exit(OF_ReturnType_failed);
     }
     *cAccelFact = f;
@@ -394,9 +400,9 @@ void ExperimentalSetup::setCtrlAccelFactor(const Vector& f)
 
 void ExperimentalSetup::setCtrlForceFactor(const Vector& f)
 {
-    if (f.Size() != getCtrlSize(OF_Resp_Force)) {
-        opserr << "FATAL ExperimentalSetup::setCtrlForceFactor - "
-            << "invalid size\n";
+    if (f.Size() != getCtrlSize(OF_Resp_Force))  {
+        opserr << "ExperimentalSetup::setCtrlForceFactor() - "
+            << "invalid size.\n";
         exit(OF_ReturnType_failed);
     }
     *cForceFact = f;
@@ -405,9 +411,9 @@ void ExperimentalSetup::setCtrlForceFactor(const Vector& f)
 
 void ExperimentalSetup::setCtrlTimeFactor(const Vector& f)
 {
-    if (f.Size() != getCtrlSize(OF_Resp_Time)) {
-        opserr << "FATAL ExperimentalSetup::setCtrlTimeFactor - "
-            << "invalid size\n";
+    if (f.Size() != getCtrlSize(OF_Resp_Time))  {
+        opserr << "ExperimentalSetup::setCtrlTimeFactor() - "
+            << "invalid size.\n";
         exit(OF_ReturnType_failed);
     }
     *cTimeFact = f;
@@ -416,9 +422,9 @@ void ExperimentalSetup::setCtrlTimeFactor(const Vector& f)
 
 void ExperimentalSetup::setDaqDispFactor(const Vector& f)
 {
-    if (f.Size() != getDaqSize(OF_Resp_Disp)) {
-        opserr << "FATAL ExperimentalSetup::setDaqDispFactor - "
-            << "invalid size\n";
+    if (f.Size() != getDaqSize(OF_Resp_Disp))  {
+        opserr << "ExperimentalSetup::setDaqDispFactor() - "
+            << "invalid size.\n";
         exit(OF_ReturnType_failed);
     }
     *dDispFact = f;
@@ -427,9 +433,9 @@ void ExperimentalSetup::setDaqDispFactor(const Vector& f)
 
 void ExperimentalSetup::setDaqVelFactor(const Vector& f)
 {
-    if (f.Size() != getDaqSize(OF_Resp_Vel)) {
-        opserr << "FATAL ExperimentalSetup::setDaqVelFactor - "
-            << "invalid size\n";
+    if (f.Size() != getDaqSize(OF_Resp_Vel))  {
+        opserr << "ExperimentalSetup::setDaqVelFactor() - "
+            << "invalid size.\n";
         exit(OF_ReturnType_failed);
     }
     *dVelFact = f;
@@ -438,9 +444,9 @@ void ExperimentalSetup::setDaqVelFactor(const Vector& f)
 
 void ExperimentalSetup::setDaqAccelFactor(const Vector& f)
 {
-    if (f.Size() != getDaqSize(OF_Resp_Accel)) {
-        opserr << "FATAL ExperimentalSetup::setDaqAccelFactor - "
-            << "invalid size\n";
+    if (f.Size() != getDaqSize(OF_Resp_Accel))  {
+        opserr << "ExperimentalSetup::setDaqAccelFactor() - "
+            << "invalid size.\n";
         exit(OF_ReturnType_failed);
     }
     *dAccelFact = f;
@@ -449,9 +455,9 @@ void ExperimentalSetup::setDaqAccelFactor(const Vector& f)
 
 void ExperimentalSetup::setDaqForceFactor(const Vector& f)
 {
-    if (f.Size() != getDaqSize(OF_Resp_Force)) {
-        opserr << "FATAL ExperimentalSetup::setDaqForceFactor - "
-            << "invalid size\n";
+    if (f.Size() != getDaqSize(OF_Resp_Force))  {
+        opserr << "ExperimentalSetup::setDaqForceFactor() - "
+            << "invalid size.\n";
         exit(OF_ReturnType_failed);
     }
     *dForceFact = f;
@@ -460,9 +466,9 @@ void ExperimentalSetup::setDaqForceFactor(const Vector& f)
 
 void ExperimentalSetup::setDaqTimeFactor(const Vector& f)
 {
-    if (f.Size() != getDaqSize(OF_Resp_Time)) {
-        opserr << "FATAL ExperimentalSetup::setDaqTimeFactor - "
-            << "invalid size\n";
+    if (f.Size() != getDaqSize(OF_Resp_Time))  {
+        opserr << "ExperimentalSetup::setDaqTimeFactor() - "
+            << "invalid size.\n";
         exit(OF_ReturnType_failed);
     }
     *dTimeFact = f;
@@ -495,87 +501,87 @@ int ExperimentalSetup::getDaqSize(int rType)
 
 void ExperimentalSetup::setCtrl()
 {
-    if (cDisp != 0) {
+    if (cDisp != 0)  {
         delete cDisp;
         cDisp = 0;
     }
-    if (cVel != 0) {
+    if (cVel != 0)  {
         delete cVel;
         cVel = 0;
     }
-    if (cAccel != 0) {
+    if (cAccel != 0)  {
         delete cAccel;
         cAccel = 0;
     }
-    if (cForce != 0) {
+    if (cForce != 0)  {
         delete cForce;
         cForce = 0;
     }
-    if (cTime != 0) {
+    if (cTime != 0)  {
         delete cTime;
         cTime = 0;
     }
-    if (cDispFact != 0) {
+    if (cDispFact != 0)  {
         delete cDispFact;
         cDispFact = 0;
     }
-    if (cVelFact != 0) {
+    if (cVelFact != 0)  {
         delete cVelFact;
         cVelFact = 0;
     }
-    if (cAccelFact != 0) {
+    if (cAccelFact != 0)  {
         delete cAccelFact;
         cAccelFact = 0;
     }
-    if (cForceFact != 0) {
+    if (cForceFact != 0)  {
         delete cForceFact;
         cForceFact = 0;
     }
-    if (cTimeFact != 0) {
+    if (cTimeFact != 0)  {
         delete cTimeFact;
         cTimeFact = 0;
     }
-
+    
     int size, i;
     size = (*sizeCtrl)[OF_Resp_Disp];
-    if (size != 0) {
+    if (size != 0)  {
         cDisp = new Vector(size);
-        if (cDispFact == 0) {
+        if (cDispFact == 0)  {
             cDispFact = new Vector(size);
             for (i=0; i<size; i++)
                 (*cDispFact)[i] = 1.0;
         }
-        if (cDisp == 0 || cDispFact == 0) {
-            opserr << "FATAL ExperimentalSetup::setCtrl - "
-                << "failed to create Vector\n";
+        if (cDisp == 0 || cDispFact == 0)  {
+            opserr << "ExperimentalSetup::setCtrl() - "
+                << "failed to create Vector.\n";
             exit(OF_ReturnType_failed);
         }
     }
     size = (*sizeCtrl)[OF_Resp_Vel];
-    if (size != 0) {
+    if (size != 0)  {
         cVel = new Vector(size);
-        if (cVelFact == 0) {
+        if (cVelFact == 0)  {
             cVelFact = new Vector(size);
             for (i=0; i<size; i++)
                 (*cVelFact)[i] = 1.0;
         }
-        if (cVel == 0 || cVelFact == 0) {
-            opserr << "FATAL ExperimentalSetup::setCtrl - "
-                << "failed to create Vector\n";
+        if (cVel == 0 || cVelFact == 0)  {
+            opserr << "ExperimentalSetup::setCtrl() - "
+                << "failed to create Vector.\n";
             exit(OF_ReturnType_failed);
         }
     }
     size = (*sizeCtrl)[OF_Resp_Accel];
-    if (size != 0) {
+    if (size != 0)  {
         cAccel = new Vector(size);
-        if (cAccelFact == 0) {
+        if (cAccelFact == 0)  {
             cAccelFact = new Vector(size);
             for (i=0; i<size; i++)
                 (*cAccelFact)[i] = 1.0;
         }
-        if (cAccel == 0 || cAccelFact == 0) {
-            opserr << "FATAL ExperimentalSetup::setCtrl - "
-                << "failed to create Vector\n";
+        if (cAccel == 0 || cAccelFact == 0)  {
+            opserr << "ExperimentalSetup::setCtrl() - "
+                << "failed to create Vector.\n";
             exit(OF_ReturnType_failed);
         }
     }
@@ -587,23 +593,23 @@ void ExperimentalSetup::setCtrl()
             for (i=0; i<size; i++)
                 (*cForceFact)[i] = 1.0;
         }
-        if (cForce == 0 || cForceFact == 0) {
-            opserr << "FATAL ExperimentalSetup::setCtrl - "
-                << "failed to create Vector\n";
+        if (cForce == 0 || cForceFact == 0)  {
+            opserr << "ExperimentalSetup::setCtrl() - "
+                << "failed to create Vector.\n";
             exit(OF_ReturnType_failed);
         }
     }
     size = (*sizeCtrl)[OF_Resp_Time];
-    if (size != 0) {
+    if (size != 0)  {
         cTime = new Vector(size);
-        if (cTimeFact == 0) {
+        if (cTimeFact == 0)  {
             cTimeFact = new Vector(size);
             for (i=0; i<size; i++)
                 (*cTimeFact)[i] = 1.0;
         }
-        if (cTime == 0 || cTimeFact == 0) {
-            opserr << "FATAL ExperimentalSetup::setCtrl - "
-                << "failed to create Vector\n";
+        if (cTime == 0 || cTimeFact == 0)  {
+            opserr << "ExperimentalSetup::setCtrl() - "
+                << "failed to create Vector.\n";
             exit(OF_ReturnType_failed);
         }
     }
@@ -612,115 +618,115 @@ void ExperimentalSetup::setCtrl()
 
 void ExperimentalSetup::setDaq()
 {
-    if (dDisp != 0) {
+    if (dDisp != 0)  {
         delete dDisp;
         dDisp = 0;
     }
-    if (dVel != 0) {
+    if (dVel != 0)  {
         delete dVel;
         dVel = 0;
     }
-    if (dAccel != 0) {
+    if (dAccel != 0)  {
         delete dAccel;
         dAccel = 0;
     }
-    if (dForce != 0) {
+    if (dForce != 0)  {
         delete dForce;
         dForce = 0;
     }
-    if (dTime != 0) {
+    if (dTime != 0)  {
         delete dTime;
         dTime = 0;
     }
-    if (dDispFact != 0) {
+    if (dDispFact != 0)  {
         delete dDispFact;
         dDispFact = 0;
     }
-    if (dVelFact != 0) {
+    if (dVelFact != 0)  {
         delete dVelFact;
         dVelFact = 0;
     }
-    if (dAccelFact != 0) {
+    if (dAccelFact != 0)  {
         delete dAccelFact;
         dAccelFact = 0;
     }
-    if (dForceFact != 0) {
+    if (dForceFact != 0)  {
         delete dForceFact;
         dForceFact = 0;
     }
-    if (dTimeFact != 0) {
+    if (dTimeFact != 0)  {
         delete dTimeFact;
         dTimeFact = 0;
     }
-
+    
     int size, i;
     size = (*sizeDaq)[OF_Resp_Disp];
-    if (size != 0) {
+    if (size != 0)  {
         dDisp = new Vector(size);
-        if (dDispFact == 0) {
+        if (dDispFact == 0)  {
             dDispFact = new Vector(size);
             for (i=0; i<size; i++)
                 (*dDispFact)[i] = 1.0;
         }
-        if (dDisp == 0 || dDispFact == 0) {
-            opserr << "FATAL ExperimentalSetup::setDaq - "
-                << "failed to create Vector\n";
+        if (dDisp == 0 || dDispFact == 0)  {
+            opserr << "ExperimentalSetup::setDaq() - "
+                << "failed to create Vector.\n";
             exit(OF_ReturnType_failed);
         }
     }
     size = (*sizeDaq)[OF_Resp_Vel];
-    if (size != 0) {
+    if (size != 0)  {
         dVel = new Vector(size);
-        if (dVelFact == 0) {
+        if (dVelFact == 0)  {
             dVelFact = new Vector(size);
             for (i=0; i<size; i++)
                 (*dVelFact)[i] = 1.0;
         }
-        if (dVel == 0 || dVelFact == 0) {
-            opserr << "FATAL ExperimentalSetup::setDaq - "
-                << "failed to create Vector\n";
+        if (dVel == 0 || dVelFact == 0)  {
+            opserr << "ExperimentalSetup::setDaq() - "
+                << "failed to create Vector.\n";
             exit(OF_ReturnType_failed);
         }
     }
     size = (*sizeDaq)[OF_Resp_Accel];
-    if (size != 0) {
+    if (size != 0)  {
         dAccel = new Vector(size);
-        if (dAccelFact == 0) {
+        if (dAccelFact == 0)  {
             dAccelFact = new Vector(size);
             for (i=0; i<size; i++)
                 (*dAccelFact)[i] = 1.0;
         }
-        if (dAccel == 0 || dAccelFact == 0) {
-            opserr << "FATAL ExperimentalSetup::setDaq - "
-                << "failed to create Vector\n";
+        if (dAccel == 0 || dAccelFact == 0)  {
+            opserr << "ExperimentalSetup::setDaq() - "
+                << "failed to create Vector.\n";
             exit(OF_ReturnType_failed);
         }
     }
     size = (*sizeDaq)[OF_Resp_Force];
-    if (size != 0) {
+    if (size != 0)  {
         dForce = new Vector(size);
-        if (dForceFact == 0) {
+        if (dForceFact == 0)  {
             dForceFact = new Vector(size);
             for (i=0; i<size; i++)
                 (*dForceFact)[i] = 1.0;
         }
-        if (dForce == 0 || dForceFact == 0) {
-            opserr << "FATAL ExperimentalSetup::setDaq - "
-                << "failed to create Vector\n";
+        if (dForce == 0 || dForceFact == 0)  {
+            opserr << "ExperimentalSetup::setDaq() - "
+                << "failed to create Vector.\n";
             exit(OF_ReturnType_failed);
         }
     }
     size = (*sizeDaq)[OF_Resp_Time];
-    if (size != 0) {
+    if (size != 0)  {
         dTime = new Vector(size);
-        if (dTimeFact == 0) {
+        if (dTimeFact == 0)  {
             dTimeFact = new Vector(size);
             for (i=0; i<size; i++)
                 (*dTimeFact)[i] = 1.0;
         }
-        if (dTime == 0 || dTimeFact == 0) {
-            opserr << "FATAL ExperimentalSetup::setDaq - "
-                << "failed to create Vector\n";
+        if (dTime == 0 || dTimeFact == 0)  {
+            opserr << "ExperimentalSetup::setDaq() - "
+                << "failed to create Vector.\n";
             exit(OF_ReturnType_failed);
         }
     }
@@ -732,7 +738,7 @@ void ExperimentalSetup::setDaq()
     int nCtrl = theCPs.getNumComponents();
     if (cpsCtrl != 0)
         delete cpsCtrl;
-    if (nCtrl == 0) {
+    if (nCtrl == 0)  {
         opserr << "invalid size of cpsCtrl";
     }
     cpsCtrl = new ArrayOfTaggedObjects(nCtrl*OF_Resp_All);
@@ -743,18 +749,18 @@ void ExperimentalSetup::setDaq()
     sizeCtrl->Zero();
     
     int i;
-    for (i=1; i<=nCtrl; i++) {
+    for (i=1; i<=nCtrl; i++)  {
         TaggedObject *mc = theCPs.getComponentPtr(i);
-        if (mc == 0) {
-            opserr << "FATAL ExperimentalSetup::setCtrlCPs - "
-                << "failed to get ExperimentalCP\n";
+        if (mc == 0)  {
+            opserr << "ExperimentalSetup::setCtrlCPs() - "
+                << "failed to get ExperimentalCP.\n";
             exit(OF_ReturnType_failed);
         }
         ExperimentalCP *theCP = (ExperimentalCP*)mc;
         cpsCtrl->addComponent(theCP->getCopy());
         
         int respType = theCP->getResponseType();
-        switch(respType) {
+        switch(respType)  {
         case OF_Resp_Disp:
             (*sizeCtrl)[OF_Resp_Disp]++;
             break;
@@ -781,10 +787,10 @@ void ExperimentalSetup::setDaq()
     
     // set factor
     int di = 0, vi = 0, ai = 0, fi = 0, ti = 0;
-    for (i=1; i<=nCtrl; i++) {
+    for (i=1; i<=nCtrl; i++)  {
         ExperimentalCP *theCP = (ExperimentalCP*)(cpsCtrl->getComponentPtr(i));
         int respType = theCP->getResponseType();
-        switch(respType) {
+        switch(respType)  {
         case OF_Resp_Disp:
             (*cDispFact)[di++] = theCP->getFactor();
             break;
@@ -817,7 +823,7 @@ void ExperimentalSetup::setDaqCPs(ArrayOfTaggedObjects &theCPs)
     int nDaq = theCPs.getNumComponents();
     if (cpsDaq != 0)
         delete cpsDaq;
-    if (nDaq == 0) {
+    if (nDaq == 0)  {
         opserr << "invalid size of cpsDaq";
     }
     cpsDaq = new ArrayOfTaggedObjects(nDaq*OF_Resp_All);
@@ -828,18 +834,18 @@ void ExperimentalSetup::setDaqCPs(ArrayOfTaggedObjects &theCPs)
     sizeDaq->Zero();
     
     int i;
-    for (i=1; i<=nDaq; i++) {
+    for (i=1; i<=nDaq; i++)  {
         TaggedObject *mc = theCPs.getComponentPtr(i);
-        if (mc == 0) {
-            opserr << "FATAL ExperimentalSetup::setDaqCPs - "
-                << "failed to get ExperimentalCP\n";
+        if (mc == 0)  {
+            opserr << "ExperimentalSetup::setDaqCPs() - "
+                << "failed to get ExperimentalCP.\n";
             exit(OF_ReturnType_failed);
         }
         ExperimentalCP *theCP = (ExperimentalCP*)mc;
         cpsDaq->addComponent(theCP->getCopy());
         
         int respType = theCP->getResponseType();
-        switch(respType) {
+        switch(respType)  {
         case OF_Resp_Disp:
             (*sizeDaq)[OF_Resp_Disp]++;
             break;
@@ -866,10 +872,10 @@ void ExperimentalSetup::setDaqCPs(ArrayOfTaggedObjects &theCPs)
     
     // set factor
     int di = 0, vi = 0, ai = 0, fi = 0, ti = 0;
-    for (i=1; i<=nDaq; i++) {
+    for (i=1; i<=nDaq; i++)  {
         ExperimentalCP *theCP = (ExperimentalCP*)(cpsDaq->getComponentPtr(i));
         int respType = theCP->getResponseType();
-        switch(respType) {
+        switch(respType)  {
         case OF_Resp_Disp:
             (*dDispFact)[di++] = theCP->getFactor();
             break;
