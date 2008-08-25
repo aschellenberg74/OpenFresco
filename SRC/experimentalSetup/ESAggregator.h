@@ -42,7 +42,6 @@ public:
     // constructors
     ESAggregator(int tag, int nSetups,
         ExperimentalSetup** setups,
-        ID *sizeTrialAll, ID *sizeOutAll,
         ExperimentalControl* control = 0);
     ESAggregator(const ESAggregator& es);
     
@@ -50,11 +49,7 @@ public:
     virtual ~ESAggregator();
     
     // public methods
-    virtual int setSize(ID sizeT, ID sizeO);
-    virtual int commitState();
     virtual int setup();
-    
-    // public methods to transform the responses
     virtual int transfTrialResponse(const Vector* disp,
         const Vector* vel,
         const Vector* accel,
@@ -65,7 +60,9 @@ public:
         Vector* accel,
         Vector* force,
         Vector* time);
-
+    
+    virtual int commitState();
+    
     virtual ExperimentalSetup *getCopy();
     
     // public methods for output
@@ -88,39 +85,39 @@ protected:
 private:
     int numSetups;                  // number of setups to aggregate
     ExperimentalSetup **theSetups;  // setups to aggregate
-
+    
     ID *sizeTrialAll;       // sum of all setup trial responses
+    ID *sizeOutAll;         // sum of all setup output responses
     ID *sizeCtrlAll;        // sum of all setup control responses
     ID *sizeDaqAll;         // sum of all setup daq responses
-    ID *sizeOutAll;         // sum of all setup output responses
-
+    
     // trial vectors for all setups
     Vector **tDispAll;
     Vector **tVelAll;
     Vector **tAccelAll;
     Vector **tForceAll;
     Vector **tTimeAll;
-
-    // control vectors for all setups
-    Vector **cDispAll;
-    Vector **cVelAll;
-    Vector **cAccelAll;
-    Vector **cForceAll;
-    Vector **cTimeAll;
-
-    // daq vectors for all setups
-    Vector **dDispAll;
-    Vector **dVelAll;
-    Vector **dAccelAll;
-    Vector **dForceAll;
-    Vector **dTimeAll;
-
+    
     // output vectors for all setups
     Vector **oDispAll;
     Vector **oVelAll;
     Vector **oAccelAll;
     Vector **oForceAll;
     Vector **oTimeAll;
+    
+    // control vectors for all setups
+    Vector **cDispAll;
+    Vector **cVelAll;
+    Vector **cAccelAll;
+    Vector **cForceAll;
+    Vector **cTimeAll;
+    
+    // daq vectors for all setups
+    Vector **dDispAll;
+    Vector **dVelAll;
+    Vector **dAccelAll;
+    Vector **dForceAll;
+    Vector **dTimeAll;    
 };
 
 #endif

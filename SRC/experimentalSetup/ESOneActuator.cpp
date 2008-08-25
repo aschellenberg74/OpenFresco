@@ -3,22 +3,19 @@
 **                 for Experimental Setup and Control                 **
 **                                                                    **
 **                                                                    **
-** Copyright (c) 2006, Yoshikazu Takahashi, Kyoto University          **
-** All rights reserved.                                               **
+** Copyright (c) 2006, The Regents of the University of California    **
+** All Rights Reserved.                                               **
 **                                                                    **
-** Licensed under the modified BSD License (the "License");           **
-** you may not use this file except in compliance with the License.   **
-** You may obtain a copy of the License in main directory.            **
-** Unless required by applicable law or agreed to in writing,         **
-** software distributed under the License is distributed on an        **
-** "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,       **
-** either express or implied. See the License for the specific        **
-** language governing permissions and limitations under the License.  **
+** Commercial use of this program without express permission of the   **
+** University of California, Berkeley, is strictly prohibited. See    **
+** file 'COPYRIGHT_UCB' in main directory for information on usage    **
+** and redistribution, and for a DISCLAIMER OF ALL WARRANTIES.        **
 **                                                                    **
 ** Developed by:                                                      **
-**   Yoshikazu Takahashi (yos@catfish.dpri.kyoto-u.ac.jp)             **
 **   Andreas Schellenberg (andreas.schellenberg@gmx.net)              **
+**   Yoshikazu Takahashi (yos@catfish.dpri.kyoto-u.ac.jp)             **
 **   Gregory L. Fenves (fenves@berkeley.edu)                          **
+**   Stephen A. Mahin (mahin@berkeley.edu)                            **
 **                                                                    **
 ** ****************************************************************** */
 
@@ -26,7 +23,7 @@
 // $Date$
 // $URL: $
 
-// Written: Yoshi (yos@catfish.dpri.kyoto-u.ac.jp)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
 // Created: 09/06
 // Revision: A
 //
@@ -36,11 +33,19 @@
 
 
 ESOneActuator::ESOneActuator(int tag, 
-    int dir,
+    int dir, int sizet, int sizeo,
     ExperimentalControl* control)
     : ExperimentalSetup(tag, control),
-    direction(dir)
+    direction(dir), sizeT(sizet), sizeO(sizeo)
 {
+    // check if direction agrees with sizeT and sizeO
+    if (dir < 0 || dir >= sizeT || dir >= sizeO)  {
+        opserr << "ESOneActuator::ESOneActuator() - "
+            << "direction of actuator is out of bound:"
+            << dir << endln;
+        exit(OF_ReturnType_failed);
+    }
+    
     // call setup method
     this->setup();
 }
@@ -50,7 +55,9 @@ ESOneActuator::ESOneActuator(const ESOneActuator& es)
     : ExperimentalSetup(es)
 {
     direction = es.direction;
-
+    sizeT     = es.sizeT;
+    sizeO     = es.sizeO;
+    
     // call setup method
     this->setup();
 }
@@ -62,32 +69,32 @@ ESOneActuator::~ESOneActuator()
 }
 
 
-int ESOneActuator::setSize(ID sizeT, ID sizeO)
+int ESOneActuator::setup()
 {
-    // check sizeTrial and sizeOut
-    // for ESOneActuator object
+    // setup the trial/out vectors
+    sizeTrial->Zero();
+    sizeOut->Zero();
+    for (int i=0; i<OF_Resp_Time; i++)  {
+        (*sizeTrial)(i) = sizeT;
+        (*sizeOut)(i) = sizeO;
+    }
+    (*sizeTrial)(OF_Resp_Time) = 1;
+    (*sizeOut)(OF_Resp_Time) = 1;
     
-    // a component of sizeT/sizeO must be greater 
-    // than "direction" if it is non-zero.
-    for (int i=0; i<OF_Resp_Time; i++) {
-        if ((sizeT[i] != 0 && sizeT[i] <= direction) ||
-            (sizeO[i] != 0 && sizeO[i] <= direction)) {
-            opserr << "ESOneActuator::setSize - wrong sizeTrial/Out\n"; 
-            opserr << "see User Manual.\n";
-            opserr << "sizeT = " << sizeT;
-            opserr << "sizeO = " << sizeO;
-            return OF_ReturnType_failed;
-        }
+    this->setTrialOutSize();
+    
+    // setup the ctrl/daq vectors
+    sizeCtrl->Zero();
+    sizeDaq->Zero();
+    for (int i=0; i<OF_Resp_Time; i++)  {
+        (*sizeCtrl)(i) = 1;
+        (*sizeDaq)(i) = 1;
     }
-    if ((sizeT[OF_Resp_Time] != 0 && sizeT[OF_Resp_Time] != 1) ||
-        (sizeO[OF_Resp_Time] != 0 && sizeO[OF_Resp_Time] != 1)) {
-        opserr << "ESOneActuator::setSize - wrong sizeTrial/Out\n"; 
-        opserr << "see User Manual.\n";
-        opserr << "sizeT = " << sizeT;
-        opserr << "sizeO = " << sizeO;
-        return OF_ReturnType_failed;
-    }
-     
+    (*sizeCtrl)(OF_Resp_Time) = 1;
+    (*sizeDaq)(OF_Resp_Time) = 1;
+    
+    this->setCtrlDaqSize();
+    
     return OF_ReturnType_completed;
 }
 
@@ -95,24 +102,6 @@ int ESOneActuator::setSize(ID sizeT, ID sizeO)
 int ESOneActuator::commitState()
 {
     return theControl->commitState();
-}
-
-
-int ESOneActuator::setup()
-{
-    // setup for ctrl/daq vectors of ESOneActuator
-    sizeCtrl->Zero();
-    sizeDaq->Zero();
-    for (int i=0; i<OF_Resp_Time; i++) {
-        (*sizeCtrl)[i] = 1;
-        (*sizeDaq)[i] = 1;
-    }
-    (*sizeCtrl)[OF_Resp_Time] = 1;
-    (*sizeDaq)[OF_Resp_Time] = 1;
-    
-    this->setCtrlDaqSize();
-    
-    return OF_ReturnType_completed;
 }
 
 

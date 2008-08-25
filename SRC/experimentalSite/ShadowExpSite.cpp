@@ -104,7 +104,6 @@ ShadowExpSite::ShadowExpSite(const ShadowExpSite& es)
     rDisp(0), rVel(0), rAccel(0), rForce(0), rTime(0)
 {
     dataSize = es.dataSize;
-    
     sendV.resize(dataSize);
     recvV.resize(dataSize);
 }
@@ -143,40 +142,6 @@ ShadowExpSite::~ShadowExpSite()
 }
 
 
-int ShadowExpSite::setSize(ID sizeT, ID sizeO) 
-{
-    this->ExperimentalSite::setSize(sizeT, sizeO);
-    
-    if (theSetup != 0)  {
-        theSetup->setSize(sizeT, sizeO);
-        int nCtrl = 0, nDaq = 0;
-        for (int i=0; i<OF_Resp_All; i++)  {
-            nCtrl += getCtrlSize(i);
-            nDaq  += getDaqSize(i);
-        }
-        if (dataSize < 1+nCtrl) dataSize = 1+nCtrl;
-        if (dataSize < nDaq)    dataSize = nDaq;
-    } else  {
-        int nInput = 0, nOutput = 0;
-        for (int i=0; i<OF_Resp_All; i++)  {
-            nInput  += sizeT[i];
-            nOutput += sizeO[i];
-        }
-        if (dataSize < 1+nInput) dataSize = 1+nInput;
-        if (dataSize < nOutput)  dataSize = nOutput;
-    }
-    
-    // send experimental setup to remote
-    this->setup();
-    
-    // resize channel Vectors
-    sendV.resize(dataSize);
-    recvV.resize(dataSize);
-    
-    return OF_ReturnType_completed;
-}
-
-
 int ShadowExpSite::setup()
 {    
     sendV(0) = OF_RemoteTest_setup;
@@ -194,6 +159,41 @@ int ShadowExpSite::setup()
         // send sizeOut
         this->sendID(*sizeOut);
     }
+    
+    return OF_ReturnType_completed;
+}
+
+
+int ShadowExpSite::setSize(ID sizeT, ID sizeO) 
+{
+    // call the base class method
+    this->ExperimentalSite::setSize(sizeT, sizeO);
+    
+    if (theSetup != 0)  {
+        theSetup->checkSize(sizeT, sizeO);
+        int nCtrl = 0, nDaq = 0;
+        for (int i=0; i<OF_Resp_All; i++)  {
+            nCtrl += getCtrlSize(i);
+            nDaq  += getDaqSize(i);
+        }
+        if (dataSize < 1+nCtrl) dataSize = 1+nCtrl;
+        if (dataSize < nDaq)    dataSize = nDaq;
+    } else  {
+        int nInput = 0, nOutput = 0;
+        for (int i=0; i<OF_Resp_All; i++)  {
+            nInput  += sizeT(i);
+            nOutput += sizeO(i);
+        }
+        if (dataSize < 1+nInput) dataSize = 1+nInput;
+        if (dataSize < nOutput)  dataSize = nOutput;
+    }
+    
+    // send experimental setup to ActorExpSite
+    this->setup();
+    
+    // resize channel Vectors
+    sendV.resize(dataSize);
+    recvV.resize(dataSize);
     
     return OF_ReturnType_completed;
 }
@@ -350,22 +350,22 @@ int ShadowExpSite::checkDaqResponse()
             // set daq response at the setup
             theSetup->setDaqResponse(rDisp, rVel, rAccel, rForce, rTime);
             // transform daq response
-            theSetup->transfDaqResponse(Disp, Vel, Accel, Force, Time);
+            theSetup->transfDaqResponse(oDisp, oVel, oAccel, oForce, oTime);
         } else  {
-            if (Disp != 0) 
-                *Disp = *rDisp;
-            if (Vel != 0) 
-                *Vel = *rVel;
-            if (Accel != 0) 
-                *Accel = *rAccel;
-            if (Force != 0) 
-                *Force = *rForce;
-            if (Time != 0) 
-                *Time = *rTime;
+            if (oDisp != 0) 
+                *oDisp = *rDisp;
+            if (oVel != 0) 
+                *oVel = *rVel;
+            if (oAccel != 0) 
+                *oAccel = *rAccel;
+            if (oForce != 0) 
+                *oForce = *rForce;
+            if (oTime != 0) 
+                *oTime = *rTime;
         }
         
         // save data in basic sys
-        this->ExperimentalSite::setDaqResponse(Disp, Vel, Accel, Force, Time); 
+        this->ExperimentalSite::setDaqResponse(oDisp, oVel, oAccel, oForce, oTime); 
         
         // set daq flag
         daqFlag = true;

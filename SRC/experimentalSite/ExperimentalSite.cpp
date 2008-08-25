@@ -38,11 +38,10 @@
 
 ExperimentalSite::ExperimentalSite(int tag, 
     ExperimentalSetup *setup)
-    : TaggedObject(tag),
-    theSetup(setup),
-    tDisp(0), tVel(0), tAccel(0), tForce(0), tTime(0),
-    Disp(0), Vel(0), Accel(0), Force(0), Time(0),
+    : TaggedObject(tag), theSetup(setup),
     sizeTrial(0), sizeOut(0),
+    tDisp(0), tVel(0), tAccel(0), tForce(0), tTime(0),
+    oDisp(0), oVel(0), oAccel(0), oForce(0), oTime(0),
     daqFlag(false)
 {
     sizeTrial = new ID(OF_Resp_All);
@@ -55,16 +54,15 @@ ExperimentalSite::ExperimentalSite(int tag,
 }
 
 
-ExperimentalSite::ExperimentalSite(const ExperimentalSite& site)
-    : TaggedObject(site.getTag()),
-    theSetup(0),
-    tDisp(0), tVel(0), tAccel(0), tForce(0), tTime(0),
-    Disp(0), Vel(0), Accel(0), Force(0), Time(0),
+ExperimentalSite::ExperimentalSite(const ExperimentalSite& es)
+    : TaggedObject(es.getTag()), theSetup(0),
     sizeTrial(0), sizeOut(0),
+    tDisp(0), tVel(0), tAccel(0), tForce(0), tTime(0),
+    oDisp(0), oVel(0), oAccel(0), oForce(0), oTime(0),
     daqFlag(false)
 {
-    if (site.theSetup != 0)  {
-        theSetup = (site.theSetup)->getCopy();
+    if (es.theSetup != 0)  {
+        theSetup = (es.theSetup)->getCopy();
         if (theSetup == 0)  {
             opserr << "ExperimentalSite::ExperimentalSite() - "
                 << "failed to get a copy of setup.\n";
@@ -79,8 +77,8 @@ ExperimentalSite::ExperimentalSite(const ExperimentalSite& site)
             << "failed to create ID.\n";
         exit(OF_ReturnType_failed);
     }
-    *sizeTrial = *(site.sizeTrial);
-    *sizeOut = *(site.sizeOut);
+    *sizeTrial = *(es.sizeTrial);
+    *sizeOut = *(es.sizeOut);
     
     this->setTrial();
     this->setOut();
@@ -103,16 +101,16 @@ ExperimentalSite::~ExperimentalSite()
     if (tTime != 0)
         delete tTime;
     
-    if (Disp != 0) 
-        delete Disp;
-    if (Vel != 0) 
-        delete Vel;
-    if (Accel != 0) 
-        delete Accel;
-    if (Force != 0) 
-        delete Force;
-    if (Time != 0)
-        delete Time;
+    if (oDisp != 0) 
+        delete oDisp;
+    if (oVel != 0) 
+        delete oVel;
+    if (oAccel != 0) 
+        delete oAccel;
+    if (oForce != 0) 
+        delete oForce;
+    if (oTime != 0)
+        delete oTime;
     
     if (sizeTrial != 0)
         delete sizeTrial;
@@ -154,9 +152,24 @@ int ExperimentalSite::setTrialResponse(const Vector* disp,
 }
 
 
-int ExperimentalSite::setTrialDisp(const Vector* disp)
+int ExperimentalSite::setDaqResponse(const Vector* disp,
+    const Vector* vel,
+    const Vector* accel,
+    const Vector* force,
+    const Vector* time)
 {
-    return setTrialResponse(disp, (Vector*)0, (Vector*)0, (Vector*)0, (Vector*)0);
+    if (oDisp != 0)
+        *oDisp = *disp;
+    if (oVel != 0)
+        *oVel = *vel;
+    if (oAccel != 0)
+        *oAccel = *accel;
+    if (oForce != 0)
+        *oForce = *force;
+    if (oTime != 0)
+        *oTime = *time;
+    
+    return OF_ReturnType_completed;
 }
 
 
@@ -168,37 +181,16 @@ int ExperimentalSite::getDaqResponse(Vector* disp,
 {
     this->checkDaqResponse();
     
-    if (Disp != 0)
-        *disp = *Disp;
-    if (Vel != 0)
-        *vel = *Vel;
-    if (Accel != 0)
-        *accel = *Accel;
-    if (Force != 0)
-        *force = *Force;
-    if (Time != 0)
-        *time = *Time;
-    
-    return OF_ReturnType_completed;
-}
-
-
-int ExperimentalSite::setDaqResponse(const Vector* disp,
-    const Vector* vel,
-    const Vector* accel,
-    const Vector* force,
-    const Vector* time)
-{
-    if (Disp != 0)
-        *Disp = *disp;
-    if (Vel != 0)
-        *Vel = *vel;
-    if (Accel != 0)
-        *Accel = *accel;
-    if (Force != 0)
-        *Force = *force;
-    if (Time != 0)
-        *Time = *time;
+    if (oDisp != 0)
+        *disp = *oDisp;
+    if (oVel != 0)
+        *vel = *oVel;
+    if (oAccel != 0)
+        *accel = *oAccel;
+    if (oForce != 0)
+        *force = *oForce;
+    if (oTime != 0)
+        *time = *oTime;
     
     return OF_ReturnType_completed;
 }
@@ -238,7 +230,7 @@ const Vector& ExperimentalSite::getDisp()
 {
     this->checkDaqResponse();
     
-    return *Disp;
+    return *oDisp;
 }
 
 
@@ -246,7 +238,7 @@ const Vector& ExperimentalSite::getVel()
 {
     this->checkDaqResponse();
     
-    return *Vel;
+    return *oVel;
 }
 
 
@@ -254,7 +246,7 @@ const Vector& ExperimentalSite::getAccel()
 {
     this->checkDaqResponse();
     
-    return *Accel;
+    return *oAccel;
 }
 
 
@@ -262,7 +254,7 @@ const Vector& ExperimentalSite::getForce()
 {
     this->checkDaqResponse();
     
-    return *Force;
+    return *oForce;
 }
 
 
@@ -270,7 +262,7 @@ const Vector& ExperimentalSite::getTime()
 {
     this->checkDaqResponse();
     
-    return *Time;
+    return *oTime;
 }
 
 
@@ -280,22 +272,52 @@ int ExperimentalSite::commitState()
 }
 
 
+ID ExperimentalSite::getTrialSize()
+{
+    return *sizeTrial;
+}
+
+
+ID ExperimentalSite::getOutSize()
+{
+    return *sizeOut;
+}
+
+
+ID ExperimentalSite::getCtrlSize()
+{
+    if (theSetup == 0)
+        return *sizeTrial;
+    else
+        return theSetup->getCtrlSize();
+}
+
+
+ID ExperimentalSite::getDaqSize()
+{
+    if (theSetup == 0)
+        return *sizeOut;
+    else
+        return theSetup->getDaqSize();
+}
+
+
 int ExperimentalSite::getTrialSize(int rType)
 {
-    return (*sizeTrial)[rType];
+    return (*sizeTrial)(rType);
 }
 
 
 int ExperimentalSite::getOutSize(int rType)
 {
-    return (*sizeOut)[rType];
+    return (*sizeOut)(rType);
 }
 
 
 int ExperimentalSite::getCtrlSize(int rType)
 {
     if (theSetup == 0)
-        return (*sizeTrial)[rType];
+        return (*sizeTrial)(rType);
     else
         return theSetup->getCtrlSize(rType);
 }
@@ -304,7 +326,7 @@ int ExperimentalSite::getCtrlSize(int rType)
 int ExperimentalSite::getDaqSize(int rType)
 {
     if (theSetup == 0)
-        return (*sizeOut)[rType];
+        return (*sizeOut)(rType);
     else
         return theSetup->getDaqSize(rType);
 }
@@ -334,7 +356,7 @@ void ExperimentalSite::setTrial()
     }
     
     int size;
-    size = (*sizeTrial)[OF_Resp_Disp];
+    size = (*sizeTrial)(OF_Resp_Disp);
     if (size != 0)  {
         tDisp = new Vector(size);
         if (tDisp == 0)  {
@@ -343,7 +365,7 @@ void ExperimentalSite::setTrial()
             exit(OF_ReturnType_failed);
         }
     }
-    size = (*sizeTrial)[OF_Resp_Vel];
+    size = (*sizeTrial)(OF_Resp_Vel);
     if (size != 0)  {
         tVel = new Vector(size);
         if (tVel == 0)  {
@@ -352,7 +374,7 @@ void ExperimentalSite::setTrial()
             exit(OF_ReturnType_failed);
         }
     }
-    size = (*sizeTrial)[OF_Resp_Accel];
+    size = (*sizeTrial)(OF_Resp_Accel);
     if (size != 0)  {
         tAccel = new Vector(size);
         if (tAccel == 0)  {
@@ -361,7 +383,7 @@ void ExperimentalSite::setTrial()
             exit(OF_ReturnType_failed);
         }
     }
-    size = (*sizeTrial)[OF_Resp_Force];
+    size = (*sizeTrial)(OF_Resp_Force);
     if (size != 0)  {
         tForce = new Vector(size);
         if (tForce == 0)  {
@@ -370,7 +392,7 @@ void ExperimentalSite::setTrial()
             exit(OF_ReturnType_failed);
         }
     }
-    size = (*sizeTrial)[OF_Resp_Time];
+    size = (*sizeTrial)(OF_Resp_Time);
     if (size != 0)  {
         tTime = new Vector(size);
         if (tTime == 0)  {
@@ -384,68 +406,68 @@ void ExperimentalSite::setTrial()
 
 void ExperimentalSite::setOut()
 {
-    if (Disp != 0)  {
-        delete Disp;
-        Disp = 0;
+    if (oDisp != 0)  {
+        delete oDisp;
+        oDisp = 0;
     }
-    if (Vel != 0)  {
-        delete Vel;
-        Vel = 0;
+    if (oVel != 0)  {
+        delete oVel;
+        oVel = 0;
     }
-    if (Accel != 0)  {
-        delete Accel;
-        Accel = 0;
+    if (oAccel != 0)  {
+        delete oAccel;
+        oAccel = 0;
     }
-    if (Force != 0)  {
-        delete Force;
-        Force = 0;
+    if (oForce != 0)  {
+        delete oForce;
+        oForce = 0;
     }
-    if (Time != 0)  {
-        delete Time;
-        Time = 0;
+    if (oTime != 0)  {
+        delete oTime;
+        oTime = 0;
     }
     
     int size;
-    size = (*sizeOut)[OF_Resp_Disp];
+    size = (*sizeOut)(OF_Resp_Disp);
     if (size != 0)  {
-        Disp = new Vector(size);
-        if (Disp == 0)  {
+        oDisp = new Vector(size);
+        if (oDisp == 0)  {
             opserr << "ExperimentalSite::setOut() - "
                 << "failed to create Disp Vector.\n";
             exit(OF_ReturnType_failed);
         }
     }
-    size = (*sizeOut)[OF_Resp_Vel];
+    size = (*sizeOut)(OF_Resp_Vel);
     if (size != 0)  {
-        Vel = new Vector(size);
-        if (Vel == 0)  {
+        oVel = new Vector(size);
+        if (oVel == 0)  {
             opserr << "ExperimentalSite::setOut() - "
                 << "failed to create Vel Vector.\n";
             exit(OF_ReturnType_failed);
         }
     }
-    size = (*sizeOut)[OF_Resp_Accel];
+    size = (*sizeOut)(OF_Resp_Accel);
     if (size != 0)  {
-        Accel = new Vector(size);
-        if (Accel == 0)  {
+        oAccel = new Vector(size);
+        if (oAccel == 0)  {
             opserr << "ExperimentalSite::setOut() - "
                 << "failed to create Accel Vector.\n";
             exit(OF_ReturnType_failed);
         }
     }
-    size = (*sizeOut)[OF_Resp_Force];
+    size = (*sizeOut)(OF_Resp_Force);
     if (size != 0)  {
-        Force = new Vector(size);
-        if (Force == 0)  {
+        oForce = new Vector(size);
+        if (oForce == 0)  {
             opserr << "ExperimentalSite::setOut() - "
                 << "failed to create Force Vector.\n";
             exit(OF_ReturnType_failed);
         }
     }
-    size = (*sizeOut)[OF_Resp_Time];
+    size = (*sizeOut)(OF_Resp_Time);
     if (size != 0)  {
-        Time = new Vector(size);
-        if (Time == 0)  {
+        oTime = new Vector(size);
+        if (oTime == 0)  {
             opserr << "ExperimentalSite::setOut() - "
                 << "failed to create Time Vector.\n";
             exit(OF_ReturnType_failed);
@@ -467,7 +489,7 @@ void ExperimentalSite::setOut()
     
     if (sizeTrial != 0)
         delete [] sizeTrial;
-    sizeTrial = new ID[OF_Resp_All];
+    sizeTrial = new ID(OF_Resp_All);
     sizeTrial->Zero();
     
     for (int i=1; i<=nTrial; i++) {
@@ -483,23 +505,23 @@ void ExperimentalSite::setOut()
         int respType = theCP->getResponseType();
         switch(respType) {
         case OF_Resp_Disp:
-            (*sizeTrial)[OF_Resp_Disp]++;
+            (*sizeTrial)(OF_Resp_Disp)++;
             break;
         case OF_Resp_Vel:
-            (*sizeTrial)[OF_Resp_Vel]++;
+            (*sizeTrial)(OF_Resp_Vel)++;
             break;
         case OF_Resp_Accel:
-            (*sizeTrial)[OF_Resp_Accel]++;
+            (*sizeTrial)(OF_Resp_Accel)++;
             break;
         case OF_Resp_Force:
-            (*sizeTrial)[OF_Resp_Force]++;
+            (*sizeTrial)(OF_Resp_Force)++;
             break;
         case OF_Resp_Time:
-            (*sizeTrial)[OF_Resp_Time]++;
+            (*sizeTrial)(OF_Resp_Time)++;
             break;
         case OF_Resp_All:
             for (int i=0; i<OF_Resp_All; i++)
-                (*sizeTrial)[i]++;
+                (*sizeTrial)(i)++;
             break;
         }
     }
@@ -537,23 +559,23 @@ void ExperimentalSite::setOutCPs(ArrayOfTaggedObjects &theCPs)
         int respType = theCP->getResponseType();
         switch(respType) {
         case OF_Resp_Disp:
-            (*sizeOut)[OF_Resp_Disp]++;
+            (*sizeOut)(OF_Resp_Disp)++;
             break;
         case OF_Resp_Vel:
-            (*sizeOut)[OF_Resp_Vel]++;
+            (*sizeOut)(OF_Resp_Vel)++;
             break;
         case OF_Resp_Accel:
-            (*sizeOut)[OF_Resp_Accel]++;
+            (*sizeOut)(OF_Resp_Accel)++;
             break;
         case OF_Resp_Force:
-            (*sizeOut)[OF_Resp_Force]++;
+            (*sizeOut)(OF_Resp_Force)++;
             break;
         case OF_Resp_Time:
-            (*sizeOut)[OF_Resp_Time]++;
+            (*sizeOut)(OF_Resp_Time)++;
             break;
         case OF_Resp_All:
             for (int i=0; i<OF_Resp_All; i++)
-                (*sizeOut)[i]++;
+                (*sizeOut)(i)++;
             break;
         }
     }

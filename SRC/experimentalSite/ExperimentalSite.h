@@ -51,32 +51,30 @@ public:
     // constructors
     ExperimentalSite(int tag, 
         ExperimentalSetup *setup = 0);
-    ExperimentalSite(const ExperimentalSite &site);
+    ExperimentalSite(const ExperimentalSite &es);
     
     // destructor
     virtual ~ExperimentalSite();
     
     // public methods to set and to get responses
-    virtual int setSize(ID sizeT, ID sizeO);
     virtual int setup() = 0;
+    virtual int setSize(ID sizeT, ID sizeO);
     
     virtual int setTrialResponse(const Vector* disp,
         const Vector* vel,
         const Vector* accel,
         const Vector* force,
         const Vector* time);
-    virtual int setTrialDisp(const Vector* disp);
-    
-    virtual int getDaqResponse(Vector* disp,
-        Vector* vel,
-        Vector* accel,
-        Vector* force,
-        Vector* time);
     virtual int setDaqResponse(const Vector* disp,
         const Vector* vel,
         const Vector* accel,
         const Vector* force,
         const Vector* time);
+    virtual int getDaqResponse(Vector* disp,
+        Vector* vel,
+        Vector* accel,
+        Vector* force,
+        Vector* time);
     virtual int checkDaqResponse() = 0;
     
     virtual const Vector& getTrialDisp();
@@ -95,6 +93,11 @@ public:
     
     virtual ExperimentalSite *getCopy() = 0;
     
+    virtual ID getTrialSize();
+    virtual ID getOutSize();
+    virtual ID getCtrlSize();
+    virtual ID getDaqSize();
+
     virtual int getTrialSize(int rType);
     virtual int getOutSize(int rType);
     virtual int getCtrlSize(int rType);
@@ -104,24 +107,23 @@ protected:
     // pointer of ExperimentalSetup
     ExperimentalSetup* theSetup;
     
-    // trial data
+    // size of trial/out data
+    // [0]:disp, [1]:vel, [2]:accel, [3]:force, [4]:time
+    ID* sizeTrial;
+    ID* sizeOut;
+    
+    // trial/out data
     Vector* tDisp;
     Vector* tVel;
     Vector* tAccel;
     Vector* tForce;
     Vector* tTime;
     
-    // output data
-    Vector* Disp;
-    Vector* Vel;
-    Vector* Accel;
-    Vector* Force;
-    Vector* Time;
-    
-    // size of trial/out data
-    // [0]:disp, [1]:vel, [2]:accel, [3]:force, [4]:time
-    ID* sizeTrial;
-    ID* sizeOut;
+    Vector* oDisp;
+    Vector* oVel;
+    Vector* oAccel;
+    Vector* oForce;
+    Vector* oTime;
     
     // daqFlag = false (first time) / true (NOT first time)
     bool daqFlag;

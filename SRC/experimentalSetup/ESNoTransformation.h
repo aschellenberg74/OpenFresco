@@ -42,7 +42,7 @@ class ESNoTransformation : public ExperimentalSetup
 public:
     // constructors
     ESNoTransformation(int tag,
-		const ID &direction,
+		const ID &direction, int sizeT, int sizeO,
 		ExperimentalControl* control = 0);
     ESNoTransformation(const ESNoTransformation& es);
 	
@@ -50,9 +50,9 @@ public:
     virtual ~ESNoTransformation();
 	
     // public methods
-    virtual int setSize(ID sizeT, ID sizeO);
-    virtual int commitState();
     virtual int setup();
+    
+    virtual int commitState();
 	
     virtual ExperimentalSetup *getCopy();
 	
@@ -72,11 +72,12 @@ protected:
     virtual int transfDaqAccel(Vector* accel);
     virtual int transfDaqForce(Vector* force);
     virtual int transfDaqTime(Vector* time);
-
+    
 private:
     int numDir;     // number of directions
     ID *direction;  // array of directions 0-5
+    int sizeT;      // trial size of disp, vel, accel, force
+    int sizeO;      // output size of disp, vel, accel, force
 };
-
 
 #endif

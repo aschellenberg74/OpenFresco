@@ -55,9 +55,10 @@ public:
     virtual ~ExperimentalSetup();
     
     // public methods to set and to obtain responses
-    virtual int setSize(ID sizeT, ID sizeO) = 0;
     virtual int setup() = 0;
+    virtual int setTrialOutSize();
     virtual int setCtrlDaqSize();
+    virtual int checkSize(ID sizeT, ID sizeO);
     
     virtual int setTrialResponse(const Vector* disp,
         const Vector* vel,
@@ -96,6 +97,18 @@ public:
     
     virtual ExperimentalSetup *getCopy() = 0;
     
+    void setTrialDispFactor(const Vector& f);
+    void setTrialVelFactor(const Vector& f);
+    void setTrialAccelFactor(const Vector& f);
+    void setTrialForceFactor(const Vector& f);
+    void setTrialTimeFactor(const Vector& f);
+    
+    void setOutDispFactor(const Vector& f);
+    void setOutVelFactor(const Vector& f);
+    void setOutAccelFactor(const Vector& f);
+    void setOutForceFactor(const Vector& f);
+    void setOutTimeFactor(const Vector& f);
+    
     void setCtrlDispFactor(const Vector& f);
     void setCtrlVelFactor(const Vector& f);
     void setCtrlAccelFactor(const Vector& f);
@@ -108,8 +121,13 @@ public:
     void setDaqForceFactor(const Vector& f);
     void setDaqTimeFactor(const Vector& f);
     
+    virtual ID getTrialSize();
+    virtual ID getOutSize();
     virtual ID getCtrlSize();
     virtual ID getDaqSize();
+
+    virtual int getTrialSize(int rType);
+    virtual int getOutSize(int rType);
     virtual int getCtrlSize(int rType);
     virtual int getDaqSize(int rType);
     
@@ -117,7 +135,30 @@ protected:
     // pointer to experimental control
     ExperimentalControl *theControl;
     
-    // control data
+    // size of trial/out data
+    // [0]:disp, [1]:vel, [2]:accel, [3]:force, [4]:time
+    ID* sizeTrial;
+    ID* sizeOut;
+    
+    // size of ctrl/daq data
+    // [0]:disp, [1]:vel, [2]:accel, [3]:force, [4]:time
+    ID *sizeCtrl;
+    ID *sizeDaq;
+    
+    // trial/out data
+    Vector *tDisp;
+    Vector *tVel;
+    Vector *tAccel;
+    Vector *tForce;
+    Vector *tTime;
+    
+    Vector *oDisp;
+    Vector *oVel;
+    Vector *oAccel;
+    Vector *oForce;
+    Vector *oTime;
+    
+    // ctrl/daq data
     Vector *cDisp;
     Vector *cVel;
     Vector *cAccel;
@@ -130,7 +171,20 @@ protected:
     Vector *dForce;
     Vector *dTime;
     
-    // factor data
+    // trial/out factor data
+    Vector *tDispFact;
+    Vector *tVelFact;
+    Vector *tAccelFact;
+    Vector *tForceFact;
+    Vector *tTimeFact;
+    
+    Vector *oDispFact;
+    Vector *oVelFact;
+    Vector *oAccelFact;
+    Vector *oForceFact;
+    Vector *oTimeFact;
+    
+    // ctrl/daq factor data
     Vector *cDispFact;
     Vector *cVelFact;
     Vector *cAccelFact;
@@ -142,11 +196,6 @@ protected:
     Vector *dAccelFact;
     Vector *dForceFact;
     Vector *dTimeFact;
-    
-    // size of ctrl/daq data
-    // sizeCtrl/Daq[0]:disp, [1]:vel, [2]:accel, [3]:force, [4]:time
-    ID *sizeCtrl; // size of ctrlV
-    ID *sizeDaq;  // size of daqV
     
     // protected tranformation methods
     virtual int transfTrialDisp(const Vector* disp) = 0;
@@ -161,6 +210,8 @@ protected:
     virtual int transfDaqForce(Vector* force) = 0;
     virtual int transfDaqTime(Vector* time) = 0;
     
+    virtual void setTrial();
+    virtual void setOut();
     virtual void setCtrl();
     virtual void setDaq();
 };

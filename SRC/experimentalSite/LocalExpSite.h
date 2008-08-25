@@ -46,14 +46,14 @@ public:
     // constructors
     LocalExpSite(int tag, 
         ExperimentalSetup* setup);
-    LocalExpSite(const LocalExpSite &site);
+    LocalExpSite(const LocalExpSite &es);
     
     // destructor
     virtual ~LocalExpSite();
     
     // public methods to set and to get responses
-    virtual int setSize(ID sizeT, ID sizeO);
     virtual int setup();
+    virtual int setSize(ID sizeT, ID sizeO);
     
     virtual int setTrialResponse(const Vector* disp,
         const Vector* vel,

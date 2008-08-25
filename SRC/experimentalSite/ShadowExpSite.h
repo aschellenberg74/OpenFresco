@@ -60,8 +60,8 @@ public:
     virtual ~ShadowExpSite();
     
     // public methods to set and to obtain responses
-    virtual int setSize(ID sizeT, ID sizeO);
     virtual int setup();
+    virtual int setSize(ID sizeT, ID sizeO);
     
     virtual int setTrialResponse(const Vector* disp,
         const Vector* vel,

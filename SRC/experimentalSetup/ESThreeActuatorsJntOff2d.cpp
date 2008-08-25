@@ -88,53 +88,29 @@ ESThreeActuatorsJntOff2d::~ESThreeActuatorsJntOff2d()
 }
 
 
-int ESThreeActuatorsJntOff2d::setSize(ID sizeT, ID sizeO)
-{
-    // check sizeTrial and sizeOut
-    // for ESThreeActuatorsJntOff2d object
-    
-    // a component of sizeT/sizeO must be equal
-    // to 3 if it is non-zero.
-    for (int i=0; i<OF_Resp_Time; i++) {
-        if ((sizeT[i] != 0 && sizeT[i] != 3) ||
-            (sizeO[i] != 0 && sizeO[i] != 3)) {
-            opserr << "ESThreeActuatorsJntOff2d::setSize - wrong sizeTrial/Out\n"; 
-            opserr << "see User Manual.\n";
-            opserr << "sizeT = " << sizeT;
-            opserr << "sizeO = " << sizeO;
-            return OF_ReturnType_failed;
-        }
-    }
-    if ((sizeT[OF_Resp_Time] != 0 && sizeT[OF_Resp_Time] != 1) ||
-        (sizeO[OF_Resp_Time] != 0 && sizeO[OF_Resp_Time] != 1)) {
-        opserr << "ESThreeActuatorsJntOff2d::setSize - wrong sizeTrial/Out\n"; 
-        opserr << "see User Manual.\n";
-        opserr << "sizeT = " << sizeT;
-        opserr << "sizeO = " << sizeO;
-        return OF_ReturnType_failed;
-    }
-    
-    return OF_ReturnType_completed;
-}
-
-
-int ESThreeActuatorsJntOff2d::commitState()
-{
-    return theControl->commitState();
-}
-
-
 int ESThreeActuatorsJntOff2d::setup()
 {
-    // setup for ctrl/daq vectors of ESThreeActuatorsJntOff2d
+    // setup the trial/out vectors
+    sizeTrial->Zero();
+    sizeOut->Zero();
+    for (int i=0; i<OF_Resp_Time; i++)  {
+        (*sizeTrial)(i) = 3;
+        (*sizeOut)(i) = 3;
+    }
+    (*sizeTrial)(OF_Resp_Time) = 1;
+    (*sizeOut)(OF_Resp_Time) = 1;
+    
+    this->setTrialOutSize();
+    
+    // setup the ctrl/daq vectors
     sizeCtrl->Zero();
     sizeDaq->Zero();
-    for (int i=0; i<OF_Resp_Time; i++) {
-        (*sizeCtrl)[i] = 3;
-        (*sizeDaq)[i] = 3;
+    for (int i=0; i<OF_Resp_Time; i++)  {
+        (*sizeCtrl)(i) = 3;
+        (*sizeDaq)(i) = 3;
     }
-    (*sizeCtrl)[OF_Resp_Time] = 1;
-    (*sizeDaq)[OF_Resp_Time] = 1;
+    (*sizeCtrl)(OF_Resp_Time) = 1;
+    (*sizeDaq)(OF_Resp_Time) = 1;
     
     this->setCtrlDaqSize();
     
@@ -144,7 +120,7 @@ int ESThreeActuatorsJntOff2d::setup()
     rotLocX(0,0) = cos(phiLocX/180.0*pi); rotLocX(0,1) = -sin(phiLocX/180.0*pi);
     rotLocX(1,0) = sin(phiLocX/180.0*pi); rotLocX(1,1) =  cos(phiLocX/180.0*pi);
     rotLocX(2,2) = 1.0;
-
+    
     return OF_ReturnType_completed;
 }
 
@@ -156,33 +132,49 @@ int ESThreeActuatorsJntOff2d::transfTrialResponse(const Vector* disp,
     const Vector* time)
 {
     // transform data
-    if (disp != 0) {
-        this->transfTrialDisp(disp);
-        for (int i=0; i<(*sizeCtrl)[OF_Resp_Disp]; i++)
-            (*cDisp)[i] *= (*cDispFact)[i];
+    if (disp != 0)  {
+        for (int i=0; i<(*sizeTrial)(OF_Resp_Disp); i++)
+            (*tDisp)(i) = (*disp)(i) * (*tDispFact)(i);
+        this->transfTrialDisp(tDisp);
+        for (int i=0; i<(*sizeCtrl)(OF_Resp_Disp); i++)
+            (*cDisp)(i) *= (*cDispFact)(i);
     }
-    if (disp != 0 && vel != 0) {
-        this->transfTrialVel(disp,vel);
-        for (int i=0; i<(*sizeCtrl)[OF_Resp_Vel]; i++)
-            (*cVel)[i] *= (*cVelFact)[i];
+    if (disp != 0 && vel != 0)  {
+        for (int i=0; i<(*sizeTrial)(OF_Resp_Vel); i++)
+            (*tVel)(i) = (*vel)(i) * (*tVelFact)(i);
+        this->transfTrialVel(tDisp,tVel);
+        for (int i=0; i<(*sizeCtrl)(OF_Resp_Vel); i++)
+            (*cVel)(i) *= (*cVelFact)(i);
     }
-    if (disp != 0 && vel != 0 && accel != 0) {
-        this->transfTrialAccel(disp,vel,accel);
-        for (int i=0; i<(*sizeCtrl)[OF_Resp_Accel]; i++)
-            (*cAccel)[i] *= (*cAccelFact)[i];
+    if (disp != 0 && vel != 0 && accel != 0)  {
+        for (int i=0; i<(*sizeTrial)(OF_Resp_Accel); i++)
+            (*tAccel)(i) = (*accel)(i) * (*tAccelFact)(i);
+        this->transfTrialAccel(tDisp,tVel,tAccel);
+        for (int i=0; i<(*sizeCtrl)(OF_Resp_Accel); i++)
+            (*cAccel)(i) *= (*cAccelFact)(i);
     }
-    if (force != 0) {
-        this->transfTrialForce(force);
-        for (int i=0; i<(*sizeCtrl)[OF_Resp_Force]; i++)
-            (*cForce)[i] *= (*cForceFact)[i];
+    if (force != 0)  {
+        for (int i=0; i<(*sizeTrial)(OF_Resp_Force); i++)
+            (*tForce)(i) = (*force)(i) * (*tForceFact)(i);
+        this->transfTrialForce(tForce);
+        for (int i=0; i<(*sizeCtrl)(OF_Resp_Force); i++)
+            (*cForce)(i) *= (*cForceFact)(i);
     }
-    if (time != 0) {
-        this->transfTrialTime(time);
-        for (int i=0; i<(*sizeCtrl)[OF_Resp_Time]; i++)
-            (*cTime)[i] *= (*cTimeFact)[i];
+    if (time != 0)  {
+        for (int i=0; i<(*sizeTrial)(OF_Resp_Time); i++)
+            (*tTime)(i) = (*time)(i) * (*tTimeFact)(i);
+        this->transfTrialTime(tTime);
+        for (int i=0; i<(*sizeCtrl)(OF_Resp_Time); i++)
+            (*cTime)(i) *= (*cTimeFact)(i);
     }
     
     return OF_ReturnType_completed;
+}
+
+
+int ESThreeActuatorsJntOff2d::commitState()
+{
+    return theControl->commitState();
 }
 
 
