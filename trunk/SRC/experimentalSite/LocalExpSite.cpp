@@ -48,8 +48,8 @@ LocalExpSite::LocalExpSite(int tag,
 }
 
 
-LocalExpSite::LocalExpSite(const LocalExpSite& site)
-    : ExperimentalSite(site)
+LocalExpSite::LocalExpSite(const LocalExpSite& es)
+    : ExperimentalSite(es)
 {
     // does nothing
 }
@@ -61,18 +61,20 @@ LocalExpSite::~LocalExpSite()
 }
 
 
-int LocalExpSite::setSize(ID sizeT, ID sizeO)
+int LocalExpSite::setup()
 {
-    this->ExperimentalSite::setSize(sizeT, sizeO);
-    
-    theSetup->setSize(sizeT, sizeO);
-    
+    // does nothing
     return OF_ReturnType_completed;
 }
 
 
-int LocalExpSite::setup()
+int LocalExpSite::setSize(ID sizeT, ID sizeO)
 {
+    // call the base class method
+    this->ExperimentalSite::setSize(sizeT, sizeO);
+    
+    theSetup->checkSize(sizeT, sizeO);
+    
     return OF_ReturnType_completed;
 }
 
@@ -107,7 +109,7 @@ int LocalExpSite::checkDaqResponse()
     if (daqFlag == false)  {
         int rValue;
         // get daq response from the setup
-        rValue = theSetup->getDaqResponse(Disp, Vel, Accel, Force, Time);
+        rValue = theSetup->getDaqResponse(oDisp, oVel, oAccel, oForce, oTime);
         if (rValue != OF_ReturnType_completed)  {
             opserr << "LocalExpSite::checkDaqResponse() - "
                 << "failed to get daq response from the setup.\n";
@@ -115,7 +117,7 @@ int LocalExpSite::checkDaqResponse()
         }
         
         // save data in basic sys
-        this->ExperimentalSite::setDaqResponse(Disp, Vel, Accel, Force, Time);
+        this->ExperimentalSite::setDaqResponse(oDisp, oVel, oAccel, oForce, oTime);
         
         // set daq flag
         daqFlag = true;

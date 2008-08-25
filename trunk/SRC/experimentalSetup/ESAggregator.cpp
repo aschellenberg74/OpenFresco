@@ -34,23 +34,21 @@
 
 ESAggregator::ESAggregator(int tag, int nSetups,
 	ExperimentalSetup** setups,
-    ID *sizetrialall, ID *sizeoutall,
     ExperimentalControl* control)
 	: ExperimentalSetup(tag, control),
     numSetups(nSetups), theSetups(0),
-    sizeTrialAll(sizetrialall), sizeCtrlAll(0),
-    sizeDaqAll(0), sizeOutAll(sizeoutall),
+    sizeTrialAll(0), sizeOutAll(0), sizeCtrlAll(0), sizeDaqAll(0), 
     tDispAll(0), tVelAll(0), tAccelAll(0), tForceAll(0), tTimeAll(0),
+    oDispAll(0), oVelAll(0), oAccelAll(0), oForceAll(0), oTimeAll(0),
     cDispAll(0), cVelAll(0), cAccelAll(0), cForceAll(0), cTimeAll(0),
-    dDispAll(0), dVelAll(0), dAccelAll(0), dForceAll(0), dTimeAll(0),
-    oDispAll(0), oVelAll(0), oAccelAll(0), oForceAll(0), oTimeAll(0)
+    dDispAll(0), dVelAll(0), dAccelAll(0), dForceAll(0), dTimeAll(0)
 {
     if (setups == 0)  {
         opserr << "ESAggregator::ESAggregator() - "
             << "null experimental setup array passed\n";
         exit(OF_ReturnType_failed);
     }
-
+    
     // allocate memory for the experimental setups
     theSetups = new ExperimentalSetup* [numSetups];
     if (theSetups == 0)  {
@@ -58,23 +56,30 @@ ESAggregator::ESAggregator(int tag, int nSetups,
             << "failed to allocate pointers\n";
         exit(OF_ReturnType_failed);
     }
-
+    
     // get copies of the setups to be aggregated
     for (int i=0; i<numSetups; i++)  {
-        if (setups[i] == 0) {
+        if (setups[i] == 0)  {
             opserr << "ESAggregator::ESAggregator() - "
                 "null experimental setup pointer passed\n";
             exit(OF_ReturnType_failed);
         }
         theSetups[i] = setups[i]->getCopy();
-        if (theSetups[i] == 0) {
+        if (theSetups[i] == 0)  {
             opserr << "ESAggregator::ESAggregator() - "
                 << "failed to copy experimental setup\n";
             exit(OF_ReturnType_failed);
         }
     }
-
-    // allocate memory for the IDs and vectors
+    
+    // allocate memory for the IDs
+    sizeTrialAll = new ID [numSetups];
+    sizeOutAll = new ID [numSetups];
+    if (!sizeTrialAll || !sizeOutAll)  {
+        opserr << "ESAggregator::ESAggregator() - "
+            << "failed to create size ID arrays\n";
+        exit(OF_ReturnType_failed);
+    }
     sizeCtrlAll = new ID [numSetups];
     sizeDaqAll = new ID [numSetups];
     if (!sizeCtrlAll || !sizeDaqAll)  {
@@ -82,6 +87,8 @@ ESAggregator::ESAggregator(int tag, int nSetups,
             << "failed to create size ID arrays\n";
         exit(OF_ReturnType_failed);
     }
+    
+    // allocate memory for the vectors
     tDispAll = new Vector* [numSetups];
     tVelAll = new Vector* [numSetups];
     tAccelAll = new Vector* [numSetups];
@@ -90,6 +97,16 @@ ESAggregator::ESAggregator(int tag, int nSetups,
     if (!tDispAll || !tVelAll || !tAccelAll || !tForceAll || !tTimeAll)  {
         opserr << "ESAggregator::ESAggregator() - "
             << "failed to create trial Vector arrays\n";
+        exit(OF_ReturnType_failed);
+    }
+    oDispAll = new Vector* [numSetups];
+    oVelAll = new Vector* [numSetups];
+    oAccelAll = new Vector* [numSetups];
+    oForceAll = new Vector* [numSetups];
+    oTimeAll = new Vector* [numSetups];
+    if (!oDispAll || !oVelAll || !oAccelAll || !oForceAll || !oTimeAll)  {
+        opserr << "ESAggregator::ESAggregator() - "
+            << "failed to create output Vector arrays\n";
         exit(OF_ReturnType_failed);
     }
     cDispAll = new Vector* [numSetups];
@@ -112,6 +129,159 @@ ESAggregator::ESAggregator(int tag, int nSetups,
             << "failed to create data acquisition Vector arrays\n";
         exit(OF_ReturnType_failed);
     }
+    
+    // call setup method
+    this->setup();
+    
+    // finally initialize all the vectors
+    for (int i=0; i<numSetups; i++)  {
+        // trial vectors
+        tDispAll[i] = 0;
+        if (sizeTrialAll[i](OF_Resp_Disp) != 0)  {
+            tDispAll[i] = new Vector(sizeTrialAll[i](OF_Resp_Disp));
+        }
+        tVelAll[i] = 0;
+        if (sizeTrialAll[i](OF_Resp_Vel) != 0)  {
+            tVelAll[i] = new Vector(sizeTrialAll[i](OF_Resp_Vel));
+        }
+        tAccelAll[i] = 0;
+        if (sizeTrialAll[i](OF_Resp_Accel) != 0)  {
+            tAccelAll[i] = new Vector(sizeTrialAll[i](OF_Resp_Accel));
+        }
+        tForceAll[i] = 0;
+        if (sizeTrialAll[i](OF_Resp_Force) != 0)  {
+            tForceAll[i] = new Vector(sizeTrialAll[i](OF_Resp_Force));
+        }
+        tTimeAll[i] = 0;
+        if (sizeTrialAll[i](OF_Resp_Time) != 0)  {
+            tTimeAll[i] = new Vector(sizeTrialAll[i](OF_Resp_Time));
+        }
+        // output vectors
+        oDispAll[i] = 0;
+        if (sizeOutAll[i](OF_Resp_Disp) != 0)  {
+            oDispAll[i] = new Vector(sizeOutAll[i](OF_Resp_Disp));
+        }
+        oVelAll[i] = 0;
+        if (sizeOutAll[i](OF_Resp_Vel) != 0)  {
+            oVelAll[i] = new Vector(sizeOutAll[i](OF_Resp_Vel));
+        }
+        oAccelAll[i] = 0;
+        if (sizeOutAll[i](OF_Resp_Accel) != 0)  {
+            oAccelAll[i] = new Vector(sizeOutAll[i](OF_Resp_Accel));
+        }
+        oForceAll[i] = 0;
+        if (sizeOutAll[i](OF_Resp_Force) != 0)  {
+            oForceAll[i] = new Vector(sizeOutAll[i](OF_Resp_Force));
+        }
+        oTimeAll[i] = 0;
+        if (sizeOutAll[i](OF_Resp_Time) != 0)  {
+            oTimeAll[i] = new Vector(sizeOutAll[i](OF_Resp_Time));
+        }
+        // control vectors
+        cDispAll[i] = 0;
+        if (sizeCtrlAll[i](OF_Resp_Disp) != 0)  {
+            cDispAll[i] = new Vector(sizeCtrlAll[i](OF_Resp_Disp));
+        }
+        cVelAll[i] = 0;
+        if (sizeCtrlAll[i](OF_Resp_Vel) != 0)  {
+            cVelAll[i] = new Vector(sizeCtrlAll[i](OF_Resp_Vel));
+        }
+        cAccelAll[i] = 0;
+        if (sizeCtrlAll[i](OF_Resp_Accel) != 0)  {
+            cAccelAll[i] = new Vector(sizeCtrlAll[i](OF_Resp_Accel));
+        }
+        cForceAll[i] = 0;
+        if (sizeCtrlAll[i](OF_Resp_Force) != 0)  {
+            cForceAll[i] = new Vector(sizeCtrlAll[i](OF_Resp_Force));
+        }
+        cTimeAll[i] = 0;
+        if (sizeCtrlAll[i](OF_Resp_Time) != 0)  {
+            cTimeAll[i] = new Vector(sizeCtrlAll[i](OF_Resp_Time));
+        }
+        // data acquisition vectors
+        dDispAll[i] = 0;
+        if (sizeDaqAll[i](OF_Resp_Disp) != 0)  {
+            dDispAll[i] = new Vector(sizeDaqAll[i](OF_Resp_Disp));
+        }
+        dVelAll[i] = 0;
+        if (sizeDaqAll[i](OF_Resp_Vel) != 0)  {
+            dVelAll[i] = new Vector(sizeDaqAll[i](OF_Resp_Vel));
+        }
+        dAccelAll[i] = 0;
+        if (sizeDaqAll[i](OF_Resp_Accel) != 0)  {
+            dAccelAll[i] = new Vector(sizeDaqAll[i](OF_Resp_Accel));
+        }
+        dForceAll[i] = 0;
+        if (sizeDaqAll[i](OF_Resp_Force) != 0)  {
+            dForceAll[i] = new Vector(sizeDaqAll[i](OF_Resp_Force));
+        }
+        dTimeAll[i] = 0;
+        if (sizeDaqAll[i](OF_Resp_Time) != 0)  {
+            dTimeAll[i] = new Vector(sizeDaqAll[i](OF_Resp_Time));
+        }
+    }
+}
+
+
+ESAggregator::ESAggregator(const ESAggregator& es)
+	: ExperimentalSetup(es), theSetups(0),
+    sizeTrialAll(0), sizeOutAll(0), sizeCtrlAll(0), sizeDaqAll(0), 
+    tDispAll(0), tVelAll(0), tAccelAll(0), tForceAll(0), tTimeAll(0),
+    oDispAll(0), oVelAll(0), oAccelAll(0), oForceAll(0), oTimeAll(0),
+    cDispAll(0), cVelAll(0), cAccelAll(0), cForceAll(0), cTimeAll(0),
+    dDispAll(0), dVelAll(0), dAccelAll(0), dForceAll(0), dTimeAll(0)
+{
+    // allocate memory for the experimental setups
+    numSetups = es.numSetups;
+    theSetups = new ExperimentalSetup* [numSetups];
+    if (theSetups == 0)  {
+        opserr << "ESAggregator::ESAggregator() - "
+            << "failed to allocate pointers\n";
+        exit(OF_ReturnType_failed);
+    }
+    
+    // get copies of the setups to be aggregated
+    for (int i=0; i<numSetups; i++)  {
+        if (es.theSetups[i] == 0)  {
+            opserr << "ESAggregator::ESAggregator() - "
+                "null experimental setup pointer passed\n";
+            exit(OF_ReturnType_failed);
+        }
+        theSetups[i] = es.theSetups[i]->getCopy();
+        if (theSetups[i] == 0)  {
+            opserr << "ESAggregator::ESAggregator() - "
+                << "failed to copy experimental setup\n";
+            exit(OF_ReturnType_failed);
+        }
+    }
+    
+    // allocate memory for the IDs
+    sizeTrialAll = new ID [numSetups];
+    sizeOutAll = new ID [numSetups];
+    if (!sizeTrialAll || !sizeOutAll)  {
+        opserr << "ESAggregator::ESAggregator() - "
+            << "failed to create size ID arrays\n";
+        exit(OF_ReturnType_failed);
+    }
+    sizeCtrlAll = new ID [numSetups];
+    sizeDaqAll = new ID [numSetups];
+    if (!sizeCtrlAll || !sizeDaqAll)  {
+        opserr << "ESAggregator::ESAggregator() - "
+            << "failed to create size ID arrays\n";
+        exit(OF_ReturnType_failed);
+    }
+    
+    // allocate memory for the vectors
+    tDispAll = new Vector* [numSetups];
+    tVelAll = new Vector* [numSetups];
+    tAccelAll = new Vector* [numSetups];
+    tForceAll = new Vector* [numSetups];
+    tTimeAll = new Vector* [numSetups];
+    if (!tDispAll || !tVelAll || !tAccelAll || !tForceAll || !tTimeAll)  {
+        opserr << "ESAggregator::ESAggregator() - "
+            << "failed to create trial Vector arrays\n";
+        exit(OF_ReturnType_failed);
+    }
     oDispAll = new Vector* [numSetups];
     oVelAll = new Vector* [numSetups];
     oAccelAll = new Vector* [numSetups];
@@ -122,127 +292,115 @@ ESAggregator::ESAggregator(int tag, int nSetups,
             << "failed to create output Vector arrays\n";
         exit(OF_ReturnType_failed);
     }
-
+    cDispAll = new Vector* [numSetups];
+    cVelAll = new Vector* [numSetups];
+    cAccelAll = new Vector* [numSetups];
+    cForceAll = new Vector* [numSetups];
+    cTimeAll = new Vector* [numSetups];
+    if (!cDispAll || !cVelAll || !cAccelAll || !cForceAll || !cTimeAll)  {
+        opserr << "ESAggregator::ESAggregator() - "
+            << "failed to create control Vector arrays\n";
+        exit(OF_ReturnType_failed);
+    }
+    dDispAll = new Vector* [numSetups];
+    dVelAll = new Vector* [numSetups];
+    dAccelAll = new Vector* [numSetups];
+    dForceAll = new Vector* [numSetups];
+    dTimeAll = new Vector* [numSetups];
+    if (!dDispAll || !dVelAll || !dAccelAll || !dForceAll || !dTimeAll)  {
+        opserr << "ESAggregator::ESAggregator() - "
+            << "failed to create data acquisition Vector arrays\n";
+        exit(OF_ReturnType_failed);
+    }
+    
     // call setup method
     this->setup();
-
+    
     // finally initialize all the vectors
-    for (int i=0; i<numSetups; i++) {
+    for (int i=0; i<numSetups; i++)  {
         // trial vectors
         tDispAll[i] = 0;
-        if (sizeTrialAll[i](OF_Resp_Disp) != 0) {
+        if (sizeTrialAll[i](OF_Resp_Disp) != 0)  {
             tDispAll[i] = new Vector(sizeTrialAll[i](OF_Resp_Disp));
         }
         tVelAll[i] = 0;
-        if (sizeTrialAll[i](OF_Resp_Vel) != 0) {
+        if (sizeTrialAll[i](OF_Resp_Vel) != 0)  {
             tVelAll[i] = new Vector(sizeTrialAll[i](OF_Resp_Vel));
         }
         tAccelAll[i] = 0;
-        if (sizeTrialAll[i](OF_Resp_Accel) != 0) {
+        if (sizeTrialAll[i](OF_Resp_Accel) != 0)  {
             tAccelAll[i] = new Vector(sizeTrialAll[i](OF_Resp_Accel));
         }
         tForceAll[i] = 0;
-        if (sizeTrialAll[i](OF_Resp_Force) != 0) {
+        if (sizeTrialAll[i](OF_Resp_Force) != 0)  {
             tForceAll[i] = new Vector(sizeTrialAll[i](OF_Resp_Force));
         }
         tTimeAll[i] = 0;
-        if (sizeTrialAll[i](OF_Resp_Time) != 0) {
+        if (sizeTrialAll[i](OF_Resp_Time) != 0)  {
             tTimeAll[i] = new Vector(sizeTrialAll[i](OF_Resp_Time));
+        }
+        // output vectors
+        oDispAll[i] = 0;
+        if (sizeOutAll[i](OF_Resp_Disp) != 0)  {
+            oDispAll[i] = new Vector(sizeOutAll[i](OF_Resp_Disp));
+        }
+        oVelAll[i] = 0;
+        if (sizeOutAll[i](OF_Resp_Vel) != 0)  {
+            oVelAll[i] = new Vector(sizeOutAll[i](OF_Resp_Vel));
+        }
+        oAccelAll[i] = 0;
+        if (sizeOutAll[i](OF_Resp_Accel) != 0)  {
+            oAccelAll[i] = new Vector(sizeOutAll[i](OF_Resp_Accel));
+        }
+        oForceAll[i] = 0;
+        if (sizeOutAll[i](OF_Resp_Force) != 0)  {
+            oForceAll[i] = new Vector(sizeOutAll[i](OF_Resp_Force));
+        }
+        oTimeAll[i] = 0;
+        if (sizeOutAll[i](OF_Resp_Time) != 0)  {
+            oTimeAll[i] = new Vector(sizeOutAll[i](OF_Resp_Time));
         }
         // control vectors
         cDispAll[i] = 0;
-        if (sizeCtrlAll[i](OF_Resp_Disp) != 0) {
+        if (sizeCtrlAll[i](OF_Resp_Disp) != 0)  {
             cDispAll[i] = new Vector(sizeCtrlAll[i](OF_Resp_Disp));
         }
         cVelAll[i] = 0;
-        if (sizeCtrlAll[i](OF_Resp_Vel) != 0) {
+        if (sizeCtrlAll[i](OF_Resp_Vel) != 0)  {
             cVelAll[i] = new Vector(sizeCtrlAll[i](OF_Resp_Vel));
         }
         cAccelAll[i] = 0;
-        if (sizeCtrlAll[i](OF_Resp_Accel) != 0) {
+        if (sizeCtrlAll[i](OF_Resp_Accel) != 0)  {
             cAccelAll[i] = new Vector(sizeCtrlAll[i](OF_Resp_Accel));
         }
         cForceAll[i] = 0;
-        if (sizeCtrlAll[i](OF_Resp_Force) != 0) {
+        if (sizeCtrlAll[i](OF_Resp_Force) != 0)  {
             cForceAll[i] = new Vector(sizeCtrlAll[i](OF_Resp_Force));
         }
         cTimeAll[i] = 0;
-        if (sizeCtrlAll[i](OF_Resp_Time) != 0) {
+        if (sizeCtrlAll[i](OF_Resp_Time) != 0)  {
             cTimeAll[i] = new Vector(sizeCtrlAll[i](OF_Resp_Time));
         }
         // data acquisition vectors
         dDispAll[i] = 0;
-        if (sizeDaqAll[i](OF_Resp_Disp) != 0) {
+        if (sizeDaqAll[i](OF_Resp_Disp) != 0)  {
             dDispAll[i] = new Vector(sizeDaqAll[i](OF_Resp_Disp));
         }
         dVelAll[i] = 0;
-        if (sizeDaqAll[i](OF_Resp_Vel) != 0) {
+        if (sizeDaqAll[i](OF_Resp_Vel) != 0)  {
             dVelAll[i] = new Vector(sizeDaqAll[i](OF_Resp_Vel));
         }
         dAccelAll[i] = 0;
-        if (sizeDaqAll[i](OF_Resp_Accel) != 0) {
+        if (sizeDaqAll[i](OF_Resp_Accel) != 0)  {
             dAccelAll[i] = new Vector(sizeDaqAll[i](OF_Resp_Accel));
         }
         dForceAll[i] = 0;
-        if (sizeDaqAll[i](OF_Resp_Force) != 0) {
+        if (sizeDaqAll[i](OF_Resp_Force) != 0)  {
             dForceAll[i] = new Vector(sizeDaqAll[i](OF_Resp_Force));
         }
         dTimeAll[i] = 0;
-        if (sizeDaqAll[i](OF_Resp_Time) != 0) {
+        if (sizeDaqAll[i](OF_Resp_Time) != 0)  {
             dTimeAll[i] = new Vector(sizeDaqAll[i](OF_Resp_Time));
-        }
-        // output vectors
-        oDispAll[i] = 0;
-        if (sizeOutAll[i](OF_Resp_Disp) != 0) {
-            oDispAll[i] = new Vector(sizeOutAll[i](OF_Resp_Disp));
-        }
-        oVelAll[i] = 0;
-        if (sizeOutAll[i](OF_Resp_Vel) != 0) {
-            oVelAll[i] = new Vector(sizeOutAll[i](OF_Resp_Vel));
-        }
-        oAccelAll[i] = 0;
-        if (sizeOutAll[i](OF_Resp_Accel) != 0) {
-            oAccelAll[i] = new Vector(sizeOutAll[i](OF_Resp_Accel));
-        }
-        oForceAll[i] = 0;
-        if (sizeOutAll[i](OF_Resp_Force) != 0) {
-            oForceAll[i] = new Vector(sizeOutAll[i](OF_Resp_Force));
-        }
-        oTimeAll[i] = 0;
-        if (sizeOutAll[i](OF_Resp_Time) != 0) {
-            oTimeAll[i] = new Vector(sizeOutAll[i](OF_Resp_Time));
-        }
-    }
-}
-
-
-ESAggregator::ESAggregator(const ESAggregator& es)
-	: ExperimentalSetup(es)
-{
-    if (theSetups != 0)
-        delete theSetups;
-
-    // allocate memory for the experimental setups
-    numSetups = es.numSetups;
-    theSetups = new ExperimentalSetup* [numSetups];
-    if (theSetups == 0)  {
-        opserr << "ESAggregator::ESAggregator() - "
-            << "failed to allocate pointers\n";
-        exit(OF_ReturnType_failed);
-    }
-
-    // get copies of the setups to be aggregated
-    for (int i=0; i<numSetups; i++)  {
-        if (es.theSetups[i] == 0) {
-            opserr << "ESAggregator::ESAggregator() - "
-                "null experimental setup pointer passed\n";
-            exit(OF_ReturnType_failed);
-        }
-        theSetups[i] = es.theSetups[i]->getCopy();
-        if (theSetups[i] == 0) {
-            opserr << "ESAggregator::ESAggregator() - "
-                << "failed to copy experimental setup\n";
-            exit(OF_ReturnType_failed);
         }
     }
 }
@@ -255,6 +413,10 @@ ESAggregator::~ESAggregator()
     if (theSetups != 0)
         delete [] theSetups;
 
+    if (sizeTrialAll != 0)
+        delete [] sizeTrialAll;
+    if (sizeOutAll != 0)
+        delete [] sizeOutAll;
     if (sizeCtrlAll != 0)
         delete [] sizeCtrlAll;
     if (sizeDaqAll != 0)
@@ -270,6 +432,17 @@ ESAggregator::~ESAggregator()
         delete [] tForceAll;
     if (tTimeAll != 0)
         delete [] tTimeAll;
+
+    if (oDispAll != 0)
+        delete [] oDispAll;
+    if (oVelAll != 0)
+        delete [] oVelAll;
+    if (oAccelAll != 0)
+        delete [] oAccelAll;
+    if (oForceAll != 0)
+        delete [] oForceAll;
+    if (oTimeAll != 0)
+        delete [] oTimeAll;
 
     if (cDispAll != 0)
         delete [] cDispAll;
@@ -292,67 +465,45 @@ ESAggregator::~ESAggregator()
         delete [] dForceAll;
     if (dTimeAll != 0)
         delete [] dTimeAll;
-
-    if (oDispAll != 0)
-        delete [] oDispAll;
-    if (oVelAll != 0)
-        delete [] oVelAll;
-    if (oAccelAll != 0)
-        delete [] oAccelAll;
-    if (oForceAll != 0)
-        delete [] oForceAll;
-    if (oTimeAll != 0)
-        delete [] oTimeAll;
-}
-
-
-int ESAggregator::setSize(ID sizeT, ID sizeO)
-{
-    // check sizeTrial and sizeOut
-    // for ESAggregator object
-    
-    // a component of sizeT/sizeO must be greater than 
-    // the components of "direction" if it is non-zero.
-    /*for (int i=0; i<OF_Resp_All; i++) {
-        if ((sizeT[i] != 0 && sizeT[i] != (*sizeCtrl)[i]) ||
-            (sizeO[i] != 0 && sizeO[i] != (*sizeDaq)[i])) {
-            opserr << "ESAggregator::setSize - wrong sizeTrial/Out\n";
-            opserr << "see User Manual.\n";
-            opserr << "sizeT = " << sizeT;
-            opserr << "sizeO = " << sizeO;
-            return OF_ReturnType_failed;
-        }
-    }*/
-
-    return OF_ReturnType_completed;
-}
-
-
-int ESAggregator::commitState()
-{
-	return theControl->commitState();
 }
 
 
 int ESAggregator::setup()
 {
-    // setup for ctrl/daq vectors of ESAggregator
+    // setup the trial/out vectors
+    sizeTrial->Zero();
+    sizeOut->Zero();
+    for (int i=0; i<numSetups; i++)  {
+        sizeTrialAll[i] = theSetups[i]->getTrialSize();
+        sizeOutAll[i] = theSetups[i]->getOutSize();
+        
+        for (int j=0; j<OF_Resp_Time; j++)  {
+            (*sizeTrial)(j) += sizeTrialAll[i](j);
+            (*sizeOut)(j) += sizeOutAll[i](j);
+        }
+    }
+    (*sizeTrial)(OF_Resp_Time) = 1;
+    (*sizeOut)(OF_Resp_Time) = 1;
+    
+    this->setTrialOutSize();
+    
+    // setup the ctrl/daq vectors
     sizeCtrl->Zero();
     sizeDaq->Zero();
-    for (int i=0; i<numSetups; i++) {
+    for (int i=0; i<numSetups; i++)  {
         sizeCtrlAll[i] = theSetups[i]->getCtrlSize();
         sizeDaqAll[i] = theSetups[i]->getDaqSize();
-
-        for (int j=0; j<OF_Resp_Time; j++) {
+        
+        for (int j=0; j<OF_Resp_Time; j++)  {
             (*sizeCtrl)(j) += sizeCtrlAll[i](j);
             (*sizeDaq)(j) += sizeDaqAll[i](j);
         }
     }
-    (*sizeCtrl)[OF_Resp_Time] = 1;
-    (*sizeDaq)[OF_Resp_Time] = 1;
+    (*sizeCtrl)(OF_Resp_Time) = 1;
+    (*sizeDaq)(OF_Resp_Time) = 1;
     
     this->setCtrlDaqSize();
-
+    
 	return OF_ReturnType_completed;
 }
 
@@ -366,80 +517,116 @@ int ESAggregator::transfTrialResponse(const Vector* disp,
     int rValue = 0;
     int tDispID = 0, tVelID = 0, tAccelID = 0, tForceID = 0;
     int cDispID = 0, cVelID = 0, cAccelID = 0, cForceID = 0;
-
-    if (disp != 0)
+    
+    if (disp != 0)  {
+        for (int i=0; i<(*sizeTrial)(OF_Resp_Disp); i++)
+            (*tDisp)(i) = (*disp)(i) * (*tDispFact)(i);
         cDisp->Zero();
-    if (vel != 0)
+    }
+    if (vel != 0)  {
+        for (int i=0; i<(*sizeTrial)(OF_Resp_Vel); i++)
+            (*tVel)(i) = (*vel)(i) * (*tVelFact)(i);
         cVel->Zero();
-    if (accel != 0)
+    }
+    if (accel != 0)  {
+        for (int i=0; i<(*sizeTrial)(OF_Resp_Accel); i++)
+            (*tAccel)(i) = (*accel)(i) * (*tAccelFact)(i);
         cAccel->Zero();
-    if (force != 0)
+    }
+    if (force != 0)  {
+        for (int i=0; i<(*sizeTrial)(OF_Resp_Force); i++)
+            (*tForce)(i) = (*force)(i) * (*tForceFact)(i);
         cForce->Zero();
-    if (time != 0)
+    }
+    if (time != 0)  {
+        for (int i=0; i<(*sizeTrial)(OF_Resp_Time); i++)
+            (*tTime)(i) = (*time)(i) * (*tTimeFact)(i);
         cTime->Zero();
-
-    for (int i=0; i<numSetups; i++) {
+    }
+    
+    for (int i=0; i<numSetups; i++)  {
         // extract trial response from aggregated setup
-        if (disp != 0 && sizeTrialAll[i](OF_Resp_Disp) != 0) {
-            tDispAll[i]->Extract(*disp,tDispID);
+        if (disp != 0 && sizeTrialAll[i](OF_Resp_Disp) != 0)  {
+            tDispAll[i]->Extract(*tDisp,tDispID);
             tDispID += sizeTrialAll[i](OF_Resp_Disp);
         }
-        if (vel != 0 && sizeTrialAll[i](OF_Resp_Vel) != 0) {
-            tVelAll[i]->Extract(*vel,tVelID);
+        if (vel != 0 && sizeTrialAll[i](OF_Resp_Vel) != 0)  {
+            tVelAll[i]->Extract(*tVel,tVelID);
             tVelID += sizeTrialAll[i](OF_Resp_Vel);
         }
-        if (accel != 0 && sizeTrialAll[i](OF_Resp_Accel) != 0) {
-            tAccelAll[i]->Extract(*accel,tAccelID);
+        if (accel != 0 && sizeTrialAll[i](OF_Resp_Accel) != 0)  {
+            tAccelAll[i]->Extract(*tAccel,tAccelID);
             tAccelID += sizeTrialAll[i](OF_Resp_Accel);
         }
-        if (force != 0 && sizeTrialAll[i](OF_Resp_Force) != 0) {
-            tForceAll[i]->Extract(*force,tForceID);
+        if (force != 0 && sizeTrialAll[i](OF_Resp_Force) != 0)  {
+            tForceAll[i]->Extract(*tForce,tForceID);
             tForceID += sizeTrialAll[i](OF_Resp_Force);
         }
-        if (time != 0 && sizeTrialAll[i](OF_Resp_Time) != 0) {
-            *tTimeAll[i] = *time;
+        if (time != 0 && sizeTrialAll[i](OF_Resp_Time) != 0)  {
+            *tTimeAll[i] = *tTime;
         }
-
+        
         // transform trial response of individual setup
         rValue = theSetups[i]->transfTrialResponse(tDispAll[i],
             tVelAll[i], tAccelAll[i], tForceAll[i], tTimeAll[i]);
-        if (rValue != OF_ReturnType_completed) {
+        if (rValue != OF_ReturnType_completed)  {
             opserr << "ESAggregator::transfTrialResponse() - "
                 << "fail to transform trial response of setup "
                 << theSetups[i]->getTag() << endln;
             return OF_ReturnType_failed;
         }
-
+        
         // get control response from individual setup
         rValue = theSetups[i]->getTrialResponse(cDispAll[i],
             cVelAll[i], cAccelAll[i], cForceAll[i], cTimeAll[i]);
-        if (rValue != OF_ReturnType_completed) {
+        if (rValue != OF_ReturnType_completed)  {
             opserr << "ESAggregator::transfTrialResponse() - "
                 << "fail to get trial response from setup "
                 << theSetups[i]->getTag() << endln;
             return OF_ReturnType_failed;
         }
-
+        
         // assemble control response of aggregated setup
-        if (disp != 0 && sizeCtrlAll[i](OF_Resp_Disp) != 0) {
+        if (disp != 0 && sizeCtrlAll[i](OF_Resp_Disp) != 0)  {
             cDisp->Assemble(*cDispAll[i], cDispID);
             cDispID += sizeCtrlAll[i](OF_Resp_Disp);
         }
-        if (vel != 0 && sizeCtrlAll[i](OF_Resp_Vel) != 0) {
+        if (vel != 0 && sizeCtrlAll[i](OF_Resp_Vel) != 0)  {
             cVel->Assemble(*cVelAll[i], cVelID);
             cVelID += sizeCtrlAll[i](OF_Resp_Vel);
         }
-        if (accel != 0 && sizeCtrlAll[i](OF_Resp_Accel) != 0) {
+        if (accel != 0 && sizeCtrlAll[i](OF_Resp_Accel) != 0)  {
             cAccel->Assemble(*cAccelAll[i], cAccelID);
             cAccelID += sizeCtrlAll[i](OF_Resp_Accel);
         }
-        if (force != 0 && sizeCtrlAll[i](OF_Resp_Force) != 0) {
+        if (force != 0 && sizeCtrlAll[i](OF_Resp_Force) != 0)  {
             cForce->Assemble(*cForceAll[i], cForceID);
             cForceID += sizeCtrlAll[i](OF_Resp_Force);
         }
-        if (time != 0 && sizeCtrlAll[i](OF_Resp_Time) != 0) {
+        if (time != 0 && sizeCtrlAll[i](OF_Resp_Time) != 0)  {
             *cTime = *cTimeAll[i];
         }
+    }
+    
+    if (disp != 0)  {
+        for (int i=0; i<(*sizeCtrl)(OF_Resp_Disp); i++)
+            (*cDisp)(i) *= (*cDispFact)(i);
+    }
+    if (vel != 0)  {
+        for (int i=0; i<(*sizeCtrl)(OF_Resp_Vel); i++)
+            (*cVel)(i) *= (*cVelFact)(i);
+    }
+    if (accel != 0)  {
+        for (int i=0; i<(*sizeCtrl)(OF_Resp_Accel); i++)
+            (*cAccel)(i) *= (*cAccelFact)(i);
+    }
+    if (force != 0)  {
+        for (int i=0; i<(*sizeCtrl)(OF_Resp_Force); i++)
+            (*cForce)(i) *= (*cForceFact)(i);
+    }
+    if (time != 0)  {
+        for (int i=0; i<(*sizeCtrl)(OF_Resp_Time); i++)
+            (*cTime)(i) *= (*cTimeFact)(i);
     }
     
     return OF_ReturnType_completed;
@@ -456,43 +643,58 @@ int ESAggregator::transfDaqResponse(Vector* disp,
     int dDispID = 0, dVelID = 0, dAccelID = 0, dForceID = 0;
     int oDispID = 0, oVelID = 0, oAccelID = 0, oForceID = 0;
 
-    if (disp != 0)
-        disp->Zero();
-    if (vel != 0)
-        vel->Zero();
-    if (accel != 0)
-        accel->Zero();
-    if (force != 0)
-        force->Zero();
-    if (time != 0)
-        time->Zero();
+    if (disp != 0)  {
+        for (int i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)
+            (*dDisp)(i) *= (*dDispFact)(i);
+        oDisp->Zero();
+    }
+    if (vel != 0)  {
+        for (int i=0; i<(*sizeDaq)(OF_Resp_Vel); i++)
+            (*dVel)(i) *= (*dVelFact)(i);
+        oVel->Zero();
+    }
+    if (accel != 0)  {
+        for (int i=0; i<(*sizeDaq)(OF_Resp_Accel); i++)
+            (*dAccel)(i) *= (*dAccelFact)(i);
+        oAccel->Zero();
+    }
+    if (force != 0)  {
+        for (int i=0; i<(*sizeDaq)(OF_Resp_Force); i++)
+            (*dForce)(i) *= (*dForceFact)(i);
+        oForce->Zero();
+    }
+    if (time != 0)  {
+        for (int i=0; i<(*sizeDaq)(OF_Resp_Time); i++)
+            (*dTime)(i) *= (*dTimeFact)(i);
+        oTime->Zero();
+    }
 
-    for (int i=0; i<numSetups; i++) {
+    for (int i=0; i<numSetups; i++)  {
         // extract daq response from aggregated setup
-        if (disp != 0 && sizeDaqAll[i](OF_Resp_Disp) != 0) {
+        if (disp != 0 && sizeDaqAll[i](OF_Resp_Disp) != 0)  {
             dDispAll[i]->Extract(*dDisp,dDispID);
             dDispID += sizeDaqAll[i](OF_Resp_Disp);
         }
-        if (vel != 0 && sizeDaqAll[i](OF_Resp_Vel) != 0) {
+        if (vel != 0 && sizeDaqAll[i](OF_Resp_Vel) != 0)  {
             dVelAll[i]->Extract(*dVel,dVelID);
             dVelID += sizeDaqAll[i](OF_Resp_Vel);
         }
-        if (accel != 0 && sizeDaqAll[i](OF_Resp_Accel) != 0) {
+        if (accel != 0 && sizeDaqAll[i](OF_Resp_Accel) != 0)  {
             dAccelAll[i]->Extract(*dAccel,dAccelID);
             dAccelID += sizeDaqAll[i](OF_Resp_Accel);
         }
-        if (force != 0 && sizeDaqAll[i](OF_Resp_Force) != 0) {
+        if (force != 0 && sizeDaqAll[i](OF_Resp_Force) != 0)  {
             dForceAll[i]->Extract(*dForce,dForceID);
             dForceID += sizeDaqAll[i](OF_Resp_Force);
         }
-        if (time != 0 && sizeDaqAll[i](OF_Resp_Time) != 0) {
+        if (time != 0 && sizeDaqAll[i](OF_Resp_Time) != 0)  {
             *dTimeAll[i] = *dTime;
         }
         
         // set daq response in individual setup
         rValue = theSetups[i]->setDaqResponse(dDispAll[i],
             dVelAll[i], dAccelAll[i], dForceAll[i], dTimeAll[i]);
-        if (rValue != OF_ReturnType_completed) {
+        if (rValue != OF_ReturnType_completed)  {
             opserr << "ESAggregator::transfDaqResponse() - "
                 << "fail to set daq response in setup "
                 << theSetups[i]->getTag() << endln;
@@ -502,7 +704,7 @@ int ESAggregator::transfDaqResponse(Vector* disp,
         // transform daq response of individual setup
         rValue = theSetups[i]->transfDaqResponse(oDispAll[i],
             oVelAll[i], oAccelAll[i], oForceAll[i], oTimeAll[i]);
-        if (rValue != OF_ReturnType_completed) {
+        if (rValue != OF_ReturnType_completed)  {
             opserr << "ESAggregator::transfDaqResponse() - "
                 << "fail to transform daq response of setup "
                 << theSetups[i]->getTag() << endln;
@@ -511,27 +713,54 @@ int ESAggregator::transfDaqResponse(Vector* disp,
 
         // assemble output response of aggregated setup
         if (disp != 0 && sizeOutAll[i](OF_Resp_Disp) != 0) {
-            disp->Assemble(*oDispAll[i], oDispID);
+            oDisp->Assemble(*oDispAll[i], oDispID);
             oDispID += sizeOutAll[i](OF_Resp_Disp);
         }
         if (vel != 0 && sizeOutAll[i](OF_Resp_Vel) != 0) {
-            vel->Assemble(*oVelAll[i], oVelID);
+            oVel->Assemble(*oVelAll[i], oVelID);
             oVelID += sizeOutAll[i](OF_Resp_Vel);
         }
         if (accel != 0 && sizeOutAll[i](OF_Resp_Accel) != 0) {
-            accel->Assemble(*oAccelAll[i], oAccelID);
+            oAccel->Assemble(*oAccelAll[i], oAccelID);
             oAccelID += sizeOutAll[i](OF_Resp_Accel);
         }
         if (force != 0 && sizeOutAll[i](OF_Resp_Force) != 0) {
-            force->Assemble(*oForceAll[i], oForceID);
+            oForce->Assemble(*oForceAll[i], oForceID);
             oForceID += sizeOutAll[i](OF_Resp_Force);
         }
         if (time != 0 && sizeOutAll[i](OF_Resp_Time) != 0) {
-            *time = *oTimeAll[i];
+            *oTime = *oTimeAll[i];
         }
     }
     
+    if (disp != 0)  {
+        for (int i=0; i<(*sizeOut)(OF_Resp_Disp); i++)
+            (*disp)(i) = (*oDisp)(i) * (*oDispFact)(i);
+    }
+    if (vel != 0)  {
+        for (int i=0; i<(*sizeOut)(OF_Resp_Vel); i++)
+            (*vel)(i) = (*oVel)(i) * (*oVelFact)(i);
+    }
+    if (accel != 0)  {
+        for (int i=0; i<(*sizeOut)(OF_Resp_Accel); i++)
+            (*accel)(i) = (*oAccel)(i) * (*oAccelFact)(i);
+    }
+    if (force != 0)  {
+        for (int i=0; i<(*sizeOut)(OF_Resp_Force); i++)
+            (*force)(i) = (*oForce)(i) * (*oForceFact)(i);
+    }
+    if (time != 0)  {
+        for (int i=0; i<(*sizeOut)(OF_Resp_Time); i++)
+            (*time)(i) = (*oTime)(i) * (*oTimeFact)(i);
+    }
+    
     return OF_ReturnType_completed;
+}
+
+
+int ESAggregator::commitState()
+{
+	return theControl->commitState();
 }
 
 

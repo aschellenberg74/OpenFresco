@@ -57,17 +57,15 @@ public:
     virtual ~ESInvertedVBraceJntOff2d();
     
     // public methods
-    virtual int setSize(ID sizeT, ID sizeO);
-    virtual int commitState();
     virtual int setup();
-    
-    // public methods to transform the responses
     virtual int transfTrialResponse(const Vector* disp,
         const Vector* vel,
         const Vector* accel,
         const Vector* force,
         const Vector* time);
-
+    
+    virtual int commitState();
+    
     virtual ExperimentalSetup *getCopy();
     
     // public methods for output
@@ -94,7 +92,7 @@ private:
     virtual int transfTrialAccel(const Vector* disp,
         const Vector* vel,
         const Vector* accel);
-
+    
     double La0;         // length of actuator 0
     double La1;         // length of actuator 1
     double La2;         // length of actuator 2
@@ -107,9 +105,9 @@ private:
     int nlGeom;         // non-linear geometry (0: linear, 1: nonlinear)
     char posAct0[6];    // position of actuator 0 (left, right)
     double phiLocX;     // angle of local x axis w.r.t rigid link [deg]
-
+    
     Matrix rotLocX;     // rotation matrix
-
+    
     bool firstWarning[3];
 };
 

@@ -49,7 +49,7 @@ public:
 		double rigidLength1, double rigidLength2, double rigidLength3, double rigidLength4,
 		double rigidHeight, double rigidHeight1, double rigidHeight2,
 		double rigidLinkN, double rigidLinkS, double rodLengthN, double rodLengthS,
-		ExperimentalControl* control = 0,
+        double spreaderBeamHeight, ExperimentalControl* control = 0,
 		int nlGeom = 0, double phiLocX = 45.0);            
     ESFourActuators3d(const ESFourActuators3d& es);
     
@@ -57,21 +57,9 @@ public:
     virtual ~ESFourActuators3d();
     
     // public methods
-    virtual int setSize(ID sizeT, ID sizeO);
-    virtual int commitState();
     virtual int setup();
     
-    // public methods to transform the responses
-    virtual int transfTrialResponse(const Vector* disp,
-        const Vector* vel,
-        const Vector* accel,
-        const Vector* force,
-        const Vector* time);
-    virtual int transfDaqResponse(Vector* disp,
-        Vector* vel,
-        Vector* accel,
-        Vector* force,
-        Vector* time);
+    virtual int commitState();
     
     virtual ExperimentalSetup *getCopy();
     
@@ -101,13 +89,14 @@ private:
 	double a2;          // rigid link length 2
 	double a3;          // rigid link length 3
 	double a4;          // rigid link length 4
-	double h;           // rigid link height between actuators
-	double h1;          // rigid link height between lower actuator and pin connection
-	double h2;          // rigid link height between lower actuator and lower beam flange
-	double arlN;        // rigid link at NORTH rod - top pin to lower beam flange
-	double arlS;        // rigid link at SOUTH rod - top pin to lower beam flange
-	double LrodN;       // pin to pin length of the north side rod
-	double LrodS;       // pin to pin length of the south side rod
+	double h;			// rigid link height between actuators
+	double h1;			// rigid link height between lower actuator and pin connection
+	double h2;			// rigid link height between lower actuator and lower beam flange
+	double arlN;		// rigid link at NORTH rod - top pin to lower beam flange
+	double arlS;		// rigid link at SOUTH rod - top pin to lower beam flange
+	double LrodN;		// pin to pin length of the north side rod
+	double LrodS;		// pin to pin length of the south side rod
+	double Hbeam;       // spreader beam height
     int nlGeom;         // non-linear geometry (0: linear, 1: nonlinear)
 	double phiLocX;     // angle of actuator 1 w.r.t reaction wall [deg]
     
@@ -123,12 +112,18 @@ private:
 	double theta22;
 	double theta33;
 	double theta44;
+	double ha3;
+	double ha4;
+	double ax3;
+	double ay3;
+	double ax4;
+	double ay4;
     
     Matrix rotLocX;     // rotation matrix
-	Vector D;           // displacement vector in x,y axis
-	Vector d;           // displacement vector in 1,2 axis
+	Vector D;			// displacement vector in x,y axis
+	Vector d;			// displacement vector in 1,2 axis
     
-    bool firstWarning[3];
+    bool firstWarning[8];
 };
 
 #endif

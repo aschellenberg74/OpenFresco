@@ -33,10 +33,10 @@
 
 
 ESNoTransformation::ESNoTransformation(int tag,
-	const ID &dir,
+	const ID &dir, int sizet, int sizeo,
 	ExperimentalControl* control)
 	: ExperimentalSetup(tag, control),
-	numDir(dir.Size()), direction(0)
+	numDir(dir.Size()), direction(0), sizeT(sizet), sizeO(sizeo)
 {
     // allocate memory for direction array
     direction = new ID(numDir);
@@ -49,10 +49,12 @@ ESNoTransformation::ESNoTransformation(int tag,
     // initialize directions and check for valid values
     (*direction) = dir;
     for (int i=0; i<numDir; i++)  {
-        if ((*direction)(i) < 0 || (*direction)(i) > 5)  {
+        if ((*direction)(i) < 0 || (*direction)(i) >= sizeT ||
+            (*direction)(i) >= sizeO)  {
             opserr << "ESNoTransformation::ESNoTransformation()"
-                << " - incorrect direction " << (*direction)(i) << " is set to 0\n";
-            (*direction)(i) = 0;
+                << " - direction ID out of bound:"
+                << (*direction)(i) << endln;
+            exit(OF_ReturnType_failed);
         }
     }
 
@@ -62,7 +64,8 @@ ESNoTransformation::ESNoTransformation(int tag,
 
 
 ESNoTransformation::ESNoTransformation(const ESNoTransformation& es)
-	: ExperimentalSetup(es)
+	: ExperimentalSetup(es),
+    direction(0)
 {
     numDir = es.numDir;
 
@@ -74,6 +77,8 @@ ESNoTransformation::ESNoTransformation(const ESNoTransformation& es)
     }
 
     direction = es.direction;
+    sizeT     = es.sizeT;
+    sizeO     = es.sizeO;
 
     // call setup method
     this->setup();
@@ -89,33 +94,31 @@ ESNoTransformation::~ESNoTransformation()
 }
 
 
-int ESNoTransformation::setSize(ID sizeT, ID sizeO)
+int ESNoTransformation::setup()
 {
-    // check sizeTrial and sizeOut
-    // for ESNoTransformation object
+    // setup the trial/out vectors
+    sizeTrial->Zero();
+    sizeOut->Zero();
+    for (int i=0; i<OF_Resp_Time; i++)  {
+        (*sizeTrial)(i) = sizeT;
+        (*sizeOut)(i) = sizeO;
+    }
+    (*sizeTrial)(OF_Resp_Time) = 1;
+    (*sizeOut)(OF_Resp_Time) = 1;
     
-    // a component of sizeT/sizeO must be greater than 
-    // the components of "direction" if it is non-zero.
-    for (int i=0; i<OF_Resp_Time; i++) {
-        for (int j=0; j<numDir; j++) {
-            if ((sizeT[i] != 0 && sizeT[i] <= (*direction)(j)) ||
-                (sizeO[i] != 0 && sizeO[i] <= (*direction)(j))) {
-                opserr << "ESNoTransformation::setSize - wrong sizeTrial/Out\n"; 
-                opserr << "see User Manual.\n";
-                opserr << "sizeT = " << sizeT;
-                opserr << "sizeO = " << sizeO;
-                return OF_ReturnType_failed;
-            }
-        }
+    this->setTrialOutSize();
+
+    // setup the ctrl/daq vectors
+    sizeCtrl->Zero();
+    sizeDaq->Zero();
+    for (int i=0; i<OF_Resp_Time; i++)  {
+        (*sizeCtrl)(i) = numDir;
+        (*sizeDaq)(i) = numDir;
     }
-    if ((sizeT[OF_Resp_Time] != 0 && sizeT[OF_Resp_Time] != 1) ||
-        (sizeO[OF_Resp_Time] != 0 && sizeO[OF_Resp_Time] != 1)) {
-        opserr << "ESNoTransformation::setSize - wrong sizeTrial/Out\n"; 
-        opserr << "see User Manual.\n";
-        opserr << "sizeT = " << sizeT;
-        opserr << "sizeO = " << sizeO;
-        return OF_ReturnType_failed;
-    }
+    (*sizeCtrl)(OF_Resp_Time) = 1;
+    (*sizeDaq)(OF_Resp_Time) = 1;
+    
+    this->setCtrlDaqSize();
 
 	return OF_ReturnType_completed;
 }
@@ -124,24 +127,6 @@ int ESNoTransformation::setSize(ID sizeT, ID sizeO)
 int ESNoTransformation::commitState()
 {
 	return theControl->commitState();
-}
-
-
-int ESNoTransformation::setup()
-{
-    // setup for ctrl/daq vectors of ESNoTransformation
-    sizeCtrl->Zero();
-    sizeDaq->Zero();
-    for (int i=0; i<OF_Resp_Time; i++) {
-        (*sizeCtrl)[i] = numDir;
-        (*sizeDaq)[i] = numDir;
-    }
-    (*sizeCtrl)[OF_Resp_Time] = 1;
-    (*sizeDaq)[OF_Resp_Time] = 1;
-    
-    this->setCtrlDaqSize();
-
-	return OF_ReturnType_completed;
 }
 
 
@@ -158,7 +143,7 @@ void ESNoTransformation::Print(OPS_Stream &s, int flag)
 	s << "ExperimentalSetup: " << this->getTag(); 
 	s << " type: ESNoTransformation\n";
     s << " dir: " << (*direction) << endln;
-	if (theControl != 0) {
+	if (theControl != 0)  {
 		s << "\tExperimentalControl tag: " << theControl->getTag();
 		s << *theControl;
     }
