@@ -31,70 +31,66 @@
 // Revision: A
 //
 // Purpose: This file contains the implementation of 
-// UndershootErrorFilter.
+// ESFErrorSimUndershoot.
 
-#include "UndershootErrorFilter.h"
+#include "ESFErrorSimUndershoot.h"
 
 #include <math.h>
 
 
-UndershootErrorFilter::UndershootErrorFilter(int tag, double error)
-    : ErrorFilter(tag),
+ESFErrorSimUndershoot::ESFErrorSimUndershoot(int tag, double error)
+    : ESFErrorSimulation(tag),
     undershoot(error), data(0.0), predata(0.0)
 {
     // does nothing
 }
 
 
-UndershootErrorFilter::UndershootErrorFilter(const UndershootErrorFilter& uef)
-    : ErrorFilter(uef)
+ESFErrorSimUndershoot::ESFErrorSimUndershoot(const ESFErrorSimUndershoot& esf)
+    : ESFErrorSimulation(esf)
 {
-    undershoot = uef.undershoot;
-    data = uef.data;
-    predata = uef.predata;
+    undershoot = esf.undershoot;
+    data = esf.data;
+    predata = esf.predata;
 }
 
 
-UndershootErrorFilter::~UndershootErrorFilter()
+ESFErrorSimUndershoot::~ESFErrorSimUndershoot()
 {
     // does nothing
 }
 
 
-double UndershootErrorFilter::filtering(double d)
+double ESFErrorSimUndershoot::filtering(double d)
 {
     data = d;
-    if(d > predata) {
+    if (d > predata)
         data -= undershoot;
-    } else if(d < predata) {
+    else if (d < predata)
         data += undershoot;
-    }
-    if(fabs(d) < 1.0e-6) {
+    if (fabs(d) < 1.0e-6)
         data += undershoot;
-    }
-    //  opserr << "U : " << d << ", U_b = " << predata << ", err = " << d-data << endln;
     predata = d;
     
     return data;
 }
 
 
-void UndershootErrorFilter::update()
+void ESFErrorSimUndershoot::update()
 {
     // does nothing
 }
 
 
-SignalFilter* UndershootErrorFilter::getCopy()
+ExperimentalSignalFilter* ESFErrorSimUndershoot::getCopy()
 {
-    return new UndershootErrorFilter(*this);
+    return new ESFErrorSimUndershoot(*this);
 }
 
 
-void UndershootErrorFilter::Print(OPS_Stream &s, int flag =0)
+void ESFErrorSimUndershoot::Print(OPS_Stream &s, int flag = 0)
 {
     s << "Filter: " << this->getTag(); 
-    s << " type: UndershootErrorFilter\n";
-    s << "\tundershoot error = " << undershoot << endln;
+    s << "  type: ESFErrorSimUndershoot\n";
+    s << "  undershoot error: " << undershoot << endln;
 }
-

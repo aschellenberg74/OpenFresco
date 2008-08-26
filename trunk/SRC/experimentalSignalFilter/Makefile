@@ -1,7 +1,7 @@
 include ../../Makefile.def
 
-OBJS       = SignalFilter.o ErrorFilter.o UndershootErrorFilter.o \
-	     RandomErrorFilter.o
+OBJS = ExperimentalSignalFilter.o ESFErrorSimulation.o \
+       ESFErrorSimUndershoot.o ESFErrorSimRandomGauss.o
 
 all:         $(OBJS)
 

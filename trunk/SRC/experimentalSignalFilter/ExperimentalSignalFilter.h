@@ -26,33 +26,45 @@
 // $Date$
 // $URL: $
 
+#ifndef ExperimentalSignalFilter_h
+#define ExperimentalSignalFilter_h
+
 // Written: Yoshi (yos@catfish.dpri.kyoto-u.ac.jp)
 // Created: 09/06
 // Revision: A
 //
-// Description: This file contains the implementation of 
-// SignalFilter.
+// Description: This file contains the class definition for 
+// ExperimentalSignalFilter.
 
-#include "SignalFilter.h"
+#include <FrescoGlobals.h>
 
+#include <TaggedObject.h>
+#include <ID.h>
+#include <Vector.h>
 
-SignalFilter::SignalFilter(int tag)
-    : TaggedObject(tag)
+class Response;
+
+class ExperimentalSignalFilter : public TaggedObject
 {
-    // does nothing
-}
+public:
+    // constructors
+    ExperimentalSignalFilter(int tag);
+    ExperimentalSignalFilter(const ExperimentalSignalFilter& esf);
+    
+    // method to get class type
+    virtual const char *getClassType() const;
+    
+    // destructor
+    virtual ~ExperimentalSignalFilter();
+    
+    virtual double filtering(double data) = 0;
+    virtual void update() = 0;
+    
+    virtual ExperimentalSignalFilter *getCopy() = 0;
+    
+    virtual Response *setResponse(const char **argv, int argc,
+        OPS_Stream &output);
+    virtual int getResponse(int responseID, Information &info);
+};
 
-
-SignalFilter::SignalFilter(const SignalFilter& f)
-    : TaggedObject(f)
-{
-    // does nothing
-}
-
-
-SignalFilter::~SignalFilter()
-{
-    // does nothing
-}
-
-
+#endif
