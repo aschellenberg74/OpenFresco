@@ -26,32 +26,41 @@
 // $Date$
 // $URL: $
 
-#ifndef ErrorFilter_h
-#define ErrorFilter_h
+#ifndef ESFErrorSimUndershoot_h
+#define ESFErrorSimUndershoot_h
 
 // Written: Yoshi (yos@catfish.dpri.kyoto-u.ac.jp)
 // Created: 09/06
 // Revision: A
 //
-// Description: This file contains the class definition for 
-// ErrorFilter.
+// Purpose: This file contains the class definition for 
+// ESFErrorSimUndershoot.
 
-#include "SignalFilter.h"
+#include "ESFErrorSimulation.h"
 
-class ErrorFilter : public SignalFilter
+class ESFErrorSimUndershoot : public ESFErrorSimulation
 {
 public:
     // constructors
-    ErrorFilter(int tag);
-    ErrorFilter(const ErrorFilter& ef);
+    ESFErrorSimUndershoot(int tag, double error);
+    ESFErrorSimUndershoot(const ESFErrorSimUndershoot& esf);
     
     // destructor
-    virtual ~ErrorFilter();
+    virtual ~ESFErrorSimUndershoot();
     
-    virtual double filtering(double data) = 0;
-    virtual void update() = 0;
+    // method to get class type
+    const char *getClassType() const {return "ESFErrorSimUndershoot";};
     
-    virtual SignalFilter *getCopy() = 0;
+    virtual double filtering(double data);
+    virtual void update();
+    
+    virtual ExperimentalSignalFilter *getCopy();
+    void Print(OPS_Stream &s, int flag);
+    
+private:
+    double undershoot;
+    double data;
+    double predata;
 };
 
 #endif

@@ -26,31 +26,35 @@
 // $Date$
 // $URL: $
 
-// Written: Yoshi
+#ifndef ESFErrorSimulation_h
+#define ESFErrorSimulation_h
+
+// Written: Yoshi (yos@catfish.dpri.kyoto-u.ac.jp)
 // Created: 09/06
 // Revision: A
 //
-// Description: This file contains the implementation of 
-// ErrorFilter.
+// Description: This file contains the class definition for 
+// ESFErrorSimulation.
 
-#include "ErrorFilter.h"
+#include "ExperimentalSignalFilter.h"
 
-
-ErrorFilter::ErrorFilter(int tag)
-    : SignalFilter(tag)
+class ESFErrorSimulation : public ExperimentalSignalFilter
 {
-    // does nothing
-}
+public:
+    // constructors
+    ESFErrorSimulation(int tag);
+    ESFErrorSimulation(const ESFErrorSimulation& esf);
+    
+    // destructor
+    virtual ~ESFErrorSimulation();
+    
+    // method to get class type
+    const char *getClassType() const {return "ESFErrorSimulation";};
+    
+    virtual double filtering(double data) = 0;
+    virtual void update() = 0;
+    
+    virtual ExperimentalSignalFilter *getCopy() = 0;
+};
 
-
-ErrorFilter::ErrorFilter(const ErrorFilter& ef)
-    : SignalFilter(ef)
-{
-    // does nothing
-}
-
-
-ErrorFilter::~ErrorFilter()
-{
-    // does nothing
-}
+#endif

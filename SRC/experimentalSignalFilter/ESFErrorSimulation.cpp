@@ -26,38 +26,30 @@
 // $Date$
 // $URL: $
 
-#ifndef UndershootErrorFilter_h
-#define UndershootErrorFilter_h
-
-// Written: Yoshi (yos@catfish.dpri.kyoto-u.ac.jp)
+// Written: Yoshi
 // Created: 09/06
 // Revision: A
 //
-// Purpose: This file contains the class definition for 
-// UndershootErrorFilter.
+// Description: This file contains the implementation of ESFErrorSimulation.
 
-#include "ErrorFilter.h"
+#include "ESFErrorSimulation.h"
 
-class UndershootErrorFilter : public ErrorFilter
+
+ESFErrorSimulation::ESFErrorSimulation(int tag)
+    : ExperimentalSignalFilter(tag)
 {
-public:
-    // constructors
-    UndershootErrorFilter(int tag, double error);
-    UndershootErrorFilter(const UndershootErrorFilter& uef);
-    
-    // destructor
-    virtual ~UndershootErrorFilter();
-    
-    virtual double filtering(double data);
-    virtual void update();
-    
-    virtual SignalFilter *getCopy();
-    void Print(OPS_Stream &s, int flag);
-    
-private:
-    double undershoot;
-    double data;
-    double predata;
-};
+    // does nothing
+}
 
-#endif
+
+ESFErrorSimulation::ESFErrorSimulation(const ESFErrorSimulation& esf)
+    : ExperimentalSignalFilter(esf)
+{
+    // does nothing
+}
+
+
+ESFErrorSimulation::~ESFErrorSimulation()
+{
+    // does nothing
+}

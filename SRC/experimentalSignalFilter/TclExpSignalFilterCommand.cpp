@@ -33,28 +33,28 @@
 #include <TclModelBuilder.h>
 #include <ArrayOfTaggedObjects.h>
 
-#include <RandomErrorFilter.h>
-#include <UndershootErrorFilter.h>
+#include <ESFErrorSimRandomGauss.h>
+#include <ESFErrorSimUndershoot.h>
 
 #include <string.h>
 
 static ArrayOfTaggedObjects *theExperimentalSignalFilters(0);
 
 
-int addExperimentalSignalFilter(SignalFilter &theSignalFilter)
+int addExperimentalSignalFilter(ExperimentalSignalFilter &theFilter)
 {
-    bool result = theExperimentalSignalFilters->addComponent(&theSignalFilter);
+    bool result = theExperimentalSignalFilters->addComponent(&theFilter);
     if (result == true)
         return 0;
     else {
         opserr << "addExperimentalSignalFilter() - "
-            << "failed to add experimental signal filter: " << theSignalFilter;
+            << "failed to add experimental signal filter: " << theFilter;
         return -1;
     }
 }
 
 
-extern SignalFilter *getExperimentalSignalFilter(int tag)
+extern ExperimentalSignalFilter *getExperimentalSignalFilter(int tag)
 {
     if (theExperimentalSignalFilters == 0) {
         opserr << "getExperimentalSignalFilter() - "
@@ -68,7 +68,7 @@ extern SignalFilter *getExperimentalSignalFilter(int tag)
         return 0;
 
     // otherwise we do a cast and return
-    SignalFilter *result = (SignalFilter *)mc;
+    ExperimentalSignalFilter *result = (ExperimentalSignalFilter *)mc;
     return result;
 }
 
@@ -94,86 +94,65 @@ int TclExpSignalFilterCommand(ClientData clientData, Tcl_Interp *interp, int arg
 		opserr << "Want: expSignalFilter type tag <specific experimental signal filter args>\n";
 		return TCL_ERROR;
     }
+
+    // pointer to signal filter that will be added
+    ExperimentalSignalFilter *theFilter = 0;
     
     // ----------------------------------------------------------------------------	
-    if (strcmp(argv[1],"RandomError") == 0)  {
+    if (strcmp(argv[1],"ErrorSimRandomGauss") == 0)  {
 		if (argc != 5)  {
 			opserr << "WARNING invalid number of arguments\n";
 			printCommand(argc,argv);
-			opserr << "Want: expSignalFilter RandomError tag avg std\n";
+			opserr << "Want: expSignalFilter ErrorSimRandomGauss tag avg std\n";
 			return TCL_ERROR;
 		}    
 		
 		int tag;
         double avg, std;
-        SignalFilter *theSignalFilter = 0;
 		
 		if (Tcl_GetInt(interp, argv[2], &tag) != TCL_OK)  {
-			opserr << "WARNING invalid RandomError tag\n";
+			opserr << "WARNING invalid ErrorSimRandomGauss tag\n";
 			return TCL_ERROR;		
 		}
 		if (Tcl_GetDouble(interp, argv[3], &avg) != TCL_OK)  {
 			opserr << "WARNING invalid avg\n";
-			opserr << "RandomError signal filter: " << tag << endln;
+			opserr << "ErrorSimRandomGauss signal filter: " << tag << endln;
 			return TCL_ERROR;	
 		}
 		if (Tcl_GetDouble(interp, argv[4], &std) != TCL_OK)  {
 			opserr << "WARNING invalid std\n";
-			opserr << "RandomError signal filter: " << tag << endln;
+			opserr << "ErrorSimRandomGauss signal filter: " << tag << endln;
 			return TCL_ERROR;	
 		}
 		
 		// parsing was successful, allocate the signal filter
-		theSignalFilter = new RandomErrorFilter(tag, avg, std);
-
-        if (theSignalFilter == 0)  {
-            opserr << "WARNING could not create experimental signal filter " << argv[1] << endln;
-            return TCL_ERROR;
-        }
-        
-        // now add the signal filter to the modelBuilder
-        if (addExperimentalSignalFilter(*theSignalFilter) < 0)  {
-            delete theSignalFilter; // invoke the destructor, otherwise mem leak
-            return TCL_ERROR;
-        }
+		theFilter = new ESFErrorSimRandomGauss(tag, avg, std);
     }
 	
     // ----------------------------------------------------------------------------	
-    else if (strcmp(argv[1],"UndershootError") == 0)  {
+    else if (strcmp(argv[1],"ErrorSimUndershoot") == 0)  {
 		if (argc != 4)  {
 			opserr << "WARNING invalid number of arguments\n";
 			printCommand(argc,argv);
-			opserr << "Want: expSignalFilter UndershootError tag error\n";
+			opserr << "Want: expSignalFilter ErrorSimUndershoot tag error\n";
 			return TCL_ERROR;
 		}    
 		
 		int tag;
 		double error;
-        SignalFilter *theSignalFilter = 0;
 		
 		if (Tcl_GetInt(interp, argv[2], &tag) != TCL_OK)  {
-			opserr << "WARNING invalid UndershootError tag\n";
+			opserr << "WARNING invalid ErrorSimUndershoot tag\n";
 			return TCL_ERROR;		
 		}
 		if (Tcl_GetDouble(interp, argv[3], &error) != TCL_OK)  {
 			opserr << "WARNING invalid error\n";
-			opserr << "UndershootError signal filter: " << tag << endln;
+			opserr << "ErrorSimUndershoot signal filter: " << tag << endln;
 			return TCL_ERROR;	
 		}
 		
 		// parsing was successful, allocate the controller
-		theSignalFilter = new UndershootErrorFilter(tag, error);
-
-        if (theSignalFilter == 0)  {
-            opserr << "WARNING could not create experimental signal filter " << argv[1] << endln;
-            return TCL_ERROR;
-        }
-        
-        // now add the signal filter to the modelBuilder
-        if (addExperimentalSignalFilter(*theSignalFilter) < 0)  {
-            delete theSignalFilter; // invoke the destructor, otherwise mem leak
-            return TCL_ERROR;
-        }
+		theFilter = new ESFErrorSimUndershoot(tag, error);
     }
 	
     // ----------------------------------------------------------------------------	
@@ -183,6 +162,17 @@ int TclExpSignalFilterCommand(ClientData clientData, Tcl_Interp *interp, int arg
             <<  argv[1] << ": check the manual\n";
         return TCL_ERROR;
     }
-
-	return TCL_OK;
+    
+    if (theFilter == 0)  {
+        opserr << "WARNING could not create experimental signal filter " << argv[1] << endln;
+        return TCL_ERROR;
+    }
+    
+    // now add the signal filter to the modelBuilder
+    if (addExperimentalSignalFilter(*theFilter) < 0)  {
+        delete theFilter; // invoke the destructor, otherwise mem leak
+        return TCL_ERROR;
+    }
+    
+    return TCL_OK;
 }

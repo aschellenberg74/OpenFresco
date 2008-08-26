@@ -31,17 +31,17 @@
 // Revision: A
 //
 // Description: This file contains the implementation of
-// RandomErrorFilter.
+// ESFErrorSimRandomGauss.
 
-#include "RandomErrorFilter.h"
+#include "ESFErrorSimRandomGauss.h"
 
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
 
 
-RandomErrorFilter::RandomErrorFilter(int tag, double ave, double std)
-    : ErrorFilter(tag), data(0.0),
+ESFErrorSimRandomGauss::ESFErrorSimRandomGauss(int tag, double ave, double std)
+    : ESFErrorSimulation(tag), data(0.0),
     mean(ave), sigma(std), idseed(0),
     Pi(atan(1.0)*4.0), sw(0), inext(0), inextp(0),
     MBIG(1000000000), MSEED(161803398), MZ(0), FAC(1.0/MBIG), ma(0),
@@ -49,78 +49,77 @@ RandomErrorFilter::RandomErrorFilter(int tag, double ave, double std)
 {
     idseed = ((unsigned)time(NULL)) % MBIG;
     ma = new int [56];
-    if(ma == 0) {
-        opserr << "FATAL - RandomErrorFilter::RandomErrorFilter - failed to create ma\n";
-    }
+    if (ma == 0)
+        opserr << "ESFErrorSimRandomGauss::ESFErrorSimRandomGauss() - failed to create ma.\n";
     idseed = ((unsigned)time(NULL)) % MBIG;
     init_rand3();
     srand(idseed);
-    for(int i=0; i<100; i++)
+    for (int i=0; i<100; i++)
         filtering(0.0);
 }
 
 
-RandomErrorFilter::RandomErrorFilter(const RandomErrorFilter& uef)
-    : ErrorFilter(uef)
+ESFErrorSimRandomGauss::ESFErrorSimRandomGauss(const ESFErrorSimRandomGauss& esf)
+    : ESFErrorSimulation(esf)
 {
-    data = uef.data;
-    mean = uef.mean;
-    sigma = uef.sigma;
-    Pi = uef.Pi;
-    sw = uef.sw;
-    inext = uef.inext;
-    inextp = uef.inextp;
-    MBIG = uef.MBIG;
-    MSEED = uef.MSEED;
-    MZ = uef.MZ;
-    FAC = uef.FAC;
+    data = esf.data;
+    mean = esf.mean;
+    sigma = esf.sigma;
+    Pi = esf.Pi;
+    sw = esf.sw;
+    inext = esf.inext;
+    inextp = esf.inextp;
+    MBIG = esf.MBIG;
+    MSEED = esf.MSEED;
+    MZ = esf.MZ;
+    FAC = esf.FAC;
     ma = new int[56];
     
     idseed = ((unsigned)time(NULL)) % MBIG;
     init_rand3();
     srand(idseed);
-    for(int i=0; i<100; i++)
+    for (int i=0; i<100; i++)
         filtering(0.0);
 }
 
 
-RandomErrorFilter::~RandomErrorFilter()
+ESFErrorSimRandomGauss::~ESFErrorSimRandomGauss()
 {
-    if(ma != 0)
+    if (ma != 0)
         delete [] ma;
 }
 
 
-double RandomErrorFilter::filtering(double d)
+double ESFErrorSimRandomGauss::filtering(double d)
 {
     data = d;
     data += gen_rand();
-    //  opserr << "U : " << d << ", err = " << d-data << endln;
+
     return data;
 }
 
 
-void RandomErrorFilter::update()
+void ESFErrorSimRandomGauss::update()
 {
     // does nothing
 }
 
 
-SignalFilter* RandomErrorFilter::getCopy()
+ExperimentalSignalFilter* ESFErrorSimRandomGauss::getCopy()
 {
-    return new RandomErrorFilter(*this);
+    return new ESFErrorSimRandomGauss(*this);
 }
 
 
-void RandomErrorFilter::Print(OPS_Stream &s, int flag =0)
+void ESFErrorSimRandomGauss::Print(OPS_Stream &s, int flag = 0)
 {
     s << "Filter: " << this->getTag(); 
-    s << " type: RandomErrorFilter\n";
-    s << "\tmean = " << mean << ", sigma = " << sigma << endln;
+    s << "  type: ESFErrorSimRandomGauss\n";
+    s << "  mean: " << mean << ", sigma: " << sigma << endln;
 }
 
 
-void RandomErrorFilter::init_rand3()
+void ESFErrorSimRandomGauss::init_rand3()
 {
     // Numerical Recipes in C++, 2nd Ed., pp.287
     int i, ii, k, mj, mk;
@@ -129,59 +128,64 @@ void RandomErrorFilter::init_rand3()
     mj %= MBIG;                         // idseed and the large number MSEED.
     ma[55] = mj;
     mk = 1;
-    for(i=1; i<=54; i++) {              // Now initialize the rest of the table,
-        ii=(21*i)%55;                     // in a slightly random order,
-        ma[ii] = mk;                      // with numbers that are not especially 
-        mk = mj-mk;                       // random.
-        if(mk < int(MZ)) mk += MBIG;
+    for (i=1; i<=54; i++)  {            // Now initialize the rest of the table,
+        ii=(21*i)%55;                   // in a slightly random order,
+        ma[ii] = mk;                    // with numbers that are not especially 
+        mk = mj-mk;                     // random.
+        if (mk < int(MZ))
+            mk += MBIG;
         mj = ma[ii];
     }
-    for(k=0; k<4; k++)                  // We randomize them by "warpping up
-        for(i=1; i<=55; i++) {            // the generator".
+    for (k=0; k<4; k++)  {              // We randomize them by "wrapping up
+        for (i=1; i<=55; i++)  {        // the generator".
             ma[i] -= ma[1+(i+30)%55];
-            if(ma[i] < int(MZ)) ma[i] += MBIG;
+            if (ma[i] < int(MZ))
+                ma[i] += MBIG;
         }
-        
-        inext = 0;                  // Prepare indices for our first generated 
-        inextp = 31;                // number. The contant 31 is special; see Knuth.
+    }
+    inext = 0;                          // Prepare indices for our first generated 
+    inextp = 31;                        // number. The contant 31 is special; see Knuth.
 }
 
 
-double RandomErrorFilter::rand3()
+double ESFErrorSimRandomGauss::rand3()
 {
     // Numerical Recipes in C++, 2nd Ed., pp.287
     int mj;
     
-    if(++inext == 56) inext=1;      // Increment inext and inextp, wrapping
-    if(++inextp == 56) inextp = 1;  // around 56 to 1
-    mj = ma[inext]-ma[inextp];      // Generate a new random number subtractively
-    if(mj < int(MZ)) mj += MBIG;    // Be sure that it is in range
+    if (++inext == 56)                  // Increment inext and inextp, wrapping
+        inext = 1;
+    if (++inextp == 56)                 // around 56 to 1
+        inextp = 1;
+    mj = ma[inext]-ma[inextp];          // Generate a new random number subtractively
+    if (mj < int(MZ))                   // Be sure that it is in range
+        mj += MBIG;
     ma[inext] = mj;
     
-    return mj*FAC;       // Output the derived uniform deviate between 0.0 .. 1.0
+    return mj*FAC;                      // Output the derived uniform deviate between 0.0 .. 1.0
 }
 
 
-double RandomErrorFilter::rand1()
+double ESFErrorSimRandomGauss::rand1()
 {
     // simple but not recommended random generator
     return (1.0 / (RAND_MAX + 1.0)) * rand();
 }
 
 
-double RandomErrorFilter::gen_rand()
+double ESFErrorSimRandomGauss::gen_rand()
 {
     double nd;
     
-    amp  = sqrt(-2 * log(rand3()));
-    theta  = 2 * Pi * rand3();
-    if(sw == 0) {
+    amp = sqrt(-2 * log(rand3()));
+    theta = 2 * Pi * rand3();
+    if (sw == 0)  {
         sw = 1;
         nd = amp*cos(theta);
-    } else {
+    } else  {
         sw = 0;
         nd = amp*sin(theta);
     }
+
     return mean + sigma*nd;
 }
-

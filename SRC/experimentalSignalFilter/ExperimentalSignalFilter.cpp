@@ -26,33 +26,61 @@
 // $Date$
 // $URL: $
 
-#ifndef SignalFilter_h
-#define SignalFilter_h
-
 // Written: Yoshi (yos@catfish.dpri.kyoto-u.ac.jp)
 // Created: 09/06
 // Revision: A
 //
-// Description: This file contains the class definition for 
-// SignalFilter.
+// Description: This file contains the implementation of 
+// ExperimentalSignalFilter.
 
-#include <TaggedObject.h>
-#include <OPS_Globals.h>
+#include "ExperimentalSignalFilter.h"
 
-class SignalFilter : public TaggedObject
+
+ExperimentalSignalFilter::ExperimentalSignalFilter(int tag)
+    : TaggedObject(tag)
 {
-public:
-    // constructors
-    SignalFilter(int tag);
-    SignalFilter(const SignalFilter& f);
-    
-    // destructor
-    virtual ~SignalFilter();
-    
-    virtual double filtering(double data) = 0;
-    virtual void update() = 0;
-    
-    virtual SignalFilter *getCopy() = 0;
-};
+    // does nothing
+}
 
-#endif
+
+ExperimentalSignalFilter::ExperimentalSignalFilter(
+    const ExperimentalSignalFilter& esf)
+    : TaggedObject(esf)
+{
+    // does nothing
+}
+
+
+ExperimentalSignalFilter::~ExperimentalSignalFilter()
+{
+    // does nothing
+}
+
+
+const char* ExperimentalSignalFilter::getClassType() const
+{
+    return "UnknownExpSignalFilterObject";
+}
+
+
+Response* ExperimentalSignalFilter::setResponse(const char **argv,
+    int argc, OPS_Stream &output)
+{
+    Response *theResponse = 0;
+    
+    output.tag("ExpSignalFilterOutput");
+    output.attr("signalFilterType",this->getClassType());
+    output.attr("signalFilterTag",this->getTag());
+        
+    output.endTag();
+    
+    return theResponse;
+}
+
+
+int ExperimentalSignalFilter::getResponse(int responseID,
+    Information &info)
+{
+    // each subclass must implement its own response
+    return -1;
+}
