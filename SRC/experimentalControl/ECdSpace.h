@@ -48,9 +48,12 @@ public:
     // destructor
     virtual ~ECdSpace();
     
+    // method to get class type
+    const char *getClassType() const {return "ECdSpace";};
+    
     // public methods to set and to get response
-    virtual int setSize(ID sizeT, ID sizeO);
     virtual int setup();
+    virtual int setSize(ID sizeT, ID sizeO);
     
     virtual int setTrialResponse(const Vector* disp, 
         const Vector* vel,

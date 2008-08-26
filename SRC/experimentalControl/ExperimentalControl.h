@@ -37,7 +37,7 @@
 // ExperimentalControl.
 
 #include <FrescoGlobals.h>
-#include <SignalFilter.h>
+#include <ExperimentalSignalFilter.h>
 
 #include <TaggedObject.h>
 #include <ID.h>
@@ -53,9 +53,12 @@ public:
     // destructor
     virtual ~ExperimentalControl();
     
+    // method to get class type
+    virtual const char *getClassType() const;
+
     // public methods to set and to get response
-    virtual int setSize(ID sizeT, ID sizeO) = 0;
     virtual int setup() = 0;
+    virtual int setSize(ID sizeT, ID sizeO) = 0;
     
     virtual int setTrialResponse(const Vector* disp,
         const Vector* vel,
@@ -72,6 +75,11 @@ public:
     
     virtual ExperimentalControl *getCopy() = 0;
     
+    void setCtrlFilter(ExperimentalSignalFilter* theFilter,
+        int respType);
+    void setDaqFilter(ExperimentalSignalFilter* theFilter,
+        int respType);
+
     const ID& getSizeCtrl();
     const ID& getSizeDaq();
     
@@ -85,8 +93,9 @@ protected:
     ID *sizeCtrl;
     ID *sizeDaq;
     
-    // signal filter
-    SignalFilter *theFilter;
+    // experimental signal filters
+    ExperimentalSignalFilter **theCtrlFilters;
+    ExperimentalSignalFilter **theDaqFilters;
 };
 
 #endif

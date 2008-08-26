@@ -46,7 +46,7 @@ ECNIEseries::ECNIEseries(int tag ,int device)//, bool rtest)
     nbit_da = 16;
     iChan_da = 0;
     iChan_da = new i16 [1];
-    piChanVect = new i16[1];
+    piChanVect = new i16 [1];
     for(int i=0; i<1; i++)
         piChanVect[i] = 0;
     iGroup = 1;
@@ -147,11 +147,11 @@ ECNIEseries::ECNIEseries(const ECNIEseries& ast)
 {
     // realtest = ast.realtest;
 
-    cDispV = new Vector((*sizeCtrl)[OF_Resp_Disp]);
-    //cVelV = new double[(*sizeCtrl)[OF_Resp_Vel]];
+    cDispV = new Vector((*sizeCtrl)(OF_Resp_Disp));
+    //cVelV = new double [(*sizeCtrl)(OF_Resp_Vel)];
 
-    dDispV = new Vector((*sizeDaq)[OF_Resp_Disp]);
-    dForceV = new Vector((*sizeDaq)[OF_Resp_Force]);
+    dDispV = new Vector((*sizeDaq)(OF_Resp_Disp));
+    dForceV = new Vector((*sizeDaq)(OF_Resp_Force));
     /*dummySpecimen = 0;
     if(ast.dummySpecimen != 0) 
     dummySpecimen = ast.dummySpecimen->getCopy();*/
@@ -165,7 +165,7 @@ ECNIEseries::ECNIEseries(const ECNIEseries& ast)
 
     iChan_da = 0;
     iChan_da = new i16 [1];
-    piChanVect = new i16[1];
+    piChanVect = new i16 [1];
     for(int i=0; i<1; i++)
         piChanVect[i] = (ast.piChanVect)[i];
     iGroup = ast.iGroup;
@@ -260,45 +260,20 @@ ECNIEseries::~ECNIEseries()
 }
 
 
-int ECNIEseries::setSize(ID sizeT, ID sizeO)
-{
-    // check sizeTrial and sizeOut
-    // for ECNIEseries object
-
-    // ECNIEseries object only use 
-    // disp or disp and vel or disp, vel and accel for trial
-    // disp and force for output
-    // check these are available in sizeT/sizeO.
-
-    if(sizeT[OF_Resp_Disp] !=1 || sizeO[OF_Resp_Disp] !=1 ||
-        sizeO[OF_Resp_Force] !=1)
-    {
-        opserr << "ECNIEseries::setSize - wrong sizeTrial/Out\n"; 
-        opserr << "see User Manual.\n";
-        exit(1);
-    }
-
-    *sizeCtrl = sizeT;
-    *sizeDaq = sizeO;
-
-    return OF_ReturnType_completed;
-}
-
-
 int ECNIEseries::setup()
-{  //opserr << (*sizeDaq)[OF_Resp_Force];
-    cDispV = new Vector((*sizeCtrl)[OF_Resp_Disp]);
-    //cVelV = new double[(*sizeCtrl)[OF_Resp_Vel]];
+{  //opserr << (*sizeDaq)(OF_Resp_Force);
+    cDispV = new Vector((*sizeCtrl)(OF_Resp_Disp));
+    //cVelV = new double [(*sizeCtrl)(OF_Resp_Vel)];
 
-    dDispV = new Vector((*sizeDaq)[OF_Resp_Disp]);
-    dForceV = new Vector((*sizeDaq)[OF_Resp_Force]);  
+    dDispV = new Vector((*sizeDaq)(OF_Resp_Disp));
+    dForceV = new Vector((*sizeDaq)(OF_Resp_Force));  
 
     //cDispV->Zero();
     //dDispV->Zero();
     //dForceV->Zero(); 
 
     //cVelV->Zero();
-    opserr << (*cDispV)[0];
+    opserr << (*cDispV)(0);
     int code = 0, i, iStatus;
     double targetVal = 0.0;
 
@@ -330,17 +305,17 @@ int ECNIEseries::setup()
     opserr << "* INITIAL VALUES OF DAQ\n";
     opserr << "*\n";
 
-    /*opserr << "*   Ch. " << 1 << ": " << (*cDispV)[0] 
+    /*opserr << "*   Ch. " << 1 << ": " << (*cDispV)(0) 
     << " (" << "mm"
-    << ") <" << (*cDispV)[0]/Vol2unit[0] << " (Volt)>\n";*/
+    << ") <" << (*cDispV)(0)/Vol2unit[0] << " (Volt)>\n";*/
 
-    opserr << "*   Ch. " << 2 << ": " << (*dForceV)[0]
+    opserr << "*   Ch. " << 2 << ": " << (*dForceV)(0)
     << " (" << "N"
-        << ") <" << (*dForceV)[0]/Vol2unit[1] << " (Volt)>\n";
+        << ") <" << (*dForceV)(0)/Vol2unit[1] << " (Volt)>\n";
 
-    opserr << "*   Ch. " << 3 << ": " << (*dDispV)[0] 
+    opserr << "*   Ch. " << 3 << ": " << (*dDispV)(0) 
     << " (" << "mm"
-        << ") <" << (*dDispV)[0]/Vol2unit[2] << " (Volt)>\n";
+        << ") <" << (*dDispV)(0)/Vol2unit[2] << " (Volt)>\n";
 
 
     opserr << "*\n";
@@ -352,7 +327,7 @@ int ECNIEseries::setup()
 
     NIDAQWaitForKey(0.0);
 
-    targetVal = (*cDispV)[0];
+    targetVal = (*cDispV)(0);
     //targetVal = 0.0;
 
     opserr << "*\n";
@@ -371,6 +346,31 @@ int ECNIEseries::setup()
     //actDisp = 0.0;//?????
 
     return code;
+}
+
+
+int ECNIEseries::setSize(ID sizeT, ID sizeO)
+{
+    // check sizeTrial and sizeOut
+    // for ECNIEseries object
+
+    // ECNIEseries object only use 
+    // disp or disp and vel or disp, vel and accel for trial
+    // disp and force for output
+    // check these are available in sizeT/sizeO.
+
+    if(sizeT(OF_Resp_Disp) !=1 || sizeO(OF_Resp_Disp) !=1 ||
+        sizeO(OF_Resp_Force) !=1)
+    {
+        opserr << "ECNIEseries::setSize - wrong sizeTrial/Out\n"; 
+        opserr << "see User Manual.\n";
+        exit(1);
+    }
+
+    *sizeCtrl = sizeT;
+    *sizeDaq = sizeO;
+
+    return OF_ReturnType_completed;
 }
 
 
@@ -472,8 +472,8 @@ int ECNIEseries::control()
 
     u32 ulCount;
     for (int i=0; i<1; i++){
-        f64 mm_s = (*dDispV)[0];
-        f64 mm_t = (*cDispV)[0];//targetDisp;
+        f64 mm_s = (*dDispV)(0);
+        f64 mm_t = (*cDispV)(0);//targetDisp;
         opserr << "\nfrom " << mm_s << " to " << mm_t << " with ctrl_w " << ctrl_w;
 
         ulCount = (u32)(fabs(mm_t - mm_s)/ctrl_w);
@@ -605,13 +605,13 @@ int ECNIEseries::acquire()
     // opserr << "\ndVoltage(1) = " << dVoltage[1];// << ", daqData = " << (*daqData)(0);
     // opserr <<  Vol2unit[1] ;
     //  if(realtest == true) {
-    (*dForceV)[0] = dVoltage[1]*Vol2unit[1];
+    (*dForceV)(0) = dVoltage[1]*Vol2unit[1];
 
     /*else {
     (*daqData)(0) = dummySpecimen->getStrain();
     (*daqData)(1) = dummySpecimen->getStress();
     }*/
-    (*dDispV)[0] = dVoltage[2]*Vol2unit[2];
+    (*dDispV)(0) = dVoltage[2]*Vol2unit[2];
 
     // for(int i = 0; i<3; i++) opserr << "i = " << i << ", daqData = " << (*daqData)(i) << endln;
 

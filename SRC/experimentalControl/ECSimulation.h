@@ -48,9 +48,12 @@ public:
     // destructor
     virtual ~ECSimulation();
     
+    // method to get class type
+    const char *getClassType() const {return "ECSimulation";};
+    
     // public methods to set and to get response
-    virtual int setSize(ID sizeT, ID sizeO) = 0;
     virtual int setup() = 0;
+    virtual int setSize(ID sizeT, ID sizeO) = 0;
     
     virtual int setTrialResponse(const Vector* disp, 
         const Vector* vel,

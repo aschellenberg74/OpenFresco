@@ -92,112 +92,37 @@ ECMtsCsi::~ECMtsCsi()
 }
 
 
-int ECMtsCsi::setSize(ID sizeT, ID sizeO)
-{
-    if (sizeT[OF_Resp_Disp] == 0 ||
-        sizeO[OF_Resp_Disp] == 0 ||
-        sizeO[OF_Resp_Force] == 0) {
-            opserr << "ECMtsCsi::setSize() - wrong sizeTrial/Out"; 
-            opserr << "see User Manual.\n";
-            exit(OF_ReturnType_failed);
-    }
-
-    *sizeCtrl = sizeT;
-    *sizeDaq  = sizeO;
-
-    // the loaded configuration must contain:
-    //		at least 1 control point
-    //		at least 1 degree of freedom (defining a displacement control channel)
-    //         in each control point
-    //		and 2 feedback signals (defining a displacement and force signal, respectively)
-    //		   per degree of freedom (all displacement signals must be first in the array
-    //         followed by all force signals)
-
-    Mts::ICsiConfiguration& cfg = CsiController->getConfiguration();
-
-    opserr << "using MtsCsi configuration file '" << cfg.getFileName() << "'" << endln;
-
-    if (cfg.getControlPoints().count() < 1)  {
-        opserr << "ECMtsCsi::setSize() - configuration must "
-            << "define at least one control point" << endln;
-        exit(OF_ReturnType_failed);
-    }
-
-    int numDoFs = 0;
-    int numFdbkSigs = 0;
-
-    for (int i=0; i<cfg.getControlPoints().count(); i++)  {
-
-        Mts::ICsiControlPoint& ctrlPt = cfg.getControlPoints()[i];
-
-        if (ctrlPt.getDegreesOfFreedom().count() < 1)  {
-            opserr << "ECMtsCsi::setSize() - configuration define "
-                << "at least one degree of freedom per control point" << endln;
-            exit(OF_ReturnType_failed);
-        }
-
-        numDoFs += ctrlPt.getDegreesOfFreedom().count();
-
-        if (ctrlPt.getFeedbackSignals().count() != (ctrlPt.getDegreesOfFreedom().count() * 2))  {
-            opserr << "ECMtsCsi::setSize() - configuration must define "
-                << "at least two feedback signals (displacement and force) " 
-                << "per degree of freedom" << endln;
-            exit(OF_ReturnType_failed);
-        }
-
-        numFdbkSigs += ctrlPt.getFeedbackSignals().count();
-    }
-
-    opserr << "MtsCsi configuration: " << numDoFs << " degrees of freedom; " 
-        << numFdbkSigs << " feedback signals" << endln;
-
-    int numTrial  = sizeT[OF_Resp_Disp];
-    int numOutput = sizeO[OF_Resp_Disp] + sizeO[OF_Resp_Force];
-
-    if (numTrial != numDoFs)  {
-        opserr << "warning: ECMtsCsi::setSize() - specified trial size (" << numTrial << ") does not "
-            << "match total number of degrees of freedom (" << numDoFs << ") defined in the "
-            << "configuration" << endln;
-    }
-
-    if (numOutput != numFdbkSigs)  {
-        opserr << "warning: ECMtsCsi::setSize() - specified output size (" << numOutput << ") does not "
-            << "match total number of feedback signals (" << numFdbkSigs << ") defined in the "
-            << "configuration" << endln;
-    }
-
-    return OF_ReturnType_completed;
-}
-
 int ECMtsCsi::setup()
 {
+    int rValue = 0;
+    
     if (targDisp != 0)
         delete targDisp;
     if (targForce != 0)
         delete targForce;
-
-    if ((*sizeCtrl)[OF_Resp_Disp] != 0)  {
-        targDisp = new Vector((*sizeCtrl)[OF_Resp_Disp]);
+    
+    if ((*sizeCtrl)(OF_Resp_Disp) != 0)  {
+        targDisp = new Vector((*sizeCtrl)(OF_Resp_Disp));
         targDisp->Zero();
     }
-    if ((*sizeCtrl)[OF_Resp_Force] != 0)  {
-        targForce = new Vector((*sizeCtrl)[OF_Resp_Force]);
+    if ((*sizeCtrl)(OF_Resp_Force) != 0)  {
+        targForce = new Vector((*sizeCtrl)(OF_Resp_Force));
         targForce->Zero();
     }
-
+    
     if (measResp != 0)
         delete [] measResp;
     if (measDisp != 0)
         delete measDisp;
     if (measForce != 0)
         delete measForce;
-
+    
     int id = 0;
-    respSize = (*sizeDaq)[OF_Resp_Disp] + (*sizeDaq)[OF_Resp_Force];
+    respSize = (*sizeDaq)(OF_Resp_Disp) + (*sizeDaq)(OF_Resp_Force);
     measResp = new double [respSize];
-    measDisp = new Vector(&measResp[id],(*sizeDaq)[OF_Resp_Disp]);
-    id += (*sizeDaq)[OF_Resp_Disp];
-    measForce = new Vector(&measResp[id],(*sizeDaq)[OF_Resp_Force]);
+    measDisp = new Vector(&measResp[id],(*sizeDaq)(OF_Resp_Disp));
+    id += (*sizeDaq)(OF_Resp_Disp);
+    measForce = new Vector(&measResp[id],(*sizeDaq)(OF_Resp_Force));
     
     // print experimental control information
     this->Print(opserr);
@@ -215,7 +140,7 @@ int ECMtsCsi::setup()
         delete CsiController;
         exit(OF_ReturnType_failed);
     }
-
+    
     // start the csi-controller
     try  {
         CsiController->startHardware();
@@ -225,21 +150,21 @@ int ECMtsCsi::setup()
         opserr << xcp.what() << endln;
         exit(OF_ReturnType_failed);
     }
-
+    
 	do  {
-        this->control();
-        this->acquire();
+        rValue += this->control();
+        rValue += this->acquire();
         
         int i;
         opserr << "**************************************\n";
         opserr << "* Initial values of DAQ are:         *\n";
         opserr << "*                                    *\n";
         opserr << "* dspDaq = [";
-        for (i=0; i<(*sizeDaq)[OF_Resp_Disp]; i++)
+        for (i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)
             opserr << " " << measDisp[i];
         opserr << " ]\n";
         opserr << "* frcDaq = [";
-        for (i=0; i<(*sizeDaq)[OF_Resp_Force]; i++)
+        for (i=0; i<(*sizeDaq)(OF_Resp_Force); i++)
             opserr << " " << measForce[i];
         opserr << " ]\n";
         opserr << "*                                    *\n";
@@ -263,6 +188,84 @@ int ECMtsCsi::setup()
     opserr << "* Running......  *\n";
     opserr << "******************\n";
     opserr << endln;
+    
+    return rValue;
+}
+
+
+int ECMtsCsi::setSize(ID sizeT, ID sizeO)
+{
+    if (sizeT(OF_Resp_Disp) == 0 ||
+        sizeO(OF_Resp_Disp) == 0 ||
+        sizeO(OF_Resp_Force) == 0) {
+            opserr << "ECMtsCsi::setSize() - wrong sizeTrial/Out"; 
+            opserr << "see User Manual.\n";
+            exit(OF_ReturnType_failed);
+    }
+
+    *sizeCtrl = sizeT;
+    *sizeDaq  = sizeO;
+
+    // the loaded configuration must contain:
+    //		at least 1 control point
+    //		at least 1 degree of freedom (defining a displacement control channel)
+    //         in each control point
+    //		and 2 feedback signals (defining a displacement and force signal, respectively)
+    //		   per degree of freedom (all displacement signals must be first in the array
+    //         followed by all force signals)
+
+    Mts::ICsiConfiguration& cfg = CsiController->getConfiguration();
+
+    opserr << "using MtsCsi configuration file '" << cfg.getFileName() << "'.\n";
+
+    if (cfg.getControlPoints().count() < 1)  {
+        opserr << "ECMtsCsi::setSize() - configuration must "
+            << "define at least one control point.\n";
+        exit(OF_ReturnType_failed);
+    }
+
+    int numDoFs = 0;
+    int numFdbkSigs = 0;
+
+    for (int i=0; i<cfg.getControlPoints().count(); i++)  {
+
+        Mts::ICsiControlPoint& ctrlPt = cfg.getControlPoints()[i];
+
+        if (ctrlPt.getDegreesOfFreedom().count() < 1)  {
+            opserr << "ECMtsCsi::setSize() - configuration define "
+                << "at least one degree of freedom per control point.\n";
+            exit(OF_ReturnType_failed);
+        }
+
+        numDoFs += ctrlPt.getDegreesOfFreedom().count();
+
+        if (ctrlPt.getFeedbackSignals().count() != (ctrlPt.getDegreesOfFreedom().count() * 2))  {
+            opserr << "ECMtsCsi::setSize() - configuration must define "
+                << "at least two feedback signals (displacement and force) " 
+                << "per degree of freedom.\n";
+            exit(OF_ReturnType_failed);
+        }
+
+        numFdbkSigs += ctrlPt.getFeedbackSignals().count();
+    }
+
+    opserr << "MtsCsi configuration: " << numDoFs << " degrees of freedom; " 
+        << numFdbkSigs << " feedback signals.\n";
+
+    int numTrial  = sizeT(OF_Resp_Disp);
+    int numOutput = sizeO(OF_Resp_Disp) + sizeO(OF_Resp_Force);
+
+    if (numTrial != numDoFs)  {
+        opserr << "warning: ECMtsCsi::setSize() - specified trial size (" << numTrial << ") does not "
+            << "match total number of degrees of freedom (" << numDoFs << ") defined in the "
+            << "configuration.\n";
+    }
+
+    if (numOutput != numFdbkSigs)  {
+        opserr << "warning: ECMtsCsi::setSize() - specified output size (" << numOutput << ") does not "
+            << "match total number of feedback signals (" << numFdbkSigs << ") defined in the "
+            << "configuration.\n";
+    }
 
     return OF_ReturnType_completed;
 }
@@ -277,16 +280,25 @@ int ECMtsCsi::setTrialResponse(const Vector* disp,
     const Vector* force,
     const Vector* time)
 {
-    *targDisp = *disp;
-    if (theFilter != 0)  {
-        for (int i=0; i<(*sizeCtrl)[OF_Resp_Disp]; i++)
-            (*targDisp)(i) = theFilter->filtering((*targDisp)(i));
+    int i, rValue = 0;
+    if (disp != 0)  {
+        *targDisp = *disp;
+        if (theCtrlFilters[OF_Resp_Disp] != 0)  {
+            for (i=0; i<(*sizeCtrl)(OF_Resp_Disp); i++)
+                (*targDisp)(i) = theCtrlFilters[OF_Resp_Disp]->filtering((*targDisp)(i));
+        }
     }
-    *targForce = *force;
+    if (force != 0)  {
+        *targForce = *force;
+        if (theCtrlFilters[OF_Resp_Force] != 0)  {
+            for (i=0; i<(*sizeCtrl)(OF_Resp_Force); i++)
+                (*targForce)(i) = theCtrlFilters[OF_Resp_Force]->filtering((*targForce)(i));
+        }
+    }
 
-    this->control();
+    rValue = this->control();
 
-    return OF_ReturnType_completed;
+    return rValue;
 }
 
 
@@ -306,8 +318,21 @@ int ECMtsCsi::getDaqResponse(Vector* disp,
 {
     this->acquire();
 
-    *disp = *measDisp;
-    *force = *measForce;
+    int i;
+    if (disp != 0)  {
+        if (theDaqFilters[OF_Resp_Disp] != 0)  {
+            for (i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)
+                (*measDisp)(i) = theDaqFilters[OF_Resp_Disp]->filtering((*measDisp)(i));
+        }
+        *disp = *measDisp;
+    }
+    if (force != 0)  {
+        if (theDaqFilters[OF_Resp_Force] != 0)  {
+            for (i=0; i<(*sizeDaq)(OF_Resp_Force); i++)
+                (*measForce)(i) = theDaqFilters[OF_Resp_Force]->filtering((*measForce)(i));
+        }
+        *force = *measForce;
+    }
 
     return OF_ReturnType_completed;
 }
@@ -332,9 +357,10 @@ void ECMtsCsi::Print(OPS_Stream &s, int flag)
     s << "* type: ECMtsCsi\n";
     s << "*   cfgFile: " << cfgFile << endln;
     s << "*   rampTime: " << rampTime << endln;
-    if (theFilter != 0) {
-        s << "*\tFilter: " << *theFilter << endln;
-    }
+    if (theCtrlFilters != 0)
+        s << "*   ctrlFilter: " << *theCtrlFilters << endln;
+    if (theDaqFilters != 0)
+        s << "*   daqFilter: " << *theDaqFilters << endln;
     s << "****************************************************************\n";
     s << endln;
 }
@@ -348,10 +374,10 @@ int ECMtsCsi::control()
     Mts::ICsiRamp* ramp = Mts::CsiFactory::newRamp();
 
     ramp->setWaitUntilCompletion(true);
-    ramp->setChannelCount((*sizeCtrl)[OF_Resp_Disp]);
+    ramp->setChannelCount((*sizeCtrl)(OF_Resp_Disp));
     ramp->setRampTime(rampTime);
 
-    for (int i=0; i<(*sizeCtrl)[OF_Resp_Disp]; i++)
+    for (int i=0; i<(*sizeCtrl)(OF_Resp_Disp); i++)
 		(*ramp)[i] = (*targDisp)(i);
 
     try  {

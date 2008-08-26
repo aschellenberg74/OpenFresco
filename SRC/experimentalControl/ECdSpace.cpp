@@ -51,7 +51,7 @@ ECdSpace::ECdSpace(int tag, int pctype, char *boardname)
     error = DS_board_index(boardName, &board_index);	
     if (error != DS_NO_ERROR)  {
         opserr << "ECdSpace::ECdSpace() - a board named " << boardName
-            << " is not registered with the DSP device driver" << endln;
+            << " is not registered with the DSP device driver.\n";
         DS_unregister_host_app();
         exit(OF_ReturnType_failed);
     }
@@ -156,6 +156,7 @@ ECdSpace::~ECdSpace()
     // each application has to unregister itself before exiting
     DS_unregister_host_app();
     
+    opserr << endln;
     opserr << "****************************************\n";
     opserr << "* The rtp application has been stopped *\n";
     opserr << "****************************************\n";
@@ -163,35 +164,10 @@ ECdSpace::~ECdSpace()
 }
 
 
-int ECdSpace::setSize(ID sizeT, ID sizeO)
-{
-    // check sizeTrial and sizeOut
-    // for ECdSpace object
-    
-    // ECdSpace objects only use 
-    // disp or disp and vel or disp, vel and accel for trial and
-    // disp and force for output
-    // check these are available in sizeT/sizeO.
-    if ((pcType == 0 && sizeT[OF_Resp_Disp] == 0) || 
-        (pcType == 1 && sizeT[OF_Resp_Disp] == 0 && sizeT[OF_Resp_Vel] == 0) ||
-        (pcType == 2 && sizeT[OF_Resp_Disp] == 0 && sizeT[OF_Resp_Vel] == 0 && sizeT[OF_Resp_Accel] == 0) ||
-        sizeO[OF_Resp_Disp] == 0 ||
-        sizeO[OF_Resp_Force] == 0) {
-        opserr << "ECdSpace::setSize() - wrong sizeTrial/Out\n"; 
-        opserr << "see User Manual.\n";
-        DS_unregister_host_app();
-        exit(OF_ReturnType_failed);
-    }
-    
-    *sizeCtrl = sizeT;
-    *sizeDaq  = sizeO;
-    
-    return OF_ReturnType_completed;
-}
-
-
 int ECdSpace::setup()
 {
+    int rValue = 0;
+    
     if (targDisp != 0)
         delete targDisp;
     if (targVel != 0)
@@ -199,19 +175,19 @@ int ECdSpace::setup()
     if (targAccel != 0)
         delete targAccel;
     
-    if ((*sizeCtrl)[OF_Resp_Disp] != 0)  {
-        targDisp = new double[(*sizeCtrl)[OF_Resp_Disp]];
-        for (int i=0; i<(*sizeCtrl)[OF_Resp_Disp]; i++)
+    if ((*sizeCtrl)(OF_Resp_Disp) != 0)  {
+        targDisp = new double [(*sizeCtrl)(OF_Resp_Disp)];
+        for (int i=0; i<(*sizeCtrl)(OF_Resp_Disp); i++)
             targDisp[i] = 0.0;
     }
-    if ((*sizeCtrl)[OF_Resp_Disp] != 0)  {
-        targVel = new double[(*sizeCtrl)[OF_Resp_Vel]];
-        for (int i=0; i<(*sizeCtrl)[OF_Resp_Vel]; i++)
+    if ((*sizeCtrl)(OF_Resp_Disp) != 0)  {
+        targVel = new double [(*sizeCtrl)(OF_Resp_Vel)];
+        for (int i=0; i<(*sizeCtrl)(OF_Resp_Vel); i++)
             targVel[i] = 0.0;
     }
-    if ((*sizeCtrl)[OF_Resp_Disp] != 0)  {
-        targAccel = new double[(*sizeCtrl)[OF_Resp_Accel]];
-        for (int i=0; i<(*sizeCtrl)[OF_Resp_Accel]; i++)
+    if ((*sizeCtrl)(OF_Resp_Disp) != 0)  {
+        targAccel = new double [(*sizeCtrl)(OF_Resp_Accel)];
+        for (int i=0; i<(*sizeCtrl)(OF_Resp_Accel); i++)
             targAccel[i] = 0.0;
     }
     
@@ -220,14 +196,14 @@ int ECdSpace::setup()
     if (measForce != 0)
         delete measForce;
     
-    if ((*sizeDaq)[OF_Resp_Disp] != 0)  {
-        measDisp = new double[(*sizeDaq)[OF_Resp_Disp]];
-        for (int i=0; i<(*sizeDaq)[OF_Resp_Disp]; i++)
+    if ((*sizeDaq)(OF_Resp_Disp) != 0)  {
+        measDisp = new double [(*sizeDaq)(OF_Resp_Disp)];
+        for (int i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)
             measDisp[i] = 0.0;
     }
-    if ((*sizeDaq)[OF_Resp_Force] != 0)  {
-        measForce = new double[(*sizeDaq)[OF_Resp_Force]];
-        for (int i=0; i<(*sizeDaq)[OF_Resp_Force]; i++)
+    if ((*sizeDaq)(OF_Resp_Force) != 0)  {
+        measForce = new double [(*sizeDaq)(OF_Resp_Force)];
+        for (int i=0; i<(*sizeDaq)(OF_Resp_Force); i++)
             measForce[i] = 0.0;
     }
     
@@ -321,19 +297,19 @@ int ECdSpace::setup()
     this->sleep(1000);
 	
 	do  {
-        this->control();
-        this->acquire();
+        rValue += this->control();
+        rValue += this->acquire();
         
         int i;
         opserr << "**************************************\n";
         opserr << "* Initial values of DAQ are:         *\n";
         opserr << "*                                    *\n";
         opserr << "* dspDaq = [";
-        for (i=0; i<(*sizeDaq)[OF_Resp_Disp]; i++)
+        for (i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)
             opserr << " " << measDisp[i];
         opserr << " ]\n";
         opserr << "* frcDaq = [";
-        for (i=0; i<(*sizeDaq)[OF_Resp_Force]; i++)
+        for (i=0; i<(*sizeDaq)(OF_Resp_Force); i++)
             opserr << " " << measForce[i];
         opserr << " ]\n";
         opserr << "*                                    *\n";
@@ -357,6 +333,33 @@ int ECdSpace::setup()
     opserr << "******************\n";
     opserr << endln;
     
+    return rValue;
+}
+
+
+int ECdSpace::setSize(ID sizeT, ID sizeO)
+{
+    // check sizeTrial and sizeOut
+    // for ECdSpace object
+    
+    // ECdSpace objects only use 
+    // disp or disp and vel or disp, vel and accel for trial and
+    // disp and force for output
+    // check these are available in sizeT/sizeO.
+    if ((pcType == 0 && sizeT(OF_Resp_Disp) == 0) || 
+        (pcType == 1 && sizeT(OF_Resp_Disp) == 0 && sizeT(OF_Resp_Vel) == 0) ||
+        (pcType == 2 && sizeT(OF_Resp_Disp) == 0 && sizeT(OF_Resp_Vel) == 0 && sizeT(OF_Resp_Accel) == 0) ||
+        sizeO(OF_Resp_Disp) == 0 ||
+        sizeO(OF_Resp_Force) == 0) {
+        opserr << "ECdSpace::setSize() - wrong sizeTrial/Out\n"; 
+        opserr << "see User Manual.\n";
+        DS_unregister_host_app();
+        exit(OF_ReturnType_failed);
+    }
+    
+    *sizeCtrl = sizeT;
+    *sizeDaq  = sizeO;
+    
     return OF_ReturnType_completed;
 }
 
@@ -367,24 +370,32 @@ int ECdSpace::setTrialResponse(const Vector* disp,
     const Vector* force,
     const Vector* time)
 {	
-    int i;
-    for (i=0; i<(*sizeCtrl)[OF_Resp_Disp]; i++)  {
-        targDisp[i] = (*disp)(i);
-        if (theFilter != 0)
-            targDisp[i] = theFilter->filtering(targDisp[i]);
+    int i, rValue = 0;
+    if (disp != 0)  {
+        for (i=0; i<(*sizeCtrl)(OF_Resp_Disp); i++)  {
+            targDisp[i] = (*disp)(i);
+            if (theCtrlFilters[OF_Resp_Disp] != 0)
+                targDisp[i] = theCtrlFilters[OF_Resp_Disp]->filtering(targDisp[i]);
+        }
     }
-    if (vel != 0) {
-        for (i=0; i<(*sizeCtrl)[OF_Resp_Vel]; i++)
+    if (vel != 0)  {
+        for (i=0; i<(*sizeCtrl)(OF_Resp_Vel); i++)  {
             targVel[i] = (*vel)(i);
+            if (theCtrlFilters[OF_Resp_Vel] != 0)
+                targVel[i] = theCtrlFilters[OF_Resp_Vel]->filtering(targVel[i]);
+        }
     }
-    if (accel != 0) {
-        for (i=0; i<(*sizeCtrl)[OF_Resp_Accel]; i++)
+    if (accel != 0)  {
+        for (i=0; i<(*sizeCtrl)(OF_Resp_Accel); i++)  {
             targAccel[i] = (*accel)(i);
+            if (theCtrlFilters[OF_Resp_Accel] != 0)
+                targAccel[i] = theCtrlFilters[OF_Resp_Accel]->filtering(targAccel[i]);
+        }
     }
         
-    this->control();
+    rValue = this->control();
     
-    return OF_ReturnType_completed;
+    return rValue;
 }
 
 
@@ -397,10 +408,20 @@ int ECdSpace::getDaqResponse(Vector* disp,
     this->acquire();
     
     int i;
-    for (i=0; i<(*sizeDaq)[OF_Resp_Disp]; i++)
-        (*disp)(i) = measDisp[i];
-    for (i=0; i<(*sizeDaq)[OF_Resp_Force]; i++)
-        (*force)(i) = measForce[i];
+    if (disp != 0)  {
+        for (i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)  {
+            if (theDaqFilters[OF_Resp_Disp] != 0)
+                measDisp[i] = theDaqFilters[OF_Resp_Disp]->filtering(measDisp[i]);
+            (*disp)(i) = measDisp[i];
+        }
+    }
+    if (force != 0)  {
+        for (i=0; i<(*sizeDaq)(OF_Resp_Force); i++)  {
+            if (theDaqFilters[OF_Resp_Force] != 0)
+                measForce[i] = theDaqFilters[OF_Resp_Force]->filtering(measForce[i]);
+            (*force)(i) = measForce[i];
+        }
+    }
         
     return OF_ReturnType_completed;
 }
@@ -425,9 +446,10 @@ void ECdSpace::Print(OPS_Stream &s, int flag)
     s << "* type: ECdSpace\n";
     s << "*   boardName: " << boardName << endln;
     s << "*   pcType: " << pcType << endln;
-    if (theFilter != 0) {
-        s << "*\tFilter: " << *theFilter << endln;
-    }
+    if (theCtrlFilters != 0)
+        s << "*   ctrlFilter: " << *theCtrlFilters << endln;
+    if (theDaqFilters != 0)
+        s << "*   daqFilter: " << *theDaqFilters << endln;
     s << "****************************************************************\n";
     s << endln;
 }
@@ -436,7 +458,7 @@ void ECdSpace::Print(OPS_Stream &s, int flag)
 int ECdSpace::control()
 {
     // send targDisp, targVel and targAccel and set newTarget flag
-    error = DS_write_64(board_index, targDispId, (*sizeCtrl)[OF_Resp_Disp], (UInt64 *)targDisp);
+    error = DS_write_64(board_index, targDispId, (*sizeCtrl)(OF_Resp_Disp), (UInt64 *)targDisp);
     if (error != DS_NO_ERROR)  {
         opserr << "ECdSpace::control() - "
             << "DS_write_64(targDisp): error = " << error << endln;
@@ -444,7 +466,7 @@ int ECdSpace::control()
         exit(OF_ReturnType_failed);
     }
     if (pcType==2 || pcType==3)  {
-        error = DS_write_64(board_index, targVelId, (*sizeCtrl)[OF_Resp_Vel], (UInt64 *)targVel);
+        error = DS_write_64(board_index, targVelId, (*sizeCtrl)(OF_Resp_Vel), (UInt64 *)targVel);
         if (error != DS_NO_ERROR)  {
             opserr << "ECdSpace::control() - "
                 << "DS_write_64(targVel): error = " << error << endln;
@@ -453,7 +475,7 @@ int ECdSpace::control()
         }
     }
     if (pcType==3)  {
-        error = DS_write_64(board_index, targAccelId, (*sizeCtrl)[OF_Resp_Accel], (UInt64 *)targAccel);
+        error = DS_write_64(board_index, targAccelId, (*sizeCtrl)(OF_Resp_Accel), (UInt64 *)targAccel);
         if (error != DS_NO_ERROR)  {
             opserr << "ECdSpace::control() - "
                 << "DS_write_64(targAccel): error = " << error << endln;
@@ -476,7 +498,7 @@ int ECdSpace::control()
     switchPC = 0;
     while (switchPC != 1) {
         error = DS_read_32(board_index, switchPCId, 1, (UInt32 *)&switchPC);
-        if (error != DS_NO_ERROR)	{
+        if (error != DS_NO_ERROR)  {
             opserr << "ECdSpace::control() - "
                 << "DS_read_32(switchPC): error = " << error << endln;
             DS_unregister_host_app();
@@ -498,7 +520,7 @@ int ECdSpace::control()
     switchPC = 1;
     while (switchPC != 0) {
         error = DS_read_32(board_index, switchPCId, 1, (UInt32 *)&switchPC);
-        if (error != DS_NO_ERROR)	{
+        if (error != DS_NO_ERROR)  {
             opserr << "ECdSpace::control() - "
                 << "DS_read_32(switchPC): error = " << error << endln;
             DS_unregister_host_app();
@@ -516,7 +538,7 @@ int ECdSpace::acquire()
     atTarget = 0;
     while (atTarget != 1)  {
         error = DS_read_32(board_index, atTargetId, 1, (UInt32 *)&atTarget);
-        if (error != DS_NO_ERROR)	{
+        if (error != DS_NO_ERROR)  {
             opserr << "ECdSpace::acquire() - "
                 << "DS_read_32(atTarget): error = " << error << endln;
             DS_unregister_host_app();
@@ -525,15 +547,15 @@ int ECdSpace::acquire()
     }
     
     // read displacements and resisting forces at target
-    error = DS_read_64(board_index, measDispId, (*sizeDaq)[OF_Resp_Disp], (UInt64 *)measDisp);
-    if (error != DS_NO_ERROR)	{
+    error = DS_read_64(board_index, measDispId, (*sizeDaq)(OF_Resp_Disp), (UInt64 *)measDisp);
+    if (error != DS_NO_ERROR)  {
         opserr << "ECdSpace::acquire() - "
             << "DS_read_64(measDisp): error = " << error << endln;
         DS_unregister_host_app();
         exit(OF_ReturnType_failed);
     }
-    error = DS_read_64(board_index, measForceId, (*sizeDaq)[OF_Resp_Force], (UInt64 *)measForce);
-    if (error != DS_NO_ERROR)	{
+    error = DS_read_64(board_index, measForceId, (*sizeDaq)(OF_Resp_Force), (UInt64 *)measForce);
+    if (error != DS_NO_ERROR)  {
         opserr << "ECdSpace::acquire() - "
             << "DS_read_64(measForce): error = " << error << endln;
         DS_unregister_host_app();

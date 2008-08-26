@@ -54,4 +54,3 @@ ECSimulation::~ECSimulation()
 {
     // does nothing
 }
-
