@@ -62,9 +62,12 @@ public:
     // destructor
     virtual ~ECSimDomain();
     
+    // method to get class type
+    const char *getClassType() const {return "ECSimDomain";};
+    
     // public methods to set and to get response
-    virtual int setSize(ID sizeT, ID sizeO);
     virtual int setup();
+    virtual int setSize(ID sizeT, ID sizeO);
     
     virtual int setTrialResponse(const Vector* disp, 
         const Vector* vel,

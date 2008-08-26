@@ -38,37 +38,78 @@
 
 ExperimentalControl::ExperimentalControl(int tag)
     : TaggedObject(tag),
-    sizeCtrl(0), sizeDaq(0), theFilter(0)
+    sizeCtrl(0), sizeDaq(0),
+    theCtrlFilters(0), theDaqFilters(0)
 {
     sizeCtrl = new ID(OF_Resp_All);
     sizeDaq = new ID(OF_Resp_All);
-    if (sizeCtrl == 0 || sizeDaq == 0) {
-        opserr << "FATAL ExperimentalControl::ExperimentalControl - "
-            << "fail to create ID."
-            << endln;
+    if (sizeCtrl == 0 || sizeDaq == 0)  {
+        opserr << "ExperimentalControl::ExperimentalControl() - "
+            << "fail to create ID.\n";
         exit(OF_ReturnType_failed);
+    }
+
+    // allocate memory for the signal filters
+    theCtrlFilters = new ExperimentalSignalFilter* [OF_Resp_All];
+    if (theCtrlFilters == 0)  {
+        opserr << "ExperimentalControl::ExperimentalControl() - "
+            << "failed to allocate pointers for ctrl filters.\n";
+        exit(OF_ReturnType_failed);
+    }
+    theDaqFilters = new ExperimentalSignalFilter* [OF_Resp_All];
+    if (theDaqFilters == 0)  {
+        opserr << "ExperimentalControl::ExperimentalControl() - "
+            << "failed to allocate pointers for daq filters.\n";
+        exit(OF_ReturnType_failed);
+    }
+
+    // initialize signal filter pointers to zero
+    for (int i=0; i<OF_Resp_All; i++)  {
+        theCtrlFilters[i] = 0;
+        theDaqFilters[i] = 0;
     }
 }
 
 ExperimentalControl::ExperimentalControl(const ExperimentalControl& ec) 
     : TaggedObject(ec), 
-    sizeCtrl(0), sizeDaq(0), theFilter(0)
+    sizeCtrl(0), sizeDaq(0),
+    theCtrlFilters(0), theDaqFilters(0)
 {
     sizeCtrl = new ID(OF_Resp_All);
     sizeDaq = new ID(OF_Resp_All);
-    if (sizeCtrl == 0 || sizeDaq == 0) {
-        opserr << "FATAL copy constructor of ExperimentalControl - "
-            << "fail to create ID."
-            << endln;
+    if (sizeCtrl == 0 || sizeDaq == 0)  {
+        opserr << "ExperimentalControl::ExperimentalControl() - "
+            << "fail to create ID.\n";
         exit(OF_ReturnType_failed);
     }
     *sizeCtrl = *(ec.sizeCtrl);
     *sizeDaq = *(ec.sizeDaq);
     
-    if (ec.theFilter != 0) 
-        theFilter = ec.theFilter->getCopy();
-    else
-        theFilter = 0;
+    // allocate memory for the signal filters
+    theCtrlFilters = new ExperimentalSignalFilter* [OF_Resp_All];
+    if (theCtrlFilters == 0)  {
+        opserr << "ExperimentalControl::ExperimentalControl() - "
+            << "failed to allocate pointers for ctrl filters.\n";
+        exit(OF_ReturnType_failed);
+    }
+    theDaqFilters = new ExperimentalSignalFilter* [OF_Resp_All];
+    if (theDaqFilters == 0)  {
+        opserr << "ExperimentalControl::ExperimentalControl() - "
+            << "failed to allocate pointers for daq filters.\n";
+        exit(OF_ReturnType_failed);
+    }
+    
+    for (int i=1; i<OF_Resp_All; i++)  {
+        if (ec.theCtrlFilters[i] != 0) 
+            theCtrlFilters[i] = ec.theCtrlFilters[i]->getCopy();
+        else
+            theCtrlFilters[i] = 0;
+
+        if (ec.theDaqFilters[i] != 0) 
+            theDaqFilters[i] = ec.theDaqFilters[i]->getCopy();
+        else
+            theDaqFilters[i] = 0;
+    }
 }
 
 
@@ -78,12 +119,66 @@ ExperimentalControl::~ExperimentalControl()
         delete sizeCtrl;
     if (sizeDaq != 0)
         delete sizeDaq;
+    if (theCtrlFilters != 0)
+        delete [] theCtrlFilters;
+    if (theDaqFilters != 0)
+        delete [] theDaqFilters;
+}
+
+
+const char* ExperimentalControl::getClassType() const
+{
+    return "UnknownExpControlObject";
 }
 
 
 int ExperimentalControl::commitState()
 {
     return 0;
+}
+
+
+void ExperimentalControl::setCtrlFilter(ExperimentalSignalFilter* theFilter,
+    int respType)
+{
+    if (theFilter == 0)  {
+        opserr << "ExperimentalControl::setCtrlFilter() - "
+            << "null signal filter pointer passed.\n";
+        exit(OF_ReturnType_failed);
+    }
+    if (respType < OF_Resp_Disp || OF_Resp_Time < respType)  {
+        opserr << "ExperimentalControl::setCtrlFilter() - "
+            << "invalid response type.\n";
+        exit(OF_ReturnType_failed);
+    }
+    theCtrlFilters[respType] = theFilter->getCopy();
+    if (theCtrlFilters[respType] == 0) {
+        opserr << "ExperimentalControl::setCtrlFilter() - "
+            << "failed to copy signal filter.\n";
+        exit(OF_ReturnType_failed);
+    }
+}
+
+
+void ExperimentalControl::setDaqFilter(ExperimentalSignalFilter* theFilter,
+    int respType)
+{
+    if (theFilter == 0)  {
+        opserr << "ExperimentalControl::setDaqFilter() - "
+            << "null signal filter pointer passed.\n";
+        exit(OF_ReturnType_failed);
+    }
+    if (respType < OF_Resp_Disp || OF_Resp_Time < respType)  {
+        opserr << "ExperimentalControl::setDaqFilter() - "
+            << "invalid response type.\n";
+        exit(OF_ReturnType_failed);
+    }
+    theDaqFilters[respType] = theFilter->getCopy();
+    if (theDaqFilters[respType] == 0) {
+        opserr << "ExperimentalControl::setDaqFilter() - "
+            << "failed to copy signal filter.\n";
+        exit(OF_ReturnType_failed);
+    }
 }
 
 

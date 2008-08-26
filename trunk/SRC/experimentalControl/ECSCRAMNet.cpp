@@ -48,32 +48,32 @@ ECSCRAMNet::ECSCRAMNet(int tag, int memoffset, int numactch)
     // map the SCRAMNet control status registers (CSRs)
 	// and the SCRAMNet physical memory
 	int rValue = sp_scram_init();
-    if (rValue != 0) {
+    if (rValue != 0)  {
         opserr << "ECSCRAMNet::ECSCRAMNet() - sp_scram_init:";
 		if (rValue == -4)
-            opserr << " could not open driver" << endln;
+            opserr << " could not open driver.\n";
 		if (rValue == -3)
-            opserr << " could not map memory" << endln;
+            opserr << " could not map memory.\n";
 		if (rValue == -2)
-            opserr << " could not map CSRs" << endln;
+            opserr << " could not map CSRs.\n";
 		if (rValue == -1)
-            opserr << " could not read registry" << endln;
+            opserr << " could not read registry.\n";
         exit(rValue);
     }
 #else
     // map the SCRAMNet control status registers (CSRs)
     rValue = scr_reg_mm(MAP);
-    if (rValue != 0) {
+    if (rValue != 0)  {
         opserr << "ECSCRAMNet::ECSCRAMNet() - scr_reg_mm(MAP):"
-            << " could not map CSRs" << endln;
+            << " could not map CSRs.\n";
         exit(rValue);
     }
 
     // map the SCRAMNet physical memory
     rValue = scr_mem_mm(MAP);
-    if (rValue != 0) {
+    if (rValue != 0)  {
         opserr << "ECSCRAMNet::ECSCRAMNet() - scr_mem_mm(MAP):"
-            << " could not map memory" << endln;
+            << " could not map memory.\n";
         scr_reg_mm(UNMAP);
         exit(rValue);
     }
@@ -141,20 +141,21 @@ ECSCRAMNet::~ECSCRAMNet()
 {
     // unmap the SCRAMNet control status registers (CSRs)
     int rValue = scr_reg_mm(UNMAP);
-    if (rValue != 0) {
+    if (rValue != 0)  {
         opserr << "ECSCRAMNet::~ECSCRAMNet() - scr_reg_mm(UNMAP):"
-            << " could not unmap CSRs" << endln;
+            << " could not unmap CSRs.\n";
         exit(rValue);
     }
 
     // unmap the SCRAMNet physical memory
     rValue = scr_mem_mm(UNMAP);
-    if (rValue != 0) {
+    if (rValue != 0)  {
         opserr << "ECSCRAMNet::~ECSCRAMNet() - scr_mem_mm(UNMAP):"
-            << " could not unmap memory" << endln;
+            << " could not unmap memory.\n";
         exit(rValue);
     }
     
+    opserr << endln;
     opserr << "**************************************************\n";
     opserr << "* The SCRANNet csr and memory have been unmapped *\n";
     opserr << "**************************************************\n";
@@ -162,37 +163,10 @@ ECSCRAMNet::~ECSCRAMNet()
 }
 
 
-int ECSCRAMNet::setSize(ID sizeT, ID sizeO)
-{
-    // check sizeTrial and sizeOut
-    // for ECSCRAMNet object
-    
-    // ECSCRAMNet objects can only use 
-    // trial response vectors with size <= numActCh and
-    // output response vectors with size <= numActCh
-    // check these are available in sizeT/sizeO.
-    if (sizeT[OF_Resp_Disp] > numActCh || sizeT[OF_Resp_Vel] > numActCh ||
-        sizeT[OF_Resp_Accel] > numActCh || sizeT[OF_Resp_Force] > numActCh ||
-        sizeT[OF_Resp_Time] > numActCh ||
-        sizeO[OF_Resp_Disp] > numActCh || sizeO[OF_Resp_Vel] > numActCh ||
-        sizeO[OF_Resp_Accel] > numActCh || sizeO[OF_Resp_Force] > numActCh ||
-        sizeO[OF_Resp_Time] > numActCh) {
-        opserr << "ECSCRAMNet::setSize() - wrong sizeTrial/Out\n"; 
-        opserr << "see User Manual.\n";
-        scr_reg_mm(UNMAP);
-        scr_mem_mm(UNMAP);
-        exit(OF_ReturnType_failed);
-    }
-    
-    (*sizeCtrl) = sizeT;
-    (*sizeDaq)  = sizeO;
-    
-    return OF_ReturnType_completed;
-}
-
-
 int ECSCRAMNet::setup()
 {
+    int rValue = 0;
+    
     // print experimental control information
     this->Print(opserr);
     
@@ -211,19 +185,19 @@ int ECSCRAMNet::setup()
     }
     
     do  {
-        this->control();
-        this->acquire();
+        rValue += this->control();
+        rValue += this->acquire();
         
         int i;
         opserr << "**************************************\n";
         opserr << "* Initial values of DAQ are:         *\n";
         opserr << "*                                    *\n";
         opserr << "* dspDaq = [";
-        for (i=0; i<(*sizeDaq)[OF_Resp_Disp]; i++)
+        for (i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)
             opserr << " " << measDisp[i];
         opserr << " ]\n";
         opserr << "* frcDaq = [";
-        for (i=0; i<(*sizeDaq)[OF_Resp_Force]; i++)
+        for (i=0; i<(*sizeDaq)(OF_Resp_Force); i++)
             opserr << " " << measForce[i];
         opserr << " ]\n";
         opserr << "*                                    *\n";
@@ -248,6 +222,35 @@ int ECSCRAMNet::setup()
     opserr << "******************\n";
     opserr << endln;
     
+    return rValue;
+}
+
+
+int ECSCRAMNet::setSize(ID sizeT, ID sizeO)
+{
+    // check sizeTrial and sizeOut
+    // for ECSCRAMNet object
+    
+    // ECSCRAMNet objects can only use 
+    // trial response vectors with size <= numActCh and
+    // output response vectors with size <= numActCh
+    // check these are available in sizeT/sizeO.
+    if (sizeT(OF_Resp_Disp) > numActCh || sizeT(OF_Resp_Vel) > numActCh ||
+        sizeT(OF_Resp_Accel) > numActCh || sizeT(OF_Resp_Force) > numActCh ||
+        sizeT(OF_Resp_Time) > numActCh ||
+        sizeO(OF_Resp_Disp) > numActCh || sizeO(OF_Resp_Vel) > numActCh ||
+        sizeO(OF_Resp_Accel) > numActCh || sizeO(OF_Resp_Force) > numActCh ||
+        sizeO(OF_Resp_Time) > numActCh)  {
+        opserr << "ECSCRAMNet::setSize() - wrong sizeTrial/Out\n"; 
+        opserr << "see User Manual.\n";
+        scr_reg_mm(UNMAP);
+        scr_mem_mm(UNMAP);
+        exit(OF_ReturnType_failed);
+    }
+    
+    (*sizeCtrl) = sizeT;
+    (*sizeDaq)  = sizeO;
+    
     return OF_ReturnType_completed;
 }
 
@@ -258,34 +261,46 @@ int ECSCRAMNet::setTrialResponse(const Vector* disp,
     const Vector* force,
     const Vector* time)
 {
-    int i;
-    if (disp != 0) {
-        for (i=0; i<(*sizeCtrl)[OF_Resp_Disp]; i++) {
+    int i, rValue = 0;
+    if (disp != 0)  {
+        for (i=0; i<(*sizeCtrl)(OF_Resp_Disp); i++)  {
             targDisp[i] = float((*disp)(i));
-            if (theFilter != 0)
-                targDisp[i] = float(theFilter->filtering(targDisp[i]));
+            if (theCtrlFilters[OF_Resp_Disp] != 0)
+                targDisp[i] = float(theCtrlFilters[OF_Resp_Disp]->filtering(targDisp[i]));
         }
     }
-    if (vel != 0) {
-        for (i=0; i<(*sizeCtrl)[OF_Resp_Vel]; i++)
-            targVel[i] = (float) (*vel)(i);
+    if (vel != 0)  {
+        for (i=0; i<(*sizeCtrl)(OF_Resp_Vel); i++)  {
+            targVel[i] = float((*vel)(i));
+            if (theCtrlFilters[OF_Resp_Vel] != 0)
+                targVel[i] = float(theCtrlFilters[OF_Resp_Vel]->filtering(targVel[i]));
+        }
     }
-    if (accel != 0) {
-        for (i=0; i<(*sizeCtrl)[OF_Resp_Accel]; i++)
-            targAccel[i] = (float) (*accel)(i);
+    if (accel != 0)  {
+        for (i=0; i<(*sizeCtrl)(OF_Resp_Accel); i++)  {
+            targAccel[i] = float((*accel)(i));
+            if (theCtrlFilters[OF_Resp_Accel] != 0)
+                targAccel[i] = float(theCtrlFilters[OF_Resp_Accel]->filtering(targAccel[i]));
+        }
     }
-    if (force != 0) {
-        for (i=0; i<(*sizeCtrl)[OF_Resp_Force]; i++)
-            targForce[i] = (float) (*force)(i);
+    if (force != 0)  {
+        for (i=0; i<(*sizeCtrl)(OF_Resp_Force); i++)  {
+            targForce[i] = float((*force)(i));
+            if (theCtrlFilters[OF_Resp_Force] != 0)
+                targForce[i] = float(theCtrlFilters[OF_Resp_Force]->filtering(targForce[i]));
+        }
     }
-    if (time != 0) {
-        for (i=0; i<(*sizeCtrl)[OF_Resp_Time]; i++)
-            targTime[i] = (float) (*time)(i);
+    if (time != 0)  {
+        for (i=0; i<(*sizeCtrl)(OF_Resp_Time); i++)  {
+            targTime[i] = float((*time)(i));
+            if (theCtrlFilters[OF_Resp_Time] != 0)
+                targTime[i] = float(theCtrlFilters[OF_Resp_Time]->filtering(targTime[i]));
+        }
     }
     
-    this->control();
+    rValue = this->control();
     
-    return OF_ReturnType_completed;
+    return rValue;
 }
 
 
@@ -298,25 +313,40 @@ int ECSCRAMNet::getDaqResponse(Vector* disp,
     this->acquire();
     
     int i;
-    if (disp != 0) {
-        for (i=0; i<(*sizeDaq)[OF_Resp_Disp]; i++)
+    if (disp != 0)  {
+        for (i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)  {
+            if (theDaqFilters[OF_Resp_Disp] != 0)
+                measDisp[i] = float(theDaqFilters[OF_Resp_Disp]->filtering(measDisp[i]));
             (*disp)(i) = measDisp[i];
+        }
     }
-    if (vel != 0) {
-        for (i=0; i<(*sizeDaq)[OF_Resp_Vel]; i++)
+    if (vel != 0)  {
+        for (i=0; i<(*sizeDaq)(OF_Resp_Vel); i++)  {
+            if (theDaqFilters[OF_Resp_Vel] != 0)
+                measVel[i] = float(theDaqFilters[OF_Resp_Vel]->filtering(measVel[i]));
             (*vel)(i) = measVel[i];
+        }
     }
-    if (accel != 0) {
-        for (i=0; i<(*sizeDaq)[OF_Resp_Accel]; i++)
+    if (accel != 0)  {
+        for (i=0; i<(*sizeDaq)(OF_Resp_Accel); i++)  {
+            if (theDaqFilters[OF_Resp_Accel] != 0)
+                measAccel[i] = float(theDaqFilters[OF_Resp_Accel]->filtering(measAccel[i]));
             (*accel)(i) = measAccel[i];
+        }
     }
-    if (force != 0) {
-        for (i=0; i<(*sizeDaq)[OF_Resp_Force]; i++)
+    if (force != 0)  {
+        for (i=0; i<(*sizeDaq)(OF_Resp_Force); i++)  {
+            if (theDaqFilters[OF_Resp_Force] != 0)
+                measForce[i] = float(theDaqFilters[OF_Resp_Force]->filtering(measForce[i]));
             (*force)(i) = measForce[i];
+        }
     }
-    if (time != 0) {
-        for (i=0; i<(*sizeDaq)[OF_Resp_Time]; i++)
+    if (time != 0)  {
+        for (i=0; i<(*sizeDaq)(OF_Resp_Time); i++)  {
+            if (theDaqFilters[OF_Resp_Time] != 0)
+                measTime[i] = float(theDaqFilters[OF_Resp_Time]->filtering(measTime[i]));
             (*time)(i) = measTime[i];
+        }
     }
     
     return OF_ReturnType_completed;
@@ -342,9 +372,10 @@ void ECSCRAMNet::Print(OPS_Stream &s, int flag)
     s << "* type: ECSCRAMNet\n";
     s << "*   memOffset: " << memOffset << endln;
     s << "*   numActCh: " << numActCh << endln;
-    if (theFilter != 0) {
-        s << "*\tFilter: " << *theFilter << endln;
-    }
+    if (theCtrlFilters != 0)
+        s << "*   ctrlFilter: " << *theCtrlFilters << endln;
+    if (theDaqFilters != 0)
+        s << "*   daqFilter: " << *theDaqFilters << endln;
     s << "****************************************************************\n";
     s << endln;
 }
@@ -357,7 +388,7 @@ int ECSCRAMNet::control()
 
     // wait until switchPC flag has changed as well
     flag = 0;
-	while (flag != 1) {
+	while (flag != 1)  {
         // read switchPC flag
         flag = switchPC[0];
     }
@@ -367,7 +398,7 @@ int ECSCRAMNet::control()
     
 	// wait until switchPC flag has changed as well
     flag = 1;
-	while (flag != 0) {
+	while (flag != 0)  {
         // read switchPC flag
         flag = switchPC[0];
     }
@@ -380,7 +411,7 @@ int ECSCRAMNet::acquire()
 {
     // wait until target is reached
     flag = 0;
-    while (flag != 1) {
+    while (flag != 1)  {
         // read atTarget flag
         flag = atTarget[0];
     }

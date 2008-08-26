@@ -50,9 +50,12 @@ public:
     //destructor
     virtual ~ECNIEseries();
 
+    // method to get class type
+    const char *getClassType() const {return "ECNIEseries";};
+    
     //public method to set and to get response
-    virtual int setSize(ID sizeT, ID size0);
     virtual int setup();
+    virtual int setSize(ID sizeT, ID size0);
 
     virtual int setTrialResponse(const Vector* disp, 
         const Vector* vel,

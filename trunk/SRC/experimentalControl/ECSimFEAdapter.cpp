@@ -48,7 +48,7 @@ ECSimFEAdapter::ECSimFEAdapter(int tag,
     theChannel = new TCP_Socket(ipPort, ipAddress);
     if (theChannel->setUpConnection() != 0)  {
         opserr << "ECSimFEAdapter::ECSimFEAdapter() - "
-            << "failed to setup TCP connection to adapter element\n";
+            << "failed to setup TCP connection to adapter element.\n";
         delete theChannel;
         exit(OF_ReturnType_failed);
     }
@@ -101,33 +101,11 @@ ECSimFEAdapter::~ECSimFEAdapter()
     if (theChannel != 0)
         delete theChannel;
 
+    opserr << endln;
     opserr << "***********************************************************\n";
     opserr << "* The connection with the adapter element has been closed *\n";
     opserr << "***********************************************************\n";
     opserr << endln;
-}
-
-
-int ECSimFEAdapter::setSize(ID sizeT, ID sizeO)
-{
-    // check sizeTrial and sizeOut
-    // for ECSimFEAdapter object
-    
-    // ECSimFEAdapter objects can only use 
-    // disp and force for trial and disp and force for output
-    // check these are available in sizeT/sizeO.
-    if ((sizeT[OF_Resp_Disp] == 0 && sizeT[OF_Resp_Force] == 0) ||
-        (sizeO[OF_Resp_Disp] == 0) || (sizeO[OF_Resp_Force] == 0))  {
-        opserr << "ECSimFEAdapter::setSize() - wrong sizeTrial/Out\n"; 
-        opserr << "see User Manual.\n";
-        delete theChannel;
-        exit(OF_ReturnType_failed);
-    }
-    
-    *sizeCtrl = sizeT;
-    *sizeDaq  = sizeO;
-    
-    return OF_ReturnType_completed;
 }
 
 
@@ -139,13 +117,13 @@ int ECSimFEAdapter::setup()
         delete targForce;
     
     int id = 1;
-    if ((*sizeCtrl)[OF_Resp_Disp] != 0)  {
-        targDisp = new Vector(&sData[id],(*sizeCtrl)[OF_Resp_Disp]);
-        id += (*sizeCtrl)[OF_Resp_Disp];
+    if ((*sizeCtrl)(OF_Resp_Disp) != 0)  {
+        targDisp = new Vector(&sData[id],(*sizeCtrl)(OF_Resp_Disp));
+        id += (*sizeCtrl)(OF_Resp_Disp);
     }
-    if ((*sizeCtrl)[OF_Resp_Force] != 0)  {
-        targForce = new Vector(&sData[id],(*sizeCtrl)[OF_Resp_Force]);
-        id += (*sizeCtrl)[OF_Resp_Force];
+    if ((*sizeCtrl)(OF_Resp_Force) != 0)  {
+        targForce = new Vector(&sData[id],(*sizeCtrl)(OF_Resp_Force));
+        id += (*sizeCtrl)(OF_Resp_Force);
     }
     
     if (measDisp != 0)
@@ -154,20 +132,20 @@ int ECSimFEAdapter::setup()
         delete measForce;
     
     id = 0;
-    if ((*sizeDaq)[OF_Resp_Disp] != 0)  {
-        measDisp = new Vector(&rData[id],(*sizeDaq)[OF_Resp_Disp]);
-        id += (*sizeDaq)[OF_Resp_Disp];
+    if ((*sizeDaq)(OF_Resp_Disp) != 0)  {
+        measDisp = new Vector(&rData[id],(*sizeDaq)(OF_Resp_Disp));
+        id += (*sizeDaq)(OF_Resp_Disp);
     }
-    if ((*sizeDaq)[OF_Resp_Force] != 0)  {
-        measForce = new Vector(&rData[id],(*sizeDaq)[OF_Resp_Force]);
-        id += (*sizeDaq)[OF_Resp_Force];
+    if ((*sizeDaq)(OF_Resp_Force) != 0)  {
+        measForce = new Vector(&rData[id],(*sizeDaq)(OF_Resp_Force));
+        id += (*sizeDaq)(OF_Resp_Force);
     }
     
     // send the data size to the adapter element
     ID idData(2*OF_Resp_All+1);
     for (int i=0; i<OF_Resp_All; i++)  {
-        idData(i) = (*sizeCtrl)[i];
-        idData(OF_Resp_All+i) = (*sizeDaq)[i];
+        idData(i) = (*sizeCtrl)(i);
+        idData(OF_Resp_All+i) = (*sizeDaq)(i);
     }
     idData(2*OF_Resp_All) = dataSize;
     theChannel->sendID(0, 0, idData, 0);
@@ -184,22 +162,54 @@ int ECSimFEAdapter::setup()
 }
 
 
+int ECSimFEAdapter::setSize(ID sizeT, ID sizeO)
+{
+    // check sizeTrial and sizeOut
+    // for ECSimFEAdapter object
+    
+    // ECSimFEAdapter objects can only use 
+    // disp and force for trial and disp and force for output
+    // check these are available in sizeT/sizeO.
+    if ((sizeT(OF_Resp_Disp) == 0 && sizeT(OF_Resp_Force) == 0) ||
+        (sizeO(OF_Resp_Disp) == 0) || (sizeO(OF_Resp_Force) == 0))  {
+        opserr << "ECSimFEAdapter::setSize() - wrong sizeTrial/Out\n"; 
+        opserr << "see User Manual.\n";
+        delete theChannel;
+        exit(OF_ReturnType_failed);
+    }
+    
+    *sizeCtrl = sizeT;
+    *sizeDaq  = sizeO;
+    
+    return OF_ReturnType_completed;
+}
+
+
 int ECSimFEAdapter::setTrialResponse(const Vector* disp,
     const Vector* vel,
     const Vector* accel,
     const Vector* force,
     const Vector* time)
 {
-    *targDisp = *disp;
-    if (theFilter != 0)  {
-        for (int i=0; i<(*sizeCtrl)[OF_Resp_Disp]; i++)
-            (*targDisp)(i) = theFilter->filtering((*targDisp)(i));
+    int i, rValue = 0;
+    if (disp != 0)  {
+        *targDisp = *disp;
+        if (theCtrlFilters[OF_Resp_Disp] != 0)  {
+            for (i=0; i<(*sizeCtrl)(OF_Resp_Disp); i++)
+                (*targDisp)(i) = theCtrlFilters[OF_Resp_Disp]->filtering((*targDisp)(i));
+        }
     }
-    *targForce = *force;
+    if (force != 0)  {
+        *targForce = *force;
+        if (theCtrlFilters[OF_Resp_Force] != 0)  {
+            for (i=0; i<(*sizeCtrl)(OF_Resp_Force); i++)
+                (*targForce)(i) = theCtrlFilters[OF_Resp_Force]->filtering((*targForce)(i));
+        }
+    }
 
-    this->control();
+    rValue = this->control();
     
-    return OF_ReturnType_completed;
+    return rValue;
 }
 
 
@@ -211,8 +221,21 @@ int ECSimFEAdapter::getDaqResponse(Vector* disp,
 {
     this->acquire();
     
-    *disp = *measDisp;
-    *force = *measForce;
+    int i;
+    if (disp != 0)  {
+        if (theDaqFilters[OF_Resp_Disp] != 0)  {
+            for (i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)
+                (*measDisp)(i) = theDaqFilters[OF_Resp_Disp]->filtering((*measDisp)(i));
+        }
+        *disp = *measDisp;
+    }
+    if (force != 0)  {
+        if (theDaqFilters[OF_Resp_Force] != 0)  {
+            for (i=0; i<(*sizeDaq)(OF_Resp_Force); i++)
+                (*measForce)(i) = theDaqFilters[OF_Resp_Force]->filtering((*measForce)(i));
+        }
+        *force = *measForce;
+    }
         
     return OF_ReturnType_completed;
 }
@@ -236,9 +259,10 @@ void ECSimFEAdapter::Print(OPS_Stream &s, int flag)
     s << "* ExperimentalControl: " << this->getTag() << endln; 
     s << "* type: ECSimFEAdapter\n";
     s << "*   ipAddress: " << ipAddress << ", ipPort: " << ipPort << endln;
-    if (theFilter != 0) {
-        s << "*\tFilter: " << *theFilter << endln;
-    }
+    if (theCtrlFilters != 0)
+        s << "*   ctrlFilter: " << *theCtrlFilters << endln;
+    if (theDaqFilters != 0)
+        s << "*   daqFilter: " << *theDaqFilters << endln;
     s << "****************************************************************\n";
     s << endln;
 }

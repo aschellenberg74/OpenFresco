@@ -50,6 +50,7 @@
 #include <string.h>
 
 extern ExperimentalCP *getExperimentalCP(int tag);
+extern ExperimentalSignalFilter *getExperimentalSignalFilter(int tag);
 static ArrayOfTaggedObjects *theExperimentalControls(0);
 
 
@@ -106,6 +107,11 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
 		opserr << "Want: expControl type tag <specific experimental control args>\n";
 		return TCL_ERROR;
     }
+
+    // pointer to control that will be added
+    ExperimentalControl *theControl = 0;
+
+    int tag, argi;
     	
 #ifdef _WIN32
     // ----------------------------------------------------------------------------	
@@ -113,87 +119,78 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
 		if (argc < 7)  {
 			opserr << "WARNING invalid number of arguments\n";
 			printCommand(argc,argv);
-			opserr << "Want: expControl xPCtarget tag type ipAddr ipPort appName <appPath>\n";
+			opserr << "Want: expControl xPCtarget tag type ipAddr ipPort appName <appPath> "
+                << "<-ctrlFilters (5 filterTag)> <-daqFilters (5 filterTag)>\n";
 			return TCL_ERROR;
 		}    
 		
-		int tag, type;
+		int type;
 		char *ipAddr, *ipPort, *appName, *appPath = 0;
-        ExperimentalControl *theControl = 0;
 		
-		if (Tcl_GetInt(interp, argv[2], &tag) != TCL_OK)  {
+        argi = 2;
+		if (Tcl_GetInt(interp, argv[argi], &tag) != TCL_OK)  {
 			opserr << "WARNING invalid expControl xPCtarget tag\n";
 			return TCL_ERROR;		
 		}
-		if (Tcl_GetInt(interp, argv[3], &type) != TCL_OK)  {
+        argi++;
+		if (Tcl_GetInt(interp, argv[argi], &type) != TCL_OK)  {
 			opserr << "WARNING invalid type\n";
 			opserr << "expControl xPCtarget " << tag << endln;
 			return TCL_ERROR;	
 		}
-		ipAddr = (char*) calloc(strlen(argv[4])+1, sizeof(char));
+        argi++;
+		ipAddr = (char*) calloc(strlen(argv[argi])+1, sizeof(char));
 		strcpy(ipAddr,argv[4]);
-		ipPort = (char*) calloc(strlen(argv[5])+1, sizeof(char));
+        argi++;
+		ipPort = (char*) calloc(strlen(argv[argi])+1, sizeof(char));
 		strcpy(ipPort,argv[5]);
-		appName = (char*) calloc(strlen(argv[6])+1, sizeof(char));
+        argi++;
+		appName = (char*) calloc(strlen(argv[argi])+1, sizeof(char));
 		strcpy(appName,argv[6]);
-        if (argc == 8)  {
-		    appPath = (char*) calloc(strlen(argv[7])+1, sizeof(char));
-		    strcpy(appPath,argv[7]);
+        argi++;
+        if (argc > 7 &&
+            strcmp(argv[argi],"-ctrlFilters") != 0 &&
+            strcmp(argv[argi],"-daqFilters") != 0)  {
+            appPath = (char*) calloc(strlen(argv[argi])+1, sizeof(char));
+            strcpy(appPath,argv[7]);
+            argi++;
         }
 		
 		// parsing was successful, allocate the control
 		theControl = new ECxPCtarget(tag, type, ipAddr, ipPort, appName, appPath);
-
-        if (theControl == 0)  {
-            opserr << "WARNING could not create experimental control " << argv[1] << endln;
-            return TCL_ERROR;
-        }
-        
-        // now add the control to the modelBuilder
-        if (addExperimentalControl(*theControl) < 0)  {
-            delete theControl; // invoke the destructor, otherwise mem leak
-            return TCL_ERROR;
-        }
     }
 	
     // ----------------------------------------------------------------------------	
     else if (strcmp(argv[1],"dSpace") == 0)  {
-		if (argc != 5)  {
+		if (argc < 5)  {
 			opserr << "WARNING invalid number of arguments\n";
 			printCommand(argc,argv);
-			opserr << "Want: expControl dSpace tag type boardName\n";
+			opserr << "Want: expControl dSpace tag type boardName "
+                << "<-ctrlFilters (5 filterTag)> <-daqFilters (5 filterTag)>\n";
 			return TCL_ERROR;
 		}    
 		
-		int tag, type;
+		int type;
 		char *boardName;
-        ExperimentalControl *theControl = 0;
 		
-		if (Tcl_GetInt(interp, argv[2], &tag) != TCL_OK)  {
+        argi = 2;
+		if (Tcl_GetInt(interp, argv[argi], &tag) != TCL_OK)  {
 			opserr << "WARNING invalid expControl dSpace tag\n";
 			return TCL_ERROR;
 		}
-		if (Tcl_GetInt(interp, argv[3], &type) != TCL_OK)  {
+        argi++;
+		if (Tcl_GetInt(interp, argv[argi], &type) != TCL_OK)  {
 			opserr << "WARNING invalid type\n";
 			opserr << "expControl dSpace " << tag << endln;
 			return TCL_ERROR;
 		}
-		boardName = (char*) calloc(strlen(argv[4])+1, sizeof(char));
+        argi++;
+		boardName = (char*) calloc(strlen(argv[argi])+1, sizeof(char));
 		strcpy(boardName,argv[4]);
+        argi++;
 		
 		// parsing was successful, allocate the control
 		theControl = new ECdSpace(tag, type, boardName);
-
-        if (theControl == 0)  {
-            opserr << "WARNING could not create experimental control " << argv[1] << endln;
-            return TCL_ERROR;
-        }
-        
-        // now add the control to the modelBuilder
-        if (addExperimentalControl(*theControl) < 0)  {
-            delete theControl; // invoke the destructor, otherwise mem leak
-            return TCL_ERROR;
-        }
     }
 
     // ----------------------------------------------------------------------------	
@@ -201,42 +198,35 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
 		if (argc < 4)  {
 			opserr << "WARNING invalid number of arguments\n";
 			printCommand(argc,argv);
-			opserr << "Want: expControl MTSCsi tag configFileName <rampTime>\n";
+			opserr << "Want: expControl MTSCsi tag configFileName <rampTime> "
+                << "<-ctrlFilters (5 filterTag)> <-daqFilters (5 filterTag)>\n";
 			return TCL_ERROR;
 		}    
 		
-		int tag;
         char *cfgFile;
         double rampTime = 0.02;
 
-		if (Tcl_GetInt(interp, argv[2], &tag) != TCL_OK)  {
+        argi = 2;
+		if (Tcl_GetInt(interp, argv[argi], &tag) != TCL_OK)  {
 			opserr << "WARNING invalid expControl MTSCsi tag\n";
 			return TCL_ERROR;
 		}
-		cfgFile = (char*) calloc(strlen(argv[3])+1, sizeof(char));
+        argi++;
+		cfgFile = (char*) calloc(strlen(argv[argi])+1, sizeof(char));
 		strcpy(cfgFile,argv[3]);
-        if (argc == 5) {
-		    if (Tcl_GetDouble(interp, argv[4], &rampTime) != TCL_OK)  {
-			    opserr << "WARNING invalid rampTime\n";
-			    opserr << "expControl MTSCsi " << tag << endln;
-			    return TCL_ERROR;	
+        argi++;
+        if (argc > 4 &&
+            strcmp(argv[argi],"-ctrlFilters") != 0 &&
+            strcmp(argv[argi],"-daqFilters") != 0)  {
+            if (Tcl_GetDouble(interp, argv[argi], &rampTime) != TCL_OK)  {
+                opserr << "WARNING invalid rampTime\n";
+                opserr << "expControl MTSCsi " << tag << endln;
+                return TCL_ERROR;	
             }
+            argi++;
         }
 		// parsing was successful, allocate the control
-		ExperimentalControl *theControl = new ECMtsCsi(tag, cfgFile, rampTime);
-
-        if (theControl == 0)  {
-            opserr << "WARNING could not create experimental controller " << argv[1] << endln;
-            return TCL_ERROR;
-        }
-        
-        // now add the controller to the modelBuilder
-        if (addExperimentalControl(*theControl) < 0)  {
-            opserr << "WARNING could not add experimental controller to the domain\n";
-            opserr << *theControl << endln;
-            delete theControl; // invoke the destructor, otherwise mem leak
-            return TCL_ERROR;
-        }
+		theControl = new ECMtsCsi(tag, cfgFile, rampTime);
     }
 
     // ----------------------------------------------------------------------------	
@@ -244,15 +234,16 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
 		if (argc < 8)  {
 			opserr << "WARNING invalid number of arguments\n";
 			printCommand(argc,argv);
-			opserr << "Want: expControl LabVIEW tag ipAddr <ipPort> -trialCP cpTags -outCP cpTags\n";
+			opserr << "Want: expControl LabVIEW tag ipAddr <ipPort> -trialCP cpTags -outCP cpTags "
+                << "<-ctrlFilters (5 filterTag)> <-daqFilters (5 filterTag)>\n";
 			return TCL_ERROR;
 		}
 
-		int tag, cpTag, ipPort = 44000, argi = 2;
+		int cpTag, ipPort = 44000;
         int numTrialCPs = 0, numOutCPs = 0;
 		char *ipAddr;
-        ExperimentalControl *theControl = 0;
 		
+        argi = 2;
 		if (Tcl_GetInt(interp, argv[argi], &tag) != TCL_OK)  {
 			opserr << "WARNING invalid expControl LabVIEW tag\n";
 			return TCL_ERROR;
@@ -275,8 +266,10 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
 		    return TCL_ERROR;
         }
         argi++;
-        while (strcmp(argv[argi+numTrialCPs],"-outCP") != 0 &&
-            argi+numTrialCPs < argc)  {
+        while (argi+numTrialCPs < argc &&
+            strcmp(argv[argi+numTrialCPs],"-outCP") != 0 &&
+            strcmp(argv[argi+numTrialCPs],"-ctrlFilters") != 0 &&
+            strcmp(argv[argi+numTrialCPs],"-daqFilters") != 0)  {
             numTrialCPs++;
         }
         if (numTrialCPs == 0)  {
@@ -312,7 +305,9 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
 		    return TCL_ERROR;		
         }
         argi++;
-        while (argi+numOutCPs < argc)  {
+        while (argi+numOutCPs < argc &&
+            strcmp(argv[argi+numOutCPs],"-ctrlFilters") != 0 &&
+            strcmp(argv[argi+numOutCPs],"-daqFilters") != 0)  {
             numOutCPs++;
         }
         if (numOutCPs == 0)  {
@@ -345,97 +340,70 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
 		
 		// parsing was successful, allocate the control
 		theControl = new ECLabVIEW(tag, numTrialCPs, trialCPs, numOutCPs, outCPs, ipAddr, ipPort);
-
-        if (theControl == 0)  {
-            opserr << "WARNING could not create experimental control " << argv[1] << endln;
-            return TCL_ERROR;
-        }
-        
-        // now add the control to the modelBuilder
-        if (addExperimentalControl(*theControl) < 0)  {
-            delete theControl; // invoke the destructor, otherwise mem leak
-
-            return TCL_ERROR;
-        }
     }
 	
     // ----------------------------------------------------------------------------	
 /*    else if (strcmp(argv[1],"NIEseries") == 0)  {
-		if (argc != 4)  {
+		if (argc < 4)  {
 			opserr << "WARNING invalid number of arguments\n";
 			printCommand(argc,argv);
-			opserr << "Want: expControl NIEseries tag device\n";
+			opserr << "Want: expControl NIEseries tag device ";
+                << "<-ctrlFilters (5 filterTag)> <-daqFilters (5 filterTag)>\n";
 			return TCL_ERROR;
 		}    
 		
-		int tag, device;
-        ExperimentalControl *theControl = 0;
+		int device;
 		
-		if (Tcl_GetInt(interp, argv[2], &tag) != TCL_OK)  {
+        argi = 2;
+		if (Tcl_GetInt(interp, argv[argi], &tag) != TCL_OK)  {
 			opserr << "WARNING invalid expControl NIEseries tag\n";
 			return TCL_ERROR;		
 		}
-		if (Tcl_GetInt(interp, argv[3], &device) != TCL_OK)  {
+        argi++;
+		if (Tcl_GetInt(interp, argv[argi], &device) != TCL_OK)  {
 			opserr << "WARNING invalid device\n";
 			opserr << "expControl NIEseries " << tag << endln;
 			return TCL_ERROR;	
 		}
+        argi++;
 		
 		// parsing was successful, allocate the control
 		theControl = new ECNIEseries(tag, device);
-
-        if (theControl == 0)  {
-            opserr << "WARNING could not create experimental control " << argv[1] << endln;
-            return TCL_ERROR;
-        }
-        
-        // now add the control to the modelBuilder
-        if (addExperimentalControl(*theControl) < 0)  {
-            delete theControl; // invoke the destructor, otherwise mem leak
-            return TCL_ERROR;
-        }
     }*/
 
     // ----------------------------------------------------------------------------	
     else if (strcmp(argv[1],"SCRAMNet") == 0)  {
-		if (argc != 5)  {
+		if (argc < 5)  {
 			opserr << "WARNING invalid number of arguments\n";
 			printCommand(argc,argv);
-			opserr << "Want: expControl SCRAMNet tag memOffset numActCh\n";
+			opserr << "Want: expControl SCRAMNet tag memOffset numActCh "
+                << "<-ctrlFilters (5 filterTag)> <-daqFilters (5 filterTag)>\n";
 			return TCL_ERROR;
 		}    
 		
-		int tag, memOffset, numActCh;
-        ExperimentalControl *theControl = 0;
+		int memOffset, numActCh;
 		
-		if (Tcl_GetInt(interp, argv[2], &tag) != TCL_OK)  {
+        argi = 2;
+		if (Tcl_GetInt(interp, argv[argi], &tag) != TCL_OK)  {
 			opserr << "WARNING invalid expControl SCRAMNet tag\n";
 			return TCL_ERROR;		
 		}
-		if (Tcl_GetInt(interp, argv[3], &memOffset) != TCL_OK)  {
+        argi++;
+		if (Tcl_GetInt(interp, argv[argi], &memOffset) != TCL_OK)  {
 			opserr << "WARNING invalid memOffset\n";
 			opserr << "expControl SCRAMNet " << tag << endln;
 			return TCL_ERROR;
 		}
-		if (Tcl_GetInt(interp, argv[4], &numActCh) != TCL_OK)  {
+        argi++;
+		if (Tcl_GetInt(interp, argv[argi], &numActCh) != TCL_OK)  {
 			opserr << "WARNING invalid numActCh\n";
 			opserr << "expControl SCRAMNet " << tag << endln;
 			return TCL_ERROR;
 		}
+        argi++;
         		
 		// parsing was successful, allocate the control
 		theControl = new ECSCRAMNet(tag, memOffset, numActCh);
-
-        if (theControl == 0)  {
-            opserr << "WARNING could not create experimental control " << argv[1] << endln;
-            return TCL_ERROR;
-        }
-        
-        // now add the control to the modelBuilder
-        if (addExperimentalControl(*theControl) < 0)  {
-            delete theControl; // invoke the destructor, otherwise mem leak
-            return TCL_ERROR;
-        }
     }
 #endif
 
@@ -444,20 +412,23 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
 		if (argc < 4)  {
 			opserr << "WARNING invalid number of arguments\n";
 			printCommand(argc,argv);
-			opserr << "Want: expControl SimUniaxialMaterials tag matTags\n";
+			opserr << "Want: expControl SimUniaxialMaterials tag matTags "
+                << "<-ctrlFilters (5 filterTag)> <-daqFilters (5 filterTag)>\n";
 			return TCL_ERROR;
 		}    
 		
-		int tag, matTag, numMats = 0, argi = 2;
-        ECSimUniaxialMaterials *theControl = 0;
+		int matTag, numMats = 0;
 		
+        argi = 2;
 		if (Tcl_GetInt(interp, argv[argi], &tag) != TCL_OK)  {
 			opserr << "WARNING invalid expControl SimUniaxialMaterials tag\n";
 			return TCL_ERROR;		
 		}
         argi++;
 		// now read the number of materials
-		while (argi+numMats < argc)  {
+		while (argi+numMats < argc &&
+            strcmp(argv[argi+numMats],"-ctrlFilters") != 0 &&
+            strcmp(argv[argi+numMats],"-daqFilters") != 0)  {
 			numMats++;
 		}
         if (numMats == 0)  {
@@ -490,17 +461,6 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
 
 		// parsing was successful, allocate the control
 		theControl = new ECSimUniaxialMaterials(tag,numMats,theSpecimen);	
-
-        if (theControl == 0)  {
-            opserr << "WARNING could not create experimental control " << argv[1] << endln;
-            return TCL_ERROR;
-        }
-        
-        // now add the control to the modelBuilder
-        if (addExperimentalControl(*theControl) < 0)  {
-            delete theControl; // invoke the destructor, otherwise mem leak
-            return TCL_ERROR;
-        }
     }
 	
     // ----------------------------------------------------------------------------	
@@ -508,14 +468,15 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
 		if (argc < 7)  {
 			opserr << "WARNING invalid number of arguments\n";
 			printCommand(argc,argv);
-			opserr << "Want: expControl SimDomain tag -trialCP cpTags -outCP cpTags\n";
+			opserr << "Want: expControl SimDomain tag -trialCP cpTags -outCP cpTags "
+                << "<-ctrlFilters (5 filterTag)> <-daqFilters (5 filterTag)>\n";
 			return TCL_ERROR;
 		}    
 		
-		int tag, cpTag, argi = 2;
+		int cpTag;
         int numTrialCPs = 0, numOutCPs = 0;
-        ExperimentalControl *theControl = 0;
 		
+        argi = 2;
 		if (Tcl_GetInt(interp, argv[argi], &tag) != TCL_OK)  {
 			opserr << "WARNING invalid expControl SimDomain tag\n";
 			return TCL_ERROR;		
@@ -527,8 +488,10 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
 		    return TCL_ERROR;
         }
         argi++;
-        while (strcmp(argv[argi+numTrialCPs],"-outCP") != 0 &&
-            argi+numTrialCPs < argc)  {
+        while (argi+numTrialCPs < argc &&
+            strcmp(argv[argi+numTrialCPs],"-outCP") != 0 &&
+            strcmp(argv[argi+numTrialCPs],"-ctrlFilters") != 0 &&
+            strcmp(argv[argi+numTrialCPs],"-daqFilters") != 0)  {
             numTrialCPs++;
         }
         if (numTrialCPs == 0)  {
@@ -564,7 +527,9 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
 		    return TCL_ERROR;		
         }
         argi++;
-        while (argi+numOutCPs < argc)  {
+        while (argi+numOutCPs < argc &&
+            strcmp(argv[argi+numOutCPs],"-ctrlFilters") != 0 &&
+            strcmp(argv[argi+numOutCPs],"-daqFilters") != 0)  {
             numOutCPs++;
         }
         if (numOutCPs == 0)  {
@@ -597,17 +562,6 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
 		
 		// parsing was successful, allocate the control
 		theControl = new ECSimDomain(tag, numTrialCPs, trialCPs, numOutCPs, outCPs, theDomain);	
-
-        if (theControl == 0)  {
-            opserr << "WARNING could not create experimental control " << argv[1] << endln;
-            return TCL_ERROR;
-        }
-        
-        // now add the control to the modelBuilder
-        if (addExperimentalControl(*theControl) < 0)  {
-            delete theControl; // invoke the destructor, otherwise mem leak
-            return TCL_ERROR;
-        }
     }
 
     // ----------------------------------------------------------------------------	
@@ -615,14 +569,15 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
 		if (argc < 5)  {
 			opserr << "WARNING invalid number of arguments\n";
 			printCommand(argc,argv);
-			opserr << "Want: expControl SimFEAdapter tag ipAddr ipPort\n";
+			opserr << "Want: expControl SimFEAdapter tag ipAddr ipPort "
+                << "<-ctrlFilters (5 filterTag)> <-daqFilters (5 filterTag)>\n";
 			return TCL_ERROR;
 		}    
 		
-		int tag, ipPort = 44000, argi = 2;
+		int ipPort = 44000;
 		char *ipAddr;
-        ExperimentalControl *theControl = 0;
 		
+        argi = 2;
 		if (Tcl_GetInt(interp, argv[argi], &tag) != TCL_OK)  {
 			opserr << "WARNING invalid expControl SimFEAdapter tag\n";
 			return TCL_ERROR;
@@ -636,20 +591,10 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
 		    opserr << "expControl SimFEAdapter " << tag << endln;
 		    return TCL_ERROR;
 	    }
+        argi++;
         		
 		// parsing was successful, allocate the control
 		theControl = new ECSimFEAdapter(tag, ipAddr, ipPort);	
-
-        if (theControl == 0)  {
-            opserr << "WARNING could not create experimental control " << argv[1] << endln;
-            return TCL_ERROR;
-        }
-        
-        // now add the control to the modelBuilder
-        if (addExperimentalControl(*theControl) < 0)  {
-            delete theControl; // invoke the destructor, otherwise mem leak
-            return TCL_ERROR;
-        }
     }
 
     // ----------------------------------------------------------------------------	
@@ -659,6 +604,66 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
             <<  argv[1] << ": check the manual\n";
         return TCL_ERROR;
     }
+    
+    if (theControl == 0)  {
+        opserr << "WARNING could not create experimental control " << argv[1] << endln;
+        return TCL_ERROR;
+    }
+    
+    // finally check for filters
+    int i;
+    for (i = argi; i < argc; i++)  {
+        if (i+5 < argc && strcmp(argv[i], "-ctrlFilters") == 0)  {
+            int filterTag;
+            ExperimentalSignalFilter *theFilter = 0;
+            for (int j=0; j<5; j++)  {
+                if (Tcl_GetInt(interp, argv[i+1+j], &filterTag) != TCL_OK)  {
+                    opserr << "WARNING invalid ctrlFilter tag\n";
+                    opserr << "expControl: " << tag << endln;
+                    return TCL_ERROR;
+                }
+                if (filterTag > 0)  {
+                    theFilter = getExperimentalSignalFilter(filterTag);
+                    if (theFilter == 0)  {
+                        opserr << "WARNING experimental signal filter not found\n";
+                        opserr << "expSignalFilter: " << filterTag << endln;
+                        opserr << "expControl: " << tag << endln;
+                        return TCL_ERROR;
+                    }
+                    theControl->setCtrlFilter(theFilter,j);
+                }
+            }
+        }
+    }
+    for (i = argi; i < argc; i++)  {
+        if (i+5 < argc && strcmp(argv[i], "-daqFilters") == 0)  {
+            int filterTag;
+            ExperimentalSignalFilter *theFilter = 0;
+            for (int j=0; j<5; j++)  {
+                if (Tcl_GetInt(interp, argv[i+1+j], &filterTag) != TCL_OK)  {
+                    opserr << "WARNING invalid daqFilter tag\n";
+                    opserr << "expControl: " << tag << endln;
+                    return TCL_ERROR;
+                }
+                if (filterTag > 0)  {
+                    theFilter = getExperimentalSignalFilter(filterTag);
+                    if (theFilter == 0)  {
+                        opserr << "WARNING experimental signal filter not found\n";
+                        opserr << "expSignalFilter: " << filterTag << endln;
+                        opserr << "expControl: " << tag << endln;
+                        return TCL_ERROR;
+                    }
+                    theControl->setDaqFilter(theFilter,j);
+                }
+            }
+        }
+    }
 
+    // now add the control to the modelBuilder
+    if (addExperimentalControl(*theControl) < 0)  {
+        delete theControl; // invoke the destructor, otherwise mem leak
+        return TCL_ERROR;
+    }
+    
 	return TCL_OK;
 }

@@ -93,7 +93,7 @@ ECSimDomain::ECSimDomain(int tag,
 {    
     if (trialcps == 0 || outcps == 0)  {
       opserr << "ECSimDomain::ECSimDomain() - "
-          << "null trialCPs or outCPs array passed\n";
+          << "null trialCPs or outCPs array passed.\n";
       exit(OF_ReturnType_failed);
     }
     trialCPs = trialcps;
@@ -141,41 +141,6 @@ ECSimDomain::~ECSimDomain()
 }
 
 
-int ECSimDomain::setSize(ID sizeT, ID sizeO)
-{
-    // check sizeTrial and sizeOut
-    // for ECSimDomain object
-
-    // ECSimDomain objects can use 
-    // disp, vel, accel and force for trial and
-    // disp, vel, accel and force for output
-    // only check if disp and force are available in sizeT/sizeO.
-    int sizeTDisp = 0, sizeTForce = 0;
-    int sizeODisp = 0, sizeOForce = 0;
-    for (int i=0; i<numTrialCPs; i++)  {
-        sizeTDisp  += (trialCPs[i]->getSizeRespType())(OF_Resp_Disp);
-        sizeTForce += (trialCPs[i]->getSizeRespType())(OF_Resp_Force);
-    }
-    for (int i=0; i<numOutCPs; i++)  {
-        sizeODisp  += (outCPs[i]->getSizeRespType())(OF_Resp_Disp);
-        sizeOForce += (outCPs[i]->getSizeRespType())(OF_Resp_Force);
-    }
-    if ((sizeTDisp != 0 && sizeTDisp != sizeT[OF_Resp_Disp]) ||
-        (sizeTForce != 0 && sizeTForce != sizeT[OF_Resp_Force]) ||
-        (sizeODisp != 0 && sizeODisp != sizeO[OF_Resp_Disp]) ||
-        (sizeOForce != 0 && sizeOForce != sizeO[OF_Resp_Force]))  {
-        opserr << "ECSimDomain::setSize() - wrong sizeTrial/Out\n"; 
-        opserr << "see User Manual.\n";
-        exit(OF_ReturnType_failed);
-    }
-
-    *sizeCtrl = sizeT;
-    *sizeDaq  = sizeO;
-
-    return OF_ReturnType_completed;
-}
-
-
 int ECSimDomain::setup()
 {
     if (targDisp != 0)
@@ -187,24 +152,24 @@ int ECSimDomain::setup()
     if (targForce != 0)
         delete targForce;
 
-    if ((*sizeCtrl)[OF_Resp_Disp] != 0)  {
-        targDisp = new double[(*sizeCtrl)[OF_Resp_Disp]];
-        for (int i=0; i<(*sizeCtrl)[OF_Resp_Disp]; i++)
+    if ((*sizeCtrl)(OF_Resp_Disp) != 0)  {
+        targDisp = new double [(*sizeCtrl)(OF_Resp_Disp)];
+        for (int i=0; i<(*sizeCtrl)(OF_Resp_Disp); i++)
             targDisp[i] = 0.0;
     }
-    if ((*sizeCtrl)[OF_Resp_Vel] != 0)  {
-        targVel = new double[(*sizeCtrl)[OF_Resp_Vel]];
-        for (int i=0; i<(*sizeCtrl)[OF_Resp_Vel]; i++)
+    if ((*sizeCtrl)(OF_Resp_Vel) != 0)  {
+        targVel = new double [(*sizeCtrl)(OF_Resp_Vel)];
+        for (int i=0; i<(*sizeCtrl)(OF_Resp_Vel); i++)
             targVel[i] = 0.0;
     }
-    if ((*sizeCtrl)[OF_Resp_Accel] != 0)  {
-        targAccel = new double[(*sizeCtrl)[OF_Resp_Accel]];
-        for (int i=0; i<(*sizeCtrl)[OF_Resp_Accel]; i++)
+    if ((*sizeCtrl)(OF_Resp_Accel) != 0)  {
+        targAccel = new double [(*sizeCtrl)(OF_Resp_Accel)];
+        for (int i=0; i<(*sizeCtrl)(OF_Resp_Accel); i++)
             targAccel[i] = 0.0;
     }
-    if ((*sizeCtrl)[OF_Resp_Force] != 0)  {
-        targForce = new double[(*sizeCtrl)[OF_Resp_Force]];
-        for (int i=0; i<(*sizeCtrl)[OF_Resp_Force]; i++)
+    if ((*sizeCtrl)(OF_Resp_Force) != 0)  {
+        targForce = new double [(*sizeCtrl)(OF_Resp_Force)];
+        for (int i=0; i<(*sizeCtrl)(OF_Resp_Force); i++)
             targForce[i] = 0.0;
     }
 
@@ -217,24 +182,24 @@ int ECSimDomain::setup()
     if (measForce != 0)
         delete measForce;
 
-    if ((*sizeDaq)[OF_Resp_Disp] != 0)  {
-        measDisp = new double[(*sizeDaq)[OF_Resp_Disp]];
-        for (int i=0; i<(*sizeDaq)[OF_Resp_Disp]; i++)
+    if ((*sizeDaq)(OF_Resp_Disp) != 0)  {
+        measDisp = new double [(*sizeDaq)(OF_Resp_Disp)];
+        for (int i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)
             measDisp[i] = 0.0;
     }
-    if ((*sizeDaq)[OF_Resp_Vel] != 0)  {
-        measVel = new double[(*sizeDaq)[OF_Resp_Vel]];
-        for (int i=0; i<(*sizeDaq)[OF_Resp_Vel]; i++)
+    if ((*sizeDaq)(OF_Resp_Vel) != 0)  {
+        measVel = new double [(*sizeDaq)(OF_Resp_Vel)];
+        for (int i=0; i<(*sizeDaq)(OF_Resp_Vel); i++)
             measVel[i] = 0.0;
     }
-    if ((*sizeDaq)[OF_Resp_Accel] != 0)  {
-        measAccel = new double[(*sizeDaq)[OF_Resp_Accel]];
-        for (int i=0; i<(*sizeDaq)[OF_Resp_Accel]; i++)
+    if ((*sizeDaq)(OF_Resp_Accel) != 0)  {
+        measAccel = new double [(*sizeDaq)(OF_Resp_Accel)];
+        for (int i=0; i<(*sizeDaq)(OF_Resp_Accel); i++)
             measAccel[i] = 0.0;
     }
-    if ((*sizeDaq)[OF_Resp_Force] != 0)  {
-        measForce = new double[(*sizeDaq)[OF_Resp_Force]];
-        for (int i=0; i<(*sizeDaq)[OF_Resp_Force]; i++)
+    if ((*sizeDaq)(OF_Resp_Force) != 0)  {
+        measForce = new double [(*sizeDaq)(OF_Resp_Force)];
+        for (int i=0; i<(*sizeDaq)(OF_Resp_Force); i++)
             measForce[i] = 0.0;
     }
 
@@ -259,15 +224,16 @@ int ECSimDomain::setup()
         int nodeTag = trialCPs[i]->getNodeTag();
         int numDir = trialCPs[i]->getNumUniqueDir();
         ID dir = trialCPs[i]->getUniqueDir();
+		Vector fact = trialCPs[i]->getFactor();
 
         // loop through all the directions
         for (int j=0; j<numDir; j++)  {
-            if ((*sizeCtrl)[OF_Resp_Vel] != 0 && (*sizeCtrl)[OF_Resp_Accel] != 0)
-                theSP[iSP] = new ExpControlSP(numESPs+1+iSP, nodeTag, dir(j), &targDisp[iSP], &targVel[iSP], &targAccel[iSP]);
-            else if ((*sizeCtrl)[OF_Resp_Accel] != 0)
-                theSP[iSP] = new ExpControlSP(numESPs+1+iSP, nodeTag, dir(j), &targDisp[iSP], &targVel[iSP]);
+            if ((*sizeCtrl)(OF_Resp_Vel) != 0 && (*sizeCtrl)(OF_Resp_Accel) != 0)
+                theSP[iSP] = new ExpControlSP(numESPs+1+iSP, nodeTag, dir(j), &targDisp[iSP], 1.0, &targVel[iSP], 1.0, &targAccel[iSP], 1.0);
+            else if ((*sizeCtrl)(OF_Resp_Accel) != 0)
+                theSP[iSP] = new ExpControlSP(numESPs+1+iSP, nodeTag, dir(j), &targDisp[iSP], 1.0, &targVel[iSP], 1.0);
             else
-                theSP[iSP] = new ExpControlSP(numESPs+1+iSP, nodeTag, dir(j), &targDisp[iSP]);
+                theSP[iSP] = new ExpControlSP(numESPs+1+iSP, nodeTag, dir(j), &targDisp[iSP], fact(j));
             
             // add the SP constraints to the load pattern
             theDomain->addSP_Constraint(theSP[iSP], 1);
@@ -301,33 +267,80 @@ int ECSimDomain::setup()
 }
 
 
+int ECSimDomain::setSize(ID sizeT, ID sizeO)
+{
+    // check sizeTrial and sizeOut
+    // for ECSimDomain object
+
+    // ECSimDomain objects can use 
+    // disp, vel, accel and force for trial and
+    // disp, vel, accel and force for output
+    // only check if disp and force are available in sizeT/sizeO.
+    int sizeTDisp = 0, sizeTForce = 0;
+    int sizeODisp = 0, sizeOForce = 0;
+    for (int i=0; i<numTrialCPs; i++)  {
+        sizeTDisp  += (trialCPs[i]->getSizeRespType())(OF_Resp_Disp);
+        sizeTForce += (trialCPs[i]->getSizeRespType())(OF_Resp_Force);
+    }
+    for (int i=0; i<numOutCPs; i++)  {
+        sizeODisp  += (outCPs[i]->getSizeRespType())(OF_Resp_Disp);
+        sizeOForce += (outCPs[i]->getSizeRespType())(OF_Resp_Force);
+    }
+    if ((sizeTDisp != 0 && sizeTDisp != sizeT(OF_Resp_Disp)) ||
+        (sizeTForce != 0 && sizeTForce != sizeT(OF_Resp_Force)) ||
+        (sizeODisp != 0 && sizeODisp != sizeO(OF_Resp_Disp)) ||
+        (sizeOForce != 0 && sizeOForce != sizeO(OF_Resp_Force)))  {
+        opserr << "ECSimDomain::setSize() - wrong sizeTrial/Out\n"; 
+        opserr << "see User Manual.\n";
+        exit(OF_ReturnType_failed);
+    }
+
+    *sizeCtrl = sizeT;
+    *sizeDaq  = sizeO;
+
+    return OF_ReturnType_completed;
+}
+
+
 int ECSimDomain::setTrialResponse(const Vector* disp,
     const Vector* vel,
     const Vector* accel,
     const Vector* force,
     const Vector* time)
 {
-    for (int i=0; i<(*sizeCtrl)[OF_Resp_Disp]; i++) {
-        targDisp[i] = (*disp)(i);
-        if (theFilter != 0)
-            targDisp[i] = theFilter->filtering(targDisp[i]);
+    int i, rValue = 0;
+    if (disp != 0)  {
+        for (i=0; i<(*sizeCtrl)(OF_Resp_Disp); i++)  {
+            targDisp[i] = (*disp)(i);
+            if (theCtrlFilters[OF_Resp_Disp] != 0)
+                targDisp[i] = theCtrlFilters[OF_Resp_Disp]->filtering(targDisp[i]);
+        }
     }
-    if (vel != 0) {
-        for (int i=0; i<(*sizeCtrl)[OF_Resp_Vel]; i++)
+    if (vel != 0)  {
+        for (i=0; i<(*sizeCtrl)(OF_Resp_Vel); i++)  {
             targVel[i] = (*vel)(i);
+            if (theCtrlFilters[OF_Resp_Vel] != 0)
+                targVel[i] = theCtrlFilters[OF_Resp_Vel]->filtering(targVel[i]);
+        }
     }
-    if (accel != 0) {
-        for (int i=0; i<(*sizeCtrl)[OF_Resp_Accel]; i++)
+    if (accel != 0)  {
+        for (i=0; i<(*sizeCtrl)(OF_Resp_Accel); i++)  {
             targAccel[i] = (*accel)(i);
+            if (theCtrlFilters[OF_Resp_Accel] != 0)
+                targAccel[i] = theCtrlFilters[OF_Resp_Accel]->filtering(targAccel[i]);
+        }
     }
-    if (force != 0) {
-        for (int i=0; i<(*sizeCtrl)[OF_Resp_Force]; i++)
+    if (force != 0)  {
+        for (i=0; i<(*sizeCtrl)(OF_Resp_Force); i++)  {
             targForce[i] = (*force)(i);
+            if (theCtrlFilters[OF_Resp_Force] != 0)
+                targForce[i] = theCtrlFilters[OF_Resp_Force]->filtering(targForce[i]);
+        }
     }
 
-    this->control();
+    rValue = this->control();
 
-    return OF_ReturnType_completed;
+    return rValue;
 }
 
 
@@ -339,14 +352,35 @@ int ECSimDomain::getDaqResponse(Vector* disp,
 {
     this->acquire();
 
-    for (int i=0; i<(*sizeDaq)[OF_Resp_Disp]; i++)
-        (*disp)(i) = measDisp[i];
-    for (int i=0; i<(*sizeDaq)[OF_Resp_Vel]; i++)
-        (*vel)(i) = measVel[i];
-    for (int i=0; i<(*sizeDaq)[OF_Resp_Accel]; i++)
-        (*accel)(i) = measAccel[i];
-    for (int i=0; i<(*sizeDaq)[OF_Resp_Force]; i++)
-        (*force)(i) = measForce[i];
+    int i;
+    if (disp != 0)  {
+        for (i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)  {
+            if (theDaqFilters[OF_Resp_Disp] != 0)
+                measDisp[i] = theDaqFilters[OF_Resp_Disp]->filtering(measDisp[i]);
+            (*disp)(i) = measDisp[i];
+        }
+    }
+    if (vel != 0)  {
+        for (i=0; i<(*sizeDaq)(OF_Resp_Vel); i++)  {
+            if (theDaqFilters[OF_Resp_Vel] != 0)
+                measVel[i] = theDaqFilters[OF_Resp_Vel]->filtering(measVel[i]);
+            (*vel)(i) = measVel[i];
+        }
+    }
+    if (accel != 0)  {
+        for (i=0; i<(*sizeDaq)(OF_Resp_Accel); i++)  {
+            if (theDaqFilters[OF_Resp_Accel] != 0)
+                measAccel[i] = theDaqFilters[OF_Resp_Accel]->filtering(measAccel[i]);
+            (*accel)(i) = measAccel[i];
+        }
+    }
+    if (force != 0)  {
+        for (i=0; i<(*sizeDaq)(OF_Resp_Force); i++)  {
+            if (theDaqFilters[OF_Resp_Force] != 0)
+                measForce[i] = theDaqFilters[OF_Resp_Force]->filtering(measForce[i]);
+            (*force)(i) = measForce[i];
+        }
+    }
 
     return OF_ReturnType_completed;
 }
@@ -378,9 +412,10 @@ void ECSimDomain::Print(OPS_Stream &s, int flag)
         s << " " << outCPs[i]->getTag();
     s << endln;
     s << "*   Domain: " << *theDomain << endln;
-    if (theFilter != 0) {
-        s << "*\tFilter: " << *theFilter << endln;
-    }
+    if (theCtrlFilters != 0)
+        s << "*   ctrlFilter: " << *theCtrlFilters << endln;
+    if (theDaqFilters != 0)
+        s << "*   daqFilter: " << *theDaqFilters << endln;
     s << "****************************************************************\n";
     s << endln;
 }
@@ -397,7 +432,7 @@ int ECSimDomain::control()
 int ECSimDomain::acquire()
 {
     // get nodal reactions if forces need to be acquired
-    if ((*sizeDaq)[OF_Resp_Force] != 0)
+    if ((*sizeDaq)(OF_Resp_Force) != 0)
         theDomain->calculateNodalReactions(true);
 
     // loop through all the output control points
@@ -407,24 +442,25 @@ int ECSimDomain::acquire()
         int nodeTag = outCPs[i]->getNodeTag();
         int numDir = outCPs[i]->getNumUniqueDir();
         ID dir = outCPs[i]->getUniqueDir();
+		Vector fact = outCPs[i]->getFactor();
 
         // loop through all the directions
         for (int j=0; j<numDir; j++)  {
-            if ((*sizeDaq)[OF_Resp_Disp] != 0)  {
+            if ((*sizeDaq)(OF_Resp_Disp) != 0)  {
                 const Vector &d = theDomain->getNode(nodeTag)->getTrialDisp();
-                measDisp[iSP] = d(dir(j));
+                measDisp[iSP] = fact(j)*d(dir(j));
             }
-            if ((*sizeDaq)[OF_Resp_Vel] != 0)  {
+            if ((*sizeDaq)(OF_Resp_Vel) != 0)  {
                 const Vector &v = theDomain->getNode(nodeTag)->getTrialVel();
-                measVel[iSP] = v(dir(j));
+                measVel[iSP] = fact(j)*v(dir(j));
             }
-            if ((*sizeDaq)[OF_Resp_Accel] != 0)  {
+            if ((*sizeDaq)(OF_Resp_Accel) != 0)  {
                 const Vector &a = theDomain->getNode(nodeTag)->getTrialAccel();
-                measAccel[iSP] = a(dir(j));
+                measAccel[iSP] = fact(j)*a(dir(j));
             }
-            if ((*sizeDaq)[OF_Resp_Force] != 0)  {
+            if ((*sizeDaq)(OF_Resp_Force) != 0)  {
                 const Vector &f = theDomain->getNode(nodeTag)->getReaction();
-                measForce[iSP] = f(dir(j));
+                measForce[iSP] = fact(j)*f(dir(j));
             }
             iSP++;
         }

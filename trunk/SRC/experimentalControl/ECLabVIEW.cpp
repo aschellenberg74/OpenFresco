@@ -51,13 +51,13 @@ ECLabVIEW::ECLabVIEW(int tag,
     logFile = fopen("ECLabVIEW.log","w");
     if (logFile == 0)  {
         opserr << "ECLabVIEW::ECLabVIEW() - "
-            << "fopen: could not open log file\n";
+            << "fopen: could not open log file.\n";
         exit(OF_ReturnType_failed);
     }
 
     if (trialcps == 0 || outcps == 0)  {
       opserr << "ECLabVIEW::ECLabVIEW() - "
-          << "null trialCPs or outCPs array passed\n";
+          << "null trialCPs or outCPs array passed.\n";
       exit(OF_ReturnType_failed);
     }
     trialCPs = trialcps;
@@ -67,7 +67,7 @@ ECLabVIEW::ECLabVIEW(int tag,
     theSocket = new TCP_Socket(ipPort, ipAddress);
     if (theSocket->setUpConnection() != 0)  {
         opserr << "ECLabVIEW::ECLabVIEW() - "
-            << "failed to setup TCP connection to LabVIEW\n";
+            << "failed to setup TCP connection to LabVIEW.\n";
         delete theSocket;
         exit(OF_ReturnType_failed);
     }
@@ -97,7 +97,7 @@ ECLabVIEW::ECLabVIEW(int tag,
 
     if (strcmp(strtok(rData,"\t"),"OK") != 0)  {
         opserr << "ECLabVIEW::ECLabVIEW() - "
-            << "failed to open a session with LabVIEW\n";
+            << "failed to open a session with LabVIEW.\n";
         opserr << rData << endln;
         delete theSocket;
         exit(OF_ReturnType_failed);
@@ -113,7 +113,7 @@ ECLabVIEW::ECLabVIEW(int tag,
 
     if (strcmp(strtok(rData,"\t"),"OK") != 0)  {
         opserr << "ECLabVIEW::ECLabVIEW() - "
-            << "failed to set parameter with LabVIEW\n";
+            << "failed to set parameter with LabVIEW.\n";
         opserr << rData << endln;
         delete theSocket;
         exit(OF_ReturnType_failed);
@@ -152,7 +152,7 @@ ECLabVIEW::~ECLabVIEW()
 
     if (strcmp(strtok(rData,"\t"),"OK") != 0)  {
         opserr << "ECLabVIEW::~ECLabVIEW() - "
-            << "failed to close the current session with LabVIEW\n";
+            << "failed to close the current session with LabVIEW.\n";
         opserr << rData << endln;
     }
 
@@ -163,6 +163,7 @@ ECLabVIEW::~ECLabVIEW()
     // close output file
     fclose(logFile);
 
+    opserr << endln;
     opserr << "********************************************\n";
     opserr << "* The session with LabVIEW has been closed *\n";
     opserr << "********************************************\n";
@@ -170,57 +171,21 @@ ECLabVIEW::~ECLabVIEW()
 }
 
 
-int ECLabVIEW::setSize(ID sizeT, ID sizeO)
-{
-    // check sizeTrial and sizeOut
-    // for ECLabVIEW object
-    
-    // ECLabVIEW objects can only use 
-    // disp and force for trial and disp and force for output
-    // check these are available in sizeT/sizeO.
-    int sizeTDisp = 0, sizeTForce = 0;
-    int sizeODisp = 0, sizeOForce = 0;
-    for (int i=0; i<numTrialCPs; i++)  {
-        sizeTDisp += (trialCPs[i]->getSizeRespType())(OF_Resp_Disp);
-        sizeTForce += (trialCPs[i]->getSizeRespType())(OF_Resp_Force);
-    }
-    for (int i=0; i<numOutCPs; i++)  {
-        sizeODisp += (outCPs[i]->getSizeRespType())(OF_Resp_Disp);
-        sizeOForce += (outCPs[i]->getSizeRespType())(OF_Resp_Force);
-    }
-    if ((sizeTDisp != 0 && sizeTDisp != sizeT[OF_Resp_Disp]) ||
-        (sizeTForce != 0 && sizeTForce != sizeT[OF_Resp_Force]) ||
-        (sizeODisp != 0 && sizeODisp != sizeO[OF_Resp_Disp]) ||
-        (sizeOForce != 0 && sizeOForce != sizeO[OF_Resp_Force]))  {
-        opserr << "ECLabVIEW::setSize() - wrong sizeTrial/Out\n"; 
-        opserr << "see User Manual.\n";
-        sprintf(sData,"close-session\tOpenFresco\n");
-        sendData = new Message(sData,(int)strlen(sData));  // needed because of bug in LabVIEW-plugin
-        theSocket->sendMsg(0, 0, *sendData, 0);
-        delete theSocket;
-        exit(OF_ReturnType_failed);
-    }
-    
-    *sizeCtrl = sizeT;
-    *sizeDaq  = sizeO;
-    
-    return OF_ReturnType_completed;
-}
-
-
 int ECLabVIEW::setup()
 {
+    int rValue = 0;
+    
     if (targDisp != 0)
         delete targDisp;
     if (targForce != 0)
         delete targForce;
     
-    if ((*sizeCtrl)[OF_Resp_Disp] != 0)  {
-        targDisp = new Vector((*sizeCtrl)[OF_Resp_Disp]);
+    if ((*sizeCtrl)(OF_Resp_Disp) != 0)  {
+        targDisp = new Vector((*sizeCtrl)(OF_Resp_Disp));
         targDisp->Zero();
     }
-    if ((*sizeCtrl)[OF_Resp_Force] != 0)  {
-        targForce = new Vector((*sizeCtrl)[OF_Resp_Force]);
+    if ((*sizeCtrl)(OF_Resp_Force) != 0)  {
+        targForce = new Vector((*sizeCtrl)(OF_Resp_Force));
         targForce->Zero();
     }
     
@@ -229,12 +194,12 @@ int ECLabVIEW::setup()
     if (measForce != 0)
         delete measForce;
     
-    if ((*sizeDaq)[OF_Resp_Disp] != 0)  {
-        measDisp = new Vector((*sizeDaq)[OF_Resp_Disp]);
+    if ((*sizeDaq)(OF_Resp_Disp) != 0)  {
+        measDisp = new Vector((*sizeDaq)(OF_Resp_Disp));
         measDisp->Zero();
     }
-    if ((*sizeDaq)[OF_Resp_Force] != 0)  {
-        measForce = new Vector((*sizeDaq)[OF_Resp_Force]);
+    if ((*sizeDaq)(OF_Resp_Force) != 0)  {
+        measForce = new Vector((*sizeDaq)(OF_Resp_Force));
         measForce->Zero();
     }
     
@@ -257,21 +222,21 @@ int ECLabVIEW::setup()
         delete theSocket;
         exit(OF_ReturnType_failed);
     }
-    		
+    
 	do  {
-        this->control();
-        this->acquire();
+        rValue += this->control();
+        rValue += this->acquire();
         
         int i;
         opserr << "**************************************\n";
         opserr << "* Initial values of DAQ are:         *\n";
         opserr << "*                                    *\n";
         opserr << "* dspDaq = [";
-        for (i=0; i<(*sizeDaq)[OF_Resp_Disp]; i++)
+        for (i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)
             opserr << " " << (*measDisp)(i);
         opserr << " ]\n";
         opserr << "* frcDaq = [";
-        for (i=0; i<(*sizeDaq)[OF_Resp_Force]; i++)
+        for (i=0; i<(*sizeDaq)(OF_Resp_Force); i++)
             opserr << " " << (*measForce)(i);
         opserr << " ]\n";
         opserr << "*                                    *\n";
@@ -299,6 +264,44 @@ int ECLabVIEW::setup()
     opserr << "******************\n";
     opserr << endln;
     
+    return rValue;
+}
+
+
+int ECLabVIEW::setSize(ID sizeT, ID sizeO)
+{
+    // check sizeTrial and sizeOut
+    // for ECLabVIEW object
+    
+    // ECLabVIEW objects can only use 
+    // disp and force for trial and disp and force for output
+    // check these are available in sizeT/sizeO.
+    int sizeTDisp = 0, sizeTForce = 0;
+    int sizeODisp = 0, sizeOForce = 0;
+    for (int i=0; i<numTrialCPs; i++)  {
+        sizeTDisp += (trialCPs[i]->getSizeRespType())(OF_Resp_Disp);
+        sizeTForce += (trialCPs[i]->getSizeRespType())(OF_Resp_Force);
+    }
+    for (int i=0; i<numOutCPs; i++)  {
+        sizeODisp += (outCPs[i]->getSizeRespType())(OF_Resp_Disp);
+        sizeOForce += (outCPs[i]->getSizeRespType())(OF_Resp_Force);
+    }
+    if ((sizeTDisp != 0 && sizeTDisp != sizeT(OF_Resp_Disp)) ||
+        (sizeTForce != 0 && sizeTForce != sizeT(OF_Resp_Force)) ||
+        (sizeODisp != 0 && sizeODisp != sizeO(OF_Resp_Disp)) ||
+        (sizeOForce != 0 && sizeOForce != sizeO(OF_Resp_Force)))  {
+        opserr << "ECLabVIEW::setSize() - wrong sizeTrial/Out\n"; 
+        opserr << "see User Manual.\n";
+        sprintf(sData,"close-session\tOpenFresco\n");
+        sendData = new Message(sData,(int)strlen(sData));  // needed because of bug in LabVIEW-plugin
+        theSocket->sendMsg(0, 0, *sendData, 0);
+        delete theSocket;
+        exit(OF_ReturnType_failed);
+    }
+    
+    *sizeCtrl = sizeT;
+    *sizeDaq  = sizeO;
+    
     return OF_ReturnType_completed;
 }
 
@@ -309,16 +312,25 @@ int ECLabVIEW::setTrialResponse(const Vector* disp,
     const Vector* force,
     const Vector* time)
 {
-    *targDisp = *disp;
-    if (theFilter != 0)  {
-        for (int i=0; i<(*sizeCtrl)[OF_Resp_Disp]; i++)
-            (*targDisp)(i) = theFilter->filtering((*targDisp)(i));
+    int i, rValue = 0;
+    if (disp != 0)  {
+        *targDisp = *disp;
+        if (theCtrlFilters[OF_Resp_Disp] != 0)  {
+            for (i=0; i<(*sizeCtrl)(OF_Resp_Disp); i++)
+                (*targDisp)(i) = theCtrlFilters[OF_Resp_Disp]->filtering((*targDisp)(i));
+        }
     }
-    *targForce = *force;
+    if (force != 0)  {
+        *targForce = *force;
+        if (theCtrlFilters[OF_Resp_Force] != 0)  {
+            for (i=0; i<(*sizeCtrl)(OF_Resp_Force); i++)
+                (*targForce)(i) = theCtrlFilters[OF_Resp_Force]->filtering((*targForce)(i));
+        }
+    }
 
-    this->control();
+    rValue = this->control();
     
-    return OF_ReturnType_completed;
+    return rValue;
 }
 
 
@@ -330,8 +342,21 @@ int ECLabVIEW::getDaqResponse(Vector* disp,
 {
     this->acquire();
     
-    *disp = *measDisp;
-    *force = *measForce;
+    int i;
+    if (disp != 0)  {
+        if (theDaqFilters[OF_Resp_Disp] != 0)  {
+            for (i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)
+                (*measDisp)(i) = theDaqFilters[OF_Resp_Disp]->filtering((*measDisp)(i));
+        }
+        *disp = *measDisp;
+    }
+    if (force != 0)  {
+        if (theDaqFilters[OF_Resp_Force] != 0)  {
+            for (i=0; i<(*sizeDaq)(OF_Resp_Force); i++)
+                (*measForce)(i) = theDaqFilters[OF_Resp_Force]->filtering((*measForce)(i));
+        }
+        *force = *measForce;
+    }
         
     return OF_ReturnType_completed;
 }
@@ -355,9 +380,10 @@ void ECLabVIEW::Print(OPS_Stream &s, int flag)
     s << "* ExperimentalControl: " << this->getTag() << endln; 
     s << "* type: ECLabVIEW\n";
     s << "*   ipAddress: " << ipAddress << ", ipPort: " << ipPort << endln;
-    if (theFilter != 0) {
-        s << "*\tFilter: " << *theFilter << endln;
-    }
+    if (theCtrlFilters != 0)
+        s << "*   ctrlFilter: " << *theCtrlFilters << endln;
+    if (theDaqFilters != 0)
+        s << "*   daqFilter: " << *theDaqFilters << endln;
     s << "****************************************************************\n";
     s << endln;
 }
@@ -409,7 +435,7 @@ int ECLabVIEW::control()
                 }
                 else {
                     opserr << "ECLabVIEW::control() - "
-                        << "requested direction is not supported\n";
+                        << "requested direction is not supported.\n";
                     exit(OF_ReturnType_failed);
                 }
                 // append ParameterType and Parameter
@@ -431,7 +457,7 @@ int ECLabVIEW::control()
                 }
                 else {
                     opserr << "ECLabVIEW::control() - "
-                        << "requested response type is not supported\n";
+                        << "requested response type is not supported.\n";
                     exit(OF_ReturnType_failed);
                 }
             }
@@ -453,7 +479,7 @@ int ECLabVIEW::control()
                 }
                 else {
                     opserr << "ECLabVIEW::control() - "
-                        << "requested direction is not supported\n";
+                        << "requested direction is not supported.\n";
                     exit(OF_ReturnType_failed);
                 }
                 // append ParameterType
@@ -479,7 +505,7 @@ int ECLabVIEW::control()
                 }
                 else {
                     opserr << "ECLabVIEW::control() - "
-                        << "requested response type is not supported\n";
+                        << "requested response type is not supported.\n";
                     exit(OF_ReturnType_failed);
                 }
                 // check if parameter is within limits and append
@@ -521,7 +547,7 @@ int ECLabVIEW::control()
         fprintf(logFile,"%s",rData);
     if (strcmp(strtok(rData,"\t"),"OK") != 0)  {
         opserr << "ECLabVIEW::control() - "
-            << "proposed control values were not accepted\n";
+            << "proposed control values were not accepted.\n";
         opserr << rData << endln;
         exit(OF_ReturnType_failed);
     }
@@ -535,7 +561,7 @@ int ECLabVIEW::control()
         fprintf(logFile,"%s",rData);
     if (strcmp(strtok(rData,"\t"),"OK") != 0)  {
         opserr << "ECLabVIEW::control() - "
-            << "failed to execute proposed control values\n";
+            << "failed to execute proposed control values.\n";
         opserr << rData << endln;
         exit(OF_ReturnType_failed);
     }
@@ -574,7 +600,7 @@ int ECLabVIEW::acquire()
         if (strcmp(strtok(rData,"\t"),"OK") != 0)  {
             opserr << "ECLabVIEW::acquire() - "
                 << "failed to acquire control-point "
-                << outCPs[i]->getTag() << " values\n";
+                << outCPs[i]->getTag() << " values.\n";
             opserr << rData << endln;
             exit(OF_ReturnType_failed);
         }
@@ -707,7 +733,7 @@ int ECLabVIEW::acquire()
             opserr << "ECLabVIEW::acquire() - "
                 << "received wrong number of displacement or force parameters\n"
                 << " want: " << sizeRespType(0) << " displacements" 
-                << "and " << sizeRespType(3) << " forces\n" << endln;
+                << "and " << sizeRespType(3) << " forces.\n";
              exit(OF_ReturnType_failed);
         }
         dID += sizeRespType(0);

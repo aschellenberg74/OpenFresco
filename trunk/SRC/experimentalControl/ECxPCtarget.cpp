@@ -46,7 +46,7 @@ ECxPCtarget::ECxPCtarget(int tag, int pctype, char *ipaddress,
     // initialize the xPC Target dynamic link library
     if (xPCInitAPI())  {
         opserr << "ECxPCtarget::ECxPCtarget()"
-            << " - xPCInitAPI: unable to load xPC Target API" << endln;
+            << " - xPCInitAPI: unable to load xPC Target API.\n";
         exit(OF_ReturnType_failed);
     }
     
@@ -170,6 +170,7 @@ ECxPCtarget::~ECxPCtarget()
     xPCClosePort(port);
     xPCFreeAPI();
     
+    opserr << endln;
     opserr << "****************************************\n";
     opserr << "* The rtp application has been stopped *\n";
     opserr << "****************************************\n";
@@ -177,35 +178,10 @@ ECxPCtarget::~ECxPCtarget()
 }
 
 
-int ECxPCtarget::setSize(ID sizeT, ID sizeO)
-{
-    // check sizeTrial and sizeOut
-    // for ECxPCtarget object
-    
-    // ECxPCtarget objects only use 
-    // disp or disp and vel or disp, vel and accel for trial and
-    // disp and force for output
-    // check these are available in sizeT/sizeO.
-    if ((pcType == 0 && sizeT[OF_Resp_Disp] == 0) || 
-        (pcType == 1 && sizeT[OF_Resp_Disp] == 0 && sizeT[OF_Resp_Vel] == 0) ||
-        (pcType == 2 && sizeT[OF_Resp_Disp] == 0 && sizeT[OF_Resp_Vel] == 0 && sizeT[OF_Resp_Accel] == 0) ||
-        (sizeO[OF_Resp_Disp] == 0 && sizeO[OF_Resp_Force] == 0))  {
-        opserr << "ECxPCtarget::setSize() - wrong sizeTrial/Out\n"; 
-        opserr << "see User Manual.\n";
-        xPCClosePort(port);
-        xPCFreeAPI();
-        exit(OF_ReturnType_failed);
-    }
-    
-    *sizeCtrl = sizeT;
-    *sizeDaq  = sizeO;
-
-    return OF_ReturnType_completed;
-}
-
-
 int ECxPCtarget::setup()
 {
+    int rValue = 0;
+    
     if (targDisp != 0)
         delete targDisp;
     if (targVel != 0)
@@ -213,19 +189,19 @@ int ECxPCtarget::setup()
     if (targAccel != 0)
         delete targAccel;
     
-    if ((*sizeCtrl)[OF_Resp_Disp] != 0)  {
-        targDisp = new double[(*sizeCtrl)[OF_Resp_Disp]];
-        for (int i=0; i<(*sizeCtrl)[OF_Resp_Disp]; i++)
+    if ((*sizeCtrl)(OF_Resp_Disp) != 0)  {
+        targDisp = new double [(*sizeCtrl)(OF_Resp_Disp)];
+        for (int i=0; i<(*sizeCtrl)(OF_Resp_Disp); i++)
             targDisp[i] = 0.0;
     }
-    if ((*sizeCtrl)[OF_Resp_Vel] != 0)  {
-        targVel = new double[(*sizeCtrl)[OF_Resp_Vel]];
-        for (int i=0; i<(*sizeCtrl)[OF_Resp_Vel]; i++)
+    if ((*sizeCtrl)(OF_Resp_Vel) != 0)  {
+        targVel = new double [(*sizeCtrl)(OF_Resp_Vel)];
+        for (int i=0; i<(*sizeCtrl)(OF_Resp_Vel); i++)
             targVel[i] = 0.0;
     }
-    if ((*sizeCtrl)[OF_Resp_Accel] != 0)  {
-        targAccel = new double[(*sizeCtrl)[OF_Resp_Accel]];
-        for (int i=0; i<(*sizeCtrl)[OF_Resp_Accel]; i++)
+    if ((*sizeCtrl)(OF_Resp_Accel) != 0)  {
+        targAccel = new double [(*sizeCtrl)(OF_Resp_Accel)];
+        for (int i=0; i<(*sizeCtrl)(OF_Resp_Accel); i++)
             targAccel[i] = 0.0;
     }
     
@@ -234,18 +210,18 @@ int ECxPCtarget::setup()
     if (measForce != 0)
         delete measForce;
     
-    if ((*sizeDaq)[OF_Resp_Disp] != 0)  {
-        measDisp = new double[(*sizeDaq)[OF_Resp_Disp]];
-        measDispId = new int[(*sizeDaq)[OF_Resp_Disp]];
-        for (int i=0; i<(*sizeDaq)[OF_Resp_Disp]; i++)  {
+    if ((*sizeDaq)(OF_Resp_Disp) != 0)  {
+        measDisp = new double [(*sizeDaq)(OF_Resp_Disp)];
+        measDispId = new int [(*sizeDaq)(OF_Resp_Disp)];
+        for (int i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)  {
             measDisp[i] = 0.0;
             measDispId[i] = 0;
         }
     }
-    if ((*sizeDaq)[OF_Resp_Force] != 0)  {
-        measForce = new double[(*sizeDaq)[OF_Resp_Force]];
-        measForceId = new int[(*sizeDaq)[OF_Resp_Force]];
-        for (int i=0; i<(*sizeDaq)[OF_Resp_Force]; i++)  {
+    if ((*sizeDaq)(OF_Resp_Force) != 0)  {
+        measForce = new double [(*sizeDaq)(OF_Resp_Force)];
+        measForceId = new int [(*sizeDaq)(OF_Resp_Force)];
+        for (int i=0; i<(*sizeDaq)(OF_Resp_Force); i++)  {
             measForce[i] = 0.0;
             measForceId[i] = 0;
         }
@@ -310,7 +286,7 @@ int ECxPCtarget::setup()
             exit(OF_ReturnType_failed);
         }
     }
-    if ((*sizeDaq)[OF_Resp_Disp]==1)  {
+    if ((*sizeDaq)(OF_Resp_Disp)==1)  {
         measDispId[0] = xPCGetSignalIdx(port, "xPC HC/measDsp");
         if (xPCGetLastError())  {
             xPCErrorMsg(xPCGetLastError(), errMsg);
@@ -322,7 +298,7 @@ int ECxPCtarget::setup()
         }
     } else  {
         char dspStr[20], sigStr[3];
-        for (int i=0; i<(*sizeDaq)[OF_Resp_Disp]; i++)  {
+        for (int i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)  {
             strcpy(dspStr,"xPC HC/measDsp/s");
             sprintf(sigStr, "%d", i+1);
             strcat(dspStr, sigStr);
@@ -337,7 +313,7 @@ int ECxPCtarget::setup()
             }
         }
     }
-    if ((*sizeDaq)[OF_Resp_Force]==1)  {
+    if ((*sizeDaq)(OF_Resp_Force)==1)  {
         measForceId[0] = xPCGetSignalIdx(port, "xPC HC/measFrc");
         if (xPCGetLastError())  {
             xPCErrorMsg(xPCGetLastError(), errMsg);
@@ -348,7 +324,7 @@ int ECxPCtarget::setup()
         }
     } else  {
         char frcStr[20], sigStr[3];
-        for (int i=0; i<(*sizeDaq)[OF_Resp_Force]; i++)  {
+        for (int i=0; i<(*sizeDaq)(OF_Resp_Force); i++)  {
             strcpy(frcStr,"xPC HC/measFrc/s");
             sprintf(sigStr, "%d", i+1);
             strcat(frcStr, sigStr);
@@ -394,19 +370,19 @@ int ECxPCtarget::setup()
     this->sleep(1000);
 		
 	do  {
-        this->control();
-        this->acquire();
+        rValue += this->control();
+        rValue += this->acquire();
         
         int i;
         opserr << "**************************************\n";
         opserr << "* Initial values of DAQ are:         *\n";
         opserr << "*                                    *\n";
         opserr << "* dspDaq = [";
-        for (i=0; i<(*sizeDaq)[OF_Resp_Disp]; i++)
+        for (i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)
             opserr << " " << measDisp[i];
         opserr << " ]\n";
         opserr << "* frcDaq = [";
-        for (i=0; i<(*sizeDaq)[OF_Resp_Force]; i++)
+        for (i=0; i<(*sizeDaq)(OF_Resp_Force); i++)
             opserr << " " << measForce[i];
         opserr << " ]\n";
         opserr << "*                                    *\n";
@@ -431,6 +407,33 @@ int ECxPCtarget::setup()
     opserr << "******************\n";
     opserr << endln;
     
+    return rValue;
+}
+
+
+int ECxPCtarget::setSize(ID sizeT, ID sizeO)
+{
+    // check sizeTrial and sizeOut
+    // for ECxPCtarget object
+    
+    // ECxPCtarget objects only use 
+    // disp or disp and vel or disp, vel and accel for trial and
+    // disp and force for output
+    // check these are available in sizeT/sizeO.
+    if ((pcType == 0 && sizeT(OF_Resp_Disp) == 0) || 
+        (pcType == 1 && sizeT(OF_Resp_Disp) == 0 && sizeT(OF_Resp_Vel) == 0) ||
+        (pcType == 2 && sizeT(OF_Resp_Disp) == 0 && sizeT(OF_Resp_Vel) == 0 && sizeT(OF_Resp_Accel) == 0) ||
+        (sizeO(OF_Resp_Disp) == 0 && sizeO(OF_Resp_Force) == 0))  {
+        opserr << "ECxPCtarget::setSize() - wrong sizeTrial/Out\n"; 
+        opserr << "see User Manual.\n";
+        xPCClosePort(port);
+        xPCFreeAPI();
+        exit(OF_ReturnType_failed);
+    }
+    
+    *sizeCtrl = sizeT;
+    *sizeDaq  = sizeO;
+
     return OF_ReturnType_completed;
 }
 
@@ -441,24 +444,32 @@ int ECxPCtarget::setTrialResponse(const Vector* disp,
     const Vector* force,
     const Vector* time)
 {
-    int i;
-    for (i=0; i<(*sizeCtrl)[OF_Resp_Disp]; i++) {
-        targDisp[i] = (*disp)(i);
-        if (theFilter != 0)
-            targDisp[i] = theFilter->filtering(targDisp[i]);
+    int i, rValue = 0;
+    if (disp != 0)  {
+        for (i=0; i<(*sizeCtrl)(OF_Resp_Disp); i++)  {
+            targDisp[i] = (*disp)(i);
+            if (theCtrlFilters[OF_Resp_Disp] != 0)
+                targDisp[i] = theCtrlFilters[OF_Resp_Disp]->filtering(targDisp[i]);
+        }
     }
-    if (vel != 0) {
-        for (i=0; i<(*sizeCtrl)[OF_Resp_Vel]; i++)
+    if (vel != 0)  {
+        for (i=0; i<(*sizeCtrl)(OF_Resp_Vel); i++)  {
             targVel[i] = (*vel)(i);
+            if (theCtrlFilters[OF_Resp_Vel] != 0)
+                targVel[i] = theCtrlFilters[OF_Resp_Vel]->filtering(targVel[i]);
+        }
     }
-    if (accel != 0) {
-        for (i=0; i<(*sizeCtrl)[OF_Resp_Accel]; i++)
+    if (accel != 0)  {
+        for (i=0; i<(*sizeCtrl)(OF_Resp_Accel); i++)  {
             targAccel[i] = (*accel)(i);
+            if (theCtrlFilters[OF_Resp_Accel] != 0)
+                targAccel[i] = theCtrlFilters[OF_Resp_Accel]->filtering(targAccel[i]);
+        }
     }
     
-    this->control();
+    rValue = this->control();
     
-    return OF_ReturnType_completed;
+    return rValue;
 }
 
 
@@ -471,10 +482,20 @@ int ECxPCtarget::getDaqResponse(Vector* disp,
     this->acquire();
     
     int i;
-    for (i=0; i<(*sizeDaq)[OF_Resp_Disp]; i++)
-        (*disp)(i) = measDisp[i];
-    for (i=0; i<(*sizeDaq)[OF_Resp_Force]; i++)
-        (*force)(i) = measForce[i];
+    if (disp != 0)  {
+        for (i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)  {
+            if (theDaqFilters[OF_Resp_Disp] != 0)
+                measDisp[i] = theDaqFilters[OF_Resp_Disp]->filtering(measDisp[i]);
+            (*disp)(i) = measDisp[i];
+        }
+    }
+    if (force != 0)  {
+        for (i=0; i<(*sizeDaq)(OF_Resp_Force); i++)  {
+            if (theDaqFilters[OF_Resp_Force] != 0)
+                measForce[i] = theDaqFilters[OF_Resp_Force]->filtering(measForce[i]);
+            (*force)(i) = measForce[i];
+        }
+    }
         
     return OF_ReturnType_completed;
 }
@@ -501,9 +522,10 @@ void ECxPCtarget::Print(OPS_Stream &s, int flag)
     s << "*   appName: " << appName << endln;
     s << "*   appPath: " << appPath << endln;
     s << "*   pcType: " << pcType << endln;
-    if (theFilter != 0) {
-        s << "*\tFilter: " << *theFilter << endln;
-    }
+    if (theCtrlFilters != 0)
+        s << "*   ctrlFilter: " << *theCtrlFilters << endln;
+    if (theDaqFilters != 0)
+        s << "*   daqFilter: " << *theDaqFilters << endln;
     s << "****************************************************************\n";
     s << endln;
 }
@@ -617,8 +639,8 @@ int ECxPCtarget::acquire()
     }
     
     // read displacements and resisting forces at target
-    if ((*sizeDaq)[OF_Resp_Disp] != 0)  {
-        xPCGetSignals(port, (*sizeDaq)[OF_Resp_Disp], measDispId, measDisp);
+    if ((*sizeDaq)(OF_Resp_Disp) != 0)  {
+        xPCGetSignals(port, (*sizeDaq)(OF_Resp_Disp), measDispId, measDisp);
         if (xPCGetLastError())  {
             xPCErrorMsg(xPCGetLastError(), errMsg);
             opserr << "ECxPCtarget::acquire() - "
@@ -628,8 +650,8 @@ int ECxPCtarget::acquire()
             exit(OF_ReturnType_failed);
         }
     }
-    if ((*sizeDaq)[OF_Resp_Force] != 0)  {
-        xPCGetSignals(port, (*sizeDaq)[OF_Resp_Force], measForceId, measForce);
+    if ((*sizeDaq)(OF_Resp_Force) != 0)  {
+        xPCGetSignals(port, (*sizeDaq)(OF_Resp_Force), measForceId, measForce);
         if (xPCGetLastError())  {
             xPCErrorMsg(xPCGetLastError(), errMsg);
             opserr << "ECxPCtarget::acquire() - "

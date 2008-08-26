@@ -43,30 +43,30 @@ ECSimUniaxialMaterials::ECSimUniaxialMaterials(int tag,
     measDisp(0), measVel(0), measForce(0)
 {
     if (specimen == 0)  {
-      opserr << "ECSimUniaxialMaterials::ECSimUniaxialMaterials() - "
-          << "null specimen array passed\n";
-      exit(OF_ReturnType_failed);
+        opserr << "ECSimUniaxialMaterials::ECSimUniaxialMaterials() - "
+            << "null specimen array passed.\n";
+        exit(OF_ReturnType_failed);
     }
 
     // allocate memory for the uniaxial materials
     theSpecimen = new UniaxialMaterial* [numMats];
     if (theSpecimen == 0)  {
         opserr << "ECSimUniaxialMaterials::ECSimUniaxialMaterials() - "
-            << "failed to allocate pointers for uniaxial materials\n";
+            << "failed to allocate pointers for uniaxial materials.\n";
         exit(OF_ReturnType_failed);
     }
 
-    // get copies of the uniaxial matrials
+    // get copies of the uniaxial materials
     for (int i=0; i<numMats; i++)  {
         if (specimen[i] == 0) {
             opserr << "ECSimUniaxialMaterials::ECSimUniaxialMaterials() - "
-                "null uniaxial material pointer passed\n";
+                "null uniaxial material pointer passed.\n";
             exit(OF_ReturnType_failed);
         }
         theSpecimen[i] = specimen[i]->getCopy();
         if (theSpecimen[i] == 0) {
             opserr << "ECSimUniaxialMaterials::ECSimUniaxialMaterials() - "
-                << "failed to copy uniaxial material\n";
+                << "failed to copy uniaxial material.\n";
             exit(OF_ReturnType_failed);
         }
     }
@@ -87,7 +87,7 @@ ECSimUniaxialMaterials::ECSimUniaxialMaterials(const ECSimUniaxialMaterials& ec)
     theSpecimen = new UniaxialMaterial* [numMats];
     if (theSpecimen == 0)  {
         opserr << "ECSimUniaxialMaterials::ECSimUniaxialMaterials() - "
-            << "failed to allocate pointers for uniaxial materials\n";
+            << "failed to allocate pointers for uniaxial materials.\n";
         exit(OF_ReturnType_failed);
     }
 
@@ -95,13 +95,13 @@ ECSimUniaxialMaterials::ECSimUniaxialMaterials(const ECSimUniaxialMaterials& ec)
     for (int i=0; i<numMats; i++)  {
         if (ec.theSpecimen[i] == 0) {
             opserr << "ECSimUniaxialMaterials::ECSimUniaxialMaterials() - "
-                "null uniaxial material pointer passed\n";
+                "null uniaxial material pointer passed.\n";
             exit(OF_ReturnType_failed);
         }
         theSpecimen[i] = ec.theSpecimen[i]->getCopy();
         if (theSpecimen[i] == 0) {
             opserr << "ECSimUniaxialMaterials::ECSimUniaxialMaterials() - "
-                << "failed to copy uniaxial material\n";
+                << "failed to copy uniaxial material.\n";
             exit(OF_ReturnType_failed);
         }
     }
@@ -129,6 +129,52 @@ ECSimUniaxialMaterials::~ECSimUniaxialMaterials()
         delete measForce;
 }
 
+
+int ECSimUniaxialMaterials::setup()
+{
+    int rValue = 0;
+    
+    if (targDisp != 0)
+        delete targDisp;
+    if (targVel != 0)
+        delete targVel;
+    
+    if ((*sizeCtrl)(OF_Resp_Disp) != 0)  {
+        targDisp = new Vector((*sizeCtrl)(OF_Resp_Disp));
+        targDisp->Zero();
+    }
+    if ((*sizeCtrl)(OF_Resp_Vel) != 0)  {
+        targVel = new Vector((*sizeCtrl)(OF_Resp_Vel));
+        targVel->Zero();
+    }
+    
+    if (measDisp != 0)
+        delete measDisp;
+    if (measVel != 0)
+        delete measVel;
+    if (measForce != 0)
+        delete measForce;
+    
+    if ((*sizeDaq)(OF_Resp_Disp) != 0)  {
+        measDisp = new Vector((*sizeDaq)(OF_Resp_Disp));
+        measDisp->Zero();
+    }
+    if ((*sizeDaq)(OF_Resp_Vel) != 0)  {
+        measVel = new Vector((*sizeDaq)(OF_Resp_Vel));
+        measVel->Zero();
+    }
+    if ((*sizeDaq)(OF_Resp_Force) != 0)  {
+        measForce = new Vector((*sizeDaq)(OF_Resp_Force));
+        measForce->Zero();
+    }
+    
+    rValue += this->control();
+    rValue += this->acquire();
+    
+    return rValue;
+}
+
+
 int ECSimUniaxialMaterials::setSize(ID sizeT, ID sizeO)
 {
     // check sizeTrial and sizeOut
@@ -138,11 +184,11 @@ int ECSimUniaxialMaterials::setSize(ID sizeT, ID sizeO)
     // disp, vel for trial and
     // disp, vel, force for output
     // check these are available in sizeT/sizeO.
-    if (sizeT[OF_Resp_Disp] != numMats ||
-        sizeT[OF_Resp_Vel] != numMats ||
-        sizeO[OF_Resp_Disp] != numMats ||
-        sizeO[OF_Resp_Vel] != numMats ||
-        sizeO[OF_Resp_Force] != numMats) {
+    if (sizeT(OF_Resp_Disp) != numMats ||
+        sizeT(OF_Resp_Vel) != numMats ||
+        sizeO(OF_Resp_Disp) != numMats ||
+        sizeO(OF_Resp_Vel) != numMats ||
+        sizeO(OF_Resp_Force) != numMats) {
         opserr << "ECSimUniaxialMaterials::setSize() - wrong sizeTrial/Out\n"; 
         opserr << "see User Manual.\n";
         exit(OF_ReturnType_failed);
@@ -154,48 +200,6 @@ int ECSimUniaxialMaterials::setSize(ID sizeT, ID sizeO)
     return OF_ReturnType_completed;
 }
 
-int ECSimUniaxialMaterials::setup()
-{
-    if (targDisp != 0)
-        delete targDisp;
-    if (targVel != 0)
-        delete targVel;
-
-    if ((*sizeCtrl)[OF_Resp_Disp] != 0)  {
-        targDisp = new Vector((*sizeCtrl)[OF_Resp_Disp]);
-        targDisp->Zero();
-    }
-    if ((*sizeCtrl)[OF_Resp_Vel] != 0)  {
-        targVel = new Vector((*sizeCtrl)[OF_Resp_Vel]);
-        targVel->Zero();
-    }
-
-    if (measDisp != 0)
-        delete measDisp;
-    if (measVel != 0)
-        delete measVel;
-    if (measForce != 0)
-        delete measForce;
-    
-    if ((*sizeDaq)[OF_Resp_Disp] != 0)  {
-        measDisp = new Vector((*sizeDaq)[OF_Resp_Disp]);
-        measDisp->Zero();
-    }
-    if ((*sizeDaq)[OF_Resp_Vel] != 0)  {
-        measVel = new Vector((*sizeDaq)[OF_Resp_Vel]);
-        measVel->Zero();
-    }
-    if ((*sizeDaq)[OF_Resp_Force] != 0)  {
-        measForce = new Vector((*sizeDaq)[OF_Resp_Force]);
-        measForce->Zero();
-    }
-
-    this->control();
-    this->acquire();
-    
-    return OF_ReturnType_completed;
-}
-
 
 int ECSimUniaxialMaterials::setTrialResponse(const Vector* disp,
     const Vector* vel,
@@ -203,16 +207,25 @@ int ECSimUniaxialMaterials::setTrialResponse(const Vector* disp,
     const Vector* force,
     const Vector* time)
 {
-    *targDisp = *disp;
-    if (theFilter != 0)  {
-        for (int i=0; i<(*sizeCtrl)[OF_Resp_Disp]; i++)
-            (*targDisp)(i) = theFilter->filtering((*targDisp)(i));
+    int i, rValue = 0;
+    if (disp != 0)  {
+        *targDisp = *disp;
+        if (theCtrlFilters[OF_Resp_Disp] != 0)  {
+            for (i=0; i<(*sizeCtrl)(OF_Resp_Disp); i++)
+                (*targDisp)(i) = theCtrlFilters[OF_Resp_Disp]->filtering((*targDisp)(i));
+        }
     }
-    *targVel = *vel;
+    if (vel != 0)  {
+        *targVel = *vel;
+        if (theCtrlFilters[OF_Resp_Vel] != 0)  {
+            for (i=0; i<(*sizeCtrl)(OF_Resp_Vel); i++)
+                (*targVel)(i) = theCtrlFilters[OF_Resp_Vel]->filtering((*targVel)(i));
+        }
+    }
     
-    this->control();
+    rValue = this->control();
     
-    return OF_ReturnType_completed;
+    return rValue;
 }
 
 
@@ -224,9 +237,28 @@ int ECSimUniaxialMaterials::getDaqResponse(Vector* disp,
 {
     this->acquire();
     
-    *disp  = *measDisp;
-    *vel   = *measVel;
-    *force = *measForce;
+    int i;
+    if (disp != 0)  {
+        if (theDaqFilters[OF_Resp_Disp] != 0)  {
+            for (i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)
+                (*measDisp)(i) = theDaqFilters[OF_Resp_Disp]->filtering((*measDisp)(i));
+        }
+        *disp = *measDisp;
+    }
+    if (vel != 0)  {
+        if (theDaqFilters[OF_Resp_Vel] != 0)  {
+            for (i=0; i<(*sizeDaq)(OF_Resp_Vel); i++)
+                (*measVel)(i) = theDaqFilters[OF_Resp_Vel]->filtering((*measVel)(i));
+        }
+        *vel = *measVel;
+    }
+    if (force != 0)  {
+        if (theDaqFilters[OF_Resp_Force] != 0)  {
+            for (i=0; i<(*sizeDaq)(OF_Resp_Force); i++)
+                (*measForce)(i) = theDaqFilters[OF_Resp_Force]->filtering((*measForce)(i));
+        }
+        *force = *measForce;
+    }
     
     return OF_ReturnType_completed;
 }
@@ -256,11 +288,12 @@ void ECSimUniaxialMaterials::Print(OPS_Stream &s, int flag)
     s << "* ExperimentalControl: " << this->getTag() << endln; 
     s << "* type: ECSimUniaxialMaterials\n";
     for (int i=0; i<numMats; i++)  {
-        s << "*\tUniaxialMaterial, tag: " << theSpecimen[i]->getTag() << endln;
+        s << "*   UniaxialMaterial, tag: " << theSpecimen[i]->getTag() << endln;
     }
-    if (theFilter != 0) {
-        s << "*\tFilter: " << *theFilter << endln;
-    }
+    if (theCtrlFilters != 0)
+        s << "*   ctrlFilter: " << *theCtrlFilters << endln;
+    if (theDaqFilters != 0)
+        s << "*   daqFilter: " << *theDaqFilters << endln;
     s << "****************************************************************\n";
     s << endln;
 }
