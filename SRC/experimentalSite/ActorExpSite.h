@@ -60,10 +60,13 @@ public:
     // destructor
     virtual ~ActorExpSite();
     
+    // method to get class type
+    const char *getClassType() const {return "ActorExpSite";};
+    
     // server loop
     int run();
     
-    // public methods to set and obtain responses
+    // public methods to set and to get response
     virtual int setup();
     virtual int setSize(ID sizeT, ID sizeO);
     

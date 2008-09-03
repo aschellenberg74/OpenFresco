@@ -37,6 +37,7 @@
 // ExperimentalSignalFilter.
 
 #include <FrescoGlobals.h>
+#include <ExpSignalFilterResponse.h>
 
 #include <TaggedObject.h>
 #include <ID.h>
@@ -62,6 +63,7 @@ public:
     
     virtual ExperimentalSignalFilter *getCopy() = 0;
     
+    // public methods for experimental signal filter recorder
     virtual Response *setResponse(const char **argv, int argc,
         OPS_Stream &output);
     virtual int getResponse(int responseID, Information &info);

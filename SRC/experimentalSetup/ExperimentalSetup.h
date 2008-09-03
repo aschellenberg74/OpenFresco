@@ -37,11 +37,14 @@
 // ExperimentalSetup. 
 
 #include <FrescoGlobals.h>
+#include <ExpSetupResponse.h>
 #include <ExperimentalControl.h>
 
 #include <TaggedObject.h>
 #include <ID.h>
 #include <Vector.h>
+
+class Response;
 
 class ExperimentalSetup : public TaggedObject
 {
@@ -53,8 +56,11 @@ public:
     
     // destructor
     virtual ~ExperimentalSetup();
+
+    // method to get class type
+    virtual const char *getClassType() const;
     
-    // public methods to set and to obtain responses
+    // public methods to set and to get response
     virtual int setup() = 0;
     virtual int setTrialOutSize();
     virtual int setCtrlDaqSize();
@@ -96,6 +102,11 @@ public:
     virtual int commitState();
     
     virtual ExperimentalSetup *getCopy() = 0;
+    
+    // public methods for experimental setup recorder
+    virtual Response *setResponse(const char **argv, int argc,
+        OPS_Stream &output);
+    virtual int getResponse(int responseID, Information &info);
     
     void setTrialDispFactor(const Vector& f);
     void setTrialVelFactor(const Vector& f);

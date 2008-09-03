@@ -344,7 +344,8 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp, int argc,
             }
 
             // parsing was successful, allocate the setup
-            theSetup = new ESTwoActuators2d(tag, La1, La2, L, theControl, nlGeom, posAct, phiLocX);
+            theSetup = new ESTwoActuators2d(tag, La1, La2, L,
+                theControl, nlGeom, posAct, phiLocX);
         }
         
         else if (ndm == 3)  {
@@ -448,7 +449,8 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp, int argc,
             }
 
             // parsing was successful, allocate the setup
-            theSetup = new ESThreeActuators2d(tag, La1, La2, La3, L1, L2, theControl, nlGeom, posAct0, phiLocX);
+            theSetup = new ESThreeActuators2d(tag, La1, La2, La3, L1, L2,
+                theControl, nlGeom, posAct0, phiLocX);
         }
         
         else if (ndm == 3)  {
@@ -681,7 +683,8 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp, int argc,
             }
             
             // parsing was successful, allocate the setup
-            theSetup = new ESInvertedVBrace2d(tag, La1, La2, La3, L1, L2, theControl, nlGeom, posAct0, phiLocX);
+            theSetup = new ESInvertedVBrace2d(tag, La1, La2, La3, L1, L2,
+                theControl, nlGeom, posAct0, phiLocX);
         }
         
         else if (ndm == 3)  {
@@ -896,6 +899,9 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp, int argc,
         
         // parsing was successful, allocate the setup
         theSetup = new ESAggregator(tag, numSetups, expSetups, theControl);
+        
+        if (expSetups != 0)
+            delete [] expSetups;
     }
     // ----------------------------------------------------------------------------	
     else if (strcmp(argv[1],"FourActuators") == 0)  {
@@ -1047,7 +1053,8 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp, int argc,
             }
 			
             // parsing was successful, allocate the setup
-            theSetup = new ESFourActuators3d(tag, L1, L2, L3, L4, a1, a2, a3, a4, h, h1, h2, arlN, arlS, LrodN, LrodS, Hbeam, theControl, nlGeom, phiLocX);
+            theSetup = new ESFourActuators3d(tag, L1, L2, L3, L4, a1, a2, a3, a4,
+                h, h1, h2, arlN, arlS, LrodN, LrodS, Hbeam, theControl, nlGeom, phiLocX);
         }
         
         else {

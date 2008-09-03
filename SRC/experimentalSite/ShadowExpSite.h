@@ -59,7 +59,10 @@ public:
     // destructor
     virtual ~ShadowExpSite();
     
-    // public methods to set and to obtain responses
+    // method to get class type
+    const char *getClassType() const {return "ShadowExpSite";};
+    
+    // public methods to set and to get response
     virtual int setup();
     virtual int setSize(ID sizeT, ID sizeO);
     
