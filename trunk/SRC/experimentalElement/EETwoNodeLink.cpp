@@ -73,7 +73,7 @@ EETwoNodeLink::EETwoNodeLink(int tag, int dim, int Nd1, int Nd2,
     dbMeas(0), vbMeas(0), abMeas(0), qMeas(0), tMeas(0),
     dbTarg(direction.Size()), vbTarg(direction.Size()),
     abTarg(direction.Size()), dbPast(direction.Size()),
-    kbInit(direction.Size(), direction.Size()), T(0,0)
+    kbInit(direction.Size(), direction.Size()), tPast(0.0), T(0,0)
 {
     // establish the connected nodes and set up the transformation matrix for orientation
     this->setUp(Nd1, Nd2, x, yp);
@@ -151,7 +151,7 @@ EETwoNodeLink::EETwoNodeLink(int tag, int dim, int Nd1, int Nd2,
     dbMeas(0), vbMeas(0), abMeas(0), qMeas(0), tMeas(0),
     dbTarg(direction.Size()), vbTarg(direction.Size()),
     abTarg(direction.Size()), dbPast(direction.Size()),
-    kbInit(direction.Size(), direction.Size()), T(0,0)
+    kbInit(direction.Size(), direction.Size()), tPast(0.0), T(0,0)
 {
     // establish the connected nodes and set up the transformation matrix for orientation
     this->setUp(Nd1, Nd2, x, yp);
@@ -494,9 +494,10 @@ int EETwoNodeLink::update()
     (*vb) = T*vg;
     (*ab) = T*ag;
     
-    if ((*db) != dbPast)  {
-        // save the displacements
+    if ((*db) != dbPast || (*t)(0) != tPast)  {
+        // save the displacements and the time
         dbPast = (*db);
+        tPast = (*t)(0);
         // set the trial response at the site
         if (theSite != 0)  {
             theSite->setTrialResponse(db, vb, ab, (Vector*)0, t);
@@ -775,11 +776,12 @@ void EETwoNodeLink::Print(OPS_Stream &s, int flag)
     if (flag == 0)  {
         // print everything
         s << "Element: " << this->getTag() << endln;
-        s << "  type: EETwoNodeLink  iNode: " << connectedExternalNodes(0);
-        s << "  jNode: " << connectedExternalNodes(1) << endln;
+        s << "  type: EETwoNodeLink" << endln;
+        s << "  iNode: " << connectedExternalNodes(0) 
+            << ", jNode: " << connectedExternalNodes(1) << endln;
         if (theSite != 0)
-            s << "  ExperimentalSite, tag: " << theSite->getTag() << endln;
-        s << "  mass:  " << mass << endln;
+            s << "  ExperimentalSite: " << theSite->getTag() << endln;
+        s << "  mass: " << mass << endln;
         // determine resisting forces in global system
         s << "  resisting force: " << this->getResistingForce() << endln;
     } else if (flag == 1)  {
@@ -809,7 +811,7 @@ Response* EETwoNodeLink::setResponse(const char **argv, int argc,
             sprintf(outputData,"P%d",i+1);
             output.tag("ResponseType",outputData);
         }
-        theResponse = new ElementResponse(this, 2, *theVector);
+        theResponse = new ElementResponse(this, 1, *theVector);
     }
     // local forces
     else if (strcmp(argv[0],"localForce") == 0 || strcmp(argv[0],"localForces") == 0)
@@ -818,7 +820,7 @@ Response* EETwoNodeLink::setResponse(const char **argv, int argc,
             sprintf(outputData,"p%d",i+1);
             output.tag("ResponseType",outputData);
         }
-        theResponse = new ElementResponse(this, 3, *theVector);
+        theResponse = new ElementResponse(this, 2, *theVector);
     }
     // basic forces
     else if (strcmp(argv[0],"basicForce") == 0 || strcmp(argv[0],"basicForces") == 0)
@@ -827,7 +829,7 @@ Response* EETwoNodeLink::setResponse(const char **argv, int argc,
             sprintf(outputData,"q%d",i+1);
             output.tag("ResponseType",outputData);
         }
-        theResponse = new ElementResponse(this, 4, Vector(numDir));
+        theResponse = new ElementResponse(this, 3, Vector(numDir));
     }
     // target basic displacements
     else if (strcmp(argv[0],"deformation") == 0 || strcmp(argv[0],"deformations") == 0 || 
@@ -838,7 +840,7 @@ Response* EETwoNodeLink::setResponse(const char **argv, int argc,
             sprintf(outputData,"db%d",i+1);
             output.tag("ResponseType",outputData);
         }
-        theResponse = new ElementResponse(this, 5, Vector(numDir));
+        theResponse = new ElementResponse(this, 4, Vector(numDir));
     }
     // target basic velocities
     else if (strcmp(argv[0],"targetVelocity") == 0 || 
@@ -848,7 +850,7 @@ Response* EETwoNodeLink::setResponse(const char **argv, int argc,
             sprintf(outputData,"vb%d",i+1);
             output.tag("ResponseType",outputData);
         }
-        theResponse = new ElementResponse(this, 6, Vector(numDir));
+        theResponse = new ElementResponse(this, 5, Vector(numDir));
     }
     // target basic accelerations
     else if (strcmp(argv[0],"targetAcceleration") == 0 || 
@@ -858,7 +860,7 @@ Response* EETwoNodeLink::setResponse(const char **argv, int argc,
             sprintf(outputData,"ab%d",i+1);
             output.tag("ResponseType",outputData);
         }
-        theResponse = new ElementResponse(this, 7, Vector(numDir));
+        theResponse = new ElementResponse(this, 6, Vector(numDir));
     }
     // measured basic displacements
     else if (strcmp(argv[0],"measuredDisplacement") == 0 || 
@@ -868,7 +870,7 @@ Response* EETwoNodeLink::setResponse(const char **argv, int argc,
             sprintf(outputData,"dbm%d",i+1);
             output.tag("ResponseType",outputData);
         }
-        theResponse = new ElementResponse(this, 8, Vector(numDir));
+        theResponse = new ElementResponse(this, 7, Vector(numDir));
     }
     // measured basic velocities
     else if (strcmp(argv[0],"measuredVelocity") == 0 || 
@@ -878,7 +880,7 @@ Response* EETwoNodeLink::setResponse(const char **argv, int argc,
             sprintf(outputData,"vbm%d",i+1);
             output.tag("ResponseType",outputData);
         }
-        theResponse = new ElementResponse(this, 9, Vector(numDir));
+        theResponse = new ElementResponse(this, 8, Vector(numDir));
     }
     // measured basic accelerations
     else if (strcmp(argv[0],"measuredAcceleration") == 0 || 
@@ -888,7 +890,7 @@ Response* EETwoNodeLink::setResponse(const char **argv, int argc,
             sprintf(outputData,"abm%d",i+1);
             output.tag("ResponseType",outputData);
         }
-        theResponse = new ElementResponse(this, 10, Vector(numDir));
+        theResponse = new ElementResponse(this, 9, Vector(numDir));
     }
     // basic deformations and basic forces
     else if (strcmp(argv[0],"defoANDforce") == 0 || strcmp(argv[0],"deformationANDforce") == 0 ||
@@ -903,7 +905,7 @@ Response* EETwoNodeLink::setResponse(const char **argv, int argc,
             sprintf(outputData,"q%d",i+1);
             output.tag("ResponseType",outputData);
         }
-        theResponse = new ElementResponse(this, 11, Vector(numDir*2));
+        theResponse = new ElementResponse(this, 10, Vector(numDir*2));
     }
 
     output.endTag(); // ElementOutput
@@ -912,90 +914,52 @@ Response* EETwoNodeLink::setResponse(const char **argv, int argc,
 }
 
 
-int EETwoNodeLink::getResponse(int responseID, Information &eleInformation)
+int EETwoNodeLink::getResponse(int responseID, Information &eleInfo)
 {
+    int numDOF2;
+    Vector defoAndForce(numDir*2);
+    
     switch (responseID)  {
-    case -1:
-        return -1;
+    case 1:  // global forces
+        return eleInfo.setVector(this->getResistingForce());
         
-    case 1:  // initial stiffness
-        if (eleInformation.theMatrix != 0)  {
-            *(eleInformation.theMatrix) = theInitStiff;
+    case 2:  // local forces
+        theVector->Zero();
+        numDOF2 = numDOF/2;
+        for (int i=0; i<numDir; i++) {
+            (*theVector)((*dir)(i))         = -(*qMeas)(i);
+            (*theVector)((*dir)(i)+numDOF2) =  (*qMeas)(i);
         }
-        return 0;
         
-    case 2:  // global forces
-        if (eleInformation.theVector != 0)  {
-            *(eleInformation.theVector) = this->getResistingForce();
-        }
-        return 0;
+        return eleInfo.setVector(*theVector);
         
-    case 3:  // local forces
-        if (eleInformation.theVector != 0)  {
-            theVector->Zero();
-            int numDOF2 = numDOF/2;
-            for (int i=0; i<numDir; i++) {
-                (*theVector)((*dir)(i))         = -(*qMeas)(i);
-                (*theVector)((*dir)(i)+numDOF2) =  (*qMeas)(i);
-            }
-            
-            *(eleInformation.theVector) = *theVector;
-        }
-        return 0;
+    case 3:  // basic forces
+        return eleInfo.setVector(*qMeas);
         
-    case 4:  // basic forces
-        if (eleInformation.theVector != 0)  {
-            *(eleInformation.theVector) = (*qMeas);
-        }
-        return 0;
+    case 4:  // target basic displacements
+        return eleInfo.setVector(dbTarg);
         
-    case 5:  // target basic displacements
-        if (eleInformation.theVector != 0)  {
-            *(eleInformation.theVector) = dbTarg;
-        }
-        return 0;
+    case 5:  // target basic velocities
+        return eleInfo.setVector(vbTarg);
         
-    case 6:  // target basic velocities
-        if (eleInformation.theVector != 0)  {
-            *(eleInformation.theVector) = vbTarg;
-        }
-        return 0;
+    case 6:  // target basic accelerations
+        return eleInfo.setVector(abTarg);
         
-    case 7:  // target basic accelerations
-        if (eleInformation.theVector != 0)  {
-            *(eleInformation.theVector) = abTarg;
-        }
-        return 0;
+    case 7:  // measured basic displacements
+        return eleInfo.setVector(this->getBasicDisp());
         
-    case 8:  // measured basic displacements
-        if (eleInformation.theVector != 0)  {
-            *(eleInformation.theVector) = this->getBasicDisp();
-        }
-        return 0;
-
-    case 9:  // measured basic velocities
-        if (eleInformation.theVector != 0)  {
-            *(eleInformation.theVector) = this->getBasicVel();
-        }
-        return 0;
-
-    case 10:  // measured basic accelerations
-        if (eleInformation.theVector != 0)  {
-            *(eleInformation.theVector) = this->getBasicAccel();
-        }
-        return 0;
-
-    case 11:  // basic deformations and basic forces
-        if (eleInformation.theVector != 0) {
-            int i;
-            for (i=0; i<numDir; i++) {
-                (*(eleInformation.theVector))(i) = dbTarg(i);
-            }
-            for (i=0; i<numDir; i++) {
-                (*(eleInformation.theVector))(i+numDir) = (*qMeas)(i);
-            }
-        }
-        return 0;
+    case 8:  // measured basic velocities
+        return eleInfo.setVector(this->getBasicVel());
+        
+    case 9:  // measured basic accelerations
+        return eleInfo.setVector(this->getBasicAccel());
+        
+    case 10:  // basic deformations and basic forces
+        defoAndForce.Zero();
+        defoAndForce.Assemble(dbTarg,0);
+        defoAndForce.Assemble(*qMeas,numDir);
+        
+        return eleInfo.setVector(defoAndForce);
         
     default:
         return 0;

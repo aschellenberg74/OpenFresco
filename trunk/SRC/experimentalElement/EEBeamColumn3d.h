@@ -61,7 +61,7 @@ public:
     
     // method to get class type
     const char *getClassType() const {return "EEBeamColumn3d";};
-
+    
     // public methods to obtain information about dof & connectivity    
     int getNumExternalNodes() const;
     const ID &getExternalNodes();
@@ -88,24 +88,27 @@ public:
     
     // public methods to obtain the daq response in global system
     const Vector &getTime();
-
+    
     // public methods to obtain the daq response in basic system
     const Vector &getBasicDisp();
     const Vector &getBasicVel();
     const Vector &getBasicAccel();
-
+    
     // public methods for element output
     int sendSelf(int commitTag, Channel &theChannel);
     int recvSelf(int commitTag, Channel &theChannel, FEM_ObjectBroker &theBroker);
     int displaySelf(Renderer &theViewer, int displayMode, float fact);    
     void Print(OPS_Stream &s, int flag = 0);    
     
+    // public methods for element recorder
     Response *setResponse(const char **argv, int argc, OPS_Stream &s);
-    int getResponse(int responseID, Information &eleInformation);
+    int getResponse(int responseID, Information &eleInfo);
     
 protected:
     
 private:
+    void applyIMod();
+    
     // private attributes - a copy for each object of the class
     ID connectedExternalNodes;      // contains the tags of the end nodes
     CrdTransf3d *theCoordTransf;
@@ -123,32 +126,30 @@ private:
     Vector *sendData;           // send vector
     double *rData;              // receive data array
     Vector *recvData;           // receive vector
-
+    
     Vector *db;         // displacements in basic system B
     Vector *vb;         // velocities in basic system B
     Vector *ab;         // accelerations in basic system B
     Vector *t;          // time
-
+    
     Vector *dbMeas;     // measured displacements in basic system B
     Vector *vbMeas;     // measured velocities in basic system B
     Vector *abMeas;     // measured accelerations in basic system B
     Vector *qMeas;      // measured forces in basic system B
     Vector *tMeas;      // measured time
-
+    
     Vector dbTarg;      // target displacements in basic system B
     Vector vbTarg;      // target velocities in basic system B
     Vector abTarg;      // target accelerations in basic system B
     
     Vector dbPast;      // displacements for recorder in basic system B
     Matrix kbInit;      // stiffness matrix in basic system B
+    double tPast;       // past time
     double qA0[6];      // fixed end forces in basic system A
     double pA0[6];      // reactions in basic system A
     
-    Matrix T;           // transformation matrix
-    Matrix Tinv;        // inverse of transformation matrix
-    
     Node *theNodes[2];
-
+    
     bool firstWarning;
 };
 

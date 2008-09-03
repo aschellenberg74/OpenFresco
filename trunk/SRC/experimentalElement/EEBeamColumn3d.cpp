@@ -66,7 +66,7 @@ EEBeamColumn3d::EEBeamColumn3d(int tag, int Nd1, int Nd2,
     db(0), vb(0), ab(0), t(0),
     dbMeas(0), vbMeas(0), abMeas(0), qMeas(0), tMeas(0),
     dbTarg(6), vbTarg(6), abTarg(6),
-    dbPast(6), kbInit(6,6), T(6,6), Tinv(6,6),
+    dbPast(6), kbInit(6,6), tPast(0.0),
     firstWarning(true)
 {
     // ensure the connectedExternalNode ID is of correct size & set values
@@ -150,7 +150,7 @@ EEBeamColumn3d::EEBeamColumn3d(int tag, int Nd1, int Nd2,
     db(0), vb(0), ab(0), t(0),
     dbMeas(0), vbMeas(0), abMeas(0), qMeas(0), tMeas(0),
     dbTarg(6), vbTarg(6), abTarg(6),
-    dbPast(6), kbInit(6,6), T(6,6), Tinv(6,6),
+    dbPast(6), kbInit(6,6), tPast(0.0),
     firstWarning(true)
 {
     // ensure the connectedExternalNode ID is of correct size & set values
@@ -400,31 +400,13 @@ void EEBeamColumn3d::setDomain(Domain *theDomain)
     }
     
     // get initial element length
-    double L = theCoordTransf->getInitialLength();
+    L = theCoordTransf->getInitialLength();
     if (L == 0.0)  {
         opserr << "EEBeamColumn3d::setDomain() - element: " 
             << this->getTag() << " has zero length\n";
         return;
     }
-    
-    // set transformation matrix from basic sys A to basic sys B
-    T.Zero();
-    T(0,0) =  1;
-    T(1,1) = -L;
-    T(2,1) = -1;  T(2,2) = 1;
-    T(3,3) =  L;
-    T(4,3) = -1;  T(4,4) = 1;
-    T(5,5) =  1;
-    
-    // set transformation matrix from basic sys B to basic sys A
-    Tinv.Zero();
-    Tinv(0,0) =  1;
-    Tinv(1,1) = -1/L;
-    Tinv(2,1) = -1/L;  Tinv(2,2) = 1;
-    Tinv(3,3) =  1/L;
-    Tinv(4,3) =  1/L;  Tinv(4,4) = 1;
-    Tinv(5,5) =  1;
-}   	 
+}
 
 
 int EEBeamColumn3d::commitState()
@@ -460,14 +442,50 @@ int EEBeamColumn3d::update()
     const Vector &vbA = theCoordTransf->getBasicTrialVel();
     const Vector &abA = theCoordTransf->getBasicTrialAccel();
     
-    // transform displacements from basic sys A to basic sys B
-    (*db) = T*dbA;
-    (*vb) = T*vbA;
-    (*ab) = T*abA;
+    // transform displacements from basic sys A to basic sys B (linear)
+    (*db)[0] = dbA(0);
+    (*db)[1] = -L*dbA(1);
+    (*db)[2] = -dbA(1)+dbA(2);
+    (*db)[3] = L*dbA(3);
+    (*db)[4] = -dbA(3)+dbA(4);
+    (*db)[5] = dbA(5);
+    (*vb)[0] = vbA(0);
+    (*vb)[1] = -L*vbA(1);
+    (*vb)[2] = -vbA(1)+vbA(2);
+    (*vb)[3] = L*vbA(3);
+    (*vb)[4] = -vbA(3)+vbA(4);
+    (*vb)[5] = vbA(5);
+    (*ab)[0] = abA(0);
+    (*ab)[1] = -L*abA(1);
+    (*ab)[2] = -abA(1)+abA(2);
+    (*ab)[3] = L*abA(3);
+    (*ab)[4] = -abA(3)+abA(4);
+    (*ab)[5] = abA(5);
     
-    if ((*db) != dbPast)  {
-        // save the displacements
+    /* transform displacements from basic sys A to basic sys B (nonlinear)
+    (*db)[0] = 
+    (*db)[1] = 
+    (*db)[2] = 
+    (*db)[3] = 
+    (*db)[4] = 
+    (*db)[5] = 
+    (*vb)[0] = 
+    (*vb)[1] = 
+    (*vb)[2] = 
+    (*vb)[3] = 
+    (*vb)[4] = 
+    (*vb)[5] = 
+    (*ab)[0] = 
+    (*ab)[1] = 
+    (*ab)[2] = 
+    (*ab)[3] = 
+    (*ab)[4] = 
+    (*ab)[5] = */
+    
+    if ((*db) != dbPast || (*t)(0) != tPast)  {
+        // save the displacements and the time
         dbPast = (*db);
+        tPast = (*t)(0);
         // set the trial response at the site
         if (theSite != 0)  {
             theSite->setTrialResponse(db, vb, ab, (Vector*)0, t);
@@ -491,12 +509,21 @@ int EEBeamColumn3d::setInitialStiff(const Matrix& kbinit)
         return -1;
     }
     kbInit = kbinit;
-        
-    // transform the stiffness from basic sys B to basic sys A
-    static Matrix kbAInit(6,6);
-    kbAInit.addMatrixTripleProduct(0.0, T, kbInit, 1.0);
     
-    // transform the stiffness from the basic to the global system
+    // transform stiffness from basic sys B to basic sys A
+    static Matrix kbAInit(6,6);
+    kbAInit(0,0) = kbInit(0,0);
+    kbAInit(1,1) = L*L*kbInit(1,1) + L*(kbInit(1,2)+kbInit(2,1)) + kbInit(2,2);
+    kbAInit(1,2) = -L*kbInit(1,2) - kbInit(2,2);
+    kbAInit(2,1) = -L*kbInit(2,1) - kbInit(2,2);
+    kbAInit(2,2) = kbInit(2,2);
+    kbAInit(3,3) = L*L*kbInit(3,3) - L*(kbInit(3,4)+kbInit(4,3)) + kbInit(4,4);
+    kbAInit(3,4) = L*kbInit(3,4) - kbInit(4,4);
+    kbAInit(4,3) = L*kbInit(4,3) - kbInit(4,4);
+    kbAInit(4,4) = kbInit(4,4);
+    kbAInit(5,5) = kbInit(5,5);
+    
+    // transform stiffness from the basic to the global system
     theInitStiff.Zero();
     theInitStiff = theCoordTransf->getInitialGlobalStiffMatrix(kbAInit);
     
@@ -517,7 +544,7 @@ const Matrix& EEBeamColumn3d::getTangentStiff()
         
         firstWarning = false;
     }
-
+    
     // get measured resisting forces
     if (theSite != 0)  {
         (*qMeas) = theSite->getForce();
@@ -529,41 +556,52 @@ const Matrix& EEBeamColumn3d::getTangentStiff()
     }
     
     // apply optional initial stiffness modification
-    if (iMod == true)  {
-        // get measured displacements
-        if (theSite != 0)  {
-            (*dbMeas) = theSite->getDisp();
-        }
-        else  {
-            sData[0] = OF_RemoteTest_getDisp;
-            theChannel->sendVector(0, 0, *sendData, 0);
-            theChannel->recvVector(0, 0, *recvData, 0);
-        }
-
-        // correct for displacement control errors using I-Modification
-        (*qMeas) -= kbInit*((*dbMeas) - (*db));
-    } else  {
-        // use elastic axial force if axial force from test is zero
-        if ((*qMeas)(0) == 0.0)
-            (*qMeas)(0) = kbInit(0,0) * (*db)(0);
-        // use elastic torsion if torsion from test is zero
-        if ((*qMeas)(5) == 0.0)
-            (*qMeas)(5) = kbInit(5,5) * (*db)(5);
-    }
+    if (iMod == true)
+        this->applyIMod();
     
-    // transform the forces from basic sys B to basic sys A
+    // use elastic axial force if axial force from test is zero
+    if ((*qMeas)[0] == 0.0)
+        (*qMeas)[0] = kbInit(0,0)*(*db)[0];
+    // use elastic torsion if torsion from test is zero
+    if ((*qMeas)[5] == 0.0)
+        (*qMeas)[5] = kbInit(5,5)*(*db)[5];
+    
+    // transform forces from basic sys B to basic sys A (linear)
     static Vector qA(6);
-    qA = T^(*qMeas);
+    qA(0) = (*qMeas)[0];
+    qA(1) = -L*(*qMeas)[1] - (*qMeas)[2];
+    qA(2) = (*qMeas)[2];
+    qA(3) = L*(*qMeas)[3] - (*qMeas)[4];
+    qA(4) = (*qMeas)[4];
+    qA(5) = (*qMeas)[5];
+    
+    /* transform forces from basic sys B to basic sys A (nonlinear)
+    static Vector qA(6);
+    qA(0) = 
+    qA(1) = 
+    qA(2) = 
+    qA(3) = 
+    qA(4) = 
+    qA(5) = */
     
     // add initial forces
     for (int i=0; i<6; i++)  {
         qA(i) += qA0[i];
     }
-
-    // transform the stiffness from basic sys B to basic sys A
+    
+    // transform stiffness from basic sys B to basic sys A
     static Matrix kbAInit(6,6);
-    kbAInit.addMatrixTripleProduct(0.0, T, kbInit, 1.0);
-
+    kbAInit(0,0) = kbInit(0,0);
+    kbAInit(1,1) = L*L*kbInit(1,1) + L*(kbInit(1,2)+kbInit(2,1)) + kbInit(2,2);
+    kbAInit(1,2) = -L*kbInit(1,2) - kbInit(2,2);
+    kbAInit(2,1) = -L*kbInit(2,1) - kbInit(2,2);
+    kbAInit(2,2) = kbInit(2,2);
+    kbAInit(3,3) = L*L*kbInit(3,3) - L*(kbInit(3,4)+kbInit(4,3)) + kbInit(4,4);
+    kbAInit(3,4) = L*kbInit(3,4) - kbInit(4,4);
+    kbAInit(4,3) = L*kbInit(4,3) - kbInit(4,4);
+    kbAInit(4,4) = kbInit(4,4);
+    kbAInit(5,5) = kbInit(5,5);
+    
     return theCoordTransf->getGlobalStiffMatrix(kbAInit, qA);
 }
 
@@ -730,42 +768,44 @@ const Vector& EEBeamColumn3d::getResistingForce()
     }
     
     // apply optional initial stiffness modification
-    if (iMod == true)  {
-        // get measured displacements
-        if (theSite != 0)  {
-            (*dbMeas) = theSite->getDisp();
-        }
-        else  {
-            sData[0] = OF_RemoteTest_getDisp;
-            theChannel->sendVector(0, 0, *sendData, 0);
-            theChannel->recvVector(0, 0, *recvData, 0);
-        }
-
-        // correct for displacement control errors using I-Modification
-        (*qMeas) -= kbInit*((*dbMeas) - (*db));
-    } else  {
-        // use elastic axial force if axial force from test is zero
-        if ((*qMeas)(0) == 0.0)
-            (*qMeas)(0) = kbInit(0,0) * (*db)(0);
-        // use elastic torsion if torsion from test is zero
-        if ((*qMeas)(5) == 0.0)
-            (*qMeas)(5) = kbInit(5,5) * (*db)(5);
-    }
+    if (iMod == true)
+        this->applyIMod();
+    
+    // use elastic axial force if axial force from test is zero
+    if ((*qMeas)[0] == 0.0)
+        (*qMeas)[0] = kbInit(0,0)*(*db)[0];
+    // use elastic torsion if torsion from test is zero
+    if ((*qMeas)[5] == 0.0)
+        (*qMeas)[5] = kbInit(5,5)*(*db)[5];
     
     // save corresponding target displacements for recorder
     dbTarg = (*db);
     vbTarg = (*vb);
     abTarg = (*ab);
-
-    // transform from basic sys B to basic sys A
+    
+    // transform forces from basic sys B to basic sys A (linear)
     static Vector qA(6);
-    qA = T^(*qMeas);
+    qA(0) = (*qMeas)[0];
+    qA(1) = -L*(*qMeas)[1] - (*qMeas)[2];
+    qA(2) = (*qMeas)[2];
+    qA(3) = L*(*qMeas)[3] - (*qMeas)[4];
+    qA(4) = (*qMeas)[4];
+    qA(5) = (*qMeas)[5];
+    
+    /* transform forces from basic sys B to basic sys A (nonlinear)
+    static Vector qA(6);
+    qA(0) = 
+    qA(1) = 
+    qA(2) = 
+    qA(3) = 
+    qA(4) = 
+    qA(5) = */
     
     // add initial forces
     for (int i=0; i<6; i++)  {
         qA(i) += qA0[i];
     }
-
+    
     // Vector for reactions in basic system A
     Vector pA0Vec(pA0, 6);
     
@@ -908,12 +948,13 @@ void EEBeamColumn3d::Print(OPS_Stream &s, int flag)
     if (flag == 0)  {
         // print everything
         s << "Element: " << this->getTag() << endln;
-        s << "  type: EEBeamColumn3d  iNode: " << connectedExternalNodes(0);
-        s << "  jNode: " << connectedExternalNodes(1) << endln;
+        s << "  type: EEBeamColumn3d" << endln;
+        s << "  iNode: " << connectedExternalNodes(0) 
+            << ", jNode: " << connectedExternalNodes(1) << endln;
         s << "  CoordTransf: " << theCoordTransf->getTag() << endln;
         if (theSite != 0)
-            s << "  ExperimentalSite, tag: " << theSite->getTag() << endln;
-        s << "  mass per unit length:  " << rho << endln;
+            s << "  ExperimentalSite: " << theSite->getTag() << endln;
+        s << "  mass per unit length: " << rho << endln;
         // determine resisting forces in global system
         s << "  resisting force: " << this->getResistingForce() << endln;
     } else if (flag == 1)  {
@@ -950,7 +991,7 @@ Response* EEBeamColumn3d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","My_2");
         output.tag("ResponseType","Mz_2");
 
-        theResponse = new ElementResponse(this, 2, theVector);
+        theResponse = new ElementResponse(this, 1, theVector);
     }
     // local forces
     else if (strcmp(argv[0],"localForce") == 0 || strcmp(argv[0],"localForces") == 0)
@@ -968,7 +1009,7 @@ Response* EEBeamColumn3d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","My_2");
         output.tag("ResponseType","Mz_2");
 
-        theResponse = new ElementResponse(this, 3, theVector);
+        theResponse = new ElementResponse(this, 2, theVector);
     }
     // forces in basic system B
     else if (strcmp(argv[0],"basicForce") == 0 || strcmp(argv[0],"basicForces") == 0)
@@ -980,7 +1021,7 @@ Response* EEBeamColumn3d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","q5");
         output.tag("ResponseType","q6");
 
-        theResponse = new ElementResponse(this, 4, Vector(6));
+        theResponse = new ElementResponse(this, 3, Vector(6));
     }
     // target displacements in basic system B
     else if (strcmp(argv[0],"deformation") == 0 || strcmp(argv[0],"deformations") == 0 || 
@@ -994,7 +1035,7 @@ Response* EEBeamColumn3d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","db5");
         output.tag("ResponseType","db6");
 
-        theResponse = new ElementResponse(this, 5, Vector(6));
+        theResponse = new ElementResponse(this, 4, Vector(6));
     }
     // target velocities in basic system B
     else if (strcmp(argv[0],"targetVelocity") == 0 ||
@@ -1007,7 +1048,7 @@ Response* EEBeamColumn3d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","vb5");
         output.tag("ResponseType","vb6");
 
-        theResponse = new ElementResponse(this, 6, Vector(6));
+        theResponse = new ElementResponse(this, 5, Vector(6));
     }
     // target accelerations in basic system B
     else if (strcmp(argv[0],"targetAcceleration") == 0 ||
@@ -1020,7 +1061,7 @@ Response* EEBeamColumn3d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","ab5");
         output.tag("ResponseType","ab6");
 
-        theResponse = new ElementResponse(this, 7, Vector(6));
+        theResponse = new ElementResponse(this, 6, Vector(6));
     }
     // measured displacements in basic system B
     else if (strcmp(argv[0],"measuredDisplacement") == 0 || 
@@ -1033,7 +1074,7 @@ Response* EEBeamColumn3d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","dbm5");
         output.tag("ResponseType","dbm6");
 
-        theResponse = new ElementResponse(this, 8, Vector(6));
+        theResponse = new ElementResponse(this, 7, Vector(6));
     }
     // measured velocities in basic system B
     else if (strcmp(argv[0],"measuredVelocity") == 0 || 
@@ -1046,7 +1087,7 @@ Response* EEBeamColumn3d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","vbm5");
         output.tag("ResponseType","vbm6");
 
-        theResponse = new ElementResponse(this, 9, Vector(6));
+        theResponse = new ElementResponse(this, 8, Vector(6));
     }
     // measured accelerations in basic system B
     else if (strcmp(argv[0],"measuredAcceleration") == 0 || 
@@ -1059,7 +1100,7 @@ Response* EEBeamColumn3d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","abm5");
         output.tag("ResponseType","abm6");
 
-        theResponse = new ElementResponse(this, 10, Vector(6));
+        theResponse = new ElementResponse(this, 9, Vector(6));
     }
 
     output.endTag(); // ElementOutput
@@ -1068,97 +1109,114 @@ Response* EEBeamColumn3d::setResponse(const char **argv, int argc,
 }
 
 
-int EEBeamColumn3d::getResponse(int responseID, Information &eleInformation)
+int EEBeamColumn3d::getResponse(int responseID, Information &eleInfo)
 {
     double L = theCoordTransf->getInitialLength();
+    Vector qA(6);
     
     switch (responseID)  {
-    case -1:
-        return -1;
+    case 1:  // global forces
+        return eleInfo.setVector(this->getResistingForce());
         
-    case 1:  // initial stiffness
-        if (eleInformation.theMatrix != 0)  {
-            *(eleInformation.theMatrix) = theInitStiff;
-        }
-        return 0;
+    case 2:  // local forces
+        // transform forces from basic sys B to basic sys A (linear)
+        qA(0) = (*qMeas)[0];
+        qA(1) = -L*(*qMeas)[1] - (*qMeas)[2];
+        qA(2) = (*qMeas)[2];
+        qA(3) = L*(*qMeas)[3] - (*qMeas)[4];
+        qA(4) = (*qMeas)[4];
+        qA(5) = (*qMeas)[5];
         
-    case 2:  // global forces
-        if (eleInformation.theVector != 0)  {
-            *(eleInformation.theVector) = this->getResistingForce();
-        }
-        return 0;      
+        /* transform forces from basic sys B to basic sys A (nonlinear)
+        static Vector qA(6);
+        qA(0) = 
+        qA(1) = 
+        qA(2) = 
+        qA(3) = 
+        qA(4) = 
+        qA(5) = */
         
-    case 3:  // local forces
-        if (eleInformation.theVector != 0)  {
-            // transform from basic sys B to basic sys A
-            static Vector qA(6);
-            qA = T^(*qMeas);
-            // Axial
-            theVector(0)  = -qA(0) + pA0[0];
-            theVector(6)  =  qA(0);
-            // Torsion
-            theVector(3)  = -qA(5) + pA0[5];
-            theVector(9)  =  qA(5);
-            // Shear Vy
-            theVector(1)  =  (qA(1)+qA(2))/L + pA0[1];
-            theVector(7)  = -(qA(1)+qA(2))/L + pA0[2];
-            // Moment Mz
-            theVector(5)  =  qA(1);
-            theVector(11) =  qA(2);
-            // Shear Vz
-            theVector(2)  = -(qA(3)+qA(4))/L + pA0[3];
-            theVector(8)  =  (qA(3)+qA(4))/L + pA0[4];
-            // Moment My
-            theVector(4)  =  qA(3);
-            theVector(10) =  qA(4);
-            
-            *(eleInformation.theVector) = theVector;
-        }
-        return 0;      
+        // Axial
+        theVector(0)  = -qA(0) + pA0[0];
+        theVector(6)  =  qA(0);
+        // Torsion
+        theVector(3)  = -qA(5) + pA0[5];
+        theVector(9)  =  qA(5);
+        // Shear Vy
+        theVector(1)  =  (qA(1)+qA(2))/L + pA0[1];
+        theVector(7)  = -(qA(1)+qA(2))/L + pA0[2];
+        // Moment Mz
+        theVector(5)  =  qA(1);
+        theVector(11) =  qA(2);
+        // Shear Vz
+        theVector(2)  = -(qA(3)+qA(4))/L + pA0[3];
+        theVector(8)  =  (qA(3)+qA(4))/L + pA0[4];
+        // Moment My
+        theVector(4)  =  qA(3);
+        theVector(10) =  qA(4);
         
-    case 4:  // forces in basic system B
-        if (eleInformation.theVector != 0)  {
-            *(eleInformation.theVector) = (*qMeas);
-        }
-        return 0;      
+        return eleInfo.setVector(theVector);
         
-    case 5:  // target displacements in basic system B
-        if (eleInformation.theVector != 0)  {
-            *(eleInformation.theVector) = dbTarg;
-        }
-        return 0;      
+    case 3:  // forces in basic system B
+        return eleInfo.setVector(*qMeas);
         
-    case 6:  // target velocities in basic system B
-        if (eleInformation.theVector != 0)  {
-            *(eleInformation.theVector) = vbTarg;
-        }
-        return 0;      
+    case 4:  // target displacements in basic system B
+        return eleInfo.setVector(dbTarg);
         
-    case 7:  // target accelerations in basic system B
-        if (eleInformation.theVector != 0)  {
-            *(eleInformation.theVector) = abTarg;
-        }
-        return 0;      
+    case 5:  // target velocities in basic system B
+        return eleInfo.setVector(vbTarg);
         
-    case 8:  // measured displacements in basic system B
-        if (eleInformation.theVector != 0)  {
-            *(eleInformation.theVector) = this->getBasicDisp();
-        }
-        return 0;
-
-    case 9:  // measured velocities in basic system B
-        if (eleInformation.theVector != 0)  {
-            *(eleInformation.theVector) = this->getBasicVel();
-        }
-        return 0;
-
-    case 10:  // measured accelerations in basic system B
-        if (eleInformation.theVector != 0)  {
-            *(eleInformation.theVector) = this->getBasicAccel();
-        }
-        return 0;
-
+    case 6:  // target accelerations in basic system B
+        return eleInfo.setVector(abTarg);
+        
+    case 7:  // measured displacements in basic system B
+        return eleInfo.setVector(this->getBasicDisp());
+        
+    case 8:  // measured velocities in basic system B
+        return eleInfo.setVector(this->getBasicVel());
+        
+    case 9:  // measured accelerations in basic system B
+        return eleInfo.setVector(this->getBasicAccel());
+        
     default:
         return -1;
+    }
+}
+
+
+void EEBeamColumn3d::applyIMod()
+{    
+    // get measured displacements
+    if (theSite != 0)  {
+        (*dbMeas) = theSite->getDisp();
+    }
+    else  {
+        sData[0] = OF_RemoteTest_getDisp;
+        theChannel->sendVector(0, 0, *sendData, 0);
+        theChannel->recvVector(0, 0, *recvData, 0);
+    }
+
+    // correct for displacement control errors using I-Modification
+    if ((*dbMeas)[0] != 0.0)  {
+        (*qMeas)[0] -= kbInit(0,0)*((*dbMeas)[0] - (*db)[0]);
+    }
+    if ((*dbMeas)[1] != 0.0)  {
+        (*qMeas)[1] -= kbInit(1,1)*((*dbMeas)[1] - (*db)[1]);
+        (*qMeas)[2] -= kbInit(2,1)*((*dbMeas)[1] - (*db)[1]);
+    }
+    if ((*dbMeas)[2] != 0.0)  {
+        (*qMeas)[1] -= kbInit(1,2)*((*dbMeas)[2] - (*db)[2]);
+        (*qMeas)[2] -= kbInit(2,2)*((*dbMeas)[2] - (*db)[2]);
+    }
+    if ((*dbMeas)[3] != 0.0)  {
+        (*qMeas)[3] -= kbInit(3,3)*((*dbMeas)[3] - (*db)[3]);
+        (*qMeas)[4] -= kbInit(4,3)*((*dbMeas)[3] - (*db)[3]);
+    }
+    if ((*dbMeas)[4] != 0.0)  {
+        (*qMeas)[3] -= kbInit(3,4)*((*dbMeas)[4] - (*db)[4]);
+        (*qMeas)[4] -= kbInit(4,4)*((*dbMeas)[4] - (*db)[4]);
+    }
+    if ((*dbMeas)[5] != 0.0)  {
+        (*qMeas)[5] -= kbInit(5,5)*((*dbMeas)[5] - (*db)[5]);
     }
 }

@@ -70,7 +70,7 @@ EETruss::EETruss(int tag, int dim, int Nd1, int Nd2,
     db(0), vb(0), ab(0), t(0),
     dbMeas(0), vbMeas(0), abMeas(0), qMeas(0), tMeas(0),
     dbTarg(1), vbTarg(1), abTarg(1),
-    dbPast(1), kbInit(1,1)
+    dbPast(1), kbInit(1,1), tPast(0.0)
 {    
     // ensure the connectedExternalNode ID is of correct size & set values
     if (connectedExternalNodes.Size() != 2)  {
@@ -143,7 +143,7 @@ EETruss::EETruss(int tag, int dim, int Nd1, int Nd2,
     db(0), vb(0), ab(0), t(0),
     dbMeas(0), vbMeas(0), abMeas(0), qMeas(0), tMeas(0),
     dbTarg(1), vbTarg(1), abTarg(1),
-    dbPast(1), kbInit(1,1)
+    dbPast(1), kbInit(1,1), tPast(0.0)
 {    
     // ensure the connectedExternalNode ID is of correct size & set values
     if (connectedExternalNodes.Size() != 2)  {
@@ -519,9 +519,10 @@ int EETruss::update()
         (*ab)(0) += (acc2(i)-acc1(i))*cosX[i];
     }
     
-    if ((*db) != dbPast)  {
-        // save the displacements
+    if ((*db) != dbPast || (*t)(0) != tPast)  {
+        // save the displacements and the time
         dbPast = (*db);
+        tPast = (*t)(0);
         // set the trial response at the site
         if (theSite != 0)  {
             theSite->setTrialResponse(db, vb, ab, (Vector*)0, t);
@@ -814,11 +815,12 @@ void EETruss::Print(OPS_Stream &s, int flag)
     if (flag == 0)  {
         // print everything
         s << "Element: " << this->getTag() << endln;
-        s << "  type: EETruss  iNode: " << connectedExternalNodes(0);
-        s << "  jNode: " << connectedExternalNodes(1) << endln;
+        s << "  type: EETruss" << endln;
+        s << "  iNode: " << connectedExternalNodes(0)
+            << ", jNode: " << connectedExternalNodes(1) << endln;
         if (theSite != 0)
-            s << "  ExperimentalSite, tag: " << theSite->getTag() << endln;
-        s << "  mass per unit length:  " << rho << endln;
+            s << "  ExperimentalSite: " << theSite->getTag() << endln;
+        s << "  mass per unit length: " << rho << endln;
         // determine resisting forces in global system
         s << "  resisting force: " << this->getResistingForce() << endln;
     } else if (flag == 1)  {
@@ -848,7 +850,7 @@ Response* EETruss::setResponse(const char **argv, int argc,
             sprintf(outputData,"P%d",i+1);
             output.tag("ResponseType",outputData);
         }
-        theResponse = new ElementResponse(this, 2, *theVector);
+        theResponse = new ElementResponse(this, 1, *theVector);
     }
     // local forces
     else if (strcmp(argv[0],"localForce") == 0 || strcmp(argv[0],"localForces") == 0)
@@ -857,14 +859,14 @@ Response* EETruss::setResponse(const char **argv, int argc,
             sprintf(outputData,"p%d",i+1);
             output.tag("ResponseType",outputData);
         }
-        theResponse = new ElementResponse(this, 3, *theVector);
+        theResponse = new ElementResponse(this, 2, *theVector);
     }
     // basic force
     else if (strcmp(argv[0],"basicForce") == 0 || strcmp(argv[0],"basicForces") == 0)
     {
         output.tag("ResponseType","q1");
 
-        theResponse = new ElementResponse(this, 4, Vector(1));
+        theResponse = new ElementResponse(this, 3, Vector(1));
     }
     // target basic displacement
     else if (strcmp(argv[0],"deformation") == 0 || strcmp(argv[0],"deformations") == 0 || 
@@ -873,7 +875,7 @@ Response* EETruss::setResponse(const char **argv, int argc,
     {
         output.tag("ResponseType","db1");
 
-        theResponse = new ElementResponse(this, 5, Vector(1));
+        theResponse = new ElementResponse(this, 4, Vector(1));
     }
     // target basic velocity
     else if (strcmp(argv[0],"targetVelocity") == 0 || 
@@ -881,7 +883,7 @@ Response* EETruss::setResponse(const char **argv, int argc,
     {
         output.tag("ResponseType","vb1");
 
-        theResponse = new ElementResponse(this, 6, Vector(1));
+        theResponse = new ElementResponse(this, 5, Vector(1));
     }
     // target basic acceleration
     else if (strcmp(argv[0],"targetAcceleration") == 0 || 
@@ -889,7 +891,7 @@ Response* EETruss::setResponse(const char **argv, int argc,
     {
         output.tag("ResponseType","ab1");
 
-        theResponse = new ElementResponse(this, 7, Vector(1));
+        theResponse = new ElementResponse(this, 6, Vector(1));
     }    
     // measured basic displacement
     else if (strcmp(argv[0],"measuredDisplacement") == 0 || 
@@ -897,7 +899,7 @@ Response* EETruss::setResponse(const char **argv, int argc,
     {
         output.tag("ResponseType","dbm1");
 
-        theResponse = new ElementResponse(this, 8, Vector(1));
+        theResponse = new ElementResponse(this, 7, Vector(1));
     }
     // measured basic velocity
     else if (strcmp(argv[0],"measuredVelocity") == 0 || 
@@ -905,7 +907,7 @@ Response* EETruss::setResponse(const char **argv, int argc,
     {
         output.tag("ResponseType","vbm1");
 
-        theResponse = new ElementResponse(this, 9, Vector(1));
+        theResponse = new ElementResponse(this, 8, Vector(1));
     }
     // measured basic acceleration
     else if (strcmp(argv[0],"measuredAcceleration") == 0 || 
@@ -913,7 +915,7 @@ Response* EETruss::setResponse(const char **argv, int argc,
     {
         output.tag("ResponseType","abm1");
 
-        theResponse = new ElementResponse(this, 10, Vector(1));
+        theResponse = new ElementResponse(this, 9, Vector(1));
     }
 
     output.endTag(); // ElementOutput
@@ -922,77 +924,41 @@ Response* EETruss::setResponse(const char **argv, int argc,
 }
 
 
-int EETruss::getResponse(int responseID, Information &eleInformation)
+int EETruss::getResponse(int responseID, Information &eleInfo)
 {
     switch (responseID)  {
-    case -1:
-        return -1;
+    case 1:  // global forces
+        return eleInfo.setVector(this->getResistingForce());
         
-    case 1:  // initial stiffness
-        if (eleInformation.theMatrix != 0)  {
-            *(eleInformation.theMatrix) = theInitStiff;
-        }
-        return 0;
+    case 2:  // local forces
+        theVector->Zero();
+        // Axial
+        (*theVector)(0)        = -(*qMeas)(0);
+        (*theVector)(numDOF/2) =  (*qMeas)(0);
         
-    case 2:  // global forces
-        if (eleInformation.theVector != 0)  {
-            *(eleInformation.theVector) = this->getResistingForce();
-        }
-        return 0;
+        return eleInfo.setVector(*theVector);
         
-    case 3:  // local forces
-        if (eleInformation.theVector != 0)  {
-            theVector->Zero();
-            // Axial
-            (*theVector)(0)        = -(*qMeas)(0);
-            (*theVector)(numDOF/2) =  (*qMeas)(0);
-            
-            *(eleInformation.theVector) = *theVector;
-        }
-        return 0;
+    case 3:  // basic force
+        return eleInfo.setVector(*qMeas);
         
-    case 4:  // basic force
-        if (eleInformation.theVector != 0)  {
-            *(eleInformation.theVector) = (*qMeas);
-        }
-        return 0;
+    case 4:  // target basic displacement
+        return eleInfo.setVector(dbTarg);
         
-    case 5:  // target basic displacement
-        if (eleInformation.theVector != 0)  {
-            *(eleInformation.theVector) = dbTarg;
-        }
-        return 0;
+    case 5:  // target basic velocity
+        return eleInfo.setVector(vbTarg);
         
-    case 6:  // target basic velocity
-        if (eleInformation.theVector != 0)  {			
-            *(eleInformation.theVector) = vbTarg;
-        }
-        return 0;
+    case 6:  // target basic acceleration
+        return eleInfo.setVector(abTarg);
         
-    case 7:  // target basic acceleration
-        if (eleInformation.theVector != 0)  {			
-            *(eleInformation.theVector) = abTarg;
-        }
-        return 0;
+    case 7:  // measured basic displacement
+        return eleInfo.setVector(this->getBasicDisp());
         
-    case 8:  // measured basic displacement
-        if (eleInformation.theVector != 0)  {
-            *(eleInformation.theVector) = this->getBasicDisp();
-        }
-        return 0;
-
-    case 9:  // measured basic velocitie
-        if (eleInformation.theVector != 0)  {
-            *(eleInformation.theVector) = this->getBasicVel();
-        }
-        return 0;
-
-    case 10:  // measured basic acceleration
-        if (eleInformation.theVector != 0)  {
-            *(eleInformation.theVector) = this->getBasicAccel();
-        }
-        return 0;
-
+    case 8:  // measured basic velocitie
+        return eleInfo.setVector(this->getBasicVel());
+        
+    case 9:  // measured basic acceleration
+        return eleInfo.setVector(this->getBasicAccel());
+        
     default:
         return 0;
     }
