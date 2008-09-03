@@ -66,7 +66,7 @@ EEBeamColumn2d::EEBeamColumn2d(int tag, int Nd1, int Nd2,
     db(0), vb(0), ab(0), t(0),
     dbMeas(0), vbMeas(0), abMeas(0), qMeas(0), tMeas(0),
     dbTarg(3), vbTarg(3), abTarg(3),
-    dbPast(3), kbInit(3,3),
+    dbPast(3), kbInit(3,3), tPast(0.0),
     firstWarning(true)
 {
     // ensure the connectedExternalNode ID is of correct size & set values
@@ -150,7 +150,7 @@ EEBeamColumn2d::EEBeamColumn2d(int tag, int Nd1, int Nd2,
     db(0), vb(0), ab(0), t(0),
     dbMeas(0), vbMeas(0), abMeas(0), qMeas(0), tMeas(0),
     dbTarg(3), vbTarg(3), abTarg(3),
-    dbPast(3), kbInit(3,3),
+    dbPast(3), kbInit(3,3), tPast(0.0),
     firstWarning(true)
 {
     // ensure the connectedExternalNode ID is of correct size & set values
@@ -462,9 +462,10 @@ int EEBeamColumn2d::update()
     (*ab)[1] = -abA(0)*sin(dbA(1))-2*vbA(0)*cos(dbA(1))*vbA(1)+(L+dbA(0))*sin(dbA(1))*pow(vbA(1),2)-(L+dbA(0))*cos(dbA(1))*abA(1);
     (*ab)[2] = -abA(1)+abA(2);
     
-    if ((*db) != dbPast)  {
-        // save the displacements
+    if ((*db) != dbPast || (*t)(0) != tPast)  {
+        // save the displacements and the time
         dbPast = (*db);
+        tPast = (*t)(0);
         // set the trial response at the site
         if (theSite != 0)  {
             theSite->setTrialResponse(db, vb, ab, (Vector*)0, t);
@@ -888,12 +889,13 @@ void EEBeamColumn2d::Print(OPS_Stream &s, int flag)
     if (flag == 0)  {
         // print everything
         s << "Element: " << this->getTag() << endln;
-        s << "  type: EEBeamColumn2d  iNode: " << connectedExternalNodes(0);
-        s << "  jNode: " << connectedExternalNodes(1) << endln;
+        s << "  type: EEBeamColumn2d" << endln;
+        s << "  iNode: " << connectedExternalNodes(0) 
+            << ", jNode: " << connectedExternalNodes(1) << endln;
         s << "  CoordTransf: " << theCoordTransf->getTag() << endln;
         if (theSite != 0)
-            s << "  ExperimentalSite, tag: " << theSite->getTag() << endln;
-        s << "  mass per unit length:  " << rho << endln;
+            s << "  ExperimentalSite: " << theSite->getTag() << endln;
+        s << "  mass per unit length: " << rho << endln;
         // determine resisting forces in global system
         s << "  resisting force: " << this->getResistingForce() << endln;
     } else if (flag == 1)  {
@@ -924,7 +926,7 @@ Response* EEBeamColumn2d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","Py_2");
         output.tag("ResponseType","Mz_2");
 
-        theResponse = new ElementResponse(this, 2, theVector);
+        theResponse = new ElementResponse(this, 1, theVector);
     }
     // local forces
     else if (strcmp(argv[0],"localForce") == 0 || strcmp(argv[0],"localForces") == 0)
@@ -936,7 +938,7 @@ Response* EEBeamColumn2d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","V_2");
         output.tag("ResponseType","M_2");
 
-        theResponse = new ElementResponse(this, 3, theVector);
+        theResponse = new ElementResponse(this, 2, theVector);
     }
     // forces in basic system B
     else if (strcmp(argv[0],"basicForce") == 0 || strcmp(argv[0],"basicForces") == 0)
@@ -945,7 +947,7 @@ Response* EEBeamColumn2d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","q2");
         output.tag("ResponseType","q3");
 
-        theResponse = new ElementResponse(this, 4, Vector(3));
+        theResponse = new ElementResponse(this, 3, Vector(3));
     }
     // target displacements in basic system B
     else if (strcmp(argv[0],"deformation") == 0 || strcmp(argv[0],"deformations") == 0 || 
@@ -956,7 +958,7 @@ Response* EEBeamColumn2d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","db2");
         output.tag("ResponseType","db3");
 
-        theResponse = new ElementResponse(this, 5, Vector(3));
+        theResponse = new ElementResponse(this, 4, Vector(3));
     }
     // target velocities in basic system B
     else if (strcmp(argv[0],"targetVelocity") == 0 ||
@@ -966,7 +968,7 @@ Response* EEBeamColumn2d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","vb2");
         output.tag("ResponseType","vb3");
 
-        theResponse = new ElementResponse(this, 6, Vector(3));
+        theResponse = new ElementResponse(this, 5, Vector(3));
     }
     // target accelerations in basic system B
     else if (strcmp(argv[0],"targetAcceleration") == 0 ||
@@ -976,7 +978,7 @@ Response* EEBeamColumn2d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","ab2");
         output.tag("ResponseType","ab3");
 
-        theResponse = new ElementResponse(this, 7, Vector(3));
+        theResponse = new ElementResponse(this, 6, Vector(3));
     }
     // measured displacements in basic system B
     else if (strcmp(argv[0],"measuredDisplacement") == 0 || 
@@ -986,7 +988,7 @@ Response* EEBeamColumn2d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","dbm2");
         output.tag("ResponseType","dbm3");
 
-        theResponse = new ElementResponse(this, 8, Vector(3));
+        theResponse = new ElementResponse(this, 7, Vector(3));
     }
     // measured velocities in basic system B
     else if (strcmp(argv[0],"measuredVelocity") == 0 || 
@@ -996,7 +998,7 @@ Response* EEBeamColumn2d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","vbm2");
         output.tag("ResponseType","vbm3");
 
-        theResponse = new ElementResponse(this, 9, Vector(3));
+        theResponse = new ElementResponse(this, 8, Vector(3));
     }
     // measured accelerations in basic system B
     else if (strcmp(argv[0],"measuredAcceleration") == 0 || 
@@ -1006,7 +1008,7 @@ Response* EEBeamColumn2d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","abm2");
         output.tag("ResponseType","abm3");
 
-        theResponse = new ElementResponse(this, 10, Vector(3));
+        theResponse = new ElementResponse(this, 9, Vector(3));
     }
 
     output.endTag(); // ElementOutput
@@ -1015,97 +1017,61 @@ Response* EEBeamColumn2d::setResponse(const char **argv, int argc,
 }
 
 
-int EEBeamColumn2d::getResponse(int responseID, Information &eleInformation)
+int EEBeamColumn2d::getResponse(int responseID, Information &eleInfo)
 {
     double L = theCoordTransf->getInitialLength();
+    double alpha;
+    Vector qA(3);
     
     switch (responseID)  {
-    case -1:
-        return -1;
+    case 1:  // global forces
+        return eleInfo.setVector(this->getResistingForce());
         
-    case 1:  // initial stiffness
-        if (eleInformation.theMatrix != 0)  {
-            *(eleInformation.theMatrix) = theInitStiff;
-        }
-        return 0;
+    case 2:  // local forces
+        /* transform forces from basic sys B to basic sys A (linear)
+        qA(0) = (*qMeas)[0];
+        qA(1) = -L*(*qMeas)[1] - (*qMeas)[2];
+        qA(2) = (*qMeas)[2];*/
         
-    case 2:  // global forces
-        if (eleInformation.theVector != 0)  {
-            *(eleInformation.theVector) = this->getResistingForce();
-        }
-        return 0;      
+        // transform forces from basic sys B to basic sys A (nonlinear)
+        alpha = atan2((*db)[1],L+(*db)[0]);
+        qA(0) = cos(alpha)*(*qMeas)[0] + sin(alpha)*(*qMeas)[1];
+        qA(1) = (*db)[1]*(*qMeas)[0] - (L+(*db)[0])*(*qMeas)[1] - (*qMeas)[2];
+        qA(2) = (*qMeas)[2];
         
-    case 3:  // local forces
-        if (eleInformation.theVector != 0)  {
-            /* transform forces from basic sys B to basic sys A (linear)
-            static Vector qA(3);
-            qA(0) = (*qMeas)[0];
-            qA(1) = -L*(*qMeas)[1] - (*qMeas)[2];
-            qA(2) = (*qMeas)[2];*/
-            
-            // transform forces from basic sys B to basic sys A (nonlinear)
-            static Vector qA(3);
-            double alpha = atan2((*db)[1],L+(*db)[0]);
-            qA(0) = cos(alpha)*(*qMeas)[0] + sin(alpha)*(*qMeas)[1];
-            qA(1) = (*db)[1]*(*qMeas)[0] - (L+(*db)[0])*(*qMeas)[1] - (*qMeas)[2];
-            qA(2) = (*qMeas)[2];
-            
-            // Axial
-            theVector(0) = -qA(0) + pA0[0];
-            theVector(3) =  qA(0);
-            // Shear
-            theVector(1) =  (qA(1)+qA(2))/L + pA0[1];
-            theVector(4) = -(qA(1)+qA(2))/L + pA0[2];
-            // Moment
-            theVector(2) =  qA(1);
-            theVector(5) =  qA(2);
-            
-            *(eleInformation.theVector) = theVector;
-        }
-        return 0;      
+        // Axial
+        theVector(0) = -qA(0) + pA0[0];
+        theVector(3) =  qA(0);
+        // Shear
+        theVector(1) =  (qA(1)+qA(2))/L + pA0[1];
+        theVector(4) = -(qA(1)+qA(2))/L + pA0[2];
+        // Moment
+        theVector(2) =  qA(1);
+        theVector(5) =  qA(2);
         
-    case 4:  // forces in basic system B
-        if (eleInformation.theVector != 0)  {
-            *(eleInformation.theVector) = (*qMeas);
-        }
-        return 0;      
+        return eleInfo.setVector(theVector);
         
-    case 5:  // target displacements in basic system B
-        if (eleInformation.theVector != 0)  {
-            *(eleInformation.theVector) = dbTarg;
-        }
-        return 0;      
+    case 3:  // forces in basic system B
+        return eleInfo.setVector(*qMeas);
         
-    case 6:  // target velocities in basic system B
-        if (eleInformation.theVector != 0)  {
-            *(eleInformation.theVector) = vbTarg;
-        }
-        return 0;      
+    case 4:  // target displacements in basic system B
+        return eleInfo.setVector(dbTarg);
         
-    case 7:  // target accelerations in basic system B
-        if (eleInformation.theVector != 0)  {
-            *(eleInformation.theVector) = abTarg;
-        }
-        return 0;      
+    case 5:  // target velocities in basic system B
+        return eleInfo.setVector(vbTarg);
         
-    case 8:  // measured displacements in basic system B
-        if (eleInformation.theVector != 0)  {
-            *(eleInformation.theVector) = this->getBasicDisp();
-        }
-        return 0;
-
-    case 9:  // measured velocities in basic system B
-        if (eleInformation.theVector != 0)  {
-            *(eleInformation.theVector) = this->getBasicVel();
-        }
-        return 0;
-
-    case 10:  // measured accelerations in basic system B
-        if (eleInformation.theVector != 0)  {
-            *(eleInformation.theVector) = this->getBasicAccel();
-        }
-        return 0;
-
+    case 6:  // target accelerations in basic system B
+        return eleInfo.setVector(abTarg);
+        
+    case 7:  // measured displacements in basic system B
+        return eleInfo.setVector(this->getBasicDisp());
+        
+    case 8:  // measured velocities in basic system B
+        return eleInfo.setVector(this->getBasicVel());
+        
+    case 9:  // measured accelerations in basic system B
+        return eleInfo.setVector(this->getBasicAccel());
+        
     default:
         return -1;
     }

@@ -64,7 +64,7 @@ EEInvertedVBrace2d::EEInvertedVBrace2d(int tag, int Nd1, int Nd2, int Nd3,
     db(0), vb(0), ab(0), t(0),
     dbMeas(0), vbMeas(0), abMeas(0), qMeas(0), tMeas(0),
     dbTarg(3), vbTarg(3), abTarg(3),
-    dbPast(3), kbInit(3,3), T(3,9)
+    dbPast(3), kbInit(3,3), tPast(0.0), T(3,9)
 {
     // ensure the connectedExternalNode ID is of correct size & set values
     if (connectedExternalNodes.Size() != 3)  {
@@ -135,7 +135,7 @@ EEInvertedVBrace2d::EEInvertedVBrace2d(int tag, int Nd1, int Nd2, int Nd3,
     db(0), vb(0), ab(0), t(0),
     dbMeas(0), vbMeas(0), abMeas(0), qMeas(0), tMeas(0),
     dbTarg(3), vbTarg(3), abTarg(3),
-    dbPast(3), kbInit(3,3), T(3,9)
+    dbPast(3), kbInit(3,3), tPast(0.0), T(3,9)
 {
     // ensure the connectedExternalNode ID is of correct size & set values
     if (connectedExternalNodes.Size() != 3)  {
@@ -460,9 +460,10 @@ int EEInvertedVBrace2d::update()
         (*vb) = T*vg;
         (*ab) = T*ag;
                 
-        if ((*db) != dbPast)  {
-            // save the displacements
+        if ((*db) != dbPast || (*t)(0) != tPast)  {
+            // save the displacements and the time
             dbPast = (*db);
+            tPast = (*t)(0);
             // set the trial response at the site
             if (theSite != 0)  {
                 theSite->setTrialResponse(db, vb, ab, (Vector*)0, t);
@@ -797,13 +798,14 @@ void EEInvertedVBrace2d::Print(OPS_Stream &s, int flag)
     if (flag == 0)  {
         // print everything
         s << "Element: " << this->getTag() << endln;
-        s << "  type: EEInvertedVBrace2d  iNode: " << connectedExternalNodes(0);
-        s << "  jNode: " << connectedExternalNodes(1); 
-        s << "  kNode: " << connectedExternalNodes(2) << endln;
+        s << "  type: EEInvertedVBrace2d" << endln;
+        s << "  iNode: " << connectedExternalNodes(0)
+            << ", jNode: " << connectedExternalNodes(1)
+            << ", kNode: " << connectedExternalNodes(2) << endln;
         if (theSite != 0)
-            s << "  ExperimentalSite, tag: " << theSite->getTag() << endln;
-        s << "  mass per unit length diagonal 1:  " << rho1 << endln;
-        s << "  mass per unit length diagonal 2:  " << rho2 << endln;
+            s << "  ExperimentalSite: " << theSite->getTag() << endln;
+        s << "  mass per unit length diagonal 1: " << rho1 << endln;
+        s << "  mass per unit length diagonal 2: " << rho2 << endln;
         // determine resisting forces in global system
         s << "  resisting force: " << this->getResistingForce() << endln;
     } else if (flag == 1)  {
@@ -837,7 +839,7 @@ Response* EEInvertedVBrace2d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","Py_3");
         output.tag("ResponseType","Mz_3");
 
-        theResponse = new ElementResponse(this, 2, theVector);
+        theResponse = new ElementResponse(this, 1, theVector);
     }
     // local forces
     else if (strcmp(argv[0],"localForce") == 0 || strcmp(argv[0],"localForces") == 0)
@@ -852,7 +854,7 @@ Response* EEInvertedVBrace2d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","py_3");
         output.tag("ResponseType","mz_3");
 
-        theResponse = new ElementResponse(this, 3, theVector);
+        theResponse = new ElementResponse(this, 2, theVector);
     }
     // basic forces
     else if (strcmp(argv[0],"basicForce") == 0 || strcmp(argv[0],"basicForces") == 0)
@@ -864,7 +866,7 @@ Response* EEInvertedVBrace2d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","q5");
         output.tag("ResponseType","q6");
 
-        theResponse = new ElementResponse(this, 4, Vector(6));
+        theResponse = new ElementResponse(this, 3, Vector(6));
     }
     // target basic displacements
     else if (strcmp(argv[0],"deformation") == 0 || strcmp(argv[0],"deformations") == 0 || 
@@ -875,7 +877,7 @@ Response* EEInvertedVBrace2d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","db2");
         output.tag("ResponseType","db3");
 
-        theResponse = new ElementResponse(this, 5, Vector(3));
+        theResponse = new ElementResponse(this, 4, Vector(3));
     }
     // target basic velocities
     else if (strcmp(argv[0],"targetVelocity") == 0 ||
@@ -885,7 +887,7 @@ Response* EEInvertedVBrace2d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","vb2");
         output.tag("ResponseType","vb3");
 
-        theResponse = new ElementResponse(this, 6, Vector(3));
+        theResponse = new ElementResponse(this, 5, Vector(3));
     }
     // target basic accelerations
     else if (strcmp(argv[0],"targetAcceleration") == 0 ||
@@ -895,7 +897,7 @@ Response* EEInvertedVBrace2d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","ab2");
         output.tag("ResponseType","ab3");
 
-        theResponse = new ElementResponse(this, 7, Vector(3));
+        theResponse = new ElementResponse(this, 6, Vector(3));
     }
     // measured basic displacements
     else if (strcmp(argv[0],"measuredDisplacement") == 0 || 
@@ -905,7 +907,7 @@ Response* EEInvertedVBrace2d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","dbm2");
         output.tag("ResponseType","dbm3");
 
-        theResponse = new ElementResponse(this, 8, Vector(3));
+        theResponse = new ElementResponse(this, 7, Vector(3));
     }
     // measured basic velocities
     else if (strcmp(argv[0],"measuredVelocity") == 0 || 
@@ -915,7 +917,7 @@ Response* EEInvertedVBrace2d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","vbm2");
         output.tag("ResponseType","vbm3");
 
-        theResponse = new ElementResponse(this, 9, Vector(3));
+        theResponse = new ElementResponse(this, 8, Vector(3));
     }
     // measured basic accelerations
     else if (strcmp(argv[0],"measuredAcceleration") == 0 || 
@@ -925,7 +927,7 @@ Response* EEInvertedVBrace2d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","abm2");
         output.tag("ResponseType","abm3");
 
-        theResponse = new ElementResponse(this, 10, Vector(3));
+        theResponse = new ElementResponse(this, 9, Vector(3));
     }
 
     output.endTag(); // ElementOutput
@@ -934,72 +936,36 @@ Response* EEInvertedVBrace2d::setResponse(const char **argv, int argc,
 }
 
 
-int EEInvertedVBrace2d::getResponse(int responseID, Information &eleInformation)
+int EEInvertedVBrace2d::getResponse(int responseID, Information &eleInfo)
 {
     switch (responseID)  {
-    case -1:
-        return -1;
+    case 1:  // global forces
+        return eleInfo.setVector(this->getResistingForce());
         
-    case 1:  // initial stiffness
-        if (eleInformation.theMatrix != 0)  {
-            *(eleInformation.theMatrix) = theInitStiff;
-        }
-        return 0;
+    case 2:  // local forces
+        return eleInfo.setVector(this->getResistingForce());
         
-    case 2:  // global forces
-        if (eleInformation.theVector != 0)  {
-            *(eleInformation.theVector) = this->getResistingForce();
-        }
-        return 0;
+    case 3:  // basic forces
+        return eleInfo.setVector(*qMeas);
         
-    case 3:  // local forces
-        if (eleInformation.theVector != 0)  {			
-            *(eleInformation.theVector) = this->getResistingForce();
-        }
-        return 0;
+    case 4:  // target basic displacements
+        return eleInfo.setVector(dbTarg);
         
-    case 4:  // basic forces
-        if (eleInformation.theVector != 0)  {			
-            *(eleInformation.theVector) = (*qMeas);
-        }
-        return 0;
+    case 5:  // target basic velocities
+        return eleInfo.setVector(vbTarg);
         
-    case 5:  // target basic displacements
-        if (eleInformation.theVector != 0)  {			
-            *(eleInformation.theVector) = dbTarg;
-        }
-        return 0;
+    case 6:  // target basic accelerations
+        return eleInfo.setVector(abTarg);
         
-    case 6:  // target basic velocities
-        if (eleInformation.theVector != 0)  {			
-            *(eleInformation.theVector) = vbTarg;
-        }
-        return 0;
+    case 7:  // measured basic displacements
+        return eleInfo.setVector(this->getBasicDisp());
         
-    case 7:  // target basic accelerations
-        if (eleInformation.theVector != 0)  {			
-            *(eleInformation.theVector) = abTarg;
-        }
-        return 0;
+    case 8:  // measured basic velocities
+        return eleInfo.setVector(this->getBasicVel());
         
-    case 8:  // measured basic displacements
-        if (eleInformation.theVector != 0)  {
-            *(eleInformation.theVector) = this->getBasicDisp();
-        }
-        return 0;
-
-    case 9:  // measured basic velocities
-        if (eleInformation.theVector != 0)  {
-            *(eleInformation.theVector) = this->getBasicVel();
-        }
-        return 0;
-
-    case 10:  // measured basic accelerations
-        if (eleInformation.theVector != 0)  {
-            *(eleInformation.theVector) = this->getBasicAccel();
-        }
-        return 0;
-
+    case 9:  // measured basic accelerations
+        return eleInfo.setVector(this->getBasicAccel());
+        
     default:
         return -1;
     }

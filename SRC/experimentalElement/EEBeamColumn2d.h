@@ -100,8 +100,9 @@ public:
     int displaySelf(Renderer &theViewer, int displayMode, float fact);    
     void Print(OPS_Stream &s, int flag = 0);    
     
+    // public methods for element recorder
     Response *setResponse(const char **argv, int argc, OPS_Stream &s);
-    int getResponse(int responseID, Information &eleInformation);
+    int getResponse(int responseID, Information &eleInfo);
     
 protected:
     
@@ -143,6 +144,7 @@ private:
     
     Vector dbPast;      // past displacements in basic system B
     Matrix kbInit;      // stiffness matrix in basic system B
+    double tPast;       // past time
     double qA0[3];      // fixed end forces in basic system A
     double pA0[3];      // reactions in basic system A
     

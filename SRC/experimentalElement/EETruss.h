@@ -59,7 +59,7 @@ public:
     
     // method to get class type
     const char *getClassType() const {return "EETruss";};
-
+    
     // public methods to obtain information about dof & connectivity    
     int getNumExternalNodes() const;
     const ID &getExternalNodes();
@@ -85,20 +85,21 @@ public:
     
     // public methods to obtain the daq response in global system
     const Vector &getTime();
-
+    
     // public methods to obtain the daq response in basic system
     const Vector &getBasicDisp();
     const Vector &getBasicVel();
     const Vector &getBasicAccel();
-
+    
     // public methods for element output
     int sendSelf(int commitTag, Channel &theChannel);
     int recvSelf(int commitTag, Channel &theChannel, FEM_ObjectBroker &theBroker);
     int displaySelf(Renderer &theViewer, int displayMode, float fact);    
     void Print(OPS_Stream &s, int flag = 0);    
     
+    // public methods for element recorder
     Response *setResponse(const char **argv, int argc, OPS_Stream &s);
-    int getResponse(int responseID, Information &eleInformation);
+    int getResponse(int responseID, Information &eleInfo);
     
 protected:
     
@@ -121,24 +122,25 @@ private:
     Vector *sendData;           // send vector
     double *rData;              // receive data array
     Vector *recvData;           // receive vector
-
+    
     Vector *db;         // trial displacements in basic system
     Vector *vb;         // trial velocities in basic system
     Vector *ab;         // trial accelerations in basic system
     Vector *t;          // trial time
-
+    
     Vector *dbMeas;     // measured displacements in basic system
     Vector *vbMeas;     // measured velocities in basic system
     Vector *abMeas;     // measured accelerations in basic system
     Vector *qMeas;      // measured forces in basic system
     Vector *tMeas;      // measured time
-
+    
     Vector dbTarg;      // target displacements in basic system
     Vector vbTarg;      // target velocities in basic system
     Vector abTarg;      // target accelerations in basic system
     
     Vector dbPast;      // past displacements in basic system
     Matrix kbInit;      // stiffness matrix in basic system
+    double tPast;       // past time
     
     double cosX[3];     // direction cosines for transformation
     
