@@ -69,11 +69,32 @@ extern ExperimentalSite *getExperimentalSite(int tag)
             << "no experimental site objects have been defined\n";
         return 0;
     }
-
+    
     TaggedObject *mc = theExperimentalSites->getComponentPtr(tag);
     if (mc == 0) 
         return 0;
+    
+    // otherwise we do a cast and return
+    ExperimentalSite *result = (ExperimentalSite *)mc;
+    return result;
+}
 
+
+extern ExperimentalSite *getExperimentalSiteFirst()
+{
+    if (theExperimentalSites == 0)  {
+        opserr << "getExperimentalSiteFirst() - "
+            << "failed to get first experimental site\n"
+            << "no experimental site objects have been defined\n";
+        return 0;
+    }
+    
+    // get first component of tagged object array
+    TaggedObjectIter &mcIter = theExperimentalSites->getComponents();
+    TaggedObject *mc = mcIter();
+    if (mc == 0)
+        return 0;
+    
     // otherwise we do a cast and return
     ExperimentalSite *result = (ExperimentalSite *)mc;
     return result;
@@ -133,7 +154,7 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp, int argc,
 		
 		// parsing was successful, allocate the site
 		theSite = new LocalExpSite(tag, theSetup);
-
+        
         if (theSite == 0)  {
             opserr << "WARNING could not create experimental site " << argv[1] << endln;
             return TCL_ERROR;
@@ -232,7 +253,7 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp, int argc,
             theSite = new ShadowExpSite(tag, *theChannel, dataSize);
         else
             theSite = new ShadowExpSite(tag, theSetup, *theChannel, dataSize);
-
+        
         if (theSite == 0)  {
             opserr << "WARNING could not create experimental site " << argv[1] << endln;
             return TCL_ERROR;
@@ -361,6 +382,6 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp, int argc,
             <<  argv[1] << ": check the manual\n";
         return TCL_ERROR;
     }
-
+    
 	return TCL_OK;
 }

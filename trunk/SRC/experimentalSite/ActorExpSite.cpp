@@ -340,22 +340,20 @@ int ActorExpSite::setSendDaqResponse()
 
 int ActorExpSite::commitState()
 {
-    int rValue;
-    if (theSetup != 0)  {
-        rValue = theSetup->commitState();
-        if (rValue != OF_ReturnType_completed)  {
-            opserr << "ActorExpSite::commitState() - "
-                << "failed to commit state for the setup.\n";
-            exit(OF_ReturnType_failed);
-        }
-    } else if (theControl != 0)  {
-        rValue = theControl->commitState();
+    int rValue = 0;
+
+    // first commit the control
+    if (theControl != 0)  {
+        rValue += theControl->commitState();
         if (rValue != OF_ReturnType_completed)  {
             opserr << "ActorExpSite::commitState() - "
                 << "failed to commit state for the control.\n";
             exit(OF_ReturnType_failed);
         }
     }
+
+    // then commit base class
+    rValue += this->ExperimentalSite::commitState();
     
     return rValue;
 }

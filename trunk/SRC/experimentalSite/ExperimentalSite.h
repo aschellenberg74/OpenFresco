@@ -39,11 +39,15 @@
 // communicating between computational and experimental sites.
 
 #include <FrescoGlobals.h>
+#include <ExpSiteResponse.h>
 #include <ExperimentalSetup.h>
 
 #include <TaggedObject.h>
 #include <ID.h>
 #include <Vector.h>
+
+class Response;
+class Recorder;
 
 class ExperimentalSite : public TaggedObject
 {
@@ -56,7 +60,10 @@ public:
     // destructor
     virtual ~ExperimentalSite();
     
-    // public methods to set and to get responses
+    // method to get class type
+    virtual const char *getClassType() const;
+    
+    // public methods to set and to get response
     virtual int setup() = 0;
     virtual int setSize(ID sizeT, ID sizeO);
     
@@ -93,6 +100,16 @@ public:
     
     virtual ExperimentalSite *getCopy() = 0;
     
+    // public methods for experimental site recorder
+    virtual Response *setResponse(const char **argv, int argc,
+        OPS_Stream &output);
+    virtual int getResponse(int responseID, Information &info);
+    
+    // methods to add and remove recorders
+    virtual int addRecorder(Recorder &theRecorder);    	
+    virtual int removeRecorders();
+    virtual int removeRecorder(int tag);
+
     virtual ID getTrialSize();
     virtual ID getOutSize();
     virtual ID getCtrlSize();
@@ -127,6 +144,11 @@ protected:
     
     // daqFlag = false (first time) / true (NOT first time)
     bool daqFlag;
+    
+    // array of pointers for experimental recorders
+    int commitTag;
+    int numRecorders;
+    Recorder **theRecorders;
     
     virtual void setTrial();
     virtual void setOut();

@@ -1,6 +1,6 @@
 include ../../Makefile.def
 
-OBJS       = ExperimentalSetup.o \
+OBJS = ExperimentalSetup.o \
 	     ESNoTransformation.o \
 	     ESAggregator.o \
 	     ESOneActuator.o \
@@ -8,7 +8,8 @@ OBJS       = ExperimentalSetup.o \
 	     ESThreeActuators2d.o \
 	     ESThreeActuatorsJntOff2d.o \
 	     ESInvertedVBrace2d.o \
-	     ESInvertedVBraceJntOff2d.o 
+	     ESInvertedVBraceJntOff2d.o \
+	     ESFourActuators3d.o
 
 all:         $(OBJS)
 

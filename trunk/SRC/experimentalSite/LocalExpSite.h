@@ -51,7 +51,10 @@ public:
     // destructor
     virtual ~LocalExpSite();
     
-    // public methods to set and to get responses
+    // method to get class type
+    const char *getClassType() const {return "LocalExpSite";};
+    
+    // public methods to set and to get response
     virtual int setup();
     virtual int setSize(ID sizeT, ID sizeO);
     

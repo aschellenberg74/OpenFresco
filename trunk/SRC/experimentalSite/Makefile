@@ -1,10 +1,9 @@
 include ../../Makefile.def
 
-OBJS       = ExperimentalSite.o \
+OBJS = ExperimentalSite.o \
 	     LocalExpSite.o \
-	     RemoteExpSite.o \
+	     ShadowExpSite.o \
 	     ActorExpSite.o
-#	     TclModelBuilderExpSiteCommand.o
 
 all:         $(OBJS)
 

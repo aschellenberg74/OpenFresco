@@ -35,6 +35,8 @@
 
 #include "ExperimentalSite.h"
 
+#include <Recorder.h>
+
 
 ExperimentalSite::ExperimentalSite(int tag, 
     ExperimentalSetup *setup)
@@ -42,7 +44,7 @@ ExperimentalSite::ExperimentalSite(int tag,
     sizeTrial(0), sizeOut(0),
     tDisp(0), tVel(0), tAccel(0), tForce(0), tTime(0),
     oDisp(0), oVel(0), oAccel(0), oForce(0), oTime(0),
-    daqFlag(false)
+    daqFlag(false), commitTag(0), numRecorders(0), theRecorders(0)
 {
     sizeTrial = new ID(OF_Resp_All);
     sizeOut = new ID(OF_Resp_All);
@@ -59,7 +61,7 @@ ExperimentalSite::ExperimentalSite(const ExperimentalSite& es)
     sizeTrial(0), sizeOut(0),
     tDisp(0), tVel(0), tAccel(0), tForce(0), tTime(0),
     oDisp(0), oVel(0), oAccel(0), oForce(0), oTime(0),
-    daqFlag(false)
+    daqFlag(false), commitTag(0), numRecorders(0), theRecorders(0)
 {
     if (es.theSetup != 0)  {
         theSetup = (es.theSetup)->getCopy();
@@ -116,6 +118,17 @@ ExperimentalSite::~ExperimentalSite()
         delete sizeTrial;
     if (sizeOut != 0)
         delete sizeOut;
+    
+    if (theRecorders != 0)  {
+        delete [] theRecorders;
+        theRecorders = 0;
+    }
+}
+
+
+const char* ExperimentalSite::getClassType() const
+{
+    return "UnknownExpSiteObject";
 }
 
 
@@ -268,7 +281,251 @@ const Vector& ExperimentalSite::getTime()
 
 int ExperimentalSite::commitState()
 {
-    return theSetup->commitState();
+    int rValue = 0;
+    
+    // first commit the setup
+    if (theSetup != 0)  {
+        rValue += theSetup->commitState();
+        if (rValue != OF_ReturnType_completed)  {
+            opserr << "ExperimentalSite::commitState() - "
+                << "failed to commit state for the setup.\n";
+            exit(OF_ReturnType_failed);
+        }
+    }
+    
+    // invoke record on all recorders
+    for (int i=0; i<numRecorders; i++)
+        if (theRecorders[i] != 0)
+            theRecorders[i]->record(commitTag, (*tTime)(0));
+    
+    // update the commitTag
+    commitTag++;
+    
+    return rValue;
+}
+
+
+Response* ExperimentalSite::setResponse(const char **argv, int argc,
+    OPS_Stream &output)
+{
+    int i;
+    char outputData[15];
+    Response *theResponse = 0;
+    
+    output.tag("ExpSiteOutput");
+    output.attr("siteType",this->getClassType());
+    output.attr("siteTag",this->getTag());
+    
+    // trial displacements
+    if (strcmp(argv[0],"trialDisp") == 0 ||
+        strcmp(argv[0],"trialDisplacement") == 0 ||
+        strcmp(argv[0],"trialDisplacements") == 0)
+    {
+        for (i=0; i<(*sizeTrial)(OF_Resp_Disp); i++)  {
+            sprintf(outputData,"trialDisp%d",i+1);
+            output.tag("ResponseType",outputData);
+        }
+        theResponse = new ExpSiteResponse(this, 1, *tDisp);
+    }
+    
+    // trial velocities
+    else if (strcmp(argv[0],"trialVel") == 0 ||
+        strcmp(argv[0],"trialVelocity") == 0 ||
+        strcmp(argv[0],"trialVelocities") == 0)
+    {
+        for (i=0; i<(*sizeTrial)(OF_Resp_Vel); i++)  {
+            sprintf(outputData,"trialVel%d",i+1);
+            output.tag("ResponseType",outputData);
+        }
+        theResponse = new ExpSiteResponse(this, 2, *tVel);
+    }
+    
+    // trial accelerations
+    else if (strcmp(argv[0],"trialAccel") == 0 ||
+        strcmp(argv[0],"trialAcceleration") == 0 ||
+        strcmp(argv[0],"trialAccelerations") == 0)
+    {
+        for (i=0; i<(*sizeTrial)(OF_Resp_Accel); i++)  {
+            sprintf(outputData,"trialAccel%d",i+1);
+            output.tag("ResponseType",outputData);
+        }
+        theResponse = new ExpSiteResponse(this, 3, *tAccel);
+    }
+    
+    // trial forces
+    else if (strcmp(argv[0],"trialForce") == 0 ||
+        strcmp(argv[0],"trialForces") == 0)
+    {
+        for (i=0; i<(*sizeTrial)(OF_Resp_Force); i++)  {
+            sprintf(outputData,"trialForce%d",i+1);
+            output.tag("ResponseType",outputData);
+        }
+        theResponse = new ExpSiteResponse(this, 4, *tForce);
+    }
+    
+    // trial times
+    else if (strcmp(argv[0],"trialTime") == 0 ||
+        strcmp(argv[0],"trialTimes") == 0)
+    {
+        for (i=0; i<(*sizeTrial)(OF_Resp_Time); i++)  {
+            sprintf(outputData,"trialTime%d",i+1);
+            output.tag("ResponseType",outputData);
+        }
+        theResponse = new ExpSiteResponse(this, 5, *tTime);
+    }
+    
+    // output displacements
+    else if (strcmp(argv[0],"outDisp") == 0 ||
+        strcmp(argv[0],"outDisplacement") == 0 ||
+        strcmp(argv[0],"outDisplacements") == 0)
+    {
+        for (i=0; i<(*sizeOut)(OF_Resp_Disp); i++)  {
+            sprintf(outputData,"outDisp%d",i+1);
+            output.tag("ResponseType",outputData);
+        }
+        theResponse = new ExpSiteResponse(this, 6, *oDisp);
+    }
+    
+    // output velocities
+    else if (strcmp(argv[0],"outVel") == 0 ||
+        strcmp(argv[0],"outVelocity") == 0 ||
+        strcmp(argv[0],"outVelocities") == 0)
+    {
+        for (i=0; i<(*sizeOut)(OF_Resp_Vel); i++)  {
+            sprintf(outputData,"outVel%d",i+1);
+            output.tag("ResponseType",outputData);
+        }
+        theResponse = new ExpSiteResponse(this, 7, *oVel);
+    }
+    
+    // output accelerations
+    else if (strcmp(argv[0],"outAccel") == 0 ||
+        strcmp(argv[0],"outAcceleration") == 0 ||
+        strcmp(argv[0],"outAccelerations") == 0)
+    {
+        for (i=0; i<(*sizeOut)(OF_Resp_Accel); i++)  {
+            sprintf(outputData,"outAccel%d",i+1);
+            output.tag("ResponseType",outputData);
+        }
+        theResponse = new ExpSiteResponse(this, 8, *oAccel);
+    }
+    
+    // output forces
+    else if (strcmp(argv[0],"outForce") == 0 ||
+        strcmp(argv[0],"outForces") == 0)
+    {
+        for (i=0; i<(*sizeOut)(OF_Resp_Force); i++)  {
+            sprintf(outputData,"outForce%d",i+1);
+            output.tag("ResponseType",outputData);
+        }
+        theResponse = new ExpSiteResponse(this, 9, *oForce);
+    }
+    
+    // output times
+    else if (strcmp(argv[0],"outTime") == 0 ||
+        strcmp(argv[0],"outTimes") == 0)
+    {
+        for (i=0; i<(*sizeOut)(OF_Resp_Time); i++)  {
+            sprintf(outputData,"outTime%d",i+1);
+            output.tag("ResponseType",outputData);
+        }
+        theResponse = new ExpSiteResponse(this, 10, *oTime);
+    }
+    
+    output.endTag();
+    
+    return theResponse;
+}
+
+
+int ExperimentalSite::getResponse(int responseID, Information &info)
+{
+    // each subclass must implement its own response
+    switch (responseID)  {
+    case 1:  // trial displacements
+        return info.setVector(*tDisp);
+        
+    case 2:  // trial velocities
+        return info.setVector(*tVel);
+        
+    case 3:  // trial accelerations
+        return info.setVector(*tAccel);
+        
+    case 4:  // trial forces
+        return info.setVector(*tForce);
+        
+    case 5:  // trial times
+        return info.setVector(*tTime);
+        
+    case 6:  // output displacements
+        return info.setVector(*oDisp);
+        
+    case 7:  // output velocities
+        return info.setVector(*oVel);
+        
+    case 8:  // output accelerations
+        return info.setVector(*oAccel);
+        
+    case 9:  // output forces
+        return info.setVector(*oForce);
+        
+    case 10:  // output times
+        return info.setVector(*oTime);
+        
+    default:
+        return -1;
+    }
+}
+
+
+int ExperimentalSite::addRecorder(Recorder &theRecorder)
+{
+    Recorder **newRecorders = new Recorder* [numRecorders + 1]; 
+    if (newRecorders == 0)  {
+        opserr << "ExperimentalSite::addRecorder() - "
+            << "could not add recorder ran out of memory\n";
+        return -1;
+    }
+    
+    for (int i=0; i<numRecorders; i++)
+        newRecorders[i] = theRecorders[i];
+    newRecorders[numRecorders] = &theRecorder;
+    
+    if (theRecorders != 0)
+        delete [] theRecorders;
+    
+    theRecorders = newRecorders;
+    numRecorders++;
+    
+    return 0;
+}
+
+
+int ExperimentalSite::removeRecorders()
+{
+    if (theRecorders != 0)  {
+        delete [] theRecorders;
+    }
+    
+    theRecorders = 0;
+    numRecorders = 0;
+    
+    return 0;
+}
+
+int ExperimentalSite::removeRecorder(int tag)
+{
+    for (int i=0; i<numRecorders; i++)  {
+        if (theRecorders[i] != 0)  {
+            if (theRecorders[i]->getTag() == tag)  {
+                delete theRecorders[i];
+                theRecorders[i] = 0;
+                return 0;
+            }
+        }    
+    }
+    
+    return -1;
 }
 
 

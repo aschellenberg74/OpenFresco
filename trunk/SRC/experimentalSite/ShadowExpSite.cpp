@@ -377,10 +377,16 @@ int ShadowExpSite::checkDaqResponse()
 
 int ShadowExpSite::commitState()
 {
+    int rValue = 0;
+
+    // first commit the ActorExpSite
     sendV(0) = OF_RemoteTest_commitState;
     this->sendVector(sendV);
     
-    return OF_ReturnType_completed;
+    // then commit base class
+    rValue += this->ExperimentalSite::commitState();
+    
+    return rValue;
 }
 
 
