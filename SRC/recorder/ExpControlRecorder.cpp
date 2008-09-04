@@ -37,31 +37,10 @@ ExpControlRecorder::ExpControlRecorder(int numcontrols,
     ExperimentalControl** thecontrols, const char** argv, int argc,
     bool echotime, OPS_Stream &theoutputstream, double deltat)
     : Recorder(RECORDER_TAGS_ExpControlRecorder),
-    numControls(numcontrols), theControls(0), responseArgs(0), numArgs(0),
-    echoTime(echotime), theOutputStream(&theoutputstream),
+    numControls(numcontrols), theControls(thecontrols), responseArgs(0),
+    numArgs(0), echoTime(echotime), theOutputStream(&theoutputstream),
     deltaT(deltat), theResponses(0), data(0), nextTimeStampToRecord(0.0)
 {
-    // initialize array with experimental controls
-    if (thecontrols == 0)  {
-        opserr << "ExpControlRecorder::ExpControlRecorder() - "
-            << "null experimental control array passed\n";
-        exit(OF_ReturnType_failed);
-    }
-    theControls = new ExperimentalControl* [numControls];
-    if (theControls == 0)  {
-        opserr << "ExpControlRecorder::ExpControlRecorder() - "
-            << "failed to allocate pointers for the controls\n";
-        exit(OF_ReturnType_failed);
-    }
-    for (int i=0; i<numControls; i++)  {
-        if (thecontrols[i] == 0)  {
-            opserr << "ExpControlRecorder::ExpControlRecorder() - "
-                "null experimental control pointer passed\n";
-            exit(OF_ReturnType_failed);
-        }
-        theControls[i] = thecontrols[i];
-    }
-    
     // create a copy of the response request
     responseArgs = new char* [argc];
     if (responseArgs == 0)  {
@@ -129,8 +108,6 @@ ExpControlRecorder::~ExpControlRecorder()
     
     if (theOutputStream != 0)
         delete theOutputStream;
-    if (theControls != 0)
-        delete [] theControls;
     if (responseArgs != 0)
         delete [] responseArgs;
     if (theResponses != 0)

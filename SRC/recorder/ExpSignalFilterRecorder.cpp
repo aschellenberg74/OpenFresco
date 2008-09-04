@@ -37,31 +37,10 @@ ExpSignalFilterRecorder::ExpSignalFilterRecorder(int numfilters,
     ExperimentalSignalFilter** thefilters, const char** argv, int argc,
     bool echotime, OPS_Stream &theoutputstream, double deltat)
     : Recorder(RECORDER_TAGS_ExpSignalFilterRecorder),
-    numFilters(numfilters), theFilters(0), responseArgs(0), numArgs(0),
-    echoTime(echotime), theOutputStream(&theoutputstream),
+    numFilters(numfilters), theFilters(thefilters), responseArgs(0),
+    numArgs(0), echoTime(echotime), theOutputStream(&theoutputstream),
     deltaT(deltat), theResponses(0), data(0), nextTimeStampToRecord(0.0)
 {
-    // initialize array with experimental signal filters
-    if (thefilters == 0)  {
-        opserr << "ExpSignalFilterRecorder::ExpSignalFilterRecorder() - "
-            << "null experimental signal filter array passed\n";
-        exit(OF_ReturnType_failed);
-    }
-    theFilters = new ExperimentalSignalFilter* [numFilters];
-    if (theFilters == 0)  {
-        opserr << "ExpSignalFilterRecorder::ExpSignalFilterRecorder() - "
-            << "failed to allocate pointers for the signal filters\n";
-        exit(OF_ReturnType_failed);
-    }
-    for (int i=0; i<numFilters; i++)  {
-        if (thefilters[i] == 0)  {
-            opserr << "ExpSignalFilterRecorder::ExpSignalFilterRecorder() - "
-                "null experimental signal filter pointer passed\n";
-            exit(OF_ReturnType_failed);
-        }
-        theFilters[i] = thefilters[i];
-    }
-    
     // create a copy of the response request
     responseArgs = new char* [argc];
     if (responseArgs == 0)  {
@@ -129,8 +108,6 @@ ExpSignalFilterRecorder::~ExpSignalFilterRecorder()
     
     if (theOutputStream != 0)
         delete theOutputStream;
-    if (theFilters != 0)
-        delete [] theFilters;
     if (responseArgs != 0)
         delete [] responseArgs;
     if (theResponses != 0)
