@@ -126,6 +126,17 @@ int openFresco_addExperimentalElement(ClientData clientData,
         theDomain, theTclBuilder);
 }
 
+// experimental recorder commands
+extern int TclAddExpRecorder(ClientData clientData, Tcl_Interp *interp,
+    int argc, TCL_Char **argv, Domain *theDomain, TclModelBuilder *theTclBuilder);
+
+int openFresco_addExperimentalRecorder(ClientData clientData,
+    Tcl_Interp *interp, int argc, TCL_Char **argv)
+{
+    return TclAddExpRecorder(clientData, interp, argc, argv,
+        theDomain, theTclBuilder);
+}
+
 
 // This is a package initialization procedure, which is called
 // by Tcl when this package is to be added to an interpreter.
@@ -171,6 +182,9 @@ OpenFresco(ClientData clientData, Tcl_Interp *interp, int argc,
         (ClientData)NULL, NULL);
 
     Tcl_CreateCommand(interp, "expElement", openFresco_addExperimentalElement,
+        (ClientData)NULL, NULL);
+
+    Tcl_CreateCommand(interp, "expRecorder", openFresco_addExperimentalRecorder,
         (ClientData)NULL, NULL);
 
     return TCL_OK;

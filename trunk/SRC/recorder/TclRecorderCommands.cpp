@@ -257,8 +257,6 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         
         if (siteTags != 0)
             delete siteTags;
-        if (theSites != 0)
-            delete [] theSites;
         if (data != 0)
             delete [] data;
     }
@@ -442,8 +440,6 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         
         if (setupTags != 0)
             delete setupTags;
-        if (theSetups != 0)
-            delete [] theSetups;
         if (data != 0)
             delete [] data;
     }
@@ -627,8 +623,6 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         
         if (controlTags != 0)
             delete controlTags;
-        if (theControls != 0)
-            delete [] theControls;
         if (data != 0)
             delete [] data;
     }
@@ -812,8 +806,6 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         
         if (filterTags != 0)
             delete filterTags;
-        if (theFilters != 0)
-            delete [] theFilters;
         if (data != 0)
             delete [] data;
     }

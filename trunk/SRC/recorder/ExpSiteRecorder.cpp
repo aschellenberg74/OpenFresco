@@ -37,31 +37,10 @@ ExpSiteRecorder::ExpSiteRecorder(int numsites,
     ExperimentalSite** thesites, const char** argv, int argc,
     bool echotime, OPS_Stream &theoutputstream, double deltat)
     : Recorder(RECORDER_TAGS_ExpSiteRecorder),
-    numSites(numsites), theSites(0), responseArgs(0), numArgs(0),
-    echoTime(echotime), theOutputStream(&theoutputstream),
+    numSites(numsites), theSites(thesites), responseArgs(0),
+    numArgs(0), echoTime(echotime), theOutputStream(&theoutputstream),
     deltaT(deltat), theResponses(0), data(0), nextTimeStampToRecord(0.0)
 {
-    // initialize array with experimental sites
-    if (thesites == 0)  {
-        opserr << "ExpSiteRecorder::ExpSiteRecorder() - "
-            << "null experimental site array passed\n";
-        exit(OF_ReturnType_failed);
-    }
-    theSites = new ExperimentalSite* [numSites];
-    if (theSites == 0)  {
-        opserr << "ExpSiteRecorder::ExpSiteRecorder() - "
-            << "failed to allocate pointers for the sites\n";
-        exit(OF_ReturnType_failed);
-    }
-    for (int i=0; i<numSites; i++)  {
-        if (thesites[i] == 0)  {
-            opserr << "ExpSiteRecorder::ExpSiteRecorder() - "
-                "null experimental site pointer passed\n";
-            exit(OF_ReturnType_failed);
-        }
-        theSites[i] = thesites[i];
-    }
-    
     // create a copy of the response request
     responseArgs = new char* [argc];
     if (responseArgs == 0)  {
@@ -129,8 +108,6 @@ ExpSiteRecorder::~ExpSiteRecorder()
     
     if (theOutputStream != 0)
         delete theOutputStream;
-    if (theSites != 0)
-        delete [] theSites;
     if (responseArgs != 0)
         delete [] responseArgs;
     if (theResponses != 0)

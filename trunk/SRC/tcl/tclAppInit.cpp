@@ -234,6 +234,28 @@ int openFresco_addExperimentalElement(ClientData clientData,
         theDomain, theTclBuilder);
 }
 
+// experimental recorder commands
+extern int TclAddExpRecorder(ClientData clientData, Tcl_Interp *interp,
+    int argc, TCL_Char **argv, Domain *theDomain, TclModelBuilder *theTclBuilder);
+
+int openFresco_addExperimentalRecorder(ClientData clientData,
+    Tcl_Interp *interp, int argc, TCL_Char **argv)
+{
+    return TclAddExpRecorder(clientData, interp, argc, argv,
+        theDomain, theTclBuilder);
+}
+
+// OpenSees recorder commands
+extern int TclAddRecorder(ClientData clientData, Tcl_Interp *interp,
+    int argc, TCL_Char **argv, Domain &theDomain);
+
+int addRecorder(ClientData clientData,
+    Tcl_Interp *interp, int argc, TCL_Char **argv)
+{
+    return TclAddRecorder(clientData, interp, argc, argv,
+        *theDomain);
+}
+
 
 // start laboratory server command
 int openFresco_startLabServer(ClientData clientData,
@@ -789,7 +811,7 @@ int openFresco_startSimAppElemServer(ClientData clientData,
 }
 
 
-// model builder command
+// OpenSees model builder command
 int specifyModelBuilder(ClientData clientData, Tcl_Interp *interp,
     int argc, TCL_Char **argv)
 {
@@ -956,12 +978,9 @@ int Tcl_AppInit(Tcl_Interp *interp)
     * they weren't already created by the init procedures called above.
     */
 
-    // OpenFresco commands
     theDomain = new Domain();
 
-    Tcl_CreateCommand(interp, "model", specifyModelBuilder,
-        (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);    
-
+    // OpenFresco commands
     Tcl_CreateCommand(interp, "expControlPoint", openFresco_addExperimentalCP,
         (ClientData)NULL, NULL);
 
@@ -980,6 +999,9 @@ int Tcl_AppInit(Tcl_Interp *interp)
     Tcl_CreateCommand(interp, "expElement", openFresco_addExperimentalElement,
         (ClientData)NULL, NULL);
 
+    Tcl_CreateCommand(interp, "expRecorder", openFresco_addExperimentalRecorder,
+        (ClientData)NULL, NULL);
+
     Tcl_CreateCommand(interp, "startLabServer", openFresco_startLabServer,
         (ClientData)NULL, NULL);
 
@@ -989,6 +1011,13 @@ int Tcl_AppInit(Tcl_Interp *interp)
     Tcl_CreateCommand(interp, "startSimAppElemServer", openFresco_startSimAppElemServer,
         (ClientData)NULL, NULL);
     
+    // OpenSees commands
+    Tcl_CreateCommand(interp, "model", specifyModelBuilder,
+        (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);
+
+    Tcl_CreateCommand(interp, "recorder", addRecorder,
+	    (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);
+
     /*
     * Specify a user-specific startup file to invoke if the application
     * is run interactively.  Typically the startup file is "~/.apprc"

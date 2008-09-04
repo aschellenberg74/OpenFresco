@@ -37,31 +37,10 @@ ExpSetupRecorder::ExpSetupRecorder(int numsetups,
     ExperimentalSetup** thesetups, const char** argv, int argc,
     bool echotime, OPS_Stream &theoutputstream, double deltat)
     : Recorder(RECORDER_TAGS_ExpSetupRecorder),
-    numSetups(numsetups), theSetups(0), responseArgs(0), numArgs(0),
-    echoTime(echotime), theOutputStream(&theoutputstream),
+    numSetups(numsetups), theSetups(thesetups), responseArgs(0),
+    numArgs(0), echoTime(echotime), theOutputStream(&theoutputstream),
     deltaT(deltat), theResponses(0), data(0), nextTimeStampToRecord(0.0)
 {
-    // initialize array with experimental setups
-    if (thesetups == 0)  {
-        opserr << "ExpSetupRecorder::ExpSetupRecorder() - "
-            << "null experimental setup array passed\n";
-        exit(OF_ReturnType_failed);
-    }
-    theSetups = new ExperimentalSetup* [numSetups];
-    if (theSetups == 0)  {
-        opserr << "ExpSetupRecorder::ExpSetupRecorder() - "
-            << "failed to allocate pointers for the setups\n";
-        exit(OF_ReturnType_failed);
-    }
-    for (int i=0; i<numSetups; i++)  {
-        if (thesetups[i] == 0)  {
-            opserr << "ExpSetupRecorder::ExpSetupRecorder() - "
-                "null experimental setup pointer passed\n";
-            exit(OF_ReturnType_failed);
-        }
-        theSetups[i] = thesetups[i];
-    }
-    
     // create a copy of the response request
     responseArgs = new char* [argc];
     if (responseArgs == 0)  {
@@ -129,8 +108,6 @@ ExpSetupRecorder::~ExpSetupRecorder()
     
     if (theOutputStream != 0)
         delete theOutputStream;
-    if (theSetups != 0)
-        delete [] theSetups;
     if (responseArgs != 0)
         delete [] responseArgs;
     if (theResponses != 0)
