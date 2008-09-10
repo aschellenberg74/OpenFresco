@@ -139,19 +139,19 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
 			return TCL_ERROR;	
 		}
         argi++;
-		ipAddr = (char*) calloc(strlen(argv[argi])+1, sizeof(char));
+        ipAddr = new char [strlen(argv[argi])+1];
 		strcpy(ipAddr,argv[4]);
         argi++;
-		ipPort = (char*) calloc(strlen(argv[argi])+1, sizeof(char));
+        ipPort = new char [strlen(argv[argi])+1];
 		strcpy(ipPort,argv[5]);
         argi++;
-		appName = (char*) calloc(strlen(argv[argi])+1, sizeof(char));
+        appName = new char [strlen(argv[argi])+1];
 		strcpy(appName,argv[6]);
         argi++;
         if (argc > 7 &&
             strcmp(argv[argi],"-ctrlFilters") != 0 &&
             strcmp(argv[argi],"-daqFilters") != 0)  {
-            appPath = (char*) calloc(strlen(argv[argi])+1, sizeof(char));
+            appPath = new char [strlen(argv[argi])+1];
             strcpy(appPath,argv[7]);
             argi++;
         }
@@ -185,7 +185,7 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
 			return TCL_ERROR;
 		}
         argi++;
-		boardName = (char*) calloc(strlen(argv[argi])+1, sizeof(char));
+        boardName = new char [strlen(argv[argi])+1];
 		strcpy(boardName,argv[4]);
         argi++;
 		
@@ -212,7 +212,7 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
 			return TCL_ERROR;
 		}
         argi++;
-		cfgFile = (char*) calloc(strlen(argv[argi])+1, sizeof(char));
+        cfgFile = new char [strlen(argv[argi])+1];
 		strcpy(cfgFile,argv[3]);
         argi++;
         if (argc > 4 &&
@@ -249,7 +249,7 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
 			return TCL_ERROR;
 		}
         argi++;
-		ipAddr = (char*) calloc(strlen(argv[argi])+1, sizeof(char));
+        ipAddr = new char [strlen(argv[argi])+1];
 		strcpy(ipAddr,argv[argi]);
         argi++;
         if (strcmp(argv[argi],"-trialCP") != 0)  {
@@ -285,6 +285,7 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
 		    return TCL_ERROR;
 	    }
         for (int i=0; i<numTrialCPs; i++)  {
+            trialCPs[i] = 0;
             if (Tcl_GetInt(interp, argv[argi], &cpTag) != TCL_OK)  {
                 opserr << "WARNING invalid cpTag\n";
                 opserr << "expControl LabVIEW " << tag << endln;
@@ -323,6 +324,7 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
 		    return TCL_ERROR;
 	    }
         for (int i=0; i<numOutCPs; i++)  {
+            outCPs[i] = 0;
             if (Tcl_GetInt(interp, argv[argi], &cpTag) != TCL_OK)  {
                 opserr << "WARNING invalid cpTag\n";
                 opserr << "expControl LabVIEW " << tag << endln;
@@ -339,7 +341,8 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
         }
 		
 		// parsing was successful, allocate the control
-		theControl = new ECLabVIEW(tag, numTrialCPs, trialCPs, numOutCPs, outCPs, ipAddr, ipPort);
+		theControl = new ECLabVIEW(tag, numTrialCPs, trialCPs,
+            numOutCPs, outCPs, ipAddr, ipPort);
     }
 	
     // ----------------------------------------------------------------------------	
@@ -444,6 +447,7 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
 		    return TCL_ERROR;
 	    }
         for (int i=0; i<numMats; i++)  {
+            theSpecimen[i] = 0;
             if (Tcl_GetInt(interp, argv[argi], &matTag) != TCL_OK)  {
                 opserr << "WARNING invalid matTag\n";
                 opserr << "expControl SimUniaxialMaterials " << tag << endln;
@@ -460,7 +464,10 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
         }
 
 		// parsing was successful, allocate the control
-		theControl = new ECSimUniaxialMaterials(tag,numMats,theSpecimen);	
+		theControl = new ECSimUniaxialMaterials(tag, numMats, theSpecimen);
+
+        if (theSpecimen != 0)
+            delete [] theSpecimen;
     }
 	
     // ----------------------------------------------------------------------------	
@@ -473,7 +480,7 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
 			return TCL_ERROR;
 		}    
 		
-		int cpTag;
+		int cpTag, i;
         int numTrialCPs = 0, numOutCPs = 0;
 		
         argi = 2;
@@ -489,9 +496,7 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
         }
         argi++;
         while (argi+numTrialCPs < argc &&
-            strcmp(argv[argi+numTrialCPs],"-outCP") != 0 &&
-            strcmp(argv[argi+numTrialCPs],"-ctrlFilters") != 0 &&
-            strcmp(argv[argi+numTrialCPs],"-daqFilters") != 0)  {
+            strcmp(argv[argi+numTrialCPs],"-outCP") != 0)  {
             numTrialCPs++;
         }
         if (numTrialCPs == 0)  {
@@ -506,7 +511,8 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
 		    opserr << "expControl SimDomain " << tag << endln;
 		    return TCL_ERROR;
 	    }
-        for (int i=0; i<numTrialCPs; i++)  {
+        for (i=0; i<numTrialCPs; i++)  {
+            trialCPs[i] = 0;
             if (Tcl_GetInt(interp, argv[argi], &cpTag) != TCL_OK)  {
                 opserr << "WARNING invalid cpTag\n";
                 opserr << "expControl SimDomain " << tag << endln;
@@ -544,7 +550,8 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
 		    opserr << "expControl SimDomain " << tag << endln;
 		    return TCL_ERROR;
 	    }
-        for (int i=0; i<numOutCPs; i++)  {
+        for (i=0; i<numOutCPs; i++)  {
+            outCPs[i] = 0;
             if (Tcl_GetInt(interp, argv[argi], &cpTag) != TCL_OK)  {
                 opserr << "WARNING invalid cpTag\n";
                 opserr << "expControl SimDomain " << tag << endln;
@@ -561,7 +568,8 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
         }
 		
 		// parsing was successful, allocate the control
-		theControl = new ECSimDomain(tag, numTrialCPs, trialCPs, numOutCPs, outCPs, theDomain);	
+		theControl = new ECSimDomain(tag, numTrialCPs, trialCPs,
+            numOutCPs, outCPs, theDomain);
     }
 
     // ----------------------------------------------------------------------------	
@@ -583,7 +591,7 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
 			return TCL_ERROR;
 		}
         argi++;
-		ipAddr = (char*) calloc(strlen(argv[argi])+1, sizeof(char));
+        ipAddr = new char [strlen(argv[argi])+1];
 		strcpy(ipAddr,argv[argi]);
         argi++;
 	    if (Tcl_GetInt(interp, argv[argi], &ipPort) != TCL_OK)  {

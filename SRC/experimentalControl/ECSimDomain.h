@@ -81,7 +81,13 @@ public:
         Vector* time);
     
     virtual int commitState();
+    
     virtual ExperimentalControl *getCopy();
+    
+    // public methods for experimental control recorder
+    virtual Response *setResponse(const char **argv, int argc,
+        OPS_Stream &output);
+    virtual int getResponse(int responseID, Information &info);
     
     // public methods for output
     void Print(OPS_Stream &s, int flag = 0);    
@@ -96,7 +102,7 @@ private:
     ExperimentalCP **trialCPs;  // trial control points
     int numOutCPs;              // number of output control points
     ExperimentalCP **outCPs;    // output control points
-
+    
     Domain            *theDomain;
     AnalysisModel     *theModel;
     ConvergenceTest   *theTest;
@@ -106,11 +112,11 @@ private:
     DOF_Numberer      *theNumberer;
     LinearSOE         *theSOE;
     StaticAnalysis    *theAnalysis;
-
+    
     TimeSeries    *theSeries;
     LoadPattern   *thePattern;
     SP_Constraint **theSP;
-
+    
     int numSPs;     // total number of SP constraints
     
     double *targDisp, *targVel, *targAccel, *targForce;

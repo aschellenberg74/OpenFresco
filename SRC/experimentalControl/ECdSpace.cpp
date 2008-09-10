@@ -66,9 +66,9 @@ ECdSpace::ECdSpace(int tag, int pctype, char *boardname)
         exit(OF_ReturnType_failed);
     }
     
-    opserr << "*****************************************\n";
-    opserr << "* The board " << boardName << " has been initialized *\n";
-    opserr << "*****************************************\n";
+    opserr << "****************************************************************\n";
+    opserr << "* The dSpace board " << boardName << " has been initialized\n";
+    opserr << "****************************************************************\n";
     opserr << endln;
     
     // before accessing the board it is required to check if an application is loaded
@@ -120,10 +120,15 @@ ECdSpace::ECdSpace(int tag, int pctype, char *boardname)
 
 
 ECdSpace::ECdSpace(const ECdSpace &ec)
-    : ExperimentalControl(ec)
+    : ExperimentalControl(ec),
+    targDisp(0), targVel(0), targAccel(0), measDisp(0), measForce(0)
 {	
+    boardState = ec.boardState;
+    simState = ec.simState;
     pcType = ec.pcType;
     boardName = ec.boardName;
+    board_index = ec.board_index;
+    simStateId = ec.simStateId;
 }
 
 
@@ -143,6 +148,10 @@ ECdSpace::~ECdSpace()
     if (measForce != 0)
         delete measForce;
     
+    // delete memory of string
+    if (boardName != 0)
+        delete [] boardName;
+
     // stop the rtp application
     simState = 0;
     error = DS_write_32(board_index, simStateId, 1, (UInt32 *)&simState);
@@ -301,9 +310,9 @@ int ECdSpace::setup()
         rValue += this->acquire();
         
         int i;
-        opserr << "**************************************\n";
-        opserr << "* Initial values of DAQ are:         *\n";
-        opserr << "*                                    *\n";
+        opserr << "****************************************************************\n";
+        opserr << "* Initial values of DAQ are:\n";
+        opserr << "*\n";
         opserr << "* dspDaq = [";
         for (i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)
             opserr << " " << measDisp[i];
@@ -312,11 +321,11 @@ int ECdSpace::setup()
         for (i=0; i<(*sizeDaq)(OF_Resp_Force); i++)
             opserr << " " << measForce[i];
         opserr << " ]\n";
-        opserr << "*                                    *\n";
-        opserr << "* Press 'Enter' to start the test or *\n";
-        opserr << "* 'r' to repeat the measurement or   *\n";
-        opserr << "* 'c' to cancel the initialization   *\n";
-        opserr << "**************************************\n";
+        opserr << "*\n";
+        opserr << "* Press 'Enter' to start the test or\n";
+        opserr << "* 'r' to repeat the measurement or\n";
+        opserr << "* 'c' to cancel the initialization\n";
+        opserr << "****************************************************************\n";
         opserr << endln;
         c = getchar();
         if (c == 'c')  {
@@ -328,9 +337,9 @@ int ECdSpace::setup()
         }
     } while (c == 'r');
     
-    opserr << "******************\n";
-    opserr << "* Running......  *\n";
-    opserr << "******************\n";
+    opserr << "*****************\n";
+    opserr << "* Running...... *\n";
+    opserr << "*****************\n";
     opserr << endln;
     
     return rValue;
@@ -439,6 +448,123 @@ ExperimentalControl *ECdSpace::getCopy()
 }
 
 
+Response* ECdSpace::setResponse(const char **argv, int argc,
+    OPS_Stream &output)
+{
+    int i;
+    char outputData[15];
+    Response *theResponse = 0;
+    
+    output.tag("ExpControlOutput");
+    output.attr("ctrlType",this->getClassType());
+    output.attr("ctrlTag",this->getTag());
+        
+    // target displacements
+    if (strcmp(argv[0],"targDisp") == 0 ||
+        strcmp(argv[0],"targetDisp") == 0 ||
+        strcmp(argv[0],"targetDisplacement") == 0 ||
+        strcmp(argv[0],"targetDisplacements") == 0)
+    {
+        for (i=0; i<(*sizeCtrl)(OF_Resp_Disp); i++)  {
+            sprintf(outputData,"targDisp%d",i+1);
+            output.tag("ResponseType",outputData);
+        }
+        theResponse = new ExpControlResponse(this, 1,
+            Vector((*sizeCtrl)(OF_Resp_Disp)));
+    }
+    
+    // target velocities
+    if (strcmp(argv[0],"targVel") == 0 ||
+        strcmp(argv[0],"targetVel") == 0 ||
+        strcmp(argv[0],"targetVelocity") == 0 ||
+        strcmp(argv[0],"targetVelocities") == 0)
+    {
+        for (i=0; i<(*sizeCtrl)(OF_Resp_Vel); i++)  {
+            sprintf(outputData,"targVel%d",i+1);
+            output.tag("ResponseType",outputData);
+        }
+        theResponse = new ExpControlResponse(this, 2,
+            Vector((*sizeCtrl)(OF_Resp_Vel)));
+    }
+    
+    // target accelerations
+    if (strcmp(argv[0],"targAccel") == 0 ||
+        strcmp(argv[0],"targetAccel") == 0 ||
+        strcmp(argv[0],"targetAcceleration") == 0 ||
+        strcmp(argv[0],"targetAccelerations") == 0)
+    {
+        for (i=0; i<(*sizeCtrl)(OF_Resp_Accel); i++)  {
+            sprintf(outputData,"targAccel%d",i+1);
+            output.tag("ResponseType",outputData);
+        }
+        theResponse = new ExpControlResponse(this, 3,
+            Vector((*sizeCtrl)(OF_Resp_Accel)));
+    }
+    
+    // measured displacements
+    if (strcmp(argv[0],"measDisp") == 0 ||
+        strcmp(argv[0],"measuredDisp") == 0 ||
+        strcmp(argv[0],"measuredDisplacement") == 0 ||
+        strcmp(argv[0],"measuredDisplacements") == 0)
+    {
+        for (i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)  {
+            sprintf(outputData,"measDisp%d",i+1);
+            output.tag("ResponseType",outputData);
+        }
+        theResponse = new ExpControlResponse(this, 4,
+            Vector((*sizeDaq)(OF_Resp_Disp)));
+    }
+    
+    // measured forces
+    if (strcmp(argv[0],"measForce") == 0 ||
+        strcmp(argv[0],"measuredForce") == 0 ||
+        strcmp(argv[0],"measuredForces") == 0)
+    {
+        for (i=0; i<(*sizeDaq)(OF_Resp_Force); i++)  {
+            sprintf(outputData,"measForce%d",i+1);
+            output.tag("ResponseType",outputData);
+        }
+        theResponse = new ExpControlResponse(this, 5,
+            Vector((*sizeDaq)(OF_Resp_Force)));
+    }
+    
+    output.endTag();
+    
+    return theResponse;
+}
+
+
+int ECdSpace::getResponse(int responseID, Information &info)
+{
+    Vector resp(0);
+
+    switch (responseID)  {
+    case 1:  // target displacements
+        resp.setData(targDisp,(*sizeCtrl)(OF_Resp_Disp));
+        return info.setVector(resp);
+        
+    case 2:  // target velocities
+        resp.setData(targVel,(*sizeCtrl)(OF_Resp_Vel));
+        return info.setVector(resp);
+        
+    case 3:  // target accelerations
+        resp.setData(targAccel,(*sizeCtrl)(OF_Resp_Accel));
+        return info.setVector(resp);
+        
+    case 4:  // measured displacements
+        resp.setData(measDisp,(*sizeDaq)(OF_Resp_Disp));
+        return info.setVector(resp);
+        
+    case 5:  // measured forces
+        resp.setData(measForce,(*sizeDaq)(OF_Resp_Force));
+        return info.setVector(resp);
+        
+    default:
+        return -1;
+    }
+}
+
+
 void ECdSpace::Print(OPS_Stream &s, int flag)
 {
     s << "****************************************************************\n";
@@ -446,10 +572,21 @@ void ECdSpace::Print(OPS_Stream &s, int flag)
     s << "* type: ECdSpace\n";
     s << "*   boardName: " << boardName << endln;
     s << "*   pcType: " << pcType << endln;
-    if (theCtrlFilters != 0)
-        s << "*   ctrlFilter: " << *theCtrlFilters << endln;
-    if (theDaqFilters != 0)
-        s << "*   daqFilter: " << *theDaqFilters << endln;
+    s << "*   ctrlFilters:";
+    for (int i=0; i<OF_Resp_All; i++)  {
+        if (theCtrlFilters[i] != 0)
+            s << " " << theCtrlFilters[i]->getTag();
+        else
+            s << " 0";
+    }
+    s << "\n*   daqFilters:";
+    for (int i=0; i<OF_Resp_All; i++)  {
+        if (theCtrlFilters[i] != 0)
+            s << " " << theCtrlFilters[i]->getTag();
+        else
+            s << " 0";
+    }
+    s << endln;
     s << "****************************************************************\n";
     s << endln;
 }

@@ -69,6 +69,11 @@ public:
     
     virtual ExperimentalControl *getCopy();
     
+    // public methods for experimental control recorder
+    virtual Response *setResponse(const char **argv, int argc,
+        OPS_Stream &output);
+    virtual int getResponse(int responseID, Information &info);
+    
     // public methods for output
     void Print(OPS_Stream &s, int flag = 0);    
     
@@ -82,7 +87,7 @@ private:
     
     int pcType, port;
     char *ipAddress, *ipPort, *appName, *appPath;
-    char errMsg[80];
+    char errMsg[256];
 
     double newTarget, switchPC, atTarget;
     double *targDisp, *targVel, *targAccel;

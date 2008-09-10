@@ -422,11 +422,87 @@ ExperimentalControl* ECNIEseries::getCopy()
 }
 
 
+Response* ECNIEseries::setResponse(const char **argv, int argc,
+    OPS_Stream &output)
+{
+    int i;
+    char outputData[15];
+    Response *theResponse = 0;
+    
+    output.tag("ExpControlOutput");
+    output.attr("ctrlType",this->getClassType());
+    output.attr("ctrlTag",this->getTag());
+        
+    // target displacements
+    if (strcmp(argv[0],"targDisp") == 0 ||
+        strcmp(argv[0],"targetDisp") == 0 ||
+        strcmp(argv[0],"targetDisplacement") == 0 ||
+        strcmp(argv[0],"targetDisplacements") == 0)
+    {
+        for (i=0; i<(*sizeCtrl)(OF_Resp_Disp); i++)  {
+            sprintf(outputData,"targDisp%d",i+1);
+            output.tag("ResponseType",outputData);
+        }
+        theResponse = new ExpControlResponse(this, 1,
+            Vector((*sizeCtrl)(OF_Resp_Disp)));
+    }
+    
+    // measured displacements
+    if (strcmp(argv[0],"measDisp") == 0 ||
+        strcmp(argv[0],"measuredDisp") == 0 ||
+        strcmp(argv[0],"measuredDisplacement") == 0 ||
+        strcmp(argv[0],"measuredDisplacements") == 0)
+    {
+        for (i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)  {
+            sprintf(outputData,"measDisp%d",i+1);
+            output.tag("ResponseType",outputData);
+        }
+        theResponse = new ExpControlResponse(this, 2,
+            Vector((*sizeDaq)(OF_Resp_Disp)));
+    }
+    
+    // measured forces
+    if (strcmp(argv[0],"measForce") == 0 ||
+        strcmp(argv[0],"measuredForce") == 0 ||
+        strcmp(argv[0],"measuredForces") == 0)
+    {
+        for (i=0; i<(*sizeDaq)(OF_Resp_Force); i++)  {
+            sprintf(outputData,"measForce%d",i+1);
+            output.tag("ResponseType",outputData);
+        }
+        theResponse = new ExpControlResponse(this, 3,
+            Vector((*sizeDaq)(OF_Resp_Force)));
+    }
+    
+    output.endTag();
+    
+    return theResponse;
+}
+
+
+int ECNIEseries::getResponse(int responseID, Information &info)
+{
+    switch (responseID)  {
+    case 1:  // target displacements
+        return info.setVector(*cDispV);
+        
+    case 2:  // measured displacements
+        return info.setVector(*dDispV);
+        
+    case 3:  // measured forces
+        return info.setVector(*dForceV);
+        
+    default:
+        return -1;
+    }
+}
+
+
 void ECNIEseries::Print(OPS_Stream &s, int flag)
 {
-    /* s << "*********************************************************\n";
+    s << "****************************************************************\n";
     s << "* ExperimentalControl: " << this->getTag() << endln; 
-    s << "* type: ECNIEseries\n";
+    s << "*   type: ECNIEseries\n";
     s << "*   <Equipment for DA>" << endln;
     for(int i=0; i<ndim; i++) {
     s << "\t";
@@ -437,14 +513,23 @@ void ECNIEseries::Print(OPS_Stream &s, int flag)
     s << "\t";
     daq_equip[i]->Print(s);//?????
     }
-    /*if(theFilter != 0) {
-    s << "\tFilter: " << *theFilter << endln;
-    }*/
-    /*if(realtest == false) {
-    s << "\tDummySpecimen(uniaxialMaterial), tag: " << dummySpecimen->getTag() 
-    << endln;
-    }*/
-
+    s << "*   ctrlFilters:";
+    for (int i=0; i<OF_Resp_All; i++)  {
+        if (theCtrlFilters[i] != 0)
+            s << " " << theCtrlFilters[i]->getTag();
+        else
+            s << " 0";
+    }
+    s << "\n*   daqFilters:";
+    for (int i=0; i<OF_Resp_All; i++)  {
+        if (theCtrlFilters[i] != 0)
+            s << " " << theCtrlFilters[i]->getTag();
+        else
+            s << " 0";
+    }
+    s << endln;
+    s << "****************************************************************\n";
+    s << endln;
 }
 
 

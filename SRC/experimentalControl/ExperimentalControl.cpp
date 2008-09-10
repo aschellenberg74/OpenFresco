@@ -138,6 +138,28 @@ int ExperimentalControl::commitState()
 }
 
 
+Response* ExperimentalControl::setResponse(const char **argv, int argc,
+    OPS_Stream &output)
+{
+    Response *theResponse = 0;
+    
+    output.tag("ExpControlOutput");
+    output.attr("ctrlType",this->getClassType());
+    output.attr("ctrlTag",this->getTag());
+        
+    output.endTag();
+    
+    return theResponse;
+}
+
+
+int ExperimentalControl::getResponse(int responseID, Information &info)
+{
+    // each subclass must implement its own response
+    return -1;
+}
+
+
 void ExperimentalControl::setCtrlFilter(ExperimentalSignalFilter* theFilter,
     int respType)
 {
