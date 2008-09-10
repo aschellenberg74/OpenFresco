@@ -70,6 +70,11 @@ public:
     
     virtual ExperimentalControl *getCopy();
     
+    // public methods for experimental control recorder
+    virtual Response *setResponse(const char **argv, int argc,
+        OPS_Stream &output);
+    virtual int getResponse(int responseID, Information &info);
+    
     // public methods for output
     void Print(OPS_Stream &s, int flag = 0);    
     
@@ -84,13 +89,13 @@ private:
     char *ipAddress;            // ip address
     int ipPort;                 // ip port
     const int dataSize;         // data size of network transactions
-
+    
     Channel *theChannel;        // channel
     double *sData;              // send data array
     Vector *sendData;           // send vector
     double *rData;              // receive data array
     Vector *recvData;           // receive vector
-
+    
     Vector *targDisp, *targForce;
     Vector *measDisp, *measForce;
 };

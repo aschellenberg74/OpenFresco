@@ -41,11 +41,10 @@ ECLabVIEW::ECLabVIEW(int tag,
     int nOutCPs, ExperimentalCP **outcps,
     char *ipaddress, int ipport)
     : ExperimentalControl(tag),
-    numTrialCPs(nTrialCPs), numOutCPs(nOutCPs),
+    numTrialCPs(nTrialCPs), trialCPs(0), numOutCPs(nOutCPs), outCPs(0),
     ipAddress(ipaddress), ipPort(ipport),
     theSocket(0), sData(0), sendData(0), rData(0), recvData(0),
     targDisp(0), targForce(0), measDisp(0), measForce(0)
-
 {   
     // open log file
     logFile = fopen("ECLabVIEW.log","w");
@@ -54,7 +53,7 @@ ECLabVIEW::ECLabVIEW(int tag,
             << "fopen: could not open log file.\n";
         exit(OF_ReturnType_failed);
     }
-
+    
     if (trialcps == 0 || outcps == 0)  {
       opserr << "ECLabVIEW::ECLabVIEW() - "
           << "null trialCPs or outCPs array passed.\n";
@@ -62,7 +61,7 @@ ECLabVIEW::ECLabVIEW(int tag,
     }
     trialCPs = trialcps;
     outCPs = outcps;
-
+    
     // setup the connection
     theSocket = new TCP_Socket(ipPort, ipAddress);
     if (theSocket->setUpConnection() != 0)  {
@@ -72,10 +71,10 @@ ECLabVIEW::ECLabVIEW(int tag,
         exit(OF_ReturnType_failed);
     }
     
-    opserr << "*************************************************\n";
-    opserr << "* The TCP/IP socket with address: " << ipAddress << "  *\n";
-    opserr << "* and port: " << ipPort << " has been opened:              *\n";
-    opserr << "*************************************************\n";
+    opserr << "****************************************************************\n";
+    opserr << "* The TCP/IP socket with address: " << ipAddress << endln;
+    opserr << "* and port: " << ipPort << " has been opened\n";
+    opserr << "****************************************************************\n";
     opserr << endln;
 
     // allocate memory for the send messages
@@ -122,9 +121,30 @@ ECLabVIEW::ECLabVIEW(int tag,
 
 
 ECLabVIEW::ECLabVIEW(const ECLabVIEW &ec)
-    : ExperimentalControl(ec)
+    : ExperimentalControl(ec),
+    theSocket(0), sData(0), sendData(0), rData(0), recvData(0),
+    targDisp(0), targForce(0), measDisp(0), measForce(0)
 {
-    // temporarily does nothing
+    numTrialCPs = ec.numTrialCPs;
+    numOutCPs = ec.numOutCPs;
+    logFile = ec.logFile;
+    
+    trialCPs = ec.trialCPs;
+    outCPs = ec.outCPs;
+    
+    // use the existing socket which is set up
+    ipAddress = ec.ipAddress;
+    ipPort = ec.ipPort;
+    theSocket = ec.theSocket;
+    
+    // allocate memory for the send messages
+    const int dataSize = 512;
+    sData = new char [dataSize];
+    sendData = new Message(sData, dataSize);
+    
+    // allocate memory for the receive messages
+    rData = new char [dataSize];
+    recvData = new Message(rData, dataSize);
 }
 
 
@@ -142,6 +162,10 @@ ECLabVIEW::~ECLabVIEW()
     if (measForce != 0)
         delete measForce;
     
+    // delete memory of string
+    if (ipAddress != 0)
+        delete [] ipAddress;
+    
     // close the session with LabVIEW
     sprintf(sData,"close-session\tOpenFresco\n");
         fprintf(logFile,"%s",sData);
@@ -149,20 +173,34 @@ ECLabVIEW::~ECLabVIEW()
     theSocket->sendMsg(0, 0, *sendData, 0);
     theSocket->recvMsgUnknownSize(0, 0, *recvData, 0);
         fprintf(logFile,"%s",rData);
-
+    
     if (strcmp(strtok(rData,"\t"),"OK") != 0)  {
         opserr << "ECLabVIEW::~ECLabVIEW() - "
             << "failed to close the current session with LabVIEW.\n";
         opserr << rData << endln;
     }
-
+    
     // close connection by destroying theSocket
+    if (sendData != 0)
+        delete sendData;
+    if (sData != 0)
+        delete [] sData;
+    if (recvData != 0)
+        delete recvData;
+    if (rData != 0)
+        delete [] rData;
     if (theSocket != 0)
         delete theSocket;
-
+    
     // close output file
     fclose(logFile);
-
+    
+    // delete memory of control points
+    if (trialCPs != 0)
+        delete [] trialCPs;
+    if (outCPs != 0)
+        delete [] outCPs;
+    
     opserr << endln;
     opserr << "********************************************\n";
     opserr << "* The session with LabVIEW has been closed *\n";
@@ -228,9 +266,9 @@ int ECLabVIEW::setup()
         rValue += this->acquire();
         
         int i;
-        opserr << "**************************************\n";
-        opserr << "* Initial values of DAQ are:         *\n";
-        opserr << "*                                    *\n";
+        opserr << "****************************************************************\n";
+        opserr << "* Initial values of DAQ are:\n";
+        opserr << "*\n";
         opserr << "* dspDaq = [";
         for (i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)
             opserr << " " << (*measDisp)(i);
@@ -239,11 +277,11 @@ int ECLabVIEW::setup()
         for (i=0; i<(*sizeDaq)(OF_Resp_Force); i++)
             opserr << " " << (*measForce)(i);
         opserr << " ]\n";
-        opserr << "*                                    *\n";
-        opserr << "* Press 'Enter' to start the test or *\n";
-        opserr << "* 'r' to repeat the measurement or   *\n";
-        opserr << "* 'c' to cancel the initialization   *\n";
-        opserr << "**************************************\n";
+        opserr << "*\n";
+        opserr << "* Press 'Enter' to start the test or\n";
+        opserr << "* 'r' to repeat the measurement or\n";
+        opserr << "* 'c' to cancel the initialization\n";
+        opserr << "****************************************************************\n";
         opserr << endln;
         c = getchar();
         if (c == 'c')  {
@@ -259,9 +297,9 @@ int ECLabVIEW::setup()
         }
     } while (c == 'r');
     
-    opserr << "******************\n";
-    opserr << "* Running......  *\n";
-    opserr << "******************\n";
+    opserr << "*****************\n";
+    opserr << "* Running...... *\n";
+    opserr << "*****************\n";
     opserr << endln;
     
     return rValue;
@@ -374,16 +412,119 @@ ExperimentalControl *ECLabVIEW::getCopy()
 }
 
 
+Response* ECLabVIEW::setResponse(const char **argv, int argc,
+    OPS_Stream &output)
+{
+    int i;
+    char outputData[15];
+    Response *theResponse = 0;
+    
+    output.tag("ExpControlOutput");
+    output.attr("ctrlType",this->getClassType());
+    output.attr("ctrlTag",this->getTag());
+        
+    // target displacements
+    if (strcmp(argv[0],"targDisp") == 0 ||
+        strcmp(argv[0],"targetDisp") == 0 ||
+        strcmp(argv[0],"targetDisplacement") == 0 ||
+        strcmp(argv[0],"targetDisplacements") == 0)
+    {
+        for (i=0; i<(*sizeCtrl)(OF_Resp_Disp); i++)  {
+            sprintf(outputData,"targDisp%d",i+1);
+            output.tag("ResponseType",outputData);
+        }
+        theResponse = new ExpControlResponse(this, 1,
+            Vector((*sizeCtrl)(OF_Resp_Disp)));
+    }
+    
+    // target forces
+    if (strcmp(argv[0],"targForce") == 0 ||
+        strcmp(argv[0],"targetForce") == 0 ||
+        strcmp(argv[0],"targetForces") == 0)
+    {
+        for (i=0; i<(*sizeCtrl)(OF_Resp_Force); i++)  {
+            sprintf(outputData,"targForce%d",i+1);
+            output.tag("ResponseType",outputData);
+        }
+        theResponse = new ExpControlResponse(this, 2,
+            Vector((*sizeCtrl)(OF_Resp_Force)));
+    }
+    
+    // measured displacements
+    if (strcmp(argv[0],"measDisp") == 0 ||
+        strcmp(argv[0],"measuredDisp") == 0 ||
+        strcmp(argv[0],"measuredDisplacement") == 0 ||
+        strcmp(argv[0],"measuredDisplacements") == 0)
+    {
+        for (i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)  {
+            sprintf(outputData,"measDisp%d",i+1);
+            output.tag("ResponseType",outputData);
+        }
+        theResponse = new ExpControlResponse(this, 3,
+            Vector((*sizeDaq)(OF_Resp_Disp)));
+    }
+    
+    // measured forces
+    if (strcmp(argv[0],"measForce") == 0 ||
+        strcmp(argv[0],"measuredForce") == 0 ||
+        strcmp(argv[0],"measuredForces") == 0)
+    {
+        for (i=0; i<(*sizeDaq)(OF_Resp_Force); i++)  {
+            sprintf(outputData,"measForce%d",i+1);
+            output.tag("ResponseType",outputData);
+        }
+        theResponse = new ExpControlResponse(this, 4,
+            Vector((*sizeDaq)(OF_Resp_Force)));
+    }
+    
+    output.endTag();
+    
+    return theResponse;
+}
+
+
+int ECLabVIEW::getResponse(int responseID, Information &info)
+{
+    switch (responseID)  {
+    case 1:  // target displacements
+        return info.setVector(*targDisp);
+        
+    case 2:  // target forces
+        return info.setVector(*targForce);
+        
+    case 3:  // measured displacements
+        return info.setVector(*measDisp);
+        
+    case 4:  // measured forces
+        return info.setVector(*measForce);
+        
+    default:
+        return -1;
+    }
+}
+
+
 void ECLabVIEW::Print(OPS_Stream &s, int flag)
 {
     s << "****************************************************************\n";
     s << "* ExperimentalControl: " << this->getTag() << endln; 
-    s << "* type: ECLabVIEW\n";
+    s << "*   type: ECLabVIEW\n";
     s << "*   ipAddress: " << ipAddress << ", ipPort: " << ipPort << endln;
-    if (theCtrlFilters != 0)
-        s << "*   ctrlFilter: " << *theCtrlFilters << endln;
-    if (theDaqFilters != 0)
-        s << "*   daqFilter: " << *theDaqFilters << endln;
+    s << "*   ctrlFilters:";
+    for (int i=0; i<OF_Resp_All; i++)  {
+        if (theCtrlFilters[i] != 0)
+            s << " " << theCtrlFilters[i]->getTag();
+        else
+            s << " 0";
+    }
+    s << "\n*   daqFilters:";
+    for (int i=0; i<OF_Resp_All; i++)  {
+        if (theCtrlFilters[i] != 0)
+            s << " " << theCtrlFilters[i]->getTag();
+        else
+            s << " 0";
+    }
+    s << endln;
     s << "****************************************************************\n";
     s << endln;
 }
@@ -416,53 +557,8 @@ int ECLabVIEW::control()
         ID dir = trialCPs[i]->getDirection();
         ID resp = trialCPs[i]->getResponseType();
         Vector fact = trialCPs[i]->getFactor();
-        const Vector *lowerLim = trialCPs[i]->getLowerLimit();
-        const Vector *upperLim = trialCPs[i]->getUpperLimit();
 
-        if (lowerLim == 0 || upperLim == 0)  {
-            // loop through all the trial control point parameters
-            // without checking if commands are within limits
-            for (int j=0; j<numDir; j++)  {
-                // append GeomType
-                if (dir(j) == 0 || dir(j) == 3)  {
-                    sprintf(sData,"%s\tx",sData);
-                }
-                else if (dir(j) == 1 || dir(j) == 4)  {
-                    sprintf(sData,"%s\ty",sData);
-                }
-                else if (dir(j) == 2 || dir(j) == 5)  {
-                    sprintf(sData,"%s\tz",sData);
-                }
-                else {
-                    opserr << "ECLabVIEW::control() - "
-                        << "requested direction is not supported.\n";
-                    exit(OF_ReturnType_failed);
-                }
-                // append ParameterType and Parameter
-                if (dir(j) < ndm && resp(j) == OF_Resp_Disp)  {
-                    sprintf(sData,"%s\tdisplacement\t%.10E",sData,fact(j)*(*targDisp)(dID));
-                    dID++;
-                }
-                else if (dir(j) < ndm && resp(j) == OF_Resp_Force)  {
-                    sprintf(sData,"%s\tforce\t%.10E",sData,fact(j)*(*targForce)(fID));
-                    fID++;
-                }
-                else if (dir(j) >= ndm && resp(j) == OF_Resp_Disp)  {
-                    sprintf(sData,"%s\trotation\t%.10E",sData,fact(j)*(*targDisp)(dID));
-                    dID++;
-                }
-                else if (dir(j) >= ndm && resp(j) == OF_Resp_Force)  {
-                    sprintf(sData,"%s\tmoment\t%.10E",sData,fact(j)*(*targForce)(fID));
-                    fID++;
-                }
-                else {
-                    opserr << "ECLabVIEW::control() - "
-                        << "requested response type is not supported.\n";
-                    exit(OF_ReturnType_failed);
-                }
-            }
-        }
-        else  {
+        if (trialCPs[i]->hasLimits())  {
             // loop through all the trial control point parameters
             // and check if commands are within given limits
             double parameter; int c;
@@ -509,17 +605,19 @@ int ECLabVIEW::control()
                     exit(OF_ReturnType_failed);
                 }
                 // check if parameter is within limits and append
-                if (parameter < (*lowerLim)(j) || parameter > (*upperLim)(j))  {
-                    opserr << "*************************************************\n";
-                    opserr << "* WARNING - Control command exceeds the limits: *\n";
-                    opserr << "*                                               *\n";
-                    opserr << "* Limits = [" << (*lowerLim)(j) << "," << (*upperLim)(j) << "]";
+                Vector lowerLim = trialCPs[i]->getLowerLimit();
+                Vector upperLim = trialCPs[i]->getUpperLimit();
+                if (parameter < lowerLim(j) || parameter > upperLim(j))  {
+                    opserr << "****************************************************************\n";
+                    opserr << "* WARNING - Control command exceeds the limits:\n";
+                    opserr << "*\n";
+                    opserr << "* Limits = [" << lowerLim(j) << "," << upperLim(j) << "]";
                     opserr << " -> Command = " << parameter << endln;
-                    opserr << "*                                               *\n";
-                    opserr << "* Press 'Enter' to continue the test or         *\n";
-                    opserr << "* 's' to saturate the command at the limits or  *\n";
-                    opserr << "* 'c' to cancel the test                        *\n";
-                    opserr << "*************************************************\n";
+                    opserr << "*\n";
+                    opserr << "* Press 'Enter' to continue the test or\n";
+                    opserr << "* 's' to saturate the command at the limits or\n";
+                    opserr << "* 'c' to cancel the test\n";
+                    opserr << "****************************************************************\n";
                     opserr << endln;
                     c = getchar();
                     if (c == 'c')  {
@@ -532,10 +630,53 @@ int ECLabVIEW::control()
                         exit(OF_ReturnType_failed);
                     } else if (c == 's')  {
                         getchar();
-                        parameter = (parameter < (*lowerLim)(j)) ? (*lowerLim)(j) : (*upperLim)(j);
+                        parameter = (parameter < lowerLim(j)) ? lowerLim(j) : upperLim(j);
                     }
                 }
                 sprintf(sData,"%s\t%.10E",sData,parameter);
+            }
+        }
+        else  {
+            // loop through all the trial control point parameters
+            // without checking if commands are within limits
+            for (int j=0; j<numDir; j++)  {
+                // append GeomType
+                if (dir(j) == 0 || dir(j) == 3)  {
+                    sprintf(sData,"%s\tx",sData);
+                }
+                else if (dir(j) == 1 || dir(j) == 4)  {
+                    sprintf(sData,"%s\ty",sData);
+                }
+                else if (dir(j) == 2 || dir(j) == 5)  {
+                    sprintf(sData,"%s\tz",sData);
+                }
+                else {
+                    opserr << "ECLabVIEW::control() - "
+                        << "requested direction is not supported.\n";
+                    exit(OF_ReturnType_failed);
+                }
+                // append ParameterType and Parameter
+                if (dir(j) < ndm && resp(j) == OF_Resp_Disp)  {
+                    sprintf(sData,"%s\tdisplacement\t%.10E",sData,fact(j)*(*targDisp)(dID));
+                    dID++;
+                }
+                else if (dir(j) < ndm && resp(j) == OF_Resp_Force)  {
+                    sprintf(sData,"%s\tforce\t%.10E",sData,fact(j)*(*targForce)(fID));
+                    fID++;
+                }
+                else if (dir(j) >= ndm && resp(j) == OF_Resp_Disp)  {
+                    sprintf(sData,"%s\trotation\t%.10E",sData,fact(j)*(*targDisp)(dID));
+                    dID++;
+                }
+                else if (dir(j) >= ndm && resp(j) == OF_Resp_Force)  {
+                    sprintf(sData,"%s\tmoment\t%.10E",sData,fact(j)*(*targForce)(fID));
+                    fID++;
+                }
+                else {
+                    opserr << "ECLabVIEW::control() - "
+                        << "requested response type is not supported.\n";
+                    exit(OF_ReturnType_failed);
+                }
             }
         }
     }

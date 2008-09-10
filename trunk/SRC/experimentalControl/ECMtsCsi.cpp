@@ -48,14 +48,23 @@ ECMtsCsi::ECMtsCsi(int tag, char *cfgfile, double ramptime)
         opserr << xcp.what() << endln;
         exit(OF_ReturnType_failed);
     }
+
+    opserr << "****************************************************************\n";
+    opserr << "* The following CSI configuration file has been loaded:\n";
+    opserr << "* " << cfgFile << endln;
+    opserr << "****************************************************************\n";
+    opserr << endln;    
 }
 
 
 ECMtsCsi::ECMtsCsi(const ECMtsCsi& ec)
     : ExperimentalControl(ec),
     CsiController(Mts::CsiFactory::newController()),
-    rampId(-1)
+    rampId(-1),
+    targDisp(0), measResp(0), measDisp(0), measForce(0),
+    respSize(0)
 {
+    cfgFile = ec.cfgFile;
     rampTime = ec.rampTime;
 
     try  {
@@ -72,15 +81,17 @@ ECMtsCsi::~ECMtsCsi()
 {
     // reset the csi-controller
     CsiController->reset();
-
+    
     // delete the csi-controller
     if (CsiController != 0)
         delete CsiController;
     CsiController = 0;
-
-    // delete memory of target vector
+    
+    // delete memory of target vectors
     if (targDisp != 0)
         delete targDisp;
+    if (targForce != 0)
+        delete targForce;
     
     // delete memory of measured vectors
     if (measDisp != 0)
@@ -89,6 +100,16 @@ ECMtsCsi::~ECMtsCsi()
         delete measForce;
     if (measResp != 0)
         delete [] measResp;
+    
+    // delete memory of string
+    if (cfgFile != 0)
+        delete [] cfgFile;
+
+    opserr << endln;
+    opserr << "*************************************\n";
+    opserr << "* The CSI controller has been reset *\n";
+    opserr << "*************************************\n";
+    opserr << endln;
 }
 
 
@@ -110,12 +131,12 @@ int ECMtsCsi::setup()
         targForce->Zero();
     }
     
-    if (measResp != 0)
-        delete [] measResp;
     if (measDisp != 0)
         delete measDisp;
     if (measForce != 0)
         delete measForce;
+    if (measResp != 0)
+        delete [] measResp;
     
     int id = 0;
     respSize = (*sizeDaq)(OF_Resp_Disp) + (*sizeDaq)(OF_Resp_Force);
@@ -156,9 +177,9 @@ int ECMtsCsi::setup()
         rValue += this->acquire();
         
         int i;
-        opserr << "**************************************\n";
-        opserr << "* Initial values of DAQ are:         *\n";
-        opserr << "*                                    *\n";
+        opserr << "****************************************************************\n";
+        opserr << "* Initial values of DAQ are:\n";
+        opserr << "*\n";
         opserr << "* dspDaq = [";
         for (i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)
             opserr << " " << measDisp[i];
@@ -167,11 +188,11 @@ int ECMtsCsi::setup()
         for (i=0; i<(*sizeDaq)(OF_Resp_Force); i++)
             opserr << " " << measForce[i];
         opserr << " ]\n";
-        opserr << "*                                    *\n";
-        opserr << "* Press 'Enter' to start the test or *\n";
-        opserr << "* 'r' to repeat the measurement or   *\n";
-        opserr << "* 'c' to cancel the initialization   *\n";
-        opserr << "**************************************\n";
+        opserr << "*\n";
+        opserr << "* Press 'Enter' to start the test or\n";
+        opserr << "* 'r' to repeat the measurement or\n";
+        opserr << "* 'c' to cancel the initialization\n";
+        opserr << "****************************************************************\n";
         opserr << endln;
         c = getchar();
         if (c == 'c')  {
@@ -184,9 +205,9 @@ int ECMtsCsi::setup()
         }
     } while (c == 'r');
     
-    opserr << "******************\n";
-    opserr << "* Running......  *\n";
-    opserr << "******************\n";
+    opserr << "*****************\n";
+    opserr << "* Running...... *\n";
+    opserr << "*****************\n";
     opserr << endln;
     
     return rValue;
@@ -350,17 +371,120 @@ ExperimentalControl *ECMtsCsi::getCopy()
 }
 
 
+Response* ECMtsCsi::setResponse(const char **argv, int argc,
+    OPS_Stream &output)
+{
+    int i;
+    char outputData[15];
+    Response *theResponse = 0;
+    
+    output.tag("ExpControlOutput");
+    output.attr("ctrlType",this->getClassType());
+    output.attr("ctrlTag",this->getTag());
+        
+    // target displacements
+    if (strcmp(argv[0],"targDisp") == 0 ||
+        strcmp(argv[0],"targetDisp") == 0 ||
+        strcmp(argv[0],"targetDisplacement") == 0 ||
+        strcmp(argv[0],"targetDisplacements") == 0)
+    {
+        for (i=0; i<(*sizeCtrl)(OF_Resp_Disp); i++)  {
+            sprintf(outputData,"targDisp%d",i+1);
+            output.tag("ResponseType",outputData);
+        }
+        theResponse = new ExpControlResponse(this, 1,
+            Vector((*sizeCtrl)(OF_Resp_Disp)));
+    }
+    
+    // target forces
+    if (strcmp(argv[0],"targForce") == 0 ||
+        strcmp(argv[0],"targetForce") == 0 ||
+        strcmp(argv[0],"targetForces") == 0)
+    {
+        for (i=0; i<(*sizeCtrl)(OF_Resp_Force); i++)  {
+            sprintf(outputData,"targForce%d",i+1);
+            output.tag("ResponseType",outputData);
+        }
+        theResponse = new ExpControlResponse(this, 2,
+            Vector((*sizeCtrl)(OF_Resp_Force)));
+    }
+    
+    // measured displacements
+    if (strcmp(argv[0],"measDisp") == 0 ||
+        strcmp(argv[0],"measuredDisp") == 0 ||
+        strcmp(argv[0],"measuredDisplacement") == 0 ||
+        strcmp(argv[0],"measuredDisplacements") == 0)
+    {
+        for (i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)  {
+            sprintf(outputData,"measDisp%d",i+1);
+            output.tag("ResponseType",outputData);
+        }
+        theResponse = new ExpControlResponse(this, 3,
+            Vector((*sizeDaq)(OF_Resp_Disp)));
+    }
+    
+    // measured forces
+    if (strcmp(argv[0],"measForce") == 0 ||
+        strcmp(argv[0],"measuredForce") == 0 ||
+        strcmp(argv[0],"measuredForces") == 0)
+    {
+        for (i=0; i<(*sizeDaq)(OF_Resp_Force); i++)  {
+            sprintf(outputData,"measForce%d",i+1);
+            output.tag("ResponseType",outputData);
+        }
+        theResponse = new ExpControlResponse(this, 4,
+            Vector((*sizeDaq)(OF_Resp_Force)));
+    }
+    
+    output.endTag();
+    
+    return theResponse;
+}
+
+
+int ECMtsCsi::getResponse(int responseID, Information &info)
+{
+    switch (responseID)  {
+    case 1:  // target displacements
+        return info.setVector(*targDisp);
+        
+    case 2:  // target forces
+        return info.setVector(*targForce);
+        
+    case 3:  // measured displacements
+        return info.setVector(*measDisp);
+        
+    case 4:  // measured forces
+        return info.setVector(*measForce);
+        
+    default:
+        return -1;
+    }
+}
+
+
 void ECMtsCsi::Print(OPS_Stream &s, int flag)
 {
     s << "****************************************************************\n";
     s << "* ExperimentalControl: " << this->getTag() << endln; 
-    s << "* type: ECMtsCsi\n";
+    s << "*   type: ECMtsCsi\n";
     s << "*   cfgFile: " << cfgFile << endln;
     s << "*   rampTime: " << rampTime << endln;
-    if (theCtrlFilters != 0)
-        s << "*   ctrlFilter: " << *theCtrlFilters << endln;
-    if (theDaqFilters != 0)
-        s << "*   daqFilter: " << *theDaqFilters << endln;
+    s << "*   ctrlFilters:";
+    for (int i=0; i<OF_Resp_All; i++)  {
+        if (theCtrlFilters[i] != 0)
+            s << " " << theCtrlFilters[i]->getTag();
+        else
+            s << " 0";
+    }
+    s << "\n*   daqFilters:";
+    for (int i=0; i<OF_Resp_All; i++)  {
+        if (theCtrlFilters[i] != 0)
+            s << " " << theCtrlFilters[i]->getTag();
+        else
+            s << " 0";
+    }
+    s << endln;
     s << "****************************************************************\n";
     s << endln;
 }

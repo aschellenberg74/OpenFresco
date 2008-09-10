@@ -37,11 +37,14 @@
 // ExperimentalControl.
 
 #include <FrescoGlobals.h>
+#include <ExpControlResponse.h>
 #include <ExperimentalSignalFilter.h>
 
 #include <TaggedObject.h>
 #include <ID.h>
 #include <Vector.h>
+
+class Response;
 
 class ExperimentalControl : public TaggedObject
 {
@@ -55,7 +58,7 @@ public:
     
     // method to get class type
     virtual const char *getClassType() const;
-
+    
     // public methods to set and to get response
     virtual int setup() = 0;
     virtual int setSize(ID sizeT, ID sizeO) = 0;
@@ -75,11 +78,17 @@ public:
     
     virtual ExperimentalControl *getCopy() = 0;
     
+    // public methods for experimental control recorder
+    virtual Response *setResponse(const char **argv, int argc,
+        OPS_Stream &output);
+    virtual int getResponse(int responseID, Information &info);
+    
+    // public methods to set experimental signal filters
     void setCtrlFilter(ExperimentalSignalFilter* theFilter,
         int respType);
     void setDaqFilter(ExperimentalSignalFilter* theFilter,
         int respType);
-
+    
     const ID& getSizeCtrl();
     const ID& getSizeDaq();
     

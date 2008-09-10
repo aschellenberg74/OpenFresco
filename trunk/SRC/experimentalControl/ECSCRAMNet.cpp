@@ -131,9 +131,29 @@ ECSCRAMNet::ECSCRAMNet(int tag, int memoffset, int numactch)
 
 ECSCRAMNet::ECSCRAMNet(const ECSCRAMNet &ec)
     : ExperimentalControl(ec),
-    memOffset(ec.memOffset), numActCh(ec.numActCh)
+    memOffset(ec.memOffset), numActCh(ec.numActCh),
+    memPtrBASE(0), memPtrOPF(0),
+    newTarget(0), switchPC(0), atTarget(0),
+    targDisp(0), targVel(0), targAccel(0), targForce(0), targTime(0),
+    measDisp(0), measVel(0), measAccel(0), measForce(0), measTime(0)
 {
-    // temporarily does nothing
+    memPtrBASE = ec.memPtrBASE;
+    memPtrOPF  = ec.memPtrOPF;
+    newTarget  = ec.newTarget;
+    switchPC   = ec.switchPC;
+    atTarget   = ec.atTarget;
+
+    targDisp  = ec.targDisp;
+    targVel   = ec.targVel;
+    targAccel = ec.targAccel;
+    targForce = ec.targForce;
+    targTime  = ec.targTime;
+
+    measDisp  = ec.measDisp;
+    measVel   = ec.measVel;
+    measAccel = ec.measAccel;
+    measForce = ec.measForce;
+    measTime  = ec.measTime;
 }
 
 
@@ -189,9 +209,9 @@ int ECSCRAMNet::setup()
         rValue += this->acquire();
         
         int i;
-        opserr << "**************************************\n";
-        opserr << "* Initial values of DAQ are:         *\n";
-        opserr << "*                                    *\n";
+        opserr << "****************************************************************\n";
+        opserr << "* Initial values of DAQ are:\n";
+        opserr << "*\n";
         opserr << "* dspDaq = [";
         for (i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)
             opserr << " " << measDisp[i];
@@ -200,11 +220,11 @@ int ECSCRAMNet::setup()
         for (i=0; i<(*sizeDaq)(OF_Resp_Force); i++)
             opserr << " " << measForce[i];
         opserr << " ]\n";
-        opserr << "*                                    *\n";
-        opserr << "* Press 'Enter' to start the test or *\n";
-        opserr << "* 'r' to repeat the measurement or   *\n";
-        opserr << "* 'c' to cancel the initialization   *\n";
-        opserr << "**************************************\n";
+        opserr << "*\n";
+        opserr << "* Press 'Enter' to start the test or\n";
+        opserr << "* 'r' to repeat the measurement or\n";
+        opserr << "* 'c' to cancel the initialization\n";
+        opserr << "****************************************************************\n";
         opserr << endln;
         c = getchar();
         if (c == 'c')  {
@@ -217,9 +237,9 @@ int ECSCRAMNet::setup()
         }
     } while (c == 'r');
         
-    opserr << "******************\n";
-    opserr << "* Running......  *\n";
-    opserr << "******************\n";
+    opserr << "*****************\n";
+    opserr << "* Running...... *\n";
+    opserr << "*****************\n";
     opserr << endln;
     
     return rValue;
@@ -365,17 +385,232 @@ ExperimentalControl *ECSCRAMNet::getCopy()
 }
 
 
+Response* ECSCRAMNet::setResponse(const char **argv, int argc,
+    OPS_Stream &output)
+{
+    int i;
+    char outputData[15];
+    Response *theResponse = 0;
+    
+    output.tag("ExpControlOutput");
+    output.attr("ctrlType",this->getClassType());
+    output.attr("ctrlTag",this->getTag());
+        
+    // target displacements
+    if (strcmp(argv[0],"targDisp") == 0 ||
+        strcmp(argv[0],"targetDisp") == 0 ||
+        strcmp(argv[0],"targetDisplacement") == 0 ||
+        strcmp(argv[0],"targetDisplacements") == 0)
+    {
+        for (i=0; i<(*sizeCtrl)(OF_Resp_Disp); i++)  {
+            sprintf(outputData,"targDisp%d",i+1);
+            output.tag("ResponseType",outputData);
+        }
+        theResponse = new ExpControlResponse(this, 1,
+            Vector((*sizeCtrl)(OF_Resp_Disp)));
+    }
+    
+    // target velocities
+    if (strcmp(argv[0],"targVel") == 0 ||
+        strcmp(argv[0],"targetVel") == 0 ||
+        strcmp(argv[0],"targetVelocity") == 0 ||
+        strcmp(argv[0],"targetVelocities") == 0)
+    {
+        for (i=0; i<(*sizeCtrl)(OF_Resp_Vel); i++)  {
+            sprintf(outputData,"targVel%d",i+1);
+            output.tag("ResponseType",outputData);
+        }
+        theResponse = new ExpControlResponse(this, 2,
+            Vector((*sizeCtrl)(OF_Resp_Vel)));
+    }
+    
+    // target accelerations
+    if (strcmp(argv[0],"targAccel") == 0 ||
+        strcmp(argv[0],"targetAccel") == 0 ||
+        strcmp(argv[0],"targetAcceleration") == 0 ||
+        strcmp(argv[0],"targetAccelerations") == 0)
+    {
+        for (i=0; i<(*sizeCtrl)(OF_Resp_Accel); i++)  {
+            sprintf(outputData,"targAccel%d",i+1);
+            output.tag("ResponseType",outputData);
+        }
+        theResponse = new ExpControlResponse(this, 3,
+            Vector((*sizeCtrl)(OF_Resp_Accel)));
+    }
+    
+    // target forces
+    if (strcmp(argv[0],"targForce") == 0 ||
+        strcmp(argv[0],"targetForce") == 0 ||
+        strcmp(argv[0],"targetForces") == 0)
+    {
+        for (i=0; i<(*sizeCtrl)(OF_Resp_Force); i++)  {
+            sprintf(outputData,"targForce%d",i+1);
+            output.tag("ResponseType",outputData);
+        }
+        theResponse = new ExpControlResponse(this, 4,
+            Vector((*sizeCtrl)(OF_Resp_Force)));
+    }
+    
+    // target times
+    if (strcmp(argv[0],"targTime") == 0 ||
+        strcmp(argv[0],"targetTime") == 0 ||
+        strcmp(argv[0],"targetTimes") == 0)
+    {
+        for (i=0; i<(*sizeCtrl)(OF_Resp_Time); i++)  {
+            sprintf(outputData,"targTime%d",i+1);
+            output.tag("ResponseType",outputData);
+        }
+        theResponse = new ExpControlResponse(this, 5,
+            Vector((*sizeCtrl)(OF_Resp_Time)));
+    }
+    
+    // measured displacements
+    if (strcmp(argv[0],"measDisp") == 0 ||
+        strcmp(argv[0],"measuredDisp") == 0 ||
+        strcmp(argv[0],"measuredDisplacement") == 0 ||
+        strcmp(argv[0],"measuredDisplacements") == 0)
+    {
+        for (i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)  {
+            sprintf(outputData,"measDisp%d",i+1);
+            output.tag("ResponseType",outputData);
+        }
+        theResponse = new ExpControlResponse(this, 6,
+            Vector((*sizeDaq)(OF_Resp_Disp)));
+    }
+    
+    // measured velocities
+    if (strcmp(argv[0],"measVel") == 0 ||
+        strcmp(argv[0],"measuredVel") == 0 ||
+        strcmp(argv[0],"measuredVelocity") == 0 ||
+        strcmp(argv[0],"measuredVelocities") == 0)
+    {
+        for (i=0; i<(*sizeDaq)(OF_Resp_Vel); i++)  {
+            sprintf(outputData,"measVel%d",i+1);
+            output.tag("ResponseType",outputData);
+        }
+        theResponse = new ExpControlResponse(this, 7,
+            Vector((*sizeDaq)(OF_Resp_Vel)));
+    }
+    
+    // measured accelerations
+    if (strcmp(argv[0],"measAccel") == 0 ||
+        strcmp(argv[0],"measuredAccel") == 0 ||
+        strcmp(argv[0],"measuredAcceleration") == 0 ||
+        strcmp(argv[0],"measuredAccelerations") == 0)
+    {
+        for (i=0; i<(*sizeDaq)(OF_Resp_Accel); i++)  {
+            sprintf(outputData,"measAccel%d",i+1);
+            output.tag("ResponseType",outputData);
+        }
+        theResponse = new ExpControlResponse(this, 8,
+            Vector((*sizeDaq)(OF_Resp_Accel)));
+    }
+    
+    // measured forces
+    if (strcmp(argv[0],"measForce") == 0 ||
+        strcmp(argv[0],"measuredForce") == 0 ||
+        strcmp(argv[0],"measuredForces") == 0)
+    {
+        for (i=0; i<(*sizeDaq)(OF_Resp_Force); i++)  {
+            sprintf(outputData,"measForce%d",i+1);
+            output.tag("ResponseType",outputData);
+        }
+        theResponse = new ExpControlResponse(this, 9,
+            Vector((*sizeDaq)(OF_Resp_Force)));
+    }
+    
+    // measured times
+    if (strcmp(argv[0],"measTime") == 0 ||
+        strcmp(argv[0],"measuredTime") == 0 ||
+        strcmp(argv[0],"measuredTimes") == 0)
+    {
+        for (i=0; i<(*sizeDaq)(OF_Resp_Time); i++)  {
+            sprintf(outputData,"measTime%d",i+1);
+            output.tag("ResponseType",outputData);
+        }
+        theResponse = new ExpControlResponse(this, 10,
+            Vector((*sizeDaq)(OF_Resp_Time)));
+    }
+    
+    output.endTag();
+    
+    return theResponse;
+}
+
+
+int ECSCRAMNet::getResponse(int responseID, Information &info)
+{
+    Vector resp(0);
+    
+    switch (responseID)  {
+    case 1:  // target displacements
+        resp.setData((double*)targDisp,(*sizeCtrl)(OF_Resp_Disp));
+        return info.setVector(resp);
+        
+    case 2:  // target velocities
+        resp.setData((double*)targVel,(*sizeCtrl)(OF_Resp_Vel));
+        return info.setVector(resp);
+        
+    case 3:  // target accelerations
+        resp.setData((double*)targAccel,(*sizeCtrl)(OF_Resp_Accel));
+        return info.setVector(resp);
+        
+    case 4:  // target forces
+        resp.setData((double*)targForce,(*sizeCtrl)(OF_Resp_Force));
+        return info.setVector(resp);
+        
+    case 5:  // target times
+        resp.setData((double*)targTime,(*sizeCtrl)(OF_Resp_Time));
+        return info.setVector(resp);
+        
+    case 6:  // measured displacements
+        resp.setData((double*)measDisp,(*sizeDaq)(OF_Resp_Disp));
+        return info.setVector(resp);
+        
+    case 7:  // measured velocities
+        resp.setData((double*)measVel,(*sizeDaq)(OF_Resp_Vel));
+        return info.setVector(resp);
+        
+    case 8:  // measured accelerations
+        resp.setData((double*)measAccel,(*sizeDaq)(OF_Resp_Accel));
+        return info.setVector(resp);
+        
+    case 9:  // measured forces
+        resp.setData((double*)measForce,(*sizeDaq)(OF_Resp_Force));
+        return info.setVector(resp);
+        
+    case 10:  // measured times
+        resp.setData((double*)measTime,(*sizeDaq)(OF_Resp_Time));
+        return info.setVector(resp);
+        
+    default:
+        return -1;
+    }
+}
+
+
 void ECSCRAMNet::Print(OPS_Stream &s, int flag)
 {
     s << "****************************************************************\n";
     s << "* ExperimentalControl: " << this->getTag() << endln; 
-    s << "* type: ECSCRAMNet\n";
+    s << "*   type: ECSCRAMNet\n";
     s << "*   memOffset: " << memOffset << endln;
     s << "*   numActCh: " << numActCh << endln;
-    if (theCtrlFilters != 0)
-        s << "*   ctrlFilter: " << *theCtrlFilters << endln;
-    if (theDaqFilters != 0)
-        s << "*   daqFilter: " << *theDaqFilters << endln;
+    s << "*   ctrlFilters:";
+    for (int i=0; i<OF_Resp_All; i++)  {
+        if (theCtrlFilters[i] != 0)
+            s << " " << theCtrlFilters[i]->getTag();
+        else
+            s << " 0";
+    }
+    s << "\n*   daqFilters:";
+    for (int i=0; i<OF_Resp_All; i++)  {
+        if (theCtrlFilters[i] != 0)
+            s << " " << theCtrlFilters[i]->getTag();
+        else
+            s << " 0";
+    }
+    s << endln;
     s << "****************************************************************\n";
     s << endln;
 }
