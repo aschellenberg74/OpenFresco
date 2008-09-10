@@ -46,31 +46,36 @@ class ExpControlSP : public SP_Constraint
 {
 public:
     // constructors    
-    ExpControlSP();
     ExpControlSP(int spTag, int nodeTag, int ndof,
-        double *ctrlDisp, double *ctrlVel = 0, double *ctrlAccel = 0);
-
+        double *ctrlDisp, double dispFact = 1.0,
+		double *ctrlVel = 0, double velFact = 1.0,
+		double *ctrlAccel = 0, double accelFact = 1.0);
+    
     // destructor
     ~ExpControlSP();
-
-    double getValue(void);
+    
+    double getValue();
     int applyConstraint(double loadFactor);
-    bool isHomogeneous(void) const;
-
+    bool isHomogeneous() const;
+    
     int sendSelf(int commitTag, Channel &theChannel);
     int recvSelf(int commitTag, Channel &theChannel,
         FEM_ObjectBroker &theBroker);
-
+    
     void Print(OPS_Stream &s, int flag = 0);
-
+    
 protected:
 
 private:
     double *ctrlDisp;           // pointer to control displacement
     double *ctrlVel;            // pointer to control velocity
     double *ctrlAccel;          // pointer to control acceleration
-
-    Node   *theNode;            // pointer to node being constrained
+    
+    double dispFact;			// control displacement factor
+    double velFact;				// control velocity factor
+    double accelFact;			// control acceleration factor
+    
+	Node   *theNode;            // pointer to node being constrained
     Vector *theNodeResponse;    // vector for setting nodal response
 };
 

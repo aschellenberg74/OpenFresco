@@ -97,7 +97,7 @@ int TclExpCPCommand(ClientData clientData, Tcl_Interp *interp, int argc,
 
 	int ndm = theTclBuilder->getNDM();
 	int ndf = theTclBuilder->getNDF();
-    int tag, nodeTag, numDir = 0, numLim = 0, argi = 1;
+    int tag, nodeTag, numDir = 0, numLim = 0, argi = 1, i;
     double f, lim;
     ExperimentalCP *theCP = 0;
 
@@ -113,7 +113,7 @@ int TclExpCPCommand(ClientData clientData, Tcl_Interp *interp, int argc,
     }
     argi++;
     // count number of directions
-    int i = argi;
+    i = argi;
     while (i<argc)  {
         if (strcmp(argv[i],"-fact") == 0)  {
             i += 2;
@@ -133,18 +133,18 @@ int TclExpCPCommand(ClientData clientData, Tcl_Interp *interp, int argc,
         opserr << "Want: expControlPoint tag nodeTag dir resp <-fact f> <-lim l u> ...\n";
         return TCL_ERROR;
     }
-    ID dir(numDir);
-    ID resp(numDir);
-    Vector fact(numDir);
     if (numLim > 0 && numLim != numDir)  {
         opserr << "WARNING invalid number of limits\n";
         printCommand(argc,argv);
         opserr << "Want: expControlPoint tag nodeTag dir resp <-fact f> <-lim l u> ...\n";
         return TCL_ERROR;
     }
-    Vector lowerLim(numDir);
-    Vector upperLim(numDir);
-    for (int i=0; i<numDir; i++)  {
+    ID dir(numDir);
+    ID resp(numDir);
+    Vector fact(numDir);
+    Vector lowerLim(numLim);
+    Vector upperLim(numLim);
+    for (i=0; i<numDir; i++)  {
         if (ndm == 1 && ndf == 1)  {
             if (strcmp(argv[argi],"1") == 0 || strcmp(argv[argi],"ux") == 0 
                 || strcmp(argv[argi],"UX") == 0)

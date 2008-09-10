@@ -43,7 +43,6 @@ class ExperimentalCP : public TaggedObject
 {
 public:
     // constructors
-    ExperimentalCP();
     ExperimentalCP(int tag, int ndm, int ndf,
         int nodeTag, const ID &direction,
         const ID &response, const Vector &factor = 0);
@@ -52,7 +51,7 @@ public:
     // destructor
     virtual ~ExperimentalCP();
     
-    virtual ExperimentalCP *getCopy (void);
+    virtual ExperimentalCP *getCopy();
     virtual void Print(OPS_Stream &s, int flag);
     
     // methods to set control point data
@@ -77,15 +76,17 @@ public:
     const ID &getUniqueDir();
     const ID &getResponseType();
     const Vector &getFactor();
-    const Vector *getLowerLimit();
-    const Vector *getUpperLimit();
+    const Vector &getLowerLimit();
+    const Vector &getUpperLimit();
 
     int getDirection(int dirID);
     int getResponseType(int dirID);
     double getFactor(int dirID);
     double getLowerLimit(int dirID);
     double getUpperLimit(int dirID);
-        
+    
+    // methods to query information
+    int hasLimits();
     int operator == (ExperimentalCP &ecp);
     int operator != (ExperimentalCP &ecp);
     
@@ -95,10 +96,10 @@ protected:
     int nodeTag;        // control node tag
     ID direction;       // numDirection directions
     ID uniqueDir;       // numUniqueDir unique directions
-    ID response;        // response types
-    Vector factor;      // factors
-    Vector *lowerLim;   // lower limits
-    Vector *upperLim;   // upper limits
+    ID response;        // numDirection response types
+    Vector factor;      // numDirection factors
+    Vector lowerLim;    // lower limits
+    Vector upperLim;    // upper limits
 
     int numDirection;   // number of directions
     int numUniqueDir;   // number of unique directions

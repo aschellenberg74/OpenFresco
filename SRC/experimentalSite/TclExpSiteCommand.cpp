@@ -211,7 +211,7 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp, int argc,
         strcpy(ipAddr,argv[argi]);
         argi++;
         if (Tcl_GetInt(interp, argv[argi], &ipPort) != TCL_OK)  {
-            opserr << "WARNING invalid RemoteSite ipPort\n";
+            opserr << "WARNING invalid ShadowSite ipPort\n";
             opserr << "expSite ShadowSite " << tag << endln;
             return TCL_ERROR;		
         }
@@ -338,7 +338,7 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp, int argc,
             theChannel = new TCP_Socket(ipPort,true);
             if (theChannel != 0) {
                 opserr << "\nChannel successfully created: "
-                    << "Waiting for RemoteExpSite...\n";
+                    << "Waiting for ShadowExpSite...\n";
             } else {
                 opserr << "WARNING could not create channel\n";
                 opserr << "expSite ActorSite " << tag << endln;
@@ -349,7 +349,7 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp, int argc,
             theChannel = new TCP_SocketSSL(ipPort,true);
             if (theChannel != 0) {
                 opserr << "\nSSL Channel successfully created: "
-                    << "Waiting for RemoteExpSite...\n";
+                    << "Waiting for ShadowExpSite...\n";
             } else {
                 opserr << "WARNING could not create SSL channel\n";
                 opserr << "expSite ActorSite " << tag << endln;
