@@ -34,17 +34,6 @@
 #include <stdlib.h>
 
 
-ExperimentalCP::ExperimentalCP()
-    : TaggedObject(0), ndm(0), ndf(0), nodeTag(0), 
-    direction(0), uniqueDir(0), response(0),
-    factor(0), lowerLim(0), upperLim(0),
-    numDirection(0), numUniqueDir(0),
-    sizeRespType(5), dirRespType(5)
-{
-    // does nothing
-}
-
-
 ExperimentalCP::ExperimentalCP(int tag, int NDM, int NDF,
     int nodetag, const ID &dir, const ID &resp, const Vector &fact)
     : TaggedObject(tag), ndm(NDM), ndf(NDF), nodeTag(nodetag),
@@ -85,38 +74,46 @@ ExperimentalCP::ExperimentalCP(int tag, int NDM, int NDF,
 
     // set sizes of response types
     sizeRespType.Zero();
-    for (int i=0; i<numDirection; i++)
-        sizeRespType(response(i))++;
+    for (int i=0; i<numDirection; i++)  {
+        if (response(i) < 0 || response(i) > 4)  {
+            opserr << "ExperimentalCP::ExperimentalCP() - "
+                << "wrong response type received\n";
+            exit(OF_ReturnType_failed);
+        }
+        sizeRespType(response(i)) += 1;
+    }
+
+    // zero the dirRespType vector
+    dirRespType.Zero();
 }
 
 
 ExperimentalCP::ExperimentalCP(const ExperimentalCP& ecp)
-    : TaggedObject(ecp)
+    : TaggedObject(ecp),
+    sizeRespType(5), dirRespType(5)
 {
     ndm       = ecp.ndm;
     ndf       = ecp.ndf;
     nodeTag   = ecp.nodeTag;
+    
+    numDirection = ecp.numDirection;
+    numUniqueDir = ecp.numUniqueDir;
     direction = ecp.direction;
     uniqueDir = ecp.uniqueDir;
     response  = ecp.response;
     factor    = ecp.factor;
-    if (ecp.lowerLim != 0)
-        (*lowerLim)  = *(ecp.lowerLim);
-    if (ecp.upperLim != 0)
-        (*upperLim)  = *(ecp.upperLim);
-    numDirection = ecp.numDirection;
-    numUniqueDir = ecp.numUniqueDir;
+    
     sizeRespType = ecp.sizeRespType;
     dirRespType  = ecp.dirRespType;
+    
+    lowerLim = ecp.lowerLim;
+    upperLim = ecp.upperLim;
 }
 
 
 ExperimentalCP::~ExperimentalCP()
 {
-    if (lowerLim != 0)
-        delete lowerLim;
-    if (upperLim != 0)
-        delete upperLim;
+    // nothing to destroy
 }
 
 
@@ -147,8 +144,13 @@ int ExperimentalCP::setNDF(int NDF)
 int ExperimentalCP::setData(int nodetag, const ID &dir,
     const ID &resp, const Vector &fact)
 {
+    nodeTag = nodetag;
+
     // save the number of directions
     numDirection = dir.Size();
+    direction = dir;
+    uniqueDir = dir;
+    response = resp;
 
     // initialize factors
     if (fact != 0)  {
@@ -170,13 +172,7 @@ int ExperimentalCP::setData(int nodetag, const ID &dir,
         for (int i=0; i<numDirection; i++)
             factor(i) = 1.0;
     }
-
-    // assign the remaining variables
-    nodeTag   = nodetag;
-    direction = dir;
-    uniqueDir = dir;
-    response  = resp;
-   
+    
     // find unique directions and number thereof
     numUniqueDir = uniqueDir.unique();
     if (numUniqueDir > ndf)  {
@@ -188,8 +184,17 @@ int ExperimentalCP::setData(int nodetag, const ID &dir,
 
     // set sizes of response types
     sizeRespType.Zero();
-    for (int i=0; i<numDirection; i++)
-        sizeRespType(response(i))++;
+    for (int i=0; i<numDirection; i++)  {
+        if (response(i) < 0 || response(i) > 4)  {
+            opserr << "ExperimentalCP::ExperimentalCP() - "
+                << "wrong response type received\n";
+            return OF_ReturnType_failed;
+        }
+        sizeRespType(response(i)) += 1;
+    }
+
+    // zero the dirRespType vector
+    dirRespType.Zero();
 
     return 0;
 }
@@ -198,23 +203,6 @@ int ExperimentalCP::setData(int nodetag, const ID &dir,
 int ExperimentalCP::setLimits(const Vector &lowerlim,
     const Vector &upperlim)
 {
-    if (lowerLim == 0 || upperLim == 0)  {
-        // create the new limits
-        lowerLim = new Vector(numDirection);
-        upperLim = new Vector(numDirection);
-    }
-    else if (lowerLim->Size() != numDirection
-        || upperLim->Size() != numDirection)  {
-        // delete the old limits
-        if (lowerLim != 0)
-            delete lowerLim;
-        if (upperLim != 0)
-            delete upperLim;
-        // create the new limits
-        lowerLim = new Vector(numDirection);
-        upperLim = new Vector(numDirection);
-    }
-
     if (lowerlim.Size() != numDirection || 
         upperlim.Size() != numDirection)  {
             opserr << "ExperimentalCP::setLimits() - "
@@ -223,8 +211,8 @@ int ExperimentalCP::setLimits(const Vector &lowerlim,
             return OF_ReturnType_failed;
     }
 
-    (*lowerLim) = lowerlim;
-    (*upperLim) = upperlim;
+    lowerLim = lowerlim;
+    upperLim = upperlim;
 
     return 0;
 }
@@ -309,14 +297,28 @@ const Vector& ExperimentalCP::getFactor()
 }
 
 
-const Vector* ExperimentalCP::getLowerLimit()
+const Vector& ExperimentalCP::getLowerLimit()
 {
+    if (lowerLim == 0)  {
+        opserr << "ExperimentalCP::getLowerLimit() - "
+            << "this control point has no lower "
+            << "limits assigned\n";
+        exit(OF_ReturnType_failed);
+    }
+    
     return lowerLim;
 }
 
 
-const Vector* ExperimentalCP::getUpperLimit()
+const Vector& ExperimentalCP::getUpperLimit()
 {
+    if (upperLim == 0)  {
+        opserr << "ExperimentalCP::getUpperLimit() - "
+            << "this control point has no upper "
+            << "limits assigned\n";
+        exit(OF_ReturnType_failed);
+    }
+    
     return upperLim;
 }
 
@@ -376,7 +378,7 @@ double ExperimentalCP::getLowerLimit(int dirID)
         exit(OF_ReturnType_failed);
     }
 
-    return (*lowerLim)(dirID);
+    return lowerLim(dirID);
 }
 
 
@@ -396,19 +398,32 @@ double ExperimentalCP::getUpperLimit(int dirID)
         exit(OF_ReturnType_failed);
     }
 
-    return (*upperLim)(dirID);
+    return upperLim(dirID);
 }
 
 
 void ExperimentalCP::Print(OPS_Stream &s, int flag)
 {
-    s << "ExperimentalCP: tag: " << this->getTag()
-        << ", ndm: " << ndm << ", ndf: " << ndf << endln;
-    s << "    node tag: " << nodeTag
-        << ", dir: " << direction
-        << ", resp: " << response
-        << ", fact: " << factor
-        << endln;
+    s << "ExperimentalCP: " << this->getTag() << endln;
+    s << "  ndm: " << ndm << ", ndf: " << ndf << endln;
+    s << "  node tag: " << nodeTag << endln;
+    s << "  dir: " << direction;
+    s << "  resp: " << response;
+    s << "  fact: " << factor;
+    if (lowerLim != 0)
+        s << "  lowerLim: " << lowerLim;
+    if (upperLim != 0)
+        s << "  upperLim: " << upperLim;
+    s << endln;
+}
+
+
+int ExperimentalCP::hasLimits()
+{
+    if (lowerLim != 0 && upperLim != 0)
+        return 1;
+
+    return 0;
 }
 
 

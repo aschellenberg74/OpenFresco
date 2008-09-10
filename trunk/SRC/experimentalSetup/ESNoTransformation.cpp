@@ -36,11 +36,12 @@ ESNoTransformation::ESNoTransformation(int tag,
 	const ID &dir, int sizet, int sizeo,
 	ExperimentalControl* control)
 	: ExperimentalSetup(tag, control),
-	numDir(dir.Size()), direction(0), sizeT(sizet), sizeO(sizeo)
+	direction(0), sizeT(sizet), sizeO(sizeo)
 {
     // allocate memory for direction array
+    numDir = dir.Size();
     direction = new ID(numDir);
-    if (!direction)  {
+    if (direction == 0)  {
         opserr << "ESNoTransformation::ESNoTransformation()"
             << " - failed to creat direction array\n";
         exit(OF_ReturnType_failed);
@@ -68,17 +69,15 @@ ESNoTransformation::ESNoTransformation(const ESNoTransformation& es)
     direction(0)
 {
     numDir = es.numDir;
-
     direction = new ID(numDir);
     if (!direction)  {
         opserr << "ESNoTransformation::ESNoTransformation()"
             << " - failed to creat direction array\n";
         exit(OF_ReturnType_failed);
     }
-
-    direction = es.direction;
-    sizeT     = es.sizeT;
-    sizeO     = es.sizeO;
+    *direction = *(es.direction);
+    sizeT = es.sizeT;
+    sizeO = es.sizeO;
 
     // call setup method
     this->setup();

@@ -109,7 +109,7 @@ int ActorExpSite::run()
         
         switch(action)  {
         case OF_RemoteTest_open:
-            opserr << "\nConnected to RemoteExpSite "
+            opserr << "\nConnected to ShadowExpSite "
                 << recvV(1) << endln;
             sendV(0) = OF_ReturnType_completed;
             sendV(1) = this->getTag();
@@ -118,7 +118,7 @@ int ActorExpSite::run()
             if (recvV(2) != atof(OPF_VERSION))  {
                 opserr << "ActorExpSite::run() - OpenFresco Version "
                     << "mismatch:\nActorExpSite Version " << atof(OPF_VERSION)
-                    << " != RemoteExpSite Version " << recvV(2) << endln;
+                    << " != ShadowExpSite Version " << recvV(2) << endln;
                 exit(OF_ReturnType_failed);
             }
             break;
@@ -158,7 +158,7 @@ int ActorExpSite::run()
             this->sendVector(sendV);
             break;
         case OF_RemoteTest_DIE:
-            opserr << "\nDisconnected from RemoteExpSite "
+            opserr << "\nDisconnected from ShadowExpSite "
                 << recvV(1) << endln << endln;
             sendV(0) = OF_ReturnType_received;
             sendV(1) = this->getTag();
