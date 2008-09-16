@@ -58,11 +58,11 @@ int addEETwoNodeLink(ClientData clientData, Tcl_Interp *interp, int argc,
     int ndm = theTclBuilder->getNDM();
     
     // check the number of arguments is correct
-    if ((argc-eleArgStart) < 10)  {
+    if ((argc-eleArgStart) < 14)  {
         opserr << "WARNING insufficient arguments\n";
         printCommand(argc, argv);
-        opserr << "Want: expElement twoNodeLink eleTag iNode jNode -dir dirs -site siteTag -initStif Kij <-orient x1 x2 x3 y1 y2 y3> <-iMod> <-mass m>\n";
-        opserr << "  or: expElement twoNodeLink eleTag iNode jNode -dir dirs -server ipPort <ipAddr> <-ssl> <-dataSize size> -initStif Kij <-orient x1 x2 x3 y1 y2 y3> <-iMod> <-mass m>\n";
+        opserr << "Want: expElement twoNodeLink eleTag iNode jNode -dir dirs -site siteTag -initStif Kij <-orient <x1 x2 x3> y1 y2 y3> <-pDelta Mratios> <-iMod> <-mass m>\n";
+        opserr << "  or: expElement twoNodeLink eleTag iNode jNode -dir dirs -server ipPort <ipAddr> <-ssl> <-dataSize size> -initStif Kij <-orient <x1 x2 x3> y1 y2 y3> <-pDelta Mratios> <-iMod> <-mass m>\n";
         return TCL_ERROR;
     }    
     
@@ -72,6 +72,7 @@ int addEETwoNodeLink(ClientData clientData, Tcl_Interp *interp, int argc,
     char *ipAddr = 0;
     int ssl = 0;
     int dataSize = OF_Network_dataSize;
+    Vector Mratio(0);
     bool iMod = false;
 	double mass = 0.0;
     
@@ -98,8 +99,9 @@ int addEETwoNodeLink(ClientData clientData, Tcl_Interp *interp, int argc,
     }
     argi = 5+eleArgStart;
     i = argi;
-    while (strcmp(argv[i],"-site") != 0 && 
-        strcmp(argv[i],"-server") != 0 && i < argc)  {
+    while (i < argc &&
+        strcmp(argv[i],"-site") != 0 && 
+        strcmp(argv[i],"-server") != 0)  {
         numDir++;
         i++;
     }
@@ -147,12 +149,12 @@ int addEETwoNodeLink(ClientData clientData, Tcl_Interp *interp, int argc,
         if (strcmp(argv[argi], "-initStif") != 0 &&
             strcmp(argv[argi], "-ssl") != 0 &&
             strcmp(argv[argi], "-dataSize") != 0)  {
-            ipAddr = (char *)malloc((strlen(argv[argi]) + 1)*sizeof(char));
+            ipAddr = new char [strlen(argv[argi])+1];
             strcpy(ipAddr,argv[argi]);
             argi++;
         }
         else  {
-            ipAddr = (char *)malloc((9 + 1)*sizeof(char));
+            ipAddr = new char [9+1];
             strcpy(ipAddr,"127.0.0.1");
         }
         for (i = argi; i < argc; i++)  {
@@ -174,42 +176,95 @@ int addEETwoNodeLink(ClientData clientData, Tcl_Interp *interp, int argc,
         return TCL_ERROR;
     }
     // check for optional arguments
-    Vector x(3); x(0) = 1.0; x(1) = 0.0; x(2) = 0.0;
+    Vector x(0);
     Vector y(3); y(0) = 0.0; y(1) = 1.0; y(2) = 0.0;
     for (i = argi; i < argc; i++)  {
         if (strcmp(argv[i],"-orient") == 0)  {
-            if (argc-1 < i+6)  {
-                opserr << "WARNING not enough paramaters after -orient flag\n";
+            int j = i+1;
+            int numOrient = 0;
+            while (j < argc &&
+                strcmp(argv[j],"-pDelta") != 0 &&
+                strcmp(argv[j],"-iMod") != 0 &&
+                strcmp(argv[j],"-mass") != 0)  {
+                numOrient++;
+                j++;
+            }
+            if (numOrient == 3)  {
+                double value;
+                // read the y values
+                for (j=0; j<3; j++)  {
+                    if (Tcl_GetDouble(interp, argv[i+1+j], &value) != TCL_OK)  {
+                        opserr << "WARNING invalid -orient value\n";
+                        opserr << "expElement twoNodeLink element: " << tag << endln;
+                        return TCL_ERROR;
+                    } else  {
+                        y(j) = value;
+                    }
+                }
+            }
+            else if (numOrient == 6)  {
+                x.resize(3);
+                double value;
+                // read the x values
+                for (j=0; j<3; j++)  {
+                    if (Tcl_GetDouble(interp, argv[i+1+j], &value) != TCL_OK)  {
+                        opserr << "WARNING invalid -orient value\n";
+                        opserr << "expElement twoNodeLink element: " << tag << endln;
+                        return TCL_ERROR;
+                    } else  {
+                        x(j) = value;
+                    }
+                }
+                // read the y values
+                for (j=0; j<3; j++)  {
+                    if (Tcl_GetDouble(interp, argv[i+4+j], &value) != TCL_OK)  {
+                        opserr << "WARNING invalid -orient value\n";
+                        opserr << "expElement twoNodeLink element: " << tag << endln;
+                        return TCL_ERROR;
+                    } else  {
+                        y(j) = value;		
+                    }
+                }
+            }
+            else  {
+                opserr << "WARNING insufficient arguments after -orient flag\n";
                 opserr << "expElement twoNodeLink element: " << tag << endln;
-                return TCL_ERROR;		
-            }
-            double value;
-            // read the x values
-            for (j=0; j<3; j++)  {
-                if (Tcl_GetDouble(interp, argv[i+1+j], &value) != TCL_OK)  {
-                    opserr << "WARNING invalid -orient value\n";
-                    opserr << "expElement twoNodeLink element: " << tag << endln;
-                    return TCL_ERROR;
-                }
-                x(j) = value;
-            }
-            // read the y values
-            for (j=0; j<3; j++)  {
-                if (Tcl_GetDouble(interp, argv[i+4+j], &value) != TCL_OK)  {
-                    opserr << "WARNING invalid -orient value\n";
-                    opserr << "expElement twoNodeLink element: " << tag << endln;
-                    return TCL_ERROR;
-                }
-                y(j) = value;		
+                return TCL_ERROR;
             }
         }
     }
-    for (i = argi; i < argc; i++)  {
+	for (i=argi; i<argc; i++)  {
+		if (i+1 < argc && strcmp(argv[i], "-pDelta") == 0)  {
+            double Mr;
+            Mratio.resize(4);
+            if (ndm == 2)  {
+                Mratio.Zero();
+                for (j=0; j<2; j++)  {
+			        if (Tcl_GetDouble(interp, argv[i+1+j], &Mr) != TCL_OK)  {
+				        opserr << "WARNING invalid mass\n";
+				        opserr << "expElement twoNodeLink element: " << tag << endln;
+				        return TCL_ERROR;
+                    }
+                    Mratio(2+j) = Mr;
+                }
+            } else if (ndm == 3)  {
+                for (j=0; j<4; j++)  {
+			        if (Tcl_GetDouble(interp, argv[i+1+j], &Mr) != TCL_OK)  {
+				        opserr << "WARNING invalid mass\n";
+				        opserr << "expElement twoNodeLink element: " << tag << endln;
+				        return TCL_ERROR;
+                    }
+                    Mratio(j) = Mr;
+                }
+            }
+		}
+	}
+    for (i=argi; i<argc; i++)  {
         if (strcmp(argv[i], "-iMod") == 0)  {
             iMod = true;
         }
     }
-	for (i = argi; i < argc; i++)  {
+	for (i=argi; i<argc; i++)  {
 		if (i+1 < argc && strcmp(argv[i], "-mass") == 0)  {
 			if (Tcl_GetDouble(interp, argv[i+1], &mass) != TCL_OK)  {
 				opserr << "WARNING invalid mass\n";
@@ -220,9 +275,9 @@ int addEETwoNodeLink(ClientData clientData, Tcl_Interp *interp, int argc,
 	}
     // now create the EETwoNodeLink
     if (theSite != 0)
-        theExpElement = new EETwoNodeLink(tag, ndm, iNode, jNode, theDirIDs, x, y, theSite, iMod, mass);
+        theExpElement = new EETwoNodeLink(tag, ndm, iNode, jNode, theDirIDs, y, x, theSite, Mratio, iMod, mass);
     else
-        theExpElement = new EETwoNodeLink(tag, ndm, iNode, jNode, theDirIDs, x, y, ipPort, ipAddr, ssl, dataSize, iMod, mass);
+        theExpElement = new EETwoNodeLink(tag, ndm, iNode, jNode, theDirIDs, y, x, ipPort, ipAddr, ssl, dataSize, Mratio, iMod, mass);
     
 	if (theExpElement == 0)  {
 		opserr << "WARNING ran out of memory creating element\n";

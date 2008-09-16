@@ -41,6 +41,7 @@
 #include <TCP_Socket.h>
 #include <TCP_SocketSSL.h>
 
+#include <float.h>
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
@@ -60,29 +61,47 @@ Vector EETwoNodeLink::EETwoNodeLinkV12(12);
 // responsible for allocating the necessary space needed
 // by each object and storing the tags of the end nodes.
 EETwoNodeLink::EETwoNodeLink(int tag, int dim, int Nd1, int Nd2, 
-    const ID &direction, const Vector &x, const Vector &yp,
-    ExperimentalSite *site,
-    bool iM, double m)
+    const ID &direction, const Vector &_y, const Vector &_x,
+    ExperimentalSite *site, Vector Mr, bool iM, double m)
     : ExperimentalElement(tag, ELE_TAG_EETwoNodeLink, site),     
-    dimension(dim), numDOF(0),
-    connectedExternalNodes(2),
-    numDir(direction.Size()), dir(0), transformation(3,3),
-    iMod(iM), mass(m),
-    theMatrix(0), theVector(0), theLoad(0),
+    dimension(dim), numDOF(0), connectedExternalNodes(2),
+    numDir(direction.Size()), dir(0), trans(3,3),
+    x(_x), y(_y), Mratio(Mr), iMod(iM), mass(m), L(0.0),
     db(0), vb(0), ab(0), t(0),
     dbMeas(0), vbMeas(0), abMeas(0), qMeas(0), tMeas(0),
     dbTarg(direction.Size()), vbTarg(direction.Size()),
-    abTarg(direction.Size()), dbPast(direction.Size()),
-    kbInit(direction.Size(), direction.Size()), tPast(0.0), T(0,0)
+    abTarg(direction.Size()), dl(0), Tgl(0,0), Tlb(0,0),
+    dbPast(direction.Size()), tPast(0.0),
+    kbInit(direction.Size(), direction.Size()),
+    theMatrix(0), theVector(0), theLoad(0),
+    firstWarning(true)
 {
-    // establish the connected nodes and set up the transformation matrix for orientation
-    this->setUp(Nd1, Nd2, x, yp);
+    // ensure the connectedExternalNode ID is of correct size & set values
+    if (connectedExternalNodes.Size() != 2)  {
+        opserr << "EETwoNodeLink::EETwoNodeLink() - element: "
+            << this->getTag() << " failed to create an ID of size 2\n";
+        exit(-1);
+    }
+    
+    connectedExternalNodes(0) = Nd1;
+    connectedExternalNodes(1) = Nd2;
+    
+    // set node pointers to NULL
+    for (int i=0; i<2; i++)
+        theNodes[i] = 0;
+    
+    // check the number of directions
+    if (numDir < 1 || numDir > 12)  {
+        opserr << "EETwoNodeLink::EETwoNodeLink() - element: "
+            << this->getTag() << " wrong number of directions\n";
+        exit(-1);
+    }
     
     // allocate memory for direction array
     dir = new ID(numDir);
-    
     if (dir == 0)  {
-        opserr << "EETwoNodeLink::EETwoNodeLink() - failed to creat direction array\n";
+        opserr << "EETwoNodeLink::EETwoNodeLink() - "
+            << "failed to creat direction array\n";
         exit(-1);
     }
     
@@ -90,9 +109,26 @@ EETwoNodeLink::EETwoNodeLink(int tag, int dim, int Nd1, int Nd2,
     (*dir) = direction;
     for (int i=0; i<numDir; i++)  {
         if ((*dir)(i) < 0 || (*dir)(i) > 5)  {
-            opserr << "EETwoNodeLink::EETwoNodeLink() - incorrect direction "
-                << (*dir)(i) << " is set to 0\n";
+            opserr << "EETwoNodeLink::EETwoNodeLink() - "
+                << "incorrect direction " << (*dir)(i)
+                << " is set to 0\n";
             (*dir)(i) = 0;
+        }
+    }
+    
+    // check p-delta moment distribution ratios
+    if (Mratio.Size() == 4)  {
+        if (Mratio(0)+Mratio(1) > 1.0)  {
+            opserr << "EETwoNodeLink::EETwoNodeLink() - "
+                << "incorrect p-delta moment ratios:\nrMy1 + rMy2 = "
+                << Mratio(0)+Mratio(1) << " > 1.0\n";
+            exit(-1);
+        }
+        if (Mratio(2)+Mratio(3) > 1.0)  {
+            opserr << "EETwoNodeLink::EETwoNodeLink() - "
+                << "incorrect p-delta moment ratios:\nrMz1 + rMz2 = "
+                << Mratio(2)+Mratio(3) << " > 1.0\n";
+            exit(-1);
         }
     }
     
@@ -137,30 +173,49 @@ EETwoNodeLink::EETwoNodeLink(int tag, int dim, int Nd1, int Nd2,
 // responsible for allocating the necessary space needed
 // by each object and storing the tags of the end nodes.
 EETwoNodeLink::EETwoNodeLink(int tag, int dim, int Nd1, int Nd2, 
-    const ID &direction, const Vector &x, const Vector &yp,
+    const ID &direction, const Vector &_y, const Vector &_x,
     int port, char *machineInetAddr, int ssl, int dataSize,
-    bool iM, double m)
+    Vector Mr, bool iM, double m)
     : ExperimentalElement(tag, ELE_TAG_EETwoNodeLink),     
-    dimension(dim), numDOF(0),
-    connectedExternalNodes(2),
-    numDir(direction.Size()), dir(0), transformation(3,3),
-    iMod(iM), mass(m),
-    theMatrix(0), theVector(0), theLoad(0),
+    dimension(dim), numDOF(0), connectedExternalNodes(2),
+    numDir(direction.Size()), dir(0), trans(3,3),
+    x(_x), y(_y), Mratio(Mr), iMod(iM), mass(m), L(0.0),
     theChannel(0), sData(0), sendData(0), rData(0), recvData(0),
     db(0), vb(0), ab(0), t(0),
     dbMeas(0), vbMeas(0), abMeas(0), qMeas(0), tMeas(0),
     dbTarg(direction.Size()), vbTarg(direction.Size()),
-    abTarg(direction.Size()), dbPast(direction.Size()),
-    kbInit(direction.Size(), direction.Size()), tPast(0.0), T(0,0)
+    abTarg(direction.Size()), dl(0), Tgl(0,0), Tlb(0,0),
+    dbPast(direction.Size()), tPast(0.0),
+    kbInit(direction.Size(), direction.Size()),
+    theMatrix(0), theVector(0), theLoad(0),
+    firstWarning(true)
 {
-    // establish the connected nodes and set up the transformation matrix for orientation
-    this->setUp(Nd1, Nd2, x, yp);
+    // ensure the connectedExternalNode ID is of correct size & set values
+    if (connectedExternalNodes.Size() != 2)  {
+        opserr << "EETwoNodeLink::EETwoNodeLink() - element: "
+            << this->getTag() << " failed to create an ID of size 2\n";
+        exit(-1);
+    }
+    
+    connectedExternalNodes(0) = Nd1;
+    connectedExternalNodes(1) = Nd2;
+    
+    // set node pointers to NULL
+    for (int i=0; i<2; i++)
+        theNodes[i] = 0;
+    
+    // check the number of directions
+    if (numDir < 1 || numDir > 12)  {
+        opserr << "EETwoNodeLink::EETwoNodeLink() - element: "
+            << this->getTag() << " wrong number of directions\n";
+        exit(-1);
+    }
     
     // allocate memory for direction array
     dir = new ID(numDir);
-    
     if (dir == 0)  {
-        opserr << "EETwoNodeLink::EETwoNodeLink() - failed to creat direction array\n";
+        opserr << "EETwoNodeLink::EETwoNodeLink() - "
+            << "failed to creat direction array\n";
         exit(-1);
     }
     
@@ -168,9 +223,26 @@ EETwoNodeLink::EETwoNodeLink(int tag, int dim, int Nd1, int Nd2,
     (*dir) = direction;
     for (int i=0; i<numDir; i++)  {
         if ((*dir)(i) < 0 || (*dir)(i) > 5)  {
-            opserr << "EETwoNodeLink::EETwoNodeLink() - incorrect direction "
-                << (*dir)(i) << " is set to 0\n";
+            opserr << "EETwoNodeLink::EETwoNodeLink() - "
+                << "incorrect direction " << (*dir)(i)
+                << " is set to 0\n";
             (*dir)(i) = 0;
+        }
+    }
+    
+    // check p-delta moment distribution ratios
+    if (Mratio.Size() == 4)  {
+        if (Mratio(0)+Mratio(1) > 1.0)  {
+            opserr << "EETwoNodeLink::EETwoNodeLink() - "
+                << "incorrect p-delta moment ratios:\nrMy1 + rMy2 = "
+                << Mratio(0)+Mratio(1) << " > 1.0\n";
+            exit(-1);
+        }
+        if (Mratio(2)+Mratio(3) > 1.0)  {
+            opserr << "EETwoNodeLink::EETwoNodeLink() - "
+                << "incorrect p-delta moment ratios:\nrMz1 + rMz2 = "
+                << Mratio(2)+Mratio(3) << " > 1.0\n";
+            exit(-1);
         }
     }
     
@@ -197,7 +269,8 @@ EETwoNodeLink::EETwoNodeLink(int tag, int dim, int Nd1, int Nd2,
             << "- failed to setup connection\n";
         exit(-1);
     }
-
+    delete [] machineInetAddr;
+    
     // set the data size for the experimental site
     int intData[2*OF_Resp_All+1];
     ID idData(intData, 2*OF_Resp_All+1);
@@ -382,13 +455,6 @@ void EETwoNodeLink::setDomain(Domain *theDomain)
         return;
     }	
     
-    /* do NOT check on length, so that element can
-    // also be used if nodes are not in same location
-    const Vector &end1Crd = theNodes[0]->getCrds();
-    const Vector &end2Crd = theNodes[1]->getCrds();	
-    Vector diff = end1Crd - end2Crd;
-    double L  = diff.Norm();*/
-    
     // call the base class method
     this->DomainComponent::setDomain(theDomain);
     
@@ -431,23 +497,33 @@ void EETwoNodeLink::setDomain(Domain *theDomain)
     
     // set the initial stiffness matrix size
     theInitStiff.resize(numDOF,numDOF);
+    theInitStiff.Zero();
     
-    if (!theLoad)
+    // set the local displacement vector size
+    dl.resize(numDOF);
+    dl.Zero();
+    
+    // allocate memory for the load vector
+    if (theLoad == 0)
         theLoad = new Vector(numDOF);
     else if (theLoad->Size() != numDOF)  {
         delete theLoad;
         theLoad = new Vector(numDOF);
     }
-    
-    if (!theLoad)  {
+    if (theLoad == 0)  {
         opserr << "EETwoNodeLink::setDomain() - element: " << this->getTag()
             << " out of memory creating vector of size: " << numDOF << endln;
         return;
     }          
     
-    // set transformation matrix from global to basic
-    if (numDir > 0)
-        this->setTranGlobalBasic(elemType, numDir);
+    // setup the transformation matrix for orientation
+    this->setUp();
+    
+    // set transformation matrix from global to local system
+    this->setTranGlobalLocal();
+
+    // set transformation matrix from local to basic system
+    this->setTranLocalBasic();
 }
 
 
@@ -483,16 +559,22 @@ int EETwoNodeLink::update()
     const Vector &acc1 = theNodes[0]->getTrialAccel();
     const Vector &acc2 = theNodes[1]->getTrialAccel();
     
-    static Vector dg(numDOF), vg(numDOF), ag(numDOF);
-    for (int i=0; i<numDOF/2; i++)  {
-        dg(i)          = dsp1(i);  vg(i)          = vel1(i);  ag(i)          = acc1(i);
-        dg(i+numDOF/2) = dsp2(i);  vg(i+numDOF/2) = vel2(i);  ag(i+numDOF/2) = acc2(i);
+    int numDOF2 = numDOF/2;
+    static Vector dg(numDOF), vg(numDOF), ag(numDOF), vl(numDOF), al(numDOF);
+    for (int i=0; i<numDOF2; i++)  {
+        dg(i)         = dsp1(i);  vg(i)         = vel1(i);  ag(i)         = acc1(i);
+        dg(i+numDOF2) = dsp2(i);  vg(i+numDOF2) = vel2(i);  ag(i+numDOF2) = acc2(i);
     }
     
-    // transform response from the global to the basic system
-    (*db) = T*dg;
-    (*vb) = T*vg;
-    (*ab) = T*ag;
+    // transform response from the global to the local system
+    dl = Tgl*dg;
+    vl = Tgl*vg;
+    al = Tgl*ag;
+
+    // transform response from the local to the basic system
+    (*db) = Tlb*dl;
+    (*vb) = Tlb*vl;
+    (*ab) = Tlb*al;
     
     if ((*db) != dbPast || (*t)(0) != tPast)  {
         // save the displacements and the time
@@ -521,12 +603,70 @@ int EETwoNodeLink::setInitialStiff(const Matrix& kbinit)
         return -1;
     }
     kbInit = kbinit;
-        
-    // transform stiffness matrix from the basic to the global system
+    
+    // zero the matrix
     theInitStiff.Zero();
-    theInitStiff.addMatrixTripleProduct(0.0, T, kbInit, 1.0);
+    
+    // transform from basic to local system
+    static Matrix kl(numDOF,numDOF);
+    kl.addMatrixTripleProduct(0.0, Tlb, kbInit, 1.0);
+    
+    // transform from local to global system
+    theInitStiff.addMatrixTripleProduct(0.0, Tgl, kl, 1.0);
     
     return 0;
+}
+
+
+const Matrix& EETwoNodeLink::getTangentStiff()
+{
+    if (firstWarning == true)  {
+        opserr << "\nWARNING EETwoNodeLink::getTangentStiff() - "
+            << "Element: " << this->getTag() << endln
+            << "TangentStiff cannot be calculated." << endln
+            << "Return InitialStiff including GeometricStiff instead." 
+            << endln;
+        opserr << "Subsequent getTangentStiff warnings will be suppressed." 
+            << endln;
+        
+        firstWarning = false;
+    }
+    
+    // zero the matrix
+    theMatrix->Zero();
+    
+    // get measured resisting forces
+    if (theSite != 0)  {
+        (*qMeas) = theSite->getForce();
+    }
+    else  {
+        sData[0] = OF_RemoteTest_getForce;
+        theChannel->sendVector(0, 0, *sendData, 0);
+        theChannel->recvVector(0, 0, *recvData, 0);
+    }
+    
+    // apply optional initial stiffness modification
+    if (iMod == true)
+        this->applyIMod();
+    
+    // use elastic force if force from test is zero
+    for (int i=0; i<numDir; i++)  {
+        if ((*qMeas)(i) == 0.0)
+            (*qMeas)(i) = kbInit(i,i) * (*db)(i);
+    }
+    
+    // transform from basic to local system
+    static Matrix kl(numDOF,numDOF);
+    kl.addMatrixTripleProduct(0.0, Tlb, kbInit, 1.0);
+    
+    // add geometric stiffness to local stiffness
+    if (Mratio.Size() == 4)
+        this->addPDeltaStiff(kl);
+    
+    // transform from local to global system
+    theMatrix->addMatrixTripleProduct(0.0, Tgl, kl, 1.0);
+    
+    return *theMatrix;
 }
 
 
@@ -577,7 +717,6 @@ int EETwoNodeLink::addInertiaLoadToUnbalance(const Vector &accel)
     const Vector &Raccel2 = theNodes[1]->getRV(accel);
     
     int numDOF2 = numDOF/2;
-    
     if (numDOF2 != Raccel1.Size() || numDOF2 != Raccel2.Size())  {
         opserr << "EETwoNodeLink::addInertiaLoadToUnbalance() - "
             << "matrix and vector sizes are incompatible\n";
@@ -612,34 +751,30 @@ const Vector& EETwoNodeLink::getResistingForce()
     }
     
     // apply optional initial stiffness modification
-    if (iMod == true)  {
-        // get measured displacements
-        if (theSite != 0)  {
-            (*dbMeas) = theSite->getDisp();
-        }
-        else  {
-            sData[0] = OF_RemoteTest_getDisp;
-            theChannel->sendVector(0, 0, *sendData, 0);
-            theChannel->recvVector(0, 0, *recvData, 0);
-        }
-        
-        // correct for displacement control errors using I-Modification
-        (*qMeas) -= kbInit*((*dbMeas) - (*db));
-    } else  {
-        // use elastic force if force from test is zero
-        for (int i=0; i<numDir; i++) {
-            if ((*qMeas)(i) == 0.0)
-                (*qMeas)(i) = kbInit(i,i) * (*db)(i);
-        }
+    if (iMod == true)
+        this->applyIMod();
+    
+    // use elastic force if force from test is zero
+    for (int i=0; i<numDir; i++)  {
+        if ((*qMeas)(i) == 0.0)
+            (*qMeas)(i) = kbInit(i,i) * (*db)(i);
     }
     
     // save corresponding target displacements for recorder
     dbTarg = (*db);
     vbTarg = (*vb);
     abTarg = (*ab);
-
+    
+    // determine resisting forces in local system
+    static Vector ql(numDOF);
+    ql = Tlb^(*qMeas);
+    
+    // add P-Delta effects to local forces
+    if (Mratio.Size() == 4)
+        this->addPDeltaForces(ql);
+    
     // determine resisting forces in global system
-    (*theVector) = T^(*qMeas);
+    (*theVector) = Tgl^ql;
     
     // subtract external load
     (*theVector) -= *theLoad;
@@ -831,6 +966,16 @@ Response* EETwoNodeLink::setResponse(const char **argv, int argc,
         }
         theResponse = new ElementResponse(this, 3, Vector(numDir));
     }
+    // target local displacements
+    else if (strcmp(argv[0],"localDisplacement") == 0 ||
+        strcmp(argv[0],"localDisplacements") == 0)
+    {
+        for (int i=0; i<numDOF; i++)  {
+            sprintf(outputData,"dl%d",i+1);
+            output.tag("ResponseType",outputData);
+        }
+        theResponse = new ElementResponse(this, 4, Vector(numDir));
+    }
     // target basic displacements
     else if (strcmp(argv[0],"deformation") == 0 || strcmp(argv[0],"deformations") == 0 || 
         strcmp(argv[0],"basicDeformation") == 0 || strcmp(argv[0],"basicDeformations") == 0 ||
@@ -840,7 +985,7 @@ Response* EETwoNodeLink::setResponse(const char **argv, int argc,
             sprintf(outputData,"db%d",i+1);
             output.tag("ResponseType",outputData);
         }
-        theResponse = new ElementResponse(this, 4, Vector(numDir));
+        theResponse = new ElementResponse(this, 5, Vector(numDir));
     }
     // target basic velocities
     else if (strcmp(argv[0],"targetVelocity") == 0 || 
@@ -850,7 +995,7 @@ Response* EETwoNodeLink::setResponse(const char **argv, int argc,
             sprintf(outputData,"vb%d",i+1);
             output.tag("ResponseType",outputData);
         }
-        theResponse = new ElementResponse(this, 5, Vector(numDir));
+        theResponse = new ElementResponse(this, 6, Vector(numDir));
     }
     // target basic accelerations
     else if (strcmp(argv[0],"targetAcceleration") == 0 || 
@@ -860,7 +1005,7 @@ Response* EETwoNodeLink::setResponse(const char **argv, int argc,
             sprintf(outputData,"ab%d",i+1);
             output.tag("ResponseType",outputData);
         }
-        theResponse = new ElementResponse(this, 6, Vector(numDir));
+        theResponse = new ElementResponse(this, 7, Vector(numDir));
     }
     // measured basic displacements
     else if (strcmp(argv[0],"measuredDisplacement") == 0 || 
@@ -870,7 +1015,7 @@ Response* EETwoNodeLink::setResponse(const char **argv, int argc,
             sprintf(outputData,"dbm%d",i+1);
             output.tag("ResponseType",outputData);
         }
-        theResponse = new ElementResponse(this, 7, Vector(numDir));
+        theResponse = new ElementResponse(this, 8, Vector(numDir));
     }
     // measured basic velocities
     else if (strcmp(argv[0],"measuredVelocity") == 0 || 
@@ -880,7 +1025,7 @@ Response* EETwoNodeLink::setResponse(const char **argv, int argc,
             sprintf(outputData,"vbm%d",i+1);
             output.tag("ResponseType",outputData);
         }
-        theResponse = new ElementResponse(this, 8, Vector(numDir));
+        theResponse = new ElementResponse(this, 9, Vector(numDir));
     }
     // measured basic accelerations
     else if (strcmp(argv[0],"measuredAcceleration") == 0 || 
@@ -890,7 +1035,7 @@ Response* EETwoNodeLink::setResponse(const char **argv, int argc,
             sprintf(outputData,"abm%d",i+1);
             output.tag("ResponseType",outputData);
         }
-        theResponse = new ElementResponse(this, 9, Vector(numDir));
+        theResponse = new ElementResponse(this, 10, Vector(numDir));
     }
     // basic deformations and basic forces
     else if (strcmp(argv[0],"defoANDforce") == 0 || strcmp(argv[0],"deformationANDforce") == 0 ||
@@ -905,7 +1050,7 @@ Response* EETwoNodeLink::setResponse(const char **argv, int argc,
             sprintf(outputData,"q%d",i+1);
             output.tag("ResponseType",outputData);
         }
-        theResponse = new ElementResponse(this, 10, Vector(numDir*2));
+        theResponse = new ElementResponse(this, 11, Vector(numDir*2));
     }
 
     output.endTag(); // ElementOutput
@@ -916,8 +1061,7 @@ Response* EETwoNodeLink::setResponse(const char **argv, int argc,
 
 int EETwoNodeLink::getResponse(int responseID, Information &eleInfo)
 {
-    int numDOF2;
-    Vector defoAndForce(numDir*2);
+    static Vector defoAndForce(numDir*2);
     
     switch (responseID)  {
     case 1:  // global forces
@@ -925,36 +1069,39 @@ int EETwoNodeLink::getResponse(int responseID, Information &eleInfo)
         
     case 2:  // local forces
         theVector->Zero();
-        numDOF2 = numDOF/2;
-        for (int i=0; i<numDir; i++) {
-            (*theVector)((*dir)(i))         = -(*qMeas)(i);
-            (*theVector)((*dir)(i)+numDOF2) =  (*qMeas)(i);
-        }
+        // determine resisting forces in local system
+        (*theVector) = Tlb^(*qMeas);
+        // add P-Delta effects to local forces
+        if (Mratio.Size() == 4)
+            this->addPDeltaForces(*theVector);
         
         return eleInfo.setVector(*theVector);
         
     case 3:  // basic forces
         return eleInfo.setVector(*qMeas);
         
-    case 4:  // target basic displacements
+	case 4:  // target local displacements
+        return eleInfo.setVector(dl);
+        
+    case 5:  // target basic displacements
         return eleInfo.setVector(dbTarg);
         
-    case 5:  // target basic velocities
+    case 6:  // target basic velocities
         return eleInfo.setVector(vbTarg);
         
-    case 6:  // target basic accelerations
+    case 7:  // target basic accelerations
         return eleInfo.setVector(abTarg);
         
-    case 7:  // measured basic displacements
+    case 8:  // measured basic displacements
         return eleInfo.setVector(this->getBasicDisp());
         
-    case 8:  // measured basic velocities
+    case 9:  // measured basic velocities
         return eleInfo.setVector(this->getBasicVel());
         
-    case 9:  // measured basic accelerations
+    case 10:  // measured basic accelerations
         return eleInfo.setVector(this->getBasicAccel());
         
-    case 10:  // basic deformations and basic forces
+    case 11:  // basic deformations and basic forces
         defoAndForce.Zero();
         defoAndForce.Assemble(dbTarg,0);
         defoAndForce.Assemble(*qMeas,numDir);
@@ -967,38 +1114,44 @@ int EETwoNodeLink::getResponse(int responseID, Information &eleInfo)
 }
 
 
-// Establish the external nodes and set up the transformation matrix for orientation
-void EETwoNodeLink::setUp(int Nd1, int Nd2, const Vector &x, const Vector &yp)
-{ 
-    // ensure the connectedExternalNode ID is of correct size & set values
-    if (connectedExternalNodes.Size() != 2)  {
-        opserr << "EETwoNodeLink::setUp() - element: "
-            << this->getTag() << " failed to create an ID of size 2\n";
+// set up the transformation matrix for orientation
+void EETwoNodeLink::setUp()
+{
+    const Vector &end1Crd = theNodes[0]->getCrds();
+    const Vector &end2Crd = theNodes[1]->getCrds();	
+    Vector xp = end1Crd - end2Crd;
+    L = xp.Norm();
+    
+    if (L > DBL_EPSILON)  {
+        if (x.Size() > 0)  {
+            opserr << "WARNING EETwoNodeLink::setUp() - " 
+                << "ignoring supplied local x vector and "
+                << "using element nodes to determine orientation\n";
+        }
+        x.resize(3);
+        x.Zero();
+        x(0) = xp(0);
+        if (xp.Size() == 2)
+            x(1) = xp(1);
+        if (xp.Size() == 3)
+            x(2) = xp(2);
     }
-    
-    connectedExternalNodes(0) = Nd1;
-    connectedExternalNodes(1) = Nd2;
-    
-    // set node pointers to NULL
-    int i;
-    for (i=0; i<2; i++)
-        theNodes[i] = 0;
-    
     // check that vectors for orientation are of correct size
-    if ( x.Size() != 3 || yp.Size() != 3 )  {
-        opserr << "EETwoNodeLink::setUp() - element: "
-            << this->getTag() << " incorrect dimension of orientation vectors\n";
+    if (x.Size() != 3 || y.Size() != 3)  {
+        opserr << "EETwoNodeLink::setUp() - "
+            << "element: " << this->getTag()
+            << " incorrect dimension of orientation vectors\n";
+        exit(-1);
     }
     
     // establish orientation of element for the tranformation matrix
     // z = x cross yp
     Vector z(3);
-    z(0) = x(1)*yp(2) - x(2)*yp(1);
-    z(1) = x(2)*yp(0) - x(0)*yp(2);
-    z(2) = x(0)*yp(1) - x(1)*yp(0);
+    z(0) = x(1)*y(2) - x(2)*y(1);
+    z(1) = x(2)*y(0) - x(0)*y(2);
+    z(2) = x(0)*y(1) - x(1)*y(0);
     
     // y = z cross x
-    Vector y(3);
     y(0) = z(1)*x(2) - z(2)*x(1);
     y(1) = z(2)*x(0) - z(0)*x(2);
     y(2) = z(0)*x(1) - z(1)*x(0);
@@ -1012,96 +1165,285 @@ void EETwoNodeLink::setUp(int Nd1, int Nd2, const Vector &x, const Vector &yp)
     if (xn == 0 || yn == 0 || zn == 0)  {
         opserr << "EETwoNodeLink::setUp() - element: "
             << this->getTag() << " invalid orientation vectors\n";
+        exit(-1);
     }
     
     // create transformation matrix of direction cosines
-    for (i=0; i<3; i++)  {
-        transformation(0,i) = x(i)/xn;
-        transformation(1,i) = y(i)/yn;
-        transformation(2,i) = z(i)/zn;
-    }    
+    for (int i=0; i<3; i++)  {
+        trans(0,i) = x(i)/xn;
+        trans(1,i) = y(i)/yn;
+        trans(2,i) = z(i)/zn;
+    }
 }
 
 
-// set basic deformation-displacement transformation matrix
-void EETwoNodeLink::setTranGlobalBasic(Etype elemType, int numDir)
+// set transformation matrix from global to local system
+void EETwoNodeLink::setTranGlobalLocal()
 {
-    enum Dtype { TRANS, ROTATE };
-    
-    int axisID, dirID;
-    Dtype dirType;
-    
     // resize transformation matrix and zero it
-    T.resize(numDir,numDOF);
-    T.Zero();
+    Tgl.resize(numDOF,numDOF);
+    Tgl.Zero();
     
-    // loop over directions, setting row in tran for each direction
-    // depending on dimensionality of element
+    for (int i=0; i<numDOF/2; i++)  {
+        
+        // switch on dimensionality of element
+        switch (elemType)  {
+        case D1N2:
+            Tgl(i,0) = Tgl(i+1,1) = trans(i,0);
+            break;
+        case D2N4:
+            Tgl(i,0) = Tgl(i+2,2) = trans(i,0);  
+            Tgl(i,1) = Tgl(i+2,3) = trans(i,1);
+            break;
+        case D2N6: 
+            if (i<2)  {
+                Tgl(i,0) = Tgl(i+3,3) = trans(i,0);  
+                Tgl(i,1) = Tgl(i+3,4) = trans(i,1);
+            } else  {
+                Tgl(i,2) = Tgl(i+3,5) = trans(i,2);
+            }
+            break;
+        case D3N6:
+            Tgl(i,0) = Tgl(i+3,3) = trans(i,0);  
+            Tgl(i,1) = Tgl(i+3,4) = trans(i,1);
+            Tgl(i,2) = Tgl(i+3,5) = trans(i,2);
+            break;
+        case D3N12:
+            if (i < 3)  {
+                Tgl(i,0) = Tgl(i+6,6)  = trans(i,0);
+                Tgl(i,1) = Tgl(i+6,7)  = trans(i,1);
+                Tgl(i,2) = Tgl(i+6,8)  = trans(i,2);
+            } else  {
+                Tgl(i,3) = Tgl(i+6,9)  = trans(i,0);
+                Tgl(i,4) = Tgl(i+6,10) = trans(i,1);
+                Tgl(i,5) = Tgl(i+6,11) = trans(i,2);
+            }
+            break;
+        }
+    }
+}
+
+
+// set transformation matrix from local to basic system
+void EETwoNodeLink::setTranLocalBasic()
+{
+    // resize transformation matrix and zero it
+    Tlb.resize(numDir,numDOF);
+    Tlb.Zero();
+    
     for (int i=0; i<numDir; i++)  {
         
-        dirID  = (*dir)(i);     // direction 0 to 5;
-        axisID = dirID % 3;     // 0, 1, 2 for axis of translation or rotation
+        int dirID = (*dir)(i);     // direction 0 to 5;
+        Tlb(i,dirID) = -1.0;
+        Tlb(i,dirID+numDOF/2) = 1.0;
         
-        // set direction type to translation or rotation
-        dirType = (dirID<3) ? TRANS : ROTATE;
-        
-        // now switch on dimensionality of element
+        // switch on dimensionality of element
         switch (elemType)  {
-            
-        case D1N2:
-            if (dirType == TRANS)
-                T(i,1) = transformation(axisID,0);
+        case D2N6:
+            if (dirID == 1)
+                Tlb(i,2) = Tlb(i,5) = -0.5*L;
             break;
-            
-        case D2N4:
-            if (dirType == TRANS)  {
-                T(i,2) = transformation(axisID,0);  
-                T(i,3) = transformation(axisID,1);
-            }
-            break;
-            
-        case D2N6: 
-            if (dirType == TRANS)  {
-                T(i,3) = transformation(axisID,0);  
-                T(i,4) = transformation(axisID,1);
-                T(i,5) = 0.0;
-            } else if (dirType == ROTATE)  {
-                T(i,3) = 0.0;
-                T(i,4) = 0.0;
-                T(i,5) = transformation(axisID,2);
-            }
-            break;
-            
-        case D3N6:
-            if (dirType == TRANS)  {
-                T(i,3) = transformation(axisID,0);  
-                T(i,4) = transformation(axisID,1);
-                T(i,5) = transformation(axisID,2);
-            }
-            break;
-            
         case D3N12:
-            if (dirType == TRANS)  {
-                T(i,6)  = transformation(axisID,0);  
-                T(i,7)  = transformation(axisID,1);
-                T(i,8)  = transformation(axisID,2);
-                T(i,9)  = 0.0;
-                T(i,10) = 0.0;
-                T(i,11) = 0.0;
-            } else if (dirType == ROTATE)  {
-                T(i,6)  = 0.0;
-                T(i,7)  = 0.0;
-                T(i,8)  = 0.0;
-                T(i,9)  = transformation(axisID,0);
-                T(i,10) = transformation(axisID,1);
-                T(i,11) = transformation(axisID,2);
-            }
-            break;
-            
-        }  // end switch
-        
-        // fill in first half of transformation matrix with negative sign
-        for (int j=0; j<numDOF/2; j++)
-            T(i,j) = -T(i,j+numDOF/2);   
+            if (dirID == 1)
+                Tlb(i,5) = Tlb(i,11) = -0.5*L;
+            else if (dirID == 2)
+                Tlb(i,4) = Tlb(i,10) = 0.5*L;
+        }
     }
+}
+
+
+void EETwoNodeLink::addPDeltaForces(Vector &pLocal)
+{
+    int dirID;
+    double N = 0.0;
+    double deltal1 = 0.0;
+    double deltal2 = 0.0;
+    
+    for (int i=0; i<numDir; i++)  {
+        dirID = (*dir)(i);  // direction 0 to 5;
+        
+        // get axial force and local disp differences
+        if (dirID == 0)
+            N = (*qMeas)(i);
+        else if (dirID == 1)
+            deltal1 = dl(1+numDOF/2) - dl(1);
+        else if (dirID == 2)
+            deltal2 = dl(2+numDOF/2) - dl(2);
+    }
+    
+    if (N != 0.0 && (deltal1 != 0.0 || deltal2 != 0.0))  {
+        for (int i=0; i<numDir; i++)  {
+            dirID = (*dir)(i);  // direction 0 to 5;
+            
+            // switch on dimensionality of element
+            switch (elemType)  {
+            case D2N4:
+                if (dirID == 1)  {
+                    double VpDelta = N*deltal1/L;
+                    VpDelta *= 1.0-Mratio(2)-Mratio(3);
+                    pLocal(1) += VpDelta;
+                    pLocal(3) -= VpDelta;
+                }
+                break;
+            case D2N6: 
+                if (dirID == 1)  {
+                    double VpDelta = N*deltal1/L;
+                    VpDelta *= 1.0-Mratio(2)-Mratio(3);
+                    pLocal(1) += VpDelta;
+                    pLocal(4) -= VpDelta;
+                }
+                else if (dirID == 2)  {
+                    double MpDelta = N*deltal1;
+                    pLocal(2) += Mratio(2)*MpDelta;
+                    pLocal(5) += Mratio(3)*MpDelta;
+                }
+                break;
+            case D3N6:
+                if (dirID == 1)  {
+                    double VpDelta = N*deltal1/L;
+                    VpDelta *= 1.0-Mratio(2)-Mratio(3);
+                    pLocal(1) += VpDelta;
+                    pLocal(4) -= VpDelta;
+                }
+                else if (dirID == 2)  {
+                    double VpDelta = N*deltal2/L;
+                    VpDelta *= 1.0-Mratio(0)-Mratio(1);
+                    pLocal(2) -= VpDelta;
+                    pLocal(5) += VpDelta;
+                }
+                break;
+            case D3N12:
+                if (dirID == 1)  {
+                    double VpDelta = N*deltal1/L;
+                    VpDelta *= 1.0-Mratio(2)-Mratio(3);
+                    pLocal(1) += VpDelta;
+                    pLocal(7) -= VpDelta;
+                }
+                else if (dirID == 2)  {
+                    double VpDelta = N*deltal2/L;
+                    VpDelta *= 1.0-Mratio(0)-Mratio(1);
+                    pLocal(2) -= VpDelta;
+                    pLocal(8) += VpDelta;
+                }
+                else if (dirID == 4)  {
+                    double MpDelta = N*deltal2;
+                    pLocal(4) -= Mratio(0)*MpDelta;
+                    pLocal(10) -= Mratio(1)*MpDelta;
+                }
+                else if (dirID == 5)  {
+                    double MpDelta = N*deltal1;
+                    pLocal(5) += Mratio(2)*MpDelta;
+                    pLocal(11) += Mratio(3)*MpDelta;
+                }
+                break;
+            }
+        }
+    }
+}
+
+
+void EETwoNodeLink::addPDeltaStiff(Matrix &kLocal)
+{
+    int dirID;
+    double N = 0.0;
+    double deltal1 = 0.0;
+    double deltal2 = 0.0;
+    
+    for (int i=0; i<numDir; i++)  {
+        dirID = (*dir)(i);  // direction 0 to 5;
+        
+        // get axial force and local disp differences
+        if (dirID == 0)
+            N = (*qMeas)(i);
+        else if (dirID == 1)
+            deltal1 = dl(1+numDOF/2) - dl(1);
+        else if (dirID == 2)
+            deltal2 = dl(2+numDOF/2) - dl(2);
+    }
+    
+    if (N != 0.0)  {
+        for (int i=0; i<numDir; i++)  {
+            dirID = (*dir)(i);  // direction 0 to 5;
+            
+            /* switch on dimensionality of element
+            switch (elemType)  {
+            case D2N4:
+                if (dirID == 1)  {
+                    double VpDelta = N*deltal1/L;
+                    VpDelta *= 1.0-Mratio(2)-Mratio(3);
+                    pLocal(1) += VpDelta;
+                    pLocal(3) -= VpDelta;
+                }
+                break;
+            case D2N6: 
+                if (dirID == 1)  {
+                    double VpDelta = N*deltal1/L;
+                    VpDelta *= 1.0-Mratio(2)-Mratio(3);
+                    pLocal(1) += VpDelta;
+                    pLocal(4) -= VpDelta;
+                }
+                else if (dirID == 2)  {
+                    double MpDelta = N*deltal1;
+                    pLocal(2) += Mratio(2)*MpDelta;
+                    pLocal(5) += Mratio(3)*MpDelta;
+                }
+                break;
+            case D3N6:
+                if (dirID == 1)  {
+                    double VpDelta = N*deltal1/L;
+                    VpDelta *= 1.0-Mratio(2)-Mratio(3);
+                    pLocal(1) += VpDelta;
+                    pLocal(4) -= VpDelta;
+                }
+                else if (dirID == 2)  {
+                    double VpDelta = N*deltal2/L;
+                    VpDelta *= 1.0-Mratio(0)-Mratio(1);
+                    pLocal(2) -= VpDelta;
+                    pLocal(5) += VpDelta;
+                }
+                break;
+            case D3N12:
+                if (dirID == 1)  {
+                    double VpDelta = N*deltal1/L;
+                    VpDelta *= 1.0-Mratio(2)-Mratio(3);
+                    pLocal(1) += VpDelta;
+                    pLocal(7) -= VpDelta;
+                }
+                else if (dirID == 2)  {
+                    double VpDelta = N*deltal2/L;
+                    VpDelta *= 1.0-Mratio(0)-Mratio(1);
+                    pLocal(2) -= VpDelta;
+                    pLocal(8) += VpDelta;
+                }
+                else if (dirID == 4)  {
+                    double MpDelta = N*deltal2;
+                    pLocal(4) -= Mratio(0)*MpDelta;
+                    pLocal(10) -= Mratio(1)*MpDelta;
+                }
+                else if (dirID == 5)  {
+                    double MpDelta = N*deltal1;
+                    pLocal(5) += Mratio(2)*MpDelta;
+                    pLocal(11) += Mratio(3)*MpDelta;
+                }
+                break;
+            }*/
+        }
+    }
+}
+
+void EETwoNodeLink::applyIMod()
+{    
+    // get measured displacements
+    if (theSite != 0)  {
+        (*dbMeas) = theSite->getDisp();
+    }
+    else  {
+        sData[0] = OF_RemoteTest_getDisp;
+        theChannel->sendVector(0, 0, *sendData, 0);
+        theChannel->recvVector(0, 0, *recvData, 0);
+    }
+    
+    // correct for displacement control errors using I-Modification
+    (*qMeas) -= kbInit*((*dbMeas) - (*db));
 }
