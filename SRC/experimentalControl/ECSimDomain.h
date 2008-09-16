@@ -50,6 +50,7 @@ class StaticAnalysis;
 class TimeSeries;
 class LoadPattern;
 class SP_Constraint;
+class Node;
 
 class ECSimDomain : public ECSimulation
 {
@@ -115,7 +116,8 @@ private:
     
     TimeSeries    *theSeries;
     LoadPattern   *thePattern;
-    SP_Constraint **theSP;
+    SP_Constraint **theSPs;
+    Node          **theNodes;
     
     int numSPs;     // total number of SP constraints
     
