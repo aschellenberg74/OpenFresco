@@ -41,15 +41,16 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/D &quot;_CRT_SECURE_NO_DEPRECATE&quot;"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;C:\Program Files\MATLAB\R2006a\extern\include&quot;"
-				PreprocessorDefinitions="_WIN32;WIN32;_DEBUG;_CONSOLE"
+				AdditionalIncludeDirectories=""
+				PreprocessorDefinitions="_WIN32;WIN32;_DEBUG;_CONSOLE;_RELIABILITY"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
+				RuntimeLibrary="1"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
+				CompileAs="0"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -62,8 +63,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalOptions="/FIXED:NO"
 				AdditionalDependencies="ws2_32.lib"
-				LinkIncremental="2"
+				LinkIncremental="1"
+				IgnoreDefaultLibraryNames="libc.lib;libcmt.lib;msvcrt.lib;libcd.lib;msvcrtd.lib"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				TargetMachine="1"
@@ -119,13 +122,13 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/D &quot;_CRT_SECURE_NO_DEPRECATE&quot;"
-				AdditionalIncludeDirectories="D:\OpenFresco\SRC\experimentalControl\scramnet\inc"
-				PreprocessorDefinitions="_WIN32;WIN32;_WINDOWS;NDEBUG;_CONSOLE"
+				AdditionalIncludeDirectories=""
+				PreprocessorDefinitions="_WIN32;WIN32;_WINDOWS;NDEBUG;_CONSOLE;_RELIABILITY"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
-				DebugInformationFormat="3"
+				DebugInformationFormat="0"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -138,9 +141,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalOptions="/FIXED:NO"
 				AdditionalDependencies="ws2_32.lib"
 				LinkIncremental="1"
-				GenerateDebugInformation="true"
+				IgnoreDefaultLibraryNames="libc.lib;libcmtd.lib;msvcrt.lib;libcd.lib;msvcrtd.lib"
+				GenerateDebugInformation="false"
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -205,13 +210,6 @@
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
