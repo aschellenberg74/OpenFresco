@@ -53,16 +53,14 @@ class EETwoNodeLink : public ExperimentalElement
 public:
     // constructors
     EETwoNodeLink(int tag, int dimension, int Nd1, int Nd2,
-        const ID &direction,
-        const Vector &x, const Vector &yprime,
+        const ID &direction, const Vector &y, const Vector &x,
         ExperimentalSite *site,
-        bool iMod = false, double mass = 0.0);
+        Vector Mratio = 0, bool iMod = false, double mass = 0.0);
     EETwoNodeLink(int tag, int dimension, int Nd1, int Nd2,
-        const ID &direction,
-        const Vector &x, const Vector &yprime,
+        const ID &direction, const Vector &y, const Vector &x,
         int port, char *machineInetAddress = 0,
         int ssl = 0, int dataSize = OF_Network_dataSize,
-        bool iMod = false, double mass = 0.0);
+        Vector Mratio = 0, bool iMod = false, double mass = 0.0);
     
     // destructor
     ~EETwoNodeLink();
@@ -85,6 +83,7 @@ public:
     // public methods to set and to obtain stiffness,
     // and to obtain mass, damping and residual information
     int setInitialStiff(const Matrix& kbInit);
+    const Matrix &getTangentStiff();
     const Matrix &getMass();
     
     void zeroLoad();
@@ -115,30 +114,35 @@ private:
     Etype elemType;
     
     // private methods
-    void setUp(int Nd1, int Nd2, const Vector& x, const Vector& y);    
-    void setTranGlobalBasic(Etype e, int n);
+    void setUp();
+    void setTranGlobalLocal();
+    void setTranLocalBasic();
+    void addPDeltaForces(Vector &pLocal);
+    void addPDeltaStiff(Matrix &kLocal);
+    void applyIMod();
     
     // private attributes - a copy for each object of the class
     int dimension;					// 1, 2, or 3 dimensions
     int numDOF;						// number of dof for EETwoNodeLink
     ID connectedExternalNodes;      // contains the tags of the end nodes
+    Node *theNodes[2];
     
-    int numDir;             // number of directions
-    ID *dir;                // array of directions 0-5
-    Matrix transformation;  // transformation matrix for orientation
-    
+    // parameters
+    int numDir;         // number of directions
+    ID *dir;            // array of directions 0-5
+    Matrix trans;       // transformation matrix for orientation
+    Vector x;           // local x direction
+    Vector y;           // local y direction
+    Vector Mratio;      // p-delta moment distribution ratios
     bool iMod;          // I-Modification flag
     double mass;        // total mass
+    double L;           // element length
     
-    Matrix *theMatrix;  // pointer to objects matrix (a class wide Matrix)
-    Vector *theVector;  // pointer to objects vector (a class wide Vector)
-    Vector *theLoad;    // pointer to the load vector
-    
-    Channel *theChannel;        // channel
-    double *sData;              // send data array
-    Vector *sendData;           // send vector
-    double *rData;              // receive data array
-    Vector *recvData;           // receive vector
+    Channel *theChannel;    // channel
+    double *sData;          // send data array
+    Vector *sendData;       // send vector
+    double *rData;          // receive data array
+    Vector *recvData;       // receive vector
     
     Vector *db;         // trial displacements in basic system
     Vector *vb;         // trial velocities in basic system
@@ -155,12 +159,17 @@ private:
     Vector vbTarg;      // target velocities in basic system
     Vector abTarg;      // target accelerations in basic system
     
-    Vector dbPast;      // past displacements in basic system
-    Matrix kbInit;      // stiffness matrix in basic system
-    double tPast;       // past time
-    Matrix T;           // transformation matrix
+    Vector dl;          // displacements in local system
+	Matrix Tgl;         // transformation matrix from global to local system
+	Matrix Tlb;         // transformation matrix from local to basic system
     
-    Node *theNodes[2];
+    Vector dbPast;      // past displacements in basic system
+    double tPast;       // past time
+    Matrix kbInit;      // stiffness matrix in basic system
+    
+    Matrix *theMatrix;  // pointer to objects matrix (a class wide Matrix)
+    Vector *theVector;  // pointer to objects vector (a class wide Vector)
+    Vector *theLoad;    // pointer to the load vector
     
     // static data - single copy for all objects of the class	
     static Matrix EETwoNodeLinkM2;   // class wide matrix for 2*2
@@ -171,6 +180,8 @@ private:
     static Vector EETwoNodeLinkV4;   // class wide Vector for size 4
     static Vector EETwoNodeLinkV6;   // class wide Vector for size 6
     static Vector EETwoNodeLinkV12;  // class wide Vector for size 12
+    
+    bool firstWarning;
 };
 
 #endif
