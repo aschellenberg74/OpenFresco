@@ -46,9 +46,9 @@ fix 5   0  1  0
 
 # Define experimental site
 # ------------------------
-# expSite RemoteSite $tag <-setup $setupTag> $ipAddr $ipPort <-ssl> <-dataSize $size>
-expSite RemoteSite 1 "127.0.0.1" 8090
-expSite RemoteSite 2 "127.0.0.1" 8091
+# expSite ShadowSite $tag <-setup $setupTag> $ipAddr $ipPort <-ssl> <-dataSize $size>
+expSite ShadowSite 1 "127.0.0.1" 8090
+expSite ShadowSite 2 "127.0.0.1" 8091
 
 # Define elments
 # --------------
@@ -149,14 +149,13 @@ recorder Element -file Elmt_Def.out -time -ele 2 4 basicDeformations
 # ------------------------------
 # perform an eigenvalue analysis
 set pi 3.14159265358979
-set lambda [eigen 3]
+set lambda [eigen -fullGenLapack 6]
 puts "\nEigenvalues at start of transient:"
 puts "lambda         omega          period"
 foreach lambda $lambda {
    set omega [expr pow($lambda,0.5)]
    set period [expr 2*$pi/pow($lambda,0.5)]
    puts "$lambda  $omega  $period"}
-puts " "
 
 # open output file for writing
 set outFileID [open elapsedTime.txt w]
@@ -165,9 +164,10 @@ set tTot [time {
     for {set i 1} {$i < 3000} {incr i} {
         set t [time {analyze  1  $dt}]
         puts $outFileID $t
+        #puts "step $i"
     }
 }]
-puts "Elapsed Time = $tTot \n"
+puts "\nElapsed Time = $tTot \n"
 # close the output file
 close $outFileID
 

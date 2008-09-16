@@ -9,7 +9,7 @@
 # Revision: A
 #
 # Purpose: this file contains the tcl input to perform
-# a local hybrid simulation of a portal frame  with
+# a local hybrid simulation of a portal frame with
 # two experimental beamColumn elements.
 # The frame can be analyzed with or without gravity loads.
 # The specimens are simulated using the SimUniaxialMaterials
@@ -19,7 +19,7 @@
 # ------------------------------
 # Start of model generation
 # ------------------------------
-# create ModelBuilder (with two-dimensions and 2 DOF/node)
+# create ModelBuilder (with two-dimensions and 3 DOF/node)
 model BasicBuilder -ndm 2 -ndf 3
 
 # Load OpenFresco package
@@ -30,8 +30,9 @@ loadPackage OpenFresco
 # Define geometry for model
 # -------------------------
 set withGravity 1;
-set P 5.0;
-set mass3 [expr 2.0*$P/386.1];
+set Pc 10.638;
+set P [expr 0.5*$Pc];
+set mass3 [expr $P/386.1];
 set mass4 [expr $P/386.1];
 # node $tag $xCrd $yCrd $mass
 node  1     0.0   0.0
@@ -47,7 +48,7 @@ fix 2   1  1  0
 # Define materials
 # ----------------
 # uniaxialMaterial Steel02 $matTag $Fy $E $b $R0 $cR1 $cR2 $a1 $a2 $a3 $a4 
-uniaxialMaterial Steel02 1 2.0 2.8 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0
+uniaxialMaterial Steel02 1 1.5 2.8 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0
 #uniaxialMaterial Elastic 1 2.8
 
 # Define experimental control
@@ -59,9 +60,9 @@ expControl SimUniaxialMaterials 2 1
 
 # Define experimental setup
 # -------------------------
-# expSetup OneActuator $tag <-control $ctrlTag> $dir <-ctrlDispFact $f> ...
-expSetup OneActuator 1 -control 1 2
-expSetup OneActuator 2 -control 2 2 -daqForceFact 2.0
+# expSetup OneActuator $tag <-control $ctrlTag> $dir -sizeTrialOut $t $o <-trialDispFact $f> ...
+expSetup OneActuator 1 -control 1 2 -sizeTrialOut 3 3
+expSetup OneActuator 2 -control 2 2 -sizeTrialOut 3 3
 
 # Define experimental site
 # ------------------------
@@ -71,26 +72,20 @@ expSite LocalSite 2 2
 
 # Define geometric transformation
 # -------------------------------
-if {$withGravity} {
-    geomTransf PDelta 1
-    #geomTransf Corotational 1
-} else {
-    geomTransf Linear 1
-}
+#geomTransf PDelta 1
+geomTransf Corotational 1
 
 # Define experimental elements
 # ----------------------------
 # left and right columns
 # expElement beamColumn $eleTag $iNode $jNode $transTag -site $siteTag -initStif $Kij <-iMod> <-rho $rho>
 expElement beamColumn 1 3 1 1 -site 1 -initStif 1310.8 0 0 0 11.2 -280.0 0 -280.0 9333.3333
-#element elasticBeamColumn 1 3 1 2.26 29000 4.022989 1
-expElement beamColumn 2 4 2 1 -site 2 -initStif 1310.8 0 0 0 22.4 -560.0 0 -560.0 18666.6666
-#element elasticBeamColumn 2 4 2 2.26 29000 8.045977 1
+expElement beamColumn 2 4 2 1 -site 2 -initStif 1310.8 0 0 0 11.2 -280.0 0 -280.0 9333.3333
 
 # Define numerical elements
 # -------------------------
 # element elasticBeamColumn $eleTag $iNode $jNode $A $E $Iz $transfTag
-element elasticBeamColumn 3 3 4 0.007 29000 22.1 1
+element elasticBeamColumn 3 3 4 3.55 29000 22.1 1
 
 if {$withGravity} {
     # Define gravity loads
@@ -98,9 +93,9 @@ if {$withGravity} {
     # Create a Plain load pattern with a Linear TimeSeries
     pattern Plain 1 "Linear" {
         # Create nodal loads at nodes 2
-	#    nd    FX          FY  MZ 
-	load  3   0.0  [expr -2.0*$P] 0.0
-	load  4   0.0  [expr -$P] 0.0
+        #    nd    FX          FY  MZ 
+        load  3   0.0  [expr -$P] 0.0
+        load  4   0.0  [expr -$P] 0.0
     }
     # ------------------------------
     # End of model generation
@@ -111,7 +106,7 @@ if {$withGravity} {
     # Start of analysis generation
     # ------------------------------
     # Create the system of equation
-    system ProfileSPD
+    system BandGeneral
     # Create the DOF numberer
     numberer Plain
     # Create the constraint handler
@@ -164,7 +159,7 @@ if {$withGravity} {
 # --------------------
 # set time series to be passed to uniform excitation
 set dt 0.01
-set scale 1.0
+set scale 1.2
 set accelSeries "Path -filePath SACNF01.txt -dt $dt -factor [expr 386.1*$scale]"
 
 # create UniformExcitation load pattern
@@ -172,10 +167,10 @@ set accelSeries "Path -filePath SACNF01.txt -dt $dt -factor [expr 386.1*$scale]"
 pattern UniformExcitation  2 1 -accel $accelSeries
 
 # calculate the rayleigh damping factors for nodes & elements
-set alphaM     1.1193940325;    # D = alphaM*M
-set betaK      0.0;             # D = betaK*Kcurrent
-set betaKinit  0.0;             # D = beatKinit*Kinit
-set betaKcomm  0.0;             # D = betaKcomm*KlastCommit
+set alphaM     1.2797;    # D = alphaM*M
+set betaK      0.0;       # D = betaK*Kcurrent
+set betaKinit  0.0;       # D = beatKinit*Kinit
+set betaKcomm  0.0;       # D = betaKcomm*KlastCommit
 
 # set the rayleigh damping 
 rayleigh $alphaM $betaK $betaKinit $betaKcomm;
@@ -188,18 +183,20 @@ rayleigh $alphaM $betaK $betaKinit $betaKcomm;
 # Start of analysis generation
 # ------------------------------
 # create the system of equations
-system ProfileSPD
+system BandGeneral
 # create the DOF numberer
 numberer Plain
 # create the constraint handler
 constraints Plain
 # create the convergence test
-test FixedNumIter 5
+test FixedNumIter 10
 # create the integration scheme
-integrator NewmarkHybridSimulation 0.5 0.25
-#integrator HHTHybridSimulation 0.5
+integrator NewmarkHybridSimulation2 0.5 0.25
+#integrator HHTHybridSimulation2 0.5
+#integrator AlphaOS 0.9
 # create the solution algorithm
-algorithm Newton; # -initial
+algorithm Newton
+#algorithm Linear
 # create the analysis object 
 analysis Transient
 # ------------------------------
@@ -245,9 +242,10 @@ foreach lambda $lambda {
 set outFileID [open elapsedTime.txt w]
 # perform the transient analysis
 set tTot [time {
-    for {set i 1} {$i < 3200} {incr i} {
+    for {set i 1} {$i < 2500} {incr i} {
         set t [time {analyze  1  [expr $dt/1.0]}]
         puts $outFileID $t
+ 	      #puts "step $i"
     }
 }]
 puts "\nElapsed Time = $tTot \n"

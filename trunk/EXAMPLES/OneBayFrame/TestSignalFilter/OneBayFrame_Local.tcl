@@ -1,27 +1,25 @@
-# File: LShapedColumn_Main.tcl (use with LShapedColumn_Adapter.tcl)
+# File: OneBayFrame_Local.tcl
 #
 # $Revision: $
 # $Date: $
 # $URL: $
 #
 # Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
-# Created: 09/07
+# Created: 11/06
 # Revision: A
 #
 # Purpose: this file contains the tcl input to perform
-# a distributed hybrid simulation of a L-shaped column
-# with one experimental beamColumn element.
-# Since the shear and moment DOF are coupled and the
-# simulation of the column is performed in an other
-# FE-software, the SimFEAdapter experimental control
-# is used to communicate with such software.
+# a local hybrid simulation of a one bay frame with
+# two experimental twoNodeLink elements.
+# The specimens are simulated using the SimUniaxialMaterials
+# controller.
 
 
 # ------------------------------
 # Start of model generation
 # ------------------------------
 # create ModelBuilder (with two-dimensions and 2 DOF/node)
-model BasicBuilder -ndm 2 -ndf 3
+model BasicBuilder -ndm 2 -ndf 2
 
 # Load OpenFresco package
 # -----------------------
@@ -30,46 +28,67 @@ loadPackage OpenFresco
 
 # Define geometry for model
 # -------------------------
-set mass2 0.04
-set mass3 0.02
+set mass3 0.04
+set mass4 0.02
 # node $tag $xCrd $yCrd $mass
-node  1     0.0    0.0
-node  2     0.0   54.0  -mass $mass2 $mass2 0.4
-node  3    36.0   54.0  -mass $mass3 $mass3 0.1
+node  1     0.0   0.00
+node  2   100.0   0.00
+node  3     0.0  54.00  -mass $mass3 $mass3
+node  4   100.0  54.00  -mass $mass4 $mass4
 
 # set the boundary conditions
-# fix $tag $DX $DY $RZ
-fix 1   1  1  1
+# fix $tag $DX $DY
+fix 1   1  1
+fix 2   1  1
+fix 3   0  1
+fix 4   0  1
+
+# Define materials
+# ----------------
+# uniaxialMaterial Steel02 $matTag $Fy $E $b $R0 $cR1 $cR2 $a1 $a2 $a3 $a4 
+#uniaxialMaterial Elastic 1 2.8
+uniaxialMaterial Steel02 1 1.5 2.8 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0
+uniaxialMaterial Elastic 2 5.6
+#uniaxialMaterial Steel02 2 3.0 5.6 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0 
+uniaxialMaterial Elastic 3 [expr 2.0*100.0/1.0]
+
+# Define experimental signal filter
+# ---------------------------------
+# expSignalFilter ErrorSimUndershoot $tag $error
+expSignalFilter ErrorSimUndershoot 1 0.01
+# expSignalFilter ErrorSimRandomGauss $tag $avg $std
+#expSignalFilter ErrorSimRandomGauss 1 0.0 0.01
 
 # Define experimental control
 # ---------------------------
-# expControl SimFEAdapter $tag ipAddr $ipPort
-expControl SimFEAdapter 1 "127.0.0.1" 44000
+# expControl SimUniaxialMaterials $tag $matTags <-ctrlFilters (5 $cfTag)> <-daqFilters (5 $dfTag)>
+expControl SimUniaxialMaterials 1 1 -ctrlFilters 1 0 0 0 0
+expControl SimUniaxialMaterials 2 2 -ctrlFilters 1 0 0 0 0
 
 # Define experimental setup
 # -------------------------
-# expSetup NoTransformation $tag <–control $ctrlTag> –dir $dirs … <–ctrlDispFact $f> ...
-expSetup NoTransformation 1 -control 1 -dir 2 1 3 -ctrlDispFact -1 1 1 -daqDispFact -1 1 1  -daqForceFact -1 1 1
+# expSetup OneActuator $tag <-control $ctrlTag> $dir -sizeTrialOut $t $o <-trialDispFact $f> ...
+expSetup OneActuator 1 -control 1 1 -sizeTrialOut 1 1
+expSetup OneActuator 2 -control 2 1 -sizeTrialOut 1 1
 
 # Define experimental site
 # ------------------------
 # expSite LocalSite $tag $setupTag
 expSite LocalSite 1 1
+expSite LocalSite 2 2
 
-# Define coordinate transformation
-# --------------------------------
-# geomTransf Linear $transfTag
-geomTransf Linear 1
+# Define experimental elements
+# ----------------------------
+# left and right columns
+# expElement twoNodeLink $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-orient <$x1 $x2 $x3> $y1 $y2 $y3> <-iMod> <-mass $m>
+expElement twoNodeLink 1 1 3 -dir 2 -site 1 -initStif 2.8 -orient -1 0 0
+expElement twoNodeLink 2 2 4 -dir 2 -site 2 -initStif 5.6 -orient -1 0 0
 
-# Define experimental element
-# ---------------------------
-# expElement beamColumn $eleTag $iNode $jNode $transTag –site $siteTag –initStif $Kij … <–iMod> <–rho $rho>
-expElement beamColumn 1 1 2 1 -site 1 -initStif 1213 0 0 0 11.2 -302.4 0 -302.4 10886.4
-
-# Define numerical element
-# ------------------------
-# element elasticBeamColumn $eleTag $iNode $jNode $A $E $Iz $transfTag
-element elasticBeamColumn 2 2 3 2.26 29000 5.067806896551724 1
+# Define numerical elements
+# -------------------------
+# spring
+# element truss $eleTag $iNode $jNode $A $matTag
+element truss 3 3 4 1.0 3
 
 # Define dynamic loads
 # --------------------
@@ -89,7 +108,7 @@ set betaKinit  0.0;             # D = beatKinit*Kinit
 set betaKcomm  0.0;             # D = betaKcomm*KlastCommit
 
 # set the rayleigh damping 
-#rayleigh $alphaM $betaK $betaKinit $betaKcomm;
+rayleigh $alphaM $betaK $betaKinit $betaKcomm;
 # ------------------------------
 # End of model generation
 # ------------------------------
@@ -108,15 +127,14 @@ numberer Plain
 constraints Plain
 
 # create the convergence test
-test EnergyIncr 1.0e-12 25
+test EnergyIncr 1.0e-6 10
 
 # create the integration scheme
-integrator Newmark 0.5 0.25
-#integrator NewmarkExplicit 0.5
+integrator NewmarkExplicit 0.5
 #integrator AlphaOS 1.0
 
 # create the solution algorithm
-algorithm Newton
+algorithm Linear
 
 # create the analysis object 
 analysis Transient
@@ -129,13 +147,13 @@ analysis Transient
 # Start of recorder generation
 # ------------------------------
 # create the recorder objects
-recorder Node -file Node_Dsp.out -time -node 2 3 -dof 1 2 3 disp
-recorder Node -file Node_Vel.out -time -node 2 3 -dof 1 2 3 vel
-recorder Node -file Node_Acc.out -time -node 2 3 -dof 1 2 3 accel
+recorder Node -file Node_Dsp.out -time -node 3 4 -dof 1 disp
+recorder Node -file Node_Vel.out -time -node 3 4 -dof 1 vel
+recorder Node -file Node_Acc.out -time -node 3 4 -dof 1 accel
 
-recorder Element -file Elmt_Frc.out  -time -ele 1 2 forces
-recorder Element -file Elmt_tDef.out -time -ele 1   targetDisplacements
-recorder Element -file Elmt_mDef.out -time -ele 1   measuredDisplacements
+recorder Element -file Elmt_Frc.out  -time -ele 1 2 3 forces
+recorder Element -file Elmt_tDef.out -time -ele 1 2   targetDisplacements
+recorder Element -file Elmt_mDef.out -time -ele 1 2   measuredDisplacements
 # --------------------------------
 # End of recorder generation
 # --------------------------------
@@ -146,7 +164,7 @@ recorder Element -file Elmt_mDef.out -time -ele 1   measuredDisplacements
 # ------------------------------
 # perform an eigenvalue analysis
 set pi 3.14159265358979
-set lambda [eigen 5]
+set lambda [eigen -fullGenLapack 2]
 puts "\nEigenvalues at start of transient:"
 puts "lambda         omega          period"
 foreach lambda $lambda {
@@ -161,7 +179,7 @@ set tTot [time {
     for {set i 1} {$i < 1600} {incr i} {
         set t [time {analyze  1  $dt}]
         puts $outFileID $t
-#	    puts "step $i"
+ 	      #puts "step $i"
     }
 }]
 puts "\nElapsed Time = $tTot \n"

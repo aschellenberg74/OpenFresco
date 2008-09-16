@@ -59,8 +59,8 @@ expControl LabVIEW 1 "127.0.0.1" 11997  -trialCP 1  -outCP 2;  # use with NEES-S
 
 # Define experimental setup
 # -------------------------
-# expSetup OneActuator $tag <-control $ctrlTag> $dir <-ctrlDispFact $f> ...
-expSetup OneActuator 1 -control 1 1
+# expSetup OneActuator $tag <-control $ctrlTag> $dir -sizeTrialOut $t $o <-trialDispFact $f> ...
+expSetup OneActuator 1 -control 1 1 -sizeTrialOut 1 1
 
 # Define experimental site
 # ------------------------
@@ -144,6 +144,16 @@ recorder Element -file Elmt_mDef.out -time -ele 1 measuredDisplacements
 # ------------------------------
 # Finally perform the analysis
 # ------------------------------
+# perform an eigenvalue analysis
+set pi 3.14159265358979
+set lambda [eigen -fullGenLapack 1]
+puts "\nEigenvalues at start of transient:"
+puts "lambda         omega          period"
+foreach lambda $lambda {
+   set omega [expr pow($lambda,0.5)]
+   set period [expr 2*$pi/pow($lambda,0.5)]
+   puts "$lambda  $omega  $period"}
+
 # open output file for writing
 set outFileID [open elapsedTime.txt w]
 # perform the transient analysis
@@ -151,10 +161,10 @@ set tTot [time {
     for {set i 1} {$i < 500} {incr i} {
         set t [time {analyze  1  $dt}]
         puts $outFileID $t
-        #puts "step $i"
+        puts "step $i"
         }
     }]
-puts "Elapsed Time = $tTot \n"
+puts "\nElapsed Time = $tTot \n"
 # close the output file
 close $outFileID
 

@@ -35,8 +35,8 @@ expControl SimUniaxialMaterials 1 1
 
 # Define experimental setup
 # -------------------------
-# expSetup OneActuator $tag <-control $ctrlTag> $dir <-ctrlDispFact $f> ...
-expSetup OneActuator 1 -control 1 2
+# expSetup OneActuator $tag <-control $ctrlTag> $dir -sizeTrialOut $t $o <-trialDispFact $f> ...
+expSetup OneActuator 1 -control 1 2 -sizeTrialOut 3 3
 
 # Define experimental site
 # ------------------------

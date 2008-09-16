@@ -68,9 +68,8 @@ expControl SimDomain  1  -trialCP 1  -outCP 2
 
 # Define experimental setup
 # -------------------------
-# expSetup NoTransformation $tag <–control $ctrlTag> –dir $dirs … <–ctrlDispFact $f> ...
-expSetup NoTransformation 1 -control 1 -dir 2 1 3 -ctrlDispFact -1 1 1 -daqDispFact -1 1 1  -daqForceFact -1 1 1
-
+# expSetup NoTransformation $tag <–control $ctrlTag> –dir $dirs -sizeTrialOut $t $o <–trialDispFact $f> ...
+expSetup NoTransformation 1 -control 1 -dir 2 1 3 -sizeTrialOut 3 3 -trialDispFact 1 -1 1 -outDispFact 1 -1 1  -outForceFact 1 -1 1
 
 # Define experimental site
 # ------------------------

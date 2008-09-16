@@ -1,4 +1,4 @@
-# File: LShapedColumn_Adapter.tcl (use with LShapedColumn_Main.tcl)
+# File: Cantilever_Slave.tcl (use with Cantilever_Master.tcl)
 #
 # $Revision: $
 # $Date: $
@@ -9,11 +9,12 @@
 # Revision: A
 #
 # Purpose: this file contains the tcl input to perform
-# a distributed hybrid simulation of a L-shaped column
+# a hybrid simulation of a simple cantilever column
 # with one experimental beamColumn element.
-# The adpater element is used to communicate with the
-# main FE-software which is coordinating and executing
-# the direct integration analysis.
+# Either the actuator or adpater element is used to
+# communicate with the main FE-software which is
+# coordinating and executing the direct integration
+# analysis.
 
 
 # ------------------------------
@@ -24,13 +25,17 @@ model BasicBuilder -ndm 2 -ndf 3
 
 # Define geometry for model
 # -------------------------
+set mass2 0.04
 # node $tag $xCrd $yCrd
 node  1     0.0    0.0
-node  2     0.0   54.0
+node  2     0.0   54.0   -mass $mass2 $mass2 0.0
+node  3   -10.0   54.0;  # for use with actuator element
 
 # set the boundary conditions
 # fix $tag $DX $DY $RZ
 fix 1   1  1  1
+fix 2   0  0  0
+fix 3   1  1  1;  # for use with actuator element
 
 # Define materials
 # ----------------
@@ -55,8 +60,12 @@ geomTransf Linear 1
 # element nonlinearBeamColumn $eleTag $iNode $jNode $numIntgrPts $secTag $transfTag
 element nonlinearBeamColumn 1 1 2 5 1 1
 
+# element actuator $eleTag $iNode $jNode EA ipPort <-rho rho>
+#element actuator 2 3 2 1E6 44000
+#element corotActuator 2 3 2 1E6 44000
+
 # element adapter eleTag -node Ndi Ndj ... -dof dofNdi -dof dofNdj ... -stif Kij ipPort <-mass Mij>
-element adapter 2 -node 2 -dof 1 2 3 -stif 1e8 0 0 0 1e8 0 0 0 1e10 44000
+element adapter 2 -node 2 -dof 1 -stif 1E5 44000
 # ------------------------------
 # End of model generation
 # ------------------------------
@@ -79,15 +88,18 @@ test NormDispIncr 1.0e-8 25
 #test NormUnbalance 1.0e-8 25
 #test EnergyIncr 1.0e-8 25
 
-
 # create the integration scheme
 integrator LoadControl 1.0
+#integrator Newmark 0.5 0.25
+#integrator NewmarkExplicit 0.5
 
 # create the solution algorithm
 algorithm Newton
+#algorithm Linear
 
 # create the analysis object 
 analysis Static
+#analysis Transient
 # ------------------------------
 # End of analysis generation
 # ------------------------------
@@ -97,13 +109,13 @@ analysis Static
 # Start of recorder generation
 # ------------------------------
 # create the recorder objects
-recorder Node -file Adap_Node_Dsp.out -time -node 2 -dof 1 2 3 disp
-recorder Node -file Adap_Node_Vel.out -time -node 2 -dof 1 2 3 vel
-recorder Node -file Adap_Node_Acc.out -time -node 2 -dof 1 2 3 accel
+recorder Node -file Slave_Node_Dsp.out -time -node 2 -dof 1 2 3 disp
+recorder Node -file Slave_Node_Vel.out -time -node 2 -dof 1 2 3 vel
+recorder Node -file Slave_Node_Acc.out -time -node 2 -dof 1 2 3 accel
 
-recorder Element -file Adap_Elmt_Frc.out  -time -ele 1 2 forces
-recorder Element -file Adap_Elmt_tDef.out -time -ele   2 targetDisplacements
-recorder Element -file Adap_Elmt_mDef.out -time -ele   2 measuredDisplacements
+recorder Element -file Slave_Elmt_Frc.out  -time -ele 1 2 forces
+recorder Element -file Slave_Elmt_tDef.out -time -ele   2 targetDisplacements
+recorder Element -file Slave_Elmt_mDef.out -time -ele   2 measuredDisplacements
 # --------------------------------
 # End of recorder generation
 # --------------------------------
@@ -112,7 +124,7 @@ recorder Element -file Adap_Elmt_mDef.out -time -ele   2 measuredDisplacements
 # ------------------------------
 # Finally perform the analysis
 # ------------------------------
-analyze 16000
+analyze 16000 0.02
 # --------------------------------
 # End of analysis
 # --------------------------------

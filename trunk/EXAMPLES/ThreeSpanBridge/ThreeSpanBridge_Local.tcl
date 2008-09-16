@@ -67,9 +67,9 @@ expControl SimUniaxialMaterials 2 4
 
 # Define experimental setup
 # -------------------------
-# expSetup OneActuator $tag <-control $ctrlTag> $dir <-ctrlDispFact $f> ...
-expSetup OneActuator 1 -control 1 2
-expSetup OneActuator 2 -control 2 2
+# expSetup OneActuator $tag <-control $ctrlTag> $dir -sizeTrialOut $t $o <-trialDispFact $f> ...
+expSetup OneActuator 1 -control 1 2 -sizeTrialOut 3 3
+expSetup OneActuator 2 -control 2 2 -sizeTrialOut 3 3
 
 # Define experimental site
 # ------------------------
@@ -185,14 +185,13 @@ recorder Element -file Elmt_Def.out -time -ele 2 3 basicDeformations
 # ------------------------------
 # perform an eigenvalue analysis
 set pi 3.14159265358979
-set lambda [eigen 4]
+set lambda [eigen -fullGenLapack 12]
 puts "\nEigenvalues at start of transient:"
 puts "lambda         omega          period"
 foreach lambda $lambda {
    set omega [expr pow($lambda,0.5)]
    set period [expr 2*$pi/pow($lambda,0.5)]
    puts "$lambda  $omega  $period"}
-puts " "
 
 # open output file for writing
 set outFileID [open elapsedTime.txt w]
@@ -201,9 +200,10 @@ set tTot [time {
     for {set i 1} {$i < 4000} {incr i} {
         set t [time {analyze  1  $dt}]
         puts $outFileID $t
+ 	      #puts "step $i"
     }
 }]
-puts "Elapsed Time = $tTot \n"
+puts "\nElapsed Time = $tTot \n"
 # close the output file
 close $outFileID
 
