@@ -31,6 +31,7 @@
 
 #include "ECxPCtarget.h"
 
+#include <windows.h>
 #include <xpcapi.h>
 #include <xpcapiconst.h>
 

@@ -123,12 +123,6 @@ int ESNoTransformation::setup()
 }
 
 
-int ESNoTransformation::commitState()
-{
-	return theControl->commitState();
-}
-
-
 ExperimentalSetup* ESNoTransformation::getCopy()
 {
 	ESNoTransformation *theCopy = new ESNoTransformation(*this);

@@ -900,6 +900,7 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp, int argc,
         // parsing was successful, allocate the setup
         theSetup = new ESAggregator(tag, numSetups, expSetups, theControl);
         
+        // cleanup dynamic memory
         if (expSetups != 0)
             delete [] expSetups;
     }

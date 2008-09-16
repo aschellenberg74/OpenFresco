@@ -176,12 +176,6 @@ int ESInvertedVBraceJntOff2d::transfTrialResponse(const Vector* disp,
 }
 
 
-int ESInvertedVBraceJntOff2d::commitState()
-{
-    return theControl->commitState();
-}
-
-
 ExperimentalSetup* ESInvertedVBraceJntOff2d::getCopy()
 {
     ESInvertedVBraceJntOff2d *theCopy = new ESInvertedVBraceJntOff2d(*this);

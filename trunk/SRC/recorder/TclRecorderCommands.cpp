@@ -255,6 +255,7 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         // now create the ExpSiteRecorder
         (*theRecorder) = new ExpSiteRecorder(numSites, theSites, data, sizeData, echoTime, *theOutputStream, deltaT);
         
+        // cleanup dynamic memory
         if (siteTags != 0)
             delete siteTags;
         if (data != 0)
@@ -438,6 +439,7 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         // now create the ExpSetupRecorder
         (*theRecorder) = new ExpSetupRecorder(numSetups, theSetups, data, sizeData, echoTime, *theOutputStream, deltaT);
         
+        // cleanup dynamic memory
         if (setupTags != 0)
             delete setupTags;
         if (data != 0)
@@ -621,6 +623,7 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         // now create the ExpControlRecorder
         (*theRecorder) = new ExpControlRecorder(numControls, theControls, data, sizeData, echoTime, *theOutputStream, deltaT);
         
+        // cleanup dynamic memory
         if (controlTags != 0)
             delete controlTags;
         if (data != 0)
@@ -804,6 +807,7 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         // now create the ExpSignalFilterRecorder
         (*theRecorder) = new ExpSignalFilterRecorder(numFilters, theFilters, data, sizeData, echoTime, *theOutputStream, deltaT);
         
+        // cleanup dynamic memory
         if (filterTags != 0)
             delete filterTags;
         if (data != 0)

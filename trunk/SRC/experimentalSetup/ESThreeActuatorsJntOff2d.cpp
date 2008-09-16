@@ -172,12 +172,6 @@ int ESThreeActuatorsJntOff2d::transfTrialResponse(const Vector* disp,
 }
 
 
-int ESThreeActuatorsJntOff2d::commitState()
-{
-    return theControl->commitState();
-}
-
-
 ExperimentalSetup* ESThreeActuatorsJntOff2d::getCopy()
 {
     ESThreeActuatorsJntOff2d *theCopy = new ESThreeActuatorsJntOff2d(*this);

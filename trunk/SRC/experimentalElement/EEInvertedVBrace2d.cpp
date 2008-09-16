@@ -175,7 +175,8 @@ EEInvertedVBrace2d::EEInvertedVBrace2d(int tag, int Nd1, int Nd2, int Nd3,
             << "- failed to setup connection\n";
         exit(-1);
     }
-
+    delete [] machineInetAddr;
+    
     // set the data size for the experimental site
     int intData[2*OF_Resp_All+1];
     ID idData(intData, 2*OF_Resp_All+1);

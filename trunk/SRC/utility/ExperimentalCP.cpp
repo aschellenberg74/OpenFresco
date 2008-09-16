@@ -43,7 +43,7 @@ ExperimentalCP::ExperimentalCP(int tag, int NDM, int NDF,
     sizeRespType(5), dirRespType(5)
 {
     // initialize factors
-    if (fact != 0)  {
+    if (fact.Size() > 0)  {
         if (resp.Size() != numDirection || 
             fact.Size() != numDirection)  {
             opserr << "ExperimentalCP::ExperimentalCP() - "
@@ -153,7 +153,7 @@ int ExperimentalCP::setData(int nodetag, const ID &dir,
     response = resp;
 
     // initialize factors
-    if (fact != 0)  {
+    if (fact.Size() > 0)  {
         if (resp.Size() != numDirection || 
             fact.Size() != numDirection)  {
             opserr << "ExperimentalCP::setData() - "

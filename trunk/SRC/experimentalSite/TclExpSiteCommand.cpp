@@ -207,7 +207,7 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp, int argc,
             argi++;
         }
         // get ip-address and ip-port
-        ipAddr = (char *)malloc((strlen(argv[argi]) + 1)*sizeof(char));
+        ipAddr = new char [strlen(argv[argi])+1];
         strcpy(ipAddr,argv[argi]);
         argi++;
         if (Tcl_GetInt(interp, argv[argi], &ipPort) != TCL_OK)  {
@@ -264,6 +264,10 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp, int argc,
             delete theSite; // invoke the destructor, otherwise mem leak
             return TCL_ERROR;
         }
+        
+        // cleanup dynamic memory
+        if (ipAddr != 0)
+            delete [] ipAddr;
     }
 	
     // ----------------------------------------------------------------------------	
