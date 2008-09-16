@@ -59,8 +59,6 @@ public:
     // public methods
     virtual int setup();
     
-    virtual int commitState();
-    
     virtual ExperimentalSetup *getCopy();
     
     // public methods for output

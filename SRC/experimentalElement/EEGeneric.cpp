@@ -56,11 +56,11 @@ Vector EEGeneric::theLoad(1);
 // by each object and storing the tags of the end nodes.
 EEGeneric::EEGeneric(int tag, ID nodes, ID *dof,
     ExperimentalSite *site,
-    bool iM, Matrix *m)
+    bool iM, const Matrix *m)
     : ExperimentalElement(tag, ELE_TAG_EEGeneric, site),
     connectedExternalNodes(nodes), basicDOF(1),
     numExternalNodes(0), numDOF(0), numBasicDOF(0),
-    iMod(iM), mass(m),
+    iMod(iM), mass(0),
     db(0), vb(0), ab(0), t(0),
     dbMeas(0), vbMeas(0), abMeas(0), qMeas(0), tMeas(0),
     dbTarg(1), vbTarg(1), abTarg(1),
@@ -92,6 +92,10 @@ EEGeneric::EEGeneric(int tag, ID nodes, ID *dof,
         numBasicDOF += dof[i].Size();
         theDOF[i] = dof[i];
     }
+    
+    // initialize mass matrix
+    if (m != 0)
+        mass = new Matrix(*m);
     
     // set the data size for the experimental site
     sizeCtrl = new ID(OF_Resp_All);
@@ -143,11 +147,11 @@ EEGeneric::EEGeneric(int tag, ID nodes, ID *dof,
 // by each object and storing the tags of the end nodes.
 EEGeneric::EEGeneric(int tag, ID nodes, ID *dof,
     int port, char *machineInetAddr, int ssl, int dataSize,
-    bool iM, Matrix *m)
+    bool iM, const Matrix *m)
     : ExperimentalElement(tag, ELE_TAG_EEGeneric),
     connectedExternalNodes(nodes), basicDOF(1),
     numExternalNodes(0), numDOF(0), numBasicDOF(0),
-    iMod(iM), mass(m),
+    iMod(iM), mass(0),
     theChannel(0), sData(0), sendData(0), rData(0), recvData(0),
     db(0), vb(0), ab(0), t(0),
     dbMeas(0), vbMeas(0), abMeas(0), qMeas(0), tMeas(0),
@@ -181,6 +185,10 @@ EEGeneric::EEGeneric(int tag, ID nodes, ID *dof,
         theDOF[i] = dof[i];
     }
     
+    // initialize mass matrix
+    if (m != 0)
+        mass = new Matrix(*m);
+    
     // setup the connection
     if (!ssl)  {
         if (machineInetAddr == 0)
@@ -204,7 +212,8 @@ EEGeneric::EEGeneric(int tag, ID nodes, ID *dof,
             << "- failed to setup connection\n";
         exit(-1);
     }
-
+    delete [] machineInetAddr;
+    
     // set the data size for the experimental site
     int intData[2*OF_Resp_All+1];
     ID idData(intData, 2*OF_Resp_All+1);
@@ -280,6 +289,8 @@ EEGeneric::~EEGeneric()
         delete [] theNodes;
     if (theDOF != 0)
         delete [] theDOF;
+    if (mass != 0)
+        delete mass;
 
     if (db != 0)
         delete db;

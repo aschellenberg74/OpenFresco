@@ -105,10 +105,10 @@ ECSimDomain::ECSimDomain(int tag,
         exit(OF_ReturnType_failed);
     }
 
-    //opserr << "***********************************\n";
-    //opserr << "* The Domain has been initialized *\n";
-    //opserr << "***********************************\n";
-    //opserr << endln;
+    opserr << "***********************************\n";
+    opserr << "* The Domain has been initialized *\n";
+    opserr << "***********************************\n";
+    opserr << endln;
 }
 
 
@@ -158,8 +158,14 @@ ECSimDomain::~ECSimDomain()
         delete measForce;
     
     // cleanup the analysis
-    if (theAnalysis != 0)
+    if (theAnalysis != 0)  {
         theAnalysis->clearAll();
+        delete theAnalysis;
+    }
+
+    // delete memory of SP constraints
+    if (theSP != 0)
+        delete [] theSP;
     
     // cleanup the domain
     if (theDomain != 0)
@@ -171,11 +177,11 @@ ECSimDomain::~ECSimDomain()
     if (outCPs != 0)
         delete [] outCPs;
     
-    //opserr << endln;
-    //opserr << "**********************************\n";
-    //opserr << "* The Domain has been cleaned up *\n";
-    //opserr << "**********************************\n";
-    //opserr << endln;
+    opserr << endln;
+    opserr << "**********************************\n";
+    opserr << "* The Domain has been cleaned up *\n";
+    opserr << "**********************************\n";
+    opserr << endln;
 }
 
 
@@ -242,7 +248,7 @@ int ECSimDomain::setup()
     }
     
     // print experimental control information
-    //this->Print(opserr);
+    this->Print(opserr);
     
     // define load pattern
     theSeries  = new LinearSeries(1.0);
@@ -307,10 +313,10 @@ int ECSimDomain::setup()
     theAnalysis->initialize();
     theAnalysis->analyze(1);
     
-    //opserr << "*****************\n";
-    //opserr << "* Running...... *\n";
-    //opserr << "*****************\n";
-    //opserr << endln;
+    opserr << "*****************\n";
+    opserr << "* Running...... *\n";
+    opserr << "*****************\n";
+    opserr << endln;
     
     return OF_ReturnType_completed;
 }

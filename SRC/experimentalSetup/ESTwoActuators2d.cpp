@@ -157,12 +157,6 @@ int ESTwoActuators2d::transfTrialResponse(const Vector* disp,
 }
 
 
-int ESTwoActuators2d::commitState()
-{
-    return theControl->commitState();
-}
-
-
 ExperimentalSetup* ESTwoActuators2d::getCopy()
 {
     ESTwoActuators2d *theCopy = new ESTwoActuators2d(*this);

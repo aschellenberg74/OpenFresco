@@ -89,7 +89,7 @@ ECLabVIEW::ECLabVIEW(int tag,
     // open a session with LabVIEW
     sprintf(sData,"open-session\tOpenFresco\n");
         fprintf(logFile,"%s",sData);
-    sendData = new Message(sData,(int)strlen(sData));  // needed because of bug in LabVIEW-plugin
+    delete sendData;  sendData = new Message(sData,(int)strlen(sData));  // needed because of bug in LabVIEW-plugin
     theSocket->sendMsg(0, 0, *sendData, 0);
     theSocket->recvMsgUnknownSize(0, 0, *recvData, 0);
         fprintf(logFile,"%s",rData);
@@ -105,7 +105,7 @@ ECLabVIEW::ECLabVIEW(int tag,
     // send parameters (needed for NEES-SAM & MiniMost -> remove later)
     sprintf(sData,"set-parameter\tOPFTransaction\tnstep\t1\n");
         fprintf(logFile,"%s",sData);
-    sendData = new Message(sData,(int)strlen(sData));  // needed because of bug in LabVIEW-plugin
+    delete sendData;  sendData = new Message(sData,(int)strlen(sData));  // needed because of bug in LabVIEW-plugin
     theSocket->sendMsg(0, 0, *sendData, 0);
     theSocket->recvMsgUnknownSize(0, 0, *recvData, 0);
         fprintf(logFile,"%s",rData);
@@ -169,7 +169,7 @@ ECLabVIEW::~ECLabVIEW()
     // close the session with LabVIEW
     sprintf(sData,"close-session\tOpenFresco\n");
         fprintf(logFile,"%s",sData);
-    sendData = new Message(sData,(int)strlen(sData));  // needed because of bug in LabVIEW-plugin
+    delete sendData;  sendData = new Message(sData,(int)strlen(sData));  // needed because of bug in LabVIEW-plugin
     theSocket->sendMsg(0, 0, *sendData, 0);
     theSocket->recvMsgUnknownSize(0, 0, *recvData, 0);
         fprintf(logFile,"%s",rData);
@@ -255,7 +255,7 @@ int ECLabVIEW::setup()
         getchar();
         sprintf(sData,"close-session\tOpenFresco\n");
             fprintf(logFile,"%s",sData);
-        sendData = new Message(sData,(int)strlen(sData));  // needed because of bug in LabVIEW-plugin
+        delete sendData;  sendData = new Message(sData,(int)strlen(sData));  // needed because of bug in LabVIEW-plugin
         theSocket->sendMsg(0, 0, *sendData, 0);
         delete theSocket;
         exit(OF_ReturnType_failed);
@@ -288,7 +288,7 @@ int ECLabVIEW::setup()
             getchar();
             sprintf(sData,"close-session\tOpenFresco\n");
                 fprintf(logFile,"%s",sData);
-            sendData = new Message(sData,(int)strlen(sData));  // needed because of bug in LabVIEW-plugin
+            delete sendData;  sendData = new Message(sData,(int)strlen(sData));  // needed because of bug in LabVIEW-plugin
             theSocket->sendMsg(0, 0, *sendData, 0);
             delete theSocket;
             exit(OF_ReturnType_failed);
@@ -331,7 +331,7 @@ int ECLabVIEW::setSize(ID sizeT, ID sizeO)
         opserr << "ECLabVIEW::setSize() - wrong sizeTrial/Out\n"; 
         opserr << "see User Manual.\n";
         sprintf(sData,"close-session\tOpenFresco\n");
-        sendData = new Message(sData,(int)strlen(sData));  // needed because of bug in LabVIEW-plugin
+        delete sendData;  sendData = new Message(sData,(int)strlen(sData));  // needed because of bug in LabVIEW-plugin
         theSocket->sendMsg(0, 0, *sendData, 0);
         delete theSocket;
         exit(OF_ReturnType_failed);
@@ -624,7 +624,7 @@ int ECLabVIEW::control()
                         getchar();
                         sprintf(sData,"close-session\tOpenFresco\n");
                             fprintf(logFile,"%s",sData);
-                        sendData = new Message(sData,(int)strlen(sData));  // needed because of bug in LabVIEW-plugin
+                        delete sendData;  sendData = new Message(sData,(int)strlen(sData));  // needed because of bug in LabVIEW-plugin
                         theSocket->sendMsg(0, 0, *sendData, 0);
                         delete theSocket;
                         exit(OF_ReturnType_failed);
@@ -682,7 +682,7 @@ int ECLabVIEW::control()
     }
     sprintf(sData,"%s\n",sData);
         fprintf(logFile,"%s",sData);
-    sendData = new Message(sData,(int)strlen(sData));  // needed because of bug in LabVIEW-plugin
+    delete sendData;  sendData = new Message(sData,(int)strlen(sData));  // needed because of bug in LabVIEW-plugin
     theSocket->sendMsg(0, 0, *sendData, 0);
     theSocket->recvMsgUnknownSize(0, 0, *recvData, 0);
         fprintf(logFile,"%s",rData);
@@ -696,7 +696,7 @@ int ECLabVIEW::control()
     // execute target values
     sprintf(sData,"execute\t%s\n",OPFTransactionID);
         fprintf(logFile,"%s",sData);
-    sendData = new Message(sData,(int)strlen(sData));  // needed because of bug in LabVIEW-plugin
+    delete sendData;  sendData = new Message(sData,(int)strlen(sData));  // needed because of bug in LabVIEW-plugin
     theSocket->sendMsg(0, 0, *sendData, 0);
     theSocket->recvMsgUnknownSize(0, 0, *recvData, 0);
         fprintf(logFile,"%s",rData);
@@ -728,7 +728,7 @@ int ECLabVIEW::acquire()
     }
     sprintf(sData,"%s\n",sData);
         fprintf(logFile,"%s",sData);
-    sendData = new Message(sData,(int)strlen(sData));  // needed because of bug in LabVIEW-plugin
+    delete sendData;  sendData = new Message(sData,(int)strlen(sData));  // needed because of bug in LabVIEW-plugin
     theSocket->sendMsg(0, 0, *sendData, 0);
 
     // receive output control point daq values

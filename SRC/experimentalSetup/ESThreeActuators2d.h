@@ -61,8 +61,6 @@ public:
         const Vector* force,
         const Vector* time);
     
-    virtual int commitState();
-    
     virtual ExperimentalSetup *getCopy();
     
     // public methods for output

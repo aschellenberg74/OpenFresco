@@ -99,12 +99,6 @@ int ESOneActuator::setup()
 }
 
 
-int ESOneActuator::commitState()
-{
-    return theControl->commitState();
-}
-
-
 ExperimentalSetup* ESOneActuator::getCopy()
 {
     ESOneActuator *theCopy = new ESOneActuator(*this);

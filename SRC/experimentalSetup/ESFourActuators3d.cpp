@@ -172,12 +172,6 @@ int ESFourActuators3d::setup()
 }
 
 
-int ESFourActuators3d::commitState()
-{
-    return theControl->commitState();
-}
-
-
 ExperimentalSetup* ESFourActuators3d::getCopy()
 {
 	ESFourActuators3d *theCopy = new ESFourActuators3d(*this);

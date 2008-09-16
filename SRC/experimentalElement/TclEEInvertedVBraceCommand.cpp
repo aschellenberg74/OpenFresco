@@ -127,11 +127,11 @@ int addEEInvertedVBrace(ClientData clientData, Tcl_Interp *interp, int argc,
             if (strcmp(argv[7+eleArgStart], "-initStif") != 0 &&
                 strcmp(argv[7+eleArgStart], "-ssl") != 0 &&
                 strcmp(argv[7+eleArgStart], "-dataSize") != 0)  {
-                ipAddr = (char *)malloc((strlen(argv[7+eleArgStart]) + 1)*sizeof(char));
+                ipAddr = new char [strlen(argv[7+eleArgStart])+1];
                 strcpy(ipAddr,argv[7+eleArgStart]);
             }
             else  {
-                ipAddr = (char *)malloc((9 + 1)*sizeof(char));
+                ipAddr = new char [9+1];
                 strcpy(ipAddr,"127.0.0.1");
             }
             for (i = 7+eleArgStart; i < argc; i++)  {

@@ -760,14 +760,23 @@ int ESAggregator::transfDaqResponse(Vector* disp,
 
 int ESAggregator::commitState()
 {
-	return theControl->commitState();
+    int rValue = 0;
+    
+    // first commit individual setups
+    for (int i=0; i<numSetups; i++)
+        rValue += theSetups[i]->commitState();
+    
+    // then commit base class
+    rValue += this->ExperimentalSetup::commitState();
+    
+	return rValue;
 }
 
 
 ExperimentalSetup* ESAggregator::getCopy()
 {
 	ESAggregator *theCopy = new ESAggregator(*this);
-
+    
 	return theCopy;
 }
 

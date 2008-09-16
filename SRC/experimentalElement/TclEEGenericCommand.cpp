@@ -86,7 +86,7 @@ int addEEGeneric(ClientData clientData, Tcl_Interp *interp,  int argc,
 	}
     argi = 3+eleArgStart;
     i = argi;
-    while (strcmp(argv[i], "-dof") != 0  && i < argc)  {
+    while (i < argc && strcmp(argv[i], "-dof") != 0)  {
         numNodes++;
         i++;
     }
@@ -123,10 +123,10 @@ int addEEGeneric(ClientData clientData, Tcl_Interp *interp,  int argc,
 	    }
         argi++;
         i = argi;
-        while (strcmp(argv[i], "-dof") != 0 && 
+        while (i < argc &&
+            strcmp(argv[i], "-dof") != 0 && 
             strcmp(argv[i], "-site") != 0 && 
-            strcmp(argv[i], "-server") != 0 && 
-            i < argc)  {
+            strcmp(argv[i], "-server") != 0)  {
             numDOFj++;
             numDOF++;
             i++;
@@ -171,12 +171,12 @@ int addEEGeneric(ClientData clientData, Tcl_Interp *interp,  int argc,
         if (strcmp(argv[argi], "-initStif") != 0 &&
             strcmp(argv[argi], "-ssl") != 0 &&
             strcmp(argv[argi], "-dataSize") != 0)  {
-            ipAddr = (char *)malloc((strlen(argv[argi]) + 1)*sizeof(char));
+            ipAddr = new char [strlen(argv[argi])+1];
             strcpy(ipAddr,argv[argi]);
             argi++;
         }
         else  {
-            ipAddr = (char *)malloc((9 + 1)*sizeof(char));
+            ipAddr = new char [9+1];
             strcpy(ipAddr,"127.0.0.1");
         }
         for (i = argi; i < argc; i++)  {
@@ -223,7 +223,7 @@ int addEEGeneric(ClientData clientData, Tcl_Interp *interp,  int argc,
 			}
 		}
 	}
- 
+    
 	// now create the EEGeneric
     if (theSite != 0) {
         if (mass == 0) {
@@ -242,6 +242,10 @@ int addEEGeneric(ClientData clientData, Tcl_Interp *interp,  int argc,
         }
     }
 	
+    // cleanup dynamic memory
+    if (dofs != 0)
+        delete [] dofs;
+    
 	if (theExpElement == 0)  {
 		opserr << "WARNING ran out of memory creating element\n";
 		opserr << "expElement generic element: " << tag << endln;

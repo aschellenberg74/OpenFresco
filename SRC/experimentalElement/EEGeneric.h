@@ -48,11 +48,11 @@ public:
     // constructors
     EEGeneric(int tag, ID nodes, ID *dof,
         ExperimentalSite *site,
-        bool iMod = false, Matrix *mass = 0);
+        bool iMod = false, const Matrix *mass = 0);
     EEGeneric(int tag, ID nodes, ID *dof,
         int port, char *machineInetAddress = 0,
         int ssl = 0, int dataSize = OF_Network_dataSize,
-        bool iMod = false, Matrix *mass = 0);
+        bool iMod = false, const Matrix *mass = 0);
     
     // destructor
     ~EEGeneric();

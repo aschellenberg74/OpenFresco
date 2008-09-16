@@ -166,12 +166,6 @@ int ESThreeActuators2d::transfTrialResponse(const Vector* disp,
 }
 
 
-int ESThreeActuators2d::commitState()
-{
-    return theControl->commitState();
-}
-
-
 ExperimentalSetup* ESThreeActuators2d::getCopy()
 {
 	ESThreeActuators2d *theCopy = new ESThreeActuators2d(*this);

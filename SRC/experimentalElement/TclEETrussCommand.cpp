@@ -110,11 +110,11 @@ int addEETruss(ClientData clientData, Tcl_Interp *interp,  int argc,
         if (strcmp(argv[6+eleArgStart], "-initStif") != 0  &&
             strcmp(argv[6+eleArgStart], "-ssl") != 0  &&
             strcmp(argv[6+eleArgStart], "-dataSize") != 0)  {
-            ipAddr = (char *)malloc((strlen(argv[6+eleArgStart]) + 1)*sizeof(char));
+            ipAddr = new char [strlen(argv[6+eleArgStart])+1];
             strcpy(ipAddr,argv[6+eleArgStart]);
         }
         else  {
-            ipAddr = (char *)malloc((9 + 1)*sizeof(char));
+            ipAddr = new char [9+1];
             strcpy(ipAddr,"127.0.0.1");
         }
         for (i = 6+eleArgStart; i < argc; i++)  {
