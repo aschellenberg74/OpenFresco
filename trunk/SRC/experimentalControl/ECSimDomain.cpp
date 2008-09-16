@@ -83,9 +83,9 @@ ECSimDomain::ECSimDomain(int tag,
     int nTrialCPs, ExperimentalCP **trialcps,
     int nOutCPs, ExperimentalCP **outcps, Domain *thedomain)
     : ECSimulation(tag), numTrialCPs(nTrialCPs), numOutCPs(nOutCPs),
-    theDomain(0), theModel(0), theTest(0), theAlgorithm(0),
-    theIntegrator(0), theHandler(0), theNumberer(0), theSOE(0),
-    theAnalysis(0), theSeries(0), thePattern(0), theSP(0), numSPs(0),
+    theDomain(0), theModel(0), theTest(0), theAlgorithm(0), theIntegrator(0),
+    theHandler(0), theNumberer(0), theSOE(0), theAnalysis(0),
+    theSeries(0), thePattern(0), theSPs(0), theNodes(0), numSPs(0),
     targDisp(0), targVel(0), targAccel(0), targForce(0),
     measDisp(0), measVel(0), measAccel(0), measForce(0)
 {
@@ -114,9 +114,9 @@ ECSimDomain::ECSimDomain(int tag,
 
 ECSimDomain::ECSimDomain(const ECSimDomain& ec)
     : ECSimulation(ec), trialCPs(0), outCPs(0),
-    theDomain(0), theModel(0), theTest(0), theAlgorithm(0),
-    theIntegrator(0), theHandler(0), theNumberer(0), theSOE(0),
-    theAnalysis(0), theSeries(0), thePattern(0), theSP(0), numSPs(0),
+    theDomain(0), theModel(0), theTest(0), theAlgorithm(0), theIntegrator(0),
+    theHandler(0), theNumberer(0), theSOE(0), theAnalysis(0),
+    theSeries(0), thePattern(0), theSPs(0), theNodes(0), numSPs(0),
     targDisp(0), targVel(0), targAccel(0), targForce(0),
     measDisp(0), measVel(0), measAccel(0), measForce(0)
 {
@@ -163,9 +163,11 @@ ECSimDomain::~ECSimDomain()
         delete theAnalysis;
     }
 
-    // delete memory of SP constraints
-    if (theSP != 0)
-        delete [] theSP;
+    // delete memory of SP constraints and nodes
+    if (theSPs != 0)
+        delete [] theSPs;
+    if (theNodes != 0)
+        delete [] theNodes;
     
     // cleanup the domain
     if (theDomain != 0)
@@ -261,9 +263,9 @@ int ECSimDomain::setup()
         numSPs += trialCPs[i]->getNumUniqueDir();
     
     // create array of single point constraints
-    theSP = new SP_Constraint* [numSPs];
+    theSPs = new SP_Constraint* [numSPs];
     for (int i=0; i<numSPs; i++)
-        theSP[i] = 0;
+        theSPs[i] = 0;
     
     // loop through all the trial control points
     int iSP = 0;
@@ -278,17 +280,24 @@ int ECSimDomain::setup()
             if ((*sizeCtrl)(OF_Resp_Disp) != 0 &&
                 (*sizeCtrl)(OF_Resp_Vel) != 0 &&
                 (*sizeCtrl)(OF_Resp_Accel) != 0)
-                theSP[iSP] = new ExpControlSP(iSP+1, nodeTag, dir(j), &targDisp[iSP], 1.0, &targVel[iSP], 1.0, &targAccel[iSP], 1.0);
+                theSPs[iSP] = new ExpControlSP(iSP+1, nodeTag, dir(j), &targDisp[iSP], 1.0, &targVel[iSP], 1.0, &targAccel[iSP], 1.0);
             else if ((*sizeCtrl)(OF_Resp_Disp) != 0 &&
                 (*sizeCtrl)(OF_Resp_Vel) != 0)
-                theSP[iSP] = new ExpControlSP(iSP+1, nodeTag, dir(j), &targDisp[iSP], 1.0, &targVel[iSP], 1.0);
+                theSPs[iSP] = new ExpControlSP(iSP+1, nodeTag, dir(j), &targDisp[iSP], 1.0, &targVel[iSP], 1.0);
             else if ((*sizeCtrl)(OF_Resp_Disp) != 0)
-                theSP[iSP] = new ExpControlSP(iSP+1, nodeTag, dir(j), &targDisp[iSP], 1.0);
+                theSPs[iSP] = new ExpControlSP(iSP+1, nodeTag, dir(j), &targDisp[iSP], 1.0);
             
             // add the SP constraints to the load pattern
-            theDomain->addSP_Constraint(theSP[iSP], 1);
+            theDomain->addSP_Constraint(theSPs[iSP], 1);
             iSP++;
         }
+    }
+    
+    // create array of output nodes to be used in acquire method
+    theNodes = new Node* [numOutCPs];
+    for (int i=0; i<numOutCPs; i++)  {
+        int nodeTag = outCPs[i]->getNodeTag();
+        theNodes[i] = theDomain->getNode(nodeTag);
     }
     
     theModel      = new AnalysisModel();
@@ -673,26 +682,25 @@ int ECSimDomain::acquire()
     int iSP = 0;
     for (int i=0; i<numOutCPs; i++)  {
         // get output control point parameters
-        int nodeTag = outCPs[i]->getNodeTag();
         int numDir = outCPs[i]->getNumUniqueDir();
         ID dir = outCPs[i]->getUniqueDir();
 
         // loop through all the directions
         for (int j=0; j<numDir; j++)  {
             if ((*sizeDaq)(OF_Resp_Disp) != 0)  {
-                const Vector &d = theDomain->getNode(nodeTag)->getTrialDisp();
+                const Vector &d = theNodes[i]->getTrialDisp();
                 measDisp[iSP] = d(dir(j));
             }
             if ((*sizeDaq)(OF_Resp_Vel) != 0)  {
-                const Vector &v = theDomain->getNode(nodeTag)->getTrialVel();
+                const Vector &v = theNodes[i]->getTrialVel();
                 measVel[iSP] = v(dir(j));
             }
             if ((*sizeDaq)(OF_Resp_Accel) != 0)  {
-                const Vector &a = theDomain->getNode(nodeTag)->getTrialAccel();
+                const Vector &a = theNodes[i]->getTrialAccel();
                 measAccel[iSP] = a(dir(j));
             }
             if ((*sizeDaq)(OF_Resp_Force) != 0)  {
-                const Vector &f = theDomain->getNode(nodeTag)->getReaction();
+                const Vector &f = theNodes[i]->getReaction();
                 measForce[iSP] = f(dir(j));
             }
             iSP++;
