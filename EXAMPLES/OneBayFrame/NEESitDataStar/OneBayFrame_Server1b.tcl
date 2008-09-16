@@ -37,10 +37,10 @@ expControl SimUniaxialMaterials 1 1
 
 # Define experimental setup
 # -------------------------
-# expSetup OneActuator $tag <-control $ctrlTag> $dir <-ctrlDispFact $f> ...
-expSetup OneActuator 1 -control 1 1;  # UC Berkeley setup
-#expSetup OneActuator 1 -control 1 1 -ctrlDispFact 2.54 -daqDispFact 2.54 -daqForceFact 4.4482;  # UBC setup with units conversion
-#expSetup OneActuator 1 -control 1 1 -ctrlDispFact ??? -daqDispFact ??? -daqForceFact ???;  # Kyoto University with units conversion
+# expSetup OneActuator $tag <-control $ctrlTag> $dir -sizeTrialOut $t $o <-trialDispFact $f> ...
+expSetup OneActuator 1 -control 1 1 -sizeTrialOut 1 1;  # UC Berkeley setup
+#expSetup OneActuator 1 -control 1 1 -sizeTrialOut 1 1 -trialDispFact 2.54 -outDispFact 2.54 -outForceFact 4.4482;  # UBC setup with units conversion
+#expSetup OneActuator 1 -control 1 1 -sizeTrialOut 1 1 -trialDispFact ??? -outDispFact ??? -outForceFact ???;  # Kyoto University with units conversion
 
 # Define experimental site
 # ------------------------

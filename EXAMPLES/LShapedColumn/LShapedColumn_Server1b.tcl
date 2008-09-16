@@ -75,7 +75,7 @@ expControl SimDomain  1  -trialCP 1 2  -outCP 3 4
 
 # Define experimental setup
 # -------------------------
-# expSetup ThreeActuators $tag <–control $ctrlTag> $La1 $La2 $La3 $L1 $L2 <–nlGeom> <–posAct1 $pos> <–phiLocX $phi> <-ctrlDispFact $f> ...
+# expSetup ThreeActuators $tag <–control $ctrlTag> $La1 $La2 $La3 $L1 $L2 <–nlGeom> <–posAct1 $pos> <–phiLocX $phi> <-trialDispFact $f> ...
 expSetup ThreeActuators 1 -control 1 54.0 54.0 54.0 36.0 36.0 -phiLocX 90.0
 
 # Define experimental site

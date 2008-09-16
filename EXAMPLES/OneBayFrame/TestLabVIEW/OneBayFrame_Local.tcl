@@ -46,8 +46,8 @@ fix 4   0  1
 # Define materials
 # ----------------
 # uniaxialMaterial Steel02 $matTag $Fy $E $b $R0 $cR1 $cR2 $a1 $a2 $a3 $a4 
-uniaxialMaterial Elastic 1 2.8655
-# uniaxialMaterial Steel02 1 1.5 2.8 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0
+uniaxialMaterial Elastic 1 2.8
+#uniaxialMaterial Steel02 1 1.5 2.8 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0
 uniaxialMaterial Elastic 2 5.6
 #uniaxialMaterial Steel02 2 3.0 5.6 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0 
 uniaxialMaterial Elastic 3 [expr 2.0*100.0/1.0]
@@ -71,9 +71,9 @@ expControl LabVIEW 2 "127.0.0.1" 11997  -trialCP 1  -outCP 2;  # use with NEES-S
 
 # Define experimental setup
 # -------------------------
-# expSetup OneActuator $tag <-control $ctrlTag> $dir <-ctrlDispFact $f> ...
-expSetup OneActuator 1 -control 1 1
-expSetup OneActuator 2 -control 2 1
+# expSetup OneActuator $tag <-control $ctrlTag> $dir -sizeTrialOut $t $o <-trialDispFact $f> ...
+expSetup OneActuator 1 -control 1 1 -sizeTrialOut 1 1
+expSetup OneActuator 2 -control 2 1 -sizeTrialOut 1 1
 
 # Define experimental site
 # ------------------------
@@ -84,9 +84,9 @@ expSite LocalSite 2 2
 # Define experimental elements
 # ----------------------------
 # left and right columns
-# expElement twoNodeLink $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-orient $x1 $x2 $x3 $y1 $y2 $y3> <-iMod> <-mass $m>
-expElement twoNodeLink 1 1 3 -dir 2 -site 1 -initStif 2.8 -orient 0 1 0 -1 0 0
-expElement twoNodeLink 2 2 4 -dir 2 -site 2 -initStif 5.6 -orient 0 1 0 -1 0 0
+# expElement twoNodeLink $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-orient <$x1 $x2 $x3> $y1 $y2 $y3> <-iMod> <-mass $m>
+expElement twoNodeLink 1 1 3 -dir 2 -site 1 -initStif 2.8 -orient -1 0 0
+expElement twoNodeLink 2 2 4 -dir 2 -site 2 -initStif 5.6 -orient -1 0 0
 
 # Define numerical elements
 # -------------------------
@@ -168,13 +168,13 @@ recorder Element -file Elmt_mDef.out -time -ele 1 2   measuredDisplacements
 # ------------------------------
 # perform an eigenvalue analysis
 set pi 3.14159265358979
-set lambda [eigen 1]
+set lambda [eigen -fullGenLapack 2]
 puts "\nEigenvalues at start of transient:"
 puts "lambda         omega          period"
 foreach lambda $lambda {
    set omega [expr pow($lambda,0.5)]
    set period [expr 2*$pi/pow($lambda,0.5)]
-   puts "$lambda  $omega  $period \n"}
+   puts "$lambda  $omega  $period"}
 
 # open output file for writing
 set outFileID [open elapsedTime.txt w]
@@ -186,7 +186,7 @@ set tTot [time {
         puts "step $i"
         }
     }]
-puts "Elapsed Time = $tTot \n"
+puts "\nElapsed Time = $tTot \n"
 # close the output file
 close $outFileID
 

@@ -68,8 +68,8 @@ expControl SimUniaxialMaterials 1 2
 
 # Define experimental setup
 # -------------------------
-# expSetup OneActuator $tag <-control $ctrlTag> $dir <-ctrlDispFact $f> ...
-expSetup OneActuator 1 -control 1 1 -ctrlDispFact [expr $S*$factMtoMM] -daqDispFact [expr 1.0/($S*$factMtoMM)] -daqForceFact [expr 1.0/($S*$S*$factNtoTonf/$nIso)]
+# expSetup OneActuator $tag <-control $ctrlTag> $dir -sizeTrialOut $t $o <-trialDispFact $f> ...
+expSetup OneActuator 1 -control 1 1 -sizeTrialOut 1 1 -ctrlDispFact [expr $S*$factMtoMM] -daqDispFact [expr 1.0/($S*$factMtoMM)] -daqForceFact [expr 1.0/($S*$S*$factNtoTonf/$nIso)]
 
 # Define experimental site
 # ------------------------
@@ -83,7 +83,7 @@ element zeroLength 1 1 2 -mat 1 -dir 1 -orient 1 0 0 0 1 0
 
 # Define experimental elements
 # ----------------------------
-# expElement twoNodeLink $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-orient $x1 $x2 $x3 $y1 $y2 $y3> <-iMod> <-mass $m>
+# expElement twoNodeLink $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-orient <$x1 $x2 $x3> $y1 $y2 $y3> <-iMod> <-mass $m>
 expElement twoNodeLink 2 2 3 -dir 1 -site 1 -initStif $E2 -orient 1 0 0 0 1 0
 
 # Define dynamic loads
@@ -161,13 +161,13 @@ recorder Element -file Elmt_Hys.out -time -ele 1 2 deformationsANDforces
 # ------------------------------
 # perform an eigenvalue analysis
 set pi 3.14159265358979
-set lambda [eigen 1]
+set lambda [eigen -fullGenLapack 2]
 puts "\nEigenvalues at start of transient:"
 puts "lambda         omega          period"
 foreach lambda $lambda {
    set omega [expr pow($lambda,0.5)]
    set period [expr 2*$pi/pow($lambda,0.5)]
-   puts "$lambda  $omega  $period \n"}
+   puts "$lambda  $omega  $period"}
 
 # open output file for writing
 set outFileID [open elapsedTime.txt w]
@@ -176,9 +176,10 @@ set tTot [time {
     for {set i 1} {$i < 1000} {incr i} {
         set t [time {analyze  1  [expr $dt/2]}]
         puts $outFileID $t
+        #puts "step $i"
     }
 }]
-puts "Elapsed Time = $tTot \n"
+puts "\nElapsed Time = $tTot \n"
 # close the output file
 close $outFileID
 

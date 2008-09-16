@@ -44,14 +44,14 @@ if {$pid == 0}  {
 
     # Define experimental site
     # ------------------------
-    # expSite RemoteSite $tag <-setup $setupTag> $ipAddr $ipPort <-ssl> <-dataSize $size>
-    expSite RemoteSite 1 "169.229.203.152" 8090 -ssl
+    # expSite ShadowSite $tag <-setup $setupTag> $ipAddr $ipPort <-ssl> <-dataSize $size>
+    expSite ShadowSite 1 "169.229.203.152" 8090 -ssl
 
     # Define experimental elements
     # ----------------------------
     # left column
-    # expElement twoNodeLink $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-orient $x1 $x2 $x3 $y1 $y2 $y3> <-iMod> <-mass $m>
-    expElement twoNodeLink 1 1 3 -dir 2 -site 1 -initStif 2.8 -orient 0 1 0 -1 0 0
+    # expElement twoNodeLink $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-orient <$x1 $x2 $x3> $y1 $y2 $y3> <-iMod> <-mass $m>
+    expElement twoNodeLink 1 1 3 -dir 2 -site 1 -initStif 2.8 -orient -1 0 0
 
     # Define numerical elements
     # -------------------------
@@ -74,14 +74,14 @@ if {$pid == 0}  {
 
     # Define experimental site
     # ------------------------
-    # expSite RemoteSite $tag <-setup $setupTag> $ipAddr $ipPort <-ssl> <-dataSize $size>
-    expSite RemoteSite 2 "169.229.203.152" 8091 -ssl
+    # expSite ShadowSite $tag <-setup $setupTag> $ipAddr $ipPort <-ssl> <-dataSize $size>
+    expSite ShadowSite 2 "169.229.203.152" 8091 -ssl
 
     # Define experimental elements
     # ----------------------------
     # right column
-    # expElement twoNodeLink $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-orient $x1 $x2 $x3 $y1 $y2 $y3> <-iMod> <-mass $m>
-    expElement twoNodeLink 2 2 4 -dir 2 -site 2 -initStif 5.6 -orient 0 1 0 -1 0 0
+    # expElement twoNodeLink $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-orient <$x1 $x2 $x3> $y1 $y2 $y3> <-iMod> <-mass $m>
+    expElement twoNodeLink 2 2 4 -dir 2 -site 2 -initStif 5.6 -orient -1 0 0
 }
 
 # Define dynamic loads
@@ -155,21 +155,14 @@ analysis Transient
 # ------------------------------
 # Finally perform the analysis
 # ------------------------------
-# open output file for writing
-#set outFileID [open elapsedTime$pid.txt w]
 # perform the transient analysis
 set tTot [time {
     for {set i 1} {$i < 1600} {incr i} {
-       set t [time {analyze  1  $dt}]
-#	set d [nodeDisp 3 1]
-#	if {$pid == 0} {puts "$i $d"}
-#	puts "$i $d"
-#       puts $outFileID $t
+        set t [time {analyze  1  $dt}]
+        #if {$pid == 0} {puts "step $i"}
     }
 }]
 puts "Elapsed Time = $tTot \n"
-# close the output file
-#close $outFileID
 
 wipe
 # --------------------------------

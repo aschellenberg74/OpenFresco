@@ -43,8 +43,8 @@ fix 1   1  1  1
 
 # Define experimental site
 # ------------------------
-# expSite RemoteSite $tag <-setup $setupTag> $ipAddr $ipPort <-ssl> <-dataSize $size>
-expSite RemoteSite 1 "127.0.0.1" 8090
+# expSite ShadowSite $tag <-setup $setupTag> $ipAddr $ipPort <-ssl> <-dataSize $size>
+expSite ShadowSite 1 "127.0.0.1" 8090
 
 # Define coordinate transformation
 # --------------------------------
@@ -98,7 +98,7 @@ numberer Plain
 constraints Plain
 
 # create the convergence test
-test EnergyIncr 1.0e-6 10
+test EnergyIncr 1.0e-8 25
 
 # create the integration scheme
 #integrator Newmark 0.5 0.25
@@ -136,25 +136,25 @@ recorder Element -file Elmt_mDef.out -time -ele 1   measuredDisplacements
 # ------------------------------
 # perform an eigenvalue analysis
 set pi 3.14159265358979
-set lambda [eigen 5]
+set lambda [eigen -fullGenLapack 6]
 puts "\nEigenvalues at start of transient:"
 puts "lambda         omega          period"
 foreach lambda $lambda {
    set omega [expr pow($lambda,0.5)]
    set period [expr 2*$pi/pow($lambda,0.5)]
-   puts "$lambda  $omega  $period \n"}
+   puts "$lambda  $omega  $period"}
 
 # open output file for writing
 set outFileID [open elapsedTime.txt w]
 # perform the transient analysis
 set tTot [time {
-    for {set i 1} {$i < 1600} {incr i} {
-        set t [time {analyze  1  $dt}]
+    for {set i 1} {$i < 16000} {incr i} {
+        set t [time {analyze  1  [expr $dt/10.0]}]
         puts $outFileID $t
-#	    puts "step $i"
+        #puts "step $i"
     }
 }]
-puts "Elapsed Time = $tTot \n"
+puts "\nElapsed Time = $tTot \n"
 # close the output file
 close $outFileID
 

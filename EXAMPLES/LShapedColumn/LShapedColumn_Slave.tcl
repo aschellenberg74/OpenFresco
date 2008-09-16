@@ -1,5 +1,4 @@
-# File: Cantilever_Adapter.tcl
-# (use with Cantilever_Main.tcl)
+# File: LShapedColumn_Slave.tcl (use with LShapedColumn_Master.tcl)
 #
 # $Revision: $
 # $Date: $
@@ -10,12 +9,11 @@
 # Revision: A
 #
 # Purpose: this file contains the tcl input to perform
-# a hybrid simulation of a simple cantilever column
+# a distributed hybrid simulation of a L-shaped column
 # with one experimental beamColumn element.
-# Either the actuator or adpater element is used to
-# communicate with the main FE-software which is
-# coordinating and executing the direct integration
-# analysis.
+# The adpater element is used to communicate with the
+# master FE-software which is coordinating and executing
+# the direct integration analysis.
 
 
 # ------------------------------
@@ -29,12 +27,10 @@ model BasicBuilder -ndm 2 -ndf 3
 # node $tag $xCrd $yCrd
 node  1     0.0    0.0
 node  2     0.0   54.0
-node  3   -10.0   54.0;  # for use with actuator element
 
 # set the boundary conditions
 # fix $tag $DX $DY $RZ
 fix 1   1  1  1
-fix 3   1  1  1;  # for use with actuator element
 
 # Define materials
 # ----------------
@@ -59,11 +55,8 @@ geomTransf Linear 1
 # element nonlinearBeamColumn $eleTag $iNode $jNode $numIntgrPts $secTag $transfTag
 element nonlinearBeamColumn 1 1 2 5 1 1
 
-# element actuator $eleTag $iNode $jNode EA ipPort <-rho rho>
-#element actuator 2 3 2 1000000 44000
-
 # element adapter eleTag -node Ndi Ndj ... -dof dofNdi -dof dofNdj ... -stif Kij ipPort <-mass Mij>
-element adapter 2 -node 2 -dof 1 -stif 100000 44000
+element adapter 2 -node 2 -dof 1 2 3 -stif 1e8 0 0 0 1e8 0 0 0 1e10 44000
 # ------------------------------
 # End of model generation
 # ------------------------------
@@ -82,10 +75,9 @@ numberer Plain
 constraints Plain
 
 # create the convergence test
-#test NormDispIncr 1.0e-8 25
-test NormUnbalance 1.0e-8 25
+test NormDispIncr 1.0e-8 25
+#test NormUnbalance 1.0e-8 25
 #test EnergyIncr 1.0e-8 25
-
 
 # create the integration scheme
 integrator LoadControl 1.0
@@ -119,7 +111,7 @@ recorder Element -file Adap_Elmt_mDef.out -time -ele   2 measuredDisplacements
 # ------------------------------
 # Finally perform the analysis
 # ------------------------------
-analyze 16000
+analyze 160000
 # --------------------------------
 # End of analysis
 # --------------------------------

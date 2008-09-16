@@ -39,8 +39,8 @@ expControl SimUniaxialMaterials 1 1
 
 # Define experimental setup
 # -------------------------
-# expSetup OneActuator $tag <-control $ctrlTag> $dir <-ctrlDispFact $f> ...
-expSetup OneActuator 1 -control 1 1
+# expSetup OneActuator $tag <-control $ctrlTag> $dir -sizeTrialOut $t $o <-trialDispFact $f> ...
+expSetup OneActuator 1 -control 1 1 -sizeTrialOut 1 1
 
 # Define experimental site
 # ------------------------
@@ -59,11 +59,11 @@ expElement truss 3 3 4 -site 1 -initStif [expr 3000.0*5.0/135.76]
 # ------------------------------
 # Start the server process
 # ------------------------------
-# startSimAppSiteServer $siteTag $port <-ssl>
-#startSimAppSiteServer 1 8090
-
 # startSimAppElemServer $eleTag $port <-ssl>
-startSimAppElemServer 3 8090
+startSimAppElemServer 3 8090;  # use with generic client element in FEA
+
+# startSimAppSiteServer $siteTag $port <-ssl>
+#startSimAppSiteServer 1 8090;  # use with experimental element in FEA
 # --------------------------------
 # End of analysis
 # --------------------------------
