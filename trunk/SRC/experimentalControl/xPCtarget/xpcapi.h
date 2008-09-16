@@ -4,9 +4,6 @@
  */
 /* Copyright 1996-2006 The MathWorks, Inc. */
 
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-
 #ifndef __XPCAPI_H__
 #define __XPCAPI_H__
 
