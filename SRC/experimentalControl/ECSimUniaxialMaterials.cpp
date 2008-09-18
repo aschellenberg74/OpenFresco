@@ -108,8 +108,12 @@ ECSimUniaxialMaterials::ECSimUniaxialMaterials(const ECSimUniaxialMaterials& ec)
 ECSimUniaxialMaterials::~ECSimUniaxialMaterials()
 {
     // delete memory of materials
-    if (theSpecimen != 0)
+    if (theSpecimen != 0)  {
+        for (int i=0; i<numMats; i++)
+            if (theSpecimen[i] != 0)
+                delete theSpecimen[i];
         delete [] theSpecimen;
+    }
     
     // delete memory of target vectors
     if (targDisp != 0)

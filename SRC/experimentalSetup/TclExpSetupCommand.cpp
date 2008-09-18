@@ -901,8 +901,12 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp, int argc,
         theSetup = new ESAggregator(tag, numSetups, expSetups, theControl);
         
         // cleanup dynamic memory
-        if (expSetups != 0)
+        if (expSetups != 0)  {
+            for (i=0; i<numSetups; i++)
+                if (expSetups[i] != 0)
+                    delete expSetups[i];
             delete [] expSetups;
+        }
     }
     // ----------------------------------------------------------------------------	
     else if (strcmp(argv[1],"FourActuators") == 0)  {
