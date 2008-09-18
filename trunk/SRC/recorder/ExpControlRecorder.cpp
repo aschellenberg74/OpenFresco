@@ -108,10 +108,18 @@ ExpControlRecorder::~ExpControlRecorder()
     
     if (theOutputStream != 0)
         delete theOutputStream;
-    if (responseArgs != 0)
+    if (responseArgs != 0)  {
+        for (int i=0; i<numArgs; i++)
+            if (responseArgs[i] != 0)
+                delete responseArgs[i];
         delete [] responseArgs;
-    if (theResponses != 0)
+    }
+    if (theResponses != 0)  {
+        for (int i=0; i<numControls; i++)
+            if (theResponses[i] != 0)
+                delete theResponses[i];
         delete [] theResponses;
+    }
     if (data != 0)
         delete data;
 }

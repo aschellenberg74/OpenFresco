@@ -167,9 +167,10 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
 
 		// parsing was successful, allocate the control
 		theControl = new ECSimUniaxialMaterials(tag, numMats, theSpecimen);
-
+        
+        // cleanup dynamic memory
         if (theSpecimen != 0)
-            delete [] theSpecimen;
+		    delete [] theSpecimen;
     }
 	
     // ----------------------------------------------------------------------------	

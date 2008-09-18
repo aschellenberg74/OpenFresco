@@ -162,22 +162,31 @@ ECSimDomain::~ECSimDomain()
         theAnalysis->clearAll();
         delete theAnalysis;
     }
-
+    
+    // cleanup the domain
+    if (theDomain != 0)
+        delete theDomain;
+    
     // delete memory of SP constraints and nodes
     if (theSPs != 0)
         delete [] theSPs;
     if (theNodes != 0)
         delete [] theNodes;
     
-    // cleanup the domain
-    if (theDomain != 0)
-        delete theDomain;
-    
     // delete memory of control points
-    if (trialCPs != 0)
+    int i;
+    if (trialCPs != 0)  {
+        for (i=0; i<numTrialCPs; i++)
+            if (trialCPs[i] != 0)
+                delete trialCPs[i];
         delete [] trialCPs;
-    if (outCPs != 0)
+    }
+    if (outCPs != 0)  {
+        for (i=0; i<numOutCPs; i++)
+            if (outCPs[i] != 0)
+                delete outCPs[i];
         delete [] outCPs;
+    }
     
     opserr << endln;
     opserr << "**********************************\n";

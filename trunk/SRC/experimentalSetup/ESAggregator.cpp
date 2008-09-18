@@ -410,9 +410,14 @@ ESAggregator::~ESAggregator()
 {
     // invoke the destructor on any objects created by the object
     // that the object still holds a pointer to
-    if (theSetups != 0)
+    int i;
+    if (theSetups != 0)  {
+        for (i=0; i<numSetups; i++)
+            if (theSetups[i] != 0)
+                delete theSetups[i];
         delete [] theSetups;
-
+    }
+    
     if (sizeTrialAll != 0)
         delete [] sizeTrialAll;
     if (sizeOutAll != 0)
@@ -422,49 +427,129 @@ ESAggregator::~ESAggregator()
     if (sizeDaqAll != 0)
         delete [] sizeDaqAll;
 
-    if (tDispAll != 0)
+    if (tDispAll != 0)  {
+        for (i=0; i<numSetups; i++)
+            if (tDispAll[i] != 0)
+                delete tDispAll[i];
         delete [] tDispAll;
-    if (tVelAll != 0)
+    }
+    if (tVelAll != 0)  {
+        for (i=0; i<numSetups; i++)
+            if (tVelAll[i] != 0)
+                delete tVelAll[i];
         delete [] tVelAll;
-    if (tAccelAll != 0)
+    }
+    if (tAccelAll != 0)  {
+        for (i=0; i<numSetups; i++)
+            if (tAccelAll[i] != 0)
+                delete tAccelAll[i];
         delete [] tAccelAll;
-    if (tForceAll != 0)
+    }
+    if (tForceAll != 0)  {
+        for (i=0; i<numSetups; i++)
+            if (tForceAll[i] != 0)
+                delete tForceAll[i];
         delete [] tForceAll;
-    if (tTimeAll != 0)
+    }
+    if (tTimeAll != 0)  {
+        for (i=0; i<numSetups; i++)
+            if (tTimeAll[i] != 0)
+                delete tTimeAll[i];
         delete [] tTimeAll;
+    }
 
-    if (oDispAll != 0)
+    if (oDispAll != 0)  {
+        for (i=0; i<numSetups; i++)
+            if (oDispAll[i] != 0)
+                delete oDispAll[i];
         delete [] oDispAll;
-    if (oVelAll != 0)
+    }
+    if (oVelAll != 0)  {
+        for (i=0; i<numSetups; i++)
+            if (oVelAll[i] != 0)
+                delete oVelAll[i];
         delete [] oVelAll;
-    if (oAccelAll != 0)
+    }
+    if (oAccelAll != 0)  {
+        for (i=0; i<numSetups; i++)
+            if (oAccelAll[i] != 0)
+                delete oAccelAll[i];
         delete [] oAccelAll;
-    if (oForceAll != 0)
+    }
+    if (oForceAll != 0)  {
+        for (i=0; i<numSetups; i++)
+            if (oForceAll[i] != 0)
+                delete oForceAll[i];
         delete [] oForceAll;
-    if (oTimeAll != 0)
+    }
+    if (oTimeAll != 0)  {
+        for (i=0; i<numSetups; i++)
+            if (oTimeAll[i] != 0)
+                delete oTimeAll[i];
         delete [] oTimeAll;
+    }
 
-    if (cDispAll != 0)
+    if (cDispAll != 0)  {
+        for (i=0; i<numSetups; i++)
+            if (cDispAll[i] != 0)
+                delete cDispAll[i];
         delete [] cDispAll;
-    if (cVelAll != 0)
+    }
+    if (cVelAll != 0)  {
+        for (i=0; i<numSetups; i++)
+            if (cVelAll[i] != 0)
+                delete cVelAll[i];
         delete [] cVelAll;
-    if (cAccelAll != 0)
+    }
+    if (cAccelAll != 0)  {
+        for (i=0; i<numSetups; i++)
+            if (cAccelAll[i] != 0)
+                delete cAccelAll[i];
         delete [] cAccelAll;
-    if (cForceAll != 0)
+    }
+    if (cForceAll != 0)  {
+        for (i=0; i<numSetups; i++)
+            if (cForceAll[i] != 0)
+                delete cForceAll[i];
         delete [] cForceAll;
-    if (cTimeAll != 0)
+    }
+    if (cTimeAll != 0)  {
+        for (i=0; i<numSetups; i++)
+            if (cTimeAll[i] != 0)
+                delete cTimeAll[i];
         delete [] cTimeAll;
+    }
 
-    if (dDispAll != 0)
+    if (dDispAll != 0)  {
+        for (i=0; i<numSetups; i++)
+            if (dDispAll[i] != 0)
+                delete dDispAll[i];
         delete [] dDispAll;
-    if (dVelAll != 0)
+    }
+    if (dVelAll != 0)  {
+        for (i=0; i<numSetups; i++)
+            if (dVelAll[i] != 0)
+                delete dVelAll[i];
         delete [] dVelAll;
-    if (dAccelAll != 0)
+    }
+    if (dAccelAll != 0)  {
+        for (i=0; i<numSetups; i++)
+            if (dAccelAll[i] != 0)
+                delete dAccelAll[i];
         delete [] dAccelAll;
-    if (dForceAll != 0)
+    }
+    if (dForceAll != 0)  {
+        for (i=0; i<numSetups; i++)
+            if (dForceAll[i] != 0)
+                delete dForceAll[i];
         delete [] dForceAll;
-    if (dTimeAll != 0)
+    }
+    if (dTimeAll != 0)  {
+        for (i=0; i<numSetups; i++)
+            if (dTimeAll[i] != 0)
+                delete dTimeAll[i];
         delete [] dTimeAll;
+    }
 }
 
 

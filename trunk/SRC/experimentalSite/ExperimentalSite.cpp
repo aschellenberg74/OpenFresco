@@ -120,8 +120,10 @@ ExperimentalSite::~ExperimentalSite()
         delete sizeOut;
     
     if (theRecorders != 0)  {
+        for (int i=0; i<numRecorders; i++)
+            if (theRecorders[i] != 0)
+                delete theRecorders[i];
         delete [] theRecorders;
-        theRecorders = 0;
     }
 }
 
@@ -491,8 +493,12 @@ int ExperimentalSite::addRecorder(Recorder &theRecorder)
         newRecorders[i] = theRecorders[i];
     newRecorders[numRecorders] = &theRecorder;
     
-    if (theRecorders != 0)
+    if (theRecorders != 0)  {
+        for (int i=0; i<numRecorders; i++)
+            if (theRecorders[i] != 0)
+                delete theRecorders[i];
         delete [] theRecorders;
+    }
     
     theRecorders = newRecorders;
     numRecorders++;
@@ -504,6 +510,9 @@ int ExperimentalSite::addRecorder(Recorder &theRecorder)
 int ExperimentalSite::removeRecorders()
 {
     if (theRecorders != 0)  {
+        for (int i=0; i<numRecorders; i++)
+            if (theRecorders[i] != 0)
+                delete theRecorders[i];
         delete [] theRecorders;
     }
     
