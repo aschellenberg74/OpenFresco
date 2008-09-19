@@ -1119,7 +1119,7 @@ void EETwoNodeLink::setUp()
 {
     const Vector &end1Crd = theNodes[0]->getCrds();
     const Vector &end2Crd = theNodes[1]->getCrds();	
-    Vector xp = end1Crd - end2Crd;
+    Vector xp = end2Crd - end1Crd;
     L = xp.Norm();
     
     if (L > DBL_EPSILON)  {
@@ -1282,16 +1282,16 @@ void EETwoNodeLink::addPDeltaForces(Vector &pLocal)
                 if (dirID == 1)  {
                     double VpDelta = N*deltal1/L;
                     VpDelta *= 1.0-Mratio(2)-Mratio(3);
-                    pLocal(1) += VpDelta;
-                    pLocal(3) -= VpDelta;
+                    pLocal(1) -= VpDelta;
+                    pLocal(3) += VpDelta;
                 }
                 break;
             case D2N6: 
                 if (dirID == 1)  {
                     double VpDelta = N*deltal1/L;
                     VpDelta *= 1.0-Mratio(2)-Mratio(3);
-                    pLocal(1) += VpDelta;
-                    pLocal(4) -= VpDelta;
+                    pLocal(1) -= VpDelta;
+                    pLocal(4) += VpDelta;
                 }
                 else if (dirID == 2)  {
                     double MpDelta = N*deltal1;
@@ -1303,8 +1303,8 @@ void EETwoNodeLink::addPDeltaForces(Vector &pLocal)
                 if (dirID == 1)  {
                     double VpDelta = N*deltal1/L;
                     VpDelta *= 1.0-Mratio(2)-Mratio(3);
-                    pLocal(1) += VpDelta;
-                    pLocal(4) -= VpDelta;
+                    pLocal(1) -= VpDelta;
+                    pLocal(4) += VpDelta;
                 }
                 else if (dirID == 2)  {
                     double VpDelta = N*deltal2/L;
@@ -1317,8 +1317,8 @@ void EETwoNodeLink::addPDeltaForces(Vector &pLocal)
                 if (dirID == 1)  {
                     double VpDelta = N*deltal1/L;
                     VpDelta *= 1.0-Mratio(2)-Mratio(3);
-                    pLocal(1) += VpDelta;
-                    pLocal(7) -= VpDelta;
+                    pLocal(1) -= VpDelta;
+                    pLocal(7) += VpDelta;
                 }
                 else if (dirID == 2)  {
                     double VpDelta = N*deltal2/L;
@@ -1347,90 +1347,98 @@ void EETwoNodeLink::addPDeltaStiff(Matrix &kLocal)
 {
     int dirID;
     double N = 0.0;
-    double deltal1 = 0.0;
-    double deltal2 = 0.0;
     
+    // get axial force
     for (int i=0; i<numDir; i++)  {
-        dirID = (*dir)(i);  // direction 0 to 5;
-        
-        // get axial force and local disp differences
-        if (dirID == 0)
+        if ((*dir)(i) == 0)
             N = (*qMeas)(i);
-        else if (dirID == 1)
-            deltal1 = dl(1+numDOF/2) - dl(1);
-        else if (dirID == 2)
-            deltal2 = dl(2+numDOF/2) - dl(2);
     }
     
     if (N != 0.0)  {
         for (int i=0; i<numDir; i++)  {
             dirID = (*dir)(i);  // direction 0 to 5;
             
-            /* switch on dimensionality of element
+            // switch on dimensionality of element
             switch (elemType)  {
             case D2N4:
                 if (dirID == 1)  {
-                    double VpDelta = N*deltal1/L;
-                    VpDelta *= 1.0-Mratio(2)-Mratio(3);
-                    pLocal(1) += VpDelta;
-                    pLocal(3) -= VpDelta;
+                    double NoverL = N/L;
+                    NoverL *= 1.0-Mratio(2)-Mratio(3);
+                    kLocal(1,1) += NoverL;
+                    kLocal(1,3) -= NoverL;
+                    kLocal(3,1) -= NoverL;
+                    kLocal(3,3) += NoverL;
                 }
                 break;
             case D2N6: 
                 if (dirID == 1)  {
-                    double VpDelta = N*deltal1/L;
-                    VpDelta *= 1.0-Mratio(2)-Mratio(3);
-                    pLocal(1) += VpDelta;
-                    pLocal(4) -= VpDelta;
+                    double NoverL = N/L;
+                    NoverL *= 1.0-Mratio(2)-Mratio(3);
+                    kLocal(1,1) += NoverL;
+                    kLocal(1,4) -= NoverL;
+                    kLocal(4,1) -= NoverL;
+                    kLocal(4,4) += NoverL;
                 }
                 else if (dirID == 2)  {
-                    double MpDelta = N*deltal1;
-                    pLocal(2) += Mratio(2)*MpDelta;
-                    pLocal(5) += Mratio(3)*MpDelta;
+                    kLocal(2,1) -= Mratio(2)*N;
+                    kLocal(2,4) += Mratio(2)*N;
+                    kLocal(5,1) -= Mratio(3)*N;
+                    kLocal(5,4) += Mratio(3)*N;
                 }
                 break;
             case D3N6:
                 if (dirID == 1)  {
-                    double VpDelta = N*deltal1/L;
-                    VpDelta *= 1.0-Mratio(2)-Mratio(3);
-                    pLocal(1) += VpDelta;
-                    pLocal(4) -= VpDelta;
+                    double NoverL = N/L;
+                    NoverL *= 1.0-Mratio(2)-Mratio(3);
+                    kLocal(1,1) += NoverL;
+                    kLocal(1,4) -= NoverL;
+                    kLocal(4,1) -= NoverL;
+                    kLocal(4,4) += NoverL;
                 }
                 else if (dirID == 2)  {
-                    double VpDelta = N*deltal2/L;
-                    VpDelta *= 1.0-Mratio(0)-Mratio(1);
-                    pLocal(2) -= VpDelta;
-                    pLocal(5) += VpDelta;
+                    double NoverL = N/L;
+                    NoverL *= 1.0-Mratio(0)-Mratio(1);
+                    kLocal(2,2) += NoverL;
+                    kLocal(2,5) -= NoverL;
+                    kLocal(5,2) -= NoverL;
+                    kLocal(5,5) += NoverL;
                 }
                 break;
             case D3N12:
                 if (dirID == 1)  {
-                    double VpDelta = N*deltal1/L;
-                    VpDelta *= 1.0-Mratio(2)-Mratio(3);
-                    pLocal(1) += VpDelta;
-                    pLocal(7) -= VpDelta;
+                    double NoverL = N/L;
+                    NoverL *= 1.0-Mratio(2)-Mratio(3);
+                    kLocal(1,1) += NoverL;
+                    kLocal(1,7) -= NoverL;
+                    kLocal(7,1) -= NoverL;
+                    kLocal(7,7) += NoverL;
                 }
                 else if (dirID == 2)  {
-                    double VpDelta = N*deltal2/L;
-                    VpDelta *= 1.0-Mratio(0)-Mratio(1);
-                    pLocal(2) -= VpDelta;
-                    pLocal(8) += VpDelta;
+                    double NoverL = N/L;
+                    NoverL *= 1.0-Mratio(0)-Mratio(1);
+                    kLocal(2,2) += NoverL;
+                    kLocal(2,8) -= NoverL;
+                    kLocal(8,2) -= NoverL;
+                    kLocal(8,8) += NoverL;
                 }
                 else if (dirID == 4)  {
-                    double MpDelta = N*deltal2;
-                    pLocal(4) -= Mratio(0)*MpDelta;
-                    pLocal(10) -= Mratio(1)*MpDelta;
+                    kLocal(4,2) += Mratio(0)*N;
+                    kLocal(4,8) -= Mratio(0)*N;
+                    kLocal(10,2) += Mratio(1)*N;
+                    kLocal(10,8) -= Mratio(1)*N;
                 }
                 else if (dirID == 5)  {
-                    double MpDelta = N*deltal1;
-                    pLocal(5) += Mratio(2)*MpDelta;
-                    pLocal(11) += Mratio(3)*MpDelta;
+                    kLocal(5,1) -= Mratio(2)*N;
+                    kLocal(5,7) += Mratio(2)*N;
+                    kLocal(11,1) -= Mratio(3)*N;
+                    kLocal(11,7) += Mratio(3)*N;
                 }
                 break;
-            }*/
+            }
         }
     }
 }
+
 
 void EETwoNodeLink::applyIMod()
 {    
