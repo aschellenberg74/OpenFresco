@@ -32,10 +32,10 @@ OPENFRESCO_SERVERPROGRAM = $(HOME)/bin/OpenFresco
 # any of the libraries already leave the directory location blank AND
 # remove the directory from DIRS.
 
-BASE		= /sw
-HOME		= /Users/hongkim/Research/bin
+BASE		= /usr/local
+HOME		= /home/min/a/fjubair
 FE		= $(HOME)/OpenSees/SRC
-OPENFRESCO	= $(HOME)/openfresco/trunk/SRC
+OPENFRESCO	= $(HOME)/OpenFresco/trunk/SRC
 
 BLASdir      = $(HOME)/OpenSees/OTHER/BLAS
 CBLASdir     = $(HOME)/OpenSees/OTHER/CBLAS
@@ -76,9 +76,9 @@ CBLAS_LIBRARY   = $(HOME)/lib/libCBlas.a
 ARPACK_LIBRARY  = $(HOME)/lib/libArpack.a
 UMFPACK_LIBRARY = $(HOME)/lib/libUmfpack.a
 METIS_LIBRARY   = $(HOME)/lib/libMetis.a
-NET_LIBRARY	= /usr/X11R6/lib/libX11.a
-TCL_LIBRARY	= $(NET_LIBRARY) -framework Tcl -framework Tk
-# TCL_LIBRARY = /usr/lib/libtk8.0.so /usr/X11R6/lib/libX11.a /usr/lib/libtcl8.0.so
+NET_LIBRARY	= /usr/lib64/libX11.so
+#TCL_LIBRARY	= $(NET_LIBRARY) -framework Tcl -framework Tk
+TCL_LIBRARY = /usr/lib64/libtk8.4.so /usr/lib64/libtcl8.4.so
 BLITZ_LIBRARY = $(HOME)/blitz/lib/libblitz.a
 
 OPENFRESCO_LIBRARY = $(HOME)/lib/libOpenFresco.a
@@ -104,9 +104,9 @@ WIPE_LIBS	= $(FE_LIBRARY) \
 # %---------------------------------------------------------%
 
 # Compilers
-CC++	= g++
-CC      = gcc
-FC	= g95
+CC++	= /usr/bin/g++
+CC      = /usr/bin/gcc
+FC	= /usr/bin/g77
 
 AR		= ar 
 ARFLAGS		= cqls
@@ -121,14 +121,14 @@ RANLIBFLAGS     =
 #    C FLAGS used -DUSE_VENDOR_BLAS (needed in SuperLU) if UNIX in C++ FLAGS
 #
 
-C++FLAGS        = -fno-common -Wall -O2 -D_UNIX -D_TCL84 -ftemplate-depth-30 -D_MACOSX
-CFLAGS          = -fno-common -Wall -O2
+C++FLAGS        = -fno-common -Wall -O3 -D_UNIX -ftemplate-depth-30 -D_LINUX -D_TCL84
+CFLAGS          = -fno-common -Wall -O3
 # CFLAGS          = -Wall -pg -O2
-FFLAGS          = -W1 -O
+FFLAGS          = -Wall -O
 
 # Linker
 LINKER          = $(CC++)
-LINKFLAGS       = -bundle
+LINKFLAGS       =
 # LINKFLAGS       =  -pg
 
 # Misc
@@ -183,18 +183,18 @@ SHELL           = /bin/sh
 # | be linked with when creating executables. These are     |
 # | platform specific and typically order does matter!!     |
 # %---------------------------------------------------------%
-MACHINE_LINKLIBS  = -L$(BASE)/lib \
+MACHINE_LINKLIBS  = -L$(BASE)/lib64 \
 		-L$(HOME)/lib \
-		-L/usr/lib 
+		-L/usr/lib64 
 
-MACHINE_NUMERICAL_LIBS  = \
+MACHINE_NUMERICAL_LIBS  = -lm \
 		$(ARPACK_LIBRARY) \
 		$(SUPERLU_LIBRARY) \
 		$(UMFPACK_LIBRARY) \
 	        $(LAPACK_LIBRARY) $(BLAS_LIBRARY) $(CBLAS_LIBRARY) \
-		-L/usr/X11R6/lib -lX11 -lGL -lGLU -lssl -lcrypto \
+		-L/usr/lib64 -lX11 -lGL -lGLU -lssl -lcrypto \
 		$(FE_LIBRARY) \
-		-lc -lg95 -ldl -lpng -lstdc++ 
+		-lc /usr/lib64/libg2c.so.0 -ldl -lpng -lstdc++ 
 
 MACHINE_SPECIFIC_LIBS = $(NET_LIBRARY)
 
@@ -206,13 +206,16 @@ MACHINE_SPECIFIC_LIBS = $(NET_LIBRARY)
 # | compilation.                                            |
 # %---------------------------------------------------------%
 
-MACHINE_INCLUDES	= -I/usr/include/xfn \
-			  -I$(BASE)/include
+MACHINE_INCLUDES	= -I/usr/include \
+			  -I$(BASE)/include \
+                          -I$(UMFPACKdir) -I$(SUPERLUdir) \
+                          
+                          
 
 # this file contains all the OpenSees/SRC includes
 include $(FE)/Makefile.incl
 
-TCL_INCLUDES = 	-I/Library/Frameworks/Tcl.framework/Headers -I/Library/Frameworks/Tk.framework/Headers
+TCL_INCLUDES = 	-I/usr/include
 
 OPENFRESCO_INCLUDES = -I$(OPENFRESCO) \
 	 	      -I$(OPENFRESCO)/experimentalElement \
@@ -221,7 +224,8 @@ OPENFRESCO_INCLUDES = -I$(OPENFRESCO) \
 		      -I$(OPENFRESCO)/experimentalSetup \
 		      -I$(OPENFRESCO)/experimentalControl \
 		      -I$(OPENFRESCO)/experimentalControl/SCRAMNet \
-		      -I$(OPENFRESCO)/experimentalSignalFilter
+		      -I$(OPENFRESCO)/experimentalSignalFilter \
+                      
 
 INCLUDES = $(TCL_INCLUDES) $(FE_INCLUDES) $(MACHINE_INCLUDES) $(OPENFRESCO_INCLUDES)
 
