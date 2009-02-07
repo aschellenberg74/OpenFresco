@@ -35,7 +35,6 @@
 #include <Domain.h>
 #include <TclModelBuilder.h>
 #include <StandardStream.h>
-#include <SimulationInformation.h>
 #include <ExperimentalSite.h>
 
 #ifdef _WIN32
@@ -50,13 +49,6 @@ OPS_Stream *opserrPtr = &sserr;
 
 Domain *theDomain;
 TclModelBuilder *theTclBuilder;
-
-SimulationInformation simulationInfo;
-char *simulationInfoOutputFilename;
-char *neesCentralProjID;
-char *neesCentralExpID;
-char *neesCentralUser;
-char *neesCentralPasswd;
 
 extern ExperimentalSite *getExperimentalSite(int tag);
 
