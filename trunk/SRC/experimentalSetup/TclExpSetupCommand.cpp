@@ -175,7 +175,7 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp, int argc,
             argi++;
         }
         // now read the trial and out sizes
-        if (strcmp(argv[argi],"-sizeTrialOut") != 0)  {
+        if (argi >= argc || strcmp(argv[argi],"-sizeTrialOut") != 0)  {
             opserr << "WARNING expecting -sizeTrialOut t o\n";
             opserr << "expSetup NoTransformation " << tag << endln;
             return TCL_ERROR;	
@@ -239,7 +239,7 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp, int argc,
         }
         argi++;
         // now read the trial and out sizes
-        if (strcmp(argv[argi],"-sizeTrialOut") != 0)  {
+        if (argi >= argc || strcmp(argv[argi],"-sizeTrialOut") != 0)  {
             opserr << "WARNING expecting -sizeTrialOut t o\n";
             opserr << "expSetup OneActuator " << tag << endln;
             return TCL_ERROR;	
