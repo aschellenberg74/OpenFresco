@@ -493,12 +493,8 @@ int ExperimentalSite::addRecorder(Recorder &theRecorder)
         newRecorders[i] = theRecorders[i];
     newRecorders[numRecorders] = &theRecorder;
     
-    if (theRecorders != 0)  {
-        for (int i=0; i<numRecorders; i++)
-            if (theRecorders[i] != 0)
-                delete theRecorders[i];
+    if (theRecorders != 0)
         delete [] theRecorders;
-    }
     
     theRecorders = newRecorders;
     numRecorders++;
