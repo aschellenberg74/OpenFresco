@@ -79,7 +79,6 @@ extern int		Tclxttest_Init _ANSI_ARGS_((Tcl_Interp *interp));
 #include <Domain.h>
 #include <TclModelBuilder.h>
 #include <StandardStream.h>
-#include <SimulationInformation.h>
 
 #include <Node.h>
 #include <ExperimentalElement.h>
@@ -99,13 +98,6 @@ double ops_Dt = 0.0;
 StandardStream sserr;
 OPS_Stream *opserrPtr = &sserr;
 #endif
-
-SimulationInformation simulationInfo;
-char *simulationInfoOutputFilename;
-char *neesCentralProjID;
-char *neesCentralExpID;
-char *neesCentralUser;
-char *neesCentralPasswd;
 
 /*
 *----------------------------------------------------------------------

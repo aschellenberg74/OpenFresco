@@ -44,8 +44,12 @@
 extern "C" {
 #include <tcl.h>
 #include <tclDecls.h>
-    EXTERN int TclFormatInt _ANSI_ARGS_((char *buffer, long n));
-    EXTERN int TclObjCommandComplete _ANSI_ARGS_((Tcl_Obj *cmdPtr));
+#ifdef _TCL85
+#define TclFormatInt(buf, n)   sprintf((buf),"%ld", (long)(n))
+#else
+    EXTERN int  TclFormatInt _ANSI_ARGS_((char *buffer, long n));
+#endif
+    EXTERN int  TclObjCommandComplete _ANSI_ARGS_((Tcl_Obj *cmdPtr));
 }
 
 #include <FrescoGlobals.h>
@@ -65,13 +69,16 @@ int Tcl_AppInit _ANSI_ARGS_((Tcl_Interp *interp));
 *
 *----------------------------------------------------------------------
 */
-#ifdef _TCL84
+#ifdef _TCL85
+int (*tclDummyLinkVarPtr)(Tcl_Interp *interp, const char *a,
+                          char *b, int c) = Tcl_LinkVar;
+#elif _TCL84
 int (*tclDummyLinkVarPtr)(Tcl_Interp *interp, const char *a,
                           char *b, int c) = Tcl_LinkVar;
 #else
 int (*tclDummyLinkVarPtr)(Tcl_Interp *interp, char *a,
                           char *b, int c) = Tcl_LinkVar;
-#endif /* _TCL84 */
+#endif
 
 
 /*
