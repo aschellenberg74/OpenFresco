@@ -61,7 +61,7 @@ Vector EETwoNodeLink::EETwoNodeLinkV12(12);
 // responsible for allocating the necessary space needed
 // by each object and storing the tags of the end nodes.
 EETwoNodeLink::EETwoNodeLink(int tag, int dim, int Nd1, int Nd2, 
-    const ID &direction, const Vector &_y, const Vector &_x,
+    const ID &direction, const Vector _y, const Vector _x,
     ExperimentalSite *site, Vector Mr, bool iM, double m)
     : ExperimentalElement(tag, ELE_TAG_EETwoNodeLink, site),     
     dimension(dim), numDOF(0), connectedExternalNodes(2),
@@ -173,7 +173,7 @@ EETwoNodeLink::EETwoNodeLink(int tag, int dim, int Nd1, int Nd2,
 // responsible for allocating the necessary space needed
 // by each object and storing the tags of the end nodes.
 EETwoNodeLink::EETwoNodeLink(int tag, int dim, int Nd1, int Nd2, 
-    const ID &direction, const Vector &_y, const Vector &_x,
+    const ID &direction, const Vector _y, const Vector _x,
     int port, char *machineInetAddr, int ssl, int dataSize,
     Vector Mr, bool iM, double m)
     : ExperimentalElement(tag, ELE_TAG_EETwoNodeLink),     
@@ -1123,24 +1123,26 @@ void EETwoNodeLink::setUp()
     L = xp.Norm();
     
     if (L > DBL_EPSILON)  {
-        if (x.Size() > 0)  {
-            opserr << "WARNING EETwoNodeLink::setUp() - " 
-                << "ignoring supplied local x vector and "
-                << "using element nodes to determine orientation\n";
+        if (x.Size() == 0)  {
+            x.resize(3);
+            x.Zero();
+            x(0) = xp(0);
+            if (xp.Size() > 1)
+                x(1) = xp(1);
+            if (xp.Size() > 2)
+                x(2) = xp(2);
+        } else  {
+            opserr << "WARNING EETwoNodeLink::setUp() - "
+                << "element: " << this->getTag() << endln
+                << "ignoring nodes and using specified "
+                << "local x vector to determine orientation\n";
         }
-        x.resize(3);
-        x.Zero();
-        x(0) = xp(0);
-        if (xp.Size() == 2)
-            x(1) = xp(1);
-        if (xp.Size() == 3)
-            x(2) = xp(2);
     }
     // check that vectors for orientation are of correct size
     if (x.Size() != 3 || y.Size() != 3)  {
         opserr << "EETwoNodeLink::setUp() - "
-            << "element: " << this->getTag()
-            << " incorrect dimension of orientation vectors\n";
+            << "element: " << this->getTag() << endln
+            << "incorrect dimension of orientation vectors\n";
         exit(-1);
     }
     
@@ -1163,8 +1165,9 @@ void EETwoNodeLink::setUp()
     
     // check valid x and y vectors, i.e. not parallel and of zero length
     if (xn == 0 || yn == 0 || zn == 0)  {
-        opserr << "EETwoNodeLink::setUp() - element: "
-            << this->getTag() << " invalid orientation vectors\n";
+        opserr << "EETwoNodeLink::setUp() - "
+            << "element: " << this->getTag() << endln
+            << "invalid orientation vectors\n";
         exit(-1);
     }
     
