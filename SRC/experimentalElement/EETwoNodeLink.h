@@ -53,11 +53,11 @@ class EETwoNodeLink : public ExperimentalElement
 public:
     // constructors
     EETwoNodeLink(int tag, int dimension, int Nd1, int Nd2,
-        const ID &direction, const Vector &y, const Vector &x,
+        const ID &direction, const Vector y, const Vector x,
         ExperimentalSite *site,
         Vector Mratio = 0, bool iMod = false, double mass = 0.0);
     EETwoNodeLink(int tag, int dimension, int Nd1, int Nd2,
-        const ID &direction, const Vector &y, const Vector &x,
+        const ID &direction, const Vector y, const Vector x,
         int port, char *machineInetAddress = 0,
         int ssl = 0, int dataSize = OF_Network_dataSize,
         Vector Mratio = 0, bool iMod = false, double mass = 0.0);
