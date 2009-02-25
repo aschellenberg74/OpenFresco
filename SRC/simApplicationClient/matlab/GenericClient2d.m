@@ -99,7 +99,7 @@ switch action
                ipAddr,' : ',num2str(ipPort)]);
          end
          % set the data size for the experimental site
-         dataSizes = int32([numDOF numDOF numDOF 0 0, numDOF 0 0 numDOF 0, dataSize]);
+         dataSizes = int32([numDOF numDOF numDOF 0 1, 0 0 0 numDOF 0, dataSize]);
          TCPSocket('sendData',socketID,dataSizes,11);
       end
    % =========================================================================
@@ -138,6 +138,7 @@ switch action
       % send trial response to experimental element
       sData(1) = 3;
       sData(2:1+3*numDOF) = vh(:,[1,4,5]);
+      sData(2+3*numDOF) = ElemState.Time;
       TCPSocket('sendData',socketID,sData,dataSize);
 
       % obtain stiffness matrix from experimental element
@@ -150,7 +151,7 @@ switch action
       sData(1) = 10;
       TCPSocket('sendData',socketID,sData,dataSize);
       rData = TCPSocket('recvData',socketID,dataSize);
-      qh = rData(numDOF+1:2*numDOF)';
+      qh = rData(1:numDOF)';
 
       % store history variables
       ElemState.Pres.vh = vh;
@@ -176,13 +177,14 @@ switch action
       % send trial response to experimental element
       sData(1) = 3;
       sData(2:1+3*numDOF) = vh(:,[1,4,5]);
+      sData(2+3*numDOF) = ElemState.Time;
       TCPSocket('sendData',socketID,sData,dataSize);
 
       % obtain resisting forces from experimental element
       sData(1) = 10;
       TCPSocket('sendData',socketID,sData,dataSize);
       rData = TCPSocket('recvData',socketID,dataSize);
-      qh = rData(numDOF+1:2*numDOF)';
+      qh = rData(1:numDOF)';
 
       % store history variables
       ElemState.Pres.vh = vh;

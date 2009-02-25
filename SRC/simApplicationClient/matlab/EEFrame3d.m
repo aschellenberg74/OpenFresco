@@ -118,7 +118,7 @@ switch action
                ipAddr,' : ',num2str(ipPort)]);
          end
          % set the data size for the experimental site
-         dataSizes = int32([ndf ndf ndf 0 0, ndf 0 0 ndf 0, dataSize]);
+         dataSizes = int32([ndf ndf ndf 0 1, ndf 0 0 ndf 0, dataSize]);
          TCPSocket('sendData',socketID,dataSizes,11);
       end
    % =========================================================================
@@ -179,6 +179,7 @@ switch action
       % send trial response to experimental site
       sData(1) = 3;
       sData(2:1+3*ndf) = v(:,[1,4,5]);
+      sData(2+3*ndf) = ElemState.Time;
       TCPSocket('sendData',socketID,sData,dataSize);
 
       % obtain resisting forces from experimental site
@@ -237,6 +238,7 @@ switch action
       % send trial response to experimental site
       sData(1) = 3;
       sData(2:1+3*ndf) = v(:,[1,4,5]);
+      sData(2+3*ndf) = ElemState.Time;
       TCPSocket('sendData',socketID,sData,dataSize);
 
       % obtain resisting forces from experimental site
