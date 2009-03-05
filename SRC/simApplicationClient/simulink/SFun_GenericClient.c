@@ -45,8 +45,6 @@ void closeconnection(int *socketID, int *ierr);
 void senddata(const int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr);
 void recvdata(const int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr);
 
-#define U(element) (*uPtrs[element])    // Pointer to Input Port0
-
 // generic client parameters
 #define ipAddr(S)   ssGetSFcnParam(S,0)    // ip address of server
 #define ipPort(S)   ssGetSFcnParam(S,1)    // ip port of server
@@ -64,7 +62,8 @@ void recvdata(const int *socketID, int *dataTypeSize, char data[], int *lenData,
 // Function: mdlCheckParameters
 //    Validate the parameters to verify they are okay
 
-static void mdlCheckParameters(SimStruct *S)  {
+static void mdlCheckParameters(SimStruct *S)
+{
     if (!mxIsChar(ipAddr(S)))  {
         ssSetErrorStatus(S,"ipAddr must be a string");
         return;
@@ -86,7 +85,8 @@ static void mdlCheckParameters(SimStruct *S)  {
 //    The sizes information is used by Simulink to determine the S-function
 //    block's characteristics (number of inputs, outputs, states, etc.).
 
-static void mdlInitializeSizes(SimStruct *S)  {
+static void mdlInitializeSizes(SimStruct *S)
+{
     ssSetNumSFcnParams(S, NPARAMS);    // Number of expected parameters
 #if defined(MATLAB_MEX_FILE)
     if (ssGetNumSFcnParams(S) == ssGetSFcnParamsCount(S))  {
@@ -143,9 +143,9 @@ static void mdlInitializeSizes(SimStruct *S)  {
 
 // ============================================================================
 // Function: mdlInitializeSampleTimes
-//    S-function is comprised of only continuous sample time elements
 
-static void mdlInitializeSampleTimes(SimStruct *S)  {
+static void mdlInitializeSampleTimes(SimStruct *S)
+{
     ssSetSampleTime(S, 0, INHERITED_SAMPLE_TIME);
     ssSetOffsetTime(S, 0, 0.0);
 }
@@ -158,7 +158,8 @@ static void mdlInitializeSampleTimes(SimStruct *S)  {
 //    have states that should be initialized once, this is the place
 //    to do it.
 
-static void mdlStart(SimStruct *S)  {
+static void mdlStart(SimStruct *S)
+{
     char_T *ipAddr;
     uint_T ipPort;
     int_T sizeAddr, iData[11];
@@ -230,10 +231,11 @@ static void mdlStart(SimStruct *S)  {
 // Function: mdlOutputs
 //    Calculate outputs
 
-static void mdlOutputs(SimStruct *S, int_T tid)  {
-    InputRealPtrsType trialResp  = ssGetInputPortRealSignalPtrs(S,0);
-    real_T            *measDisp  = ssGetOutputPortRealSignal(S,0);
-    real_T            *measForce = ssGetOutputPortRealSignal(S,1);
+static void mdlOutputs(SimStruct *S, int_T tid)
+{
+    InputRealPtrsType trialResp = ssGetInputPortRealSignalPtrs(S,0);
+    real_T *measDisp = ssGetOutputPortRealSignal(S,0);
+    real_T *measForce = ssGetOutputPortRealSignal(S,1);
 
     int_T i, ierr, nleft, dataTypeSize;
     char_T *gMsg;
@@ -266,7 +268,7 @@ static void mdlOutputs(SimStruct *S, int_T tid)  {
     // send trial response
     sData[0] = 3;
     for (i=0; i<sizeTrialDisp; i++)  {
-        sData[1+i] = *trialResp[i];
+        sData[1+i] = (*trialResp[i]);
         sData[1+sizeTrialDisp+i] = 0.0;
         sData[1+2*sizeTrialDisp+i] = 0.0;
     }
@@ -295,9 +297,9 @@ static void mdlOutputs(SimStruct *S, int_T tid)  {
 
 // ============================================================================
 // Function: mdlTerminate
-//    No termination needed, but we are required to have this routine.
 
-static void mdlTerminate(SimStruct *S)  {
+static void mdlTerminate(SimStruct *S)
+{
     int_T ierr, nleft, dataTypeSize;
     char_T *gMsg;
 
