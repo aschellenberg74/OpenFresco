@@ -1,12 +1,12 @@
 Model {
-  Name			  "Test"
+  Name			  "Test_GenericClient"
   Version		  7.2
   MdlSubVersion		  0
   GraphicalInterface {
     NumRootInports	    0
     NumRootOutports	    0
     ParameterArgumentNames  ""
-    ComputedModelVersion    "1.179"
+    ComputedModelVersion    "1.181"
     NumModelReferences	    0
     NumTestPointedSignals   0
   }
@@ -25,9 +25,9 @@ Model {
   ModifiedByFormat	  "%<Auto>"
   LastModifiedBy	  "Andreas"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Tue Feb 24 22:15:00 2009"
+  LastModifiedDate	  "Wed Mar 04 15:48:20 2009"
   RTWModifiedTimeStamp	  0
-  ModelVersionFormat	  "1.%<AutoIncrement:179>"
+  ModelVersionFormat	  "1.%<AutoIncrement:181>"
   ConfigurationManager	  "None"
   SampleTimeColors	  off
   SampleTimeAnnotations	  off
@@ -583,7 +583,7 @@ Model {
     }
   }
   System {
-    Name		    "Test"
+    Name		    "Test_GenericClient"
     Location		    [6, 83, 425, 310]
     Open		    on
     ModelBrowserVisibility  off
@@ -609,19 +609,19 @@ Model {
       MaskType		      "GenericClient Element"
       MaskPromptString	      "IP Address of Server|IP Port Number of Server|Size of Data Arrays"
       MaskStyleString	      "edit,edit,edit"
-      MaskTunableValueString  "on,on,on"
+      MaskTunableValueString  "off,off,off"
       MaskCallbackString      "||"
       MaskEnableString	      "on,on,on"
       MaskVisibilityString    "on,on,on"
       MaskToolTipString	      "on,on,on"
       MaskVarAliasString      ",,"
-      MaskVariables	      "ipAddr=@1;ipPort=@2;dataSize=@3;"
+      MaskVariables	      "ipAddr=&1;ipPort=@2;dataSize=@3;"
       MaskDisplay	      "disp('GenericClient\\nElement');"
       MaskIconFrame	      on
       MaskIconOpaque	      on
       MaskIconRotate	      "none"
       MaskIconUnits	      "autoscale"
-      MaskValueString	      "'127.0.0.1'|8090|256"
+      MaskValueString	      "127.0.0.1|8090|256"
       MaskTabNameString	      ",,"
     }
     Block {
