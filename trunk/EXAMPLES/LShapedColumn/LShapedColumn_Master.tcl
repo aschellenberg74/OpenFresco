@@ -129,13 +129,13 @@ analysis Transient
 # Start of recorder generation
 # ------------------------------
 # create the recorder objects
-recorder Node -file Node_Dsp.out -time -node 2 3 -dof 1 2 3 disp
-recorder Node -file Node_Vel.out -time -node 2 3 -dof 1 2 3 vel
-recorder Node -file Node_Acc.out -time -node 2 3 -dof 1 2 3 accel
+recorder Node -file Master_Node_Dsp.out -time -node 2 3 -dof 1 2 3 disp
+recorder Node -file Master_Node_Vel.out -time -node 2 3 -dof 1 2 3 vel
+recorder Node -file Master_Node_Acc.out -time -node 2 3 -dof 1 2 3 accel
 
-recorder Element -file Elmt_Frc.out  -time -ele 1 2 forces
-recorder Element -file Elmt_tDef.out -time -ele 1   targetDisplacements
-recorder Element -file Elmt_mDef.out -time -ele 1   measuredDisplacements
+recorder Element -file Master_Elmt_Frc.out  -time -ele 1 2 forces
+recorder Element -file Master_Elmt_tDef.out -time -ele 1   targetDisplacements
+recorder Element -file Master_Elmt_mDef.out -time -ele 1   measuredDisplacements
 # --------------------------------
 # End of recorder generation
 # --------------------------------
