@@ -52,7 +52,7 @@ c
      .     cm,lmc,
      .     gl11,gl21,gl31,gl12,gl22,gl32,gl13,gl23,gl33,
      .     cmtrx,lft,llt)
-
+      
       include 'nlqparm'
       common/bk28/summss,xke,xpe,tt,xte0,erodeke,erodeie
       dimension force(nlq,ndtot),stiff(nlq,ndtot,ndtot)
@@ -76,22 +76,22 @@ c
      .     gl12(nlq),gl22(nlq),gl32(nlq),
      .     gl13(nlq),gl23(nlq),gl33(nlq)
       dimension cmtrx(nlq,15,3)
-
+      
       integer*4 sizeData
       parameter (sizeData=256)
-
+      
       integer*4 sizeInt, sizeDouble
       parameter (sizeInt=4, sizeDouble=8)
-
+      
       integer*4 port
       integer*4 socketID
       integer*4 stat
-
+      
       integer*4 ID(11)
       real*8    tData(sizeData), mData(sizeData)
       
       save tData, mData
-
+      
       do i=lft,llt
          if (nint(hsv(i,1)) .eq. 0) then
             port=nint(cm(1))
@@ -128,22 +128,20 @@ c ...    update response if time has advanced
 c
          if (tt .gt. tData(1)) then
 c
-c ...       receive and check action
+c ...       receive data
 c
             call recvdata(socketID, sizeDouble, tData, sizeData, stat)
-            if (tData(1) .ne. 10.) then
-               write(*,*) 'Wrong action received'
-               call closeconnection(socketID, stat)
-               call adios(2)
+            if (tData(1) .eq. 10.) then
+c
+c ...          send measured displacements and forces
+c
+               call senddata(socketID, sizeDouble, mData, sizeData, stat)
+c
+c ...          receive new trial response
+c
+               call recvdata(socketID, sizeDouble, tData, sizeData, stat)
             endif
-c
-c ...       send measured displacements and forces
-c
-            call senddata(socketID, sizeDouble, mData, sizeData, stat)
-c
-c ...       receive new target displacements and forces
-c
-            call recvdata(socketID, sizeDouble, tData, sizeData, stat)
+            
             if (tData(1) .ne. 3.) then
                if (tData(1) .eq. 99.) then
                   write(*,*) 'The Simulation has successfully completed'
@@ -160,7 +158,7 @@ c ...       save current time
 c
             tData(1)=tt
          endif
-
+         
          hsv(i,2)=hsv(i,2)+dx1(i)
          mData(1)=hsv(i,2)
          mData(2)=(tData(2)-hsv(i,2))*cm(2)
