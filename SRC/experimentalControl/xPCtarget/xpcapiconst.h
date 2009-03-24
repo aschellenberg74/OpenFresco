@@ -133,6 +133,9 @@ typedef enum ErrorValues_tag {
     ESIGLABELNOTUNIQUE   =  62,
     ESIGLABELNOTFOUND    =  63,
     ETOOMANYSIGNALS      =  64,
+    ETIMELOGDISABLED     =  65,
+    ESTATELOGDISABLED    =  66,
+    EOUTPUTLOGDISABLED   =  67,
 
     ELOADAPPFIRST        = 101,
     EUNLOADAPPFIRST      = 102,
@@ -148,7 +151,7 @@ typedef enum ErrorValues_tag {
 
 
     EINVXPCVERSION       = 801,
-
+    EINVINSTANDALONE     = 802,
     EMALFORMED           = 900,
 
     EINTERNAL            = 999,
