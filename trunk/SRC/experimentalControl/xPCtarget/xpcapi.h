@@ -107,9 +107,9 @@ typedef struct {
 } diskinfo;
 
 typedef struct {
-    char			Name[8];
-    char			Ext[3];
-    int		        Day;
+    char	    Name[8];
+    char	    Ext[3];
+    int		    Day;
     int             Month;
     int             Year;
     int             Hour;
@@ -118,6 +118,13 @@ typedef struct {
     unsigned long   Size;
 }dirStruct;
 
+typedef struct {
+    int            FilePos;
+    int            AllocatedSize;
+    int            ClusterChains;
+    int            VolumeSerialNumber;
+    char           FullName[255];
+}fileinfo;
 
 /* --------------------------------------------------- */
 XPCAPIFUNC(int, xPCReOpenPort)(int port);
@@ -284,6 +291,20 @@ XPCAPIFUNC(diskinfo, xPCFSDiskInfo)(int port, const char *driveLetter);
 XPCAPIFUNC(const char *, xPCFSFileTable)(int port, char *tableBuffer);
 XPCAPIFUNC(void, xPCFSDirItems)(int port, const char *path, dirStruct *dirs, int numDirItems);
 XPCAPIFUNC(int, xPCFSDirStructSize)(int port, const char *path);
+XPCAPIFUNC(int,  xPCGetNumScopes)(int port);
+XPCAPIFUNC(int,  xPCGetNumHiddenScopes)(int port);
+XPCAPIFUNC(void, xPCGetScopeList)(int port, int *data);
+XPCAPIFUNC(void, xPCGetHiddenList)(int port, int *data);
+XPCAPIFUNC(void, xPCScGetSignalList)(int port, int scNum, int *data);
+XPCAPIFUNC(int,  xPCGetSimMode)(int port);
+XPCAPIFUNC(void, xPCGetPCIInfo)(int port, char *buf);
+XPCAPIFUNC(double, xPCGetSessionTime)(int port);
+XPCAPIFUNC(void, xPCGetLogStatus)(int port, int *logArray);
+XPCAPIFUNC(fileinfo, xPCFSFileInfo)(int port, int fileHandle);
+XPCAPIFUNC(void,  xPCSetDefaultStopTime)(int port);
+XPCAPIFUNC(int ,  xPCGetXMLSize)(int port);
+XPCAPIFUNC(int ,  xPCIsTargetScope)(int port);
+XPCAPIFUNC(void , xPCSetTargetScopeUpdate)(int port,int value);
 /* --------------------------------------------------- */
 
 int  xPCInitAPI(void);

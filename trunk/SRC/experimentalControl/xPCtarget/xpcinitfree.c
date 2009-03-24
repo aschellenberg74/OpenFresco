@@ -442,6 +442,49 @@ int xPCResolveAPI(HMODULE dllHandle) {
     if ((xPCGetHiddenScopeEcho = (void *)
          GetProcAddress(dllHandle, "xPCGetHiddenScopeEcho")) == NULL)
         return -1;
+    if ((xPCGetNumScopes = (void *)
+         GetProcAddress(dllHandle, "xPCGetNumScopes")) == NULL)
+        return -1;
+    if ((xPCGetNumHiddenScopes = (void *)
+         GetProcAddress(dllHandle, "xPCGetNumHiddenScopes")) == NULL)
+        return -1;
+    if ((xPCGetScopeList = (void *)
+         GetProcAddress(dllHandle, "xPCGetScopeList")) == NULL)
+        return -1;
+    if ((xPCGetHiddenList = (void *)
+         GetProcAddress(dllHandle, "xPCGetHiddenList")) == NULL)
+        return -1;
+    if ((xPCScGetSignalList = (void *)
+         GetProcAddress(dllHandle, "xPCScGetSignalList")) == NULL)
+        return -1;
+    if ((xPCGetSimMode = (void *)
+         GetProcAddress(dllHandle, "xPCGetSimMode")) == NULL)
+        return -1;
+    if ((xPCGetPCIInfo = (void *)
+         GetProcAddress(dllHandle, "xPCGetPCIInfo")) == NULL)
+        return -1;
+    if ((xPCGetSessionTime = (void *)
+         GetProcAddress(dllHandle, "xPCGetSessionTime")) == NULL)
+        return -1;
+    if ((xPCGetLogStatus = (void *)
+         GetProcAddress(dllHandle, "xPCGetLogStatus")) == NULL)
+        return -1;
+    if ((xPCFSFileInfo = (void *)
+         GetProcAddress(dllHandle, "xPCFSFileInfo")) == NULL)
+        return -1;
+    if ((xPCSetDefaultStopTime = (void *)
+         GetProcAddress(dllHandle, "xPCSetDefaultStopTime")) == NULL)
+        return -1;
+    if ((xPCGetXMLSize = (void *)
+         GetProcAddress(dllHandle, "xPCGetXMLSize")) == NULL)
+        return -1;
+    if ((xPCIsTargetScope = (void *)
+         GetProcAddress(dllHandle, "xPCIsTargetScope")) == NULL)
+        return -1;
+    if ((xPCSetTargetScopeUpdate = (void *)
+         GetProcAddress(dllHandle, "xPCSetTargetScopeUpdate")) == NULL)
+        return -1;
+
     GETFCNPTR(xPCFSScSetFilename);
     GETFCNPTR(xPCFSScGetFilename);
     GETFCNPTR(xPCFSScSetWriteMode);
@@ -596,6 +639,15 @@ void xPCFreeAPI(void) {
     xPCScGetNumSignals=          NULL;
     xPCGetHiddenScopeEcho=       NULL;
     xPCSetHiddenScopeEcho=       NULL;
+    xPCGetSimMode=               NULL;
+    xPCGetPCIInfo=               NULL;
+    xPCGetSessionTime=           NULL;
+    xPCGetLogStatus=             NULL;
+    xPCFSFileInfo=               NULL;
+    xPCSetDefaultStopTime=       NULL;
+    xPCGetXMLSize=               NULL;
+    xPCIsTargetScope=            NULL;
+    xPCSetTargetScopeUpdate=     NULL;
     return;
 }
 
