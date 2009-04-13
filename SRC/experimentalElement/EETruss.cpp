@@ -63,7 +63,7 @@ EETruss::EETruss(int tag, int dim, int Nd1, int Nd2,
     ExperimentalSite *site,
     bool iM, double r)
     : ExperimentalElement(tag, ELE_TAG_EETruss, site),
-    dimension(dim), numDOF(0),
+    numDIM(dim), numDOF(0),
     connectedExternalNodes(2),
     iMod(iM), rho(r), L(0.0), 
     theMatrix(0), theVector(0), theLoad(0),
@@ -71,7 +71,7 @@ EETruss::EETruss(int tag, int dim, int Nd1, int Nd2,
     dbMeas(0), vbMeas(0), abMeas(0), qMeas(0), tMeas(0),
     dbTarg(1), vbTarg(1), abTarg(1),
     dbPast(1), kbInit(1,1), tPast(0.0)
-{    
+{
     // ensure the connectedExternalNode ID is of correct size & set values
     if (connectedExternalNodes.Size() != 2)  {
         opserr << "EETruss::EETruss() - element: "
@@ -83,14 +83,14 @@ EETruss::EETruss(int tag, int dim, int Nd1, int Nd2,
     connectedExternalNodes(1) = Nd2;        
     
     // set node pointers to NULL
-    for (int i=0; i<2; i++)
-        theNodes[i] = 0;
+    theNodes[0] = 0;
+    theNodes[1] = 0;
     
     // zero direction cosines
     cosX[0] = 0.0;
     cosX[1] = 0.0;
     cosX[2] = 0.0;
-
+    
     // set the data size for the experimental site
     sizeCtrl = new ID(OF_Resp_All);
     sizeDaq = new ID(OF_Resp_All);
@@ -113,14 +113,14 @@ EETruss::EETruss(int tag, int dim, int Nd1, int Nd2,
     vb = new Vector(1);
     ab = new Vector(1);
     t  = new Vector(1);
-
+    
     // allocate memory for measured response vectors
     dbMeas = new Vector(1);
     vbMeas = new Vector(1);
     abMeas = new Vector(1);
     qMeas  = new Vector(1);
     tMeas  = new Vector(1);
-
+    
     // initialize additional vectors
     dbTarg.Zero();
     vbTarg.Zero();
@@ -135,7 +135,7 @@ EETruss::EETruss(int tag, int dim, int Nd1, int Nd2,
     int port, char *machineInetAddr, int ssl, int dataSize,
     bool iM, double r)
     : ExperimentalElement(tag, ELE_TAG_EETruss),
-    dimension(dim), numDOF(0),
+    numDIM(dim), numDOF(0),
     connectedExternalNodes(2),
     iMod(iM), rho(r), L(0.0), 
     theMatrix(0), theVector(0), theLoad(0),
@@ -144,26 +144,26 @@ EETruss::EETruss(int tag, int dim, int Nd1, int Nd2,
     dbMeas(0), vbMeas(0), abMeas(0), qMeas(0), tMeas(0),
     dbTarg(1), vbTarg(1), abTarg(1),
     dbPast(1), kbInit(1,1), tPast(0.0)
-{    
+{
     // ensure the connectedExternalNode ID is of correct size & set values
     if (connectedExternalNodes.Size() != 2)  {
         opserr << "EETruss::EETruss() - element: "
             <<  tag << " failed to create an ID of size 2\n";
         exit(-1);
     }
-
+    
     connectedExternalNodes(0) = Nd1;
     connectedExternalNodes(1) = Nd2;        
-
+    
     // set node pointers to NULL
-    for (int i=0; i<2; i++)
-        theNodes[i] = 0;
-
+    theNodes[0] = 0;
+    theNodes[1] = 0;
+    
     // zero direction cosines
     cosX[0] = 0.0;
     cosX[1] = 0.0;
     cosX[2] = 0.0;
-
+    
     // setup the connection
     if (!ssl)  {
         if (machineInetAddr == 0)
@@ -195,7 +195,7 @@ EETruss::EETruss(int tag, int dim, int Nd1, int Nd2,
     sizeCtrl = new ID(intData, OF_Resp_All);
     sizeDaq = new ID(&intData[OF_Resp_All], OF_Resp_All);
     idData.Zero();
-
+    
     (*sizeCtrl)[OF_Resp_Disp]  = 1;
     (*sizeCtrl)[OF_Resp_Vel]   = 1;
     (*sizeCtrl)[OF_Resp_Accel] = 1;
@@ -206,10 +206,10 @@ EETruss::EETruss(int tag, int dim, int Nd1, int Nd2,
     (*sizeDaq)[OF_Resp_Accel]  = 1;
     (*sizeDaq)[OF_Resp_Force]  = 1;
     (*sizeDaq)[OF_Resp_Time]   = 1;
-
+    
     if (dataSize < 5) dataSize = 5;
     intData[2*OF_Resp_All] = dataSize;
-
+    
     theChannel->sendID(0, 0, idData, 0);
     
     // allocate memory for the send vectors
@@ -224,7 +224,7 @@ EETruss::EETruss(int tag, int dim, int Nd1, int Nd2,
     id += 1;
     t = new Vector(&sData[id], 1);
     sendData->Zero();
-
+    
     // allocate memory for the receive vectors
     id = 0;
     rData = new double [dataSize];
@@ -239,7 +239,7 @@ EETruss::EETruss(int tag, int dim, int Nd1, int Nd2,
     id += 1;
     tMeas = new Vector(&rData[id], 1);
     recvData->Zero();
-
+    
     // initialize additional vectors
     dbTarg.Zero();
     vbTarg.Zero();
@@ -255,7 +255,7 @@ EETruss::~EETruss()
     // that the object still holds a pointer to
     if (theLoad != 0)
         delete theLoad;
-
+    
     if (db != 0)
         delete db;
     if (vb != 0)
@@ -275,7 +275,7 @@ EETruss::~EETruss()
         delete qMeas;
     if (tMeas != 0)
         delete tMeas;
-
+    
     if (theSite == 0)  {
         sData[0] = OF_RemoteTest_DIE;
         theChannel->sendVector(0, 0, *sendData, 0);
@@ -331,7 +331,7 @@ void EETruss::setDomain(Domain *theDomain)
     if (!theDomain)  {
         theNodes[0] = 0;
         theNodes[1] = 0;
-        L = 0;
+        L = 0.0;
         return;
     }
     
@@ -370,40 +370,40 @@ void EETruss::setDomain(Domain *theDomain)
             << "have differing dof at ends for element: " << this->getTag() << endln;
         
         return;
-    }	
+    }
     
     // call the base class method
     this->DomainComponent::setDomain(theDomain);
     
     // now set the number of dof for element and set matrix and vector pointer
-    if (dimension == 1 && dofNd1 == 1)  {
+    if (numDIM == 1 && dofNd1 == 1)  {
         numDOF = 2;    
         theMatrix = &EETrussM2;
         theVector = &EETrussV2;
     }
-    else if (dimension == 2 && dofNd1 == 2)  {
+    else if (numDIM == 2 && dofNd1 == 2)  {
         numDOF = 4;
         theMatrix = &EETrussM4;
         theVector = &EETrussV4;	
     }
-    else if (dimension == 2 && dofNd1 == 3)  {
+    else if (numDIM == 2 && dofNd1 == 3)  {
         numDOF = 6;	
         theMatrix = &EETrussM6;
         theVector = &EETrussV6;		
     }
-    else if (dimension == 3 && dofNd1 == 3)  {
+    else if (numDIM == 3 && dofNd1 == 3)  {
         numDOF = 6;	
         theMatrix = &EETrussM6;
         theVector = &EETrussV6;			
     }
-    else if (dimension == 3 && dofNd1 == 6)  {
+    else if (numDIM == 3 && dofNd1 == 6)  {
         numDOF = 12;	    
         theMatrix = &EETrussM12;
         theVector = &EETrussV12;			
     }
     else  {
         opserr <<"EETruss::setDomain() - can not handle "
-            << dimension << " dofs at nodes in " << dofNd1  << " d problem\n";
+            << numDIM << " dofs at nodes in " << dofNd1  << " d problem\n";
         
         return;
     }
@@ -423,61 +423,30 @@ void EETruss::setDomain(Domain *theDomain)
             << " out of memory creating vector of size: " << numDOF << endln;
         
         return;
-    }          
+    }
     
     // now determine the length, cosines and fill in the transformation
     // NOTE t = -t(every one else uses for residual calc)
     const Vector &end1Crd = theNodes[0]->getCrds();
     const Vector &end2Crd = theNodes[1]->getCrds();	
     
-    // zero the cosines
+    // initalize the cosines
     cosX[0] = cosX[1] = cosX[2] = 0.0;
+    for (int i=0; i<numDIM; i++)
+        cosX[i] = end2Crd(i)-end1Crd(i);
     
-    if (dimension == 1)  {
-        double dx = end2Crd(0)-end1Crd(0);	
-        
-        L = sqrt(dx*dx);
-        
-        if (L == 0.0)  {
-            opserr <<"EETruss::setDomain() - element: "
-                << this->getTag() << " has zero length\n";
-            return;
-        }
-        
-        cosX[0] = 1.0;
+    // get initial length
+    L = sqrt(cosX[0]*cosX[0] + cosX[1]*cosX[1] + cosX[2]*cosX[2]);
+    if (L == 0.0)  {
+        opserr <<"EETruss::setDomain() - element: "
+            << this->getTag() << " has zero length\n";
+        return;
     }
-    else if (dimension == 2)  {
-        double dx = end2Crd(0)-end1Crd(0);
-        double dy = end2Crd(1)-end1Crd(1);	
-        
-        L = sqrt(dx*dx + dy*dy);
-        
-        if (L == 0.0) {
-            opserr <<"EETruss::setDomain() - element: "
-                << this->getTag() << " has zero length\n";
-            return;
-        }
-        
-        cosX[0] = dx/L;
-        cosX[1] = dy/L;
-    }
-    else  {
-        double dx = end2Crd(0)-end1Crd(0);
-        double dy = end2Crd(1)-end1Crd(1);	
-        double dz = end2Crd(2)-end1Crd(2);		
-        
-        L = sqrt(dx*dx + dy*dy + dz*dz);
-        
-        if (L == 0.0)  {
-            opserr <<"EETruss::setDomain() - element: "
-                << this->getTag() << " has zero length\n";
-            return;
-        }
-        
-        cosX[0] = dx/L;
-        cosX[1] = dy/L;
-        cosX[2] = dz/L;
-    }
+    
+    // set global orientations
+	cosX[0] /= L;
+	cosX[1] /= L;
+	cosX[2] /= L;
 }   	 
 
 
@@ -500,7 +469,7 @@ int EETruss::commitState()
 int EETruss::update()
 {
     int rValue = 0;
-
+    
     // get current time
     Domain *theDomain = this->getDomain();
     (*t)(0) = theDomain->getCurrentTime();
@@ -514,7 +483,7 @@ int EETruss::update()
     const Vector &acc2 = theNodes[1]->getTrialAccel();	
     
     (*db)(0) = (*vb)(0) = (*ab)(0) = 0.0;
-    for (int i=0; i<dimension; i++)  {
+    for (int i=0; i<numDIM; i++)  {
         (*db)(0) += (dsp2(i)-dsp1(i))*cosX[i];
         (*vb)(0) += (vel2(i)-vel1(i))*cosX[i];
         (*ab)(0) += (acc2(i)-acc1(i))*cosX[i];
@@ -547,13 +516,13 @@ int EETruss::setInitialStiff(const Matrix& kbinit)
         return -1;
     }
     kbInit = kbinit;
-        
+    
     // transform the stiffness from the basic to the global system
     theInitStiff.Zero();
     int numDOF2 = numDOF/2;
     double temp;
-    for (int i=0; i<dimension; i++)  {
-        for (int j=0; j<dimension; j++)  {
+    for (int i=0; i<numDIM; i++)  {
+        for (int j=0; j<numDIM; j++)  {
             temp = cosX[i]*cosX[j]*kbInit(0,0);
             theInitStiff(i,j) = temp;
             theInitStiff(i+numDOF2,j) = -temp;
@@ -569,13 +538,13 @@ int EETruss::setInitialStiff(const Matrix& kbinit)
 const Matrix& EETruss::getMass()
 {   
     // zero the matrix
-    theMatrix->Zero();    
+    theMatrix->Zero();
     
     // form mass matrix
     if (L != 0.0 && rho != 0.0)  {
         double m = 0.5*rho*L;
         int numDOF2 = numDOF/2;
-        for (int i=0; i<dimension; i++)  {
+        for (int i=0; i<numDIM; i++)  {
             (*theMatrix)(i,i) = m;
             (*theMatrix)(i+numDOF2,i+numDOF2) = m;
         }
@@ -622,7 +591,7 @@ int EETruss::addInertiaLoadToUnbalance(const Vector &accel)
     
     // want to add ( - fact * M R * accel ) to unbalance
     double m = 0.5*rho*L;
-    for (int i=0; i<dimension; i++) {
+    for (int i=0; i<numDIM; i++) {
         double val1 = Raccel1(i);
         double val2 = Raccel2(i);	
         
@@ -673,10 +642,10 @@ const Vector& EETruss::getResistingForce()
     dbTarg = (*db);
     vbTarg = (*vb);
     abTarg = (*ab);
-
+    
     // determine resisting forces in global system
     int numDOF2 = numDOF/2;
-    for (int i=0; i<dimension; i++)  {
+    for (int i=0; i<numDIM; i++)  {
         (*theVector)(i) = -cosX[i]*(*qMeas)(0);
         (*theVector)(i+numDOF2) = cosX[i]*(*qMeas)(0);
     }
@@ -703,7 +672,7 @@ const Vector& EETruss::getResistingForceIncInertia()
         
         int numDOF2 = numDOF/2;
         double m = 0.5*rho*L;
-        for (int i=0; i<dimension; i++) {
+        for (int i=0; i<numDIM; i++) {
             (*theVector)(i) += m * accel1(i);
             (*theVector)(i+numDOF2) += m * accel2(i);
         }
@@ -723,7 +692,7 @@ const Vector& EETruss::getTime()
         theChannel->sendVector(0, 0, *sendData, 0);
         theChannel->recvVector(0, 0, *recvData, 0);
     }
-
+    
     return *tMeas;
 }
 
@@ -738,7 +707,7 @@ const Vector& EETruss::getBasicDisp()
         theChannel->sendVector(0, 0, *sendData, 0);
         theChannel->recvVector(0, 0, *recvData, 0);
     }
-
+    
     return *dbMeas;
 }
 
@@ -753,7 +722,7 @@ const Vector& EETruss::getBasicVel()
         theChannel->sendVector(0, 0, *sendData, 0);
         theChannel->recvVector(0, 0, *recvData, 0);
     }
-
+    
     return *vbMeas;
 }
 
@@ -768,7 +737,7 @@ const Vector& EETruss::getBasicAccel()
         theChannel->sendVector(0, 0, *sendData, 0);
         theChannel->recvVector(0, 0, *recvData, 0);
     }
-
+    
     return *abMeas;
 }
 
@@ -802,7 +771,7 @@ int EETruss::displaySelf(Renderer &theViewer,
     static Vector v1(3);
     static Vector v2(3);
     
-    for (int i=0; i<dimension; i++)  {
+    for (int i=0; i<numDIM; i++)  {
         v1(i) = end1Crd(i) + end1Disp(i)*fact;
         v2(i) = end2Crd(i) + end2Disp(i)*fact;    
     }
@@ -834,15 +803,15 @@ Response* EETruss::setResponse(const char **argv, int argc,
     OPS_Stream &output)
 {
     Response *theResponse = 0;
-
+    
     output.tag("ElementOutput");
     output.attr("eleType","EETruss");
     output.attr("eleTag",this->getTag());
     output.attr("node1",connectedExternalNodes[0]);
     output.attr("node2",connectedExternalNodes[1]);
-
+    
     char outputData[10];
-
+    
     // global forces
     if (strcmp(argv[0],"force") == 0 || strcmp(argv[0],"forces") == 0 ||
         strcmp(argv[0],"globalForce") == 0 || strcmp(argv[0],"globalForces") == 0)
@@ -918,9 +887,9 @@ Response* EETruss::setResponse(const char **argv, int argc,
 
         theResponse = new ElementResponse(this, 9, Vector(1));
     }
-
+    
     output.endTag(); // ElementOutput
-
+    
     return theResponse;
 }
 
