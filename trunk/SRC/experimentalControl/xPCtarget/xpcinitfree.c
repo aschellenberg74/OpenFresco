@@ -361,6 +361,9 @@ int xPCResolveAPI(HMODULE dllHandle) {
     if ((xPCFSReadFile = (void *)
          GetProcAddress(dllHandle, "xPCFSReadFile")) == NULL)
         return -1;
+    if ((xPCFSRead = (void *)
+         GetProcAddress(dllHandle, "xPCFSRead")) == NULL)
+        return -1;
     if ((xPCFSWriteFile = (void *)
          GetProcAddress(dllHandle, "xPCFSWriteFile")) == NULL)
         return -1;
@@ -606,6 +609,7 @@ void xPCFreeAPI(void) {
     xPCGetTargetVersion =        NULL;
     xPCTargetPing =              NULL;
     xPCFSReadFile =              NULL;
+    xPCFSRead     =              NULL;
     xPCFSWriteFile =             NULL;
     xPCFSGetFileSize =           NULL;
     xPCFSOpenFile =              NULL;

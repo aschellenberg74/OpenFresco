@@ -253,6 +253,8 @@ XPCAPIFUNC(void, xPCGetTargetVersion)(int port, char *ver);
 XPCAPIFUNC(int, xPCTargetPing)(int port);
 XPCAPIFUNC(void, xPCFSReadFile)(int port, int fileHandle, int start,
                                int numsamples, unsigned char *data);
+XPCAPIFUNC(int, xPCFSRead)(int port, int fileHandle, int start,
+                           int numsamples, unsigned char *data);
 XPCAPIFUNC(void, xPCFSWriteFile)(int port, int fileHandle, int numbytes,
                                  const unsigned char *data);
 XPCAPIFUNC(void, xPCFSBufferInfo)(int port, char *data);
