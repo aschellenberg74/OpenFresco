@@ -630,6 +630,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\SRC\experimentalElement\EETrussCorot.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\SRC\experimentalElement\EETrussCorot.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\SRC\experimentalElement\EETwoNodeLink.cpp"
 				>
 			</File>

@@ -37,6 +37,7 @@
 #include <Domain.h>
 
 #include <EETruss.h>
+#include <EETrussCorot.h>
 
 extern void printCommand(int argc, TCL_Char **argv);
 extern ExperimentalSite *getExperimentalSite(int tag);
@@ -151,10 +152,18 @@ int addEETruss(ClientData clientData, Tcl_Interp *interp,  int argc,
 	}
 
 	// now create the EETruss
-    if (theSite != 0)
-	    theExpElement = new EETruss(tag, ndm, iNode, jNode, theSite, iMod, rho);
-    else
-	    theExpElement = new EETruss(tag, ndm, iNode, jNode, ipPort, ipAddr, ssl, dataSize, iMod, rho);
+    if (strcmp(argv[eleArgStart], "truss") == 0)  {
+        if (theSite != 0)
+	        theExpElement = new EETruss(tag, ndm, iNode, jNode, theSite, iMod, rho);
+        else
+	        theExpElement = new EETruss(tag, ndm, iNode, jNode, ipPort, ipAddr, ssl, dataSize, iMod, rho);
+    }
+    else if (strcmp(argv[eleArgStart], "corotTruss") == 0)  {
+        if (theSite != 0)
+	        theExpElement = new EETrussCorot(tag, ndm, iNode, jNode, theSite, iMod, rho);
+        else
+	        theExpElement = new EETrussCorot(tag, ndm, iNode, jNode, ipPort, ipAddr, ssl, dataSize, iMod, rho);
+    }
 	
 	if (theExpElement == 0)  {
 		opserr << "WARNING ran out of memory creating element\n";

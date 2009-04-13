@@ -74,14 +74,14 @@ public:
     
     // public methods to set and to obtain stiffness, 
     // and to obtain mass, damping and residual information    
-    int setInitialStiff(const Matrix& kbInit);    
-    const Matrix &getMass();    
+    int setInitialStiff(const Matrix& kbInit);
+    const Matrix &getMass();
     
-    void zeroLoad();	
+    void zeroLoad();
     int addLoad(ElementalLoad *theLoad, double loadFactor);
     int addInertiaLoadToUnbalance(const Vector &accel);
     const Vector &getResistingForce();
-    const Vector &getResistingForceIncInertia();            
+    const Vector &getResistingForceIncInertia();
     
     // public methods to obtain the daq response in global system
     const Vector &getTime();
@@ -105,23 +105,24 @@ protected:
     
 private:
     // private attributes - a copy for each object of the class
-    int dimension;					// truss in 2 or 3d domain
-    int numDOF;						// number of dof for EETruss
+    int numDIM;					    // truss in 1d, 2d or 3d domain
+    int numDOF;						// number of dof for truss
     ID  connectedExternalNodes;		// contains the tags of the end nodes
     
-    bool iMod;		// I-Modification flag
-    double rho;		// rho: mass per unit length
-    double L;		// undeformed element length
+    bool iMod;		    // I-Modification flag
+    double rho;		    // rho: mass per unit length
+    double L;		    // undeformed element length
+    double cosX[3];     // direction cosines for transformation
     
     Matrix *theMatrix;  // pointer to objects matrix (a class wide Matrix)
     Vector *theVector;  // pointer to objects vector (a class wide Vector)
     Vector *theLoad;    // pointer to the load vector
     
-    Channel *theChannel;        // channel
-    double *sData;              // send data array
-    Vector *sendData;           // send vector
-    double *rData;              // receive data array
-    Vector *recvData;           // receive vector
+    Channel *theChannel;    // channel
+    double *sData;          // send data array
+    Vector *sendData;       // send vector
+    double *rData;          // receive data array
+    Vector *recvData;       // receive vector
     
     Vector *db;         // trial displacements in basic system
     Vector *vb;         // trial velocities in basic system
@@ -142,9 +143,7 @@ private:
     Matrix kbInit;      // stiffness matrix in basic system
     double tPast;       // past time
     
-    double cosX[3];     // direction cosines for transformation
-    
-    Node *theNodes[2];
+    Node *theNodes[2];  // array of node pointers
     
     // static data - single copy for all objects of the class	
     static Matrix EETrussM2;   // class wide matrix for 2*2
