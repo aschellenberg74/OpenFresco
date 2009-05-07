@@ -22,18 +22,28 @@ EXPERIMENTALTEST_OBJS = $(OPENFRESCO)/utility/ExperimentalCP.o \
 	   $(OPENFRESCO)/experimentalSetup/ESThreeActuatorsJntOff2d.o \
 	   $(OPENFRESCO)/experimentalSetup/ESInvertedVBrace2d.o \
 	   $(OPENFRESCO)/experimentalSetup/ESInvertedVBraceJntOff2d.o \
+	   $(OPENFRESCO)/experimentalSetup/ESFourActuators3d.o \
 	   $(OPENFRESCO)/experimentalControl/ExperimentalControl.o \
 	   $(OPENFRESCO)/experimentalSite/LocalExpSite.o \
-	   $(OPENFRESCO)/experimentalSite/RemoteExpSite.o \
+	   $(OPENFRESCO)/experimentalSite/ShadowExpSite.o \
 	   $(OPENFRESCO)/experimentalSite/ActorExpSite.o \
 	   $(OPENFRESCO)/experimentalControl/ECSimulation.o \
 	   $(OPENFRESCO)/experimentalControl/ECSimUniaxialMaterials.o \
 	   $(OPENFRESCO)/experimentalControl/ECSimDomain.o \
 	   $(OPENFRESCO)/experimentalControl/ECSimFEAdapter.o \
-	   $(OPENFRESCO)/experimentalSignalFilter/SignalFilter.o \
-	   $(OPENFRESCO)/experimentalSignalFilter/ErrorFilter.o \
-	   $(OPENFRESCO)/experimentalSignalFilter/UndershootErrorFilter.o \
-	   $(OPENFRESCO)/experimentalSignalFilter/RandomErrorFilter.o
+	   $(OPENFRESCO)/experimentalSignalFilter/ESFErrorSimRandomGauss.o \
+	   $(OPENFRESCO)/experimentalSignalFilter/ESFErrorSimulation.o \
+	   $(OPENFRESCO)/experimentalSignalFilter/ESFErrorSimUndershoot.o \
+	   $(OPENFRESCO)/experimentalSignalFilter/ExperimentalSignalFilter.o \
+	   $(OPENFRESCO)/recorder/ExpControlRecorder.o \
+       $(OPENFRESCO)/recorder/ExpSetupRecorder.o \
+	   $(OPENFRESCO)/recorder/ExpSignalFilterRecorder.o \
+	   $(OPENFRESCO)/recorder/ExpSiteRecorder.o \
+	   $(OPENFRESCO)/recorder/response/ExpControlResponse.o \
+	   $(OPENFRESCO)/recorder/response/ExpSetupResponse.o \
+	   $(OPENFRESCO)/recorder/response/ExpSignalFilterResponse.o \
+	   $(OPENFRESCO)/recorder/response/ExpSiteResponse.o
+	   #$(OPENFRESCO)/experimentalControl/ECSCRAMNet.o
 
 OPENFRESCO_TCLFILES = \
 	$(OPENFRESCO)/utility/TclExpCPCommand.o \
@@ -46,7 +56,10 @@ OPENFRESCO_TCLFILES = \
 	$(OPENFRESCO)/experimentalControl/TclExpControlCommand.o \
 	$(OPENFRESCO)/experimentalSite/TclExpSiteCommand.o \
 	$(OPENFRESCO)/experimentalSignalFilter/TclExpSignalFilterCommand.o \
-	$(OPENFRESCO)/experimentalSetup/TclExpSetupCommand.o
+	$(OPENFRESCO)/experimentalSetup/TclExpSetupCommand.o \
+	$(OPENFRESCO)/recorder/TclRecorderCommands.o \
+	$(FE)/tcl/TclFeViewer.o
+
 
 all: $(OBJS) $(DYLIBOBJS)
 	@$(CD) $(OPENFRESCO)/utility; $(MAKE) tcl;
@@ -55,12 +68,14 @@ all: $(OBJS) $(DYLIBOBJS)
 	@$(CD) $(OPENFRESCO)/experimentalControl; $(MAKE) tcl;
 	@$(CD) $(OPENFRESCO)/experimentalElement; $(MAKE) tcl;
 	@$(CD) $(OPENFRESCO)/experimentalSignalFilter; $(MAKE) tcl;
+	@$(CD) $(OPENFRESCO)/recorder; $(MAKE) tcl;
 	echo $(TCL_LIBRARY)
-	@$(LINKER) $(OBJS) $(OPENFRESCO_TCLFILES) \
+	$(LINKER) $(OBJS) $(OPENFRESCO_TCLFILES) \
 	$(OPENFRESCO_LIBRARY) $(FE_LIBRARY) $(MACHINE_LINKLIBS) \
 	$(MACHINE_NUMERICAL_LIBS)  \
 	$(MACHINE_SPECIFIC_LIBS) $(TCL_LIBRARY) \
 	-o $(OPENFRESCO_SERVERPROGRAM)
+	echo $(TCL_LIBRARY)
 	@$(LINKER) $(LINKFLAGS) $(DYLIBOBJS) $(OPENFRESCO_TCLFILES) \
 	$(EXPERIMENTALTEST_OBJS) \
 	$(FE_LIBRARY) $(MACHINE_LINKLIBS) \
