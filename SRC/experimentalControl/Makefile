@@ -5,6 +5,7 @@ OBJS       = ExperimentalControl.o \
 	     ECSimUniaxialMaterials.o \
 	     ECSimDomain.o \
 	     ECSimFEAdapter.o
+#		 ECSRAMNet.o
 #	     ECNIEseries.o nidaqex.o \
 #	     EquipmentSpec.o
 
