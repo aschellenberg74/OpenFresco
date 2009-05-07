@@ -21,19 +21,28 @@ EXPERIMENTALTEST_OBJS = $(OPENFRESCO)/utility/ExperimentalCP.o \
 	   $(OPENFRESCO)/experimentalSetup/ESThreeActuatorsJntOff2d.o \
 	   $(OPENFRESCO)/experimentalSetup/ESInvertedVBrace2d.o \
 	   $(OPENFRESCO)/experimentalSetup/ESInvertedVBraceJntOff2d.o \
+	   $(OPENFRESCO)/experimentalSetup/ESFourActuators3d.o \
 	   $(OPENFRESCO)/experimentalControl/ExperimentalControl.o \
 	   $(OPENFRESCO)/experimentalSite/LocalExpSite.o \
-	   $(OPENFRESCO)/experimentalSite/RemoteExpSite.o \
+	   $(OPENFRESCO)/experimentalSite/ShadowExpSite.o \
 	   $(OPENFRESCO)/experimentalSite/ActorExpSite.o \
 	   $(OPENFRESCO)/experimentalControl/ECSimulation.o \
 	   $(OPENFRESCO)/experimentalControl/ECSimUniaxialMaterials.o \
 	   $(OPENFRESCO)/experimentalControl/ECSimDomain.o \
 	   $(OPENFRESCO)/experimentalControl/ECSimFEAdapter.o \
-	   $(OPENFRESCO)/experimentalSignalFilter/SignalFilter.o \
-	   $(OPENFRESCO)/experimentalSignalFilter/ErrorFilter.o \
-	   $(OPENFRESCO)/experimentalSignalFilter/UndershootErrorFilter.o \
-	   $(OPENFRESCO)/experimentalSignalFilter/RandomErrorFilter.o
-
+	   $(OPENFRESCO)/experimentalSignalFilter/ESFErrorSimRandomGauss.o \
+	   $(OPENFRESCO)/experimentalSignalFilter/ESFErrorSimulation.o \
+	   $(OPENFRESCO)/experimentalSignalFilter/ESFErrorSimUndershoot.o \
+	   $(OPENFRESCO)/experimentalSignalFilter/ExperimentalSignalFilter.o \
+	   $(OPENFRESCO)/recorder/ExpControlRecorder.o \
+       $(OPENFRESCO)/recorder/ExpSetupRecorder.o \
+	   $(OPENFRESCO)/recorder/ExpSignalFilterRecorder.o \
+	   $(OPENFRESCO)/recorder/ExpSiteRecorder.o \
+	   $(OPENFRESCO)/recorder/response/ExpControlResponse.o \
+	   $(OPENFRESCO)/recorder/response/ExpSetupResponse.o \
+	   $(OPENFRESCO)/recorder/response/ExpSignalFilterResponse.o \
+	   $(OPENFRESCO)/recorder/response/ExpSiteResponse.o
+	   #$(OPENFRESCO)/experimentalControl/ECSCRAMNet.o
 
 # Compilation control
 
@@ -44,6 +53,8 @@ all: FrescoGlobals.h
 	@$(CD) $(OPENFRESCO)/experimentalControl; $(MAKE);
 	@$(CD) $(OPENFRESCO)/experimentalElement; $(MAKE);
 	@$(CD) $(OPENFRESCO)/experimentalSignalFilter; $(MAKE);
+	@$(CD) $(OPENFRESCO)/recorder; $(MAKE);
+	@$(CD) $(OPENFRESCO)/recorder/response; $(MAKE);
 	$(AR) $(ARFLAGS) $(OPENFRESCO_LIBRARY) $(EXPERIMENTALTEST_OBJS)
 
 # Miscellaneous
@@ -54,12 +65,15 @@ clean: tidy
 	@$(RM) $(RMFLAGS) Makefile.bak $(OBJS) *.o *~ #*# core
 
 spotless: clean
+	@$(CD) $(OPENFRESCO)/utility; $(MAKE) wipe;
 	@$(CD) $(OPENFRESCO)/experimentalSite; $(MAKE) wipe;
 	@$(CD) $(OPENFRESCO)/experimentalSetup; $(MAKE) wipe;
 	@$(CD) $(OPENFRESCO)/experimentalControl; $(MAKE) wipe;
 	@$(CD) $(OPENFRESCO)/experimentalElement; $(MAKE) wipe;
 	@$(CD) $(OPENFRESCO)/experimentalSignalFilter; $(MAKE) wipe;
 	@$(CD) $(OPENFRESCO)/experimentalSignalFilter; $(MAKE) wipe;
+	@$(CD) $(OPENFRESCO)/recorder; $(MAKE) wipe;
+	@$(CD) $(OPENFRESCO)/recorder/response; $(MAKE) wipe;
 
 wipe: spotless
 
