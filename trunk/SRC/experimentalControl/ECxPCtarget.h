@@ -90,12 +90,12 @@ private:
     char errMsg[256];
 
     double newTarget, switchPC, atTarget;
-    double *targDisp, *targVel, *targAccel;
-    double *measDisp, *measForce;
+    double *ctrlDisp, *ctrlVel, *ctrlAccel;
+    double *daqDisp, *daqForce;
     
     int newTargetId, switchPCId, atTargetId;
-    int targDispId, targVelId, targAccelId;
-    int *measDispId, *measForceId;
+    int ctrlDispId, ctrlVelId, ctrlAccelId;
+    int *daqDispId, *daqForceId;
 };
 
 #endif

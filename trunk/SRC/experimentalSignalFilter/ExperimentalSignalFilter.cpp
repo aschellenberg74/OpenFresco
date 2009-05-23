@@ -71,7 +71,7 @@ Response* ExperimentalSignalFilter::setResponse(const char **argv,
     output.tag("ExpSignalFilterOutput");
     output.attr("signalFilterType",this->getClassType());
     output.attr("signalFilterTag",this->getTag());
-        
+    
     output.endTag();
     
     return theResponse;

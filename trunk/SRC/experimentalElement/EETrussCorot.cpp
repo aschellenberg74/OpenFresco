@@ -68,8 +68,8 @@ EETrussCorot::EETrussCorot(int tag, int dim, int Nd1, int Nd2,
     iMod(iM), rho(r), L(0.0), Ln(0.0), R(3,3),
     theMatrix(0), theVector(0), theLoad(0),
     db(0), vb(0), ab(0), t(0),
-    dbMeas(0), vbMeas(0), abMeas(0), qMeas(0), tMeas(0),
-    dbTarg(1), vbTarg(1), abTarg(1),
+    dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
+    dbCtrl(1), vbCtrl(1), abCtrl(1),
     dbPast(1), kbInit(1,1), tPast(0.0),
     firstWarning(true)
 {
@@ -110,17 +110,17 @@ EETrussCorot::EETrussCorot(int tag, int dim, int Nd1, int Nd2,
     ab = new Vector(1);
     t  = new Vector(1);
     
-    // allocate memory for measured response vectors
-    dbMeas = new Vector(1);
-    vbMeas = new Vector(1);
-    abMeas = new Vector(1);
-    qMeas  = new Vector(1);
-    tMeas  = new Vector(1);
+    // allocate memory for daq response vectors
+    dbDaq = new Vector(1);
+    vbDaq = new Vector(1);
+    abDaq = new Vector(1);
+    qDaq  = new Vector(1);
+    tDaq  = new Vector(1);
     
     // initialize additional vectors
-    dbTarg.Zero();
-    vbTarg.Zero();
-    abTarg.Zero();
+    dbCtrl.Zero();
+    vbCtrl.Zero();
+    abCtrl.Zero();
     dbPast.Zero();
 }
 
@@ -137,8 +137,8 @@ EETrussCorot::EETrussCorot(int tag, int dim, int Nd1, int Nd2,
     theMatrix(0), theVector(0), theLoad(0),
     theChannel(0), sData(0), sendData(0), rData(0), recvData(0),
     db(0), vb(0), ab(0), t(0),
-    dbMeas(0), vbMeas(0), abMeas(0), qMeas(0), tMeas(0),
-    dbTarg(1), vbTarg(1), abTarg(1),
+    dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
+    dbCtrl(1), vbCtrl(1), abCtrl(1),
     dbPast(1), kbInit(1,1), tPast(0.0),
     firstWarning(true)
 {
@@ -221,21 +221,21 @@ EETrussCorot::EETrussCorot(int tag, int dim, int Nd1, int Nd2,
     id = 0;
     rData = new double [dataSize];
     recvData = new Vector(rData, dataSize);
-    dbMeas = new Vector(&rData[id], 1);
+    dbDaq = new Vector(&rData[id], 1);
     id += 1;
-    vbMeas = new Vector(&rData[id], 1);
+    vbDaq = new Vector(&rData[id], 1);
     id += 1;
-    abMeas = new Vector(&rData[id], 1);
+    abDaq = new Vector(&rData[id], 1);
     id += 1;
-    qMeas = new Vector(&rData[id], 1);
+    qDaq = new Vector(&rData[id], 1);
     id += 1;
-    tMeas = new Vector(&rData[id], 1);
+    tDaq = new Vector(&rData[id], 1);
     recvData->Zero();
     
     // initialize additional vectors
-    dbTarg.Zero();
-    vbTarg.Zero();
-    abTarg.Zero();
+    dbCtrl.Zero();
+    vbCtrl.Zero();
+    abCtrl.Zero();
     dbPast.Zero();
 }
 
@@ -257,16 +257,16 @@ EETrussCorot::~EETrussCorot()
     if (t != 0)
         delete t;
     
-    if (dbMeas != 0)
-        delete dbMeas;
-    if (vbMeas != 0)
-        delete vbMeas;
-    if (abMeas != 0)
-        delete abMeas;
-    if (qMeas != 0)
-        delete qMeas;
-    if (tMeas != 0)
-        delete tMeas;
+    if (dbDaq != 0)
+        delete dbDaq;
+    if (vbDaq != 0)
+        delete vbDaq;
+    if (abDaq != 0)
+        delete abDaq;
+    if (qDaq != 0)
+        delete qDaq;
+    if (tDaq != 0)
+        delete tDaq;
     
     if (theSite == 0)  {
         sData[0] = OF_RemoteTest_DIE;
@@ -611,9 +611,9 @@ const Matrix& EETrussCorot::getTangentStiff()
         firstWarning = false;
     }
     
-    // get measured resisting forces
+    // get daq resisting forces
     if (theSite != 0)  {
-        (*qMeas) = theSite->getForce();
+        (*qDaq) = theSite->getForce();
     }
     else  {
         sData[0] = OF_RemoteTest_getForce;
@@ -623,9 +623,9 @@ const Matrix& EETrussCorot::getTangentStiff()
     
     // apply optional initial stiffness modification
     if (iMod == true)  {
-        // get measured displacements
+        // get daq displacements
         if (theSite != 0)  {
-            (*dbMeas) = theSite->getDisp();
+            (*dbDaq) = theSite->getDisp();
         }
         else  {
             sData[0] = OF_RemoteTest_getDisp;
@@ -634,7 +634,7 @@ const Matrix& EETrussCorot::getTangentStiff()
         }
         
         // correct for displacement control errors using I-Modification
-        (*qMeas) -= kbInit*((*dbMeas) - (*db));
+        (*qDaq) -= kbInit*((*dbDaq) - (*db));
     }
     
     // transform the stiffness from the basic to the local system
@@ -646,8 +646,8 @@ const Matrix& EETrussCorot::getTangentStiff()
             kl(i,j) = EAoverL3*d21[i]*d21[j];
     
     // add geometric stiffness portion
-    double SL = (*qMeas)(0)/Ln;
-    double SA = (*qMeas)(0)/(Ln*Ln*Ln);
+    double SL = (*qDaq)(0)/Ln;
+    double SA = (*qDaq)(0)/(Ln*Ln*Ln);
     for (i=0; i<3; i++)  {
         kl(i,i) += SL;
         for (j=0; j<3; j++)
@@ -750,9 +750,9 @@ const Vector& EETrussCorot::getResistingForce()
     // zero the residual
     theVector->Zero();
     
-    // get measured resisting forces
+    // get daq resisting forces
     if (theSite != 0)  {
-        (*qMeas) = theSite->getForce();
+        (*qDaq) = theSite->getForce();
     }
     else  {
         sData[0] = OF_RemoteTest_getForce;
@@ -762,9 +762,9 @@ const Vector& EETrussCorot::getResistingForce()
     
     // apply optional initial stiffness modification
     if (iMod == true)  {
-        // get measured displacements
+        // get daq displacements
         if (theSite != 0)  {
-            (*dbMeas) = theSite->getDisp();
+            (*dbDaq) = theSite->getDisp();
         }
         else  {
             sData[0] = OF_RemoteTest_getDisp;
@@ -773,19 +773,19 @@ const Vector& EETrussCorot::getResistingForce()
         }
         
         // correct for displacement control errors using I-Modification
-        (*qMeas) -= kbInit*((*dbMeas) - (*db));
+        (*qDaq) -= kbInit*((*dbDaq) - (*db));
     }
     
-    // save corresponding target displacements for recorder
-    dbTarg = (*db);
-    vbTarg = (*vb);
-    abTarg = (*ab);
+    // save corresponding ctrl displacements for recorder
+    dbCtrl = (*db);
+    vbCtrl = (*vb);
+    abCtrl = (*ab);
 
     // transform the forces from the basic to the local system
     static Vector ql(3);
-	ql(0) = d21[0]/Ln*(*qMeas)(0);
-	ql(1) = d21[1]/Ln*(*qMeas)(0);
-	ql(2) = d21[2]/Ln*(*qMeas)(0);
+	ql(0) = d21[0]/Ln*(*qDaq)(0);
+	ql(1) = d21[1]/Ln*(*qDaq)(0);
+	ql(2) = d21[2]/Ln*(*qDaq)(0);
 
     // transform the forces from the local to the global system
     static Vector qg(3);
@@ -833,7 +833,7 @@ const Vector& EETrussCorot::getResistingForceIncInertia()
 const Vector& EETrussCorot::getTime()
 {	
     if (theSite != 0)  {
-        (*tMeas) = theSite->getTime();
+        (*tDaq) = theSite->getTime();
     }
     else  {
         sData[0] = OF_RemoteTest_getTime;
@@ -841,14 +841,14 @@ const Vector& EETrussCorot::getTime()
         theChannel->recvVector(0, 0, *recvData, 0);
     }
     
-    return *tMeas;
+    return *tDaq;
 }
 
 
 const Vector& EETrussCorot::getBasicDisp()
 {	
     if (theSite != 0)  {
-        (*dbMeas) = theSite->getDisp();
+        (*dbDaq) = theSite->getDisp();
     }
     else  {
         sData[0] = OF_RemoteTest_getDisp;
@@ -856,14 +856,14 @@ const Vector& EETrussCorot::getBasicDisp()
         theChannel->recvVector(0, 0, *recvData, 0);
     }
     
-    return *dbMeas;
+    return *dbDaq;
 }
 
 
 const Vector& EETrussCorot::getBasicVel()
 {	
     if (theSite != 0)  {
-        (*vbMeas) = theSite->getVel();
+        (*vbDaq) = theSite->getVel();
     }
     else  {
         sData[0] = OF_RemoteTest_getVel;
@@ -871,14 +871,14 @@ const Vector& EETrussCorot::getBasicVel()
         theChannel->recvVector(0, 0, *recvData, 0);
     }
     
-    return *vbMeas;
+    return *vbDaq;
 }
 
 
 const Vector& EETrussCorot::getBasicAccel()
 {	
     if (theSite != 0)  {
-        (*abMeas) = theSite->getAccel();
+        (*abDaq) = theSite->getAccel();
     }
     else  {
         sData[0] = OF_RemoteTest_getAccel;
@@ -886,7 +886,7 @@ const Vector& EETrussCorot::getBasicAccel()
         theChannel->recvVector(0, 0, *recvData, 0);
     }
     
-    return *abMeas;
+    return *abDaq;
 }
 
 
@@ -961,8 +961,10 @@ Response* EETrussCorot::setResponse(const char **argv, int argc,
     char outputData[10];
     
     // global forces
-    if (strcmp(argv[0],"force") == 0 || strcmp(argv[0],"forces") == 0 ||
-        strcmp(argv[0],"globalForce") == 0 || strcmp(argv[0],"globalForces") == 0)
+    if (strcmp(argv[0],"force") == 0 ||
+        strcmp(argv[0],"forces") == 0 ||
+        strcmp(argv[0],"globalForce") == 0 ||
+        strcmp(argv[0],"globalForces") == 0)
     {
         for (int i=0; i<numDOF; i++)  {
             sprintf(outputData,"P%d",i+1);
@@ -970,8 +972,10 @@ Response* EETrussCorot::setResponse(const char **argv, int argc,
         }
         theResponse = new ElementResponse(this, 1, *theVector);
     }
+    
     // local forces
-    else if (strcmp(argv[0],"localForce") == 0 || strcmp(argv[0],"localForces") == 0)
+    else if (strcmp(argv[0],"localForce") == 0 ||
+        strcmp(argv[0],"localForces") == 0)
     {
         for (int i=0; i<numDOF; i++)  {
             sprintf(outputData,"p%d",i+1);
@@ -979,59 +983,80 @@ Response* EETrussCorot::setResponse(const char **argv, int argc,
         }
         theResponse = new ElementResponse(this, 2, *theVector);
     }
+    
     // basic force
-    else if (strcmp(argv[0],"basicForce") == 0 || strcmp(argv[0],"basicForces") == 0)
+    else if (strcmp(argv[0],"basicForce") == 0 ||
+        strcmp(argv[0],"basicForces") == 0 ||
+        strcmp(argv[0],"daqForce") == 0 ||
+        strcmp(argv[0],"daqForces") == 0)
     {
         output.tag("ResponseType","q1");
 
         theResponse = new ElementResponse(this, 3, Vector(1));
     }
-    // target basic displacement
-    else if (strcmp(argv[0],"deformation") == 0 || strcmp(argv[0],"deformations") == 0 || 
-        strcmp(argv[0],"basicDeformation") == 0 || strcmp(argv[0],"basicDeformations") == 0 ||
-        strcmp(argv[0],"targetDisplacement") == 0 || strcmp(argv[0],"targetDisplacements") == 0)
+    
+    // ctrl basic displacement
+    else if (strcmp(argv[0],"defo") == 0 ||
+        strcmp(argv[0],"deformation") == 0 ||
+        strcmp(argv[0],"deformations") == 0 ||
+        strcmp(argv[0],"basicDefo") == 0 ||
+        strcmp(argv[0],"basicDeformation") == 0 ||
+        strcmp(argv[0],"basicDeformations") == 0 ||
+        strcmp(argv[0],"ctrlDisp") == 0 ||
+        strcmp(argv[0],"ctrlDisplacement") == 0 ||
+        strcmp(argv[0],"ctrlDisplacements") == 0)
     {
         output.tag("ResponseType","db1");
 
         theResponse = new ElementResponse(this, 4, Vector(1));
     }
-    // target basic velocity
-    else if (strcmp(argv[0],"targetVelocity") == 0 || 
-        strcmp(argv[0],"targetVelocities") == 0)
+    
+    // ctrl basic velocity
+    else if (strcmp(argv[0],"ctrlVel") == 0 ||
+        strcmp(argv[0],"ctrlVelocity") == 0 ||
+        strcmp(argv[0],"ctrlVelocities") == 0)
     {
         output.tag("ResponseType","vb1");
 
         theResponse = new ElementResponse(this, 5, Vector(1));
     }
-    // target basic acceleration
-    else if (strcmp(argv[0],"targetAcceleration") == 0 || 
-        strcmp(argv[0],"targetAccelerations") == 0)
+    
+    // ctrl basic acceleration
+    else if (strcmp(argv[0],"ctrlAccel") == 0 ||
+        strcmp(argv[0],"ctrlAcceleration") == 0 ||
+        strcmp(argv[0],"ctrlAccelerations") == 0)
     {
         output.tag("ResponseType","ab1");
 
         theResponse = new ElementResponse(this, 6, Vector(1));
     }    
-    // measured basic displacement
-    else if (strcmp(argv[0],"measuredDisplacement") == 0 || 
-        strcmp(argv[0],"measuredDisplacements") == 0)
+    
+    // daq basic displacement
+    else if (strcmp(argv[0],"daqDisp") == 0 ||
+        strcmp(argv[0],"daqDisplacement") == 0 ||
+        strcmp(argv[0],"daqDisplacements") == 0)
     {
-        output.tag("ResponseType","dbm1");
+        output.tag("ResponseType","dbDaq1");
 
         theResponse = new ElementResponse(this, 7, Vector(1));
     }
-    // measured basic velocity
-    else if (strcmp(argv[0],"measuredVelocity") == 0 || 
-        strcmp(argv[0],"measuredVelocities") == 0)
+    
+    // daq basic velocity
+    else if (strcmp(argv[0],"daqVel") == 0 ||
+        strcmp(argv[0],"daqVelocity") == 0 ||
+        strcmp(argv[0],"daqVelocities") == 0)
     {
-        output.tag("ResponseType","vbm1");
+        output.tag("ResponseType","vbDaq1");
 
         theResponse = new ElementResponse(this, 8, Vector(1));
     }
-    // measured basic acceleration
-    else if (strcmp(argv[0],"measuredAcceleration") == 0 || 
-        strcmp(argv[0],"measuredAccelerations") == 0)
+    
+    // daq basic acceleration
+    else if (strcmp(argv[0],"daqAccel") == 0 ||
+        strcmp(argv[0],"daqAcceleration") == 0 ||
+        strcmp(argv[0],"daqAccelerations") == 0)
     {
-        output.tag("ResponseType","abm1");
+        output.tag("ResponseType","abDaq1");
 
         theResponse = new ElementResponse(this, 9, Vector(1));
     }
@@ -1051,30 +1076,30 @@ int EETrussCorot::getResponse(int responseID, Information &eleInfo)
     case 2:  // local forces
         theVector->Zero();
         // Axial
-        (*theVector)(0)        = -(*qMeas)(0);
-        (*theVector)(numDOF/2) =  (*qMeas)(0);
+        (*theVector)(0)        = -(*qDaq)(0);
+        (*theVector)(numDOF/2) =  (*qDaq)(0);
         
         return eleInfo.setVector(*theVector);
         
     case 3:  // basic force
-        return eleInfo.setVector(*qMeas);
+        return eleInfo.setVector(*qDaq);
         
-    case 4:  // target basic displacement
-        return eleInfo.setVector(dbTarg);
+    case 4:  // ctrl basic displacement
+        return eleInfo.setVector(dbCtrl);
         
-    case 5:  // target basic velocity
-        return eleInfo.setVector(vbTarg);
+    case 5:  // ctrl basic velocity
+        return eleInfo.setVector(vbCtrl);
         
-    case 6:  // target basic acceleration
-        return eleInfo.setVector(abTarg);
+    case 6:  // ctrl basic acceleration
+        return eleInfo.setVector(abCtrl);
         
-    case 7:  // measured basic displacement
+    case 7:  // daq basic displacement
         return eleInfo.setVector(this->getBasicDisp());
         
-    case 8:  // measured basic velocitie
+    case 8:  // daq basic velocitie
         return eleInfo.setVector(this->getBasicVel());
         
-    case 9:  // measured basic acceleration
+    case 9:  // daq basic acceleration
         return eleInfo.setVector(this->getBasicAccel());
         
     default:

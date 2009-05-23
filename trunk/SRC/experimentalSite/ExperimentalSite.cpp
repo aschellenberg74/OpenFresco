@@ -319,9 +319,10 @@ Response* ExperimentalSite::setResponse(const char **argv, int argc,
     output.attr("siteTag",this->getTag());
     
     // trial displacements
-    if (strcmp(argv[0],"trialDisp") == 0 ||
+    if (tDisp != 0 && (
+        strcmp(argv[0],"trialDisp") == 0 ||
         strcmp(argv[0],"trialDisplacement") == 0 ||
-        strcmp(argv[0],"trialDisplacements") == 0)
+        strcmp(argv[0],"trialDisplacements") == 0))
     {
         for (i=0; i<(*sizeTrial)(OF_Resp_Disp); i++)  {
             sprintf(outputData,"trialDisp%d",i+1);
@@ -331,9 +332,10 @@ Response* ExperimentalSite::setResponse(const char **argv, int argc,
     }
     
     // trial velocities
-    else if (strcmp(argv[0],"trialVel") == 0 ||
+    else if (tVel != 0 && (
+        strcmp(argv[0],"trialVel") == 0 ||
         strcmp(argv[0],"trialVelocity") == 0 ||
-        strcmp(argv[0],"trialVelocities") == 0)
+        strcmp(argv[0],"trialVelocities") == 0))
     {
         for (i=0; i<(*sizeTrial)(OF_Resp_Vel); i++)  {
             sprintf(outputData,"trialVel%d",i+1);
@@ -343,9 +345,10 @@ Response* ExperimentalSite::setResponse(const char **argv, int argc,
     }
     
     // trial accelerations
-    else if (strcmp(argv[0],"trialAccel") == 0 ||
+    else if (tAccel != 0 && (
+        strcmp(argv[0],"trialAccel") == 0 ||
         strcmp(argv[0],"trialAcceleration") == 0 ||
-        strcmp(argv[0],"trialAccelerations") == 0)
+        strcmp(argv[0],"trialAccelerations") == 0))
     {
         for (i=0; i<(*sizeTrial)(OF_Resp_Accel); i++)  {
             sprintf(outputData,"trialAccel%d",i+1);
@@ -355,8 +358,9 @@ Response* ExperimentalSite::setResponse(const char **argv, int argc,
     }
     
     // trial forces
-    else if (strcmp(argv[0],"trialForce") == 0 ||
-        strcmp(argv[0],"trialForces") == 0)
+    else if (tForce != 0 && (
+        strcmp(argv[0],"trialForce") == 0 ||
+        strcmp(argv[0],"trialForces") == 0))
     {
         for (i=0; i<(*sizeTrial)(OF_Resp_Force); i++)  {
             sprintf(outputData,"trialForce%d",i+1);
@@ -366,8 +370,9 @@ Response* ExperimentalSite::setResponse(const char **argv, int argc,
     }
     
     // trial times
-    else if (strcmp(argv[0],"trialTime") == 0 ||
-        strcmp(argv[0],"trialTimes") == 0)
+    else if (tTime != 0 && (
+        strcmp(argv[0],"trialTime") == 0 ||
+        strcmp(argv[0],"trialTimes") == 0))
     {
         for (i=0; i<(*sizeTrial)(OF_Resp_Time); i++)  {
             sprintf(outputData,"trialTime%d",i+1);
@@ -377,9 +382,10 @@ Response* ExperimentalSite::setResponse(const char **argv, int argc,
     }
     
     // output displacements
-    else if (strcmp(argv[0],"outDisp") == 0 ||
+    else if (oDisp != 0 && (
+        strcmp(argv[0],"outDisp") == 0 ||
         strcmp(argv[0],"outDisplacement") == 0 ||
-        strcmp(argv[0],"outDisplacements") == 0)
+        strcmp(argv[0],"outDisplacements") == 0))
     {
         for (i=0; i<(*sizeOut)(OF_Resp_Disp); i++)  {
             sprintf(outputData,"outDisp%d",i+1);
@@ -389,9 +395,10 @@ Response* ExperimentalSite::setResponse(const char **argv, int argc,
     }
     
     // output velocities
-    else if (strcmp(argv[0],"outVel") == 0 ||
+    else if (oVel != 0 && (
+        strcmp(argv[0],"outVel") == 0 ||
         strcmp(argv[0],"outVelocity") == 0 ||
-        strcmp(argv[0],"outVelocities") == 0)
+        strcmp(argv[0],"outVelocities") == 0))
     {
         for (i=0; i<(*sizeOut)(OF_Resp_Vel); i++)  {
             sprintf(outputData,"outVel%d",i+1);
@@ -401,9 +408,10 @@ Response* ExperimentalSite::setResponse(const char **argv, int argc,
     }
     
     // output accelerations
-    else if (strcmp(argv[0],"outAccel") == 0 ||
+    else if (oAccel != 0 && (
+        strcmp(argv[0],"outAccel") == 0 ||
         strcmp(argv[0],"outAcceleration") == 0 ||
-        strcmp(argv[0],"outAccelerations") == 0)
+        strcmp(argv[0],"outAccelerations") == 0))
     {
         for (i=0; i<(*sizeOut)(OF_Resp_Accel); i++)  {
             sprintf(outputData,"outAccel%d",i+1);
@@ -413,8 +421,9 @@ Response* ExperimentalSite::setResponse(const char **argv, int argc,
     }
     
     // output forces
-    else if (strcmp(argv[0],"outForce") == 0 ||
-        strcmp(argv[0],"outForces") == 0)
+    else if (oForce != 0 && (
+        strcmp(argv[0],"outForce") == 0 ||
+        strcmp(argv[0],"outForces") == 0))
     {
         for (i=0; i<(*sizeOut)(OF_Resp_Force); i++)  {
             sprintf(outputData,"outForce%d",i+1);
@@ -424,8 +433,9 @@ Response* ExperimentalSite::setResponse(const char **argv, int argc,
     }
     
     // output times
-    else if (strcmp(argv[0],"outTime") == 0 ||
-        strcmp(argv[0],"outTimes") == 0)
+    else if (oTime != 0 && (
+        strcmp(argv[0],"outTime") == 0 ||
+        strcmp(argv[0],"outTimes") == 0))
     {
         for (i=0; i<(*sizeOut)(OF_Resp_Time); i++)  {
             sprintf(outputData,"outTime%d",i+1);
@@ -442,7 +452,6 @@ Response* ExperimentalSite::setResponse(const char **argv, int argc,
 
 int ExperimentalSite::getResponse(int responseID, Information &info)
 {
-    // each subclass must implement its own response
     switch (responseID)  {
     case 1:  // trial displacements
         return info.setVector(*tDisp);

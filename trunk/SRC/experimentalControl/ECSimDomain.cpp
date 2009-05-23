@@ -86,8 +86,8 @@ ECSimDomain::ECSimDomain(int tag,
     theDomain(0), theModel(0), theTest(0), theAlgorithm(0), theIntegrator(0),
     theHandler(0), theNumberer(0), theSOE(0), theAnalysis(0),
     theSeries(0), thePattern(0), theSPs(0), theNodes(0), numSPs(0),
-    targDisp(0), targVel(0), targAccel(0), targForce(0),
-    measDisp(0), measVel(0), measAccel(0), measForce(0)
+    ctrlDisp(0), ctrlVel(0), ctrlAccel(0), ctrlForce(0),
+    daqDisp(0), daqVel(0), daqAccel(0), daqForce(0)
 {
     if (trialcps == 0 || outcps == 0)  {
       opserr << "ECSimDomain::ECSimDomain() - "
@@ -117,8 +117,8 @@ ECSimDomain::ECSimDomain(const ECSimDomain& ec)
     theDomain(0), theModel(0), theTest(0), theAlgorithm(0), theIntegrator(0),
     theHandler(0), theNumberer(0), theSOE(0), theAnalysis(0),
     theSeries(0), thePattern(0), theSPs(0), theNodes(0), numSPs(0),
-    targDisp(0), targVel(0), targAccel(0), targForce(0),
-    measDisp(0), measVel(0), measAccel(0), measForce(0)
+    ctrlDisp(0), ctrlVel(0), ctrlAccel(0), ctrlForce(0),
+    daqDisp(0), daqVel(0), daqAccel(0), daqForce(0)
 {
     numTrialCPs = ec.numTrialCPs;
     trialCPs = ec.trialCPs;
@@ -137,25 +137,25 @@ ECSimDomain::ECSimDomain(const ECSimDomain& ec)
 
 ECSimDomain::~ECSimDomain()
 {
-    // delete memory of target vectors
-    if (targDisp != 0)
-        delete targDisp;
-    if (targVel != 0)
-        delete targVel;
-    if (targAccel != 0)
-        delete targAccel;
-    if (targForce != 0)
-        delete targForce;
+    // delete memory of ctrl vectors
+    if (ctrlDisp != 0)
+        delete ctrlDisp;
+    if (ctrlVel != 0)
+        delete ctrlVel;
+    if (ctrlAccel != 0)
+        delete ctrlAccel;
+    if (ctrlForce != 0)
+        delete ctrlForce;
     
-    // delete memory of measured vectors
-    if (measDisp != 0)
-        delete measDisp;
-    if (measVel != 0)
-        delete measVel;
-    if (measAccel != 0)
-        delete measAccel;
-    if (measForce != 0)
-        delete measForce;
+    // delete memory of daq vectors
+    if (daqDisp != 0)
+        delete daqDisp;
+    if (daqVel != 0)
+        delete daqVel;
+    if (daqAccel != 0)
+        delete daqAccel;
+    if (daqForce != 0)
+        delete daqForce;
     
     // cleanup the analysis
     if (theAnalysis != 0)  {
@@ -198,64 +198,64 @@ ECSimDomain::~ECSimDomain()
 
 int ECSimDomain::setup()
 {
-    if (targDisp != 0)
-        delete targDisp;
-    if (targVel != 0)
-        delete targVel;
-    if (targAccel != 0)
-        delete targAccel;
-    if (targForce != 0)
-        delete targForce;
+    if (ctrlDisp != 0)
+        delete ctrlDisp;
+    if (ctrlVel != 0)
+        delete ctrlVel;
+    if (ctrlAccel != 0)
+        delete ctrlAccel;
+    if (ctrlForce != 0)
+        delete ctrlForce;
     
     if ((*sizeCtrl)(OF_Resp_Disp) != 0)  {
-        targDisp = new double [(*sizeCtrl)(OF_Resp_Disp)];
+        ctrlDisp = new double [(*sizeCtrl)(OF_Resp_Disp)];
         for (int i=0; i<(*sizeCtrl)(OF_Resp_Disp); i++)
-            targDisp[i] = 0.0;
+            ctrlDisp[i] = 0.0;
     }
     if ((*sizeCtrl)(OF_Resp_Vel) != 0)  {
-        targVel = new double [(*sizeCtrl)(OF_Resp_Vel)];
+        ctrlVel = new double [(*sizeCtrl)(OF_Resp_Vel)];
         for (int i=0; i<(*sizeCtrl)(OF_Resp_Vel); i++)
-            targVel[i] = 0.0;
+            ctrlVel[i] = 0.0;
     }
     if ((*sizeCtrl)(OF_Resp_Accel) != 0)  {
-        targAccel = new double [(*sizeCtrl)(OF_Resp_Accel)];
+        ctrlAccel = new double [(*sizeCtrl)(OF_Resp_Accel)];
         for (int i=0; i<(*sizeCtrl)(OF_Resp_Accel); i++)
-            targAccel[i] = 0.0;
+            ctrlAccel[i] = 0.0;
     }
     if ((*sizeCtrl)(OF_Resp_Force) != 0)  {
-        targForce = new double [(*sizeCtrl)(OF_Resp_Force)];
+        ctrlForce = new double [(*sizeCtrl)(OF_Resp_Force)];
         for (int i=0; i<(*sizeCtrl)(OF_Resp_Force); i++)
-            targForce[i] = 0.0;
+            ctrlForce[i] = 0.0;
     }
     
-    if (measDisp != 0)
-        delete measDisp;
-    if (measVel != 0)
-        delete measVel;
-    if (measAccel != 0)
-        delete measAccel;
-    if (measForce != 0)
-        delete measForce;
+    if (daqDisp != 0)
+        delete daqDisp;
+    if (daqVel != 0)
+        delete daqVel;
+    if (daqAccel != 0)
+        delete daqAccel;
+    if (daqForce != 0)
+        delete daqForce;
     
     if ((*sizeDaq)(OF_Resp_Disp) != 0)  {
-        measDisp = new double [(*sizeDaq)(OF_Resp_Disp)];
+        daqDisp = new double [(*sizeDaq)(OF_Resp_Disp)];
         for (int i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)
-            measDisp[i] = 0.0;
+            daqDisp[i] = 0.0;
     }
     if ((*sizeDaq)(OF_Resp_Vel) != 0)  {
-        measVel = new double [(*sizeDaq)(OF_Resp_Vel)];
+        daqVel = new double [(*sizeDaq)(OF_Resp_Vel)];
         for (int i=0; i<(*sizeDaq)(OF_Resp_Vel); i++)
-            measVel[i] = 0.0;
+            daqVel[i] = 0.0;
     }
     if ((*sizeDaq)(OF_Resp_Accel) != 0)  {
-        measAccel = new double [(*sizeDaq)(OF_Resp_Accel)];
+        daqAccel = new double [(*sizeDaq)(OF_Resp_Accel)];
         for (int i=0; i<(*sizeDaq)(OF_Resp_Accel); i++)
-            measAccel[i] = 0.0;
+            daqAccel[i] = 0.0;
     }
     if ((*sizeDaq)(OF_Resp_Force) != 0)  {
-        measForce = new double [(*sizeDaq)(OF_Resp_Force)];
+        daqForce = new double [(*sizeDaq)(OF_Resp_Force)];
         for (int i=0; i<(*sizeDaq)(OF_Resp_Force); i++)
-            measForce[i] = 0.0;
+            daqForce[i] = 0.0;
     }
     
     // print experimental control information
@@ -289,12 +289,12 @@ int ECSimDomain::setup()
             if ((*sizeCtrl)(OF_Resp_Disp) != 0 &&
                 (*sizeCtrl)(OF_Resp_Vel) != 0 &&
                 (*sizeCtrl)(OF_Resp_Accel) != 0)
-                theSPs[iSP] = new ExpControlSP(iSP+1, nodeTag, dir(j), &targDisp[iSP], 1.0, &targVel[iSP], 1.0, &targAccel[iSP], 1.0);
+                theSPs[iSP] = new ExpControlSP(iSP+1, nodeTag, dir(j), &ctrlDisp[iSP], 1.0, &ctrlVel[iSP], 1.0, &ctrlAccel[iSP], 1.0);
             else if ((*sizeCtrl)(OF_Resp_Disp) != 0 &&
                 (*sizeCtrl)(OF_Resp_Vel) != 0)
-                theSPs[iSP] = new ExpControlSP(iSP+1, nodeTag, dir(j), &targDisp[iSP], 1.0, &targVel[iSP], 1.0);
+                theSPs[iSP] = new ExpControlSP(iSP+1, nodeTag, dir(j), &ctrlDisp[iSP], 1.0, &ctrlVel[iSP], 1.0);
             else if ((*sizeCtrl)(OF_Resp_Disp) != 0)
-                theSPs[iSP] = new ExpControlSP(iSP+1, nodeTag, dir(j), &targDisp[iSP], 1.0);
+                theSPs[iSP] = new ExpControlSP(iSP+1, nodeTag, dir(j), &ctrlDisp[iSP], 1.0);
             
             // add the SP constraints to the load pattern
             theDomain->addSP_Constraint(theSPs[iSP], 1);
@@ -310,18 +310,25 @@ int ECSimDomain::setup()
     }
     
     theModel      = new AnalysisModel();
-    theTest       = new CTestNormDispIncr(1.0E-8, 100, 0);
+
+    theTest       = new CTestNormDispIncr(1.0E-12, 100, 0);
+    //theTest       = new CTestNormUnbalance(1.0E-12, 100, 0);
+    //theTest       = new CTestEnergyIncr(1.0E-12, 100, 0);
+
     theAlgorithm  = new NewtonRaphson(*theTest);
+
     theIntegrator = new LoadControl(1.0, 1, 1.0, 1.0);
-    //theHandler    = new TransformationConstraintHandler();
-    theHandler    = new PenaltyConstraintHandler(1.0E12, 1.0E12);
+
+    theHandler    = new TransformationConstraintHandler();
+    //theHandler    = new PenaltyConstraintHandler(1.0E12, 1.0E12);
+    //theHandler    = new LagrangeConstraintHandler(1.0, 1.0);
+
     theNumberer   = new PlainNumberer();
-    //RCM *theRCM = new RCM(false);
-    //theNumberer   = new DOF_Numberer(*theRCM);
-    //BandGenLinSolver *theSolver = new BandGenLinLapackSolver();
-    //theSOE        = new BandGenLinSOE(*theSolver);
-    ProfileSPDLinSolver *theSolver = new ProfileSPDLinDirectSolver();
-    theSOE        = new ProfileSPDLinSOE(*theSolver);
+
+    BandGenLinSolver *theSolver = new BandGenLinLapackSolver();
+    theSOE        = new BandGenLinSOE(*theSolver);
+    //ProfileSPDLinSolver *theSolver = new ProfileSPDLinDirectSolver();
+    //theSOE        = new ProfileSPDLinSOE(*theSolver);
     
     theAnalysis = new StaticAnalysis(*theDomain, *theHandler, *theNumberer,
                                      *theModel, *theAlgorithm, *theSOE,
@@ -384,30 +391,30 @@ int ECSimDomain::setTrialResponse(const Vector* disp,
     int i, rValue = 0;
     if (disp != 0)  {
         for (i=0; i<(*sizeCtrl)(OF_Resp_Disp); i++)  {
-            targDisp[i] = (*disp)(i);
+            ctrlDisp[i] = (*disp)(i);
             if (theCtrlFilters[OF_Resp_Disp] != 0)
-                targDisp[i] = theCtrlFilters[OF_Resp_Disp]->filtering(targDisp[i]);
+                ctrlDisp[i] = theCtrlFilters[OF_Resp_Disp]->filtering(ctrlDisp[i]);
         }
     }
     if (vel != 0)  {
         for (i=0; i<(*sizeCtrl)(OF_Resp_Vel); i++)  {
-            targVel[i] = (*vel)(i);
+            ctrlVel[i] = (*vel)(i);
             if (theCtrlFilters[OF_Resp_Vel] != 0)
-                targVel[i] = theCtrlFilters[OF_Resp_Vel]->filtering(targVel[i]);
+                ctrlVel[i] = theCtrlFilters[OF_Resp_Vel]->filtering(ctrlVel[i]);
         }
     }
     if (accel != 0)  {
         for (i=0; i<(*sizeCtrl)(OF_Resp_Accel); i++)  {
-            targAccel[i] = (*accel)(i);
+            ctrlAccel[i] = (*accel)(i);
             if (theCtrlFilters[OF_Resp_Accel] != 0)
-                targAccel[i] = theCtrlFilters[OF_Resp_Accel]->filtering(targAccel[i]);
+                ctrlAccel[i] = theCtrlFilters[OF_Resp_Accel]->filtering(ctrlAccel[i]);
         }
     }
     if (force != 0)  {
         for (i=0; i<(*sizeCtrl)(OF_Resp_Force); i++)  {
-            targForce[i] = (*force)(i);
+            ctrlForce[i] = (*force)(i);
             if (theCtrlFilters[OF_Resp_Force] != 0)
-                targForce[i] = theCtrlFilters[OF_Resp_Force]->filtering(targForce[i]);
+                ctrlForce[i] = theCtrlFilters[OF_Resp_Force]->filtering(ctrlForce[i]);
         }
     }
 
@@ -429,29 +436,29 @@ int ECSimDomain::getDaqResponse(Vector* disp,
     if (disp != 0)  {
         for (i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)  {
             if (theDaqFilters[OF_Resp_Disp] != 0)
-                measDisp[i] = theDaqFilters[OF_Resp_Disp]->filtering(measDisp[i]);
-            (*disp)(i) = measDisp[i];
+                daqDisp[i] = theDaqFilters[OF_Resp_Disp]->filtering(daqDisp[i]);
+            (*disp)(i) = daqDisp[i];
         }
     }
     if (vel != 0)  {
         for (i=0; i<(*sizeDaq)(OF_Resp_Vel); i++)  {
             if (theDaqFilters[OF_Resp_Vel] != 0)
-                measVel[i] = theDaqFilters[OF_Resp_Vel]->filtering(measVel[i]);
-            (*vel)(i) = measVel[i];
+                daqVel[i] = theDaqFilters[OF_Resp_Vel]->filtering(daqVel[i]);
+            (*vel)(i) = daqVel[i];
         }
     }
     if (accel != 0)  {
         for (i=0; i<(*sizeDaq)(OF_Resp_Accel); i++)  {
             if (theDaqFilters[OF_Resp_Accel] != 0)
-                measAccel[i] = theDaqFilters[OF_Resp_Accel]->filtering(measAccel[i]);
-            (*accel)(i) = measAccel[i];
+                daqAccel[i] = theDaqFilters[OF_Resp_Accel]->filtering(daqAccel[i]);
+            (*accel)(i) = daqAccel[i];
         }
     }
     if (force != 0)  {
         for (i=0; i<(*sizeDaq)(OF_Resp_Force); i++)  {
             if (theDaqFilters[OF_Resp_Force] != 0)
-                measForce[i] = theDaqFilters[OF_Resp_Force]->filtering(measForce[i]);
-            (*force)(i) = measForce[i];
+                daqForce[i] = theDaqFilters[OF_Resp_Force]->filtering(daqForce[i]);
+            (*force)(i) = daqForce[i];
         }
     }
 
@@ -481,111 +488,111 @@ Response* ECSimDomain::setResponse(const char **argv, int argc,
     output.tag("ExpControlOutput");
     output.attr("ctrlType",this->getClassType());
     output.attr("ctrlTag",this->getTag());
-        
-    // target displacements
-    if (strcmp(argv[0],"targDisp") == 0 ||
-        strcmp(argv[0],"targetDisp") == 0 ||
-        strcmp(argv[0],"targetDisplacement") == 0 ||
-        strcmp(argv[0],"targetDisplacements") == 0)
+    
+    // ctrl displacements
+    if (ctrlDisp != 0 && (
+        strcmp(argv[0],"ctrlDisp") == 0 ||
+        strcmp(argv[0],"ctrlDisplacement") == 0 ||
+        strcmp(argv[0],"ctrlDisplacements") == 0))
     {
         for (i=0; i<(*sizeCtrl)(OF_Resp_Disp); i++)  {
-            sprintf(outputData,"targDisp%d",i+1);
+            sprintf(outputData,"ctrlDisp%d",i+1);
             output.tag("ResponseType",outputData);
         }
         theResponse = new ExpControlResponse(this, 1,
             Vector((*sizeCtrl)(OF_Resp_Disp)));
     }
     
-    // target velocities
-    if (strcmp(argv[0],"targVel") == 0 ||
-        strcmp(argv[0],"targetVel") == 0 ||
-        strcmp(argv[0],"targetVelocity") == 0 ||
-        strcmp(argv[0],"targetVelocities") == 0)
+    // ctrl velocities
+    if (ctrlVel != 0 && (
+        strcmp(argv[0],"ctrlVel") == 0 ||
+        strcmp(argv[0],"ctrlVelocity") == 0 ||
+        strcmp(argv[0],"ctrlVelocities") == 0))
     {
         for (i=0; i<(*sizeCtrl)(OF_Resp_Vel); i++)  {
-            sprintf(outputData,"targVel%d",i+1);
+            sprintf(outputData,"ctrlVel%d",i+1);
             output.tag("ResponseType",outputData);
         }
         theResponse = new ExpControlResponse(this, 2,
             Vector((*sizeCtrl)(OF_Resp_Vel)));
     }
     
-    // target accelerations
-    if (strcmp(argv[0],"targAccel") == 0 ||
-        strcmp(argv[0],"targetAccel") == 0 ||
-        strcmp(argv[0],"targetAcceleration") == 0 ||
-        strcmp(argv[0],"targetAccelerations") == 0)
+    // ctrl accelerations
+    if (ctrlAccel != 0 && (
+        strcmp(argv[0],"ctrlAccel") == 0 ||
+        strcmp(argv[0],"ctrlAcceleration") == 0 ||
+        strcmp(argv[0],"ctrlAccelerations") == 0))
     {
         for (i=0; i<(*sizeCtrl)(OF_Resp_Accel); i++)  {
-            sprintf(outputData,"targAccel%d",i+1);
+            sprintf(outputData,"ctrlAccel%d",i+1);
             output.tag("ResponseType",outputData);
         }
         theResponse = new ExpControlResponse(this, 3,
             Vector((*sizeCtrl)(OF_Resp_Accel)));
     }
     
-    // target forces
-    if (strcmp(argv[0],"targForce") == 0 ||
-        strcmp(argv[0],"targetForce") == 0 ||
-        strcmp(argv[0],"targetForces") == 0)
+    // ctrl forces
+    if (ctrlForce != 0 && (
+        strcmp(argv[0],"ctrlForce") == 0 ||
+        strcmp(argv[0],"ctrlForces") == 0))
     {
         for (i=0; i<(*sizeCtrl)(OF_Resp_Force); i++)  {
-            sprintf(outputData,"targForce%d",i+1);
+            sprintf(outputData,"ctrlForce%d",i+1);
             output.tag("ResponseType",outputData);
         }
         theResponse = new ExpControlResponse(this, 4,
             Vector((*sizeCtrl)(OF_Resp_Force)));
     }
     
-    // measured displacements
-    if (strcmp(argv[0],"measDisp") == 0 ||
-        strcmp(argv[0],"measuredDisp") == 0 ||
-        strcmp(argv[0],"measuredDisplacement") == 0 ||
-        strcmp(argv[0],"measuredDisplacements") == 0)
+    // daq displacements
+    if (daqDisp != 0 && (
+        strcmp(argv[0],"daqDisp") == 0 ||
+        strcmp(argv[0],"daqDisplacement") == 0 ||
+        strcmp(argv[0],"daqDisplacements") == 0))
     {
         for (i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)  {
-            sprintf(outputData,"measDisp%d",i+1);
+            sprintf(outputData,"daqDisp%d",i+1);
             output.tag("ResponseType",outputData);
         }
         theResponse = new ExpControlResponse(this, 5,
             Vector((*sizeDaq)(OF_Resp_Disp)));
     }
     
-    // measured velocities
-    if (strcmp(argv[0],"measVel") == 0 ||
-        strcmp(argv[0],"measuredVel") == 0 ||
-        strcmp(argv[0],"measuredVelocity") == 0 ||
-        strcmp(argv[0],"measuredVelocities") == 0)
+    // daq velocities
+    if (daqVel != 0 && (
+        strcmp(argv[0],"daqVel") == 0 ||
+        strcmp(argv[0],"daqVelocity") == 0 ||
+        strcmp(argv[0],"daqVelocities") == 0))
     {
         for (i=0; i<(*sizeDaq)(OF_Resp_Vel); i++)  {
-            sprintf(outputData,"measVel%d",i+1);
+            sprintf(outputData,"daqVel%d",i+1);
             output.tag("ResponseType",outputData);
         }
         theResponse = new ExpControlResponse(this, 6,
             Vector((*sizeDaq)(OF_Resp_Vel)));
     }
     
-    // measured accelerations
-    if (strcmp(argv[0],"measAccel") == 0 ||
-        strcmp(argv[0],"measuredAccel") == 0 ||
-        strcmp(argv[0],"measuredAcceleration") == 0 ||
-        strcmp(argv[0],"measuredAccelerations") == 0)
+    // daq accelerations
+    if (daqAccel != 0 && (
+        strcmp(argv[0],"daqAccel") == 0 ||
+        strcmp(argv[0],"daqAcceleration") == 0 ||
+        strcmp(argv[0],"daqAccelerations") == 0))
     {
         for (i=0; i<(*sizeDaq)(OF_Resp_Accel); i++)  {
-            sprintf(outputData,"measAccel%d",i+1);
+            sprintf(outputData,"daqAccel%d",i+1);
             output.tag("ResponseType",outputData);
         }
         theResponse = new ExpControlResponse(this, 7,
             Vector((*sizeDaq)(OF_Resp_Accel)));
     }
     
-    // measured forces
-    if (strcmp(argv[0],"measForce") == 0 ||
-        strcmp(argv[0],"measuredForce") == 0 ||
-        strcmp(argv[0],"measuredForces") == 0)
+    // daq forces
+    if (daqForce != 0 && (
+        strcmp(argv[0],"daqForce") == 0 ||
+        strcmp(argv[0],"daqForces") == 0))
     {
         for (i=0; i<(*sizeDaq)(OF_Resp_Force); i++)  {
-            sprintf(outputData,"measForce%d",i+1);
+            sprintf(outputData,"daqForce%d",i+1);
             output.tag("ResponseType",outputData);
         }
         theResponse = new ExpControlResponse(this, 8,
@@ -603,36 +610,36 @@ int ECSimDomain::getResponse(int responseID, Information &info)
     Vector resp(0);
     
     switch (responseID)  {
-    case 1:  // target displacements
-        resp.setData(targDisp,(*sizeCtrl)(OF_Resp_Disp));
+    case 1:  // ctrl displacements
+        resp.setData(ctrlDisp,(*sizeCtrl)(OF_Resp_Disp));
         return info.setVector(resp);
         
-    case 2:  // target velocities
-        resp.setData(targVel,(*sizeCtrl)(OF_Resp_Vel));
+    case 2:  // ctrl velocities
+        resp.setData(ctrlVel,(*sizeCtrl)(OF_Resp_Vel));
         return info.setVector(resp);
         
-    case 3:  // target accelerations
-        resp.setData(targAccel,(*sizeCtrl)(OF_Resp_Accel));
+    case 3:  // ctrl accelerations
+        resp.setData(ctrlAccel,(*sizeCtrl)(OF_Resp_Accel));
         return info.setVector(resp);
         
-    case 4:  // target forces
-        resp.setData(targForce,(*sizeCtrl)(OF_Resp_Force));
+    case 4:  // ctrl forces
+        resp.setData(ctrlForce,(*sizeCtrl)(OF_Resp_Force));
         return info.setVector(resp);
         
-    case 5:  // measured displacements
-        resp.setData(measDisp,(*sizeDaq)(OF_Resp_Disp));
+    case 5:  // daq displacements
+        resp.setData(daqDisp,(*sizeDaq)(OF_Resp_Disp));
         return info.setVector(resp);
         
-    case 6:  // measured velocities
-        resp.setData(measVel,(*sizeDaq)(OF_Resp_Vel));
+    case 6:  // daq velocities
+        resp.setData(daqVel,(*sizeDaq)(OF_Resp_Vel));
         return info.setVector(resp);
         
-    case 7:  // measured accelerations
-        resp.setData(measAccel,(*sizeDaq)(OF_Resp_Accel));
+    case 7:  // daq accelerations
+        resp.setData(daqAccel,(*sizeDaq)(OF_Resp_Accel));
         return info.setVector(resp);
         
-    case 8:  // measured forces
-        resp.setData(measForce,(*sizeDaq)(OF_Resp_Force));
+    case 8:  // daq forces
+        resp.setData(daqForce,(*sizeDaq)(OF_Resp_Force));
         return info.setVector(resp);
         
     default:
@@ -698,19 +705,19 @@ int ECSimDomain::acquire()
         for (int j=0; j<numDir; j++)  {
             if ((*sizeDaq)(OF_Resp_Disp) != 0)  {
                 const Vector &d = theNodes[i]->getTrialDisp();
-                measDisp[iSP] = d(dir(j));
+                daqDisp[iSP] = d(dir(j));
             }
             if ((*sizeDaq)(OF_Resp_Vel) != 0)  {
                 const Vector &v = theNodes[i]->getTrialVel();
-                measVel[iSP] = v(dir(j));
+                daqVel[iSP] = v(dir(j));
             }
             if ((*sizeDaq)(OF_Resp_Accel) != 0)  {
                 const Vector &a = theNodes[i]->getTrialAccel();
-                measAccel[iSP] = a(dir(j));
+                daqAccel[iSP] = a(dir(j));
             }
             if ((*sizeDaq)(OF_Resp_Force) != 0)  {
                 const Vector &f = theNodes[i]->getReaction();
-                measForce[iSP] = f(dir(j));
+                daqForce[iSP] = f(dir(j));
             }
             iSP++;
         }

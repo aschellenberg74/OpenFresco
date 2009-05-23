@@ -42,7 +42,7 @@ ECSimFEAdapter::ECSimFEAdapter(int tag,
     ipAddress(ipaddress), ipPort(ipport),
     dataSize(OF_Network_dataSize), theChannel(0),
     sData(0), sendData(0), rData(0), recvData(0),
-    targDisp(0), targForce(0), measDisp(0), measForce(0)
+    ctrlDisp(0), ctrlForce(0), daqDisp(0), daqForce(0)
 {   
     // setup the connection
     theChannel = new TCP_Socket(ipPort, ipAddress);
@@ -75,7 +75,7 @@ ECSimFEAdapter::ECSimFEAdapter(const ECSimFEAdapter &ec)
     : ECSimulation(ec),
     dataSize(OF_Network_dataSize), theChannel(0),
     sData(0), sendData(0), rData(0), recvData(0),
-    targDisp(0), targForce(0), measDisp(0), measForce(0)
+    ctrlDisp(0), ctrlForce(0), daqDisp(0), daqForce(0)
 {
     // use the existing channel which is set up
     ipAddress = ec.ipAddress;
@@ -100,17 +100,17 @@ ECSimFEAdapter::~ECSimFEAdapter()
     sData[0] = OF_RemoteTest_DIE;
     theChannel->sendVector(0, 0, *sendData, 0);
 
-    // delete memory of target vectors
-    if (targDisp != 0)
-        delete targDisp;
-    if (targForce != 0)
-        delete targForce;
+    // delete memory of ctrl vectors
+    if (ctrlDisp != 0)
+        delete ctrlDisp;
+    if (ctrlForce != 0)
+        delete ctrlForce;
     
-    // delete memory of measured vectors
-    if (measDisp != 0)
-        delete measDisp;
-    if (measForce != 0)
-        delete measForce;
+    // delete memory of daq vectors
+    if (daqDisp != 0)
+        delete daqDisp;
+    if (daqForce != 0)
+        delete daqForce;
 
     // delete memory of string
     if (ipAddress != 0)
@@ -138,33 +138,33 @@ ECSimFEAdapter::~ECSimFEAdapter()
 
 int ECSimFEAdapter::setup()
 {
-    if (targDisp != 0)
-        delete targDisp;
-    if (targForce != 0)
-        delete targForce;
+    if (ctrlDisp != 0)
+        delete ctrlDisp;
+    if (ctrlForce != 0)
+        delete ctrlForce;
     
     int id = 1;
     if ((*sizeCtrl)(OF_Resp_Disp) != 0)  {
-        targDisp = new Vector(&sData[id],(*sizeCtrl)(OF_Resp_Disp));
+        ctrlDisp = new Vector(&sData[id],(*sizeCtrl)(OF_Resp_Disp));
         id += (*sizeCtrl)(OF_Resp_Disp);
     }
     if ((*sizeCtrl)(OF_Resp_Force) != 0)  {
-        targForce = new Vector(&sData[id],(*sizeCtrl)(OF_Resp_Force));
+        ctrlForce = new Vector(&sData[id],(*sizeCtrl)(OF_Resp_Force));
         id += (*sizeCtrl)(OF_Resp_Force);
     }
     
-    if (measDisp != 0)
-        delete measDisp;
-    if (measForce != 0)
-        delete measForce;
+    if (daqDisp != 0)
+        delete daqDisp;
+    if (daqForce != 0)
+        delete daqForce;
     
     id = 0;
     if ((*sizeDaq)(OF_Resp_Disp) != 0)  {
-        measDisp = new Vector(&rData[id],(*sizeDaq)(OF_Resp_Disp));
+        daqDisp = new Vector(&rData[id],(*sizeDaq)(OF_Resp_Disp));
         id += (*sizeDaq)(OF_Resp_Disp);
     }
     if ((*sizeDaq)(OF_Resp_Force) != 0)  {
-        measForce = new Vector(&rData[id],(*sizeDaq)(OF_Resp_Force));
+        daqForce = new Vector(&rData[id],(*sizeDaq)(OF_Resp_Force));
         id += (*sizeDaq)(OF_Resp_Force);
     }
     
@@ -220,17 +220,17 @@ int ECSimFEAdapter::setTrialResponse(const Vector* disp,
 {
     int i, rValue = 0;
     if (disp != 0)  {
-        *targDisp = *disp;
+        *ctrlDisp = *disp;
         if (theCtrlFilters[OF_Resp_Disp] != 0)  {
             for (i=0; i<(*sizeCtrl)(OF_Resp_Disp); i++)
-                (*targDisp)(i) = theCtrlFilters[OF_Resp_Disp]->filtering((*targDisp)(i));
+                (*ctrlDisp)(i) = theCtrlFilters[OF_Resp_Disp]->filtering((*ctrlDisp)(i));
         }
     }
     if (force != 0)  {
-        *targForce = *force;
+        *ctrlForce = *force;
         if (theCtrlFilters[OF_Resp_Force] != 0)  {
             for (i=0; i<(*sizeCtrl)(OF_Resp_Force); i++)
-                (*targForce)(i) = theCtrlFilters[OF_Resp_Force]->filtering((*targForce)(i));
+                (*ctrlForce)(i) = theCtrlFilters[OF_Resp_Force]->filtering((*ctrlForce)(i));
         }
     }
 
@@ -252,16 +252,16 @@ int ECSimFEAdapter::getDaqResponse(Vector* disp,
     if (disp != 0)  {
         if (theDaqFilters[OF_Resp_Disp] != 0)  {
             for (i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)
-                (*measDisp)(i) = theDaqFilters[OF_Resp_Disp]->filtering((*measDisp)(i));
+                (*daqDisp)(i) = theDaqFilters[OF_Resp_Disp]->filtering((*daqDisp)(i));
         }
-        *disp = *measDisp;
+        *disp = *daqDisp;
     }
     if (force != 0)  {
         if (theDaqFilters[OF_Resp_Force] != 0)  {
             for (i=0; i<(*sizeDaq)(OF_Resp_Force); i++)
-                (*measForce)(i) = theDaqFilters[OF_Resp_Force]->filtering((*measForce)(i));
+                (*daqForce)(i) = theDaqFilters[OF_Resp_Force]->filtering((*daqForce)(i));
         }
-        *force = *measForce;
+        *force = *daqForce;
     }
         
     return OF_ReturnType_completed;
@@ -290,59 +290,55 @@ Response* ECSimFEAdapter::setResponse(const char **argv, int argc,
     output.tag("ExpControlOutput");
     output.attr("ctrlType",this->getClassType());
     output.attr("ctrlTag",this->getTag());
-        
-    // target displacements
-    if (strcmp(argv[0],"targDisp") == 0 ||
-        strcmp(argv[0],"targetDisp") == 0 ||
-        strcmp(argv[0],"targetDisplacement") == 0 ||
-        strcmp(argv[0],"targetDisplacements") == 0)
+    
+    // ctrl displacements
+    if (ctrlDisp != 0 && (
+        strcmp(argv[0],"ctrlDisp") == 0 ||
+        strcmp(argv[0],"ctrlDisplacement") == 0 ||
+        strcmp(argv[0],"ctrlDisplacements") == 0))
     {
         for (i=0; i<(*sizeCtrl)(OF_Resp_Disp); i++)  {
-            sprintf(outputData,"targDisp%d",i+1);
+            sprintf(outputData,"ctrlDisp%d",i+1);
             output.tag("ResponseType",outputData);
         }
-        theResponse = new ExpControlResponse(this, 1,
-            Vector((*sizeCtrl)(OF_Resp_Disp)));
+        theResponse = new ExpControlResponse(this, 1, *ctrlDisp);
     }
     
-    // target forces
-    if (strcmp(argv[0],"targForce") == 0 ||
-        strcmp(argv[0],"targetForce") == 0 ||
-        strcmp(argv[0],"targetForces") == 0)
+    // ctrl forces
+    if (ctrlForce != 0 && (
+        strcmp(argv[0],"ctrlForce") == 0 ||
+        strcmp(argv[0],"ctrlForces") == 0))
     {
         for (i=0; i<(*sizeCtrl)(OF_Resp_Force); i++)  {
-            sprintf(outputData,"targForce%d",i+1);
+            sprintf(outputData,"ctrlForce%d",i+1);
             output.tag("ResponseType",outputData);
         }
-        theResponse = new ExpControlResponse(this, 2,
-            Vector((*sizeCtrl)(OF_Resp_Force)));
+        theResponse = new ExpControlResponse(this, 2, *ctrlForce);
     }
     
-    // measured displacements
-    if (strcmp(argv[0],"measDisp") == 0 ||
-        strcmp(argv[0],"measuredDisp") == 0 ||
-        strcmp(argv[0],"measuredDisplacement") == 0 ||
-        strcmp(argv[0],"measuredDisplacements") == 0)
+    // daq displacements
+    if (daqDisp != 0 && (
+        strcmp(argv[0],"daqDisp") == 0 ||
+        strcmp(argv[0],"daqDisplacement") == 0 ||
+        strcmp(argv[0],"daqDisplacements") == 0))
     {
         for (i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)  {
-            sprintf(outputData,"measDisp%d",i+1);
+            sprintf(outputData,"daqDisp%d",i+1);
             output.tag("ResponseType",outputData);
         }
-        theResponse = new ExpControlResponse(this, 3,
-            Vector((*sizeDaq)(OF_Resp_Disp)));
+        theResponse = new ExpControlResponse(this, 3, *daqDisp);
     }
     
-    // measured forces
-    if (strcmp(argv[0],"measForce") == 0 ||
-        strcmp(argv[0],"measuredForce") == 0 ||
-        strcmp(argv[0],"measuredForces") == 0)
+    // daq forces
+    if (daqForce != 0 && (
+        strcmp(argv[0],"daqForce") == 0 ||
+        strcmp(argv[0],"daqForces") == 0))
     {
         for (i=0; i<(*sizeDaq)(OF_Resp_Force); i++)  {
-            sprintf(outputData,"measForce%d",i+1);
+            sprintf(outputData,"daqForce%d",i+1);
             output.tag("ResponseType",outputData);
         }
-        theResponse = new ExpControlResponse(this, 4,
-            Vector((*sizeDaq)(OF_Resp_Force)));
+        theResponse = new ExpControlResponse(this, 4, *daqForce);
     }
     
     output.endTag();
@@ -354,17 +350,17 @@ Response* ECSimFEAdapter::setResponse(const char **argv, int argc,
 int ECSimFEAdapter::getResponse(int responseID, Information &info)
 {
     switch (responseID)  {
-    case 1:  // target displacements
-        return info.setVector(*targDisp);
+    case 1:  // ctrl displacements
+        return info.setVector(*ctrlDisp);
         
-    case 2:  // target forces
-        return info.setVector(*targForce);
+    case 2:  // ctrl forces
+        return info.setVector(*ctrlForce);
         
-    case 3:  // measured displacements
-        return info.setVector(*measDisp);
+    case 3:  // daq displacements
+        return info.setVector(*daqDisp);
         
-    case 4:  // measured forces
-        return info.setVector(*measForce);
+    case 4:  // daq forces
+        return info.setVector(*daqForce);
         
     default:
         return -1;

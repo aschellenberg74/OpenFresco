@@ -91,8 +91,8 @@ private:
 	float *memPtrOPF;
 
     unsigned int *newTarget, *switchPC, *atTarget;
-    float *targDisp, *targVel, *targAccel, *targForce, *targTime;
-    float *measDisp, *measVel, *measAccel, *measForce, *measTime;
+    float *ctrlDisp, *ctrlVel, *ctrlAccel, *ctrlForce, *ctrlTime;
+    float *daqDisp, *daqVel, *daqAccel, *daqForce, *daqTime;
 
     unsigned int flag;
 };

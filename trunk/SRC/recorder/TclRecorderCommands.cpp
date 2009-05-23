@@ -49,7 +49,7 @@
 #include <BinaryFileStream.h>
 #include <DatabaseStream.h>
 
-enum outputMode {STANDARD_STREAM, DATA_STREAM, XML_STREAM, DATABASE_STREAM, BINARY_STREAM};
+enum outputMode {STANDARD_STREAM, DATA_STREAM, XML_STREAM, DATABASE_STREAM, BINARY_STREAM, DATA_STREAM_CSV};
 
 extern const char * getInterpPWD(Tcl_Interp *interp);  // commands.cpp
 extern ExperimentalSite *getExperimentalSite(int tag);
@@ -166,18 +166,35 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
             
             else if (strcmp(argv[argi],"-file") == 0)  {
                 fileName = argv[argi+1];
-                eMode = DATA_STREAM;
                 const char *pwd = getInterpPWD(interp);
                 simulationInfo.addOutputFile(fileName,pwd);
+                eMode = DATA_STREAM;
                 argi += 2;
-                if (strcmp(argv[argi],"-xml") == 0)  {
-                    eMode = XML_STREAM;
-                    argi++;
-                } else if (strcmp(argv[argi],"-headings") == 0)  {
-                    eMode = DATA_STREAM;
-                    argi++;
-                }
             }
+            
+            else if ((strcmp(argv[argi],"-csv") == 0) || (strcmp(argv[argi],"-fileCSV") == 0))  {
+                fileName = argv[argi+1];
+                const char *pwd = getInterpPWD(interp);
+                simulationInfo.addOutputFile(fileName,pwd);
+                eMode = DATA_STREAM_CSV;
+                argi += 2;
+            }
+            
+            else if ((strcmp(argv[argi],"-xml") == 0) || (strcmp(argv[argi],"-nees") == 0))  {
+                fileName = argv[argi+1];
+                const char *pwd = getInterpPWD(interp);
+                simulationInfo.addOutputFile(fileName,pwd);
+                eMode = XML_STREAM;
+                argi += 2;
+            }	    
+            
+            else if ((strcmp(argv[argi],"-binary") == 0))  {
+                fileName = argv[argi+1];
+                const char *pwd = getInterpPWD(interp);
+                simulationInfo.addOutputFile(fileName,pwd);
+                eMode = BINARY_STREAM;
+                argi += 2;
+            }	    
             
             else if (strcmp(argv[argi],"-database") == 0)  {
                 theRecorderDatabase = theDatabase;
@@ -190,22 +207,6 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
                 }
                 argi += 2;
             }
-            
-            else if ((strcmp(argv[argi],"-nees") == 0) || (strcmp(argv[argi],"-xml") == 0))  {
-                fileName = argv[argi+1];
-                const char *pwd = getInterpPWD(interp);
-                simulationInfo.addOutputFile(fileName, pwd);
-                eMode = XML_STREAM;
-                argi += 2;
-            }	    
-            
-            else if ((strcmp(argv[argi],"-binary") == 0))  {
-                fileName = argv[argi+1];
-                const char *pwd = getInterpPWD(interp);
-                simulationInfo.addOutputFile(fileName, pwd);
-                eMode = BINARY_STREAM;
-                argi += 2;
-            }	    
             
             else  {
                 // first unknown string then is assumed to start 
@@ -228,12 +229,14 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         // construct the theOutputStream
         if (eMode == DATA_STREAM && fileName != 0)  {
             theOutputStream = new DataFileStream(fileName);
+        } else if (eMode == DATA_STREAM_CSV && fileName != 0)  {
+	        theOutputStream = new DataFileStream(fileName,OVERWRITE,2,1);
         } else if (eMode == XML_STREAM && fileName != 0)  {
             theOutputStream = new XmlFileStream(fileName);
-        } else if (eMode == DATABASE_STREAM && tableName != 0)  {
-            theOutputStream = new DatabaseStream(theDatabase, tableName);
         } else if (eMode == BINARY_STREAM && fileName != 0)  {
             theOutputStream = new BinaryFileStream(fileName);
+        } else if (eMode == DATABASE_STREAM && tableName != 0)  {
+            theOutputStream = new DatabaseStream(theDatabase,tableName);
         } else
             theOutputStream = new StandardStream();
         
@@ -350,18 +353,35 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
             
             else if (strcmp(argv[argi],"-file") == 0)  {
                 fileName = argv[argi+1];
-                eMode = DATA_STREAM;
                 const char *pwd = getInterpPWD(interp);
                 simulationInfo.addOutputFile(fileName,pwd);
+                eMode = DATA_STREAM;
                 argi += 2;
-                if (strcmp(argv[argi],"-xml") == 0)  {
-                    eMode = XML_STREAM;
-                    argi++;
-                } else if (strcmp(argv[argi],"-headings") == 0)  {
-                    eMode = DATA_STREAM;
-                    argi++;
-                }
             }
+            
+            else if ((strcmp(argv[argi],"-csv") == 0) || (strcmp(argv[argi],"-fileCSV") == 0))  {
+                fileName = argv[argi+1];
+                const char *pwd = getInterpPWD(interp);
+                simulationInfo.addOutputFile(fileName,pwd);
+                eMode = DATA_STREAM_CSV;
+                argi += 2;
+            }
+            
+            else if ((strcmp(argv[argi],"-xml") == 0) || (strcmp(argv[argi],"-nees") == 0))  {
+                fileName = argv[argi+1];
+                const char *pwd = getInterpPWD(interp);
+                simulationInfo.addOutputFile(fileName,pwd);
+                eMode = XML_STREAM;
+                argi += 2;
+            }	    
+            
+            else if ((strcmp(argv[argi],"-binary") == 0))  {
+                fileName = argv[argi+1];
+                const char *pwd = getInterpPWD(interp);
+                simulationInfo.addOutputFile(fileName,pwd);
+                eMode = BINARY_STREAM;
+                argi += 2;
+            }	    
             
             else if (strcmp(argv[argi],"-database") == 0)  {
                 theRecorderDatabase = theDatabase;
@@ -374,22 +394,6 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
                 }
                 argi += 2;
             }
-            
-            else if ((strcmp(argv[argi],"-nees") == 0) || (strcmp(argv[argi],"-xml") == 0))  {
-                fileName = argv[argi+1];
-                const char *pwd = getInterpPWD(interp);
-                simulationInfo.addOutputFile(fileName, pwd);
-                eMode = XML_STREAM;
-                argi += 2;
-            }	    
-            
-            else if ((strcmp(argv[argi],"-binary") == 0))  {
-                fileName = argv[argi+1];
-                const char *pwd = getInterpPWD(interp);
-                simulationInfo.addOutputFile(fileName, pwd);
-                eMode = BINARY_STREAM;
-                argi += 2;
-            }	    
             
             else  {
                 // first unknown string then is assumed to start 
@@ -412,12 +416,14 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         // construct the theOutputStream
         if (eMode == DATA_STREAM && fileName != 0)  {
             theOutputStream = new DataFileStream(fileName);
+        } else if (eMode == DATA_STREAM_CSV && fileName != 0)  {
+	        theOutputStream = new DataFileStream(fileName,OVERWRITE,2,1);
         } else if (eMode == XML_STREAM && fileName != 0)  {
             theOutputStream = new XmlFileStream(fileName);
-        } else if (eMode == DATABASE_STREAM && tableName != 0)  {
-            theOutputStream = new DatabaseStream(theDatabase, tableName);
         } else if (eMode == BINARY_STREAM && fileName != 0)  {
             theOutputStream = new BinaryFileStream(fileName);
+        } else if (eMode == DATABASE_STREAM && tableName != 0)  {
+            theOutputStream = new DatabaseStream(theDatabase,tableName);
         } else
             theOutputStream = new StandardStream();
         
@@ -534,18 +540,35 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
             
             else if (strcmp(argv[argi],"-file") == 0)  {
                 fileName = argv[argi+1];
-                eMode = DATA_STREAM;
                 const char *pwd = getInterpPWD(interp);
                 simulationInfo.addOutputFile(fileName,pwd);
+                eMode = DATA_STREAM;
                 argi += 2;
-                if (strcmp(argv[argi],"-xml") == 0)  {
-                    eMode = XML_STREAM;
-                    argi++;
-                } else if (strcmp(argv[argi],"-headings") == 0)  {
-                    eMode = DATA_STREAM;
-                    argi++;
-                }
             }
+            
+            else if ((strcmp(argv[argi],"-csv") == 0) || (strcmp(argv[argi],"-fileCSV") == 0))  {
+                fileName = argv[argi+1];
+                const char *pwd = getInterpPWD(interp);
+                simulationInfo.addOutputFile(fileName,pwd);
+                eMode = DATA_STREAM_CSV;
+                argi += 2;
+            }
+            
+            else if ((strcmp(argv[argi],"-xml") == 0) || (strcmp(argv[argi],"-nees") == 0))  {
+                fileName = argv[argi+1];
+                const char *pwd = getInterpPWD(interp);
+                simulationInfo.addOutputFile(fileName,pwd);
+                eMode = XML_STREAM;
+                argi += 2;
+            }	    
+            
+            else if ((strcmp(argv[argi],"-binary") == 0))  {
+                fileName = argv[argi+1];
+                const char *pwd = getInterpPWD(interp);
+                simulationInfo.addOutputFile(fileName,pwd);
+                eMode = BINARY_STREAM;
+                argi += 2;
+            }	    
             
             else if (strcmp(argv[argi],"-database") == 0)  {
                 theRecorderDatabase = theDatabase;
@@ -558,22 +581,6 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
                 }
                 argi += 2;
             }
-            
-            else if ((strcmp(argv[argi],"-nees") == 0) || (strcmp(argv[argi],"-xml") == 0))  {
-                fileName = argv[argi+1];
-                const char *pwd = getInterpPWD(interp);
-                simulationInfo.addOutputFile(fileName, pwd);
-                eMode = XML_STREAM;
-                argi += 2;
-            }	    
-            
-            else if ((strcmp(argv[argi],"-binary") == 0))  {
-                fileName = argv[argi+1];
-                const char *pwd = getInterpPWD(interp);
-                simulationInfo.addOutputFile(fileName, pwd);
-                eMode = BINARY_STREAM;
-                argi += 2;
-            }	    
             
             else  {
                 // first unknown string then is assumed to start 
@@ -593,15 +600,17 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         for (i=argi, j=0; i<argc; i++, j++)
             data[j] = argv[i];
         
-        // construct the theOutputStream
+        // construct theOutputStream
         if (eMode == DATA_STREAM && fileName != 0)  {
             theOutputStream = new DataFileStream(fileName);
+        } else if (eMode == DATA_STREAM_CSV && fileName != 0)  {
+	        theOutputStream = new DataFileStream(fileName,OVERWRITE,2,1);
         } else if (eMode == XML_STREAM && fileName != 0)  {
             theOutputStream = new XmlFileStream(fileName);
-        } else if (eMode == DATABASE_STREAM && tableName != 0)  {
-            theOutputStream = new DatabaseStream(theDatabase, tableName);
         } else if (eMode == BINARY_STREAM && fileName != 0)  {
             theOutputStream = new BinaryFileStream(fileName);
+        } else if (eMode == DATABASE_STREAM && tableName != 0)  {
+            theOutputStream = new DatabaseStream(theDatabase,tableName);
         } else
             theOutputStream = new StandardStream();
         
@@ -718,18 +727,35 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
             
             else if (strcmp(argv[argi],"-file") == 0)  {
                 fileName = argv[argi+1];
-                eMode = DATA_STREAM;
                 const char *pwd = getInterpPWD(interp);
                 simulationInfo.addOutputFile(fileName,pwd);
+                eMode = DATA_STREAM;
                 argi += 2;
-                if (strcmp(argv[argi],"-xml") == 0)  {
-                    eMode = XML_STREAM;
-                    argi++;
-                } else if (strcmp(argv[argi],"-headings") == 0)  {
-                    eMode = DATA_STREAM;
-                    argi++;
-                }
             }
+            
+            else if ((strcmp(argv[argi],"-csv") == 0) || (strcmp(argv[argi],"-fileCSV") == 0))  {
+                fileName = argv[argi+1];
+                const char *pwd = getInterpPWD(interp);
+                simulationInfo.addOutputFile(fileName,pwd);
+                eMode = DATA_STREAM_CSV;
+                argi += 2;
+            }
+            
+            else if ((strcmp(argv[argi],"-xml") == 0) || (strcmp(argv[argi],"-nees") == 0))  {
+                fileName = argv[argi+1];
+                const char *pwd = getInterpPWD(interp);
+                simulationInfo.addOutputFile(fileName,pwd);
+                eMode = XML_STREAM;
+                argi += 2;
+            }	    
+            
+            else if ((strcmp(argv[argi],"-binary") == 0))  {
+                fileName = argv[argi+1];
+                const char *pwd = getInterpPWD(interp);
+                simulationInfo.addOutputFile(fileName,pwd);
+                eMode = BINARY_STREAM;
+                argi += 2;
+            }	    
             
             else if (strcmp(argv[argi],"-database") == 0)  {
                 theRecorderDatabase = theDatabase;
@@ -742,22 +768,6 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
                 }
                 argi += 2;
             }
-            
-            else if ((strcmp(argv[argi],"-nees") == 0) || (strcmp(argv[argi],"-xml") == 0))  {
-                fileName = argv[argi+1];
-                const char *pwd = getInterpPWD(interp);
-                simulationInfo.addOutputFile(fileName, pwd);
-                eMode = XML_STREAM;
-                argi += 2;
-            }	    
-            
-            else if ((strcmp(argv[argi],"-binary") == 0))  {
-                fileName = argv[argi+1];
-                const char *pwd = getInterpPWD(interp);
-                simulationInfo.addOutputFile(fileName, pwd);
-                eMode = BINARY_STREAM;
-                argi += 2;
-            }	    
             
             else  {
                 // first unknown string then is assumed to start 
@@ -780,12 +790,14 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         // construct the theOutputStream
         if (eMode == DATA_STREAM && fileName != 0)  {
             theOutputStream = new DataFileStream(fileName);
+        } else if (eMode == DATA_STREAM_CSV && fileName != 0)  {
+	        theOutputStream = new DataFileStream(fileName,OVERWRITE,2,1);
         } else if (eMode == XML_STREAM && fileName != 0)  {
             theOutputStream = new XmlFileStream(fileName);
-        } else if (eMode == DATABASE_STREAM && tableName != 0)  {
-            theOutputStream = new DatabaseStream(theDatabase, tableName);
         } else if (eMode == BINARY_STREAM && fileName != 0)  {
             theOutputStream = new BinaryFileStream(fileName);
+        } else if (eMode == DATABASE_STREAM && tableName != 0)  {
+            theOutputStream = new DatabaseStream(theDatabase,tableName);
         } else
             theOutputStream = new StandardStream();
         

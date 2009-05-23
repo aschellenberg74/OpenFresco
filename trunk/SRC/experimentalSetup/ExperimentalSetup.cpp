@@ -522,11 +522,12 @@ Response* ExperimentalSetup::setResponse(const char **argv, int argc,
     output.tag("ExpSetupOutput");
     output.attr("setupType",this->getClassType());
     output.attr("setupTag",this->getTag());
-        
+    
     // trial displacements
-    if (strcmp(argv[0],"trialDisp") == 0 ||
+    if (tDisp != 0 && (
+        strcmp(argv[0],"trialDisp") == 0 ||
         strcmp(argv[0],"trialDisplacement") == 0 ||
-        strcmp(argv[0],"trialDisplacements") == 0)
+        strcmp(argv[0],"trialDisplacements") == 0))
     {
         for (i=0; i<(*sizeTrial)(OF_Resp_Disp); i++)  {
             sprintf(outputData,"trialDisp%d",i+1);
@@ -536,9 +537,10 @@ Response* ExperimentalSetup::setResponse(const char **argv, int argc,
     }
     
     // trial velocities
-    else if (strcmp(argv[0],"trialVel") == 0 ||
+    else if (tVel != 0 && (
+        strcmp(argv[0],"trialVel") == 0 ||
         strcmp(argv[0],"trialVelocity") == 0 ||
-        strcmp(argv[0],"trialVelocities") == 0)
+        strcmp(argv[0],"trialVelocities") == 0))
     {
         for (i=0; i<(*sizeTrial)(OF_Resp_Vel); i++)  {
             sprintf(outputData,"trialVel%d",i+1);
@@ -548,9 +550,10 @@ Response* ExperimentalSetup::setResponse(const char **argv, int argc,
     }
     
     // trial accelerations
-    else if (strcmp(argv[0],"trialAccel") == 0 ||
+    else if (tAccel != 0 && (
+        strcmp(argv[0],"trialAccel") == 0 ||
         strcmp(argv[0],"trialAcceleration") == 0 ||
-        strcmp(argv[0],"trialAccelerations") == 0)
+        strcmp(argv[0],"trialAccelerations") == 0))
     {
         for (i=0; i<(*sizeTrial)(OF_Resp_Accel); i++)  {
             sprintf(outputData,"trialAccel%d",i+1);
@@ -560,8 +563,9 @@ Response* ExperimentalSetup::setResponse(const char **argv, int argc,
     }
     
     // trial forces
-    else if (strcmp(argv[0],"trialForce") == 0 ||
-        strcmp(argv[0],"trialForces") == 0)
+    else if (tForce != 0 && (
+        strcmp(argv[0],"trialForce") == 0 ||
+        strcmp(argv[0],"trialForces") == 0))
     {
         for (i=0; i<(*sizeTrial)(OF_Resp_Force); i++)  {
             sprintf(outputData,"trialForce%d",i+1);
@@ -571,8 +575,9 @@ Response* ExperimentalSetup::setResponse(const char **argv, int argc,
     }
     
     // trial times
-    else if (strcmp(argv[0],"trialTime") == 0 ||
-        strcmp(argv[0],"trialTimes") == 0)
+    else if (tTime != 0 && (
+        strcmp(argv[0],"trialTime") == 0 ||
+        strcmp(argv[0],"trialTimes") == 0))
     {
         for (i=0; i<(*sizeTrial)(OF_Resp_Time); i++)  {
             sprintf(outputData,"trialTime%d",i+1);
@@ -582,9 +587,10 @@ Response* ExperimentalSetup::setResponse(const char **argv, int argc,
     }
     
     // output displacements
-    else if (strcmp(argv[0],"outDisp") == 0 ||
+    else if (oDisp != 0 && (
+        strcmp(argv[0],"outDisp") == 0 ||
         strcmp(argv[0],"outDisplacement") == 0 ||
-        strcmp(argv[0],"outDisplacements") == 0)
+        strcmp(argv[0],"outDisplacements") == 0))
     {
         for (i=0; i<(*sizeOut)(OF_Resp_Disp); i++)  {
             sprintf(outputData,"outDisp%d",i+1);
@@ -594,9 +600,10 @@ Response* ExperimentalSetup::setResponse(const char **argv, int argc,
     }
     
     // output velocities
-    else if (strcmp(argv[0],"outVel") == 0 ||
+    else if (oVel != 0 && (
+        strcmp(argv[0],"outVel") == 0 ||
         strcmp(argv[0],"outVelocity") == 0 ||
-        strcmp(argv[0],"outVelocities") == 0)
+        strcmp(argv[0],"outVelocities") == 0))
     {
         for (i=0; i<(*sizeOut)(OF_Resp_Vel); i++)  {
             sprintf(outputData,"outVel%d",i+1);
@@ -606,9 +613,10 @@ Response* ExperimentalSetup::setResponse(const char **argv, int argc,
     }
     
     // output accelerations
-    else if (strcmp(argv[0],"outAccel") == 0 ||
+    else if (oAccel != 0 && (
+        strcmp(argv[0],"outAccel") == 0 ||
         strcmp(argv[0],"outAcceleration") == 0 ||
-        strcmp(argv[0],"outAccelerations") == 0)
+        strcmp(argv[0],"outAccelerations") == 0))
     {
         for (i=0; i<(*sizeOut)(OF_Resp_Accel); i++)  {
             sprintf(outputData,"outAccel%d",i+1);
@@ -618,8 +626,9 @@ Response* ExperimentalSetup::setResponse(const char **argv, int argc,
     }
     
     // output forces
-    else if (strcmp(argv[0],"outForce") == 0 ||
-        strcmp(argv[0],"outForces") == 0)
+    else if (oForce != 0 && (
+        strcmp(argv[0],"outForce") == 0 ||
+        strcmp(argv[0],"outForces") == 0))
     {
         for (i=0; i<(*sizeOut)(OF_Resp_Force); i++)  {
             sprintf(outputData,"outForce%d",i+1);
@@ -629,8 +638,9 @@ Response* ExperimentalSetup::setResponse(const char **argv, int argc,
     }
     
     // output times
-    else if (strcmp(argv[0],"outTime") == 0 ||
-        strcmp(argv[0],"outTimes") == 0)
+    else if (oTime != 0 && (
+        strcmp(argv[0],"outTime") == 0 ||
+        strcmp(argv[0],"outTimes") == 0))
     {
         for (i=0; i<(*sizeOut)(OF_Resp_Time); i++)  {
             sprintf(outputData,"outTime%d",i+1);
@@ -640,119 +650,129 @@ Response* ExperimentalSetup::setResponse(const char **argv, int argc,
     }
     
     // control displacements
-    if (strcmp(argv[0],"ctrlDisp") == 0 ||
+    if (cDisp != 0 && (
+        strcmp(argv[0],"ctrlDisp") == 0 ||
         strcmp(argv[0],"ctrlDisplacement") == 0 ||
-        strcmp(argv[0],"ctrlDisplacements") == 0)
+        strcmp(argv[0],"ctrlDisplacements") == 0))
     {
         for (i=0; i<(*sizeCtrl)(OF_Resp_Disp); i++)  {
             sprintf(outputData,"ctrlDisp%d",i+1);
             output.tag("ResponseType",outputData);
         }
-        theResponse = new ExpSetupResponse(this, 1, *cDisp);
+        theResponse = new ExpSetupResponse(this, 11, *cDisp);
     }
     
     // control velocities
-    else if (strcmp(argv[0],"ctrlVel") == 0 ||
+    else if (cVel != 0 && (
+        strcmp(argv[0],"ctrlVel") == 0 ||
         strcmp(argv[0],"ctrlVelocity") == 0 ||
-        strcmp(argv[0],"ctrlVelocities") == 0)
+        strcmp(argv[0],"ctrlVelocities") == 0))
     {
         for (i=0; i<(*sizeCtrl)(OF_Resp_Vel); i++)  {
             sprintf(outputData,"ctrlVel%d",i+1);
             output.tag("ResponseType",outputData);
         }
-        theResponse = new ExpSetupResponse(this, 2, *cVel);
+        theResponse = new ExpSetupResponse(this, 12, *cVel);
     }
     
     // control accelerations
-    else if (strcmp(argv[0],"ctrlAccel") == 0 ||
+    else if (cAccel != 0 && (
+        strcmp(argv[0],"ctrlAccel") == 0 ||
         strcmp(argv[0],"ctrlAcceleration") == 0 ||
-        strcmp(argv[0],"ctrlAccelerations") == 0)
+        strcmp(argv[0],"ctrlAccelerations") == 0))
     {
         for (i=0; i<(*sizeCtrl)(OF_Resp_Accel); i++)  {
             sprintf(outputData,"ctrlAccel%d",i+1);
             output.tag("ResponseType",outputData);
         }
-        theResponse = new ExpSetupResponse(this, 3, *cAccel);
+        theResponse = new ExpSetupResponse(this, 13, *cAccel);
     }
     
     // control forces
-    else if (strcmp(argv[0],"ctrlForce") == 0 ||
-        strcmp(argv[0],"ctrlForces") == 0)
+    else if (cForce != 0 && (
+        strcmp(argv[0],"ctrlForce") == 0 ||
+        strcmp(argv[0],"ctrlForces") == 0))
     {
         for (i=0; i<(*sizeCtrl)(OF_Resp_Force); i++)  {
             sprintf(outputData,"ctrlForce%d",i+1);
             output.tag("ResponseType",outputData);
         }
-        theResponse = new ExpSetupResponse(this, 4, *cForce);
+        theResponse = new ExpSetupResponse(this, 14, *cForce);
     }
     
     // control times
-    else if (strcmp(argv[0],"ctrlTime") == 0 ||
-        strcmp(argv[0],"ctrlTimes") == 0)
+    else if (cTime != 0 && (
+        strcmp(argv[0],"ctrlTime") == 0 ||
+        strcmp(argv[0],"ctrlTimes") == 0))
     {
         for (i=0; i<(*sizeCtrl)(OF_Resp_Time); i++)  {
             sprintf(outputData,"ctrlTime%d",i+1);
             output.tag("ResponseType",outputData);
         }
-        theResponse = new ExpSetupResponse(this, 5, *cTime);
+        theResponse = new ExpSetupResponse(this, 15, *cTime);
     }
     
     // daq displacements
-    else if (strcmp(argv[0],"daqDisp") == 0 ||
+    else if (dDisp != 0 && (
+        strcmp(argv[0],"daqDisp") == 0 ||
         strcmp(argv[0],"daqDisplacement") == 0 ||
-        strcmp(argv[0],"daqDisplacements") == 0)
+        strcmp(argv[0],"daqDisplacements") == 0))
     {
         for (i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)  {
             sprintf(outputData,"daqDisp%d",i+1);
             output.tag("ResponseType",outputData);
         }
-        theResponse = new ExpSetupResponse(this, 6, *dDisp);
+        theResponse = new ExpSetupResponse(this, 16, *dDisp);
     }
     
     // daq velocities
-    else if (strcmp(argv[0],"daqVel") == 0 ||
+    else if (dVel != 0 && (
+        strcmp(argv[0],"daqVel") == 0 ||
         strcmp(argv[0],"daqVelocity") == 0 ||
-        strcmp(argv[0],"daqVelocities") == 0)
+        strcmp(argv[0],"daqVelocities") == 0))
     {
         for (i=0; i<(*sizeDaq)(OF_Resp_Vel); i++)  {
             sprintf(outputData,"daqVel%d",i+1);
             output.tag("ResponseType",outputData);
         }
-        theResponse = new ExpSetupResponse(this, 7, *dVel);
+        theResponse = new ExpSetupResponse(this, 17, *dVel);
     }
     
     // daq accelerations
-    else if (strcmp(argv[0],"daqAccel") == 0 ||
+    else if (dAccel != 0 && (
+        strcmp(argv[0],"daqAccel") == 0 ||
         strcmp(argv[0],"daqAcceleration") == 0 ||
-        strcmp(argv[0],"daqAccelerations") == 0)
+        strcmp(argv[0],"daqAccelerations") == 0))
     {
         for (i=0; i<(*sizeDaq)(OF_Resp_Accel); i++)  {
             sprintf(outputData,"daqAccel%d",i+1);
             output.tag("ResponseType",outputData);
         }
-        theResponse = new ExpSetupResponse(this, 8, *dAccel);
+        theResponse = new ExpSetupResponse(this, 18, *dAccel);
     }
     
     // daq forces
-    else if (strcmp(argv[0],"daqForce") == 0 ||
-        strcmp(argv[0],"daqForces") == 0)
+    else if (dForce != 0 && (
+        strcmp(argv[0],"daqForce") == 0 ||
+        strcmp(argv[0],"daqForces") == 0))
     {
         for (i=0; i<(*sizeDaq)(OF_Resp_Force); i++)  {
             sprintf(outputData,"daqForce%d",i+1);
             output.tag("ResponseType",outputData);
         }
-        theResponse = new ExpSetupResponse(this, 9, *dForce);
+        theResponse = new ExpSetupResponse(this, 19, *dForce);
     }
     
     // daq times
-    else if (strcmp(argv[0],"daqTime") == 0 ||
-        strcmp(argv[0],"daqTimes") == 0)
+    else if (dTime != 0 && (
+        strcmp(argv[0],"daqTime") == 0 ||
+        strcmp(argv[0],"daqTimes") == 0))
     {
         for (i=0; i<(*sizeDaq)(OF_Resp_Time); i++)  {
             sprintf(outputData,"daqTime%d",i+1);
             output.tag("ResponseType",outputData);
         }
-        theResponse = new ExpSetupResponse(this, 10, *dTime);
+        theResponse = new ExpSetupResponse(this, 20, *dTime);
     }
     
     output.endTag();
@@ -763,7 +783,6 @@ Response* ExperimentalSetup::setResponse(const char **argv, int argc,
 
 int ExperimentalSetup::getResponse(int responseID, Information &info)
 {
-    // each subclass must implement its own response
     switch (responseID)  {
     case 1:  // trial displacements
         return info.setVector(*tDisp);

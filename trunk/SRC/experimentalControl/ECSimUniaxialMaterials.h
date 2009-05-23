@@ -89,8 +89,8 @@ private:
     int numMats;                     // number of uniaxial materials
     UniaxialMaterial **theSpecimen;  // uniaxial materials
     
-    Vector *targDisp, *targVel;    
-    Vector *measDisp, *measVel, *measForce;
+    Vector *ctrlDisp, *ctrlVel;    
+    Vector *daqDisp, *daqVel, *daqForce;
 };
 
 #endif

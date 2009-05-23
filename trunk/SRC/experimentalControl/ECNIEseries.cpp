@@ -37,7 +37,7 @@
 
 ECNIEseries::ECNIEseries(int tag ,int device)//, bool rtest)
     : ExperimentalControl(tag),//realtest(rtest),
-    cDispV(0), /*cVelV(0),*/  dDispV(0), /*dVelV(0),*/ dForceV(0), actForce(0), actDisp(0)//,iDevice(0)
+    ctrlDisp(0), /*ctrlVel(0),*/  daqDisp(0), /*daqVel(0),*/ daqForce(0), actForce(0), actDisp(0)//,iDevice(0)
 {
     // NI PCI-6036E setting
     iDevice = device;
@@ -147,11 +147,11 @@ ECNIEseries::ECNIEseries(const ECNIEseries& ast)
 {
     // realtest = ast.realtest;
 
-    cDispV = new Vector((*sizeCtrl)(OF_Resp_Disp));
-    //cVelV = new double [(*sizeCtrl)(OF_Resp_Vel)];
+    ctrlDisp = new Vector((*sizeCtrl)(OF_Resp_Disp));
+    //ctrlVel = new double [(*sizeCtrl)(OF_Resp_Vel)];
 
-    dDispV = new Vector((*sizeDaq)(OF_Resp_Disp));
-    dForceV = new Vector((*sizeDaq)(OF_Resp_Force));
+    daqDisp = new Vector((*sizeDaq)(OF_Resp_Disp));
+    daqForce = new Vector((*sizeDaq)(OF_Resp_Force));
     /*dummySpecimen = 0;
     if(ast.dummySpecimen != 0) 
     dummySpecimen = ast.dummySpecimen->getCopy();*/
@@ -239,19 +239,19 @@ ECNIEseries::~ECNIEseries()
     if(Vol2unit != 0)
         delete [] Vol2unit;
 
-    // delete memory of target vectors
-    if (cDispV != 0)
-        delete cDispV;
-    /*if (targVel != 0)
-    delete targVel;
-    if (targAccel != 0)
-    delete targAccel;*/
+    // delete memory of ctrl vectors
+    if (ctrlDisp != 0)
+        delete ctrlDisp;
+    /*if (ctrlVel != 0)
+    delete ctrlVel;
+    if (ctrlAccel != 0)
+    delete ctrlAccel;*/
 
-    // delete memory of measured vectors
-    if (dDispV != 0)
-        delete dDispV;
-    if (dForceV != 0)
-        delete dForceV;
+    // delete memory of daq vectors
+    if (daqDisp != 0)
+        delete daqDisp;
+    if (daqForce != 0)
+        delete daqForce;
 
     // delete memory of 1d material
 
@@ -262,18 +262,18 @@ ECNIEseries::~ECNIEseries()
 
 int ECNIEseries::setup()
 {  //opserr << (*sizeDaq)(OF_Resp_Force);
-    cDispV = new Vector((*sizeCtrl)(OF_Resp_Disp));
-    //cVelV = new double [(*sizeCtrl)(OF_Resp_Vel)];
+    ctrlDisp = new Vector((*sizeCtrl)(OF_Resp_Disp));
+    //ctrlVel = new double [(*sizeCtrl)(OF_Resp_Vel)];
 
-    dDispV = new Vector((*sizeDaq)(OF_Resp_Disp));
-    dForceV = new Vector((*sizeDaq)(OF_Resp_Force));  
+    daqDisp = new Vector((*sizeDaq)(OF_Resp_Disp));
+    daqForce = new Vector((*sizeDaq)(OF_Resp_Force));  
 
-    //cDispV->Zero();
-    //dDispV->Zero();
-    //dForceV->Zero(); 
+    //ctrlDisp->Zero();
+    //daqDisp->Zero();
+    //daqForce->Zero(); 
 
-    //cVelV->Zero();
-    opserr << (*cDispV)(0);
+    //ctrlVel->Zero();
+    opserr << (*ctrlDisp)(0);
     int code = 0, i, iStatus;
     double targetVal = 0.0;
 
@@ -305,17 +305,17 @@ int ECNIEseries::setup()
     opserr << "* INITIAL VALUES OF DAQ\n";
     opserr << "*\n";
 
-    /*opserr << "*   Ch. " << 1 << ": " << (*cDispV)(0) 
+    /*opserr << "*   Ch. " << 1 << ": " << (*ctrlDisp)(0) 
     << " (" << "mm"
-    << ") <" << (*cDispV)(0)/Vol2unit[0] << " (Volt)>\n";*/
+    << ") <" << (*ctrlDisp)(0)/Vol2unit[0] << " (Volt)>\n";*/
 
-    opserr << "*   Ch. " << 2 << ": " << (*dForceV)(0)
+    opserr << "*   Ch. " << 2 << ": " << (*daqForce)(0)
     << " (" << "N"
-        << ") <" << (*dForceV)(0)/Vol2unit[1] << " (Volt)>\n";
+        << ") <" << (*daqForce)(0)/Vol2unit[1] << " (Volt)>\n";
 
-    opserr << "*   Ch. " << 3 << ": " << (*dDispV)(0) 
+    opserr << "*   Ch. " << 3 << ": " << (*daqDisp)(0) 
     << " (" << "mm"
-        << ") <" << (*dDispV)(0)/Vol2unit[2] << " (Volt)>\n";
+        << ") <" << (*daqDisp)(0)/Vol2unit[2] << " (Volt)>\n";
 
 
     opserr << "*\n";
@@ -327,7 +327,7 @@ int ECNIEseries::setup()
 
     NIDAQWaitForKey(0.0);
 
-    targetVal = (*cDispV)(0);
+    targetVal = (*ctrlDisp)(0);
     //targetVal = 0.0;
 
     opserr << "*\n";
@@ -338,7 +338,7 @@ int ECNIEseries::setup()
     }*/
 
     //if(realtest == true) {
-    //actForce = (*dForceV)(0);
+    //actForce = (*daqForce)(0);
     /*} else {
     code = dummySpecimen->setTrialStrain(targetVal);
     actForce = dummySpecimen->getStress();
@@ -380,8 +380,8 @@ int ECNIEseries::setTrialResponse(const Vector* disp,
     const Vector* force,
     const Vector* time)
 {	
-    *cDispV = *disp;
-    //*cVelV = *vel;
+    *ctrlDisp = *disp;
+    //*ctrlVel = *vel;
     this->control();
 
     return OF_ReturnType_completed;
@@ -396,9 +396,9 @@ int ECNIEseries::getDaqResponse(Vector* disp,
 {
     this->acquire();
 
-    *disp = *dDispV;
-    //*vel = *dVelV;
-    *force = *dForceV;
+    *disp = *daqDisp;
+    //*vel = *daqVel;
+    *force = *daqForce;
 
     return OF_ReturnType_completed;
 }
@@ -432,42 +432,39 @@ Response* ECNIEseries::setResponse(const char **argv, int argc,
     output.tag("ExpControlOutput");
     output.attr("ctrlType",this->getClassType());
     output.attr("ctrlTag",this->getTag());
-        
-    // target displacements
-    if (strcmp(argv[0],"targDisp") == 0 ||
-        strcmp(argv[0],"targetDisp") == 0 ||
-        strcmp(argv[0],"targetDisplacement") == 0 ||
-        strcmp(argv[0],"targetDisplacements") == 0)
+    
+    // ctrl displacements
+    if (strcmp(argv[0],"ctrlDisp") == 0 ||
+        strcmp(argv[0],"ctrlDisplacement") == 0 ||
+        strcmp(argv[0],"ctrlDisplacements") == 0)
     {
         for (i=0; i<(*sizeCtrl)(OF_Resp_Disp); i++)  {
-            sprintf(outputData,"targDisp%d",i+1);
+            sprintf(outputData,"ctrlDisp%d",i+1);
             output.tag("ResponseType",outputData);
         }
         theResponse = new ExpControlResponse(this, 1,
             Vector((*sizeCtrl)(OF_Resp_Disp)));
     }
     
-    // measured displacements
-    if (strcmp(argv[0],"measDisp") == 0 ||
-        strcmp(argv[0],"measuredDisp") == 0 ||
-        strcmp(argv[0],"measuredDisplacement") == 0 ||
-        strcmp(argv[0],"measuredDisplacements") == 0)
+    // daq displacements
+    if (strcmp(argv[0],"daqDisp") == 0 ||
+        strcmp(argv[0],"daqDisplacement") == 0 ||
+        strcmp(argv[0],"daqDisplacements") == 0)
     {
         for (i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)  {
-            sprintf(outputData,"measDisp%d",i+1);
+            sprintf(outputData,"daqDisp%d",i+1);
             output.tag("ResponseType",outputData);
         }
         theResponse = new ExpControlResponse(this, 2,
             Vector((*sizeDaq)(OF_Resp_Disp)));
     }
     
-    // measured forces
-    if (strcmp(argv[0],"measForce") == 0 ||
-        strcmp(argv[0],"measuredForce") == 0 ||
-        strcmp(argv[0],"measuredForces") == 0)
+    // daq forces
+    if (strcmp(argv[0],"daqForce") == 0 ||
+        strcmp(argv[0],"daqForces") == 0)
     {
         for (i=0; i<(*sizeDaq)(OF_Resp_Force); i++)  {
-            sprintf(outputData,"measForce%d",i+1);
+            sprintf(outputData,"daqForce%d",i+1);
             output.tag("ResponseType",outputData);
         }
         theResponse = new ExpControlResponse(this, 3,
@@ -483,14 +480,14 @@ Response* ECNIEseries::setResponse(const char **argv, int argc,
 int ECNIEseries::getResponse(int responseID, Information &info)
 {
     switch (responseID)  {
-    case 1:  // target displacements
-        return info.setVector(*cDispV);
+    case 1:  // ctrl displacements
+        return info.setVector(*ctrlDisp);
         
-    case 2:  // measured displacements
-        return info.setVector(*dDispV);
+    case 2:  // daq displacements
+        return info.setVector(*daqDisp);
         
-    case 3:  // measured forces
-        return info.setVector(*dForceV);
+    case 3:  // daq forces
+        return info.setVector(*daqForce);
         
     default:
         return -1;
@@ -536,7 +533,7 @@ void ECNIEseries::Print(OPS_Stream &s, int flag)
 int ECNIEseries::control()
 {
     int code = 0;
-    //double targetDisp = (*cDispV)(1);
+    //double targetDisp = (*ctrlDisp)(1);
 
     // opserr << "targetDisp = " << targetDisp << endln;
 
@@ -557,15 +554,15 @@ int ECNIEseries::control()
 
     u32 ulCount;
     for (int i=0; i<1; i++){
-        f64 mm_s = (*dDispV)(0);
-        f64 mm_t = (*cDispV)(0);//targetDisp;
+        f64 mm_s = (*daqDisp)(0);
+        f64 mm_t = (*ctrlDisp)(0);//targetDisp;
         opserr << "\nfrom " << mm_s << " to " << mm_t << " with ctrl_w " << ctrl_w;
 
         ulCount = (u32)(fabs(mm_t - mm_s)/ctrl_w);
 
         if(ulCount == 0) {
             // must check again!!!!!!!!!!!!!!!!!
-            //targetDisp = (*dDispV)(1);
+            //targetDisp = (*daqDisp)(1);
             /*if(targetDisp != actDisp) {
             if(theFilter != 0)
             targetDisp = theFilter->filtering(targetDisp);
@@ -574,7 +571,7 @@ int ECNIEseries::control()
             dummySpecimen->setTrialStrain(targetDisp);
             //        dummySpecimen->setTrialStrain(mm_t);
             }*/
-            //actDisp = (*dDispV)(1);
+            //actDisp = (*daqDisp)(1);
             //      actDisp = mm_t;
 
             return code;
@@ -651,7 +648,7 @@ int ECNIEseries::control()
     }
     this->sleep(200);
     acquire();
-    //targetDisp = (*dDispV)(1);
+    //targetDisp = (*daqDisp)(1);
 
     /*  if(targetDisp != actDisp) {
     if(theFilter != 0)
@@ -663,7 +660,7 @@ int ECNIEseries::control()
     //  }
 
     //  actDisp = s_c(0);
-    //actDisp = (*dDispV)(1);
+    //actDisp = (*daqDisp)(1);
 
     for(int i=0; i<1; i++) {
         delete pdBuffer[i];
@@ -686,17 +683,17 @@ int ECNIEseries::acquire()
         iRetVal = NIDAQErrorHandler(iStatus, "AI_VRead", iIgnoreWarning);
     }
 
-    //(*cDispV)(1) = dVoltage[0]*Vol2unit[0];
+    //(*ctrlDisp)(1) = dVoltage[0]*Vol2unit[0];
     // opserr << "\ndVoltage(1) = " << dVoltage[1];// << ", daqData = " << (*daqData)(0);
     // opserr <<  Vol2unit[1] ;
     //  if(realtest == true) {
-    (*dForceV)(0) = dVoltage[1]*Vol2unit[1];
+    (*daqForce)(0) = dVoltage[1]*Vol2unit[1];
 
     /*else {
     (*daqData)(0) = dummySpecimen->getStrain();
     (*daqData)(1) = dummySpecimen->getStress();
     }*/
-    (*dDispV)(0) = dVoltage[2]*Vol2unit[2];
+    (*daqDisp)(0) = dVoltage[2]*Vol2unit[2];
 
     // for(int i = 0; i<3; i++) opserr << "i = " << i << ", daqData = " << (*daqData)(i) << endln;
 

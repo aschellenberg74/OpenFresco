@@ -64,8 +64,8 @@ EEBeamColumn2d::EEBeamColumn2d(int tag, int Nd1, int Nd2,
     connectedExternalNodes(2), theCoordTransf(0),
     iMod(iM), rho(r), L(0.0),
     db(0), vb(0), ab(0), t(0),
-    dbMeas(0), vbMeas(0), abMeas(0), qMeas(0), tMeas(0),
-    dbTarg(3), vbTarg(3), abTarg(3),
+    dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
+    dbCtrl(3), vbCtrl(3), abCtrl(3),
     dbPast(3), kbInit(3,3), tPast(0.0),
     firstWarning(true)
 {
@@ -107,12 +107,12 @@ EEBeamColumn2d::EEBeamColumn2d(int tag, int Nd1, int Nd2,
     ab = new Vector(3);
     t  = new Vector(1);
 
-    // allocate memory for measured response vectors
-    dbMeas = new Vector(3);
-    vbMeas = new Vector(3);
-    abMeas = new Vector(3);
-    qMeas  = new Vector(3);
-    tMeas  = new Vector(1);
+    // allocate memory for daq response vectors
+    dbDaq = new Vector(3);
+    vbDaq = new Vector(3);
+    abDaq = new Vector(3);
+    qDaq  = new Vector(3);
+    tDaq  = new Vector(1);
 
     // set the initial stiffness matrix size
     theInitStiff.resize(6,6);
@@ -126,9 +126,9 @@ EEBeamColumn2d::EEBeamColumn2d(int tag, int Nd1, int Nd2,
     }
     
     // initialize additional vectors
-    dbTarg.Zero();
-    vbTarg.Zero();
-    abTarg.Zero();
+    dbCtrl.Zero();
+    vbCtrl.Zero();
+    abCtrl.Zero();
     dbPast.Zero();
     for (i=0; i<3; i++)  {
         qA0[i] = 0.0;
@@ -148,8 +148,8 @@ EEBeamColumn2d::EEBeamColumn2d(int tag, int Nd1, int Nd2,
     iMod(iM), rho(r), L(0.0),
     theChannel(0), sData(0), sendData(0), rData(0), recvData(0),
     db(0), vb(0), ab(0), t(0),
-    dbMeas(0), vbMeas(0), abMeas(0), qMeas(0), tMeas(0),
-    dbTarg(3), vbTarg(3), abTarg(3),
+    dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
+    dbCtrl(3), vbCtrl(3), abCtrl(3),
     dbPast(3), kbInit(3,3), tPast(0.0),
     firstWarning(true)
 {
@@ -233,15 +233,15 @@ EEBeamColumn2d::EEBeamColumn2d(int tag, int Nd1, int Nd2,
     id = 0;
     rData = new double [dataSize];
     recvData = new Vector(rData, dataSize);
-    dbMeas = new Vector(&rData[id], 1);
+    dbDaq = new Vector(&rData[id], 1);
     id += 3;
-    vbMeas = new Vector(&rData[id], 1);
+    vbDaq = new Vector(&rData[id], 1);
     id += 3;
-    abMeas = new Vector(&rData[id], 1);
+    abDaq = new Vector(&rData[id], 1);
     id += 3;
-    qMeas = new Vector(&rData[id], 1);
+    qDaq = new Vector(&rData[id], 1);
     id += 3;
-    tMeas = new Vector(&rData[id], 1);
+    tDaq = new Vector(&rData[id], 1);
     recvData->Zero();
 
     // set the initial stiffness matrix size
@@ -256,9 +256,9 @@ EEBeamColumn2d::EEBeamColumn2d(int tag, int Nd1, int Nd2,
     }
     
     // initialize additional vectors
-    dbTarg.Zero();
-    vbTarg.Zero();
-    abTarg.Zero();
+    dbCtrl.Zero();
+    vbCtrl.Zero();
+    abCtrl.Zero();
     dbPast.Zero();
     for (i=0; i<3; i++)  {
         qA0[i] = 0.0;
@@ -284,16 +284,16 @@ EEBeamColumn2d::~EEBeamColumn2d()
     if (t != 0)
         delete t;
 
-    if (dbMeas != 0)
-        delete dbMeas;
-    if (vbMeas != 0)
-        delete vbMeas;
-    if (abMeas != 0)
-        delete abMeas;
-    if (qMeas != 0)
-        delete qMeas;
-    if (tMeas != 0)
-        delete tMeas;
+    if (dbDaq != 0)
+        delete dbDaq;
+    if (vbDaq != 0)
+        delete vbDaq;
+    if (abDaq != 0)
+        delete abDaq;
+    if (qDaq != 0)
+        delete qDaq;
+    if (tDaq != 0)
+        delete tDaq;
 
     if (theSite == 0)  {
         sData[0] = OF_RemoteTest_DIE;
@@ -521,9 +521,9 @@ const Matrix& EEBeamColumn2d::getTangentStiff()
         firstWarning = false;
     }
     
-    // get measured resisting forces
+    // get daq resisting forces
     if (theSite != 0)  {
-        (*qMeas) = theSite->getForce();
+        (*qDaq) = theSite->getForce();
     }
     else  {
         sData[0] = OF_RemoteTest_getForce;
@@ -539,23 +539,23 @@ const Matrix& EEBeamColumn2d::getTangentStiff()
         this->applyIMod();
     
     // use elastic axial force if axial force from test is zero
-    if ((*qMeas)[0] == 0.0)  {
+    if ((*qDaq)[0] == 0.0)  {
         double qA0 = kbInit(0,0)*(sqrt(pow(L+(*db)[0],2)+pow((*db)[1],2))-L);
-        (*qMeas)[0] = cos(alpha)*qA0;
-        (*qMeas)[1] += sin(alpha)*qA0;
+        (*qDaq)[0] = cos(alpha)*qA0;
+        (*qDaq)[1] += sin(alpha)*qA0;
     }
     
     /* transform forces from basic sys B to basic sys A (linear)
     static Vector qA(3);
-    qA(0) = (*qMeas)[0];
-    qA(1) = -L*(*qMeas)[1] - (*qMeas)[2];
-    qA(2) = (*qMeas)[2];*/
+    qA(0) = (*qDaq)[0];
+    qA(1) = -L*(*qDaq)[1] - (*qDaq)[2];
+    qA(2) = (*qDaq)[2];*/
     
     // transform forces from basic sys B to basic sys A (nonlinear)
     static Vector qA(3);
-    qA(0) = cos(alpha)*(*qMeas)[0] + sin(alpha)*(*qMeas)[1];
-    qA(1) = (*db)[1]*(*qMeas)[0] - (L+(*db)[0])*(*qMeas)[1] - (*qMeas)[2];
-    qA(2) = (*qMeas)[2];
+    qA(0) = cos(alpha)*(*qDaq)[0] + sin(alpha)*(*qDaq)[1];
+    qA(1) = (*db)[1]*(*qDaq)[0] - (L+(*db)[0])*(*qDaq)[1] - (*qDaq)[2];
+    qA(2) = (*qDaq)[2];
     
     // add fixed end forces
     for (int i=0; i<3; i++)  {
@@ -704,9 +704,9 @@ const Vector& EEBeamColumn2d::getResistingForce()
     // zero the residual
     theVector.Zero();
     
-    // get measured resisting forces
+    // get daq resisting forces
     if (theSite != 0)  {
-        (*qMeas) = theSite->getForce();
+        (*qDaq) = theSite->getForce();
     }
     else  {
         sData[0] = OF_RemoteTest_getForce;
@@ -722,28 +722,28 @@ const Vector& EEBeamColumn2d::getResistingForce()
         this->applyIMod();
     
     // use elastic axial force if axial force from test is zero
-    if ((*qMeas)[0] == 0.0)  {
+    if ((*qDaq)[0] == 0.0)  {
         double qA0 = kbInit(0,0)*(sqrt(pow(L+(*db)[0],2)+pow((*db)[1],2))-L);
-        (*qMeas)[0] = cos(alpha)*qA0;
-        (*qMeas)[1] += sin(alpha)*qA0;
+        (*qDaq)[0] = cos(alpha)*qA0;
+        (*qDaq)[1] += sin(alpha)*qA0;
     }
     
-    // save corresponding target response for recorder
-    dbTarg = (*db);
-    vbTarg = (*vb);
-    abTarg = (*ab);
+    // save corresponding ctrl response for recorder
+    dbCtrl = (*db);
+    vbCtrl = (*vb);
+    abCtrl = (*ab);
     
     /* transform forces from basic sys B to basic sys A (linear)
     static Vector qA(3);
-    qA(0) = (*qMeas)[0];
-    qA(1) = -L*(*qMeas)[1] - (*qMeas)[2];
-    qA(2) = (*qMeas)[2];*/
+    qA(0) = (*qDaq)[0];
+    qA(1) = -L*(*qDaq)[1] - (*qDaq)[2];
+    qA(2) = (*qDaq)[2];*/
     
     // transform forces from basic sys B to basic sys A (nonlinear)
     static Vector qA(3);
-    qA(0) = cos(alpha)*(*qMeas)[0] + sin(alpha)*(*qMeas)[1];
-    qA(1) = (*db)[1]*(*qMeas)[0] - (L+(*db)[0])*(*qMeas)[1] - (*qMeas)[2];
-    qA(2) = (*qMeas)[2];
+    qA(0) = cos(alpha)*(*qDaq)[0] + sin(alpha)*(*qDaq)[1];
+    qA(1) = (*db)[1]*(*qDaq)[0] - (L+(*db)[0])*(*qDaq)[1] - (*qDaq)[2];
+    qA(2) = (*qDaq)[2];
     
     // add fixed end forces
     for (int i=0; i<3; i++)  {
@@ -790,7 +790,7 @@ const Vector& EEBeamColumn2d::getResistingForceIncInertia()
 const Vector& EEBeamColumn2d::getTime()
 {	
     if (theSite != 0)  {
-        (*tMeas) = theSite->getTime();
+        (*tDaq) = theSite->getTime();
     }
     else  {
         sData[0] = OF_RemoteTest_getTime;
@@ -798,14 +798,14 @@ const Vector& EEBeamColumn2d::getTime()
         theChannel->recvVector(0, 0, *recvData, 0);
     }
 
-    return *tMeas;
+    return *tDaq;
 }
 
 
 const Vector& EEBeamColumn2d::getBasicDisp()
 {	
     if (theSite != 0)  {
-        (*dbMeas) = theSite->getDisp();
+        (*dbDaq) = theSite->getDisp();
     }
     else  {
         sData[0] = OF_RemoteTest_getDisp;
@@ -813,14 +813,14 @@ const Vector& EEBeamColumn2d::getBasicDisp()
         theChannel->recvVector(0, 0, *recvData, 0);
     }
 
-    return *dbMeas;
+    return *dbDaq;
 }
 
 
 const Vector& EEBeamColumn2d::getBasicVel()
 {	
     if (theSite != 0)  {
-        (*vbMeas) = theSite->getVel();
+        (*vbDaq) = theSite->getVel();
     }
     else  {
         sData[0] = OF_RemoteTest_getVel;
@@ -828,14 +828,14 @@ const Vector& EEBeamColumn2d::getBasicVel()
         theChannel->recvVector(0, 0, *recvData, 0);
     }
 
-    return *vbMeas;
+    return *vbDaq;
 }
 
 
 const Vector& EEBeamColumn2d::getBasicAccel()
 {	
     if (theSite != 0)  {
-        (*abMeas) = theSite->getAccel();
+        (*abDaq) = theSite->getAccel();
     }
     else  {
         sData[0] = OF_RemoteTest_getAccel;
@@ -843,7 +843,7 @@ const Vector& EEBeamColumn2d::getBasicAccel()
         theChannel->recvVector(0, 0, *recvData, 0);
     }
 
-    return *abMeas;
+    return *abDaq;
 }
 
 
@@ -909,16 +909,18 @@ Response* EEBeamColumn2d::setResponse(const char **argv, int argc,
     OPS_Stream &output)
 {
     Response *theResponse = 0;
-
+    
     output.tag("ElementOutput");
     output.attr("eleType","EEBeamColumn2d");
     output.attr("eleTag",this->getTag());
     output.attr("node1",connectedExternalNodes[0]);
     output.attr("node2",connectedExternalNodes[1]);
-
+    
     // global forces
-    if (strcmp(argv[0],"force") == 0 || strcmp(argv[0],"forces") == 0 ||
-        strcmp(argv[0],"globalForce") == 0 || strcmp(argv[0],"globalForces") == 0)
+    if (strcmp(argv[0],"force") == 0 ||
+        strcmp(argv[0],"forces") == 0 ||
+        strcmp(argv[0],"globalForce") == 0 ||
+        strcmp(argv[0],"globalForces") == 0)
     {
         output.tag("ResponseType","Px_1");
         output.tag("ResponseType","Py_1");
@@ -929,8 +931,10 @@ Response* EEBeamColumn2d::setResponse(const char **argv, int argc,
 
         theResponse = new ElementResponse(this, 1, theVector);
     }
+    
     // local forces
-    else if (strcmp(argv[0],"localForce") == 0 || strcmp(argv[0],"localForces") == 0)
+    else if (strcmp(argv[0],"localForce") == 0 ||
+        strcmp(argv[0],"localForces") == 0)
     {
         output.tag("ResponseType","N_1");
         output.tag("ResponseType","V_1");
@@ -941,8 +945,12 @@ Response* EEBeamColumn2d::setResponse(const char **argv, int argc,
 
         theResponse = new ElementResponse(this, 2, theVector);
     }
+    
     // forces in basic system B
-    else if (strcmp(argv[0],"basicForce") == 0 || strcmp(argv[0],"basicForces") == 0)
+    else if (strcmp(argv[0],"basicForce") == 0 ||
+        strcmp(argv[0],"basicForces") == 0 ||
+        strcmp(argv[0],"daqForce") == 0 ||
+        strcmp(argv[0],"daqForces") == 0)
     {
         output.tag("ResponseType","q1");
         output.tag("ResponseType","q2");
@@ -950,10 +958,17 @@ Response* EEBeamColumn2d::setResponse(const char **argv, int argc,
 
         theResponse = new ElementResponse(this, 3, Vector(3));
     }
-    // target displacements in basic system B
-    else if (strcmp(argv[0],"deformation") == 0 || strcmp(argv[0],"deformations") == 0 || 
-        strcmp(argv[0],"basicDeformation") == 0 || strcmp(argv[0],"basicDeformations") == 0 ||
-        strcmp(argv[0],"targetDisplacement") == 0 || strcmp(argv[0],"targetDisplacements") == 0)
+    
+    // ctrl displacements in basic system B
+    else if (strcmp(argv[0],"defo") == 0 ||
+        strcmp(argv[0],"deformation") == 0 ||
+        strcmp(argv[0],"deformations") == 0 ||
+        strcmp(argv[0],"basicDefo") == 0 ||
+        strcmp(argv[0],"basicDeformation") == 0 ||
+        strcmp(argv[0],"basicDeformations") == 0 ||
+        strcmp(argv[0],"ctrlDisp") == 0 ||
+        strcmp(argv[0],"ctrlDisplacement") == 0 ||
+        strcmp(argv[0],"ctrlDisplacements") == 0)
     {
         output.tag("ResponseType","db1");
         output.tag("ResponseType","db2");
@@ -961,9 +976,11 @@ Response* EEBeamColumn2d::setResponse(const char **argv, int argc,
 
         theResponse = new ElementResponse(this, 4, Vector(3));
     }
-    // target velocities in basic system B
-    else if (strcmp(argv[0],"targetVelocity") == 0 ||
-        strcmp(argv[0],"targetVelocities") == 0)
+    
+    // ctrl velocities in basic system B
+    else if (strcmp(argv[0],"ctrlVel") == 0 ||
+        strcmp(argv[0],"ctrlVelocity") == 0 ||
+        strcmp(argv[0],"ctrlVelocities") == 0)
     {
         output.tag("ResponseType","vb1");
         output.tag("ResponseType","vb2");
@@ -971,9 +988,11 @@ Response* EEBeamColumn2d::setResponse(const char **argv, int argc,
 
         theResponse = new ElementResponse(this, 5, Vector(3));
     }
-    // target accelerations in basic system B
-    else if (strcmp(argv[0],"targetAcceleration") == 0 ||
-        strcmp(argv[0],"targetAccelerations") == 0)
+    
+    // ctrl accelerations in basic system B
+    else if (strcmp(argv[0],"ctrlAccel") == 0 ||
+        strcmp(argv[0],"ctrlAcceleration") == 0 ||
+        strcmp(argv[0],"ctrlAccelerations") == 0)
     {
         output.tag("ResponseType","ab1");
         output.tag("ResponseType","ab2");
@@ -981,39 +1000,45 @@ Response* EEBeamColumn2d::setResponse(const char **argv, int argc,
 
         theResponse = new ElementResponse(this, 6, Vector(3));
     }
-    // measured displacements in basic system B
-    else if (strcmp(argv[0],"measuredDisplacement") == 0 || 
-        strcmp(argv[0],"measuredDisplacements") == 0)
+    
+    // daq displacements in basic system B
+    else if (strcmp(argv[0],"daqDisp") == 0 ||
+        strcmp(argv[0],"daqDisplacement") == 0 ||
+        strcmp(argv[0],"daqDisplacements") == 0)
     {
-        output.tag("ResponseType","dbm1");
-        output.tag("ResponseType","dbm2");
-        output.tag("ResponseType","dbm3");
+        output.tag("ResponseType","dbDaq1");
+        output.tag("ResponseType","dbDaq2");
+        output.tag("ResponseType","dbDaq3");
 
         theResponse = new ElementResponse(this, 7, Vector(3));
     }
-    // measured velocities in basic system B
-    else if (strcmp(argv[0],"measuredVelocity") == 0 || 
-        strcmp(argv[0],"measuredVelocities") == 0)
+    
+    // daq velocities in basic system B
+    else if (strcmp(argv[0],"daqVel") == 0 ||
+        strcmp(argv[0],"daqVelocity") == 0 ||
+        strcmp(argv[0],"daqVelocities") == 0)
     {
-        output.tag("ResponseType","vbm1");
-        output.tag("ResponseType","vbm2");
-        output.tag("ResponseType","vbm3");
+        output.tag("ResponseType","vbDaq1");
+        output.tag("ResponseType","vbDaq2");
+        output.tag("ResponseType","vbDaq3");
 
         theResponse = new ElementResponse(this, 8, Vector(3));
     }
-    // measured accelerations in basic system B
-    else if (strcmp(argv[0],"measuredAcceleration") == 0 || 
-        strcmp(argv[0],"measuredAccelerations") == 0)
+    
+    // daq accelerations in basic system B
+    else if (strcmp(argv[0],"daqAccel") == 0 ||
+        strcmp(argv[0],"daqAcceleration") == 0 ||
+        strcmp(argv[0],"daqAccelerations") == 0)
     {
-        output.tag("ResponseType","abm1");
-        output.tag("ResponseType","abm2");
-        output.tag("ResponseType","abm3");
+        output.tag("ResponseType","abDaq1");
+        output.tag("ResponseType","abDaq2");
+        output.tag("ResponseType","abDaq3");
 
         theResponse = new ElementResponse(this, 9, Vector(3));
     }
-
+    
     output.endTag(); // ElementOutput
-
+    
     return theResponse;
 }
 
@@ -1030,15 +1055,15 @@ int EEBeamColumn2d::getResponse(int responseID, Information &eleInfo)
         
     case 2:  // local forces
         /* transform forces from basic sys B to basic sys A (linear)
-        qA(0) = (*qMeas)[0];
-        qA(1) = -L*(*qMeas)[1] - (*qMeas)[2];
-        qA(2) = (*qMeas)[2];*/
+        qA(0) = (*qDaq)[0];
+        qA(1) = -L*(*qDaq)[1] - (*qDaq)[2];
+        qA(2) = (*qDaq)[2];*/
         
         // transform forces from basic sys B to basic sys A (nonlinear)
         alpha = atan2((*db)[1],L+(*db)[0]);
-        qA(0) = cos(alpha)*(*qMeas)[0] + sin(alpha)*(*qMeas)[1];
-        qA(1) = (*db)[1]*(*qMeas)[0] - (L+(*db)[0])*(*qMeas)[1] - (*qMeas)[2];
-        qA(2) = (*qMeas)[2];
+        qA(0) = cos(alpha)*(*qDaq)[0] + sin(alpha)*(*qDaq)[1];
+        qA(1) = (*db)[1]*(*qDaq)[0] - (L+(*db)[0])*(*qDaq)[1] - (*qDaq)[2];
+        qA(2) = (*qDaq)[2];
         
         // Axial
         theVector(0) = -qA(0) + pA0[0];
@@ -1053,24 +1078,24 @@ int EEBeamColumn2d::getResponse(int responseID, Information &eleInfo)
         return eleInfo.setVector(theVector);
         
     case 3:  // forces in basic system B
-        return eleInfo.setVector(*qMeas);
+        return eleInfo.setVector(*qDaq);
         
-    case 4:  // target displacements in basic system B
-        return eleInfo.setVector(dbTarg);
+    case 4:  // ctrl displacements in basic system B
+        return eleInfo.setVector(dbCtrl);
         
-    case 5:  // target velocities in basic system B
-        return eleInfo.setVector(vbTarg);
+    case 5:  // ctrl velocities in basic system B
+        return eleInfo.setVector(vbCtrl);
         
-    case 6:  // target accelerations in basic system B
-        return eleInfo.setVector(abTarg);
+    case 6:  // ctrl accelerations in basic system B
+        return eleInfo.setVector(abCtrl);
         
-    case 7:  // measured displacements in basic system B
+    case 7:  // daq displacements in basic system B
         return eleInfo.setVector(this->getBasicDisp());
         
-    case 8:  // measured velocities in basic system B
+    case 8:  // daq velocities in basic system B
         return eleInfo.setVector(this->getBasicVel());
         
-    case 9:  // measured accelerations in basic system B
+    case 9:  // daq accelerations in basic system B
         return eleInfo.setVector(this->getBasicAccel());
         
     default:
@@ -1081,9 +1106,9 @@ int EEBeamColumn2d::getResponse(int responseID, Information &eleInfo)
 
 void EEBeamColumn2d::applyIMod()
 {    
-    // get measured displacements
+    // get daq displacements
     if (theSite != 0)  {
-        (*dbMeas) = theSite->getDisp();
+        (*dbDaq) = theSite->getDisp();
     }
     else  {
         sData[0] = OF_RemoteTest_getDisp;
@@ -1092,15 +1117,15 @@ void EEBeamColumn2d::applyIMod()
     }
 
     // correct for displacement control errors using I-Modification
-    if ((*dbMeas)[0] != 0.0)  {
-        (*qMeas)[0] -= kbInit(0,0)*((*dbMeas)[0] - (*db)[0]);
+    if ((*dbDaq)[0] != 0.0)  {
+        (*qDaq)[0] -= kbInit(0,0)*((*dbDaq)[0] - (*db)[0]);
     }
-    if ((*dbMeas)[1] != 0.0)  {
-        (*qMeas)[1] -= kbInit(1,1)*((*dbMeas)[1] - (*db)[1]);
-        (*qMeas)[2] -= kbInit(2,1)*((*dbMeas)[1] - (*db)[1]);
+    if ((*dbDaq)[1] != 0.0)  {
+        (*qDaq)[1] -= kbInit(1,1)*((*dbDaq)[1] - (*db)[1]);
+        (*qDaq)[2] -= kbInit(2,1)*((*dbDaq)[1] - (*db)[1]);
     }
-    if ((*dbMeas)[2] != 0.0)  {
-        (*qMeas)[1] -= kbInit(1,2)*((*dbMeas)[2] - (*db)[2]);
-        (*qMeas)[2] -= kbInit(2,2)*((*dbMeas)[2] - (*db)[2]);
+    if ((*dbDaq)[2] != 0.0)  {
+        (*qDaq)[1] -= kbInit(1,2)*((*dbDaq)[2] - (*db)[2]);
+        (*qDaq)[2] -= kbInit(2,2)*((*dbDaq)[2] - (*db)[2]);
     }
 }

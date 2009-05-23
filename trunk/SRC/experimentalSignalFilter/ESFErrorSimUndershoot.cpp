@@ -88,7 +88,7 @@ ExperimentalSignalFilter* ESFErrorSimUndershoot::getCopy()
 }
 
 
-void ESFErrorSimUndershoot::Print(OPS_Stream &s, int flag = 0)
+void ESFErrorSimUndershoot::Print(OPS_Stream &s, int flag)
 {
     s << "Filter: " << this->getTag(); 
     s << "  type: ESFErrorSimUndershoot\n";

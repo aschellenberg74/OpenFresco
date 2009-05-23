@@ -93,13 +93,13 @@ private:
     board_spec_tp board_spec;
 
     unsigned int newTarget, switchPC, atTarget;
-    double *targDisp, *targVel, *targAccel;
-    double *measDisp, *measForce;
+    double *ctrlDisp, *ctrlVel, *ctrlAccel;
+    double *daqDisp, *daqForce;
     
     UInt32 simStateId;
     UInt32 newTargetId, switchPCId, atTargetId;
-    UInt32 targDispId, targVelId, targAccelId;
-    UInt32 measDispId, measForceId;
+    UInt32 ctrlDispId, ctrlVelId, ctrlAccelId;
+    UInt32 daqDispId, daqForceId;
 };
 
 #endif
