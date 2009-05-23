@@ -105,8 +105,8 @@ private:
     char *rData;                // receive data array
     Message *recvData;          // receive vector
 
-    Vector *targDisp, *targForce;
-    Vector *measDisp, *measForce;
+    Vector *ctrlDisp, *ctrlForce;
+    Vector *daqDisp, *daqForce;
     
     time_t rawtime;
     struct tm *ptm;

@@ -96,8 +96,8 @@ private:
     double *rData;              // receive data array
     Vector *recvData;           // receive vector
     
-    Vector *targDisp, *targForce;
-    Vector *measDisp, *measForce;
+    Vector *ctrlDisp, *ctrlForce;
+    Vector *daqDisp, *daqForce;
 };
 
 #endif

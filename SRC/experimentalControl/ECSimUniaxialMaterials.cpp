@@ -39,8 +39,8 @@ ECSimUniaxialMaterials::ECSimUniaxialMaterials(int tag,
     int nummats, UniaxialMaterial **specimen)
     : ECSimulation(tag),
     numMats(nummats), theSpecimen(0),
-    targDisp(0), targVel(0),
-    measDisp(0), measVel(0), measForce(0)
+    ctrlDisp(0), ctrlVel(0),
+    daqDisp(0), daqVel(0), daqForce(0)
 {
     if (specimen == 0)  {
         opserr << "ECSimUniaxialMaterials::ECSimUniaxialMaterials() - "
@@ -76,8 +76,8 @@ ECSimUniaxialMaterials::ECSimUniaxialMaterials(int tag,
 ECSimUniaxialMaterials::ECSimUniaxialMaterials(const ECSimUniaxialMaterials& ec)
     : ECSimulation(ec),
     numMats(0), theSpecimen(0),
-    targDisp(0), targVel(0),
-    measDisp(0), measVel(0), measForce(0)
+    ctrlDisp(0), ctrlVel(0),
+    daqDisp(0), daqVel(0), daqForce(0)
 {
     // allocate memory for the uniaxial materials
     numMats = ec.numMats;
@@ -115,19 +115,19 @@ ECSimUniaxialMaterials::~ECSimUniaxialMaterials()
         delete [] theSpecimen;
     }
     
-    // delete memory of target vectors
-    if (targDisp != 0)
-        delete targDisp;
-    if (targVel != 0)
-        delete targVel;
+    // delete memory of ctrl vectors
+    if (ctrlDisp != 0)
+        delete ctrlDisp;
+    if (ctrlVel != 0)
+        delete ctrlVel;
     
-    // delete memory of measured vectors
-    if (measDisp != 0)
-        delete measDisp;
-    if (measVel != 0)
-        delete measVel;
-    if (measForce != 0)
-        delete measForce;
+    // delete memory of daq vectors
+    if (daqDisp != 0)
+        delete daqDisp;
+    if (daqVel != 0)
+        delete daqVel;
+    if (daqForce != 0)
+        delete daqForce;
 }
 
 
@@ -135,38 +135,38 @@ int ECSimUniaxialMaterials::setup()
 {
     int rValue = 0;
     
-    if (targDisp != 0)
-        delete targDisp;
-    if (targVel != 0)
-        delete targVel;
+    if (ctrlDisp != 0)
+        delete ctrlDisp;
+    if (ctrlVel != 0)
+        delete ctrlVel;
     
     if ((*sizeCtrl)(OF_Resp_Disp) != 0)  {
-        targDisp = new Vector((*sizeCtrl)(OF_Resp_Disp));
-        targDisp->Zero();
+        ctrlDisp = new Vector((*sizeCtrl)(OF_Resp_Disp));
+        ctrlDisp->Zero();
     }
     if ((*sizeCtrl)(OF_Resp_Vel) != 0)  {
-        targVel = new Vector((*sizeCtrl)(OF_Resp_Vel));
-        targVel->Zero();
+        ctrlVel = new Vector((*sizeCtrl)(OF_Resp_Vel));
+        ctrlVel->Zero();
     }
     
-    if (measDisp != 0)
-        delete measDisp;
-    if (measVel != 0)
-        delete measVel;
-    if (measForce != 0)
-        delete measForce;
+    if (daqDisp != 0)
+        delete daqDisp;
+    if (daqVel != 0)
+        delete daqVel;
+    if (daqForce != 0)
+        delete daqForce;
     
     if ((*sizeDaq)(OF_Resp_Disp) != 0)  {
-        measDisp = new Vector((*sizeDaq)(OF_Resp_Disp));
-        measDisp->Zero();
+        daqDisp = new Vector((*sizeDaq)(OF_Resp_Disp));
+        daqDisp->Zero();
     }
     if ((*sizeDaq)(OF_Resp_Vel) != 0)  {
-        measVel = new Vector((*sizeDaq)(OF_Resp_Vel));
-        measVel->Zero();
+        daqVel = new Vector((*sizeDaq)(OF_Resp_Vel));
+        daqVel->Zero();
     }
     if ((*sizeDaq)(OF_Resp_Force) != 0)  {
-        measForce = new Vector((*sizeDaq)(OF_Resp_Force));
-        measForce->Zero();
+        daqForce = new Vector((*sizeDaq)(OF_Resp_Force));
+        daqForce->Zero();
     }
     
     // print experimental control information
@@ -213,17 +213,17 @@ int ECSimUniaxialMaterials::setTrialResponse(const Vector* disp,
 {
     int i, rValue = 0;
     if (disp != 0)  {
-        *targDisp = *disp;
+        *ctrlDisp = *disp;
         if (theCtrlFilters[OF_Resp_Disp] != 0)  {
             for (i=0; i<(*sizeCtrl)(OF_Resp_Disp); i++)
-                (*targDisp)(i) = theCtrlFilters[OF_Resp_Disp]->filtering((*targDisp)(i));
+                (*ctrlDisp)(i) = theCtrlFilters[OF_Resp_Disp]->filtering((*ctrlDisp)(i));
         }
     }
     if (vel != 0)  {
-        *targVel = *vel;
+        *ctrlVel = *vel;
         if (theCtrlFilters[OF_Resp_Vel] != 0)  {
             for (i=0; i<(*sizeCtrl)(OF_Resp_Vel); i++)
-                (*targVel)(i) = theCtrlFilters[OF_Resp_Vel]->filtering((*targVel)(i));
+                (*ctrlVel)(i) = theCtrlFilters[OF_Resp_Vel]->filtering((*ctrlVel)(i));
         }
     }
     
@@ -245,23 +245,23 @@ int ECSimUniaxialMaterials::getDaqResponse(Vector* disp,
     if (disp != 0)  {
         if (theDaqFilters[OF_Resp_Disp] != 0)  {
             for (i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)
-                (*measDisp)(i) = theDaqFilters[OF_Resp_Disp]->filtering((*measDisp)(i));
+                (*daqDisp)(i) = theDaqFilters[OF_Resp_Disp]->filtering((*daqDisp)(i));
         }
-        *disp = *measDisp;
+        *disp = *daqDisp;
     }
     if (vel != 0)  {
         if (theDaqFilters[OF_Resp_Vel] != 0)  {
             for (i=0; i<(*sizeDaq)(OF_Resp_Vel); i++)
-                (*measVel)(i) = theDaqFilters[OF_Resp_Vel]->filtering((*measVel)(i));
+                (*daqVel)(i) = theDaqFilters[OF_Resp_Vel]->filtering((*daqVel)(i));
         }
-        *vel = *measVel;
+        *vel = *daqVel;
     }
     if (force != 0)  {
         if (theDaqFilters[OF_Resp_Force] != 0)  {
             for (i=0; i<(*sizeDaq)(OF_Resp_Force); i++)
-                (*measForce)(i) = theDaqFilters[OF_Resp_Force]->filtering((*measForce)(i));
+                (*daqForce)(i) = theDaqFilters[OF_Resp_Force]->filtering((*daqForce)(i));
         }
-        *force = *measForce;
+        *force = *daqForce;
     }
     
     return OF_ReturnType_completed;
@@ -296,74 +296,69 @@ Response* ECSimUniaxialMaterials::setResponse(const char **argv, int argc,
     output.tag("ExpControlOutput");
     output.attr("ctrlType",this->getClassType());
     output.attr("ctrlTag",this->getTag());
-        
-    // target displacements
-    if (strcmp(argv[0],"targDisp") == 0 ||
-        strcmp(argv[0],"targetDisp") == 0 ||
-        strcmp(argv[0],"targetDisplacement") == 0 ||
-        strcmp(argv[0],"targetDisplacements") == 0)
+    
+    // ctrl displacements
+    if (ctrlDisp != 0 && (
+        strcmp(argv[0],"ctrlDisp") == 0 ||
+        strcmp(argv[0],"ctrlDisplacement") == 0 ||
+        strcmp(argv[0],"ctrlDisplacements") == 0))
     {
         for (i=0; i<(*sizeCtrl)(OF_Resp_Disp); i++)  {
-            sprintf(outputData,"targDisp%d",i+1);
+            sprintf(outputData,"ctrlDisp%d",i+1);
             output.tag("ResponseType",outputData);
         }
-        theResponse = new ExpControlResponse(this, 1,
-            Vector((*sizeCtrl)(OF_Resp_Disp)));
+        theResponse = new ExpControlResponse(this, 1, *ctrlDisp);
     }
     
-    // target velocities
-    if (strcmp(argv[0],"targVel") == 0 ||
-        strcmp(argv[0],"targetVel") == 0 ||
-        strcmp(argv[0],"targetVelocity") == 0 ||
-        strcmp(argv[0],"targetVelocities") == 0)
+    // ctrl velocities
+    if (ctrlVel != 0 && (
+        strcmp(argv[0],"ctrlVel") == 0 ||
+        strcmp(argv[0],"ctrlVelocity") == 0 ||
+        strcmp(argv[0],"ctrlVelocities") == 0))
     {
         for (i=0; i<(*sizeCtrl)(OF_Resp_Vel); i++)  {
-            sprintf(outputData,"targVel%d",i+1);
+            sprintf(outputData,"ctrlVel%d",i+1);
             output.tag("ResponseType",outputData);
         }
-        theResponse = new ExpControlResponse(this, 2,
-            Vector((*sizeCtrl)(OF_Resp_Vel)));
+        theResponse = new ExpControlResponse(this, 2, *ctrlVel);
     }
     
-    // measured displacements
-    if (strcmp(argv[0],"measDisp") == 0 ||
-        strcmp(argv[0],"measuredDisp") == 0 ||
-        strcmp(argv[0],"measuredDisplacement") == 0 ||
-        strcmp(argv[0],"measuredDisplacements") == 0)
+    // daq displacements
+    if (daqDisp != 0 && (
+        strcmp(argv[0],"daqDisp") == 0 ||
+        strcmp(argv[0],"daqDisplacement") == 0 ||
+        strcmp(argv[0],"daqDisplacements") == 0))
     {
         for (i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)  {
-            sprintf(outputData,"measDisp%d",i+1);
+            sprintf(outputData,"daqDisp%d",i+1);
             output.tag("ResponseType",outputData);
         }
-        theResponse = new ExpControlResponse(this, 3,
-            Vector((*sizeDaq)(OF_Resp_Disp)));
+        theResponse = new ExpControlResponse(this, 3, *daqDisp);
     }
     
-    // measured velocities
-    if (strcmp(argv[0],"measVel") == 0 ||
-        strcmp(argv[0],"measuredVel") == 0 ||
-        strcmp(argv[0],"measuredVelocity") == 0 ||
-        strcmp(argv[0],"measuredVelocities") == 0)
+    // daq velocities
+    if (daqVel != 0 && (
+        strcmp(argv[0],"daqVel") == 0 ||
+        strcmp(argv[0],"daqVelocity") == 0 ||
+        strcmp(argv[0],"daqVelocities") == 0))
     {
         for (i=0; i<(*sizeDaq)(OF_Resp_Vel); i++)  {
-            sprintf(outputData,"measVel%d",i+1);
+            sprintf(outputData,"daqVel%d",i+1);
             output.tag("ResponseType",outputData);
         }
-        theResponse = new ExpControlResponse(this, 4,
-            Vector((*sizeDaq)(OF_Resp_Vel)));
+        theResponse = new ExpControlResponse(this, 4, *daqVel);
     }
     
-    // measured forces
-    if (strcmp(argv[0],"measForce") == 0 ||
-        strcmp(argv[0],"measuredForce") == 0 ||
-        strcmp(argv[0],"measuredForces") == 0)
+    // daq forces
+    if (daqForce != 0 && (
+        strcmp(argv[0],"daqForce") == 0 ||
+        strcmp(argv[0],"daqForces") == 0))
     {
         for (i=0; i<(*sizeDaq)(OF_Resp_Force); i++)  {
-            sprintf(outputData,"measForce%d",i+1);
+            sprintf(outputData,"daqForce%d",i+1);
             output.tag("ResponseType",outputData);
         }
-        theResponse = new ExpControlResponse(this, 5,
-            Vector((*sizeDaq)(OF_Resp_Force)));
+        theResponse = new ExpControlResponse(this, 5, *daqForce);
     }
     
     output.endTag();
@@ -375,20 +370,20 @@ Response* ECSimUniaxialMaterials::setResponse(const char **argv, int argc,
 int ECSimUniaxialMaterials::getResponse(int responseID, Information &info)
 {
     switch (responseID)  {
-    case 1:  // target displacements
-        return info.setVector(*targDisp);
+    case 1:  // ctrl displacements
+        return info.setVector(*ctrlDisp);
         
-    case 2:  // target velocities
-        return info.setVector(*targVel);
+    case 2:  // ctrl velocities
+        return info.setVector(*ctrlVel);
         
-    case 3:  // measured displacements
-        return info.setVector(*measDisp);
+    case 3:  // daq displacements
+        return info.setVector(*daqDisp);
         
-    case 4:  // measured velocities
-        return info.setVector(*measVel);
+    case 4:  // daq velocities
+        return info.setVector(*daqVel);
         
-    case 5:  // measured forces
-        return info.setVector(*measForce);
+    case 5:  // daq forces
+        return info.setVector(*daqForce);
         
     default:
         return -1;
@@ -429,7 +424,7 @@ int ECSimUniaxialMaterials::control()
     int rValue = 0;
 
     for (int i=0; i<numMats; i++)  {
-        rValue += theSpecimen[i]->setTrialStrain((*targDisp)(i),(*targVel)(i));
+        rValue += theSpecimen[i]->setTrialStrain((*ctrlDisp)(i),(*ctrlVel)(i));
     }
     
     return rValue;
@@ -439,9 +434,9 @@ int ECSimUniaxialMaterials::control()
 int ECSimUniaxialMaterials::acquire()
 {
     for (int i=0; i<numMats; i++)  {
-        (*measDisp)(i)  = theSpecimen[i]->getStrain();
-        (*measVel)(i)   = theSpecimen[i]->getStrainRate();
-        (*measForce)(i) = theSpecimen[i]->getStress();
+        (*daqDisp)(i)  = theSpecimen[i]->getStrain();
+        (*daqVel)(i)   = theSpecimen[i]->getStrainRate();
+        (*daqForce)(i) = theSpecimen[i]->getStress();
     }
     
     return OF_ReturnType_completed;

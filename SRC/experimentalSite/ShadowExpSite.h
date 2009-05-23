@@ -79,7 +79,7 @@ public:
     virtual ExperimentalSite *getCopy();
     
     // public methods for output
-    void Print(OPS_Stream &s, int flag);
+    void Print(OPS_Stream &s, int flag = 0);
     
 protected:
     // data size of vectors in Channel

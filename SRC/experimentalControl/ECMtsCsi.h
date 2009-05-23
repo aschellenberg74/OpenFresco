@@ -88,9 +88,9 @@ private:
 	double rampTime;
     int	rampId;
 	
-    Vector *targDisp, *targForce;
-    double *measResp;
-    Vector *measDisp, *measForce;
+    Vector *ctrlDisp, *ctrlForce;
+    double *daqResp;
+    Vector *daqDisp, *daqForce;
 
     int respSize;
 };

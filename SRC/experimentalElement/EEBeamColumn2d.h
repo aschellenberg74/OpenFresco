@@ -132,15 +132,15 @@ private:
     Vector *ab;         // trial accelerations in basic system B
     Vector *t;          // trial time
     
-    Vector *dbMeas;     // measured displacements in basic system B
-    Vector *vbMeas;     // measured velocities in basic system B
-    Vector *abMeas;     // measured accelerations in basic system B
-    Vector *qMeas;      // measured forces in basic system B
-    Vector *tMeas;      // measured time
+    Vector *dbDaq;      // daq displacements in basic system B
+    Vector *vbDaq;      // daq velocities in basic system B
+    Vector *abDaq;      // daq accelerations in basic system B
+    Vector *qDaq;       // daq forces in basic system B
+    Vector *tDaq;       // daq time
     
-    Vector dbTarg;      // target displacements in basic system B
-    Vector vbTarg;      // target velocities in basic system B
-    Vector abTarg;      // target accelerations in basic system B
+    Vector dbCtrl;      // ctrl displacements in basic system B
+    Vector vbCtrl;      // ctrl velocities in basic system B
+    Vector abCtrl;      // ctrl accelerations in basic system B
     
     Vector dbPast;      // past displacements in basic system B
     Matrix kbInit;      // stiffness matrix in basic system B

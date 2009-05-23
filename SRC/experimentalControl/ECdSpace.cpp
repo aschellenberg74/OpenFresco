@@ -35,7 +35,7 @@
 ECdSpace::ECdSpace(int tag, int pctype, char *boardname)
     : ExperimentalControl(tag),
     pcType(pctype), boardName(boardname),
-    targDisp(0), targVel(0), targAccel(0), measDisp(0), measForce(0)
+    ctrlDisp(0), ctrlVel(0), ctrlAccel(0), daqDisp(0), daqForce(0)
 {	    
     // the host application OpenFresco needs to access the dSpace board
     // OpenSees is therefore registred with the DSP device driver
@@ -121,7 +121,7 @@ ECdSpace::ECdSpace(int tag, int pctype, char *boardname)
 
 ECdSpace::ECdSpace(const ECdSpace &ec)
     : ExperimentalControl(ec),
-    targDisp(0), targVel(0), targAccel(0), measDisp(0), measForce(0)
+    ctrlDisp(0), ctrlVel(0), ctrlAccel(0), daqDisp(0), daqForce(0)
 {	
     boardState = ec.boardState;
     simState = ec.simState;
@@ -134,19 +134,19 @@ ECdSpace::ECdSpace(const ECdSpace &ec)
 
 ECdSpace::~ECdSpace()
 {
-    // delete memory of target vectors
-    if (targDisp != 0)
-        delete targDisp;
-    if (targVel != 0)
-        delete targVel;
-    if (targAccel != 0)
-        delete targAccel;
+    // delete memory of ctrl vectors
+    if (ctrlDisp != 0)
+        delete ctrlDisp;
+    if (ctrlVel != 0)
+        delete ctrlVel;
+    if (ctrlAccel != 0)
+        delete ctrlAccel;
     
-    // delete memory of measured vectors
-    if (measDisp != 0)
-        delete measDisp;
-    if (measForce != 0)
-        delete measForce;
+    // delete memory of daq vectors
+    if (daqDisp != 0)
+        delete daqDisp;
+    if (daqForce != 0)
+        delete daqForce;
     
     // delete memory of string
     if (boardName != 0)
@@ -177,43 +177,43 @@ int ECdSpace::setup()
 {
     int rValue = 0;
     
-    if (targDisp != 0)
-        delete targDisp;
-    if (targVel != 0)
-        delete targVel;
-    if (targAccel != 0)
-        delete targAccel;
+    if (ctrlDisp != 0)
+        delete ctrlDisp;
+    if (ctrlVel != 0)
+        delete ctrlVel;
+    if (ctrlAccel != 0)
+        delete ctrlAccel;
     
     if ((*sizeCtrl)(OF_Resp_Disp) != 0)  {
-        targDisp = new double [(*sizeCtrl)(OF_Resp_Disp)];
+        ctrlDisp = new double [(*sizeCtrl)(OF_Resp_Disp)];
         for (int i=0; i<(*sizeCtrl)(OF_Resp_Disp); i++)
-            targDisp[i] = 0.0;
+            ctrlDisp[i] = 0.0;
     }
     if ((*sizeCtrl)(OF_Resp_Disp) != 0)  {
-        targVel = new double [(*sizeCtrl)(OF_Resp_Vel)];
+        ctrlVel = new double [(*sizeCtrl)(OF_Resp_Vel)];
         for (int i=0; i<(*sizeCtrl)(OF_Resp_Vel); i++)
-            targVel[i] = 0.0;
+            ctrlVel[i] = 0.0;
     }
     if ((*sizeCtrl)(OF_Resp_Disp) != 0)  {
-        targAccel = new double [(*sizeCtrl)(OF_Resp_Accel)];
+        ctrlAccel = new double [(*sizeCtrl)(OF_Resp_Accel)];
         for (int i=0; i<(*sizeCtrl)(OF_Resp_Accel); i++)
-            targAccel[i] = 0.0;
+            ctrlAccel[i] = 0.0;
     }
     
-    if (measDisp != 0)
-        delete measDisp;
-    if (measForce != 0)
-        delete measForce;
+    if (daqDisp != 0)
+        delete daqDisp;
+    if (daqForce != 0)
+        delete daqForce;
     
     if ((*sizeDaq)(OF_Resp_Disp) != 0)  {
-        measDisp = new double [(*sizeDaq)(OF_Resp_Disp)];
+        daqDisp = new double [(*sizeDaq)(OF_Resp_Disp)];
         for (int i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)
-            measDisp[i] = 0.0;
+            daqDisp[i] = 0.0;
     }
     if ((*sizeDaq)(OF_Resp_Force) != 0)  {
-        measForce = new double [(*sizeDaq)(OF_Resp_Force)];
+        daqForce = new double [(*sizeDaq)(OF_Resp_Force)];
         for (int i=0; i<(*sizeDaq)(OF_Resp_Force); i++)
-            measForce[i] = 0.0;
+            daqForce[i] = 0.0;
     }
     
     // get addresses of the controlled variables on the DSP board		  
@@ -238,7 +238,7 @@ int ECdSpace::setup()
         DS_unregister_host_app();
         exit(OF_ReturnType_failed);
     }
-    error = DS_get_var_addr(board_index, "targDsp", &targDispId);
+    error = DS_get_var_addr(board_index, "targDsp", &ctrlDispId);
     if (error != DS_NO_ERROR)  {
         opserr << "ECdSpace::setup() - DS_get_var_addr - "
             << "targDsp: error = " << error << endln;
@@ -246,7 +246,7 @@ int ECdSpace::setup()
         exit(OF_ReturnType_failed);
     }
     if (pcType==2 || pcType==3)  {
-        error = DS_get_var_addr(board_index, "targVel", &targVelId);
+        error = DS_get_var_addr(board_index, "targVel", &ctrlVelId);
         if (error != DS_NO_ERROR)  {
             opserr << "ECdSpace::setup() - DS_get_var_addr - "
                 << "targVel: error = " << error << endln;
@@ -255,7 +255,7 @@ int ECdSpace::setup()
         }
     }
     if (pcType==3)  {
-        error = DS_get_var_addr(board_index, "targAcc", &targAccelId);
+        error = DS_get_var_addr(board_index, "targAcc", &ctrlAccelId);
         if (error != DS_NO_ERROR)  {
             opserr << "ECdSpace::setup() - DS_get_var_addr - "
                 << "targAcc: error = " << error << endln;
@@ -263,14 +263,14 @@ int ECdSpace::setup()
             exit(OF_ReturnType_failed);
         }
     }
-    error = DS_get_var_addr(board_index, "measDsp", &measDispId);
+    error = DS_get_var_addr(board_index, "measDsp", &daqDispId);
     if (error != DS_NO_ERROR)  {
         opserr << "ECdSpace::setup() - DS_get_var_addr - "
             << "measDsp: error = " << error << endln;
         DS_unregister_host_app();
         exit(OF_ReturnType_failed);
     }
-    error = DS_get_var_addr(board_index, "measFrc", &measForceId);
+    error = DS_get_var_addr(board_index, "measFrc", &daqForceId);
     if (error != DS_NO_ERROR)  {
         opserr << "ECdSpace::setup() - DS_get_var_addr - "
             << "measFrc: error = " << error << endln;
@@ -315,11 +315,11 @@ int ECdSpace::setup()
         opserr << "*\n";
         opserr << "* dspDaq = [";
         for (i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)
-            opserr << " " << measDisp[i];
+            opserr << " " << daqDisp[i];
         opserr << " ]\n";
         opserr << "* frcDaq = [";
         for (i=0; i<(*sizeDaq)(OF_Resp_Force); i++)
-            opserr << " " << measForce[i];
+            opserr << " " << daqForce[i];
         opserr << " ]\n";
         opserr << "*\n";
         opserr << "* Press 'Enter' to start the test or\n";
@@ -382,23 +382,23 @@ int ECdSpace::setTrialResponse(const Vector* disp,
     int i, rValue = 0;
     if (disp != 0)  {
         for (i=0; i<(*sizeCtrl)(OF_Resp_Disp); i++)  {
-            targDisp[i] = (*disp)(i);
+            ctrlDisp[i] = (*disp)(i);
             if (theCtrlFilters[OF_Resp_Disp] != 0)
-                targDisp[i] = theCtrlFilters[OF_Resp_Disp]->filtering(targDisp[i]);
+                ctrlDisp[i] = theCtrlFilters[OF_Resp_Disp]->filtering(ctrlDisp[i]);
         }
     }
     if (vel != 0)  {
         for (i=0; i<(*sizeCtrl)(OF_Resp_Vel); i++)  {
-            targVel[i] = (*vel)(i);
+            ctrlVel[i] = (*vel)(i);
             if (theCtrlFilters[OF_Resp_Vel] != 0)
-                targVel[i] = theCtrlFilters[OF_Resp_Vel]->filtering(targVel[i]);
+                ctrlVel[i] = theCtrlFilters[OF_Resp_Vel]->filtering(ctrlVel[i]);
         }
     }
     if (accel != 0)  {
         for (i=0; i<(*sizeCtrl)(OF_Resp_Accel); i++)  {
-            targAccel[i] = (*accel)(i);
+            ctrlAccel[i] = (*accel)(i);
             if (theCtrlFilters[OF_Resp_Accel] != 0)
-                targAccel[i] = theCtrlFilters[OF_Resp_Accel]->filtering(targAccel[i]);
+                ctrlAccel[i] = theCtrlFilters[OF_Resp_Accel]->filtering(ctrlAccel[i]);
         }
     }
         
@@ -420,15 +420,15 @@ int ECdSpace::getDaqResponse(Vector* disp,
     if (disp != 0)  {
         for (i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)  {
             if (theDaqFilters[OF_Resp_Disp] != 0)
-                measDisp[i] = theDaqFilters[OF_Resp_Disp]->filtering(measDisp[i]);
-            (*disp)(i) = measDisp[i];
+                daqDisp[i] = theDaqFilters[OF_Resp_Disp]->filtering(daqDisp[i]);
+            (*disp)(i) = daqDisp[i];
         }
     }
     if (force != 0)  {
         for (i=0; i<(*sizeDaq)(OF_Resp_Force); i++)  {
             if (theDaqFilters[OF_Resp_Force] != 0)
-                measForce[i] = theDaqFilters[OF_Resp_Force]->filtering(measForce[i]);
-            (*force)(i) = measForce[i];
+                daqForce[i] = theDaqFilters[OF_Resp_Force]->filtering(daqForce[i]);
+            (*force)(i) = daqForce[i];
         }
     }
         
@@ -458,70 +458,70 @@ Response* ECdSpace::setResponse(const char **argv, int argc,
     output.tag("ExpControlOutput");
     output.attr("ctrlType",this->getClassType());
     output.attr("ctrlTag",this->getTag());
-        
-    // target displacements
-    if (strcmp(argv[0],"targDisp") == 0 ||
-        strcmp(argv[0],"targetDisp") == 0 ||
-        strcmp(argv[0],"targetDisplacement") == 0 ||
-        strcmp(argv[0],"targetDisplacements") == 0)
+    
+    // ctrl displacements
+    if (ctrlDisp != 0 && (
+        strcmp(argv[0],"ctrlDisp") == 0 ||
+        strcmp(argv[0],"ctrlDisplacement") == 0 ||
+        strcmp(argv[0],"ctrlDisplacements") == 0))
     {
         for (i=0; i<(*sizeCtrl)(OF_Resp_Disp); i++)  {
-            sprintf(outputData,"targDisp%d",i+1);
+            sprintf(outputData,"ctrlDisp%d",i+1);
             output.tag("ResponseType",outputData);
         }
         theResponse = new ExpControlResponse(this, 1,
             Vector((*sizeCtrl)(OF_Resp_Disp)));
     }
     
-    // target velocities
-    if (strcmp(argv[0],"targVel") == 0 ||
-        strcmp(argv[0],"targetVel") == 0 ||
-        strcmp(argv[0],"targetVelocity") == 0 ||
-        strcmp(argv[0],"targetVelocities") == 0)
+    // ctrl velocities
+    if (ctrlVel != 0 && (
+        strcmp(argv[0],"ctrlVel") == 0 ||
+        strcmp(argv[0],"ctrlVelocity") == 0 ||
+        strcmp(argv[0],"ctrlVelocities") == 0))
     {
         for (i=0; i<(*sizeCtrl)(OF_Resp_Vel); i++)  {
-            sprintf(outputData,"targVel%d",i+1);
+            sprintf(outputData,"ctrlVel%d",i+1);
             output.tag("ResponseType",outputData);
         }
         theResponse = new ExpControlResponse(this, 2,
             Vector((*sizeCtrl)(OF_Resp_Vel)));
     }
     
-    // target accelerations
-    if (strcmp(argv[0],"targAccel") == 0 ||
-        strcmp(argv[0],"targetAccel") == 0 ||
-        strcmp(argv[0],"targetAcceleration") == 0 ||
-        strcmp(argv[0],"targetAccelerations") == 0)
+    // ctrl accelerations
+    if (ctrlAccel != 0 && (
+        strcmp(argv[0],"ctrlAccel") == 0 ||
+        strcmp(argv[0],"ctrlAcceleration") == 0 ||
+        strcmp(argv[0],"ctrlAccelerations") == 0))
     {
         for (i=0; i<(*sizeCtrl)(OF_Resp_Accel); i++)  {
-            sprintf(outputData,"targAccel%d",i+1);
+            sprintf(outputData,"ctrlAccel%d",i+1);
             output.tag("ResponseType",outputData);
         }
         theResponse = new ExpControlResponse(this, 3,
             Vector((*sizeCtrl)(OF_Resp_Accel)));
     }
     
-    // measured displacements
-    if (strcmp(argv[0],"measDisp") == 0 ||
-        strcmp(argv[0],"measuredDisp") == 0 ||
-        strcmp(argv[0],"measuredDisplacement") == 0 ||
-        strcmp(argv[0],"measuredDisplacements") == 0)
+    // daq displacements
+    if (daqDisp != 0 && (
+        strcmp(argv[0],"daqDisp") == 0 ||
+        strcmp(argv[0],"daqDisplacement") == 0 ||
+        strcmp(argv[0],"daqDisplacements") == 0))
     {
         for (i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)  {
-            sprintf(outputData,"measDisp%d",i+1);
+            sprintf(outputData,"daqDisp%d",i+1);
             output.tag("ResponseType",outputData);
         }
         theResponse = new ExpControlResponse(this, 4,
             Vector((*sizeDaq)(OF_Resp_Disp)));
     }
     
-    // measured forces
-    if (strcmp(argv[0],"measForce") == 0 ||
-        strcmp(argv[0],"measuredForce") == 0 ||
-        strcmp(argv[0],"measuredForces") == 0)
+    // daq forces
+    if (daqForce != 0 && (
+        strcmp(argv[0],"daqForce") == 0 ||
+        strcmp(argv[0],"daqForces") == 0))
     {
         for (i=0; i<(*sizeDaq)(OF_Resp_Force); i++)  {
-            sprintf(outputData,"measForce%d",i+1);
+            sprintf(outputData,"daqForce%d",i+1);
             output.tag("ResponseType",outputData);
         }
         theResponse = new ExpControlResponse(this, 5,
@@ -539,24 +539,24 @@ int ECdSpace::getResponse(int responseID, Information &info)
     Vector resp(0);
 
     switch (responseID)  {
-    case 1:  // target displacements
-        resp.setData(targDisp,(*sizeCtrl)(OF_Resp_Disp));
+    case 1:  // ctrl displacements
+        resp.setData(ctrlDisp,(*sizeCtrl)(OF_Resp_Disp));
         return info.setVector(resp);
         
-    case 2:  // target velocities
-        resp.setData(targVel,(*sizeCtrl)(OF_Resp_Vel));
+    case 2:  // ctrl velocities
+        resp.setData(ctrlVel,(*sizeCtrl)(OF_Resp_Vel));
         return info.setVector(resp);
         
-    case 3:  // target accelerations
-        resp.setData(targAccel,(*sizeCtrl)(OF_Resp_Accel));
+    case 3:  // ctrl accelerations
+        resp.setData(ctrlAccel,(*sizeCtrl)(OF_Resp_Accel));
         return info.setVector(resp);
         
-    case 4:  // measured displacements
-        resp.setData(measDisp,(*sizeDaq)(OF_Resp_Disp));
+    case 4:  // daq displacements
+        resp.setData(daqDisp,(*sizeDaq)(OF_Resp_Disp));
         return info.setVector(resp);
         
-    case 5:  // measured forces
-        resp.setData(measForce,(*sizeDaq)(OF_Resp_Force));
+    case 5:  // daq forces
+        resp.setData(daqForce,(*sizeDaq)(OF_Resp_Force));
         return info.setVector(resp);
         
     default:
@@ -594,28 +594,28 @@ void ECdSpace::Print(OPS_Stream &s, int flag)
 
 int ECdSpace::control()
 {
-    // send targDisp, targVel and targAccel and set newTarget flag
-    error = DS_write_64(board_index, targDispId, (*sizeCtrl)(OF_Resp_Disp), (UInt64 *)targDisp);
+    // send ctrlDisp, ctrlVel and ctrlAccel and set newTarget flag
+    error = DS_write_64(board_index, ctrlDispId, (*sizeCtrl)(OF_Resp_Disp), (UInt64 *)ctrlDisp);
     if (error != DS_NO_ERROR)  {
         opserr << "ECdSpace::control() - "
-            << "DS_write_64(targDisp): error = " << error << endln;
+            << "DS_write_64(ctrlDisp): error = " << error << endln;
         DS_unregister_host_app();
         exit(OF_ReturnType_failed);
     }
     if (pcType==2 || pcType==3)  {
-        error = DS_write_64(board_index, targVelId, (*sizeCtrl)(OF_Resp_Vel), (UInt64 *)targVel);
+        error = DS_write_64(board_index, ctrlVelId, (*sizeCtrl)(OF_Resp_Vel), (UInt64 *)ctrlVel);
         if (error != DS_NO_ERROR)  {
             opserr << "ECdSpace::control() - "
-                << "DS_write_64(targVel): error = " << error << endln;
+                << "DS_write_64(ctrlVel): error = " << error << endln;
             DS_unregister_host_app();
             exit(OF_ReturnType_failed);
         }
     }
     if (pcType==3)  {
-        error = DS_write_64(board_index, targAccelId, (*sizeCtrl)(OF_Resp_Accel), (UInt64 *)targAccel);
+        error = DS_write_64(board_index, ctrlAccelId, (*sizeCtrl)(OF_Resp_Accel), (UInt64 *)ctrlAccel);
         if (error != DS_NO_ERROR)  {
             opserr << "ECdSpace::control() - "
-                << "DS_write_64(targAccel): error = " << error << endln;
+                << "DS_write_64(ctrlAccel): error = " << error << endln;
             DS_unregister_host_app();
             exit(OF_ReturnType_failed);
         }
@@ -684,17 +684,17 @@ int ECdSpace::acquire()
     }
     
     // read displacements and resisting forces at target
-    error = DS_read_64(board_index, measDispId, (*sizeDaq)(OF_Resp_Disp), (UInt64 *)measDisp);
+    error = DS_read_64(board_index, daqDispId, (*sizeDaq)(OF_Resp_Disp), (UInt64 *)daqDisp);
     if (error != DS_NO_ERROR)  {
         opserr << "ECdSpace::acquire() - "
-            << "DS_read_64(measDisp): error = " << error << endln;
+            << "DS_read_64(daqDisp): error = " << error << endln;
         DS_unregister_host_app();
         exit(OF_ReturnType_failed);
     }
-    error = DS_read_64(board_index, measForceId, (*sizeDaq)(OF_Resp_Force), (UInt64 *)measForce);
+    error = DS_read_64(board_index, daqForceId, (*sizeDaq)(OF_Resp_Force), (UInt64 *)daqForce);
     if (error != DS_NO_ERROR)  {
         opserr << "ECdSpace::acquire() - "
-            << "DS_read_64(measForce): error = " << error << endln;
+            << "DS_read_64(daqForce): error = " << error << endln;
         DS_unregister_host_app();
         exit(OF_ReturnType_failed);
     }

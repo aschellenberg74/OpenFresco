@@ -62,8 +62,8 @@ EEInvertedVBrace2d::EEInvertedVBrace2d(int tag, int Nd1, int Nd2, int Nd3,
     iMod(iM), nlGeom(nlgeom),
     rho1(r1), rho2(r2), L1(0.0), L2(0.0),
     db(0), vb(0), ab(0), t(0),
-    dbMeas(0), vbMeas(0), abMeas(0), qMeas(0), tMeas(0),
-    dbTarg(3), vbTarg(3), abTarg(3),
+    dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
+    dbCtrl(3), vbCtrl(3), abCtrl(3),
     dbPast(3), kbInit(3,3), tPast(0.0), T(3,9)
 {
     // ensure the connectedExternalNode ID is of correct size & set values
@@ -104,20 +104,20 @@ EEInvertedVBrace2d::EEInvertedVBrace2d(int tag, int Nd1, int Nd2, int Nd3,
     ab = new Vector(3);
     t  = new Vector(1);
 
-    // allocate memory for measured response vectors
-    dbMeas = new Vector(3);
-    vbMeas = new Vector(3);
-    abMeas = new Vector(3);
-    qMeas  = new Vector(6);
-    tMeas  = new Vector(1);
+    // allocate memory for daq response vectors
+    dbDaq = new Vector(3);
+    vbDaq = new Vector(3);
+    abDaq = new Vector(3);
+    qDaq  = new Vector(6);
+    tDaq  = new Vector(1);
 
     // set the initial stiffness matrix size
     theInitStiff.resize(9,9);
     
     // initialize additional vectors
-    dbTarg.Zero();
-    vbTarg.Zero();
-    abTarg.Zero();
+    dbCtrl.Zero();
+    vbCtrl.Zero();
+    abCtrl.Zero();
     dbPast.Zero();
 }
 
@@ -133,8 +133,8 @@ EEInvertedVBrace2d::EEInvertedVBrace2d(int tag, int Nd1, int Nd2, int Nd3,
     rho1(r1), rho2(r2), L1(0.0), L2(0.0),
     theChannel(0), sData(0), sendData(0), rData(0), recvData(0),
     db(0), vb(0), ab(0), t(0),
-    dbMeas(0), vbMeas(0), abMeas(0), qMeas(0), tMeas(0),
-    dbTarg(3), vbTarg(3), abTarg(3),
+    dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
+    dbCtrl(3), vbCtrl(3), abCtrl(3),
     dbPast(3), kbInit(3,3), tPast(0.0), T(3,9)
 {
     // ensure the connectedExternalNode ID is of correct size & set values
@@ -217,24 +217,24 @@ EEInvertedVBrace2d::EEInvertedVBrace2d(int tag, int Nd1, int Nd2, int Nd3,
     id = 0;
     rData = new double [dataSize];
     recvData = new Vector(rData, dataSize);
-    dbMeas = new Vector(&rData[id], 1);
+    dbDaq = new Vector(&rData[id], 1);
     id += 3;
-    vbMeas = new Vector(&rData[id], 1);
+    vbDaq = new Vector(&rData[id], 1);
     id += 3;
-    abMeas = new Vector(&rData[id], 1);
+    abDaq = new Vector(&rData[id], 1);
     id += 3;
-    qMeas = new Vector(&rData[id], 1);
+    qDaq = new Vector(&rData[id], 1);
     id += 6;
-    tMeas = new Vector(&rData[id], 1);
+    tDaq = new Vector(&rData[id], 1);
     recvData->Zero();
 
     // set the initial stiffness matrix size
     theInitStiff.resize(9,9);
     
     // initialize additional vectors
-    dbTarg.Zero();
-    vbTarg.Zero();
-    abTarg.Zero();
+    dbCtrl.Zero();
+    vbCtrl.Zero();
+    abCtrl.Zero();
     dbPast.Zero();
 }
 
@@ -253,16 +253,16 @@ EEInvertedVBrace2d::~EEInvertedVBrace2d()
     if (t != 0)
         delete t;
 
-    if (dbMeas != 0)
-        delete dbMeas;
-    if (vbMeas != 0)
-        delete vbMeas;
-    if (abMeas != 0)
-        delete abMeas;
-    if (qMeas != 0)
-        delete qMeas;
-    if (tMeas != 0)
-        delete tMeas;
+    if (dbDaq != 0)
+        delete dbDaq;
+    if (vbDaq != 0)
+        delete vbDaq;
+    if (abDaq != 0)
+        delete abDaq;
+    if (qDaq != 0)
+        delete qDaq;
+    if (tDaq != 0)
+        delete tDaq;
 
     if (theSite == 0)  {
         sData[0] = OF_RemoteTest_DIE;
@@ -595,7 +595,7 @@ const Vector& EEInvertedVBrace2d::getResistingForce()
     
     // determine resisting forces in basic system
     if (theSite != 0)  {
-        (*qMeas) = theSite->getForce();
+        (*qDaq) = theSite->getForce();
     }
     else  {
         sData[0] = OF_RemoteTest_getForce;
@@ -605,9 +605,9 @@ const Vector& EEInvertedVBrace2d::getResistingForce()
     
     // apply optional initial stiffness modification
     if (iMod == true)  {
-        // get measured displacements
+        // get daq displacements
         if (theSite != 0)  {
-            (*dbMeas) = theSite->getDisp();
+            (*dbDaq) = theSite->getDisp();
         }
         else  {
             sData[0] = OF_RemoteTest_getDisp;
@@ -617,7 +617,7 @@ const Vector& EEInvertedVBrace2d::getResistingForce()
 
         // correct for displacement control errors using I-Modification
         static Vector qb;
-        qb = kbInit*((*dbMeas) - (*db));
+        qb = kbInit*((*dbDaq) - (*db));
         
         //double ratioX1 = (q(0)+q(3)!=0) ? q(0)/(q(0) + q(3)) : 0.5;
         //double ratioX2 = (q(0)+q(3)!=0) ? q(3)/(q(0) + q(3)) : 0.5;
@@ -628,26 +628,26 @@ const Vector& EEInvertedVBrace2d::getResistingForce()
         //q(3) += qb(0)*ratioX2;
         //q(4) += qb(1)*ratioY2;
         
-        (*qMeas)(0) += qb(0)/2 + qb(1)/2*dx1[0]/dx1[1];
-        (*qMeas)(1) += qb(0)/2*dx1[1]/dx1[0] + qb(1)/2;
-        (*qMeas)(3) += qb(0)/2 + qb(1)/2*dx2[0]/dx2[1];
-        (*qMeas)(4) += qb(0)/2*dx2[1]/dx2[0] + qb(1)/2;
+        (*qDaq)(0) += qb(0)/2 + qb(1)/2*dx1[0]/dx1[1];
+        (*qDaq)(1) += qb(0)/2*dx1[1]/dx1[0] + qb(1)/2;
+        (*qDaq)(3) += qb(0)/2 + qb(1)/2*dx2[0]/dx2[1];
+        (*qDaq)(4) += qb(0)/2*dx2[1]/dx2[0] + qb(1)/2;
     }
     
-    // save corresponding target displacements for recorder
-    dbTarg = (*db);
-    vbTarg = (*vb);
-    abTarg = (*ab);
+    // save corresponding ctrl displacements for recorder
+    dbCtrl = (*db);
+    vbCtrl = (*vb);
+    abCtrl = (*ab);
 
     // determine resisting forces in global system and account for load-cell
     // cross-talk by averaging between shear and axial loads
-    theVector(0) = 0.5*((*qMeas)(0) + dx1[0]/dx1[1]*(*qMeas)(1));
-    theVector(1) = 0.5*(dx1[1]/dx1[0]*(*qMeas)(0) + (*qMeas)(1));
-    //theVector(2) = (*qMeas)(2);    // with moments
+    theVector(0) = 0.5*((*qDaq)(0) + dx1[0]/dx1[1]*(*qDaq)(1));
+    theVector(1) = 0.5*(dx1[1]/dx1[0]*(*qDaq)(0) + (*qDaq)(1));
+    //theVector(2) = (*qDaq)(2);    // with moments
     theVector(2) = 0;       // w/o moments
-    theVector(3) = 0.5*((*qMeas)(3) + dx2[0]/dx2[1]*(*qMeas)(4));
-    theVector(4) = 0.5*(dx2[1]/dx2[0]*(*qMeas)(3) + (*qMeas)(4));
-    //theVector(5) = (*qMeas)(5);    // with moments
+    theVector(3) = 0.5*((*qDaq)(3) + dx2[0]/dx2[1]*(*qDaq)(4));
+    theVector(4) = 0.5*(dx2[1]/dx2[0]*(*qDaq)(3) + (*qDaq)(4));
+    //theVector(5) = (*qDaq)(5);    // with moments
     theVector(5) = 0;       // w/o moments
     theVector(6) = -theVector(0) - theVector(3);
     theVector(7) = -theVector(1) - theVector(4);
@@ -692,7 +692,7 @@ const Vector& EEInvertedVBrace2d::getResistingForceIncInertia()
 const Vector& EEInvertedVBrace2d::getTime()
 {	
     if (theSite != 0)  {
-        (*tMeas) = theSite->getTime();
+        (*tDaq) = theSite->getTime();
     }
     else  {
         sData[0] = OF_RemoteTest_getTime;
@@ -700,14 +700,14 @@ const Vector& EEInvertedVBrace2d::getTime()
         theChannel->recvVector(0, 0, *recvData, 0);
     }
 
-    return *tMeas;
+    return *tDaq;
 }
 
 
 const Vector& EEInvertedVBrace2d::getBasicDisp()
 {	
     if (theSite != 0)  {
-        (*dbMeas) = theSite->getDisp();
+        (*dbDaq) = theSite->getDisp();
     }
     else  {
         sData[0] = OF_RemoteTest_getDisp;
@@ -715,14 +715,14 @@ const Vector& EEInvertedVBrace2d::getBasicDisp()
         theChannel->recvVector(0, 0, *recvData, 0);
     }
 
-    return *dbMeas;
+    return *dbDaq;
 }
 
 
 const Vector& EEInvertedVBrace2d::getBasicVel()
 {	
     if (theSite != 0)  {
-        (*vbMeas) = theSite->getVel();
+        (*vbDaq) = theSite->getVel();
     }
     else  {
         sData[0] = OF_RemoteTest_getVel;
@@ -730,14 +730,14 @@ const Vector& EEInvertedVBrace2d::getBasicVel()
         theChannel->recvVector(0, 0, *recvData, 0);
     }
 
-    return *vbMeas;
+    return *vbDaq;
 }
 
 
 const Vector& EEInvertedVBrace2d::getBasicAccel()
 {	
     if (theSite != 0)  {
-        (*abMeas) = theSite->getAccel();
+        (*abDaq) = theSite->getAccel();
     }
     else  {
         sData[0] = OF_RemoteTest_getAccel;
@@ -745,7 +745,7 @@ const Vector& EEInvertedVBrace2d::getBasicAccel()
         theChannel->recvVector(0, 0, *recvData, 0);
     }
 
-    return *abMeas;
+    return *abDaq;
 }
 
 
@@ -819,16 +819,18 @@ Response* EEInvertedVBrace2d::setResponse(const char **argv, int argc,
     OPS_Stream &output)
 {
     Response *theResponse = 0;
-
+    
     output.tag("ElementOutput");
     output.attr("eleType","EEInvertedVBrace2d");
     output.attr("eleTag",this->getTag());
     output.attr("node1",connectedExternalNodes[0]);
     output.attr("node2",connectedExternalNodes[1]);
-
+    
     // global forces
-    if (strcmp(argv[0],"force") == 0 || strcmp(argv[0],"forces") == 0 ||
-        strcmp(argv[0],"globalForce") == 0 || strcmp(argv[0],"globalForces") == 0)
+    if (strcmp(argv[0],"force") == 0 ||
+        strcmp(argv[0],"forces") == 0 ||
+        strcmp(argv[0],"globalForce") == 0 ||
+        strcmp(argv[0],"globalForces") == 0)
     {
         output.tag("ResponseType","Px_1");
         output.tag("ResponseType","Py_1");
@@ -842,8 +844,10 @@ Response* EEInvertedVBrace2d::setResponse(const char **argv, int argc,
 
         theResponse = new ElementResponse(this, 1, theVector);
     }
+    
     // local forces
-    else if (strcmp(argv[0],"localForce") == 0 || strcmp(argv[0],"localForces") == 0)
+    else if (strcmp(argv[0],"localForce") == 0 ||
+        strcmp(argv[0],"localForces") == 0)
     {
         output.tag("ResponseType","px_1");
         output.tag("ResponseType","py_1");
@@ -857,8 +861,12 @@ Response* EEInvertedVBrace2d::setResponse(const char **argv, int argc,
 
         theResponse = new ElementResponse(this, 2, theVector);
     }
+    
     // basic forces
-    else if (strcmp(argv[0],"basicForce") == 0 || strcmp(argv[0],"basicForces") == 0)
+    else if (strcmp(argv[0],"basicForce") == 0 ||
+        strcmp(argv[0],"basicForces") == 0 ||
+        strcmp(argv[0],"daqForce") == 0 ||
+        strcmp(argv[0],"daqForces") == 0)
     {
         output.tag("ResponseType","q1");
         output.tag("ResponseType","q2");
@@ -869,10 +877,17 @@ Response* EEInvertedVBrace2d::setResponse(const char **argv, int argc,
 
         theResponse = new ElementResponse(this, 3, Vector(6));
     }
-    // target basic displacements
-    else if (strcmp(argv[0],"deformation") == 0 || strcmp(argv[0],"deformations") == 0 || 
-        strcmp(argv[0],"basicDeformation") == 0 || strcmp(argv[0],"basicDeformations") == 0 ||
-        strcmp(argv[0],"targetDisplacement") == 0 || strcmp(argv[0],"targetDisplacements") == 0)
+    
+    // ctrl basic displacements
+    else if (strcmp(argv[0],"defo") == 0 ||
+        strcmp(argv[0],"deformation") == 0 ||
+        strcmp(argv[0],"deformations") == 0 ||
+        strcmp(argv[0],"basicDefo") == 0 ||
+        strcmp(argv[0],"basicDeformation") == 0 ||
+        strcmp(argv[0],"basicDeformations") == 0 ||
+        strcmp(argv[0],"ctrlDisp") == 0 ||
+        strcmp(argv[0],"ctrlDisplacement") == 0 ||
+        strcmp(argv[0],"ctrlDisplacements") == 0)
     {
         output.tag("ResponseType","db1");
         output.tag("ResponseType","db2");
@@ -880,9 +895,11 @@ Response* EEInvertedVBrace2d::setResponse(const char **argv, int argc,
 
         theResponse = new ElementResponse(this, 4, Vector(3));
     }
-    // target basic velocities
-    else if (strcmp(argv[0],"targetVelocity") == 0 ||
-        strcmp(argv[0],"targetVelocities") == 0)
+    
+    // ctrl basic velocities
+    else if (strcmp(argv[0],"ctrlVel") == 0 ||
+        strcmp(argv[0],"ctrlVelocity") == 0 ||
+        strcmp(argv[0],"ctrlVelocities") == 0)
     {
         output.tag("ResponseType","vb1");
         output.tag("ResponseType","vb2");
@@ -890,9 +907,11 @@ Response* EEInvertedVBrace2d::setResponse(const char **argv, int argc,
 
         theResponse = new ElementResponse(this, 5, Vector(3));
     }
-    // target basic accelerations
-    else if (strcmp(argv[0],"targetAcceleration") == 0 ||
-        strcmp(argv[0],"targetAccelerations") == 0)
+    
+    // ctrl basic accelerations
+    else if (strcmp(argv[0],"ctrlAccel") == 0 ||
+        strcmp(argv[0],"ctrlAcceleration") == 0 ||
+        strcmp(argv[0],"ctrlAccelerations") == 0)
     {
         output.tag("ResponseType","ab1");
         output.tag("ResponseType","ab2");
@@ -900,39 +919,45 @@ Response* EEInvertedVBrace2d::setResponse(const char **argv, int argc,
 
         theResponse = new ElementResponse(this, 6, Vector(3));
     }
-    // measured basic displacements
-    else if (strcmp(argv[0],"measuredDisplacement") == 0 || 
-        strcmp(argv[0],"measuredDisplacements") == 0)
+    
+    // daq basic displacements
+    else if (strcmp(argv[0],"daqDisp") == 0 ||
+        strcmp(argv[0],"daqDisplacement") == 0 ||
+        strcmp(argv[0],"daqDisplacements") == 0)
     {
-        output.tag("ResponseType","dbm1");
-        output.tag("ResponseType","dbm2");
-        output.tag("ResponseType","dbm3");
+        output.tag("ResponseType","dbDaq1");
+        output.tag("ResponseType","dbDaq2");
+        output.tag("ResponseType","dbDaq3");
 
         theResponse = new ElementResponse(this, 7, Vector(3));
     }
-    // measured basic velocities
-    else if (strcmp(argv[0],"measuredVelocity") == 0 || 
-        strcmp(argv[0],"measuredVelocities") == 0)
+    
+    // daq basic velocities
+    else if (strcmp(argv[0],"daqVel") == 0 ||
+        strcmp(argv[0],"daqVelocity") == 0 ||
+        strcmp(argv[0],"daqVelocities") == 0)
     {
-        output.tag("ResponseType","vbm1");
-        output.tag("ResponseType","vbm2");
-        output.tag("ResponseType","vbm3");
+        output.tag("ResponseType","vbDaq1");
+        output.tag("ResponseType","vbDaq2");
+        output.tag("ResponseType","vbDaq3");
 
         theResponse = new ElementResponse(this, 8, Vector(3));
     }
-    // measured basic accelerations
-    else if (strcmp(argv[0],"measuredAcceleration") == 0 || 
-        strcmp(argv[0],"measuredAccelerations") == 0)
+    
+    // daq basic accelerations
+    else if (strcmp(argv[0],"daqAccel") == 0 ||
+        strcmp(argv[0],"daqAcceleration") == 0 ||
+        strcmp(argv[0],"daqAccelerations") == 0)
     {
-        output.tag("ResponseType","abm1");
-        output.tag("ResponseType","abm2");
-        output.tag("ResponseType","abm3");
+        output.tag("ResponseType","abDaq1");
+        output.tag("ResponseType","abDaq2");
+        output.tag("ResponseType","abDaq3");
 
         theResponse = new ElementResponse(this, 9, Vector(3));
     }
-
+    
     output.endTag(); // ElementOutput
-
+    
     return theResponse;
 }
 
@@ -947,24 +972,24 @@ int EEInvertedVBrace2d::getResponse(int responseID, Information &eleInfo)
         return eleInfo.setVector(this->getResistingForce());
         
     case 3:  // basic forces
-        return eleInfo.setVector(*qMeas);
+        return eleInfo.setVector(*qDaq);
         
-    case 4:  // target basic displacements
-        return eleInfo.setVector(dbTarg);
+    case 4:  // ctrl basic displacements
+        return eleInfo.setVector(dbCtrl);
         
-    case 5:  // target basic velocities
-        return eleInfo.setVector(vbTarg);
+    case 5:  // ctrl basic velocities
+        return eleInfo.setVector(vbCtrl);
         
-    case 6:  // target basic accelerations
-        return eleInfo.setVector(abTarg);
+    case 6:  // ctrl basic accelerations
+        return eleInfo.setVector(abCtrl);
         
-    case 7:  // measured basic displacements
+    case 7:  // daq basic displacements
         return eleInfo.setVector(this->getBasicDisp());
         
-    case 8:  // measured basic velocities
+    case 8:  // daq basic velocities
         return eleInfo.setVector(this->getBasicVel());
         
-    case 9:  // measured basic accelerations
+    case 9:  // daq basic accelerations
         return eleInfo.setVector(this->getBasicAccel());
         
     default:

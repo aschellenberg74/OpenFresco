@@ -91,8 +91,8 @@ private:
     
     void sleep(const clock_t wait);
 
-    Vector *cDispV;
-    Vector *dDispV, *dForceV;
+    Vector *ctrlDisp;
+    Vector *daqDisp, *daqForce;
 
     double actForce;
     double actDisp;

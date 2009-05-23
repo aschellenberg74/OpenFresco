@@ -55,7 +55,9 @@ public:
     virtual void update();
     
     virtual ExperimentalSignalFilter *getCopy();
-    void Print(OPS_Stream &s, int flag);
+    
+    // public methods for output
+    void Print(OPS_Stream &s, int flag = 0);
     
 private:
     double undershoot;

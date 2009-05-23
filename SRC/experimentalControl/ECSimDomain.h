@@ -121,8 +121,8 @@ private:
     
     int numSPs;     // total number of SP constraints
     
-    double *targDisp, *targVel, *targAccel, *targForce;
-    double *measDisp, *measVel, *measAccel, *measForce;
+    double *ctrlDisp, *ctrlVel, *ctrlAccel, *ctrlForce;
+    double *daqDisp, *daqVel, *daqAccel, *daqForce;
 };
 
 #endif

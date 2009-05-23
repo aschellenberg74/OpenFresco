@@ -111,7 +111,7 @@ ExperimentalSignalFilter* ESFErrorSimRandomGauss::getCopy()
 }
 
 
-void ESFErrorSimRandomGauss::Print(OPS_Stream &s, int flag = 0)
+void ESFErrorSimRandomGauss::Print(OPS_Stream &s, int flag)
 {
     s << "Filter: " << this->getTag(); 
     s << "  type: ESFErrorSimRandomGauss\n";
