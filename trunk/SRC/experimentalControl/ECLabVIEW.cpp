@@ -524,8 +524,8 @@ void ECLabVIEW::Print(OPS_Stream &s, int flag)
     }
     s << "\n*   daqFilters:";
     for (int i=0; i<OF_Resp_All; i++)  {
-        if (theCtrlFilters[i] != 0)
-            s << " " << theCtrlFilters[i]->getTag();
+        if (theDaqFilters[i] != 0)
+            s << " " << theDaqFilters[i]->getTag();
         else
             s << " 0";
     }
