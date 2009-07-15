@@ -1,5 +1,5 @@
-Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual Studio 2005
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "openFrescoDll", "proj\openFrescoDll\openFrescoDll.vcproj", "{41D52F86-31CD-4DCF-8F58-BEC7C09D48E7}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cExample", "proj\cExample\cExample.vcproj", "{2F8F864C-55C7-457E-9D80-ACB031753D56}"
