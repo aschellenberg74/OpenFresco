@@ -11,6 +11,8 @@ HybridCtrlParameters.dtInt = 0.02;        % integration time step (sec)
 HybridCtrlParameters.dtSim = 0.02;        % simulation time step (sec)
 HybridCtrlParameters.dtCon = 1/1000;      % controller time step (sec)
 HybridCtrlParameters.delay = 0.0;         % delay due to undershoot (sec)
+%HybridCtrlParameters.delay = 0.0661+0.0275;  % delay due to undershoot (sec)
+%HybridCtrlParameters.delay = 0.0661+0.0488;  % delay due to undershoot (sec)
 
 % calculate max number of substeps
 HybridCtrlParameters.N = round(HybridCtrlParameters.dtSim/HybridCtrlParameters.dtCon);
@@ -52,4 +54,4 @@ disp(HybridCtrlParameters);
 % initialization of tunable parameters
 nAct = 1;
 newTarget = 0;
-targDsp   = zeros(1,nAct);
+targDsp = zeros(1,nAct);

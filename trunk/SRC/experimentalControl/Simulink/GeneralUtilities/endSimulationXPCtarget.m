@@ -1,31 +1,32 @@
 function data = endSimulationXPCtarget(outputFile)
-%ENDSIMULATIONXPCTARGET to stop xPC-Target, retrieve and plot variables
-% data = endSimulationXPCtarget(outputFile)
+%ENDSIMULATIONXPCTARGET to stop xPC-Target and download the data
+% endSimulationXPCtarget(outputFile)
 %
 % data       : output structure with following fields
 %     .fileName : names of retrieved files
 %     .values   : array with data values
 % outputFile : output file the data is saved to
 %
-%
-% Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
-% Created: 04/05
+% implemented by Andreas Schellenberg 11/2004
 
 close all;
 clc;
 
-% stop xPCtarget model
-tg = xpc;
-tg.stop;
+% connect to target and stop model
+try
+   tg = xpc;
+   tg.stop;
+end
 
-% get the variables saved on the xPC Target
-data = getXPCtargetVar({'targDsp.dat','commDsp.dat','measDsp.dat', ...
-   'state.dat','count.dat','flag.dat','measFrc.dat'});
+% get the variables saved on the target
+data = getXPCtargetVar({'targDsp','commDsp','measDsp', ...
+   'state','count','flag','measFrc'});
 
-% save workspace
+% save data structure to file
 save(outputFile,'data');
+
+% disconnect from target
+close(xpc);
 
 % plot output
 plotOutputXPCtarget(outputFile);
-
-close(xpc);
