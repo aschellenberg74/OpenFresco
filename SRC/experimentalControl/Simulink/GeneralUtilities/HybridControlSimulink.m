@@ -1,25 +1,25 @@
-function varargout = HybridControlSimulink(action,type,appName,targDsp,targVel,targAcc)
+function varargout = HybridControlSimulink(action,type,appName,ctrlDsp,ctrlVel,ctrlAcc)
 %HYBRIDCONTROLSIMULINK to obtain the resting forces from simulink
-% varargout = HybridControlSimulink(action,type,appName,targDsp,targVel,targAcc)
+% varargout = HybridControlSimulink(action,type,appName,ctrlDsp,ctrlVel,ctrlAcc)
 %
 % varargout : output with following possible values
-%                 {measDsp,measFrc} : for case 'acquire'
-%                 {}                : for case 'initialize', 'execute' and 'stop'
+%                 {daqDsp,daqFrc} : for case 'acquire'
+%                 {}              : for case 'initialize', 'execute' and 'stop'
 % action    : switch with following possible values
 %                 'initialize'   initialize the api to access the simulink model
-%                 'execute'      send the target displacements to predictor-corrector
-%                 'acquire'      acquire resisting forces and displacements 
+%                 'control'      send the target displacements to predictor-corrector
+%                 'acquire'      acquire displacements and resisting forces 
 %                 'stop'         stop the simulink model
 % type      : controller type (Dsp, DspVel, DspVelAcc)
 % appName   : simulink application name
-% targDsp   : controller target displacements
-% targVel   : controller target velocities
-% targAcc   : controller target accelerations
+% ctrlDsp   : control displacements
+% ctrlVel   : control velocities
+% ctrlAcc   : control accelerations
 %
 % Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
 % Created: 11/04
 
-persistent updateFlagId targetFlagId targDspId targVelId targAccId measDspId measFrcId
+persistent newTargetId switchPCId atTargetId ctrlDspId ctrlVelId ctrlAccId daqDspId daqFrcId
 
 % set pause time
 ptime = 0.0001;
@@ -28,64 +28,77 @@ switch action
    %=======================================================================
    case 'init'
       clc;
-      % get signal structures
-      updateFlagId = [appName,'/simPC HC/updateFlag'];
-      targetFlagId = get_param([appName,'/simPC HC/targetFlag'],'RuntimeObject');
-      targDspId  = [appName,'/simPC HC/targDsp'];
-      if strcmp(type,'DspVel') | strcmp(type,'DspVelAcc')
-         targVelId  = [appName,'/simPC HC/targVel'];
+      % get signal structures      
+      newTargetId = [appName,'/model/simPC HC/newTarget'];      
+      switchPCId = get_param([appName,'/model/simPC HC/switchPC'],'RuntimeObject');
+      atTargetId = get_param([appName,'/model/simPC HC/atTarget'],'RuntimeObject');
+      ctrlDspId = [appName,'/model/simPC HC/targDsp'];
+      if strcmp(type,'DspVel') || strcmp(type,'DspVelAcc')
+         ctrlVelId = [appName,'/model/simPC HC/targVel'];
       end
       if strcmp(type,'DspVelAcc')
-         targAccId  = [appName,'/simPC HC/targAcc'];
+         ctrlAccId = [appName,'/simPC HC/targAcc'];
       end
-      measDspId    = get_param([appName,'/simPC HC/measDsp'],'RuntimeObject');
-      measFrcId    = get_param([appName,'/simPC HC/measFrc'],'RuntimeObject');
+      daqDspId = get_param([appName,'/model/simPC HC/measDsp'],'RuntimeObject');
+      daqFrcId = get_param([appName,'/model/simPC HC/measFrc'],'RuntimeObject');
 
-      % reset updateFlag and targDsp
-      set_param(updateFlagId,'Value','-1');
-      set_param(targDspId,'Value',['[',num2str(targDsp),']']);
-      if strcmp(type,'DspVel') | strcmp(type,'DspVelAcc')
-         set_param(targVelId,'Value',['[',num2str(targVel),']']);
+      % reset newTarget flag and control response
+      set_param(newTargetId,'Value','0');
+      set_param(ctrlDspId,'Value',['[',num2str(ctrlDsp),']']);
+      if strcmp(type,'DspVel') || strcmp(type,'DspVelAcc')
+         set_param(ctrlVelId,'Value',['[',num2str(ctrlVel),']']);
       end
       if strcmp(type,'DspVelAcc')
-         set_param(targAccId,'Value',['[',num2str(targAcc),']']);
+         set_param(ctrlAccId,'Value',['[',num2str(ctrlAcc),']']);
       end      
       pause(ptime);
       
       varargout = {};
    %=======================================================================
-   case 'execute'
-      % send target displacements and set updateFlag
-      set_param(targDspId,'Value',['[',num2str(targDsp),']']);
-      if strcmp(type,'DspVel') | strcmp(type,'DspVelAcc')
-         set_param(targVelId,'Value',['[',num2str(targVel),']']);
+   case 'control'
+      % send ctrlDisp, ctrlVel and ctrlAccel
+      set_param(ctrlDspId,'Value',['[',num2str(ctrlDsp),']']);
+      if strcmp(type,'DspVel') || strcmp(type,'DspVelAcc')
+         set_param(ctrlVelId,'Value',['[',num2str(ctrlVel),']']);
       end
       if strcmp(type,'DspVelAcc')
-         set_param(targAccId,'Value',['[',num2str(targAcc),']']);
-      end            
-      set_param(updateFlagId,'Value','1');
+         set_param(ctrlAccId,'Value',['[',num2str(ctrlAcc),']']);
+      end
+      
+      % set newTarget flag
+      set_param(newTargetId,'Value','1');
+      
+      % wait until switchPC flag has changed as well
+      switchPC = 0;
+      while (switchPC ~= 1)
+        switchPC = switchPCId.OutputPort(1).Data;
+      end
+      
+      % reset newTarget flag
+      set_param(newTargetId,'Value','0');
+      
+      % wait until switchPC flag has changed as well
+      switchPC = 1;
+      while (switchPC ~= 0)
+        switchPC = switchPCId.OutputPort(1).Data;
+      end
       pause(ptime);
       
       varargout = {};
    %=======================================================================
    case 'acquire'
-      targetFlag = 1;
-      while targetFlag
-         % get targetFlag
-         pause(ptime);
-         targetFlag = targetFlagId.OutputPort(1).Data;
+      % wait until target is reached
+      atTarget = 0;
+      while (atTarget ~= 1)
+         atTarget = atTargetId.OutputPort(1).Data;
       end
       
-      % get displacement and resisting force at target
+      % read displacements and resisting forces at target
+      daqDsp = daqDspId.InputPort(1).Data';
+      daqFrc = daqFrcId.InputPort(1).Data';
       pause(ptime);
-      measDsp = measDspId.InputPort(1).Data';
-      measFrc = measFrcId.InputPort(1).Data';
       
-      % reset updateFlag
-      set_param(updateFlagId,'Value','0');
-      pause(ptime);
-
-      varargout = {measDsp,measFrc};
+      varargout = {daqDsp,daqFrc};
    %=======================================================================
    case 'stop'
       % stop simulink model

@@ -298,7 +298,7 @@ int correctD2(double *dsp, double x)
     for (i=0; i<nAct; i++)  {
         dsp[i] = dsp1[i]*(x)*(x-xi)/(1.0-xi)
             + dspXi[i]*(x-1.0)*(x)/(xi-1.0)/(xi)
-            + dsp2[i]*(x-1.0)*(x-xi)/(xi);
+            + dsp3[i]*(x-1.0)*(x-xi)/(xi);
     }
 
     return 0;
@@ -323,8 +323,8 @@ int correctD3(double *dsp, double x)
     for (i=0; i<nAct; i++)  {    
         dsp[i] = dsp1[i]*(x)*(1.0+x)*(x-xi)/(2.0)/(1-xi)
             + dspXi[i]*(x-1.0)*(x)*(1.0+x)/(xi-1.0)/(xi)/(1.0+xi)
-            + dsp2[i]*(x-1.0)*(1.0+x)*(x-xi)/(xi)
-            - dsp3[i]*(x-1.0)*(x)*(x-xi)/(2.0)/(1.0+xi);
+            + dsp3[i]*(x-1.0)*(1.0+x)*(x-xi)/(xi)
+            - dsp4[i]*(x-1.0)*(x)*(x-xi)/(2.0)/(1.0+xi);
     }
 
     return 0;

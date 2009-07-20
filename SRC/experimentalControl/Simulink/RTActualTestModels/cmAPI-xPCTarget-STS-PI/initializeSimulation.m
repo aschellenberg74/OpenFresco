@@ -10,8 +10,8 @@ clc;
 %%%%%%%%%% HYBRID CONTROLLER PARAMETERS %%%%%%%%%%
 
 % set time steps
-HybridCtrlParameters.dtInt = 0.02;        % integration time step (sec)
-HybridCtrlParameters.dtSim = 0.02;        % simulation time step (sec)
+HybridCtrlParameters.dtInt = 1/128;       %8.164e-003;  % integration time step (sec)
+HybridCtrlParameters.dtSim = 1;           % simulation time step (sec)
 HybridCtrlParameters.dtCon = 1/1024;      % controller time step (sec)
 HybridCtrlParameters.delay = 0;           % delay due to undershoot (sec)
 %HybridCtrlParameters.delay = 0.0661+0.0275;  % delay due to undershoot (sec)
@@ -50,6 +50,7 @@ disp('Model Properties:');
 disp('=================');
 disp(HybridCtrlParameters);
 
+
 %%%%%%%%%% SIGNAL COUNTS %%%%%%%%%%
 
 nAct	  = 8;                                    % number of actuators
@@ -65,7 +66,7 @@ nUDPInp = 1+6*nAct+nAdcU+nDucU+nEncU+nDinp;     % no. of inputs to simulink brid
 
 samplePeriod = 1/1024;
 
-%%%%%%%%%% START MTS (STS) %%%%%%%%%%
+%%%%%%%%%% SCRAMNET PARTITIONS %%%%%%%%%%
 
 %%%%%%%%%% outputs to scramnet %%%%%%%%%%
 
@@ -170,80 +171,45 @@ partition(23).Size = num2str(nDinp);
 partition(24).Type = 'uint32';
 partition(24).Size = '866';
 
-%%%%%%%%%% END MTS (STS) %%%%%%%%%%
-
-
 %%%%%%%%%% START PACIFIC %%%%%%%%%%
 
-% blank space (since it is not used here)
-partition(25).Type = 'uint32';
-partition(25).Size = '94231';
-
-%%%%%%%%%% END PACIFIC %%%%%%%%%%
-
-
-%%%%%%%%%% START OPENFRESCO %%%%%%%%%%
-
-%%%%%%%%%% flags from/to scramnet %%%%%%%%%%
-
-% newTarget (from)
-partition(26).Type = 'uint32';
-partition(26).Size = '1';
-
-% switchPC (to)
-partition(27).Type = 'uint32';
-partition(27).Size = '1';
-
-% atTarget (to)
-partition(28).Type = 'uint32';
-partition(28).Size = '1';
+% PI software parameters
+chanID         = [1,2,5,6,7,10]   % index vector of channels to be extracted from SCRAMNET
+chanOffSet     = 0;        % offset (0, 16, 32, 48, 64, 80, 96, 112, 128) since total number of channels are divided in groups of 16; limited by xPC
+CVTcompression = 8;        % number of channels per card allocated by software (do not change), current config (March 2005): 8 channels
+% PI hardware parameters
+nCard          = 4;        % max number of PI cards; limited by xPC (do not change), current config (March 2005): 4 cards
+nChan          = 4;        % number of channels per card (do not change), current config (March 2005): 4 channels per card
+% index vectors
+chanID         = chanID - chanOffSet;
+countsID       = ((ceil(chanID/nChan)-1)*CVTcompression + (chanID/nChan-(ceil(chanID/nChan)-1))*nChan)*2;
+calibrationID  = [(countsID./2-1)*11+6,(countsID./2-1)*11+7,(countsID./2-1)*11+8,(countsID./2-1)*11+9,(countsID./2-1)*11+10];
 
 %%%%%%%%%% inputs from scramnet %%%%%%%%%%
 
-% disp commands
-partition(29).Type = 'single';
-partition(29).Size = num2str(nAct);
+% heartbeat (memory address 0X1000)
+partition(25).Type = 'uint32';
+partition(25).Size = '1';
 
-% vel commands
-partition(30).Type = 'single';
-partition(30).Size = num2str(nAct);
+% raw data [counts]
+partition(26).Type = 'int16';
+partition(26).Size = num2str(nCard*CVTcompression*2);
 
-% accel commands
-partition(31).Type = 'single';
-partition(31).Size = num2str(nAct);
+% blank space (remainder of 1024 words - heartbeat - raw data)
+partition(27).Type = 'uint32';
+partition(27).Size = num2str(1024 - 1 - nCard*CVTcompression);
 
-% force commands
-partition(32).Type = 'single';
-partition(32).Size = num2str(nAct);
+% calibration header (memory address 0X2000)
+partition(28).Type = 'uint8';
+partition(28).Size = '88';
 
-% time commands
-partition(33).Type = 'single';
-partition(33).Size = num2str(nAct);
+% calibration constants
+partition(29).Type = 'double';
+partition(29).Size = num2str(nCard*CVTcompression*11);
 
-%%%%%%%%%% outputs to scramnet %%%%%%%%%%
-
-% disp feedbacks
-partition(34).Type = 'single';
-partition(34).Size = num2str(nAct);
-
-% vel feedbacks
-partition(35).Type = 'single';
-partition(35).Size = num2str(nAct);
-
-% accel feedbacks
-partition(36).Type = 'single';
-partition(36).Size = num2str(nAct);
-
-% force feedbacks
-partition(37).Type = 'single';
-partition(37).Size = num2str(nAct);
-
-% time feedbacks
-partition(38).Type = 'single';
-partition(38).Size = num2str(nAct);
-
-%%%%%%%%%% END OPENFRESCO %%%%%%%%%%
-
+% blank space (remainder of 1024 words - header - constants)
+partition(30).Type = 'uint32';
+partition(30).Size = num2str(1024 - 11 - nCard*CVTcompression*11);
 
 %%%%%%%%%% scramnet interrupt configuration %%%%%%%%%%
 
