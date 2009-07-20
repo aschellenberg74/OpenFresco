@@ -295,6 +295,7 @@ int ExperimentalSetup::setCtrlDaqSize()
 
 int ExperimentalSetup::checkSize(ID sizeT, ID sizeO)
 {
+    // check for correct data sizes
     for (int i=0; i<OF_Resp_All; i++)  {
         if ((sizeT(i) != 0 && sizeT(i) != (*sizeTrial)(i)) ||
             (sizeO(i) != 0 && sizeO(i) != (*sizeOut)(i)))  {
@@ -305,6 +306,128 @@ int ExperimentalSetup::checkSize(ID sizeT, ID sizeO)
             opserr << "sizeOut: site  = " << sizeO 
                    << "         setup = " << *sizeOut << endln;
             return OF_ReturnType_failed;
+        }
+    }
+    
+    // cleanup of data vectors that are no longer required
+    if (sizeT(OF_Resp_Disp) == 0)  {
+        (*sizeTrial)(OF_Resp_Disp) = 0;
+        if (tDisp != 0)  {
+            delete tDisp;
+            tDisp = 0;
+        }
+        (*sizeCtrl)(OF_Resp_Disp) = 0;
+        if (cDisp != 0)  {
+            delete cDisp;
+            cDisp = 0;
+        }
+    }
+    if (sizeT(OF_Resp_Vel) == 0)  {
+        (*sizeTrial)(OF_Resp_Vel) = 0;
+        if (tVel != 0)  {
+            delete tVel;
+            tVel = 0;
+        }
+        (*sizeCtrl)(OF_Resp_Vel) = 0;
+        if (cVel != 0)  {
+            delete cVel;
+            cVel = 0;
+        }
+    }
+    if (sizeT(OF_Resp_Accel) == 0)  {
+        (*sizeTrial)(OF_Resp_Accel) = 0;
+        if (tAccel != 0)  {
+            delete tAccel;
+            tAccel = 0;
+        }
+        (*sizeCtrl)(OF_Resp_Accel) = 0;
+        if (cAccel != 0)  {
+            delete cAccel;
+            cAccel = 0;
+        }
+    }
+    if (sizeT(OF_Resp_Force) == 0)  {
+        (*sizeTrial)(OF_Resp_Force) = 0;
+        if (tForce != 0)  {
+            delete tForce;
+            tForce = 0;
+        }
+        (*sizeCtrl)(OF_Resp_Force) = 0;
+        if (cForce != 0)  {
+            delete cForce;
+            cForce = 0;
+        }
+    }
+    if (sizeT(OF_Resp_Time) == 0)  {
+        (*sizeTrial)(OF_Resp_Time) = 0;
+        if (tTime != 0)  {
+            delete tTime;
+            tTime = 0;
+        }
+        (*sizeCtrl)(OF_Resp_Time) = 0;
+        if (cTime != 0)  {
+            delete cTime;
+            cTime = 0;
+        }
+    }
+    if (sizeO(OF_Resp_Disp) == 0)  {
+        (*sizeOut)(OF_Resp_Disp) = 0;
+        if (oDisp != 0)  {
+            delete oDisp;
+            oDisp = 0;
+        }
+        (*sizeDaq)(OF_Resp_Disp) = 0;
+        if (dDisp != 0)  {
+            delete dDisp;
+            dDisp = 0;
+        }
+    }
+    if (sizeO(OF_Resp_Vel) == 0)  {
+        (*sizeOut)(OF_Resp_Vel) = 0;
+        if (oVel != 0)  {
+            delete oVel;
+            oVel = 0;
+        }
+        (*sizeDaq)(OF_Resp_Vel) = 0;
+        if (dVel != 0)  {
+            delete dVel;
+            dVel = 0;
+        }
+    }
+    if (sizeO(OF_Resp_Accel) == 0)  {
+        (*sizeOut)(OF_Resp_Accel) = 0;
+        if (oAccel != 0)  {
+            delete oAccel;
+            oAccel = 0;
+        }
+        (*sizeDaq)(OF_Resp_Accel) = 0;
+        if (dAccel != 0)  {
+            delete dAccel;
+            dAccel = 0;
+        }
+    }
+    if (sizeO(OF_Resp_Force) == 0)  {
+        (*sizeOut)(OF_Resp_Force) = 0;
+        if (oForce != 0)  {
+            delete oForce;
+            oForce = 0;
+        }
+        (*sizeDaq)(OF_Resp_Force) = 0;
+        if (dForce != 0)  {
+            delete dForce;
+            dForce = 0;
+        }
+    }
+    if (sizeO(OF_Resp_Time) == 0)  {
+        (*sizeOut)(OF_Resp_Time) = 0;
+        if (oTime != 0)  {
+            delete oTime;
+            oTime = 0;
+        }
+        (*sizeDaq)(OF_Resp_Time) = 0;
+        if (dTime != 0)  {
+            delete dTime;
+            dTime = 0;
         }
     }
     
