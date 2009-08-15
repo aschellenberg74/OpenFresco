@@ -309,26 +309,26 @@ int ECSimDomain::setup()
         theNodes[i] = theDomain->getNode(nodeTag);
     }
     
-    theModel      = new AnalysisModel();
+    theModel = new AnalysisModel();
 
-    theTest       = new CTestNormDispIncr(1.0E-12, 100, 0);
-    //theTest       = new CTestNormUnbalance(1.0E-12, 100, 0);
-    //theTest       = new CTestEnergyIncr(1.0E-12, 100, 0);
+    theTest = new CTestNormDispIncr(1.0E-12, 100, 0);
+    //theTest = new CTestNormUnbalance(1.0E-12, 100, 0);
+    //theTest = new CTestEnergyIncr(1.0E-12, 100, 0);
 
-    theAlgorithm  = new NewtonRaphson(*theTest);
+    theAlgorithm = new NewtonRaphson(*theTest);
 
     theIntegrator = new LoadControl(1.0, 1, 1.0, 1.0);
 
-    theHandler    = new TransformationConstraintHandler();
-    //theHandler    = new PenaltyConstraintHandler(1.0E12, 1.0E12);
-    //theHandler    = new LagrangeConstraintHandler(1.0, 1.0);
+    //theHandler = new TransformationConstraintHandler();
+    theHandler = new PenaltyConstraintHandler(1.0E12, 1.0E12);
+    //theHandler = new LagrangeConstraintHandler(1.0, 1.0);
 
-    theNumberer   = new PlainNumberer();
+    theNumberer = new PlainNumberer();
 
     BandGenLinSolver *theSolver = new BandGenLinLapackSolver();
-    theSOE        = new BandGenLinSOE(*theSolver);
+    theSOE = new BandGenLinSOE(*theSolver);
     //ProfileSPDLinSolver *theSolver = new ProfileSPDLinDirectSolver();
-    //theSOE        = new ProfileSPDLinSOE(*theSolver);
+    //theSOE = new ProfileSPDLinSOE(*theSolver);
     
     theAnalysis = new StaticAnalysis(*theDomain, *theHandler, *theNumberer,
                                      *theModel, *theAlgorithm, *theSOE,
