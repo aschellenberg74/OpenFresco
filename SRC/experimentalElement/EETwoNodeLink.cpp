@@ -91,7 +91,7 @@ EETwoNodeLink::EETwoNodeLink(int tag, int dim, int Nd1, int Nd2,
         theNodes[i] = 0;
     
     // check the number of directions
-    if (numDir < 1 || numDir > 12)  {
+    if (numDir < 1 || numDir > 6)  {
         opserr << "EETwoNodeLink::EETwoNodeLink() - element: "
             << this->getTag() << " wrong number of directions\n";
         exit(-1);
@@ -205,7 +205,7 @@ EETwoNodeLink::EETwoNodeLink(int tag, int dim, int Nd1, int Nd2,
         theNodes[i] = 0;
     
     // check the number of directions
-    if (numDir < 1 || numDir > 12)  {
+    if (numDir < 1 || numDir > 6)  {
         opserr << "EETwoNodeLink::EETwoNodeLink() - element: "
             << this->getTag() << " wrong number of directions\n";
         exit(-1);
@@ -1216,42 +1216,46 @@ void EETwoNodeLink::setTranGlobalLocal()
     Tgl.resize(numDOF,numDOF);
     Tgl.Zero();
     
-    for (int i=0; i<numDOF/2; i++)  {
-        
-        // switch on dimensionality of element
-        switch (elemType)  {
-        case D1N2:
-            Tgl(i,0) = Tgl(i+1,1) = trans(i,0);
-            break;
-        case D2N4:
-            Tgl(i,0) = Tgl(i+2,2) = trans(i,0);  
-            Tgl(i,1) = Tgl(i+2,3) = trans(i,1);
-            break;
-        case D2N6: 
-            if (i<2)  {
-                Tgl(i,0) = Tgl(i+3,3) = trans(i,0);  
-                Tgl(i,1) = Tgl(i+3,4) = trans(i,1);
-            } else  {
-                Tgl(i,2) = Tgl(i+3,5) = trans(i,2);
-            }
-            break;
-        case D3N6:
-            Tgl(i,0) = Tgl(i+3,3) = trans(i,0);  
-            Tgl(i,1) = Tgl(i+3,4) = trans(i,1);
-            Tgl(i,2) = Tgl(i+3,5) = trans(i,2);
-            break;
-        case D3N12:
-            if (i < 3)  {
-                Tgl(i,0) = Tgl(i+6,6)  = trans(i,0);
-                Tgl(i,1) = Tgl(i+6,7)  = trans(i,1);
-                Tgl(i,2) = Tgl(i+6,8)  = trans(i,2);
-            } else  {
-                Tgl(i,3) = Tgl(i+6,9)  = trans(i,0);
-                Tgl(i,4) = Tgl(i+6,10) = trans(i,1);
-                Tgl(i,5) = Tgl(i+6,11) = trans(i,2);
-            }
-            break;
-        }
+    // switch on dimensionality of element
+    switch (elemType)  {
+    case D1N2:
+        Tgl(0,0) = Tgl(1,1) = trans(0,0);
+        break;
+    case D2N4:
+        Tgl(0,0) = Tgl(2,2) = trans(0,0);
+        Tgl(0,1) = Tgl(2,3) = trans(0,1);
+        Tgl(1,0) = Tgl(3,2) = trans(1,0);
+        Tgl(1,1) = Tgl(3,3) = trans(1,1);
+        break;
+    case D2N6:
+        Tgl(0,0) = Tgl(3,3) = trans(0,0);
+        Tgl(0,1) = Tgl(3,4) = trans(0,1);
+        Tgl(1,0) = Tgl(4,3) = trans(1,0);
+        Tgl(1,1) = Tgl(4,4) = trans(1,1);
+        Tgl(2,2) = Tgl(5,5) = trans(2,2);
+        break;
+    case D3N6:
+        Tgl(0,0) = Tgl(3,3) = trans(0,0);
+        Tgl(0,1) = Tgl(3,4) = trans(0,1);
+        Tgl(0,2) = Tgl(3,5) = trans(0,2);
+        Tgl(1,0) = Tgl(4,3) = trans(1,0);
+        Tgl(1,1) = Tgl(4,4) = trans(1,1);
+        Tgl(1,2) = Tgl(4,5) = trans(1,2);
+        Tgl(2,0) = Tgl(5,3) = trans(2,0);
+        Tgl(2,1) = Tgl(5,4) = trans(2,1);
+        Tgl(2,2) = Tgl(5,5) = trans(2,2);
+        break;
+    case D3N12:
+        Tgl(0,0) = Tgl(3,3) = Tgl(6,6) = Tgl(9,9)   = trans(0,0);
+        Tgl(0,1) = Tgl(3,4) = Tgl(6,7) = Tgl(9,10)  = trans(0,1);
+        Tgl(0,2) = Tgl(3,5) = Tgl(6,8) = Tgl(9,11)  = trans(0,2);
+        Tgl(1,0) = Tgl(4,3) = Tgl(7,6) = Tgl(10,9)  = trans(1,0);
+        Tgl(1,1) = Tgl(4,4) = Tgl(7,7) = Tgl(10,10) = trans(1,1);
+        Tgl(1,2) = Tgl(4,5) = Tgl(7,8) = Tgl(10,11) = trans(1,2);
+        Tgl(2,0) = Tgl(5,3) = Tgl(8,6) = Tgl(11,9)  = trans(2,0);
+        Tgl(2,1) = Tgl(5,4) = Tgl(8,7) = Tgl(11,10) = trans(2,1);
+        Tgl(2,2) = Tgl(5,5) = Tgl(8,8) = Tgl(11,11) = trans(2,2);
+        break;
     }
 }
 

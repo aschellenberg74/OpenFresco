@@ -56,6 +56,7 @@ int addEETwoNodeLink(ClientData clientData, Tcl_Interp *interp, int argc,
     
     ExperimentalElement *theExpElement = 0;
     int ndm = theTclBuilder->getNDM();
+    int ndf = theTclBuilder->getNDF();
     
     // check the number of arguments is correct
     if ((argc-eleArgStart) < 14)  {
@@ -117,6 +118,12 @@ int addEETwoNodeLink(ClientData clientData, Tcl_Interp *interp, int argc,
         if (Tcl_GetInt(interp, argv[argi], &dirID) != TCL_OK)  {
             opserr << "WARNING invalid direction ID\n";
             opserr << "expElement twoNodeLink element: " << tag << endln;	    
+            return TCL_ERROR;
+        }
+        if (dirID < 1 || dirID > ndf)  {
+            opserr << "WARNING invalid direction ID: ";
+            opserr << "dir = " << dirID << " > ndf = " << ndf;
+            opserr << "\nexpElement twoNodeLink element: " << tag << endln;	    
             return TCL_ERROR;
         }
         theDirIDs(i) = dirID-1;
