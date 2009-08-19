@@ -1,5 +1,4 @@
-# File: OneBayFrame_Client1.tcl
-# (use with OneBayFrame_Server1a.tcl & OneBayFrame_Server1b.tcl)
+# File: OneBayFrame_Local.tcl
 #
 # $Revision: $
 # $Date: $
@@ -10,7 +9,7 @@
 # Revision: A
 #
 # Purpose: this file contains the tcl input to perform
-# a distributed hybrid simulation of a one bay frame with
+# a local hybrid simulation of a one bay frame with
 # two experimental twoNodeLink elements.
 # The specimens are simulated using the SimUniaxialMaterials
 # controller.
@@ -46,18 +45,37 @@ fix 4   0  1
 
 # Define materials
 # ----------------
+# uniaxialMaterial Steel02 $matTag $Fy $E $b $R0 $cR1 $cR2 $a1 $a2 $a3 $a4 
+#uniaxialMaterial Elastic 1 2.8
+uniaxialMaterial Steel02 1 1.5 2.8 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0
+uniaxialMaterial Elastic 2 5.6
+#uniaxialMaterial Steel02 2 3.0 5.6 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0 
 uniaxialMaterial Elastic 3 [expr 2.0*100.0/1.0]
+
+# Define experimental control
+# ---------------------------
+# expControl SimUniaxialMaterials $tag $matTags
+expControl SimUniaxialMaterials 1 1
+#expControl xPCtarget 1 1 "192.168.2.20" 22222 HybridControllerD3D3_1Act "D:/PredictorCorrector/RTActualTestModels/cmAPI-xPCTarget-STS"
+#expControl SCRAMNet 1 381020 8
+expControl SimUniaxialMaterials 2 2
+
+# Define experimental setup
+# -------------------------
+# expSetup OneActuator $tag <-control $ctrlTag> $dir -sizeTrialOut $t $o <-trialDispFact $f> ...
+expSetup OneActuator 1 -control 1 1 -sizeTrialOut 1 1
+expSetup OneActuator 2 -control 2 1 -sizeTrialOut 1 1
 
 # Define experimental site
 # ------------------------
-# expSite ShadowSite $tag <-setup $setupTag> $ipAddr $ipPort <-ssl> <-dataSize $size>
-expSite ShadowSite 1 "127.0.0.1" 8090
-expSite ShadowSite 2 "127.0.0.1" 8091
+# expSite LocalSite $tag $setupTag
+expSite LocalSite 1 1
+expSite LocalSite 2 2
 
 # Define experimental elements
 # ----------------------------
 # left and right columns
-# expElement twoNodeLink $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-orient <$x1 $x2 $x3> $y1 $y2 $y3> <-iMod> <-mass $m>
+# expElement twoNodeLink $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-orient <$x1 $x2 $x3> $y1 $y2 $y3> <-pDelta Mratios> <-iMod> <-mass $m>
 expElement twoNodeLink 1 1 3 -dir 2 -site 1 -initStif 2.8 -orient -1 0 0
 expElement twoNodeLink 2 2 4 -dir 2 -site 2 -initStif 5.6 -orient -1 0 0
 
@@ -128,9 +146,44 @@ recorder Node -file Node_Dsp.out -time -node 3 4 -dof 1 disp
 recorder Node -file Node_Vel.out -time -node 3 4 -dof 1 vel
 recorder Node -file Node_Acc.out -time -node 3 4 -dof 1 accel
 
-recorder Element -file Elmt_Frc.out  -time -ele 1 2 3 forces
-recorder Element -file Elmt_tDef.out -time -ele 1 2   targetDisplacements
-recorder Element -file Elmt_mDef.out -time -ele 1 2   measuredDisplacements
+recorder Element -file Elmt_Frc.out     -time -ele 1 2 3 forces
+recorder Element -file Elmt_ctrlDsp.out -time -ele 1 2   ctrlDisp
+recorder Element -file Elmt_daqDsp.out  -time -ele 1 2   daqDisp
+
+expRecorder Site -file Site_trialDsp.out -time -site 1 2 trialDisp
+expRecorder Site -file Site_trialVel.out -time -site 1 2 trialVel
+expRecorder Site -file Site_trialAcc.out -time -site 1 2 trialAccel
+expRecorder Site -file Site_trialTme.out -time -site 1 2 trialTime
+expRecorder Site -file Site_outDsp.out -time -site 1 2 outDisp
+expRecorder Site -file Site_outVel.out -time -site 1 2 outVel
+expRecorder Site -file Site_outAcc.out -time -site 1 2 outAccel
+expRecorder Site -file Site_outFrc.out -time -site 1 2 outForce
+expRecorder Site -file Site_outTme.out -time -site 1 2 outTime
+
+expRecorder Setup -file Setup_trialDsp.out -time -setup 1 2 trialDisp
+expRecorder Setup -file Setup_trialVel.out -time -setup 1 2 trialVel
+expRecorder Setup -file Setup_trialAcc.out -time -setup 1 2 trialAccel
+expRecorder Setup -file Setup_trialTme.out -time -setup 1 2 trialTime
+expRecorder Setup -file Setup_outDsp.out -time -setup 1 2 outDisp
+expRecorder Setup -file Setup_outVel.out -time -setup 1 2 outVel
+expRecorder Setup -file Setup_outAcc.out -time -setup 1 2 outAccel
+expRecorder Setup -file Setup_outFrc.out -time -setup 1 2 outForce
+expRecorder Setup -file Setup_outTme.out -time -setup 1 2 outTime
+expRecorder Setup -file Setup_ctrlDsp.out -time -setup 1 2 ctrlDisp
+expRecorder Setup -file Setup_ctrlVel.out -time -setup 1 2 ctrlVel
+expRecorder Setup -file Setup_ctrlAcc.out -time -setup 1 2 ctrlAccel
+expRecorder Setup -file Setup_ctrlTme.out -time -setup 1 2 ctrlTime
+expRecorder Setup -file Setup_daqDsp.out -time -setup 1 2 daqDisp
+expRecorder Setup -file Setup_daqVel.out -time -setup 1 2 daqVel
+expRecorder Setup -file Setup_daqAcc.out -time -setup 1 2 daqAccel
+expRecorder Setup -file Setup_daqFrc.out -time -setup 1 2 daqForce
+expRecorder Setup -file Setup_daqTme.out -time -setup 1 2 daqTime
+
+expRecorder Control -file Control_ctrlDsp.out -time -control 1 2 ctrlDisp
+expRecorder Control -file Control_ctrlVel.out -time -control 1 2 ctrlVel
+expRecorder Control -file Control_daqDsp.out -time -control 1 2 daqDisp
+expRecorder Control -file Control_daqVel.out -time -control 1 2 daqVel
+expRecorder Control -file Control_daqFrc.out -time -control 1 2 daqForce
 # --------------------------------
 # End of recorder generation
 # --------------------------------

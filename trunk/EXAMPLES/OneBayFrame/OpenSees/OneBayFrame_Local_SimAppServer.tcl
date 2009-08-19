@@ -1,4 +1,4 @@
-# File: OneBayFrame_Server1a.tcl (use with OneBayFrame_Client1.tcl)
+# File: OneBayFrame_Local_SimAppServer.tcl (use with OneBayFrame_Local_Client.tcl)
 #
 # $Revision: $
 # $Date: $
@@ -9,11 +9,10 @@
 # Revision: A
 #
 # Purpose: this file contains the tcl input to perform
-# a distributed hybrid simulation of a one bay frame
+# a local hybrid simulation of a one bay frame
 # with two experimental twoNodeLink elements.
 # The specimen is simulated using the SimUniaxialMaterials
 # controller.
-# The experimental setups are on the server sides.
 
 
 # ------------------------------
@@ -21,6 +20,12 @@
 # ------------------------------
 # create ModelBuilder (with two-dimensions and 2 DOF/node)
 model BasicBuilder -ndm 2 -ndf 2
+
+# Define geometry for model
+# -------------------------
+# node $tag $xCrd $yCrd $mass
+node  1     0.0   0.00
+node  3     0.0  54.00
 
 # Define materials
 # ----------------
@@ -32,7 +37,7 @@ uniaxialMaterial Steel02 1 1.5 2.8 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0
 # ---------------------------
 # expControl SimUniaxialMaterials $tag $matTags
 expControl SimUniaxialMaterials 1 1
-#expControl xPCtarget 1 1 "192.168.2.20" 22222 HybridControllerPoly3_1Act "D:/PredictorCorrector/RTActualTestModels/c&mAPI-xPCTarget-STS"
+#expControl xPCtarget 1 1 "192.168.2.20" 22222 HybridControllerD3D3_1Act "D:/PredictorCorrector/RTActualTestModels/cmAPI-xPCTarget-STS"
 
 # Define experimental setup
 # -------------------------
@@ -41,8 +46,14 @@ expSetup OneActuator 1 -control 1 1 -sizeTrialOut 1 1
 
 # Define experimental site
 # ------------------------
-# expSite ActorSite $tag -setup $setupTag $ipPort <-ssl>
-expSite ActorSite 1 -setup 1 8090
+# expSite LocalSite $tag $setupTag
+expSite LocalSite 1 1
+
+# Define experimental element
+# ---------------------------
+# left column
+# expElement twoNodeLink $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-orient <$x1 $x2 $x3> $y1 $y2 $y3> <-pDelta Mratios> <-iMod> <-mass $m>
+expElement twoNodeLink 1 1 3 -dir 2 -site 1 -initStif 2.8 -orient -1 0 0
 # ------------------------------
 # End of model generation
 # ------------------------------
@@ -51,8 +62,11 @@ expSite ActorSite 1 -setup 1 8090
 # ------------------------------
 # Start the server process
 # ------------------------------
-# startLabServer $siteTag
-startLabServer  1
+# startSimAppElemServer $eleTag $port <-ssl>
+#startSimAppElemServer 1 8090;  # use with generic client element in FEA
+
+# startSimAppSiteServer $siteTag $port <-ssl>
+startSimAppSiteServer 1 8090;  # use with experimental element in FEA
 # --------------------------------
 # End of analysis
 # --------------------------------

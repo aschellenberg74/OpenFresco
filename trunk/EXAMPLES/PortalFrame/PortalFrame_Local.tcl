@@ -55,7 +55,7 @@ uniaxialMaterial Steel02 1 1.5 2.8 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0
 # ---------------------------
 # expControl SimUniaxialMaterials $tag $matTags
 expControl SimUniaxialMaterials 1 1
-#expControl xPCtarget 1 1 "192.168.2.20" 22222 HybridControllerPoly3_1Act "D:/PredictorCorrector/RTActualTestModels/c&mAPI-xPCTarget-STS"
+#expControl xPCtarget 1 1 "192.168.2.20" 22222 HybridControllerD3D3_1Act "D:/PredictorCorrector/RTActualTestModels/cmAPI-xPCTarget-STS"
 expControl SimUniaxialMaterials 2 1
 
 # Define experimental setup
@@ -184,19 +184,30 @@ rayleigh $alphaM $betaK $betaKinit $betaKcomm;
 # ------------------------------
 # create the system of equations
 system BandGeneral
+
 # create the DOF numberer
 numberer Plain
+
 # create the constraint handler
 constraints Plain
+
 # create the convergence test
-test FixedNumIter 10
+test FixedNumIter 5
+#test NormDispIncr 1E-8 25
+
 # create the integration scheme
-integrator NewmarkHybridSimulation2 0.5 0.25
-#integrator HHTHybridSimulation2 0.5
+integrator NewmarkHSFixedNumIter 0.5 0.25
+#integrator NewmarkHSIncrReduct 0.5 0.25 0.8
+#integrator HHTHSFixedNumIter 0.5
+#integrator HHTHSIncrReduct 0.5 0.8
+#integrator CollocationHSFixedNumIter 1.5
+#integrator CollocationHSIncrReduct 1.5 0.8
 #integrator AlphaOS 0.9
+
 # create the solution algorithm
 algorithm Newton
 #algorithm Linear
+
 # create the analysis object 
 analysis Transient
 # ------------------------------
@@ -213,10 +224,10 @@ recorder Node -file Node_Vel.out -time -node     3 4 -dof 1 2 3 vel
 recorder Node -file Node_Acc.out -time -node     3 4 -dof 1 2 3 accel
 recorder Node -file Node_Rxn.out -time -node 1 2 3 4 -dof 1 2 3 reactionIncludingInertia
 
-recorder Element -file Elmt_gFrc.out -time -ele 1 2 3 forces
-recorder Element -file Elmt_bFrc.out -time -ele 1 2   basicForces
-recorder Element -file Elmt_tDef.out -time -ele 1 2   targetDisplacements
-recorder Element -file Elmt_mDef.out -time -ele 1 2   measuredDisplacements
+recorder Element -file Elmt_glbFrc.out  -time -ele 1 2 3 forces
+expRecorder Control -file Control_ctrlDsp.out -time -control 1 2 ctrlDisp
+expRecorder Control -file Control_daqDsp.out  -time -control 1 2 daqDisp
+expRecorder Control -file Control_daqFrc.out  -time -control 1 2 daqForce
 # --------------------------------
 # End of recorder generation
 # --------------------------------
