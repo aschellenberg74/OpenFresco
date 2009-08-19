@@ -1,19 +1,15 @@
-# File: OneBayFrame_Distr_Client.tcl
-# (use with OneBayFrame_Distr_SimAppServer.tcl & OneBayFrame_Distr_LabServer.tcl)
+# File: OneBayFrame_Complete.tcl
 #
 # $Revision: $
 # $Date: $
 # $URL: $
 #
 # Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
-# Created: 11/06
+# Created: 08/08
 # Revision: A
 #
 # Purpose: this file contains the tcl input to perform
-# a distributed hybrid simulation of a one bay frame with
-# two experimental twoNodeLink elements.
-# The specimens are simulated using the SimUniaxialMaterials
-# controller.
+# an analytical simulation of a one bay frame.
 
 
 # ------------------------------
@@ -21,11 +17,6 @@
 # ------------------------------
 # create ModelBuilder (with two-dimensions and 2 DOF/node)
 model BasicBuilder -ndm 2 -ndf 2
-
-# Load OpenFresco package
-# -----------------------
-# (make sure all dlls are in the same folder as openSees.exe)
-loadPackage OpenFresco
 
 # Define geometry for model
 # -------------------------
@@ -47,43 +38,22 @@ fix 4   0  1
 # Define materials
 # ----------------
 # uniaxialMaterial Steel02 $matTag $Fy $E $b $R0 $cR1 $cR2 $a1 $a2 $a3 $a4 
-uniaxialMaterial Elastic 2 5.6
-#uniaxialMaterial Steel02 2 3.0 5.6 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0 
+#uniaxialMaterial Elastic 1 2.8
+uniaxialMaterial Steel02 1 1.5 2.8 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0
+#uniaxialMaterial Elastic 2 5.6
+uniaxialMaterial Steel02 2 3.0 5.6 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0 
 uniaxialMaterial Elastic 3 [expr 2.0*100.0/1.0]
-
-# Define experimental control
-# ---------------------------
-# expControl SimUniaxialMaterials $tag $matTags
-expControl SimUniaxialMaterials 2 2
-
-# Define experimental setup
-# -------------------------
-# expSetup OneActuator $tag <-control $ctrlTag> $dir -sizeTrialOut $t $o <-trialDispFact $f> ...
-expSetup OneActuator 2 -control 2 1 -sizeTrialOut 1 1
-
-# Define experimental site
-# ------------------------
-# expSite LocalSite $tag $setupTag
-expSite LocalSite 2 2
-
-# Define experimental elements
-# ----------------------------
-# left column
-# element genericClient $eleTag -node $Ndi $Ndj ... -dof $dofNdi -dof $dofNdj ... -server $ipPort <$ipAddr> <-ssl> <-dataSize $size>
-#element genericClient 1 -node 1 3 -dof 1 2 -dof 1 2 -server 8090;  # use with SimAppElemServer
-
-# expElement twoNodeLink $eleTag $iNode $jNode -dir $dirs -server $ipPort <ipAddr> <-ssl> <-dataSize $size> -initStif $Kij <-orient <$x1 $x2 $x3> $y1 $y2 $y3> <-iMod> <-mass $m>
-expElement twoNodeLink 1 1 3 -dir 2 -server 8090 -initStif 2.8 -orient -1 0 0;  # use with SimAppSiteServer
 
 # Define numerical elements
 # -------------------------
+# left and right columns
+# element twoNodeLink $eleTag $iNode $jNode -mat $matTags -dir $dirs <-orient <$x1 $x2 $x3> $y1 $y2 $y3> <-pDelta $Mratios> <-mass $m>
+element twoNodeLink 1 1 3 -mat 1 -dir 2 -orient -1 0 0
+element twoNodeLink 2 2 4 -mat 2 -dir 2 -orient -1 0 0
+
 # spring
 # element truss $eleTag $iNode $jNode $A $matTag
 element truss 3 3 4 1.0 3
-
-# right column
-# expElement twoNodeLink $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-orient <$x1 $x2 $x3> $y1 $y2 $y3> <-iMod> <-mass $m>
-expElement twoNodeLink 2 2 4 -dir 2 -site 2 -initStif 5.6 -orient -1 0 0
 
 # Define dynamic loads
 # --------------------
@@ -102,7 +72,7 @@ set betaK      0.0;             # D = betaK*Kcurrent
 set betaKinit  0.0;             # D = beatKinit*Kinit
 set betaKcomm  0.0;             # D = betaKcomm*KlastCommit
 
-# set the rayleigh damping 
+# set the rayleigh damping
 rayleigh $alphaM $betaK $betaKinit $betaKcomm;
 # ------------------------------
 # End of model generation
@@ -147,8 +117,6 @@ recorder Node -file Node_Vel.out -time -node 3 4 -dof 1 vel
 recorder Node -file Node_Acc.out -time -node 3 4 -dof 1 accel
 
 recorder Element -file Elmt_Frc.out  -time -ele 1 2 3 forces
-recorder Element -file Elmt_tDef.out -time -ele 1 2   targetDisplacements
-recorder Element -file Elmt_mDef.out -time -ele 1 2   measuredDisplacements
 # --------------------------------
 # End of recorder generation
 # --------------------------------

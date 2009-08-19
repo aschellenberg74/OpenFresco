@@ -50,7 +50,7 @@ if {$pid == 0}  {
     # Define experimental elements
     # ----------------------------
     # left column
-    # expElement twoNodeLink $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-orient <$x1 $x2 $x3> $y1 $y2 $y3> <-iMod> <-mass $m>
+    # expElement twoNodeLink $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-orient <$x1 $x2 $x3> $y1 $y2 $y3> <-pDelta Mratios> <-iMod> <-mass $m>
     expElement twoNodeLink 1 1 3 -dir 2 -site 1 -initStif 2.8 -orient -1 0 0
 
     # Define numerical elements
@@ -80,7 +80,7 @@ if {$pid == 0}  {
     # Define experimental elements
     # ----------------------------
     # right column
-    # expElement twoNodeLink $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-orient <$x1 $x2 $x3> $y1 $y2 $y3> <-iMod> <-mass $m>
+    # expElement twoNodeLink $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-orient <$x1 $x2 $x3> $y1 $y2 $y3> <-pDelta Mratios> <-iMod> <-mass $m>
     expElement twoNodeLink 2 2 4 -dir 2 -site 2 -initStif 5.6 -orient -1 0 0
 }
 
@@ -144,9 +144,9 @@ analysis Transient
 #recorder Node -file Node_Vel$pid.out -time -node 3 4 -dof 1 vel
 #recorder Node -file Node_Acc$pid.out -time -node 3 4 -dof 1 accel
 
-#recorder Element -file Elmt_Frc$pid.out  -time -ele 1 2 3 forces
-#recorder Element -file Elmt_tDef$pid.out -time -ele 1 2 targetDisplacements
-#recorder Element -file Elmt_mDef$pid.out -time -ele 1 2 measuredDisplacements
+#recorder Element -file Elmt_Frc$pid.out     -time -ele 1 2 3 forces
+#recorder Element -file Elmt_ctrlDsp$pid.out -time -ele 1 2   ctrlDisp
+#recorder Element -file Elmt_daqDsp$pid.out  -time -ele 1 2   daqDisp
 # --------------------------------
 # End of recorder generation
 # --------------------------------

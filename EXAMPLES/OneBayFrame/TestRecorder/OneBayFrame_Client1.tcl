@@ -1,4 +1,5 @@
-# File: OneBayFrame_Local.tcl
+# File: OneBayFrame_Client1.tcl
+# (use with OneBayFrame_Server1a.tcl & OneBayFrame_Server1b.tcl)
 #
 # $Revision: $
 # $Date: $
@@ -9,7 +10,7 @@
 # Revision: A
 #
 # Purpose: this file contains the tcl input to perform
-# a local hybrid simulation of a one bay frame with
+# a distributed hybrid simulation of a one bay frame with
 # two experimental twoNodeLink elements.
 # The specimens are simulated using the SimUniaxialMaterials
 # controller.
@@ -45,37 +46,18 @@ fix 4   0  1
 
 # Define materials
 # ----------------
-# uniaxialMaterial Steel02 $matTag $Fy $E $b $R0 $cR1 $cR2 $a1 $a2 $a3 $a4 
-#uniaxialMaterial Elastic 1 2.8
-uniaxialMaterial Steel02 1 1.5 2.8 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0
-uniaxialMaterial Elastic 2 5.6
-#uniaxialMaterial Steel02 2 3.0 5.6 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0 
 uniaxialMaterial Elastic 3 [expr 2.0*100.0/1.0]
-
-# Define experimental control
-# ---------------------------
-# expControl SimUniaxialMaterials $tag $matTags
-expControl SimUniaxialMaterials 1 1
-#expControl xPCtarget 1 1 "192.168.2.20" 22222 HybridControllerPoly3_1Act "D:/PredictorCorrector/RTActualTestModels/c&mAPI-xPCTarget-STS"
-#expControl SCRAMNet 1 381020 8
-expControl SimUniaxialMaterials 2 2
-
-# Define experimental setup
-# -------------------------
-# expSetup OneActuator $tag <-control $ctrlTag> $dir -sizeTrialOut $t $o <-trialDispFact $f> ...
-expSetup OneActuator 1 -control 1 1 -sizeTrialOut 1 1
-expSetup OneActuator 2 -control 2 1 -sizeTrialOut 1 1
 
 # Define experimental site
 # ------------------------
-# expSite LocalSite $tag $setupTag
-expSite LocalSite 1 1
-expSite LocalSite 2 2
+# expSite ShadowSite $tag <-setup $setupTag> $ipAddr $ipPort <-ssl> <-dataSize $size>
+expSite ShadowSite 1 "127.0.0.1" 8090
+expSite ShadowSite 2 "127.0.0.1" 8091
 
 # Define experimental elements
 # ----------------------------
 # left and right columns
-# expElement twoNodeLink $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-orient <$x1 $x2 $x3> $y1 $y2 $y3> <-iMod> <-mass $m>
+# expElement twoNodeLink $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-orient <$x1 $x2 $x3> $y1 $y2 $y3> <-pDelta Mratios> <-iMod> <-mass $m>
 expElement twoNodeLink 1 1 3 -dir 2 -site 1 -initStif 2.8 -orient -1 0 0
 expElement twoNodeLink 2 2 4 -dir 2 -site 2 -initStif 5.6 -orient -1 0 0
 
@@ -142,13 +124,23 @@ analysis Transient
 # Start of recorder generation
 # ------------------------------
 # create the recorder objects
-recorder Node -file Node_Dsp.out -time -node 3 4 -dof 1 disp
-recorder Node -file Node_Vel.out -time -node 3 4 -dof 1 vel
-recorder Node -file Node_Acc.out -time -node 3 4 -dof 1 accel
+recorder Node -file ClientNode_Dsp.out -time -node 3 4 -dof 1 disp
+recorder Node -file ClientNode_Vel.out -time -node 3 4 -dof 1 vel
+recorder Node -file ClientNode_Acc.out -time -node 3 4 -dof 1 accel
 
-recorder Element -file Elmt_Frc.out  -time -ele 1 2 3 forces
-recorder Element -file Elmt_tDef.out -time -ele 1 2   targetDisplacements
-recorder Element -file Elmt_mDef.out -time -ele 1 2   measuredDisplacements
+recorder Element -file ClientElmt_Frc.out     -time -ele 1 2 3 forces
+recorder Element -file ClientElmt_ctrlDsp.out -time -ele 1 2   ctrlDisp
+recorder Element -file ClientElmt_daqDsp.out  -time -ele 1 2   daqDisp
+
+expRecorder Site -file ClientSite_trialDsp.out -time -site 1 2 trialDisp
+expRecorder Site -file ClientSite_trialVel.out -time -site 1 2 trialVel
+expRecorder Site -file ClientSite_trialAcc.out -time -site 1 2 trialAccel
+expRecorder Site -file ClientSite_trialTme.out -time -site 1 2 trialTime
+expRecorder Site -file ClientSite_outDsp.out -time -site 1 2 outDisp
+expRecorder Site -file ClientSite_outVel.out -time -site 1 2 outVel
+expRecorder Site -file ClientSite_outAcc.out -time -site 1 2 outAccel
+expRecorder Site -file ClientSite_outFrc.out -time -site 1 2 outForce
+expRecorder Site -file ClientSite_outTme.out -time -site 1 2 outTime
 # --------------------------------
 # End of recorder generation
 # --------------------------------

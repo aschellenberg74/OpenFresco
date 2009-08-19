@@ -60,7 +60,7 @@ geomTransf Linear 1
 
 # Define experimental element
 # ---------------------------
-# expElement beamColumn $eleTag $iNode $jNode $transTag –site $siteTag –initStif $Kij … <–iMod> <–rho $rho>
+# expElement beamColumn $eleTag $iNode $jNode $transTag –site $siteTag –initStif $Kij ... <–iMod> <–rho $rho>
 expElement beamColumn 1 1 2 1 -site 1 -initStif 1213 0 0 0 11.2 -302.4 0 -302.4 10886.4
 
 # Define dynamic loads
@@ -128,9 +128,9 @@ recorder Node -file Master_Node_Dsp.out -time -node 2 -dof 1 2 3 disp
 recorder Node -file Master_Node_Vel.out -time -node 2 -dof 1 2 3 vel
 recorder Node -file Master_Node_Acc.out -time -node 2 -dof 1 2 3 accel
 
-recorder Element -file Master_Elmt_Frc.out  -time -ele 1 forces
-recorder Element -file Master_Elmt_tDef.out -time -ele 1 targetDisplacements
-recorder Element -file Master_Elmt_mDef.out -time -ele 1 measuredDisplacements
+recorder Element -file Master_Elmt_Frc.out     -time -ele 1 forces
+recorder Element -file Master_Elmt_ctrlDsp.out -time -ele 1 ctrlDisp
+recorder Element -file Master_Elmt_daqDsp.out  -time -ele 1 daqDisp
 # --------------------------------
 # End of recorder generation
 # --------------------------------

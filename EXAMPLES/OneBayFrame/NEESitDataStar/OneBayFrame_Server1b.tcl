@@ -33,7 +33,7 @@ uniaxialMaterial Elastic 1  5.6;  # UC Berkeley Cantilever Column [kip/in]
 # ---------------------------
 # expControl SimUniaxialMaterials $tag $matTags
 expControl SimUniaxialMaterials 1 1
-#expControl xPCtarget 1 1 "192.168.2.20" 22222 HybridControllerPoly3_1Act "D:/PredictorCorrector/RTActualTestModels/c&mAPI-xPCTarget-STS"
+#expControl xPCtarget 1 1 "192.168.2.20" 22222 HybridControllerD3D3_1Act "D:/PredictorCorrector/RTActualTestModels/cmAPI-xPCTarget-STS"
 
 # Define experimental setup
 # -------------------------

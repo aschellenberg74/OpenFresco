@@ -100,9 +100,9 @@ recorder Node -file Slave_Node_Dsp.out -time -node 2 -dof 1 2 3 disp
 recorder Node -file Slave_Node_Vel.out -time -node 2 -dof 1 2 3 vel
 recorder Node -file Slave_Node_Acc.out -time -node 2 -dof 1 2 3 accel
 
-recorder Element -file Slave_Elmt_Frc.out  -time -ele 1 2 forces
-recorder Element -file Slave_Elmt_tDef.out -time -ele   2 targetDisplacements
-recorder Element -file Slave_Elmt_mDef.out -time -ele   2 measuredDisplacements
+recorder Element -file Slave_Elmt_Frc.out     -time -ele 1 2 forces
+recorder Element -file Slave_Elmt_ctrlDsp.out -time -ele   2 ctrlDisp
+recorder Element -file Slave_Elmt_daqDsp.out  -time -ele   2 daqDisp
 # --------------------------------
 # End of recorder generation
 # --------------------------------

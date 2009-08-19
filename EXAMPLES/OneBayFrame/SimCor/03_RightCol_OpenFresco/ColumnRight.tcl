@@ -37,12 +37,12 @@ uniaxialMaterial Elastic 1 5.6
 # ---------------------------
 # expControl SimUniaxialMaterials $tag $matTags
 expControl SimUniaxialMaterials 1 1
-#expControl xPCtarget 1 1 "192.168.2.20" "22222" "HybridControllerPoly3_1Act" "D:\\PredictorCorrector\\RTActualTestModels\\c&mAPI-xPCTarget-STS\\"
+#expControl xPCtarget 1 1 "192.168.2.20" 22222 HybridControllerD3D3_1Act "D:/PredictorCorrector/RTActualTestModels/cmAPI-xPCTarget-STS"
 
 # Define experimental setup
 # -------------------------
-# expSetup OneActuator $tag <-control $ctrlTag> $dir <-ctrlDispFact $f> ...
-expSetup OneActuator 1 -control 1 1
+# expSetup OneActuator $tag <-control $ctrlTag> $dir -sizeTrialOut $t $o <-trialDispFact $f> ...
+expSetup OneActuator 1 -control 1 1 -sizeTrialOut 1 1
 
 # Define experimental site
 # ------------------------
@@ -52,7 +52,7 @@ expSite LocalSite 1 1
 # Define experimental element
 # ---------------------------
 # left column
-# expElement zeroLength $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-orient $x1 $x2 $x3 $y1 $y2 $y3> <-iMod> <-mass $m>
+# expElement twoNodeLink $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-orient <$x1 $x2 $x3> $y1 $y2 $y3> <-pDelta Mratios> <-iMod> <-mass $m>
 expElement twoNodeLink 1 1 3 -dir 2 -site 1 -initStif 5.6 -orient 0 1 0 -1 0 0
 # ------------------------------
 # End of model generation
@@ -66,7 +66,7 @@ expElement twoNodeLink 1 1 3 -dir 2 -site 1 -initStif 5.6 -orient 0 1 0 -1 0 0
 startSimAppSiteServer 1 8092
 
 # startSimAppElemServer $eleTag $port
-#startSimAppElemServer 1 8090
+#startSimAppElemServer 1 8092
 # --------------------------------
 # End of analysis
 # --------------------------------
