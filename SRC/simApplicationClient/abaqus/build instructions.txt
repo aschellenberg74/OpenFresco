@@ -1,0 +1,72 @@
+==========================================================
+Instructions for building Abaqus (R) user defined elements
+==========================================================
+
+1) add Visual Studio to "Path" environmental system variable:
+=============================================================
+For MS VS2008:
+--------------
+C:\Program Files\Microsoft Visual Studio 9.0\VC\lib
+C:\Program Files\Microsoft Visual Studio 9.0\VC\bin
+C:\Program Files\Microsoft Visual Studio 9.0\Common7\IDE
+For MS VS2005:
+--------------
+C:\Program Files\Microsoft Visual Studio 8\VC\lib
+C:\Program Files\Microsoft Visual Studio 8\VC\bin
+C:\Program Files\Microsoft Visual Studio 8\Common7\IDE
+
+2) add Visual Studio to "INCLUDE" environmental system variable:
+================================================================
+For MS VS2008:
+--------------
+C:\Program Files\Microsoft Visual Studio 9.0\VC\include
+C:\Program Files\Microsoft SDKs\Windows\v6.0A\Include
+For MS VS2005:
+--------------
+C:\Program Files\Microsoft Visual Studio 8\VC\include
+C:\Program Files\Microsoft Visual Studio 8\VC\PlatformSDK\Include
+
+3) add Visual Studio to "LIB" environmental system variable:
+============================================================
+For MS VS2008:
+--------------
+C:\Program Files\Microsoft Visual Studio 9.0\VC\lib
+C:\Program Files\Microsoft SDKs\Windows\v6.0A\Lib
+For MS VS2005:
+--------------
+C:\Program Files\Microsoft Visual Studio 8\VC\lib
+C:\Program Files\Microsoft Visual Studio 8\VC\PlatformSDK\Lib
+
+4) add ifort.exe location to "Path" environmental system variable:
+==================================================================
+For IFC 11:
+-----------
+C:\Program Files\Intel\Compiler\11.0\061\fortran\Bin\IA32
+For IFC 9:
+----------
+C:\Program Files\Intel\Compiler\Fortran\9.1\IA32\Bin
+
+5) add abaqus commands location to "Path" environmental system variable:
+========================================================================
+C:\SIMULIA\Abaqus\Commands
+
+6) compile socket.c
+===================
+cl socket.c /c /O2 /D_CRT_SECURE_NO_DEPRECATE /DF77_NAME_UPPER /DUSE_FORT_STDCALL /DMIXED_STRING_LEN
+
+7) compile socketf.c
+====================
+cl socketf.c /c /O2 /D_CRT_SECURE_NO_DEPRECATE /DF77_NAME_UPPER /DUSE_FORT_STDCALL /DMIXED_STRING_LEN
+
+8) compile Abaqus user element genericClient_exp.for
+====================================================
+ifort genericClient_exp.for /c /Gm /recursive /nologo
+rename genericClient_exp.for to genericClient_exp_temp.for
+
+9) combine object files and winsocket library into single element object file
+=============================================================================
+lib /out:genericClient_exp.obj genericClient_exp_temp.obj socket.obj socketf.obj ws2_32.lib
+
+10) execute abaqus
+==================
+abaqus job=onebayframe_exp user=genericclient_exp interactive
