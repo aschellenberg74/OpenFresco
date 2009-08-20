@@ -72,7 +72,7 @@ typedef struct socketConnection {
 } SocketConnection;
 
 static SocketConnection *theSockets = NULL;
-static int socketIDs  = 0;
+static int socketIDs = 0;
 
 
 void CALL_CONV startupsockets(int *ierr)
@@ -117,63 +117,63 @@ void CALL_CONV setupconnectionserver(unsigned int *port, int *socketID)
         struct sockaddr    addr;
         struct sockaddr_in addr_in;
     } other_Addr;
-
+    
     socket_type sockfd;
     socket_type newsockfd;
     socklen_type addrLength;
     unsigned int other_Port;
     char *other_InetAddr;
-
+    
     int ierr;
     SocketConnection *theSocket = theSockets;
-
+    
     // initialize sockets
     startupsockets(&ierr);
     if (ierr != 0) {
-        fprintf(stderr,"socket.c - could not startup server socket\n");
+        fprintf(stderr,"socket::setupconnectionserver() - could not startup server socket\n");
         *socketID = -1;
         return;
     }
-
+    
     // set up my_Addr.addr_in with address given by port and internet address of
     // machine on which the process that uses this routine is running.
-
+    
     // set up my_Addr
     bzero((char *) &my_Addr, sizeof(my_Addr));
     my_Addr.addr_in.sin_family = AF_INET;
     my_Addr.addr_in.sin_port = htons(*port);
-
+    
 #ifdef _WIN32
     my_Addr.addr_in.sin_addr.S_un.S_addr = htonl(INADDR_ANY);
 #else
     my_Addr.addr_in.sin_addr.s_addr = htonl(INADDR_ANY);
 #endif
-
+    
     // open a socket
     if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-        fprintf(stderr,"socket.c - could not open server socket\n");
+        fprintf(stderr,"socket::setupconnectionserver() - could not open server socket\n");
         *socketID = -2;
         return;
     }
-
+    
     // bind local address to it
     if (bind(sockfd, &my_Addr.addr, sizeof(my_Addr.addr)) < 0) {
-        fprintf(stderr,"socket.c - could not bind local address\n");
+        fprintf(stderr,"socket::setupconnectionserver() - could not bind local address\n");
         *socketID = -3;
         return;
     }
-
+    
     addrLength = sizeof(other_Addr.addr);
-
+    
     // wait for other process to contact me & setup connection
     listen(sockfd, 1);
     newsockfd = accept(sockfd, &other_Addr.addr, &addrLength);
     if (newsockfd < 0) {
-        fprintf(stderr,"socket.c - could not accept client connection\n");
+        fprintf(stderr,"socket::setupconnectionserver() - could not accept client connection\n");
         *socketID = -4;
         return;
     }    
-
+    
     // close old socket & reset sockfd
     // we can close as we are not going to wait for others to connect
 #ifdef _WIN32
@@ -182,14 +182,14 @@ void CALL_CONV setupconnectionserver(unsigned int *port, int *socketID)
     close(sockfd);
 #endif
     sockfd = newsockfd;
-
+    
     // get other_Port and other_InetAddr
     other_Port = ntohs(other_Addr.addr_in.sin_port);
     other_InetAddr = inet_ntoa(other_Addr.addr_in.sin_addr);
-
+    
     // add a new socket connection
     theSocket = (SocketConnection *)malloc(sizeof(SocketConnection));
-
+    
     socketIDs++;
     theSocket->port = other_Port;
     theSocket->machineInetAddr = (char *)malloc((strlen(other_InetAddr)+1)*sizeof(char));
@@ -198,7 +198,7 @@ void CALL_CONV setupconnectionserver(unsigned int *port, int *socketID)
     theSocket->sockfd = sockfd;
     theSocket->next = theSockets;
     theSockets = theSocket;
-
+    
     // set up return values & return
     *socketID = theSocket->socketID;
 }
@@ -223,27 +223,27 @@ void CALL_CONV setupconnectionclient(unsigned int *other_Port, const char other_
         struct sockaddr    addr;
         struct sockaddr_in addr_in;
     } other_Addr;
-
+    
     socket_type sockfd;
-
+    
     int ierr;
     SocketConnection *theSocket = theSockets;
-
+    
     // check inputs
     if (other_InetAddr == 0) {
-        fprintf(stderr,"socket.c - missing other_InetAddr\n");
+        fprintf(stderr,"socket::setupconnectionclient() - missing other_InetAddr\n");
         *socketID = -1;
         return;
     }
-
+    
     // initialize sockets
     startupsockets(&ierr);
     if (ierr != 0) {
-        fprintf(stderr,"socket.c - could not startup client socket\n");
-        *socketID = -1;
+        fprintf(stderr,"socket::setupconnectionclient() - could not startup client socket\n");
+        *socketID = -2;
         return;
     }
-
+    
     while (theSocket != 0) {
         if (theSocket->port == *other_Port) {
             if (strcmp(theSocket->machineInetAddr, other_InetAddr) == 0) {
@@ -253,56 +253,56 @@ void CALL_CONV setupconnectionclient(unsigned int *other_Port, const char other_
         }
         theSocket = theSocket->next;
     }
-
+    
     // set up other_Addr.addr_in with address given by port and internet
     // address of remote machine to which the connection is made.
-
+    
     // set up remote address
     bzero((char *) &other_Addr, sizeof(other_Addr));
     other_Addr.addr_in.sin_family = AF_INET;
     other_Addr.addr_in.sin_port = htons(*other_Port);
-
+    
 #ifdef _WIN32
     other_Addr.addr_in.sin_addr.S_un.S_addr = inet_addr(other_InetAddr);
 #else
     other_Addr.addr_in.sin_addr.s_addr = inet_addr(other_InetAddr);
 #endif
-
+    
     // set up my_Addr.addr_in
     bzero((char *) &my_Addr, sizeof(my_Addr));
     my_Addr.addr_in.sin_family = AF_INET;
     my_Addr.addr_in.sin_port = htons(0);
-
+    
 #ifdef _WIN32
     my_Addr.addr_in.sin_addr.S_un.S_addr = htonl(INADDR_ANY);
 #else
     my_Addr.addr_in.sin_addr.s_addr = htonl(INADDR_ANY);
 #endif
-
+    
     // open a socket
     if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-        fprintf(stderr,"socket.c - could not open client socket\n");
-        *socketID = -2;
-        return;
-    }
-
-    // bind local address to it
-    if (bind(sockfd, &my_Addr.addr, sizeof(my_Addr.addr)) < 0) {
-        fprintf(stderr,"socket.c - could not bind local address\n");
+        fprintf(stderr,"socket::setupconnectionclient() - could not open client socket\n");
         *socketID = -3;
         return;
     }
-
+    
+    // bind local address to it
+    if (bind(sockfd, &my_Addr.addr, sizeof(my_Addr.addr)) < 0) {
+        fprintf(stderr,"socket::setupconnectionclient() - could not bind local address\n");
+        *socketID = -4;
+        return;
+    }
+    
     // now try to connect to socket with remote address
     if (connect(sockfd, &other_Addr.addr, sizeof(other_Addr.addr))< 0) {
-            fprintf(stderr,"socket.c - could not connect to server\n");
-            *socketID = -4;
+            fprintf(stderr,"socket::setupconnectionclient() - could not connect to server\n");
+            *socketID = -5;
             return;
     }
-
+    
     // add a new socket connection
     theSocket = (SocketConnection *)malloc(sizeof(SocketConnection));
-
+    
     socketIDs++;
     theSocket->port = *other_Port;
     theSocket->machineInetAddr = (char *)malloc((strlen(other_InetAddr)+1)*sizeof(char));
@@ -311,7 +311,7 @@ void CALL_CONV setupconnectionclient(unsigned int *other_Port, const char other_
     theSocket->sockfd = sockfd;
     theSocket->next = theSockets;
     theSockets = theSocket;
-
+    
     // set up return values & return
     *socketID = theSocket->socketID;
 }
@@ -327,23 +327,25 @@ void CALL_CONV setupconnectionclient(unsigned int *other_Port, const char other_
 void CALL_CONV closeconnection(int *socketID, int *ierr)
 {
     SocketConnection *theSocket = theSockets;
-
+    
+    // find the socket
     while (theSocket->socketID != *socketID) 
         theSocket = theSocket->next;
     if (theSocket == 0) {
+        fprintf(stderr,"socket::closeconnection() - could not find socket to close\n");
         *ierr = -1;
         return;
     }
-
+    
 #ifdef _WIN32
     closesocket(theSocket->sockfd);
 #else
     close(theSocket->sockfd);
 #endif
-
+    
     // cleanup sockets
     cleanupsockets();
-
+    
     *ierr = 0;
 }
 
@@ -363,26 +365,27 @@ void CALL_CONV senddata(int *socketID, int *dataTypeSize, char data[], int *lenD
     int nwrite, nleft;    
     char *gMsg = data;
     SocketConnection *theSocket = theSockets;  
-
+    
     // find the socket
-    while (theSocket->socketID != *socketID) 
+    while (theSocket != 0 && theSocket->socketID != *socketID) 
         theSocket = theSocket->next;
     if (theSocket == 0) {
+        fprintf(stderr,"socket::senddata() - could not find socket to send data\n");
         *ierr = -1;
         return;
     }
-
+    
     // send the data
     // if o.k. get a pointer to the data in the message and 
     // place the incoming data there
     nleft = *lenData * *dataTypeSize;
-
+    
     while (nleft > 0) {
         nwrite = send(theSocket->sockfd, gMsg, nleft, 0);
         nleft -= nwrite;
         gMsg +=  nwrite;
     }
-
+    
     *ierr = 0;
 }
 
@@ -402,15 +405,16 @@ void CALL_CONV recvdata(int *socketID, int *dataTypeSize, char data[], int *lenD
     int nread, nleft;    
     char *gMsg = data;
     SocketConnection *theSocket = theSockets;  
-
+    
     // find the socket
-    while (theSocket->socketID != *socketID) 
+    while (theSocket != 0 && theSocket->socketID != *socketID) 
         theSocket=theSocket->next;
     if (theSocket == 0) {
+        fprintf(stderr,"socket::recvdata() - could not find socket to receive data\n");
         *ierr = -1;
         return;
     }
-
+    
     // receive the data
     // if o.k. get a pointer to the data in the message and 
     // place the incoming data there
@@ -421,7 +425,7 @@ void CALL_CONV recvdata(int *socketID, int *dataTypeSize, char data[], int *lenD
         nleft -= nread;
         gMsg +=  nread;
     }
-
+    
     *ierr = 0;
 }
 
@@ -438,13 +442,15 @@ void CALL_CONV recvdata(int *socketID, int *dataTypeSize, char data[], int *lenD
 void CALL_CONV getsocketid(unsigned int *port, const char machineInetAddr[], int *lengthInet, int *socketID)
 {
     SocketConnection *theSocket = theSockets;
-
+    
     // check inputs
     if (machineInetAddr == 0) {
+        fprintf(stderr,"socket::getsocketid() - missing machineInetAddr\n");
         *socketID = -1;
         return;
     }
-    // search for open socket with sockID
+    
+    // search for open socket with socketID
     while (theSocket != 0) {
         if (theSocket->port == *port) {
             if (strcmp(theSocket->machineInetAddr, machineInetAddr) == 0) {
@@ -454,6 +460,6 @@ void CALL_CONV getsocketid(unsigned int *port, const char machineInetAddr[], int
         }
         theSocket = theSocket->next;
     }
-
-    *socketID = -1;
+    fprintf(stderr,"socket::getsocketid() - could not find socket to get socketID\n");
+    *socketID = -2;
 }
