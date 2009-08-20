@@ -118,7 +118,7 @@ c       time
         iData(5)  = 0
 c ...   sizeCtrl
 c       disp
-        iData(6)  = nst
+        iData(6)  = 0
 c       vel
         iData(7)  = 0
 c       accel

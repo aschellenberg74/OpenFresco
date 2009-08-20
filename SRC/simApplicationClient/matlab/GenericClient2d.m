@@ -89,7 +89,7 @@ switch action
       ipAddr   = ElemData.ipAddr;
       numDOF   = numNodes*ndf;
       
-      % setup connection to experimental site
+      % setup connection to experimental element
       dataSize = max(1+3*numDOF,numDOF^2);
       sData = zeros(1,dataSize);
       if isempty(socketID)
@@ -98,7 +98,7 @@ switch action
             error('TCPSocket:openConnection',['Unable to setup connection to ',...
                ipAddr,' : ',num2str(ipPort)]);
          end
-         % set the data size for the experimental site
+         % set the data size for experimental element
          dataSizes = int32([numDOF numDOF numDOF 0 1, 0 0 0 numDOF 0, dataSize]);
          TCPSocket('sendData',socketID,dataSizes,11);
       end
@@ -124,7 +124,7 @@ switch action
       varargout = {ElemState};
    % =========================================================================
    case 'stif'
-      if (Time < ElemState.Time)
+      if (ElemState.Time > Time)
          % commit state
          sData(1) = 5;
          TCPSocket('sendData',socketID,sData,dataSize);
@@ -163,7 +163,7 @@ switch action
       varargout = {ElemState};
    % =========================================================================
    case 'forc'
-      if (Time < ElemState.Time)
+      if (ElemState.Time > Time)
          % commit state
          sData(1) = 5;
          TCPSocket('sendData',socketID,sData,dataSize);

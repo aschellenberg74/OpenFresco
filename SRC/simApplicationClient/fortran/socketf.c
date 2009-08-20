@@ -46,20 +46,32 @@
 #define closeconnection_ CLOSECONNECTION
 #define senddata_ SENDDATA
 #define recvdata_ RECVDATA
+#define getsocketid_ GETSOCKETID
 #elif defined(F77_NAME_LOWER_2USCORE)
 #define setupconnectionserver_ setupconnectionserver__
 #define setupconnectionclient_ setupconnectionclient__
 #define closeconnection_ closeconnection__
 #define senddata_ senddata__
 #define recvdata_ recvdata__
+#define getsocketid_ getsocketid__
 #elif !defined(F77_NAME_LOWER_USCORE)
 #define setupconnectionserver_ setupconnectionserver
 #define setupconnectionclient_ setupconnectionclient
 #define closeconnection_ closeconnection
 #define senddata_ senddata
 #define recvdata_ recvdata
+#define getsocketid_ getsocketid
 /* F77_NAME_LOWER_USCORE */
 /* Else leave name alone */
+#endif
+
+/* Adjust string and hidden length conventions */
+#ifdef MIXED_STRING_LEN
+#define CHNAME(id) const char id ## [], const int id ## _len
+#define CHLEN(id)
+#else
+#define CHNAME(id) const char id ## []
+#define CHLEN(id) , const int id ## _len
 #endif
 
 /* Functions defined in socket.c */
@@ -68,6 +80,7 @@ void setupconnectionclient(unsigned int *other_Port, const char other_InetAddr[]
 void closeconnection(int *socketID, int *ierr);
 void senddata(int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr);
 void recvdata(int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr);
+void getsocketid(unsigned int *port, const char machineInetAddr[], int *lengthInet, int *socketID);
 
 #ifdef  __cplusplus
 extern "C" {
@@ -78,7 +91,7 @@ void FORT_CALL setupconnectionserver_ (unsigned int *port, int *socketID) {
     setupconnectionserver(port, socketID);
 }
 
-void FORT_CALL setupconnectionclient_ (unsigned int *other_Port, const char other_InetAddr[], int *lengthInet, int *socketID) {
+void FORT_CALL setupconnectionclient_ (unsigned int *other_Port, CHNAME(other_InetAddr), int *lengthInet, int *socketID CHLEN(other_InetAddr)) {
     setupconnectionclient (other_Port, other_InetAddr, lengthInet, socketID);
 }
 
@@ -92,6 +105,10 @@ void FORT_CALL senddata_ (int *socketID, int *dataTypeSize, char data[], int *le
 
 void FORT_CALL recvdata_ (int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr) {
     recvdata(socketID, dataTypeSize, data, lenData, ierr);
+}
+
+void FORT_CALL getsocketid_ (unsigned int *port, CHNAME(machineInetAddr), int *lengthInet, int *socketID CHLEN(machineInetAddr)) {
+	  getsocketid(port, machineInetAddr, lengthInet, socketID);
 }
 
 #ifdef  __cplusplus
