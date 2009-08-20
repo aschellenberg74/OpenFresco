@@ -1,0 +1,132 @@
+** File: OneBayFrame_Exp.inp (use with OneBayFrame_Local_SimAppServer.tcl)
+**
+** $Revision: $
+** $Date: $
+** $URL: $
+**
+** Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+** Created: 03/09
+** Revision: A
+**
+** Purpose: this file contains the tcl input to perform
+** a local hybrid simulation of a one bay frame with
+** one experimental element.
+** The genericClient_exp.obj element is utilized within
+** Abaqus/Explicit to represent the experimental element.
+**
+**
+*HEADING
+ Transient analysis of OneBayFrame to ELC ground motion
+ Imperial units [in, kip, sec]
+ 1-axis horizontal, 2-axis vertical
+*PREPRINT, ECHO=YES, MODEL=YES, HISTORY=YES
+**
+** -----------------
+**  Define Geometry
+** -----------------
+*NODE, NSET=AllNodes
+1,   0,  0
+2, 100,  0
+3,   0, 50
+4, 100, 50
+**
+** -----------------
+**  Define Elements
+** -----------------
+*ELSET, ELSET=AllElements
+1, 2, 3, 103, 104, 203, 204
+*USER ELEMENT, TYPE=VU1, NODES=2, COORDINATES=2, I PROPERTIES=1, VARIABLES=2
+1, 2
+*ELEMENT, TYPE=VU1, ELSET=ColumnLeft
+1, 1, 3
+*ELEMENT, TYPE=CONN2D2, ELSET=ColumnRight
+2, 2, 4
+*ELEMENT, TYPE=CONN2D2, ELSET=BeamTop
+3, 3, 4
+**
+** ---------------------------
+**  Define Masses and Damping
+** ---------------------------
+*ELEMENT, TYPE=MASS, ELSET=MassLeft
+103, 3
+*ELEMENT, TYPE=MASS, ELSET=MassRight
+104, 4
+*ELEMENT, TYPE=CONN2D2, ELSET=DampingLeft
+203, 3
+*ELEMENT, TYPE=CONN2D2, ELSET=DampingRight
+204, 4
+**
+** ---------------------------
+**  Define Element Properties
+** ---------------------------
+*UEL PROPERTY, ELSET=ColumnLeft
+8090
+*CONNECTOR SECTION, ELSET=ColumnRight, BEHAVIOR=ColumnRight
+CARTESIAN
+*CONNECTOR BEHAVIOR, NAME=ColumnRight 
+*CONNECTOR ELASTICITY, COMPONENT=1
+5.6
+*CONNECTOR SECTION, ELSET=BeamTop, BEHAVIOR=BeamTop
+CARTESIAN
+*CONNECTOR BEHAVIOR, NAME=BeamTop 
+*CONNECTOR ELASTICITY, COMPONENT=1
+2.0
+*MASS, ELSET=MassLeft
+0.04
+*MASS, ELSET=MassRight
+0.02
+*CONNECTOR SECTION, ELSET=DampingLeft, BEHAVIOR=DampingLeft
+CARTESIAN
+*CONNECTOR BEHAVIOR, NAME=DampingLeft 
+*CONNECTOR DAMPING, COMPONENT=1
+0.0404
+*CONNECTOR SECTION, ELSET=DampingRight, BEHAVIOR=DampingRight
+CARTESIAN
+*CONNECTOR BEHAVIOR, NAME=DampingRight 
+*CONNECTOR DAMPING, COMPONENT=1
+0.0202
+**
+** ----------------------------
+**  Define Boundary Conditions
+** ----------------------------
+*BOUNDARY
+1, 1, 1
+1, 2, 2
+1, 6, 6
+2, 1, 1
+2, 2, 2
+2, 6, 6
+3, 2, 2
+3, 6, 6
+4, 2, 2
+4, 6, 6
+**
+** -------------------
+**  Define TimeSeries
+** -------------------
+*AMPLITUDE, NAME=ELC, INPUT=elcentro.inp
+**
+** ------------------------
+**  Define STEP: Transient
+** ------------------------
+*STEP, NAME=Transient, NLGEOM=NO
+El Centro Earthquake
+*DYNAMIC, EXPLICIT, DIRECT USER CONTROL
+0.02, 32.0
+**
+** --------------
+**  Define Loads
+** --------------
+*CLOAD, AMPLITUDE=ELC
+3, 1, -0.04
+4, 1, -0.02
+**
+** -----------------------
+**  Define History Output
+** -----------------------
+*OUTPUT, HISTORY, FREQUENCY=1
+*NODE OUTPUT, NSET=AllNodes
+U1, V1, A1, RF1
+*ELEMENT OUTPUT, ELSET=AllElements
+CTF1
+*END STEP
