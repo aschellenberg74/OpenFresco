@@ -521,15 +521,18 @@ int EETrussCorot::update()
     
     // update offsets in basic system
     for (int i=0; i<numDIM; i++)  {
-        d21[0] += (dsp2(i)-dsp1(i))*R(0,i);
-        d21[1] += (dsp2(i)-dsp1(i))*R(1,i);
-        d21[2] += (dsp2(i)-dsp1(i))*R(2,i);
-        v21[0] += (vel2(i)-vel1(i))*R(0,i);
-        v21[1] += (vel2(i)-vel1(i))*R(1,i);
-        v21[2] += (vel2(i)-vel1(i))*R(2,i);
-        a21[0] += (acc2(i)-acc1(i))*R(0,i);
-        a21[1] += (acc2(i)-acc1(i))*R(1,i);
-        a21[2] += (acc2(i)-acc1(i))*R(2,i);
+        double deltaDsp = dsp2(i) - dsp1(i);
+        d21[0] += deltaDsp*R(0,i);
+        d21[1] += deltaDsp*R(1,i);
+        d21[2] += deltaDsp*R(2,i);
+        double deltaVel = vel2(i) - vel1(i);
+        v21[0] += deltaVel*R(0,i);
+        v21[1] += deltaVel*R(1,i);
+        v21[2] += deltaVel*R(2,i);
+        double deltaAcc = acc2(i) - acc1(i);
+        a21[0] += deltaAcc*R(0,i);
+        a21[1] += deltaAcc*R(1,i);
+        a21[2] += deltaAcc*R(2,i);
     }
     
     // compute new length and deformation

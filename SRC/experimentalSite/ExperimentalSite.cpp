@@ -296,9 +296,15 @@ int ExperimentalSite::commitState()
     }
     
     // invoke record on all recorders
-    for (int i=0; i<numRecorders; i++)
-        if (theRecorders[i] != 0)
-            theRecorders[i]->record(commitTag, (*tTime)(0));
+    if (tTime != 0)  {
+        for (int i=0; i<numRecorders; i++)
+            if (theRecorders[i] != 0)
+                theRecorders[i]->record(commitTag, (*tTime)(0));
+    } else  {
+        for (int i=0; i<numRecorders; i++)
+            if (theRecorders[i] != 0)
+                theRecorders[i]->record(commitTag, commitTag);
+    }
     
     // update the commitTag
     commitTag++;
