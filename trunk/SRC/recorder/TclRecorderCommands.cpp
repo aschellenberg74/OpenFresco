@@ -57,8 +57,13 @@ extern ExperimentalSite *getExperimentalSiteFirst();
 extern ExperimentalSetup *getExperimentalSetup(int tag);
 extern ExperimentalControl *getExperimentalControl(int tag);
 extern ExperimentalSignalFilter *getExperimentalSignalFilter(int tag);
+#ifdef _WIN32
 extern SimulationInformation simulationInfo;
 extern FE_Datastore *theDatabase;
+#else
+SimulationInformation simulationInfo;
+FE_Datastore *theDatabase;
+#endif
 
 int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
     TCL_Char **argv, Domain *theDomain, TclModelBuilder *theTclBuilder,
@@ -869,3 +874,33 @@ int TclAddExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
     
     return TCL_OK;
 }
+
+const char * getInterpPWD(Tcl_Interp *interp) {
+  static char *pwd = 0;
+
+  if (pwd != 0)
+    delete [] pwd;
+
+#ifdef _TCL84
+  Tcl_Obj *cwd = Tcl_FSGetCwd(interp);
+  if (cwd != NULL) {
+    int length;
+    const char *objPWD = Tcl_GetStringFromObj(cwd, &length);
+    pwd = new char[length+1];
+    strcpy(pwd, objPWD);
+    Tcl_DecrRefCount(cwd);	
+  }
+#else
+
+  Tcl_DString buf;
+  const char *objPWD = Tcl_GetCwd(interp, &buf);
+
+  pwd = new char[strlen(objPWD)+1];
+  strcpy(pwd, objPWD);
+
+  Tcl_DStringFree(&buf);
+
+#endif
+  return pwd;
+}
+
