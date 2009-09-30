@@ -41,7 +41,7 @@
 #define DllExport _declspec(dllexport)
 #else
 #define DllExport
-Domain *ops_TheActiveDomain = 0;
+extern Domain *ops_TheActiveDomain;
 double ops_Dt = 0.0;
 StandardStream sserr;
 OPS_Stream *opserrPtr = &sserr;
