@@ -6,7 +6,7 @@
 #	     to use the OpenFresco framework on Mac OS X.
 #
 #  Written: yos
-#  Created: 09/07
+#  Created: Sep/09
 #
 #  Send bug reports, comments or suggestions to yos@catfish.dpri.kyoto-u.ac.jp
 #
@@ -33,7 +33,7 @@ OPENFRESCO_SERVERPROGRAM = $(HOME)/bin/OpenFresco
 # remove the directory from DIRS.
 
 BASE		= /sw
-HOME		= /Users/hongkim/Research/bin
+HOME		= /Users/yos/cabinet
 FE		= $(HOME)/OpenSees/SRC
 OPENFRESCO	= $(HOME)/openfresco/trunk/SRC
 
@@ -76,13 +76,12 @@ CBLAS_LIBRARY   = $(HOME)/lib/libCBlas.a
 ARPACK_LIBRARY  = $(HOME)/lib/libArpack.a
 UMFPACK_LIBRARY = $(HOME)/lib/libUmfpack.a
 METIS_LIBRARY   = $(HOME)/lib/libMetis.a
-NET_LIBRARY	= /usr/X11R6/lib/libX11.a
-TCL_LIBRARY	= $(NET_LIBRARY) -framework Tcl -framework Tk
-# TCL_LIBRARY = /usr/lib/libtk8.0.so /usr/X11R6/lib/libX11.a /usr/lib/libtcl8.0.so
+NET_LIBRARY	= 
+TCL_LIBRARY	= /usr/local/lib/libtcl8.5.dylib
 BLITZ_LIBRARY = $(HOME)/blitz/lib/libblitz.a
 
 OPENFRESCO_LIBRARY = $(HOME)/lib/libOpenFresco.a
-OPENFRESCO_DYLIBRARY = $(HOME)/lib/OpenFresco.so
+OPENFRESCO_DYLIBRARY = $(HOME)/lib/OpenFresco.dylib
 
 # WATCH OUT .. These libraries are removed when 'make wipe' is invoked.
 WIPE_LIBS	= $(FE_LIBRARY) \
@@ -106,7 +105,7 @@ WIPE_LIBS	= $(FE_LIBRARY) \
 # Compilers
 CC++	= g++
 CC      = gcc
-FC	= g95
+FC	= g77
 
 AR		= ar 
 ARFLAGS		= cqls
@@ -121,15 +120,15 @@ RANLIBFLAGS     =
 #    C FLAGS used -DUSE_VENDOR_BLAS (needed in SuperLU) if UNIX in C++ FLAGS
 #
 
-C++FLAGS        = -fno-common -Wall -O2 -D_UNIX -D_TCL84 -ftemplate-depth-30 -D_MACOSX
+C++FLAGS        = -fno-common -Wall -O2 -D_UNIX -D_TCL85 -ftemplate-depth-30 -D_MACOSX
 CFLAGS          = -fno-common -Wall -O2
 # CFLAGS          = -Wall -pg -O2
 FFLAGS          = -W1 -O
 
 # Linker
 LINKER          = $(CC++)
-LINKFLAGS       = -bundle
-# LINKFLAGS       =  -pg
+LINKFLAGS       = -Wl
+LINKFLAGS2       = -bundle
 
 # Misc
 MAKE		= make
@@ -191,12 +190,11 @@ MACHINE_NUMERICAL_LIBS  = \
 		$(ARPACK_LIBRARY) \
 		$(SUPERLU_LIBRARY) \
 		$(UMFPACK_LIBRARY) \
-	        $(LAPACK_LIBRARY) $(BLAS_LIBRARY) $(CBLAS_LIBRARY) \
-		-L/usr/X11R6/lib -lX11 -lGL -lGLU -lssl -lcrypto \
-		$(FE_LIBRARY) \
-		-lc -lg95 -ldl -lpng -lstdc++ 
+	        $(LAPACK_LIBRARY) \
+		$(BLAS_LIBRARY) \
+		$(CBLAS_LIBRARY) 
 
-MACHINE_SPECIFIC_LIBS = $(NET_LIBRARY)
+MACHINE_SPECIFIC_LIBS = -lssl -lcrypto -lc -lg2c
 
 
 # %---------------------------------------------------------%
@@ -217,11 +215,15 @@ TCL_INCLUDES = 	-I/Library/Frameworks/Tcl.framework/Headers -I/Library/Framework
 OPENFRESCO_INCLUDES = -I$(OPENFRESCO) \
 	 	      -I$(OPENFRESCO)/experimentalElement \
 		      -I$(OPENFRESCO)/utility \
+		      -I$(OPENFRESCO)/recorder \
+		      -I$(OPENFRESCO)/recorder/response \
 		      -I$(OPENFRESCO)/experimentalSite \
 		      -I$(OPENFRESCO)/experimentalSetup \
 		      -I$(OPENFRESCO)/experimentalControl \
 		      -I$(OPENFRESCO)/experimentalControl/SCRAMNet \
-		      -I$(OPENFRESCO)/experimentalSignalFilter
+		      -I$(OPENFRESCO)/experimentalSignalFilter \
+		      -I$(OPENFRESCO)/simApplicationClient \
+		      -I$(OPENFRESCO)/tcl
 
 INCLUDES = $(TCL_INCLUDES) $(FE_INCLUDES) $(MACHINE_INCLUDES) $(OPENFRESCO_INCLUDES)
 
