@@ -3,6 +3,7 @@ include ../../Makefile.def
 OBJS       = ExperimentalElement.o \
 	     EETwoNodeLink.o \
 	     EETruss.o \
+	     EETrussCorot.o \
 	     EEGeneric.o \
 	     EEBeamColumn2d.o \
 	     EEBeamColumn3d.o \
