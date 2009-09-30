@@ -93,7 +93,7 @@ Domain *theDomain = 0;
 TclModelBuilder *theTclBuilder = 0;
 
 #ifndef _WIN32
-Domain *ops_TheActiveDomain = 0;
+extern Domain *ops_TheActiveDomain;
 double ops_Dt = 0.0;
 StandardStream sserr;
 OPS_Stream *opserrPtr = &sserr;
