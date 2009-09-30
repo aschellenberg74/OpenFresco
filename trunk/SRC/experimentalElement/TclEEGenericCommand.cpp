@@ -53,8 +53,7 @@ int addEEGeneric(ClientData clientData, Tcl_Interp *interp,  int argc,
 	}
 	
 	ExperimentalElement *theExpElement = 0;
-	int ndm = theTclBuilder->getNDM();
-
+    
 	// check the number of arguments is correct
 	if ((argc-eleArgStart) < 10)  {
 		opserr << "WARNING insufficient arguments\n";

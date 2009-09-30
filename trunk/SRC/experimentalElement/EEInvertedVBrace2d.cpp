@@ -681,8 +681,8 @@ const Vector& EEInvertedVBrace2d::getResistingForceIncInertia()
         theVector(1) += m1 * accel1(1);
         theVector(3) += m2 * accel2(0);    
         theVector(4) += m2 * accel2(1);
-        theVector(6) += (m1+m2) * accel2(0);    
-        theVector(7) += (m1+m2) * accel2(1);
+        theVector(6) += (m1+m2) * accel3(0);    
+        theVector(7) += (m1+m2) * accel3(1);
     }
     
     return theVector;
