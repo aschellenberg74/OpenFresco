@@ -73,6 +73,7 @@ int TclExpElementCommand(ClientData clientData, Tcl_Interp *interp, int argc,
     // check that there is at least two arguments
     if (argc < 2)  {
         opserr << "WARNING need to specify an element type\n";
+        printCommand(argc,argv);
         opserr << "Want: expElement eleType <specific element args> .. see manual for valid eleTypes & arguments\n";
         return TCL_ERROR;
     }

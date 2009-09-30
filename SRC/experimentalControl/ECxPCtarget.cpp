@@ -408,6 +408,7 @@ int ECxPCtarget::setup()
         c = getchar();
         if (c == 'c')  {
             getchar();
+            xPCStopApp(port);
             xPCClosePort(port);
             xPCFreeAPI();
             exit(OF_ReturnType_failed);

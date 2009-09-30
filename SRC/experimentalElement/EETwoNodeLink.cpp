@@ -1284,6 +1284,10 @@ void EETwoNodeLink::setTranLocalBasic()
                 Tlb(i,5) = Tlb(i,11) = -0.5*L;
             else if (dirID == 2)
                 Tlb(i,4) = Tlb(i,10) = 0.5*L;
+            break;
+        default :
+            // do nothing
+            break;
         }
     }
 }
@@ -1372,6 +1376,9 @@ void EETwoNodeLink::addPDeltaForces(Vector &pLocal)
                     pLocal(5) += Mratio(2)*MpDelta;
                     pLocal(11) += Mratio(3)*MpDelta;
                 }
+                break;
+            default :
+                // do nothing
                 break;
             }
         }
@@ -1469,6 +1476,9 @@ void EETwoNodeLink::addPDeltaStiff(Matrix &kLocal)
                     kLocal(11,1) -= Mratio(3)*N;
                     kLocal(11,7) += Mratio(3)*N;
                 }
+                break;
+            default :
+                // do nothing
                 break;
             }
         }
