@@ -7,6 +7,7 @@ EXPERIMENTALTEST_OBJS = $(OPENFRESCO)/utility/ExperimentalCP.o \
 	   $(OPENFRESCO)/utility/ExpControlSP.o \
 	   $(OPENFRESCO)/experimentalElement/ExperimentalElement.o \
 	   $(OPENFRESCO)/experimentalElement/EETruss.o \
+	   $(OPENFRESCO)/experimentalElement/EETrussCorot.o \
 	   $(OPENFRESCO)/experimentalElement/EEBeamColumn2d.o \
 	   $(OPENFRESCO)/experimentalElement/EEBeamColumn3d.o \
 	   $(OPENFRESCO)/experimentalElement/EEInvertedVBrace2d.o \
@@ -70,13 +71,13 @@ all: $(OBJS) $(DYLIBOBJS)
 	@$(CD) $(OPENFRESCO)/experimentalSignalFilter; $(MAKE) tcl;
 	@$(CD) $(OPENFRESCO)/recorder; $(MAKE) tcl;
 	echo $(TCL_LIBRARY)
-	$(LINKER) $(OBJS) $(OPENFRESCO_TCLFILES) \
+	$(LINKER) $(LINKFLAGS) $(OBJS) $(OPENFRESCO_TCLFILES) \
 	$(OPENFRESCO_LIBRARY) $(FE_LIBRARY) $(MACHINE_LINKLIBS) \
 	$(MACHINE_NUMERICAL_LIBS)  \
 	$(MACHINE_SPECIFIC_LIBS) $(TCL_LIBRARY) \
 	-o $(OPENFRESCO_SERVERPROGRAM)
 	echo $(TCL_LIBRARY)
-	@$(LINKER) $(LINKFLAGS) $(DYLIBOBJS) $(OPENFRESCO_TCLFILES) \
+	$(LINKER) $(LINKFLAGS2) $(DYLIBOBJS) $(OPENFRESCO_TCLFILES) \
 	$(EXPERIMENTALTEST_OBJS) \
 	$(FE_LIBRARY) $(MACHINE_LINKLIBS) \
 	$(MACHINE_NUMERICAL_LIBS)  \
