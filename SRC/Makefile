@@ -13,6 +13,9 @@ EXPERIMENTALTEST_OBJS = $(OPENFRESCO)/utility/ExperimentalCP.o \
 	   $(OPENFRESCO)/experimentalElement/EETwoNodeLink.o \
 	   $(OPENFRESCO)/experimentalElement/EEGeneric.o \
 	   $(OPENFRESCO)/experimentalSite/ExperimentalSite.o \
+	   $(OPENFRESCO)/experimentalSite/LocalExpSite.o \
+	   $(OPENFRESCO)/experimentalSite/ShadowExpSite.o \
+	   $(OPENFRESCO)/experimentalSite/ActorExpSite.o \
 	   $(OPENFRESCO)/experimentalSetup/ExperimentalSetup.o \
 	   $(OPENFRESCO)/experimentalSetup/ESNoTransformation.o \
 	   $(OPENFRESCO)/experimentalSetup/ESAggregator.o \
@@ -24,26 +27,22 @@ EXPERIMENTALTEST_OBJS = $(OPENFRESCO)/utility/ExperimentalCP.o \
 	   $(OPENFRESCO)/experimentalSetup/ESInvertedVBraceJntOff2d.o \
 	   $(OPENFRESCO)/experimentalSetup/ESFourActuators3d.o \
 	   $(OPENFRESCO)/experimentalControl/ExperimentalControl.o \
-	   $(OPENFRESCO)/experimentalSite/LocalExpSite.o \
-	   $(OPENFRESCO)/experimentalSite/ShadowExpSite.o \
-	   $(OPENFRESCO)/experimentalSite/ActorExpSite.o \
 	   $(OPENFRESCO)/experimentalControl/ECSimulation.o \
 	   $(OPENFRESCO)/experimentalControl/ECSimUniaxialMaterials.o \
 	   $(OPENFRESCO)/experimentalControl/ECSimDomain.o \
 	   $(OPENFRESCO)/experimentalControl/ECSimFEAdapter.o \
+	   $(OPENFRESCO)/experimentalSignalFilter/ExperimentalSignalFilter.o \
 	   $(OPENFRESCO)/experimentalSignalFilter/ESFErrorSimRandomGauss.o \
 	   $(OPENFRESCO)/experimentalSignalFilter/ESFErrorSimulation.o \
 	   $(OPENFRESCO)/experimentalSignalFilter/ESFErrorSimUndershoot.o \
-	   $(OPENFRESCO)/experimentalSignalFilter/ExperimentalSignalFilter.o \
-	   $(OPENFRESCO)/recorder/ExpControlRecorder.o \
-       $(OPENFRESCO)/recorder/ExpSetupRecorder.o \
-	   $(OPENFRESCO)/recorder/ExpSignalFilterRecorder.o \
-	   $(OPENFRESCO)/recorder/ExpSiteRecorder.o \
-	   $(OPENFRESCO)/recorder/response/ExpControlResponse.o \
-	   $(OPENFRESCO)/recorder/response/ExpSetupResponse.o \
-	   $(OPENFRESCO)/recorder/response/ExpSignalFilterResponse.o \
-	   $(OPENFRESCO)/recorder/response/ExpSiteResponse.o
-	   #$(OPENFRESCO)/experimentalControl/ECSCRAMNet.o
+	   $(OPENFRESCO)/experimentalRecorder/ExpControlRecorder.o \
+	   $(OPENFRESCO)/experimentalRecorder/ExpSetupRecorder.o \
+	   $(OPENFRESCO)/experimentalRecorder/ExpSignalFilterRecorder.o \
+	   $(OPENFRESCO)/experimentalRecorder/ExpSiteRecorder.o \
+	   $(OPENFRESCO)/experimentalRecorder/response/ExpControlResponse.o \
+	   $(OPENFRESCO)/experimentalRecorder/response/ExpSetupResponse.o \
+	   $(OPENFRESCO)/experimentalRecorder/response/ExpSignalFilterResponse.o \
+	   $(OPENFRESCO)/experimentalRecorder/response/ExpSiteResponse.o
 
 # Compilation control
 
@@ -54,8 +53,8 @@ all: FrescoGlobals.h
 	@$(CD) $(OPENFRESCO)/experimentalControl; $(MAKE);
 	@$(CD) $(OPENFRESCO)/experimentalElement; $(MAKE);
 	@$(CD) $(OPENFRESCO)/experimentalSignalFilter; $(MAKE);
-	@$(CD) $(OPENFRESCO)/recorder; $(MAKE);
-	@$(CD) $(OPENFRESCO)/recorder/response; $(MAKE);
+	@$(CD) $(OPENFRESCO)/experimentalRecorder; $(MAKE);
+	@$(CD) $(OPENFRESCO)/experimentalRecorder/response; $(MAKE);
 	$(AR) $(ARFLAGS) $(OPENFRESCO_LIBRARY) $(EXPERIMENTALTEST_OBJS)
 
 # Miscellaneous
@@ -72,9 +71,8 @@ spotless: clean
 	@$(CD) $(OPENFRESCO)/experimentalControl; $(MAKE) wipe;
 	@$(CD) $(OPENFRESCO)/experimentalElement; $(MAKE) wipe;
 	@$(CD) $(OPENFRESCO)/experimentalSignalFilter; $(MAKE) wipe;
-	@$(CD) $(OPENFRESCO)/experimentalSignalFilter; $(MAKE) wipe;
-	@$(CD) $(OPENFRESCO)/recorder; $(MAKE) wipe;
-	@$(CD) $(OPENFRESCO)/recorder/response; $(MAKE) wipe;
+	@$(CD) $(OPENFRESCO)/experimentalRecorder; $(MAKE) wipe;
+	@$(CD) $(OPENFRESCO)/experimentalRecorder/response; $(MAKE) wipe;
 
 wipe: spotless
 

@@ -215,8 +215,8 @@ TCL_INCLUDES = 	-I/Library/Frameworks/Tcl.framework/Headers -I/Library/Framework
 OPENFRESCO_INCLUDES = -I$(OPENFRESCO) \
 	 	      -I$(OPENFRESCO)/experimentalElement \
 		      -I$(OPENFRESCO)/utility \
-		      -I$(OPENFRESCO)/recorder \
-		      -I$(OPENFRESCO)/recorder/response \
+		      -I$(OPENFRESCO)/experimentalRecorder \
+		      -I$(OPENFRESCO)/experimentalRecorder/response \
 		      -I$(OPENFRESCO)/experimentalSite \
 		      -I$(OPENFRESCO)/experimentalSetup \
 		      -I$(OPENFRESCO)/experimentalControl \

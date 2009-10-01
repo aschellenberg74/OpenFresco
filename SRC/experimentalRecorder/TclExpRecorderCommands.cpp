@@ -875,32 +875,33 @@ int TclAddExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
     return TCL_OK;
 }
 
+#ifndef _WIN32
 const char * getInterpPWD(Tcl_Interp *interp) {
-  static char *pwd = 0;
+    static char *pwd = 0;
 
-  if (pwd != 0)
-    delete [] pwd;
+    if (pwd != 0)
+        delete [] pwd;
 
 #ifdef _TCL84
-  Tcl_Obj *cwd = Tcl_FSGetCwd(interp);
-  if (cwd != NULL) {
-    int length;
-    const char *objPWD = Tcl_GetStringFromObj(cwd, &length);
-    pwd = new char[length+1];
-    strcpy(pwd, objPWD);
-    Tcl_DecrRefCount(cwd);	
-  }
+    Tcl_Obj *cwd = Tcl_FSGetCwd(interp);
+    if (cwd != NULL) {
+        int length;
+        const char *objPWD = Tcl_GetStringFromObj(cwd, &length);
+        pwd = new char[length+1];
+        strcpy(pwd, objPWD);
+        Tcl_DecrRefCount(cwd);	
+    }
 #else
 
-  Tcl_DString buf;
-  const char *objPWD = Tcl_GetCwd(interp, &buf);
+    Tcl_DString buf;
+    const char *objPWD = Tcl_GetCwd(interp, &buf);
 
-  pwd = new char[strlen(objPWD)+1];
-  strcpy(pwd, objPWD);
+    pwd = new char[strlen(objPWD)+1];
+    strcpy(pwd, objPWD);
 
-  Tcl_DStringFree(&buf);
+    Tcl_DStringFree(&buf);
 
 #endif
-  return pwd;
+    return pwd;
 }
-
+#endif
