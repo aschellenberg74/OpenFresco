@@ -6,7 +6,7 @@ OBJS = ExpSiteRecorder.o ExpSetupRecorder.o ExpControlRecorder.o\
 all:         $(OBJS)
 	@$(CD) response; $(MAKE);
 
-tcl: 	TclRecorderCommands.o
+tcl: 	TclExpRecorderCommands.o
 
 # Miscellaneous
 tidy:	
