@@ -79,7 +79,7 @@ int TclExpElementCommand(ClientData clientData, Tcl_Interp *interp, int argc,
     }
 
     // ----------------------------------------------------------------------------	
-    if (strcmp(argv[1],"truss") == 0)  {
+    if (strcmp(argv[1],"truss") == 0 || strcmp(argv[1],"corotTruss") == 0)  {
         int eleArgStart = 1;
         int result = addEETruss(clientData, interp, argc, argv,
             theTclDomain, theTclBuilder, eleArgStart);
