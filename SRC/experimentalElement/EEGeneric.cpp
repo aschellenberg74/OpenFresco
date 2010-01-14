@@ -699,23 +699,29 @@ int EEGeneric::displaySelf(Renderer &theViewer,
     int displayMode, float fact)
 {
     int rValue = 0, i, j;
-
+    
     if (numExternalNodes > 1)  {
-        Vector *v = new Vector [numExternalNodes];
-
         // first determine the end points of the beam based on
         // the display factor (a measure of the distorted image)
-        for (i=0; i<numExternalNodes; i++)  {
-            const Vector &endCrd = theNodes[i]->getCrds();
-            const Vector &endDisp = theNodes[i]->getDisp();
-            int numCrds = endCrd.Size();
-            for (j=0; j<numCrds; i++)
-                v[i](j) = endCrd(j) + endDisp(j)*fact;
+        for (i=0; i<numExternalNodes-1; i++)  {
+            const Vector &end1Crd = theNodes[i]->getCrds();
+            const Vector &end2Crd = theNodes[i+1]->getCrds();
+            
+            const Vector &end1Disp = theNodes[i]->getDisp();
+            const Vector &end2Disp = theNodes[i+1]->getDisp();
+            
+            int end1NumCrds = end1Crd.Size();
+            int end2NumCrds = end2Crd.Size();
+            
+            Vector v1(3), v2(3);
+            
+            for (j=0; j<end1NumCrds; j++)
+                v1(j) = end1Crd(j) + end1Disp(j)*fact;
+            for (j=0; j<end2NumCrds; j++)
+                v2(j) = end2Crd(j) + end2Disp(j)*fact;
+            
+            rValue += theViewer.drawLine (v1, v2, 1.0, 1.0);
         }
-
-        for (i=0; i<numExternalNodes-1; i++)
-            rValue += theViewer.drawLine (v[i], v[i+1], 1.0, 1.0);
-        //rValue += theViewer.drawLine (v[i+1], v[0], 1.0, 1.0);
     }
     
     return rValue;
