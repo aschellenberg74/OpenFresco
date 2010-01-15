@@ -45,7 +45,8 @@ ECMtsCsi::ECMtsCsi(int tag, char *cfgfile, double ramptime)
         CsiController->loadConfiguration(cfgFile);
     }
     catch (const Mts::ICsiException& xcp)  {
-        opserr << xcp.what() << endln;
+        opserr << "ECMtsCsi::ECMtsCsi() - "
+            << "loadConfiguration: error = " << xcp.what() << endln;
         exit(OF_ReturnType_failed);
     }
 
@@ -71,7 +72,8 @@ ECMtsCsi::ECMtsCsi(const ECMtsCsi& ec)
         CsiController->loadConfiguration(ec.CsiController->getConfiguration().getFileName());
     }
     catch (const Mts::ICsiException& xcp)  {
-        opserr << xcp.what() << endln;
+        opserr << "ECMtsCsi::ECMtsCsi() - "
+            << "loadConfiguration: error = " << xcp.what() << endln;
         exit(OF_ReturnType_failed);
     }
 }
@@ -168,7 +170,8 @@ int ECMtsCsi::setup()
         CsiController->startTest();
     }
     catch (const Mts::ICsiException& xcp)  {
-        opserr << xcp.what() << endln;
+        opserr << "ECMtsCsi::setup() - "
+            << "startHardware: error = " << xcp.what() << endln;
         exit(OF_ReturnType_failed);
     }
     
@@ -504,7 +507,8 @@ int ECMtsCsi::control()
         rampId = CsiController->runRamp(ramp);
     }
     catch (const Mts::ICsiException& xcp)  {
-        opserr << xcp.what() << endln;
+        opserr << "ECMtsCsi::control() - "
+            << "runRamp: error = " << xcp.what() << endln;
         exit(OF_ReturnType_failed);
     }
 
@@ -520,7 +524,8 @@ int ECMtsCsi::acquire()
         CsiController->acquireFeedback(rampId, daqResp);
     }
     catch (const Mts::ICsiException& xcp)  {
-        opserr << xcp.what() << endln;
+        opserr << "ECMtsCsi::acquire() - "
+            << "acquireFeedback: error = " << xcp.what() << endln;
         exit(OF_ReturnType_failed);
     }
 
