@@ -61,12 +61,13 @@ Vector EETwoNodeLink::EETwoNodeLinkV12(12);
 // responsible for allocating the necessary space needed
 // by each object and storing the tags of the end nodes.
 EETwoNodeLink::EETwoNodeLink(int tag, int dim, int Nd1, int Nd2, 
-    const ID &direction, const Vector _y, const Vector _x,
-    ExperimentalSite *site, Vector Mr, bool iM, double m)
+    const ID &direction, ExperimentalSite *site,
+    const Vector _y, const Vector _x, const Vector Mr,
+    const Vector sdI, bool iM, double m)
     : ExperimentalElement(tag, ELE_TAG_EETwoNodeLink, site),     
     dimension(dim), numDOF(0), connectedExternalNodes(2),
-    numDir(direction.Size()), dir(0), trans(3,3),
-    x(_x), y(_y), Mratio(Mr), iMod(iM), mass(m), L(0.0),
+    numDir(direction.Size()), dir(0), trans(3,3), x(_x), y(_y),
+    Mratio(Mr), shearDistI(sdI), iMod(iM), mass(m), L(0.0),
     db(0), vb(0), ab(0), t(0),
     dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
     dbCtrl(direction.Size()), vbCtrl(direction.Size()),
@@ -132,6 +133,22 @@ EETwoNodeLink::EETwoNodeLink(int tag, int dim, int Nd1, int Nd2,
         }
     }
     
+    // check shear distance ratios
+    if (shearDistI.Size() == 2)  {
+        if (shearDistI(0) < 0.0 || shearDistI(0) > 1.0)  {
+            opserr << "EETwoNodeLink::EETwoNodeLink() - "
+                << "incorrect shear distance ratio:\n shearDistIy = "
+                << shearDistI(0) << " < 0.0 or > 1.0\n";
+            exit(-1);
+        }
+        if (shearDistI(1) < 0.0 || shearDistI(1) > 1.0)  {
+            opserr << "EETwoNodeLink::EETwoNodeLink() - "
+                << "incorrect shear distance ratio:\n shearDistIz = "
+                << shearDistI(1) << " < 0.0 or > 1.0\n";
+            exit(-1);
+        }
+    }
+    
     // set the data size for the experimental site
     sizeCtrl = new ID(OF_Resp_All);
     sizeDaq = new ID(OF_Resp_All);
@@ -173,13 +190,13 @@ EETwoNodeLink::EETwoNodeLink(int tag, int dim, int Nd1, int Nd2,
 // responsible for allocating the necessary space needed
 // by each object and storing the tags of the end nodes.
 EETwoNodeLink::EETwoNodeLink(int tag, int dim, int Nd1, int Nd2, 
-    const ID &direction, const Vector _y, const Vector _x,
-    int port, char *machineInetAddr, int ssl, int dataSize,
-    Vector Mr, bool iM, double m)
+    const ID &direction, int port, char *machineInetAddr, int ssl,
+    int dataSize, const Vector _y, const Vector _x, const Vector Mr,
+    const Vector sdI, bool iM, double m)
     : ExperimentalElement(tag, ELE_TAG_EETwoNodeLink),     
     dimension(dim), numDOF(0), connectedExternalNodes(2),
-    numDir(direction.Size()), dir(0), trans(3,3),
-    x(_x), y(_y), Mratio(Mr), iMod(iM), mass(m), L(0.0),
+    numDir(direction.Size()), dir(0), trans(3,3), x(_x), y(_y),
+    Mratio(Mr), shearDistI(sdI), iMod(iM), mass(m), L(0.0),
     theChannel(0), sData(0), sendData(0), rData(0), recvData(0),
     db(0), vb(0), ab(0), t(0),
     dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
@@ -242,6 +259,22 @@ EETwoNodeLink::EETwoNodeLink(int tag, int dim, int Nd1, int Nd2,
             opserr << "EETwoNodeLink::EETwoNodeLink() - "
                 << "incorrect p-delta moment ratios:\nrMz1 + rMz2 = "
                 << Mratio(2)+Mratio(3) << " > 1.0\n";
+            exit(-1);
+        }
+    }
+    
+    // check shear distance ratios
+    if (shearDistI.Size() == 2)  {
+        if (shearDistI(0) < 0.0 || shearDistI(0) > 1.0)  {
+            opserr << "EETwoNodeLink::EETwoNodeLink() - "
+                << "incorrect shear distance ratio:\n shearDistIy = "
+                << shearDistI(0) << " < 0.0 or > 1.0\n";
+            exit(-1);
+        }
+        if (shearDistI(1) < 0.0 || shearDistI(1) > 1.0)  {
+            opserr << "EETwoNodeLink::EETwoNodeLink() - "
+                << "incorrect shear distance ratio:\n shearDistIz = "
+                << shearDistI(1) << " < 0.0 or > 1.0\n";
             exit(-1);
         }
     }
@@ -1151,6 +1184,7 @@ void EETwoNodeLink::setUp()
     Vector xp = end2Crd - end1Crd;
     L = xp.Norm();
     
+    // setup x and y orientation vectors
     if (L > DBL_EPSILON)  {
         if (x.Size() == 0)  {
             x.resize(3);
@@ -1166,7 +1200,17 @@ void EETwoNodeLink::setUp()
                 << "ignoring nodes and using specified "
                 << "local x vector to determine orientation\n";
         }
+    } else  {
+        if (x.Size() == 0)  {
+            x.resize(3);
+            x(0) = 1.0; x(1) = 0.0; x(2) = 0.0;
+        }
     }
+    if (y.Size() == 0)  {
+        y.resize(3);
+        y(0) = 0.0; y(1) = 1.0; y(2) = 0.0;
+    }
+    
     // check that vectors for orientation are of correct size
     if (x.Size() != 3 || y.Size() != 3)  {
         opserr << "EETwoNodeLink::setUp() - "
@@ -1276,14 +1320,32 @@ void EETwoNodeLink::setTranLocalBasic()
         // switch on dimensionality of element
         switch (elemType)  {
         case D2N6:
-            if (dirID == 1)
-                Tlb(i,2) = Tlb(i,5) = -0.5*L;
+            if (dirID == 1)  {
+                if (shearDistI.Size() == 2)  {
+                    Tlb(i,2) = -shearDistI(0)*L;
+                    Tlb(i,5) = -(1.0 - shearDistI(0))*L;
+                } else  {
+                    Tlb(i,2) = Tlb(i,5) = -0.5*L;
+                }
+            }
             break;
         case D3N12:
-            if (dirID == 1)
-                Tlb(i,5) = Tlb(i,11) = -0.5*L;
-            else if (dirID == 2)
-                Tlb(i,4) = Tlb(i,10) = 0.5*L;
+            if (dirID == 1)  {
+                if (shearDistI.Size() == 2)  {
+                    Tlb(i,5)  = -shearDistI(0)*L;
+                    Tlb(i,11) = -(1.0-shearDistI(0))*L;
+                } else  {
+                    Tlb(i,5)  = Tlb(i,11) = -0.5*L;
+                }
+            }
+            else if (dirID == 2)  {
+                if (shearDistI.Size() == 2)  {
+                    Tlb(i,4)  = shearDistI(1)*L;
+                    Tlb(i,10) = (1.0-shearDistI(1))*L;
+                } else  {
+                    Tlb(i,4)  = Tlb(i,10) = 0.5*L;
+                }
+            }
             break;
         default :
             // do nothing
