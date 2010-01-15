@@ -35,7 +35,9 @@
 #include <Domain.h>
 #include <TclModelBuilder.h>
 #include <StandardStream.h>
+
 #include <ExperimentalSite.h>
+#include <ActorExpSite.h>
 
 #ifdef _WIN32
 #define DllExport _declspec(dllexport)
@@ -130,6 +132,40 @@ int openFresco_addExperimentalRecorder(ClientData clientData,
 }
 
 
+// start laboratory server command
+int openFresco_startLabServer(ClientData clientData,
+    Tcl_Interp *interp, int argc, TCL_Char **argv)
+{ 
+    if (argc != 2)  {
+        opserr << "WARNING insufficient arguments\n"
+            << "Want: startLabServer siteTag\n";
+        return TCL_ERROR;
+    }
+
+    int siteTag;
+
+    if (Tcl_GetInt(interp, argv[1], &siteTag) != TCL_OK)  {
+        opserr << "WARNING invalid startLabServer siteTag\n";
+        return TCL_ERROR;
+    }
+    ActorExpSite *theExperimentalSite =
+        dynamic_cast <ActorExpSite*> (getExperimentalSite(siteTag));
+    if (theExperimentalSite != 0)  {
+        // start server process
+        opserr << "\nActorExpSite " << siteTag
+            << " now running..." << endln;
+        theExperimentalSite->run();
+    } else  {
+        opserr << "WARNING actor experimental site not found\n";
+        opserr << "unable to start expSite: " << siteTag << endln;
+        return TCL_ERROR;
+    }
+    delete theExperimentalSite;
+
+    return TCL_OK;
+}
+
+
 // This is a package initialization procedure, which is called
 // by Tcl when this package is to be added to an interpreter.
 extern "C" DllExport int
@@ -177,6 +213,9 @@ OpenFresco(ClientData clientData, Tcl_Interp *interp, int argc,
         (ClientData)NULL, NULL);
 
     Tcl_CreateCommand(interp, "expRecorder", openFresco_addExperimentalRecorder,
+        (ClientData)NULL, NULL);
+
+    Tcl_CreateCommand(interp, "startLabServer", openFresco_startLabServer,
         (ClientData)NULL, NULL);
 
     return TCL_OK;
