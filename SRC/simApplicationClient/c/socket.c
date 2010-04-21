@@ -213,7 +213,8 @@ void CALL_CONV setupconnectionserver(unsigned int *port, int *socketID)
 *
 * return: int *socketID - negative number if failed to setup connection
 */
-void CALL_CONV setupconnectionclient(unsigned int *other_Port, const char other_InetAddr[], int *lengthInet, int *socketID)
+void CALL_CONV setupconnectionclient(unsigned int *other_Port,
+    const char other_InetAddr[], int *lengthInet, int *socketID)
 {
     union {
         struct sockaddr    addr;
@@ -351,7 +352,7 @@ void CALL_CONV closeconnection(int *socketID, int *ierr)
 
 
 /*
-* senddata() - function to send data
+* senddata() - function to send data in blocking mode
 *
 * input: int *socketID - socket identifier
 *        int *dataTypeSize - size of data type
@@ -362,12 +363,13 @@ void CALL_CONV closeconnection(int *socketID, int *ierr)
 */
 void CALL_CONV senddata(int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr)
 {
-    int nwrite, nleft;    
+    int nwrite, nleft;
+    unsigned long nbMode = 0;
     char *gMsg = data;
-    SocketConnection *theSocket = theSockets;  
+    SocketConnection *theSocket = theSockets;
     
     // find the socket
-    while (theSocket != 0 && theSocket->socketID != *socketID) 
+    while (theSocket != 0 && theSocket->socketID != *socketID)
         theSocket = theSocket->next;
     if (theSocket == 0) {
         fprintf(stderr,"socket::senddata() - could not find socket to send data\n");
@@ -375,8 +377,23 @@ void CALL_CONV senddata(int *socketID, int *dataTypeSize, char data[], int *lenD
         return;
     }
     
+    // turn on blocking mode
+#ifdef _WIN32
+    if (ioctlsocket(theSocket->sockfd,FIONBIO,&nbMode) != 0) {
+        fprintf(stderr,"socket::senddata() - could not turn on blocking mode\n");
+        *ierr = -2;
+        return;
+    }
+#else
+    if (ioctl(theSocket->sockfd,FIONBIO,&nbMode) != 0) {
+        fprintf(stderr,"socket::senddata() - could not turn on blocking mode\n");
+        *ierr = -2;
+        return;
+    }
+#endif
+    
     // send the data
-    // if o.k. get a pointer to the data in the message and 
+    // if o.k. get a pointer to the data in the message and
     // place the incoming data there
     nleft = *lenData * *dataTypeSize;
     
@@ -391,7 +408,67 @@ void CALL_CONV senddata(int *socketID, int *dataTypeSize, char data[], int *lenD
 
 
 /*
-* recvdata() - function to receive data
+* sendnbdata() - function to send data in nonblocking mode
+*
+* input: int *socketID - socket identifier
+*        int *dataTypeSize - size of data type
+*        char *data - pointer to data to send
+*        int *lenData - length of data
+*        
+* return: int *ierr - 0 if successfull, negative number if not
+*/
+void CALL_CONV sendnbdata(int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr)
+{
+    int nwrite, nleft;
+    unsigned long nbMode = 1;
+    char *gMsg = data;
+    SocketConnection *theSocket = theSockets;
+    
+    // find the socket
+    while (theSocket != 0 && theSocket->socketID != *socketID)
+        theSocket = theSocket->next;
+    if (theSocket == 0) {
+        fprintf(stderr,"socket::sendnbdata() - could not find socket to send data\n");
+        *ierr = -1;
+        return;
+    }
+    
+    // turn on nonblocking mode
+#ifdef _WIN32
+    if (ioctlsocket(theSocket->sockfd,FIONBIO,&nbMode) != 0) {
+        fprintf(stderr,"socket::sendnbdata() - could not turn on nonblocking mode\n");
+        *ierr = -2;
+        return;
+    }
+#else
+    if (ioctl(theSocket->sockfd,FIONBIO,&nbMode) != 0) {
+        fprintf(stderr,"socket::sendnbdata() - could not turn on nonblocking mode\n");
+        *ierr = -2;
+        return;
+    }
+#endif
+    
+    // send the data
+    // if o.k. get a pointer to the data in the message and
+    // place the incoming data there
+    nleft = *lenData * *dataTypeSize;
+    
+    while (nleft > 0) {
+        nwrite = send(theSocket->sockfd, gMsg, nleft, 0);
+        if (nwrite < 0) {
+            *ierr = -3;
+            return;
+        }
+        nleft -= nwrite;
+        gMsg +=  nwrite;
+    }
+    
+    *ierr = 0;
+}
+
+
+/*
+* recvdata() - function to receive data in blocking mode
 *
 * input: int *socketID - socket identifier
 *        int *dataTypeSize - size of data type
@@ -402,12 +479,13 @@ void CALL_CONV senddata(int *socketID, int *dataTypeSize, char data[], int *lenD
 */
 void CALL_CONV recvdata(int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr)
 {
-    int nread, nleft;    
+    int nread, nleft;
+    unsigned long nbMode = 0;
     char *gMsg = data;
-    SocketConnection *theSocket = theSockets;  
+    SocketConnection *theSocket = theSockets;
     
     // find the socket
-    while (theSocket != 0 && theSocket->socketID != *socketID) 
+    while (theSocket != 0 && theSocket->socketID != *socketID)
         theSocket=theSocket->next;
     if (theSocket == 0) {
         fprintf(stderr,"socket::recvdata() - could not find socket to receive data\n");
@@ -415,13 +493,88 @@ void CALL_CONV recvdata(int *socketID, int *dataTypeSize, char data[], int *lenD
         return;
     }
     
+    // turn on blocking mode
+#ifdef _WIN32
+    if (ioctlsocket(theSocket->sockfd,FIONBIO,&nbMode) != 0) {
+        fprintf(stderr,"socket::recvdata() - could not turn on blocking mode\n");
+        *ierr = -2;
+        return;
+    }
+#else
+    if (ioctl(theSocket->sockfd,FIONBIO,&nbMode) != 0) {
+        fprintf(stderr,"socket::recvdata() - could not turn on blocking mode\n");
+        *ierr = -2;
+        return;
+    }
+#endif
+    
     // receive the data
-    // if o.k. get a pointer to the data in the message and 
+    // if o.k. get a pointer to the data in the message and
     // place the incoming data there
     nleft = *lenData * *dataTypeSize;
-
+    
     while (nleft > 0) {
         nread = recv(theSocket->sockfd, gMsg, nleft, 0);
+        nleft -= nread;
+        gMsg +=  nread;
+    }
+    
+    *ierr = 0;
+}
+
+
+/*
+* recvnbdata() - function to receive data in nonblocking mode
+*
+* input: int *socketID - socket identifier
+*        int *dataTypeSize - size of data type
+*        char *data - pointer to data to receive
+*        int *lenData - length of data
+*        
+* return: int *ierr - 0 if successfull, negative number if not
+*/
+void CALL_CONV recvnbdata(int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr)
+{
+    int nread, nleft;
+    unsigned long nbMode = 1;
+    char *gMsg = data;
+    SocketConnection *theSocket = theSockets;
+    
+    // find the socket
+    while (theSocket != 0 && theSocket->socketID != *socketID)
+        theSocket=theSocket->next;
+    if (theSocket == 0) {
+        fprintf(stderr,"socket::recvnbdata() - could not find socket to receive data\n");
+        *ierr = -1;
+        return;
+    }
+    
+    // turn on nonblocking mode
+#ifdef _WIN32
+    if (ioctlsocket(theSocket->sockfd,FIONBIO,&nbMode) != 0) {
+        fprintf(stderr,"socket::recvnbdata() - could not turn on nonblocking mode\n");
+        *ierr = -2;
+        return;
+    }
+#else
+    if (ioctl(theSocket->sockfd,FIONBIO,&nbMode) != 0) {
+        fprintf(stderr,"socket::recvnbdata() - could not turn on nonblocking mode\n");
+        *ierr = -2;
+        return;
+    }
+#endif
+    
+    // receive the data
+    // if o.k. get a pointer to the data in the message and
+    // place the incoming data there
+    nleft = *lenData * *dataTypeSize;
+    
+    while (nleft > 0) {
+        nread = recv(theSocket->sockfd, gMsg, nleft, 0);
+        if (nread < 0) {
+            *ierr = -3;
+            return;
+        }
         nleft -= nread;
         gMsg +=  nread;
     }
