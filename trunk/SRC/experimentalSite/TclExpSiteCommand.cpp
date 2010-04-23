@@ -39,6 +39,7 @@
 
 #include <TCP_Socket.h>
 #include <TCP_SocketSSL.h>
+#include <UDP_Socket.h>
 
 #include <Vector.h>
 #include <string.h>
@@ -101,6 +102,16 @@ extern ExperimentalSite *getExperimentalSiteFirst()
 }
 
 
+extern int clearExperimentalSites(Tcl_Interp *interp)
+{
+    if (theExperimentalSites != 0) {
+        theExperimentalSites->clearAll(false);
+    }
+    
+    return 0;
+}
+
+
 static void printCommand(int argc, TCL_Char **argv)
 {
     opserr << "Input command: ";
@@ -115,7 +126,7 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp, int argc,
 {
     if (theExperimentalSites == 0)
         theExperimentalSites = new ArrayOfTaggedObjects(32);
-
+    
     // make sure there is a minimum number of arguments
     if (argc < 3)  {
 		opserr << "WARNING insufficient number of experimental site arguments\n";
@@ -178,7 +189,8 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp, int argc,
 		
 		int tag, setupTag, ipPort, argi;
 		char *ipAddr;
-        int ssl = 0;
+        int ssl = 0, udp = 0;
+        int noDelay = 0;
         int dataSize = OF_Network_dataSize;
         ExperimentalSetup *theSetup = 0;
         Channel *theChannel = 0;
@@ -218,8 +230,14 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp, int argc,
         argi++;
         // check for optional arguments
         for (int i = argi; i < argc; i++)  {
-            if (strcmp(argv[i], "-ssl") == 0)  {
+            if (strcmp(argv[i], "-ssl") == 0 && udp == 0)  {
                 ssl = 1;
+            }
+            else if (strcmp(argv[i], "-udp") == 0 && ssl == 0)  {
+                udp = 1;
+            }
+            else if (strcmp(argv[i], "-noDelay") == 0)  {
+                noDelay = 1;
             }
             else if (strcmp(argv[i], "-dataSize") == 0)  {
 		        if (Tcl_GetInt(interp, argv[i+1], &dataSize) != TCL_OK)  {
@@ -229,25 +247,33 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp, int argc,
 		        }
             }
         }
-
+        
         // setup the connection
-        if (!ssl)  {
-            theChannel = new TCP_Socket(ipPort,ipAddr,true);
-            if (!theChannel) {
-                opserr << "WARNING could not create channel\n";
-                opserr << "expSite ShadowSite " << tag << endln;
-                return TCL_ERROR;
-            }
-        }
-        else  {
-            theChannel = new TCP_SocketSSL(ipPort,ipAddr,true);
+        if (ssl)  {
+            theChannel = new TCP_SocketSSL(ipPort,ipAddr,true,noDelay);
             if (!theChannel) {
                 opserr << "WARNING could not create SSL channel\n";
                 opserr << "expSite ShadowSite " << tag << endln;
                 return TCL_ERROR;
             }
         }
-
+        else if (udp)  {
+            theChannel = new UDP_Socket(ipPort,ipAddr,true);
+            if (!theChannel) {
+                opserr << "WARNING could not create UDP channel\n";
+                opserr << "expSite ShadowSite " << tag << endln;
+                return TCL_ERROR;
+            }
+        }
+        else  {
+            theChannel = new TCP_Socket(ipPort,ipAddr,true,noDelay);
+            if (!theChannel) {
+                opserr << "WARNING could not create TCP channel\n";
+                opserr << "expSite ShadowSite " << tag << endln;
+                return TCL_ERROR;
+            }
+        }
+        
         // parsing was successful, allocate the site
         if (theSetup == 0)
             theSite = new ShadowExpSite(tag, *theChannel, dataSize);
@@ -281,7 +307,8 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp, int argc,
 		}    
 		
 		int tag, setupTag, ctrlTag, ipPort, argi;
-        int ssl = 0;
+        int ssl = 0, udp = 0;
+        int noDelay = 0;
         ExperimentalSetup *theSetup = 0;
         ExperimentalControl *theControl = 0;
         Channel *theChannel = 0;
@@ -332,25 +359,20 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp, int argc,
         argi++;
         // check for optional arguments
         for (int i = argi; i < argc; i++)  {
-            if (strcmp(argv[i], "-ssl") == 0)  {
+            if (strcmp(argv[i], "-ssl") == 0 && udp == 0)  {
                 ssl = 1;
             }
-        }
-
-        // parsing was successful, setup the connection and allocate the site
-        if (!ssl)  {
-            theChannel = new TCP_Socket(ipPort,true);
-            if (theChannel != 0) {
-                opserr << "\nChannel successfully created: "
-                    << "Waiting for ShadowExpSite...\n";
-            } else {
-                opserr << "WARNING could not create channel\n";
-                opserr << "expSite ActorSite " << tag << endln;
-                return TCL_ERROR;
+            else if (strcmp(argv[i], "-udp") == 0 && ssl == 0)  {
+                udp = 1;
+            }
+            else if (strcmp(argv[i], "-noDelay") == 0)  {
+                noDelay = 1;
             }
         }
-        else  {
-            theChannel = new TCP_SocketSSL(ipPort,true);
+        
+        // parsing was successful, setup the connection and allocate the site
+        if (ssl)  {
+            theChannel = new TCP_SocketSSL(ipPort,true,noDelay);
             if (theChannel != 0) {
                 opserr << "\nSSL Channel successfully created: "
                     << "Waiting for ShadowExpSite...\n";
@@ -360,7 +382,29 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp, int argc,
                 return TCL_ERROR;
             }
         }
-
+        else if (udp)  {
+            theChannel = new UDP_Socket(ipPort,true);
+            if (theChannel != 0) {
+                opserr << "\nUDP Channel successfully created: "
+                    << "Waiting for ShadowExpSite...\n";
+            } else {
+                opserr << "WARNING could not create UDP channel\n";
+                opserr << "expSite ActorSite " << tag << endln;
+                return TCL_ERROR;
+            }
+        }
+        else  {
+            theChannel = new TCP_Socket(ipPort,true,noDelay);
+            if (theChannel != 0) {
+                opserr << "\nTCP Channel successfully created: "
+                    << "Waiting for ShadowExpSite...\n";
+            } else {
+                opserr << "WARNING could not create TCP channel\n";
+                opserr << "expSite ActorSite " << tag << endln;
+                return TCL_ERROR;
+            }
+        }
+        
         // parsing was successful, allocate the site
         if (theControl == 0)
             theSite = new ActorExpSite(tag, theSetup, *theChannel);
