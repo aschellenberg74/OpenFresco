@@ -72,6 +72,16 @@ extern ExperimentalCP *getExperimentalCP(int tag)
 }
 
 
+extern int clearExperimentalCPs(Tcl_Interp *interp)
+{
+    if (theExperimentalCPs != 0) {
+        theExperimentalCPs->clearAll(false);
+    }
+    
+    return 0;
+}
+
+
 static void printCommand(int argc, TCL_Char **argv)
 {
     opserr << "Input command: ";

@@ -73,6 +73,16 @@ extern ExperimentalSignalFilter *getExperimentalSignalFilter(int tag)
 }
 
 
+extern int clearExperimentalSignalFilters(Tcl_Interp *interp)
+{
+    if (theExperimentalSignalFilters != 0) {
+        theExperimentalSignalFilters->clearAll(false);
+    }
+    
+    return 0;
+}
+
+
 static void printCommand(int argc, TCL_Char **argv)
 {
     opserr << "Input command: ";

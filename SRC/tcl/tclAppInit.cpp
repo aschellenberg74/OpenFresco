@@ -79,6 +79,7 @@ extern int		Tclxttest_Init _ANSI_ARGS_((Tcl_Interp *interp));
 #include <Domain.h>
 #include <TclModelBuilder.h>
 #include <StandardStream.h>
+//#include <FE_Datastore.h>
 
 #include <Node.h>
 #include <ExperimentalElement.h>
@@ -87,10 +88,12 @@ extern int		Tclxttest_Init _ANSI_ARGS_((Tcl_Interp *interp));
 
 #include <TCP_Socket.h>
 #include <TCP_SocketSSL.h>
+#include <UDP_Socket.h>
 #include <Matrix.h>
 
 Domain *theDomain = 0;
 TclModelBuilder *theTclBuilder = 0;
+//FE_Datastore *theDatabase = 0;
 
 #ifndef _WIN32
 extern Domain *ops_TheActiveDomain;
@@ -163,6 +166,7 @@ extern ExperimentalSite *getExperimentalSite(int tag);
 // experimental control point commands
 extern int TclExpCPCommand(ClientData clientData, Tcl_Interp *interp,
     int argc, TCL_Char **argv, Domain *theDomain, TclModelBuilder *theTclBuilder);
+extern int clearExperimentalCPs(Tcl_Interp *interp);
 
 int openFresco_addExperimentalCP(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
@@ -174,6 +178,7 @@ int openFresco_addExperimentalCP(ClientData clientData,
 // experimental signal filter commands
 extern int TclExpSignalFilterCommand(ClientData clientData, Tcl_Interp *interp,
     int argc, TCL_Char **argv, Domain *theDomain, TclModelBuilder *theTclBuilder);
+extern int clearExperimentalSignalFilters(Tcl_Interp *interp);
 
 int openFresco_addExperimentalSignalFilter(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
@@ -185,6 +190,7 @@ int openFresco_addExperimentalSignalFilter(ClientData clientData,
 // experimental control commands
 extern int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
     int argc, TCL_Char **argv, Domain *theDomain, TclModelBuilder *theTclBuilder);
+extern int clearExperimentalControls(Tcl_Interp *interp);
 
 int openFresco_addExperimentalControl(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
@@ -196,6 +202,7 @@ int openFresco_addExperimentalControl(ClientData clientData,
 // experimental setup commands
 extern int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp,
     int argc, TCL_Char **argv, Domain *theDomain, TclModelBuilder *theTclBuilder);
+extern int clearExperimentalSetups(Tcl_Interp *interp);
 
 int openFresco_addExperimentalSetup(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
@@ -207,6 +214,7 @@ int openFresco_addExperimentalSetup(ClientData clientData,
 // experimental site commands
 extern int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp,
     int argc, TCL_Char **argv, Domain *theDomain, TclModelBuilder *theTclBuilder);
+extern int clearExperimentalSites(Tcl_Interp *interp);
 
 int openFresco_addExperimentalSite(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
@@ -757,7 +765,6 @@ int openFresco_startSimAppElemServer(ClientData clientData,
             break;
         case OF_RemoteTest_DIE:
             exitYet = true;
-            delete theExperimentalElement;
             break;
         default:
             opserr << "WARNING SimAppElemServer invalid action "
@@ -800,6 +807,27 @@ int openFresco_startSimAppElemServer(ClientData clientData,
     delete [] sData;
 
     return TCL_OK;
+}
+
+
+// wipe entire model command
+int openFresco_wipeModel(ClientData clientData,
+    Tcl_Interp *interp, int argc, TCL_Char **argv)
+{
+    /*if (theDatabase != 0)  {
+        delete theDatabase;
+        theDatabase = 0;
+    }*/
+    
+    theDomain->clearAll();
+    
+    clearExperimentalCPs(interp);
+    clearExperimentalSignalFilters(interp);
+    clearExperimentalControls(interp);
+    clearExperimentalSetups(interp);
+    clearExperimentalSites(interp);
+
+    return TCL_OK;  
 }
 
 
@@ -893,7 +921,7 @@ int specifyModelBuilder(ClientData clientData, Tcl_Interp *interp,
         }
     }
     else {
-        Tcl_SetResult(interp, "WARNING unknown model builder type", TCL_STATIC);
+        //Tcl_SetResult(interp, "WARNING unknown model builder type", TCL_STATIC);
 
         opserr << "WARNING model builder type " << argv[1]
             << " not supported\n";
@@ -1002,7 +1030,10 @@ int Tcl_AppInit(Tcl_Interp *interp)
 
     Tcl_CreateCommand(interp, "startSimAppElemServer", openFresco_startSimAppElemServer,
         (ClientData)NULL, NULL);
-    
+
+    Tcl_CreateCommand(interp, "wipe", openFresco_wipeModel,
+        (ClientData)NULL, NULL); 
+
     // OpenSees commands
     Tcl_CreateCommand(interp, "model", specifyModelBuilder,
         (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);
