@@ -83,6 +83,16 @@ extern ExperimentalSetup *getExperimentalSetup(int tag)
 }
 
 
+extern int clearExperimentalSetups(Tcl_Interp *interp)
+{
+    if (theExperimentalSetups != 0) {
+        theExperimentalSetups->clearAll(false);
+    }
+    
+    return 0;
+}
+
+
 static void printCommand(int argc, TCL_Char **argv)
 {
     opserr << "Input command: ";
