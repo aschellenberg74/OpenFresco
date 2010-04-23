@@ -47,9 +47,10 @@
 #include <DataFileStream.h>
 #include <XmlFileStream.h>
 #include <BinaryFileStream.h>
+#include <TCP_Stream.h>
 #include <DatabaseStream.h>
 
-enum outputMode {STANDARD_STREAM, DATA_STREAM, XML_STREAM, DATABASE_STREAM, BINARY_STREAM, DATA_STREAM_CSV};
+enum outputMode {STANDARD_STREAM, DATA_STREAM, XML_STREAM, DATABASE_STREAM, BINARY_STREAM, DATA_STREAM_CSV, TCP_STREAM};
 
 extern const char * getInterpPWD(Tcl_Interp *interp);  // commands.cpp
 extern ExperimentalSite *getExperimentalSite(int tag);
@@ -90,6 +91,9 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         bool echoTime = false;
         outputMode eMode = STANDARD_STREAM; 
         double deltaT = 0.0;
+        int precision = 6;
+        const char *inetAddr = 0;
+        int inetPort;
         int i, j, argi = 2;
         int flags = 0;
         int sizeData = 0;
@@ -169,6 +173,13 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
                 argi++;
             } 
             
+            else if (strcmp(argv[argi],"-precision") == 0)  {
+                argi++;
+                if (Tcl_GetInt(interp, argv[argi], &precision) != TCL_OK)	
+                    return TCL_ERROR;		  
+                argi++;
+            }
+            
             else if (strcmp(argv[argi],"-file") == 0)  {
                 fileName = argv[argi+1];
                 const char *pwd = getInterpPWD(interp);
@@ -201,6 +212,14 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
                 argi += 2;
             }	    
             
+            else if ((strcmp(argv[argi],"-tcp") == 0) || (strcmp(argv[argi],"-TCP") == 0))  {
+                inetAddr = argv[argi+1];
+                if (Tcl_GetInt(interp, argv[argi+2], &inetPort) != TCL_OK)
+                    return TCL_ERROR;
+                eMode = TCP_STREAM;
+                argi += 3;
+            }	    
+            
             else if (strcmp(argv[argi],"-database") == 0)  {
                 theRecorderDatabase = theDatabase;
                 if (theRecorderDatabase != 0)  {
@@ -221,10 +240,8 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
             }
         }
         
-        if (sizeData <= 0)  {
-            opserr << "WARNING no response type specified for experimental site recorder\n";
-            return TCL_ERROR;
-        }
+        if (sizeData <= 0)
+            opserr << "WARNING no data response type specified for experimental site recorder\n";
         
         const char **data = new const char *[sizeData];
         
@@ -240,10 +257,15 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
             theOutputStream = new XmlFileStream(fileName);
         } else if (eMode == BINARY_STREAM && fileName != 0)  {
             theOutputStream = new BinaryFileStream(fileName);
+        } else if (eMode == TCP_STREAM && inetAddr != 0)  {
+	        theOutputStream = new TCP_Stream(inetPort, inetAddr);
         } else if (eMode == DATABASE_STREAM && tableName != 0)  {
             theOutputStream = new DatabaseStream(theDatabase,tableName);
         } else
             theOutputStream = new StandardStream();
+        
+        // set precision for stream
+        theOutputStream->setPrecision(precision);
         
         // construct array of experimental sites
         theSites = new ExperimentalSite* [numSites];
@@ -277,6 +299,9 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         bool echoTime = false;
         outputMode eMode = STANDARD_STREAM; 
         double deltaT = 0.0;
+        int precision = 6;
+        const char *inetAddr = 0;
+        int inetPort;
         int i, j, argi = 2;
         int flags = 0;
         int sizeData = 0;
@@ -356,6 +381,13 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
                 argi++;
             } 
             
+            else if (strcmp(argv[argi],"-precision") == 0)  {
+                argi++;
+                if (Tcl_GetInt(interp, argv[argi], &precision) != TCL_OK)	
+                    return TCL_ERROR;		  
+                argi++;
+            }
+            
             else if (strcmp(argv[argi],"-file") == 0)  {
                 fileName = argv[argi+1];
                 const char *pwd = getInterpPWD(interp);
@@ -388,6 +420,14 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
                 argi += 2;
             }	    
             
+            else if ((strcmp(argv[argi],"-tcp") == 0) || (strcmp(argv[argi],"-TCP") == 0))  {
+                inetAddr = argv[argi+1];
+                if (Tcl_GetInt(interp, argv[argi+2], &inetPort) != TCL_OK)
+                    return TCL_ERROR;
+                eMode = TCP_STREAM;
+                argi += 3;
+            }	    
+            
             else if (strcmp(argv[argi],"-database") == 0)  {
                 theRecorderDatabase = theDatabase;
                 if (theRecorderDatabase != 0)  {
@@ -408,10 +448,8 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
             }
         }
         
-        if (sizeData <= 0)  {
-            opserr << "WARNING no response type specified for experimental setup recorder\n";
-            return TCL_ERROR;
-        }
+        if (sizeData <= 0)
+            opserr << "WARNING no data response type specified for experimental setup recorder\n";
         
         const char **data = new const char *[sizeData];
         
@@ -427,10 +465,15 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
             theOutputStream = new XmlFileStream(fileName);
         } else if (eMode == BINARY_STREAM && fileName != 0)  {
             theOutputStream = new BinaryFileStream(fileName);
+        } else if (eMode == TCP_STREAM && inetAddr != 0)  {
+	        theOutputStream = new TCP_Stream(inetPort, inetAddr);
         } else if (eMode == DATABASE_STREAM && tableName != 0)  {
             theOutputStream = new DatabaseStream(theDatabase,tableName);
         } else
             theOutputStream = new StandardStream();
+        
+        // set precision for stream
+        theOutputStream->setPrecision(precision);
         
         // construct array of experimental setups
         theSetups = new ExperimentalSetup* [numSetups];
@@ -464,6 +507,9 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         bool echoTime = false;
         outputMode eMode = STANDARD_STREAM; 
         double deltaT = 0.0;
+        int precision = 6;
+        const char *inetAddr = 0;
+        int inetPort;
         int i, j, argi = 2;
         int flags = 0;
         int sizeData = 0;
@@ -543,6 +589,13 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
                 argi++;
             } 
             
+            else if (strcmp(argv[argi],"-precision") == 0)  {
+                argi++;
+                if (Tcl_GetInt(interp, argv[argi], &precision) != TCL_OK)	
+                    return TCL_ERROR;		  
+                argi++;
+            }
+            
             else if (strcmp(argv[argi],"-file") == 0)  {
                 fileName = argv[argi+1];
                 const char *pwd = getInterpPWD(interp);
@@ -575,6 +628,14 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
                 argi += 2;
             }	    
             
+            else if ((strcmp(argv[argi],"-tcp") == 0) || (strcmp(argv[argi],"-TCP") == 0))  {
+                inetAddr = argv[argi+1];
+                if (Tcl_GetInt(interp, argv[argi+2], &inetPort) != TCL_OK)
+                    return TCL_ERROR;
+                eMode = TCP_STREAM;
+                argi += 3;
+            }	    
+            
             else if (strcmp(argv[argi],"-database") == 0)  {
                 theRecorderDatabase = theDatabase;
                 if (theRecorderDatabase != 0)  {
@@ -595,10 +656,8 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
             }
         }
         
-        if (sizeData <= 0)  {
-            opserr << "WARNING no response type specified for experimental control recorder\n";
-            return TCL_ERROR;
-        }
+        if (sizeData <= 0)
+            opserr << "WARNING no data response type specified for experimental control recorder\n";
         
         const char **data = new const char *[sizeData];
         
@@ -614,10 +673,15 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
             theOutputStream = new XmlFileStream(fileName);
         } else if (eMode == BINARY_STREAM && fileName != 0)  {
             theOutputStream = new BinaryFileStream(fileName);
+        } else if (eMode == TCP_STREAM && inetAddr != 0)  {
+	        theOutputStream = new TCP_Stream(inetPort, inetAddr);
         } else if (eMode == DATABASE_STREAM && tableName != 0)  {
             theOutputStream = new DatabaseStream(theDatabase,tableName);
         } else
             theOutputStream = new StandardStream();
+        
+        // set precision for stream
+        theOutputStream->setPrecision(precision);
         
         // construct array of experimental controls
         theControls = new ExperimentalControl* [numControls];
@@ -651,6 +715,9 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         bool echoTime = false;
         outputMode eMode = STANDARD_STREAM; 
         double deltaT = 0.0;
+        int precision = 6;
+        const char *inetAddr = 0;
+        int inetPort;
         int i, j, argi = 2;
         int flags = 0;
         int sizeData = 0;
@@ -730,6 +797,13 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
                 argi++;
             } 
             
+            else if (strcmp(argv[argi],"-precision") == 0)  {
+                argi++;
+                if (Tcl_GetInt(interp, argv[argi], &precision) != TCL_OK)	
+                    return TCL_ERROR;		  
+                argi++;
+            }
+            
             else if (strcmp(argv[argi],"-file") == 0)  {
                 fileName = argv[argi+1];
                 const char *pwd = getInterpPWD(interp);
@@ -762,6 +836,14 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
                 argi += 2;
             }	    
             
+            else if ((strcmp(argv[argi],"-tcp") == 0) || (strcmp(argv[argi],"-TCP") == 0))  {
+                inetAddr = argv[argi+1];
+                if (Tcl_GetInt(interp, argv[argi+2], &inetPort) != TCL_OK)
+                    return TCL_ERROR;
+                eMode = TCP_STREAM;
+                argi += 3;
+            }	    
+            
             else if (strcmp(argv[argi],"-database") == 0)  {
                 theRecorderDatabase = theDatabase;
                 if (theRecorderDatabase != 0)  {
@@ -782,10 +864,8 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
             }
         }
         
-        if (sizeData <= 0)  {
-            opserr << "WARNING no response type specified for experimental signal filter recorder\n";
-            return TCL_ERROR;
-        }
+        if (sizeData <= 0)
+            opserr << "WARNING no data response type specified for experimental signal filter recorder\n";
         
         const char **data = new const char *[sizeData];
         
@@ -801,10 +881,15 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
             theOutputStream = new XmlFileStream(fileName);
         } else if (eMode == BINARY_STREAM && fileName != 0)  {
             theOutputStream = new BinaryFileStream(fileName);
+        } else if (eMode == TCP_STREAM && inetAddr != 0)  {
+	        theOutputStream = new TCP_Stream(inetPort, inetAddr);
         } else if (eMode == DATABASE_STREAM && tableName != 0)  {
             theOutputStream = new DatabaseStream(theDatabase,tableName);
         } else
             theOutputStream = new StandardStream();
+        
+        // set precision for stream
+        theOutputStream->setPrecision(precision);
         
         // construct array of experimental signal filters
         theFilters = new ExperimentalSignalFilter* [numFilters];
