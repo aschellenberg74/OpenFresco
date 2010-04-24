@@ -98,18 +98,18 @@ static void mdlInitializeSizes(SimStruct *S)
         return;      // Parameter mismatch will be reported by Simulink
     }
 #endif // MATLAB_MEX_FILE
-
+    
     ssSetNumContStates(S, 0);
     ssSetNumDiscStates(S, 0);
-
+    
     if (!ssSetNumInputPorts(S, 1)) return;
     ssSetInputPortWidth(S, 0, DYNAMICALLY_SIZED);
     ssSetInputPortDirectFeedThrough(S, 0, 1);
-
+    
     if (!ssSetNumOutputPorts(S, 2)) return;
     ssSetOutputPortWidth(S, 0, DYNAMICALLY_SIZED);
     ssSetOutputPortWidth(S, 1, DYNAMICALLY_SIZED);
-
+    
     ssSetNumSampleTimes(S, 1);
     ssSetNumDWork(S, 5);
     ssSetNumRWork(S, 0);
@@ -117,25 +117,25 @@ static void mdlInitializeSizes(SimStruct *S)
     ssSetNumPWork(S, 0);
     ssSetNumModes(S, 0);
     ssSetNumNonsampledZCs(S, 0);
-
+    
     // allocate memory for socketID
     ssSetDWorkWidth(S, 0, 1);
     ssSetDWorkDataType(S, 0, SS_INT32);
-
+    
     // allocate memory for dataSize
     ssSetDWorkWidth(S, 1, 1);
     ssSetDWorkDataType(S, 1, SS_INT32);
-
+    
     // allocate memory for the send and receive vectors
     ssSetDWorkWidth(S, 2, 256);
     ssSetDWorkDataType(S, 2, SS_DOUBLE);
     ssSetDWorkWidth(S, 3, 256);
     ssSetDWorkDataType(S, 3, SS_DOUBLE);
-
+    
     // allocate memory for time
     ssSetDWorkWidth(S, 4, 1);
     ssSetDWorkDataType(S, 4, SS_DOUBLE);
-
+    
     // take care when specifying exception free code - see sfuntmpl_doc.c
     ssSetOptions(S, SS_OPTION_EXCEPTION_FREE_CODE);
 }
@@ -163,27 +163,27 @@ static void mdlStart(SimStruct *S)
     char_T *ipAddr;
     uint_T ipPort;
     int_T sizeAddr, iData[11];
-
+    
     int_T i, ierr, nleft, dataTypeSize;
     char_T *gMsg;
-
+    
     // get parameters
     int_T sizeTrialDisp = ssGetInputPortWidth(S,0);
     int_T sizeDaqDisp   = ssGetOutputPortWidth(S,0);
     int_T sizeDaqForce  = ssGetOutputPortWidth(S,1);
-
+    
     // get work vectors
     int_T *socketID = (int_T*)ssGetDWork(S,0);
     int_T *dataSize = (int_T*)ssGetDWork(S,1);
     real_T *sData   = (real_T*)ssGetDWork(S,2);
     real_T *rData   = (real_T*)ssGetDWork(S,3);
-
+    
     // initialize socketID and dataSize
     socketID[0] = -1;
     dataSize[0] = (int_T)mxGetScalar(dataSize(S));
     dataSize[0] = (1+3*sizeTrialDisp>dataSize[0]) ? 1+3*sizeTrialDisp : dataSize[0];
     dataSize[0] = (sizeDaqDisp+sizeDaqForce>dataSize[0]) ? sizeDaqDisp+sizeDaqForce : dataSize[0];
-
+    
     // resize and initialize send and receive vectors
     ssSetDWorkWidth(S, 2, dataSize[0]);
     ssSetDWorkWidth(S, 3, dataSize[0]);
@@ -191,7 +191,7 @@ static void mdlStart(SimStruct *S)
         sData[i] = 0.0;
         rData[i] = 0.0;
     }
-
+    
     // setup the connection
     ipAddr = mxArrayToString(ipAddr(S));
     sizeAddr = (int_T)mxGetN(ipAddr(S)) + 1;
@@ -202,23 +202,23 @@ static void mdlStart(SimStruct *S)
         ssSetErrorStatus(S,"Failed to setup connection with server");
         return;
     }
-
+    
     // set the data size for the server
     // sizeCtrl
-    iData[0] = sizeTrialDisp;  // disp
-    iData[1] = sizeTrialDisp;  // vel
-    iData[2] = sizeTrialDisp;  // accel
-    iData[3] = 0;              // force
-    iData[4] = 0;              // time
+    iData[0] = sizeTrialDisp;   // disp
+    iData[1] = sizeTrialDisp;   // vel
+    iData[2] = sizeTrialDisp;   // accel
+    iData[3] = 0;               // force
+    iData[4] = 0;               // time
     // sizeDaq
-    iData[5] = sizeDaqDisp;    // disp
-    iData[6] = 0;              // vel
-    iData[7] = 0;              // accel
-    iData[8] = sizeDaqForce;   // force
-    iData[9] = 0;              // time
+    iData[5] = sizeDaqDisp;     // disp
+    iData[6] = 0;               // vel
+    iData[7] = 0;               // accel
+    iData[8] = sizeDaqForce;    // force
+    iData[9] = 0;               // time
     // dataSize
     iData[10] = dataSize[0];
-
+    
     // send the data sizes
     gMsg = (char_T *)iData;
     dataTypeSize = sizeof(int_T);
@@ -234,26 +234,26 @@ static void mdlStart(SimStruct *S)
 static void mdlOutputs(SimStruct *S, int_T tid)
 {
     InputRealPtrsType trialResp = ssGetInputPortRealSignalPtrs(S,0);
-    real_T *measDisp = ssGetOutputPortRealSignal(S,0);
-    real_T *measForce = ssGetOutputPortRealSignal(S,1);
-
+    real_T *daqDisp  = ssGetOutputPortRealSignal(S,0);
+    real_T *daqForce = ssGetOutputPortRealSignal(S,1);
+    
     int_T i, ierr, nleft, dataTypeSize;
     char_T *gMsg;
-
+    
     // get parameters
     int_T sizeTrialDisp = ssGetInputPortWidth(S,0);
     int_T sizeDaqDisp   = ssGetOutputPortWidth(S,0);
     int_T sizeDaqForce  = ssGetOutputPortWidth(S,1);
-
+    
     // get work vectors
     int_T *socketID = (int_T*)ssGetDWork(S,0);
     int_T *dataSize = (int_T*)ssGetDWork(S,1);
     real_T *sData   = (real_T*)ssGetDWork(S,2);
     real_T *rData   = (real_T*)ssGetDWork(S,3);
     time_T *time    = (time_T*)ssGetDWork(S,4); 
-
+    
     UNUSED_ARG(tid);    // not used in single tasking mode
-
+    
     if (time[0] < ssGetT(S))  {
         // commit state
         sData[0] = 5;
@@ -264,7 +264,7 @@ static void mdlOutputs(SimStruct *S, int_T tid)
         // save current time
         time[0] = ssGetT(S);
     }
-
+    
     // send trial response
     sData[0] = 3;
     for (i=0; i<sizeTrialDisp; i++)  {
@@ -276,21 +276,21 @@ static void mdlOutputs(SimStruct *S, int_T tid)
     dataTypeSize = sizeof(real_T);
     nleft = dataSize[0];
     senddata(socketID, &dataTypeSize, gMsg, &nleft, &ierr);
-
+    
     // get measured response
     sData[0] = 6;
     gMsg = (char_T *)sData;
     nleft = dataSize[0];
     senddata(socketID, &dataTypeSize, gMsg, &nleft, &ierr);
-
+    
     gMsg = (char_T *)rData;
     nleft = dataSize[0];
     recvdata(socketID, &dataTypeSize, gMsg, &nleft, &ierr);
     for (i=0; i<sizeDaqDisp; i++) {
-        measDisp[i] = rData[i];
+        daqDisp[i] = rData[i];
     }
     for (i=0; i<sizeDaqForce; i++) {
-        measForce[i] = rData[sizeDaqDisp+i];
+        daqForce[i] = rData[sizeDaqDisp+i];
     }
 }
 
@@ -302,21 +302,21 @@ static void mdlTerminate(SimStruct *S)
 {
     int_T ierr, nleft, dataTypeSize;
     char_T *gMsg;
-
+    
     // get work vectors
     int_T *socketID = (int_T*)ssGetDWork(S,0);
     int_T *dataSize = (int_T*)ssGetDWork(S,1);
     real_T *sData   = (real_T*)ssGetDWork(S,2);
     real_T *rData   = (real_T*)ssGetDWork(S,3);
-
+    
     // shutdown server
     sData[0] = 99;
-
+    
     gMsg = (char_T *)sData;
     dataTypeSize = sizeof(real_T);
     nleft = dataSize[0];
     senddata(socketID, &dataTypeSize, gMsg, &nleft, &ierr);
-
+    
     closeconnection(socketID, &ierr);
 }
 

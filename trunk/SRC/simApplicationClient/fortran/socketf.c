@@ -45,21 +45,27 @@
 #define setupconnectionclient_ SETUPCONNECTIONCLIENT
 #define closeconnection_ CLOSECONNECTION
 #define senddata_ SENDDATA
+#define sendnbdata_ SENDNBDATA
 #define recvdata_ RECVDATA
+#define recvnbdata_ RECVNBDATA
 #define getsocketid_ GETSOCKETID
 #elif defined(F77_NAME_LOWER_2USCORE)
 #define setupconnectionserver_ setupconnectionserver__
 #define setupconnectionclient_ setupconnectionclient__
 #define closeconnection_ closeconnection__
 #define senddata_ senddata__
+#define sendnbdata_ sendnbdata__
 #define recvdata_ recvdata__
+#define recvnbdata_ recvnbdata__
 #define getsocketid_ getsocketid__
 #elif !defined(F77_NAME_LOWER_USCORE)
 #define setupconnectionserver_ setupconnectionserver
 #define setupconnectionclient_ setupconnectionclient
 #define closeconnection_ closeconnection
 #define senddata_ senddata
+#define sendnbdata_ sendnbdata
 #define recvdata_ recvdata
+#define recvnbdata_ recvnbdata
 #define getsocketid_ getsocketid
 /* F77_NAME_LOWER_USCORE */
 /* Else leave name alone */
@@ -79,7 +85,9 @@ void setupconnectionserver(unsigned int *port, int *socketID);
 void setupconnectionclient(unsigned int *other_Port, const char other_InetAddr[], int *lengthInet, int *socketID);
 void closeconnection(int *socketID, int *ierr);
 void senddata(int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr);
+void sendnbdata(int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr);
 void recvdata(int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr);
+void recvnbdata(int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr);
 void getsocketid(unsigned int *port, const char machineInetAddr[], int *lengthInet, int *socketID);
 
 #ifdef  __cplusplus
@@ -103,8 +111,16 @@ void FORT_CALL senddata_ (int *socketID, int *dataTypeSize, char data[], int *le
     senddata(socketID, dataTypeSize, data, lenData, ierr);
 }
 
+void FORT_CALL sendnbdata_ (int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr) {
+    sendnbdata(socketID, dataTypeSize, data, lenData, ierr);
+}
+
 void FORT_CALL recvdata_ (int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr) {
     recvdata(socketID, dataTypeSize, data, lenData, ierr);
+}
+
+void FORT_CALL recvnbdata_ (int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr) {
+    recvnbdata(socketID, dataTypeSize, data, lenData, ierr);
 }
 
 void FORT_CALL getsocketid_ (unsigned int *port, CHNAME(machineInetAddr), int *lengthInet, int *socketID CHLEN(machineInetAddr)) {
