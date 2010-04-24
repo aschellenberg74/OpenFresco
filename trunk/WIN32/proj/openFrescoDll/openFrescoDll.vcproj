@@ -365,6 +365,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\SRC\experimentalControl\ECSimSimulink.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\SRC\experimentalControl\ECSimSimulink.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\src\experimentalControl\ECSimulation.cpp"
 				>
 			</File>
