@@ -63,8 +63,8 @@ expControl SimFEAdapter 2 "127.0.0.1" 44000
 # Define experimental setup
 # -------------------------
 # expSetup OneActuator $tag <-control $ctrlTag> $dir -sizeTrialOut $t $o <-trialDispFact $f> ...
-expSetup OneActuator 1 -control 1 1 -sizeTrialOut 1 1
-expSetup OneActuator 2 -control 2 1 -sizeTrialOut 1 1
+expSetup OneActuator 1 -control 1 1 -sizeTrialOut 1 1 -trialDispFact -1 -outDispFact -1 -outForceFact -1
+expSetup OneActuator 2 -control 2 1 -sizeTrialOut 1 1 -trialDispFact -1 -outDispFact -1 -outForceFact -1
 
 # Define experimental site
 # ------------------------
