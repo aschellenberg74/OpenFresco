@@ -1200,15 +1200,26 @@ void EETwoNodeLink::setUp()
                 << "ignoring nodes and using specified "
                 << "local x vector to determine orientation\n";
         }
+        if (y.Size() == 0)  {
+            y.resize(3);
+            y.Zero();
+            y(0) = -xp(1);
+            if (xp.Size() > 1)
+                y(1) = xp(0);
+            if (xp.Size() > 2)
+                opserr << "WARNING EETwoNodeLink::setUp() - " 
+                    << "element: " << this->getTag() << endln
+                    << "no local y vector specified\n";
+        }
     } else  {
         if (x.Size() == 0)  {
             x.resize(3);
             x(0) = 1.0; x(1) = 0.0; x(2) = 0.0;
         }
-    }
-    if (y.Size() == 0)  {
-        y.resize(3);
-        y(0) = 0.0; y(1) = 1.0; y(2) = 0.0;
+        if (y.Size() == 0)  {
+            y.resize(3);
+            y(0) = 0.0; y(1) = 1.0; y(2) = 0.0;
+        }
     }
     
     // check that vectors for orientation are of correct size
