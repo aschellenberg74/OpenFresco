@@ -260,6 +260,7 @@ int addEEGeneric(ClientData clientData, Tcl_Interp *interp,  int argc,
 	}
 
 	// finally check for initial stiffness terms
+    int setInitStif = -1;
 	for (i=argi; i<argc; i++)  {
 		if (strcmp(argv[i], "-initStif") == 0)  {
 			if (argc-1 < i+numDOF*numDOF)  {
@@ -279,10 +280,15 @@ int addEEGeneric(ClientData clientData, Tcl_Interp *interp,  int argc,
 					theInitStif(j,k) = stif;
 				}
 			}
-			theExpElement->setInitialStiff(theInitStif);
+			setInitStif = theExpElement->setInitialStiff(theInitStif);
 		}
 	}
-
+    if (setInitStif != 0)  {
+        opserr << "WARNING initial stiffness not set\n";
+        opserr << "expElement generic element: " << tag << endln;
+        return TCL_ERROR;
+    }
+    
 	// if get here we have sucessfully created the EEGeneric and added it to the domain
 	return TCL_OK;
 }

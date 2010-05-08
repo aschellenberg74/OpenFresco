@@ -195,6 +195,7 @@ int addEEBeamColumn(ClientData clientData, Tcl_Interp *interp, int argc,
 		}
 		
 		// finally check for initial stiffness terms
+        int setInitStif = -1;
 		for (i = 7+eleArgStart; i < argc; i++)  {
 			if (strcmp(argv[i], "-initStif") == 0)  {
 				if (argc-1 < i+9)  {
@@ -214,9 +215,14 @@ int addEEBeamColumn(ClientData clientData, Tcl_Interp *interp, int argc,
 						theInitStif(j,k) = stif;
 					}
 				}
-				theExpElement->setInitialStiff(theInitStif);
+				setInitStif = theExpElement->setInitialStiff(theInitStif);
 			}
 		}
+        if (setInitStif != 0)  {
+            opserr << "WARNING initial stiffness not set\n";
+            opserr << "expElement beamColumn element: " << tag << endln;
+            return TCL_ERROR;
+        }
 	}
 	
 	else if (ndm == 3)  {
@@ -354,6 +360,7 @@ int addEEBeamColumn(ClientData clientData, Tcl_Interp *interp, int argc,
 		}
 		
 		// finally check for initial stiffness terms
+        int setInitStif = -1;
 		for (i = 7+eleArgStart; i < argc; i++)  {
 			if (strcmp(argv[i], "-initStif") == 0)  {
 				if (argc-1 < i+36)  {
@@ -373,9 +380,14 @@ int addEEBeamColumn(ClientData clientData, Tcl_Interp *interp, int argc,
 						theInitStif(j,k) = stif;
 					}
 				}
-				theExpElement->setInitialStiff(theInitStif);
+				setInitStif = theExpElement->setInitialStiff(theInitStif);
 			}
 		}
+        if (setInitStif != 0)  {
+            opserr << "WARNING initial stiffness not set\n";
+            opserr << "expElement beamColumn element: " << tag << endln;
+            return TCL_ERROR;
+        }
 	}
 	
 	else  {
