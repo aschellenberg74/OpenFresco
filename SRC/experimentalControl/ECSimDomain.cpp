@@ -262,7 +262,7 @@ int ECSimDomain::setup()
     this->Print(opserr);
     
     // define load pattern
-    theSeries  = new LinearSeries(1.0);
+    theSeries  = new LinearSeries(1,1.0);
     thePattern = new LoadPattern(1);
     thePattern->setTimeSeries(theSeries);
     theDomain->addLoadPattern(thePattern);
