@@ -1,4 +1,4 @@
-%INITIALIZESIMULATION to initialization the parameters needed to build the Simulink model
+%INITIALIZESIMULATION to initialize the parameters needed to build the Simulink model
 %
 % created by MTS
 % modified by Andreas Schellenberg (andreas.schellenberg@gmx.net) 11/2004
@@ -50,7 +50,6 @@ disp('Model Properties:');
 disp('=================');
 disp(HybridCtrlParameters);
 
-
 %%%%%%%%%% SIGNAL COUNTS %%%%%%%%%%
 
 nAct	  = 8;                                    % number of actuators
@@ -66,7 +65,8 @@ nUDPInp = 1+6*nAct+nAdcU+nDucU+nEncU+nDinp;     % no. of inputs to simulink brid
 
 samplePeriod = 1/1024;
 
-%%%%%%%%%% SCRAMNET PARTITIONS %%%%%%%%%%
+
+%%%%%%%%%% START MTS (STS) %%%%%%%%%%
 
 %%%%%%%%%% outputs to scramnet %%%%%%%%%%
 
@@ -171,12 +171,15 @@ partition(23).Size = num2str(nDinp);
 partition(24).Type = 'uint32';
 partition(24).Size = '866';
 
+%%%%%%%%%% END MTS (STS) %%%%%%%%%%
+
+
 %%%%%%%%%% START PACIFIC %%%%%%%%%%
 
 % PI software parameters
-chanID         = [1,2,5,6,7,10]   % index vector of channels to be extracted from SCRAMNET
-chanOffSet     = 0;        % offset (0, 16, 32, 48, 64, 80, 96, 112, 128) since total number of channels are divided in groups of 16; limited by xPC
-CVTcompression = 8;        % number of channels per card allocated by software (do not change), current config (March 2005): 8 channels
+chanID         = [1,2,5,6,7,10];    % index vector of channels to be extracted from SCRAMNET
+chanOffSet     = 0;                 % offset (0, 16, 32, 48, 64, 80, 96, 112, 128) since total number of channels are divided in groups of 16; limited by xPC
+CVTcompression = 8;                 % number of channels per card allocated by software (do not change), current config (March 2005): 8 channels
 % PI hardware parameters
 nCard          = 4;        % max number of PI cards; limited by xPC (do not change), current config (March 2005): 4 cards
 nChan          = 4;        % number of channels per card (do not change), current config (March 2005): 4 channels per card
@@ -211,6 +214,9 @@ partition(29).Size = num2str(nCard*CVTcompression*11);
 partition(30).Type = 'uint32';
 partition(30).Size = num2str(1024 - 11 - nCard*CVTcompression*11);
 
+%%%%%%%%%% END PACIFIC %%%%%%%%%%
+
+
 %%%%%%%%%% scramnet interrupt configuration %%%%%%%%%%
 
 % enable scramnet receive interrupt
@@ -233,3 +239,7 @@ node            = completenodestruct(node);
 % display interrupt longword location
 irqAddr = node.Partitions(irqPartition).Internal.Address / 4 ...
 		+ node.Partitions(irqPartition).Internal.Sizes(1) - 1;
+
+disp('SCRAMNet Interrupt Longword Location:');
+disp('=====================================');
+disp(irqAddr);

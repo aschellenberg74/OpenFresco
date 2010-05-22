@@ -50,7 +50,6 @@ disp('Model Properties:');
 disp('=================');
 disp(HybridCtrlParameters);
 
-
 %%%%%%%%%% SIGNAL COUNTS %%%%%%%%%%
 
 nAct    = 8;                                  % number of actuators
@@ -66,7 +65,8 @@ nUDPInp = 1+6*nAct+nAdcU+nDucU+nEncU+nDinp;   % no. of inputs to simulink bridge
 
 samplePeriod = 1/1024;
 
-%%%%%%%%%% SCRAMNET PARTITIONS %%%%%%%%%%
+
+%%%%%%%%%% START MTS (STS) %%%%%%%%%%
 
 %%%%%%%%%% outputs to scramnet %%%%%%%%%%
 
@@ -171,6 +171,9 @@ partition(23).Size = num2str(nDinp);
 partition(24).Type = 'uint32';
 partition(24).Size = '866';
 
+%%%%%%%%%% END MTS (STS) %%%%%%%%%%
+
+
 %%%%%%%%%% scramnet interrupt configuration %%%%%%%%%%
 
 % enable scramnet receive interrupt
@@ -193,3 +196,7 @@ node            = completenodestruct(node);
 % display interrupt longword location
 irqAddr = node.Partitions(irqPartition).Internal.Address / 4 ...
     + node.Partitions(irqPartition).Internal.Sizes(1) - 1;
+
+disp('SCRAMNet Interrupt Longword Location:');
+disp('=====================================');
+disp(irqAddr);

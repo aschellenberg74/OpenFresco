@@ -1,4 +1,4 @@
-%INITIALIZESIMULATION to initialization the parameters needed to build the Simulink model
+%INITIALIZESIMULATION to initialize the parameters needed to build the Simulink model
 %
 % implemented by Andreas Schellenberg (andreas.schellenberg@gmx.net) 11/2004
 
