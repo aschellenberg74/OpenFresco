@@ -1,4 +1,4 @@
-%INITIALIZESIMULATION to initialization the parameters needed to build the Simulink model
+%INITIALIZESIMULATION to initialize the parameters needed to build the Simulink model
 %
 % created by MTS
 % modified by Andreas Schellenberg (andreas.schellenberg@gmx.net) 11/2004
@@ -64,6 +64,7 @@ nUDPInp = 1+6*nAct+nAdcU+nDucU+nEncU+nDinp;     % no. of inputs to simulink brid
 %%%%%%%%%% SAMPLE PERIOD %%%%%%%%%%
 
 samplePeriod = 1/1024;
+
 
 %%%%%%%%%% START MTS (STS) %%%%%%%%%%
 
@@ -267,3 +268,7 @@ node            = completenodestruct(node);
 % display interrupt longword location
 irqAddr = node.Partitions(irqPartition).Internal.Address / 4 ...
 		+ node.Partitions(irqPartition).Internal.Sizes(1) - 1;
+
+disp('SCRAMNet Interrupt Longword Location:');
+disp('=====================================');
+disp(irqAddr);
