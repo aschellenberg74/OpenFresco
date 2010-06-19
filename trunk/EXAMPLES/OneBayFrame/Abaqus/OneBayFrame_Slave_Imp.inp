@@ -1,0 +1,98 @@
+** File: OneBayFrame_Slave_Imp.inp (use with OneBayFrame_Master.tcl)
+**
+** $Revision: $
+** $Date: $
+** $URL: $
+**
+** Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+** Created: 10/09
+** Revision: A
+**
+** Purpose: this file contains the abaqus input to perform
+** a hybrid simulation of a one bay frame with
+** two experimental zero length elements.
+** The adpater element is used to communicate with the
+** main FE-software which is coordinating and executing
+** the direct integration analysis.
+** The adapter_imp.obj element is utilized within
+** Abaqus/Standard to represent the experimental element.
+**
+**
+*HEADING
+ Transient analysis of OneBayFrame to ELC ground motion
+ Imperial units [in, kip, sec]
+ 1-axis horizontal, 2-axis vertical
+*PREPRINT, ECHO=YES, MODEL=YES, HISTORY=YES
+**
+** -----------------
+**  Define Geometry
+** -----------------
+*NODE, NSET=AllNodes
+2, 100,  0
+4, 100, 50
+**
+** -----------------
+**  Define Elements
+** -----------------
+*ELSET, ELSET=AllElements
+1, 2, 104, 204
+*USER ELEMENT, TYPE=U1, NODES=1, COORDINATES=2, PROPERTIES=1, I PROPERTIES=1, VARIABLES=2
+1
+*ELEMENT, TYPE=U1, ELSET=AdapterRight
+1, 4
+*ELEMENT, TYPE=CONN2D2, ELSET=ColumnRight
+2, 2, 4
+**
+** ---------------------------
+**  Define Masses and Damping
+** ---------------------------
+*ELEMENT, TYPE=MASS, ELSET=MassRight
+104, 4
+*ELEMENT, TYPE=CONN2D2, ELSET=DampingRight
+204, 4
+**
+** ---------------------------
+**  Define Element Properties
+** ---------------------------
+*UEL PROPERTY, ELSET=AdapterRight
+1.0E12, 44000
+*CONNECTOR SECTION, ELSET=ColumnRight, BEHAVIOR=ColumnRight
+CARTESIAN
+*CONNECTOR BEHAVIOR, NAME=ColumnRight 
+*CONNECTOR ELASTICITY, COMPONENT=1
+5.6
+*MASS, ELSET=MassRight
+0.02
+*CONNECTOR SECTION, ELSET=DampingRight, BEHAVIOR=DampingRight
+CARTESIAN
+*CONNECTOR BEHAVIOR, NAME=DampingRight 
+*CONNECTOR DAMPING, COMPONENT=1
+0.0202
+**
+** ----------------------------
+**  Define Boundary Conditions
+** ----------------------------
+*BOUNDARY
+2, 1, 1
+2, 2, 2
+2, 6, 6
+4, 2, 2
+4, 6, 6
+**
+** ------------------------
+**  Define STEP: Transient
+** ------------------------
+*STEP, NAME=Transient, NLGEOM=NO, INC=16000
+El Centro Earthquake
+*STATIC, DIRECT
+1.0, 16000
+**
+** -----------------------
+**  Define History Output
+** -----------------------
+*OUTPUT, HISTORY, FREQUENCY=1
+*NODE OUTPUT, NSET=AllNodes
+U1, V1, A1, RF1
+*ELEMENT OUTPUT, ELSET=AllElements
+CTF1
+*END STEP
