@@ -8,7 +8,7 @@
 ** Created: 03/09
 ** Revision: A
 **
-** Purpose: this file contains the tcl input to perform
+** Purpose: this file contains the abaqus input to perform
 ** a local hybrid simulation of a one bay frame with
 ** one experimental element.
 ** The genericClient_imp.obj element is utilized within
@@ -35,7 +35,7 @@
 ** -----------------
 *ELSET, ELSET=AllElements
 1, 2, 3, 103, 104, 203, 204
-*USER ELEMENT, TYPE=U1, NODES=2, COORDINATES=2, I PROPERTIES=1, VARIABLES=2
+*USER ELEMENT, TYPE=U1, NODES=2, COORDINATES=2, I PROPERTIES=1, VARIABLES=8
 1, 2
 *ELEMENT, TYPE=U1, ELSET=ColumnLeft
 1, 1, 3
@@ -129,4 +129,6 @@ El Centro Earthquake
 U1, V1, A1, RF1
 *ELEMENT OUTPUT, ELSET=AllElements
 CTF1
+*NODE FILE, NSET=AllNodes
+U, V, A
 *END STEP

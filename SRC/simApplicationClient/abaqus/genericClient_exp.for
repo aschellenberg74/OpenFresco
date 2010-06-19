@@ -37,7 +37,7 @@
 ** vuel is an explicit Abaqus (R) client element. The element
 ** communicates with the OpenFresco middle-tier server through
 ** a tcp/ip connection.
-c
+
       subroutine vuel(nblock,rhs,amass,dtimeStable,svars,nsvars,
      *                energy,
      *                nnode,ndofel,props,nprops,jprops,njprops,
@@ -48,7 +48,7 @@ c
      *                dMassScaleFactor,
      *                predef,npredef,
      *                jdltyp, adlmag)
-c
+      
       include 'vaba_param.inc'
       
 c     operational code keys
@@ -105,111 +105,139 @@ c     local variables
       integer*4 dataSize
       parameter (dataSize = 256)
       
+      integer*4 numSockIDs
+      parameter (numSockIDs = 32)
+      
       integer*4 sizeInt, sizeDouble
       parameter (sizeInt = 4, sizeDouble = 8)
       
       integer*4 port
       integer*4 sizeMachineInet
+      integer*4 socketIDs(numSockIDs)
       integer*4 socketID
       integer*4 stat
       
       integer*4 iData(11)
       real*8    sData(dataSize)
       real*8    rData(dataSize)
+      real*8    timePast
+      
+      save socketIDs
+      save timePast
+      
+      data socketIDs /numSockIDs*0/
+      data timePast /0.0/
       
       
-      if (jtype .eq. 1 .and.
-     *   lflags(iProcedure) .eq. jDynExplicit) then
+c     extract socketID
+c     (jtype = user-defined integer value n in element type VUn)
+      if (jtype .le. numSockIDs) then
+         socketID = socketIDs(jtype)
+      else
+         write(*,*) 'ERROR - Only ',numSockIDs,' genericClient_exp ',
+     *              'elements supported: consider increasing ',
+     *              'numSockIDs parameter in genericClient_exp.for'
+         call xplb_exit
+      endif
+      
+c     setup connection with SimAppElemServer
+      if (socketID .eq. 0 .and. time(iTotalTime) .gt. 0.0) then
+         port = jprops(1)
+         sizeMachineInet = 9+1
+         call setupconnectionclient(port,
+     *                              '127.0.0.1'//char(0),
+     *                              sizeMachineInet,
+     *                              socketID)
+         if (socketID .le. 0) then
+            write(*,*) 'ERROR - failed to setup connection'
+            call xplb_exit
+         endif
+         socketIDs(jtype) = socketID
          
-         if (lflags(iOpCode) .eq. jMassCalc ) then
+c        set the data size for the experimental element
+c        sizeCtrl(disp)
+         iData(1)  = ndofel
+c        sizeCtrl(vel)
+         iData(2)  = ndofel
+c        sizeCtrl(accel)
+         iData(3)  = ndofel
+c        sizeCtrl(force)
+         iData(4)  = 0
+c        sizeCtrl(time)
+         iData(5)  = 1
+c        sizeDaq(disp)
+         iData(6)  = 0
+c        sizeDaq(vel)
+         iData(7)  = 0
+c        sizeDaq(accel)
+         iData(8)  = 0
+c        sizeDaq(force)
+         iData(9)  = ndofel
+c        sizeDaq(time)
+         iData(10) = 0
+c        dataSize
+         iData(11) = dataSize
+         
+         call senddata(socketID, sizeInt,
+     *                 iData, 11, stat)
+      endif
+      
+c     zero rhs vector
+      do kblock = 1, nblock
+         do i = 1, ndofel
+            rhs(kblock,i) = 0.0
+         enddo
+      enddo
+      
+c     dynamic analysis
+      if (lflags(iProcedure) .eq. jDynExplicit) then
+         
+c        mass matrix
+         if (lflags(iOpCode) .eq. jMassCalc) then
             do kblock = 1, nblock
                do i = 1, ndofel
                   amass(kblock,i,i) = 1E-12
                enddo
             enddo
          
-         else if (lflags(iOpCode) .eq. jIntForceAndDtStable) then
+c        resisting force
+         else if (lflags(iOpCode) .eq. jIntForceAndDtStable
+     *            .and. time(iTotalTime) .gt. 0.0) then
             do kblock = 1, nblock
-               
 c              stable time increment in the element
                dtimeStable(kblock) = 1.0
                
-               if (time(iTotalTime) .gt. 0.0) then
-                  if (nint(svars(kblock,1)) .eq. 0) then
-                     port = jprops(1)
-                     sizeMachineInet = 9+1
-                     call setupconnectionclient(port,
-     *                                          '127.0.0.1'//char(0),
-     *                                          sizeMachineInet,
-     *                                          socketID)
-                     if (socketID .le. 0) then
-                        write(*,*) 'ERROR - failed to setup connection'
-                        call xplb_exit
-                     endif
-                     svars(kblock,1) = socketID
-                        
-c                    set the data size for the experimental element
-c                    sizeCtrl(disp)
-                     iData(1)  = ndofel
-c                    sizeCtrl(vel)
-                     iData(2)  = ndofel
-c                    sizeCtrl(accel)
-                     iData(3)  = ndofel
-c                    sizeCtrl(force)
-                     iData(4)  = 0
-c                    sizeCtrl(time)
-                     iData(5)  = 1
-c                    sizeDaq(disp)
-                     iData(6)  = 0
-c                    sizeDaq(vel)
-                     iData(7)  = 0
-c                    sizeDaq(accel)
-                     iData(8)  = 0
-c                    sizeDaq(force)
-                     iData(9)  = ndofel
-c                    sizeDaq(time)
-                     iData(10) = 0
-c                    dataSize
-                     iData(11) = dataSize
-                        
-                     call senddata(socketID, sizeInt,
-     *                             iData, 11, stat)
-                  else
-                     socketID = nint(svars(kblock,1))
-                  endif
-                  
-c                 commit state
-                  if (time(iTotalTime) .gt. svars(kblock,2)) then
-                     sData(1) = 5
-                     call senddata(socketID, sizeDouble,
-     *                             sData, dataSize, stat)
-                     svars(kblock,2) = time(iTotalTime)
-                  endif
-                  
-c                 send trial response to experimental element
-                  sData(1) = 3
-                  do i = 1, ndofel
-                     sData(1+i) = u(kblock,i)
-                     sData(1+ndofel+i) = v(kblock,i)
-                     sData(1+2*ndofel+i) = a(kblock,i)
-                  enddo
-                  sData(1+3*ndofel+1) = time(iTotalTime)
-                  
+c              commit state
+               if (time(iTotalTime) .gt. timePast) then
+                  sData(1) = 5
                   call senddata(socketID, sizeDouble,
      *                          sData, dataSize, stat)
-                  
-c                 get measured resisting forces
-                  sData(1) = 10
-                  call senddata(socketID, sizeDouble,
-     *                          sData, dataSize, stat)
-                  
-                  call recvdata(socketID, sizeDouble,
-     *                          rData, dataSize, stat)
-                  
-                  do i = 1, ndofel
-                     rhs(kblock,i) = rData(i)
-                  enddo
+                  timePast = time(iTotalTime)
                endif
+               
+c              send trial response to experimental element
+               sData(1) = 3
+               do i = 1, ndofel
+                  sData(1+i) = u(kblock,i)
+                  sData(1+ndofel+i) = v(kblock,i)
+                  sData(1+2*ndofel+i) = a(kblock,i)
+               enddo
+               sData(1+3*ndofel+1) = time(iTotalTime)
+               
+               call senddata(socketID, sizeDouble,
+     *                       sData, dataSize, stat)
+               
+c              get measured resisting forces
+               sData(1) = 10
+               call senddata(socketID, sizeDouble,
+     *                       sData, dataSize, stat)
+               
+               call recvdata(socketID, sizeDouble,
+     *                       rData, dataSize, stat)
+               
+               do i = 1, ndofel
+                  rhs(kblock,i) = rData(i)
+               enddo
             enddo
          endif
       endif
