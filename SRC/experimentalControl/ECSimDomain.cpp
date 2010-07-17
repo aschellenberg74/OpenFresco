@@ -289,12 +289,12 @@ int ECSimDomain::setup()
             if ((*sizeCtrl)(OF_Resp_Disp) != 0 &&
                 (*sizeCtrl)(OF_Resp_Vel) != 0 &&
                 (*sizeCtrl)(OF_Resp_Accel) != 0)
-                theSPs[iSP] = new ExpControlSP(iSP+1, nodeTag, dir(j), &ctrlDisp[iSP], 1.0, &ctrlVel[iSP], 1.0, &ctrlAccel[iSP], 1.0);
+                theSPs[iSP] = new ExpControlSP(nodeTag, dir(j), &ctrlDisp[iSP], 1.0, &ctrlVel[iSP], 1.0, &ctrlAccel[iSP], 1.0);
             else if ((*sizeCtrl)(OF_Resp_Disp) != 0 &&
                 (*sizeCtrl)(OF_Resp_Vel) != 0)
-                theSPs[iSP] = new ExpControlSP(iSP+1, nodeTag, dir(j), &ctrlDisp[iSP], 1.0, &ctrlVel[iSP], 1.0);
+                theSPs[iSP] = new ExpControlSP(nodeTag, dir(j), &ctrlDisp[iSP], 1.0, &ctrlVel[iSP], 1.0);
             else if ((*sizeCtrl)(OF_Resp_Disp) != 0)
-                theSPs[iSP] = new ExpControlSP(iSP+1, nodeTag, dir(j), &ctrlDisp[iSP], 1.0);
+                theSPs[iSP] = new ExpControlSP(nodeTag, dir(j), &ctrlDisp[iSP], 1.0);
             
             // add the SP constraints to the load pattern
             theDomain->addSP_Constraint(theSPs[iSP], 1);

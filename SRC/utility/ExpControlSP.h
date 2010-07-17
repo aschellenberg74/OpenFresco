@@ -46,7 +46,7 @@ class ExpControlSP : public SP_Constraint
 {
 public:
     // constructors    
-    ExpControlSP(int spTag, int nodeTag, int ndof,
+    ExpControlSP(int nodeTag, int ndof,
         double *ctrlDisp, double dispFact = 1.0,
 		double *ctrlVel = 0, double velFact = 1.0,
 		double *ctrlAccel = 0, double accelFact = 1.0);
