@@ -39,11 +39,11 @@
 #include <ID.h>
 
 
-ExpControlSP::ExpControlSP(int tag, int node, int ndof,
+ExpControlSP::ExpControlSP(int node, int ndof,
     double *ctrldisp, double dispfact,
 	double *ctrlvel, double velfact,
 	double *ctrlaccel, double accelfact)
-    : SP_Constraint(tag, node, ndof, CNSTRNT_TAG_ExpControlSP),
+    : SP_Constraint(node, ndof, CNSTRNT_TAG_ExpControlSP),
     ctrlDisp(ctrldisp), ctrlVel(ctrlvel), ctrlAccel(ctrlaccel),
 	dispFact(dispfact), velFact(velfact), accelFact(accelfact),
     theNode(0), theNodeResponse(0)
