@@ -1,0 +1,8 @@
+Estimados todos:
+
+Realizó cualquier tipo de trabajo en Matlab y Simulink: funciones, GUIDE y modelos. Sobre todo trabajos relacionados con la electrónica, telecomunicaciones y procesamiento de imágenes.
+
+El costo por trabajo es negociable, 50% al iniciar y el otro 50% al terminar. Envío el código en formato *.p (encriptado) para revisión. Luego, si está como se desea, envío el código abierto en formato *.m.
+
+Para contrato escribir a diegokillemall@yahoo.com y en el asunto colocar “Trabajo en Matlab”.
+
