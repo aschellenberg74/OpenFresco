@@ -8,14 +8,39 @@ DOF_selection = get(get(handles.Structure(2), 'SelectedObject'),'String');
 handles.Model.Type = DOF_selection;
 
 switch action
+    case 'scroll'
+        slider = round(get(gcbo,'Value')*10)/10;
+        if slider <= 0.3
+            set(handles.Structure([3 6:13]),'Visible','on');
+            set(handles.Structure([4 14:21]),'Visible','off');
+            set(handles.Structure([5 22:29]),'Visible','off');
+            set(handles.Structure([10 18 26]),'Visible','off');
+        elseif slider <= 0.6
+            set(handles.Structure([3 6:13]),'Visible','off');
+            set(handles.Structure([4 14:21]),'Visible','on');
+            set(handles.Structure([5 22:29]),'Visible','off');
+            set(handles.Structure([10 18 26]),'Visible','off');
+        else
+            set(handles.Structure([3 6:13]),'Visible','off');
+            set(handles.Structure([4 14:21]),'Visible','off');
+            set(handles.Structure([5 22:29]),'Visible','on');
+            set(handles.Structure([10 18 26]),'Visible','off');
+        end
     case 'choose DOF'
         active_color = [0 0 0];
         inactive_color = [0.6 0.6 0.6];
         dof1_children = [get(handles.Structure(6),'Children')' get(handles.Structure(8),'Children')'];
         dof2_children = [get(handles.Structure(14),'Children')' get(handles.Structure(16),'Children')'];
         dof3_children = [get(handles.Structure(22),'Children')' get(handles.Structure(24),'Children')'];
+        
+        %Reset Values
+        handles.Model.M = [];
+        handles.Model.K = [];
+        handles.Model.Zeta = [];
         switch DOF_selection;
             case '1 DOF'
+                handles.Model.StructActive = [3 6:13];
+                handles.Model.StructInactive = [4 5 14:29];
                 %Adjust colors to emphasize active/inactive fields
                 set(handles.Structure(7),'BackgroundColor',[1 1 1],'Style','edit');
                 set(handles.Structure(9),'BackgroundColor',[1 1 1],'Style','edit');
@@ -122,6 +147,8 @@ switch action
                 set(handles.EC(33),'String',handles.ExpControl.store.CPOptions(2:end));
                 
             case '2 DOF A'
+                handles.Model.StructActive = [4 14:21];
+                handles.Model.StructInactive = [3 5 6:13 22:29];
                 %Adjust colors to emphasize active/inactive fields
                 set(handles.Structure(7),'BackgroundColor','default','Style','text','String','Enter mass here');
                 set(handles.Structure(9),'BackgroundColor','default','Style','text','String','Enter stiffness here');
@@ -256,6 +283,9 @@ switch action
                 
                 
             case '2 DOF B'
+                handles.Model.StructActive = [5 22:29];
+                handles.Model.StructInactive = [3 4 6:21];
+                
                 %Adjust colors to emphasize active/inactive fields
                 set(handles.Structure(7),'BackgroundColor','default','Style','text','String','Enter mass here');
                 set(handles.Structure(9),'BackgroundColor','default','Style','text','String','Enter stiffness here');
@@ -394,6 +424,22 @@ switch action
                 end
             end
         end
+        if isempty(handles.Model.K)
+            return;
+        else
+            handles.Model.Omega = sqrt(eig(handles.Model.K, handles.Model.M));
+            if size(handles.Model.Omega) == [2 1];
+                if handles.Model.Omega(1) < handles.Model.Omega(2)
+                    handles.Model.minTDOF = 2;
+                else
+                    handles.Model.minTDOF = 1;
+                end
+            else
+                handles.Model.minTDOF = 1;
+            end
+            handles.Model.T = sort(2*pi./(handles.Model.Omega));
+            set(handles.Structure(handles.Model.Period_field),'String',sprintf(['Period:    ' num2str(handles.Model.T')]));
+        end
 
     case 'stiffness_input'
         input_val = str2num(get(handles.Structure(handles.Model.Stiffness_field),'String'));
@@ -422,13 +468,8 @@ switch action
                 end
             end
         end
-        guidata(gcbf, handles);
-        
-    case 'period_calc'
         if isempty(handles.Model.M)
-            msgbox('Must enter valid mass value(s)','Invalid Input','error');
-        elseif isempty(handles.Model.K)
-            msgbox('Must enter valid stiffness value(s)','Invalid Input','error');
+            return;
         else
             handles.Model.Omega = sqrt(eig(handles.Model.K, handles.Model.M));
             if size(handles.Model.Omega) == [2 1];
@@ -441,9 +482,30 @@ switch action
                 handles.Model.minTDOF = 1;
             end
             handles.Model.T = sort(2*pi./(handles.Model.Omega));
-            set(handles.Structure(handles.Model.Period_field),'String',num2str(handles.Model.T'));
-            guidata(gcbf, handles);
+            set(handles.Structure(handles.Model.Period_field),'String',sprintf(['Period:    ' num2str(handles.Model.T')]));
         end
+        guidata(gcbf, handles);
+        
+%     case 'period_calc'
+%         if isempty(handles.Model.M)
+%             msgbox('Must enter valid mass value(s)','Invalid Input','error');
+%         elseif isempty(handles.Model.K)
+%             msgbox('Must enter valid stiffness value(s)','Invalid Input','error');
+%         else
+%             handles.Model.Omega = sqrt(eig(handles.Model.K, handles.Model.M));
+%             if size(handles.Model.Omega) == [2 1];
+%                 if handles.Model.Omega(1) < handles.Model.Omega(2)
+%                     handles.Model.minTDOF = 2;
+%                 else
+%                     handles.Model.minTDOF = 1;
+%                 end
+%             else
+%                 handles.Model.minTDOF = 1;
+%             end
+%             handles.Model.T = sort(2*pi./(handles.Model.Omega));
+%             set(handles.Structure(handles.Model.Period_field),'String',num2str(handles.Model.T'));
+%             guidata(gcbf, handles);
+%         end
 
     case 'choose damping'
         damp_type = get(gcbo,'Value');

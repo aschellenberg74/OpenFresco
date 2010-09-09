@@ -28,7 +28,7 @@ switch handles.Store.StopOption
             GroundMotion.scaleag{mo} = [0.0 0.0];
         end
         
-        set(handles.Sidebar(4),'Value',1);
+        set(findobj('Tag','StartControl'),'Value',1)
         set(handles.Analysis(7),'Value',1);
         
         Response = Integrator_NewmarkExplicit(Model,GroundMotion,LastState,Analysis);
