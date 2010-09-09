@@ -29,7 +29,7 @@ switch action
             close(findobj('Tag','StructOutDOF2'))
         end        
         set(handles.Analysis(6),'SelectedObject',[]);
-        set(handles.Sidebar(3),'SelectedObject',[]);
+%         set(handles.Sidebar(3),'SelectedObject',[]);
         
         %Store directory
         handles.Model.DIR = pwd;
@@ -82,7 +82,7 @@ switch action
                 set(handles.Structure(3),'Value',1);
                 set(handles.Structure(7),'String',num2str(handles.Model.M));
                 set(handles.Structure(9),'String',num2str(handles.Model.K));
-                set(handles.Structure(11),'String',num2str(handles.Model.T));
+                set(handles.Structure(11),'String',sprintf(['Period:    ' num2str(handles.Model.T')]));
                 switch handles.Model.DampType
                     case 'Stiffness Proportional'
                         set(handles.Structure(12),'Value',2);
@@ -222,7 +222,13 @@ switch action
                 %Set Structure page on
                 h = guihandles(gcf);
                 set(h.Struct,'Value',1);
+                set(handles.Sidebar(7),'CData',handles.Store.sideButSelect);
+                set(handles.Sidebar(8:11),'CData',handles.Store.sideBut);
                 set(handles.Structure,'Visible','on');
+                set(handles.Structure(handles.Model.StructActive),'Visible','on');
+                set(handles.Structure(handles.Model.StructInactive),'Visible','off');
+                set(handles.Structure([10 18 26]),'Visible','off');
+                set(handles.Structure(30),'Value',0);
                 set(handles.GroundMotions,'Visible','off');
                 set(get(handles.GroundMotions(7), 'Children'), 'Visible', 'off');
                 set(get(handles.GroundMotions(8), 'Children'), 'Visible', 'off');
@@ -265,7 +271,7 @@ switch action
                 k = num2str(handles.Model.K);
                 set(handles.Structure(15),'String',[m(1,:) ';' m(2,:)]);
                 set(handles.Structure(17),'String',[k(1,:) ';' k(2,:)])
-                set(handles.Structure(19),'String',num2str(handles.Model.T'));
+                set(handles.Structure(19),'String',sprintf(['Period:    ' num2str(handles.Model.T')]));
                 switch handles.Model.DampType
                     case 'Stiffness Proportional'
                         set(handles.Structure(20),'Value',2);
@@ -408,7 +414,13 @@ switch action
                 %Set Structure page on
                 h = guihandles(gcf);
                 set(h.Struct,'Value',1);
+                set(handles.Sidebar(7),'CData',handles.Store.sideButSelect);
+                set(handles.Sidebar(8:11),'CData',handles.Store.sideBut);
                 set(handles.Structure,'Visible','on');
+                set(handles.Structure(handles.Model.StructActive),'Visible','on');
+                set(handles.Structure(handles.Model.StructInactive),'Visible','off');
+                set(handles.Structure([10 18 26]),'Visible','off');
+                set(handles.Structure(30),'Value',0.5);
                 set(handles.GroundMotions,'Visible','off');
                 set(get(handles.GroundMotions(7), 'Children'), 'Visible', 'off');
                 set(get(handles.GroundMotions(8), 'Children'), 'Visible', 'off');
@@ -446,7 +458,7 @@ switch action
                 k = num2str(handles.Model.K);
                 set(handles.Structure(23),'String',[m(1,:) ';' m(2,:)]);
                 set(handles.Structure(25),'String',[k(1,:) ';' k(2,:)])
-                set(handles.Structure(27),'String',num2str(handles.Model.T'));
+                set(handles.Structure(27),'String',sprintf(['Period:    ' num2str(handles.Model.T')]));
                 switch handles.Model.DampType
                     case 'Stiffness Proportional'
                         set(handles.Structure(28),'Value',2);
@@ -599,7 +611,13 @@ switch action
                 %Set Structure page on
                 h = guihandles(gcf);
                 set(h.Struct,'Value',1);
+                set(handles.Sidebar(7),'CData',handles.Store.sideButSelect);
+                set(handles.Sidebar(8:11),'CData',handles.Store.sideBut);
                 set(handles.Structure,'Visible','on');
+                set(handles.Structure(handles.Model.StructActive),'Visible','on');
+                set(handles.Structure(handles.Model.StructInactive),'Visible','off');
+                set(handles.Structure([10 18 26]),'Visible','off');
+                set(handles.Structure(30),'Value',1);
                 set(handles.GroundMotions,'Visible','off');
                 set(get(handles.GroundMotions(7), 'Children'), 'Visible', 'off');
                 set(get(handles.GroundMotions(8), 'Children'), 'Visible', 'off');
