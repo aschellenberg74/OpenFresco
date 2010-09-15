@@ -4,7 +4,7 @@ function Structure(action, varargin)
 handles = guidata(gcbf);
 
 %Identify chosen DOF
-DOF_selection = get(get(handles.Structure(2), 'SelectedObject'),'String');
+DOF_selection = get(get(handles.Structure(2), 'SelectedObject'),'Tag');
 handles.Model.Type = DOF_selection;
 
 switch action

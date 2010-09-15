@@ -221,15 +221,20 @@ switch action
                 
                 %Set Structure page on
                 h = guihandles(gcf);
-                set(h.Struct,'Value',1);
-                set(handles.Sidebar(7),'CData',handles.Store.sideButSelect);
-                set(handles.Sidebar(8:11),'CData',handles.Store.sideBut);
+                set(h.Structure,'Value',1);
+                set(handles.Sidebar(7),'CData',handles.Store.Structure1);
+                set(handles.Sidebar(8),'CData',handles.Store.Loading0);
+                set(handles.Sidebar(9),'CData',handles.Store.ExpSetup0);
+                set(handles.Sidebar(10),'CData',handles.Store.ExpControl0);
+                set(handles.Sidebar(11),'CData',handles.Store.Analysis0);
                 set(handles.Structure,'Visible','on');
                 set(handles.Structure(handles.Model.StructActive),'Visible','on');
                 set(handles.Structure(handles.Model.StructInactive),'Visible','off');
                 set(handles.Structure([10 18 26]),'Visible','off');
                 set(handles.Structure(30),'Value',0);
                 set(handles.GroundMotions,'Visible','off');
+                set(handles.GroundMotions(19),'Value',1);
+                set(handles.GroundMotions(20),'Value',0);
                 set(get(handles.GroundMotions(7), 'Children'), 'Visible', 'off');
                 set(get(handles.GroundMotions(8), 'Children'), 'Visible', 'off');
                 set(get(handles.GroundMotions(9), 'Children'), 'Visible', 'off');
@@ -413,15 +418,20 @@ switch action
                 
                 %Set Structure page on
                 h = guihandles(gcf);
-                set(h.Struct,'Value',1);
-                set(handles.Sidebar(7),'CData',handles.Store.sideButSelect);
-                set(handles.Sidebar(8:11),'CData',handles.Store.sideBut);
+                set(h.Structure,'Value',1);
+                set(handles.Sidebar(7),'CData',handles.Store.Structure1);
+                set(handles.Sidebar(8),'CData',handles.Store.Loading0);
+                set(handles.Sidebar(9),'CData',handles.Store.ExpSetup0);
+                set(handles.Sidebar(10),'CData',handles.Store.ExpControl0);
+                set(handles.Sidebar(11),'CData',handles.Store.Analysis0);
                 set(handles.Structure,'Visible','on');
                 set(handles.Structure(handles.Model.StructActive),'Visible','on');
                 set(handles.Structure(handles.Model.StructInactive),'Visible','off');
                 set(handles.Structure([10 18 26]),'Visible','off');
                 set(handles.Structure(30),'Value',0.5);
                 set(handles.GroundMotions,'Visible','off');
+                set(handles.GroundMotions(19),'Value',1);
+                set(handles.GroundMotions(20),'Value',0);
                 set(get(handles.GroundMotions(7), 'Children'), 'Visible', 'off');
                 set(get(handles.GroundMotions(8), 'Children'), 'Visible', 'off');
                 set(get(handles.GroundMotions(9), 'Children'), 'Visible', 'off');
@@ -610,15 +620,20 @@ switch action
                 
                 %Set Structure page on
                 h = guihandles(gcf);
-                set(h.Struct,'Value',1);
-                set(handles.Sidebar(7),'CData',handles.Store.sideButSelect);
-                set(handles.Sidebar(8:11),'CData',handles.Store.sideBut);
+                set(h.Structure,'Value',1);
+                set(handles.Sidebar(7),'CData',handles.Store.Structure1);
+                set(handles.Sidebar(8),'CData',handles.Store.Loading0);
+                set(handles.Sidebar(9),'CData',handles.Store.ExpSetup0);
+                set(handles.Sidebar(10),'CData',handles.Store.ExpControl0);
+                set(handles.Sidebar(11),'CData',handles.Store.Analysis0);
                 set(handles.Structure,'Visible','on');
                 set(handles.Structure(handles.Model.StructActive),'Visible','on');
                 set(handles.Structure(handles.Model.StructInactive),'Visible','off');
                 set(handles.Structure([10 18 26]),'Visible','off');
                 set(handles.Structure(30),'Value',1);
                 set(handles.GroundMotions,'Visible','off');
+                set(handles.GroundMotions(19),'Value',1);
+                set(handles.GroundMotions(20),'Value',0);
                 set(get(handles.GroundMotions(7), 'Children'), 'Visible', 'off');
                 set(get(handles.GroundMotions(8), 'Children'), 'Visible', 'off');
                 set(get(handles.GroundMotions(9), 'Children'), 'Visible', 'off');
