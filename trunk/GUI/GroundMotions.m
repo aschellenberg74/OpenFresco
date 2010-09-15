@@ -16,6 +16,37 @@ maxT = 4.99;
 numTvalues = 300;
 
 switch action
+    case 'tab toggle'
+    %Switch panel display based on tab selection
+        Tab_Selection = get(gcbo,'String');
+        switch Tab_Selection
+            case 'Ground Motions'
+                set(handles.GroundMotions(19),'Value',1);
+                set(handles.GroundMotions(20),'Value',0);
+                set(handles.GroundMotions(2:9),'Visible','on');
+%                 set(handles.GroundMotions(),'Visible','off');
+                set(get(handles.GroundMotions(7), 'Children'), 'Visible', 'on');
+                set(get(handles.GroundMotions(8), 'Children'), 'Visible', 'on');
+                set(get(handles.GroundMotions(9), 'Children'), 'Visible', 'on');
+                set(get(handles.GroundMotions(15), 'Children'), 'Visible', 'on');
+                set(get(handles.GroundMotions(16), 'Children'), 'Visible', 'on');
+                set(get(handles.GroundMotions(17), 'Children'), 'Visible', 'on');
+                if strcmp(handles.Model.Type,'2 DOF B')
+                    set(handles.GroundMotions(10:17),'Visible','on');
+                end
+            case 'Initial Conditions'
+                set(handles.GroundMotions(19),'Value',0);
+                set(handles.GroundMotions(20),'Value',1);
+%                 set(handles.GroundMotions(),'Visible','on');
+                set(handles.GroundMotions(2:17),'Visible','off');
+                set(get(handles.GroundMotions(7), 'Children'), 'Visible', 'off');
+                set(get(handles.GroundMotions(8), 'Children'), 'Visible', 'off');
+                set(get(handles.GroundMotions(9), 'Children'), 'Visible', 'off');
+                set(get(handles.GroundMotions(15), 'Children'), 'Visible', 'off');
+                set(get(handles.GroundMotions(16), 'Children'), 'Visible', 'off');
+                set(get(handles.GroundMotions(17), 'Children'), 'Visible', 'off');
+        end
+        
     case 'load'
         [filename, pathname] = uigetfile({'*.txt;*.AT2'});
         %Break from function if load file is cancelled

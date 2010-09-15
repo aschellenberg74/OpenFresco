@@ -11,7 +11,7 @@ DOF_selection = handles.Model.Type;
 switch action
     case 'choose DOF'
         %Prevent user from changing setup
-        TF = strcmp(get(get(handles.ES(2), 'SelectedObject'),'String'), DOF_selection);
+        TF = strcmp(get(get(handles.ES(2), 'SelectedObject'),'Tag'), DOF_selection);
         if TF ~=1
             msgbox({'Cannot change experimental setup type!','Can only change structure type'},'Error','error');
             switch DOF_selection

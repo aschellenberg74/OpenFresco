@@ -30,7 +30,7 @@ f_ErrorMon = figure('Visible','on','Name','Error Monitors',...
     'MenuBar','none',...
     'Tag','ErrMon',...
     'Color',[0.3 0.5 0.7],...
-    'Position',[SS(3)*0.12,0,SS(3)*0.87,SS(4)]);
+    'Position',[SS(3)*0.12,SS(4)*0.03,SS(3)*0.88,SS(4)*0.92]);
 
 %Toolbar
 % set(f_ErrorMon,'Toolbar','figure');
@@ -93,7 +93,7 @@ if strcmp(handles.Model.Type, '1 DOF')
     
 else
     %2 DOF Case
-    set(f_ErrorMon,'Position',[SS(3)*0.12,0,SS(3)*0.88,SS(4)]);
+%     set(f_ErrorMon,'Position',[SS(3)*0.12,0,SS(3)*0.88,SS(4)]);
     
     %Title
     uicontrol(f_ErrorMon,'Style','text',...
