@@ -124,9 +124,12 @@ switch action
         varargout = {0};
     % ======================================================================
     case 'disconnect'
-        sData(1) = 99;
-        TCPSocket('sendData',socketID(tag),sData,dataSize);
-        TCPSocket('closeConnection',socketID(tag));
+        if (socketID(tag)>0)
+            sData(1) = 99;
+            TCPSocket('sendData',socketID(tag),sData,dataSize);
+            TCPSocket('closeConnection',socketID(tag));
+            socketID(tag) = -1;
+        end
         
         varargout = {0};
     % ======================================================================
