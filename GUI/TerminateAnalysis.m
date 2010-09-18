@@ -17,23 +17,27 @@ handles = guidata(findobj('Tag','OpenFresco Quick Start'));
 
 switch handles.Store.StopOption
     case 'Unload'
+        % update damping values for free vibration
         zeta = 0.1;
         Model.alphaM = 0.0;
         Model.betaK  = 2*zeta/Model.Omega(1);
         
-        tEnd = 10;
+        % update loading to no load
+        tEnd = LastState.Time(end) + 10;
         numMotions = length(GroundMotion.dt);
         for mo=1:numMotions
             GroundMotion.scalet{mo}  = [0.0 tEnd];
             GroundMotion.scaleag{mo} = [0.0 0.0];
         end
         
+        % reset analysis control buttons
         set(findobj('Tag','StartControl'),'Value',1)
         set(handles.Analysis(7),'Value',1);
         
+        % execute free vibration analysis
         Response = Integrator_NewmarkExplicit(Model,GroundMotion,LastState,Analysis);
         
     case 'Save State'
-        
+        Response = LastState;
         
 end

@@ -56,8 +56,9 @@ end
 % change to analysis deltaT
 deltaT = GroundMotion.dtAnalysis;
 t = deltaT*(0:floor(tEnd/deltaT));
-npts = length(t);
-ag = zeros(npts,numMotions);
+iStart = 1;
+iEnd = length(t);
+ag = zeros(iEnd,numMotions);
 for mo=1:numMotions
     ag(:,mo) = interp1(GroundMotion.scalet{mo},GroundMotion.scaleag{mo},t,'linear',0.0);
 end
@@ -74,28 +75,29 @@ tic;
 gamma = 0.50;
 
 % initialize global response variables
-U = zeros(ndf,npts);
-Udot = zeros(ndf,npts);
-Udotdot = zeros(ndf,npts);
-Pr = zeros(ndf,npts);
-Um = zeros(ndf,npts);
+U = zeros(ndf,iEnd);
+Udot = zeros(ndf,iEnd);
+Udotdot = zeros(ndf,iEnd);
+Pr = zeros(ndf,iEnd);
+Um = zeros(ndf,iEnd);
 
 % set initial conditions if existing
 if ~isempty(InitialState)
+   iStart = length(InitialState.Time);
    if isfield(InitialState,'U') && ~isempty(InitialState.U)
-       U(:,1) = InitialState.U;
+       U(:,1:iStart) = InitialState.U;
    end
    if isfield(InitialState,'Udot') && ~isempty(InitialState.Udot)
-       Udot(:,1) = InitialState.Udot;
+       Udot(:,1:iStart) = InitialState.Udot;
    end
    if isfield(InitialState,'Udotdot') && ~isempty(InitialState.Udotdot)
-       Udotdot(:,1) = InitialState.Udotdot;
+       Udotdot(:,1:iStart) = InitialState.Udotdot;
    end
    if isfield(InitialState,'Pr') && ~isempty(InitialState.Pr)
-       Pr(:,1) = InitialState.Pr;
+       Pr(:,1:iStart) = InitialState.Pr;
    end
    if isfield(InitialState,'Um') && ~isempty(InitialState.Um)
-       Um(:,1) = InitialState.Um;
+       Um(:,1:iStart) = InitialState.Um;
    end
 end
 
@@ -106,17 +108,25 @@ a1 = 0.5*deltaT*deltaT;
 a2 = deltaT*(1.0 - gamma);
 
 % calculations for each time step, i
-for i=1:npts-1
+for i=iStart:iEnd-1
     
     % check if pause button is pressed
     while (~get(Analysis(7),'Value'))
+        % check if stop button is pressed
         if get(Analysis(9),'Value')
-            CurrentState.U = U(:,i);
-            CurrentState.Udot = Udot(:,i);
-            CurrentState.Udotdot = Udotdot(:,i);
-            CurrentState.Pr = Pr(:,i);
-            CurrentState.Um = Um(:,i);
+            CurrentState.Time = t(:,1:i);
+            CurrentState.U = U(:,1:i);
+            CurrentState.Udot = Udot(:,1:i);
+            CurrentState.Udotdot = Udotdot(:,1:i);
+            CurrentState.Pr = Pr(:,1:i);
+            CurrentState.Um = Um(:,1:i);
             Response = TerminateAnalysis(Model,GroundMotion,CurrentState,Analysis);
+            % disconnect from experimental sites if not done so already
+            for el=1:numElem
+                if strncmp(Element{el}.type,'Element_Exp',11)
+                    feval(Element{el}.type,'disconnect',Element{el});
+                end
+            end
             return;
         end
         pause(0.01);
