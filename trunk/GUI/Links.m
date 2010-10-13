@@ -6,8 +6,8 @@ handles = guidata(gcbf);
 
 switch action
     case 'User Tips'
-        web('https://neesforge.nees.org/docman/index.php?group_id=36&selected_doc_group_id=36&language_id=1', '-browser');
-%         web('http://openfresco.neesforge.nees.org/');
+        web('http://peer.berkeley.edu/publications/peer_reports/reports_2009/web_PEER9104_Schellenberg_etal.pdf', '-browser');
+%         open('Schellenberg_etal.pdf');
 end
 
 

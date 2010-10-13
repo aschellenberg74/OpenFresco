@@ -1,32 +1,24 @@
 function WriteTCL(varargin)
 % GUI_Analysis layout of analysis page of GUI
-%       Comments displayed at the command line in response 
-%       to the help command. 
+%       Comments displayed at the command line in response
+%       to the help command.
 
 %  Initialization tasks
 handles = guidata(gcbf);
+% get the path
+DIR = handles.Model.DIR;
 
-% Check the required input data
-[error message] = InputCheck;
+FID = fopen(fullfile(DIR,'OPFAnalysis.tcl'),'w');
 
-if error == 1
-    msgbox(message,'Error','error');
-    return
-else
-    
-    % get the path
-    DIR = handles.Model.DIR;
-    
-    FID = fopen(fullfile(DIR,'OPFAnalysis.tcl'),'w');
-    
-    % Print header
-    fprintf(FID,'####################################################\n');
-    fprintf(FID,'# File: OPFAnalysis.tcl                            #\n');
-    fprintf(FID,'#                                                  #\n');
-    fprintf(FID,'# Purpose: Script file for use with OpenFresco GUI #\n');
-    fprintf(FID,'#                                                  #\n');
-    fprintf(FID,'####################################################\n\n\n');
-    
+% Print header
+fprintf(FID,'####################################################\n');
+fprintf(FID,'# File: OPFAnalysis.tcl                            #\n');
+fprintf(FID,'#                                                  #\n');
+fprintf(FID,'# Purpose: Script file for use with OpenFresco GUI #\n');
+fprintf(FID,'#                                                  #\n');
+fprintf(FID,'####################################################\n\n\n');
+
+try
     switch handles.Model.Type
         %%%%%%%%%%%%
         %1 DOF Case%
@@ -371,8 +363,11 @@ else
     end
     
     msgbox('The .tcl file was written successfully!','','none');
-    fclose(FID);
     %Update handles structure
     guidata(gcbf, handles);
+catch ME
+    if strcmp(ME.identifier,'MATLAB:nonExistentField') || strcmp(ME.identifier,'MATLAB:badSwitchExpression')
+        msgbox('The .tcl file could not be written successfully!','Error','error');
+    end
 end
 end

@@ -17,15 +17,21 @@ switch action
             set(handles.Sidebar(6),'Value',1);
             set(handles.Analysis(9),'Value',1);
             set(handles.Analysis(7),'CData',handles.Store.Start0a);
-            set(handles.Analysis(8),'CData',handles.Store.analysisBut1);
-            set(handles.Analysis(9),'CData',handles.Store.stopButSelect1);
+            set(handles.Analysis(8),'CData',handles.Store.Pause0a);
+            set(handles.Analysis(9),'CData',handles.Store.Stop1a);
             set(handles.Sidebar(4),'CData',handles.Store.Start0b);
-            set(handles.Sidebar(5),'CData',handles.Store.analysisBut2);
-            set(handles.Sidebar(6),'CData',handles.Store.stopButSelect2);
+            set(handles.Sidebar(5),'CData',handles.Store.Pause0b);
+            set(handles.Sidebar(6),'CData',handles.Store.Stop1b);
             %Otherwise...
         else
             switch analysis_option
                 case 'Start'
+                    DIR = handles.Model.DIR;
+                    if exist(fullfile(DIR,'OPFAnalysis.tcl')) == 0
+                        msgbox('No .tcl file found!','Error','error')
+                        set(handles.Analysis(7),'Value',0);
+                        return
+                    end
                     set(handles.Analysis(7),'CData',handles.Store.Start1a);
                     handles.Store.AnalysisOption = analysis_option;
                     guidata(findobj('Tag','OpenFresco Quick Start'), handles);
@@ -122,17 +128,29 @@ switch action
                         set(handles.Analysis(7),'Value',1);
                         guidata(findobj('Tag','OpenFresco Quick Start'), handles);
                         DIR = handles.Model.DIR;
-                        RunOpenFresco(fullfile(DIR,'OPS & OPF'),fullfile(DIR,'OPFAnalysis.tcl'));
+                        % load path to OpenFresco executable
+                        if exist('OpenFrescoPath.txt','file')==0
+                            fprintf(1,'Using GUI-internal OpenFresco executable.\n');
+                            pathOPF = which('OpenFresco');
+                            pathOPF = pathOPF(1:end-15);
+                        else
+                            fprintf(1,'Using user-specified OpenFresco executable.\n');
+                            FID = fopen(fullfile(DIR,'OpenFrescoPath.txt'),'r');
+                            pathOPF = fscanf(FID,'%c');
+                            fclose(FID);
+                        end
+                        % now run OpenFresco
+                        RunOpenFresco(pathOPF,fullfile(DIR,'OPFAnalysis.tcl'));
                         clear functions;
                         handles.Response = Integrator_NewmarkExplicit(handles.Model,handles.GM,[],handles.Analysis);
                         set(findobj('Tag','StopControl'),'Value',1);
                         set(handles.Analysis(9),'Value',1);
                         set(handles.Analysis(7),'CData',handles.Store.Start0a);
-                        set(handles.Analysis(8),'CData',handles.Store.analysisBut1);
-                        set(handles.Analysis(9),'CData',handles.Store.stopButSelect1);
+                        set(handles.Analysis(8),'CData',handles.Store.Pause0a);
+                        set(handles.Analysis(9),'CData',handles.Store.Stop1a);
                         set(handles.Sidebar(4),'CData',handles.Store.Start0b);
-                        set(handles.Sidebar(5),'CData',handles.Store.analysisBut2);
-                        set(handles.Sidebar(6),'CData',handles.Store.stopButSelect2);
+                        set(handles.Sidebar(5),'CData',handles.Store.Pause0b);
+                        set(handles.Sidebar(6),'CData',handles.Store.Stop1b);
                         handles.Model.StopFlag = 1;
                         handles.Store.AnalysisOption = 'Stop';
                         saveResults = questdlg(sprintf('Analysis complete!\nWould you like to save the test results?'),'Save?','Yes','No','Yes');
@@ -143,14 +161,14 @@ switch action
                             case 'No'
                         end                        
                     else
-                        set(findobj('Tag','StartControl'),'Value',1);
+                        set(findobj('Tag','Start'),'Value',1);
                         set(handles.Analysis(7),'Value',1);
                         set(handles.Analysis(7),'CData',handles.Store.Start1a);
-                        set(handles.Analysis(8),'CData',handles.Store.analysisBut1);
-                        set(handles.Analysis(9),'CData',handles.Store.analysisBut1);
+                        set(handles.Analysis(8),'CData',handles.Store.Pause0a);
+                        set(handles.Analysis(9),'CData',handles.Store.Stop0a);
                         set(handles.Sidebar(4),'CData',handles.Store.Start1b);
-                        set(handles.Sidebar(5),'CData',handles.Store.analysisBut2);
-                        set(handles.Sidebar(6),'CData',handles.Store.analysisBut2);
+                        set(handles.Sidebar(5),'CData',handles.Store.Pause0b);
+                        set(handles.Sidebar(6),'CData',handles.Store.Stop0b);
                         figure(findobj('Tag','ErrMon'));
                         if ~isempty(findobj('Tag','StructOutDOF2'));
                             figure(findobj('Tag','StructOutDOF2'));
@@ -160,16 +178,20 @@ switch action
                     end
                     
                 case 'Pause'
+                    if handles.Model.firstStart
+                        msgbox('Test not yet started!','Error','error');
+                        return
+                    end
                     handles.Store.AnalysisOption = analysis_option;
                     disp('Paused...');
-                    set(findobj('Tag','PauseControl'),'Value',1);
+                    set(findobj('Tag','Pause'),'Value',1);
                     set(handles.Analysis(8),'Value',1);
                     set(handles.Analysis(7),'CData',handles.Store.Start0a);
-                    set(handles.Analysis(8),'CData',handles.Store.pauseButSelect1);
-                    set(handles.Analysis(9),'CData',handles.Store.analysisBut1);
+                    set(handles.Analysis(8),'CData',handles.Store.Pause1a);
+                    set(handles.Analysis(9),'CData',handles.Store.Stop0a);
                     set(handles.Sidebar(4),'CData',handles.Store.Start0b);
-                    set(handles.Sidebar(5),'CData',handles.Store.pauseButSelect2);
-                    set(handles.Sidebar(6),'CData',handles.Store.analysisBut2);
+                    set(handles.Sidebar(5),'CData',handles.Store.Pause1b);
+                    set(handles.Sidebar(6),'CData',handles.Store.Stop0b);
                     figure(findobj('Tag','ErrMon'));
                     if ~isempty(findobj('Tag','StructOutDOF2'))
                         figure(findobj('Tag','StructOutDOF2'));
@@ -177,14 +199,18 @@ switch action
                     figure(findobj('Tag','StructOutDOF1'));
                     
                 case 'Stop'
-                    set(findobj('Tag','StopControl'),'Value',1);
+                    if handles.Model.firstStart
+                        msgbox('Test not yet started!','Error','error');
+                        return
+                    end
+                    set(findobj('Tag','Stop'),'Value',1);
                     set(handles.Analysis(9),'Value',1);
                     set(handles.Analysis(7),'CData',handles.Store.Start0a);
-                    set(handles.Analysis(8),'CData',handles.Store.analysisBut1);
-                    set(handles.Analysis(9),'CData',handles.Store.stopButSelect1);
+                    set(handles.Analysis(8),'CData',handles.Store.Pause0a);
+                    set(handles.Analysis(9),'CData',handles.Store.Stop1a);
                     set(handles.Sidebar(4),'CData',handles.Store.Start0b);
-                    set(handles.Sidebar(5),'CData',handles.Store.analysisBut2);
-                    set(handles.Sidebar(6),'CData',handles.Store.stopButSelect2);
+                    set(handles.Sidebar(5),'CData',handles.Store.Pause0b);
+                    set(handles.Sidebar(6),'CData',handles.Store.Stop1b);
                     %Bring figures to front
                     figure(findobj('Tag','ErrMon'));
                     if ~isempty(findobj('Tag','StructOutDOF2'))
@@ -196,7 +222,7 @@ switch action
                         'Stop Test', ...
                         'Unload', 'Save State', 'Cancel', 'Unload');
                     handles.Store.StopOption = stop_option;
-                    set(findobj('Tag','StopControl'),'Value',1);
+                    set(findobj('Tag','Stop'),'Value',1);
                     set(handles.Analysis(9),'Value',1);
                     switch stop_option
                         case 'Unload'
@@ -208,32 +234,33 @@ switch action
                             disp('Saving...');
                             handles.Model.StopFlag = 1;
                         case 'Cancel'
+                            handles.Model.StopFlag = 0;
                             id = find(strcmp(handles.Store.AnalysisOption, get(handles.Analysis(7:8),'Tag')) == 1);
                             set(handles.Analysis(id+6),'Value',1);
                             if id == 1
-                                set(findobj('Tag','StartControl'),'Value',1);
+                                set(findobj('Tag','Start'),'Value',1);
                                 set(handles.Analysis(7),'CData',handles.Store.Start1a);
-                                set(handles.Analysis(8),'CData',handles.Store.analysisBut1);
-                                set(handles.Analysis(9),'CData',handles.Store.analysisBut1);
-                                set(handles.Sidebar(4),'CData',handles.Store.Start1b);
-                                set(handles.Sidebar(5),'CData',handles.Store.analysisBut2);
-                                set(handles.Sidebar(6),'CData',handles.Store.analysisBut2);
+                                set(handles.Analysis(8),'CData',handles.Store.Pause0a);
+                                set(handles.Analysis(9),'CData',handles.Store.Stop0a);
+                                set(handles.Sidebar(4),'CData',handles.Store.Start1b,'Value',1);
+                                set(handles.Sidebar(5),'CData',handles.Store.Pause0b);
+                                set(handles.Sidebar(6),'CData',handles.Store.Stop0b);
                             elseif id == 2
-                                set(findobj('Tag','PauseControl'),'Value',1)
+                                set(findobj('Tag','Pause'),'Value',1)
                                 set(handles.Analysis(7),'CData',handles.Store.Start0a);
-                                set(handles.Analysis(8),'CData',handles.Store.pauseButSelect1);
-                                set(handles.Analysis(9),'CData',handles.Store.analysisBut1);
+                                set(handles.Analysis(8),'CData',handles.Store.Pause1a);
+                                set(handles.Analysis(9),'CData',handles.Store.Stop0a);
                                 set(handles.Sidebar(4),'CData',handles.Store.Start0b);
-                                set(handles.Sidebar(5),'CData',handles.Store.pauseButSelect2);
-                                set(handles.Sidebar(6),'CData',handles.Store.analysisBut2);
+                                set(handles.Sidebar(5),'CData',handles.Store.Pause1b,'Value',1);
+                                set(handles.Sidebar(6),'CData',handles.Store.Stop0b);
                             else
-                                set(findobj('Tag','StopControl'),'Value',1)
+                                set(findobj('Tag','Stop'),'Value',1)
                                 set(handles.Analysis(7),'CData',handles.Store.Start0a);
-                                set(handles.Analysis(8),'CData',handles.Store.analysisBut1);
-                                set(handles.Analysis(9),'CData',handles.Store.stopButSelect1);
+                                set(handles.Analysis(8),'CData',handles.Store.Pause0a);
+                                set(handles.Analysis(9),'CData',handles.Store.Stop1a);
                                 set(handles.Sidebar(4),'CData',handles.Store.Start0b);
-                                set(handles.Sidebar(5),'CData',handles.Store.analysisBut2);
-                                set(handles.Sidebar(6),'CData',handles.Store.stopButSelect2);
+                                set(handles.Sidebar(5),'CData',handles.Store.Pause0b);
+                                set(handles.Sidebar(6),'CData',handles.Store.Stop1b,'Value',1);
                             end
                             %Bring figures to front
                             figure(findobj('Tag','ErrMon'));
@@ -247,7 +274,10 @@ switch action
         end
         
     case 'generate report'
-        GUI_Report;
+        Report;
+        DIR = handles.Model.DIR;
+        reportText = fileread(fullfile(DIR,'OPFReport.txt'));
+        GUI_Output(reportText,'Input Summary','Report');
         
     case 'new test'
         handles.Model.StopFlag = 0;
@@ -266,6 +296,11 @@ switch action
             close(findobj('Tag','AnalysisControls'))
         end    
         
+        %Check for .tcl file and delete if found
+        if exist('OPFAnalysis.tcl') == 2
+            delete('OPFAnalysis.tcl');
+        end
+
         %Select structure tab
         tabs = get(handles.Sidebar(1),'Children');
         set(handles.Sidebar(1),'SelectedObject',tabs(5));
@@ -291,8 +326,8 @@ switch action
         set(handles.Analysis,'Visible','off');
         set(handles.Analysis(6),'SelectedObject',[]);
         set(handles.Analysis(7),'CData',handles.Store.Start0a);
-        set(handles.Analysis(8),'CData',handles.Store.analysisBut1);
-        set(handles.Analysis(9),'CData',handles.Store.analysisBut1);
+        set(handles.Analysis(8),'CData',handles.Store.Pause0a);
+        set(handles.Analysis(9),'CData',handles.Store.Stop0a);
         guidata(findobj('Tag','OpenFresco Quick Start'), handles);
         
     case 'dtAnalysis'

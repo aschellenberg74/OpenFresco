@@ -30,7 +30,8 @@ f_ErrorMon = figure('Visible','on','Name','Error Monitors',...
     'MenuBar','none',...
     'Tag','ErrMon',...
     'Color',[0.3 0.5 0.7],...
-    'Position',[SS(3)*0.12,SS(4)*0.03,SS(3)*0.88,SS(4)*0.92]);
+    'KeyPressFcn',@shortcutKeys,...
+    'Position',[SS(3)*0.12,SS(4)*0.05,SS(3)*0.88,SS(4)*0.87]);
 
 %Toolbar
 % set(f_ErrorMon,'Toolbar','figure');
@@ -38,7 +39,11 @@ f_ErrorMon = figure('Visible','on','Name','Error Monitors',...
 % delete(Toolbar_handles([3:14 17:18]));
 % set(Toolbar_handles(15), 'TooltipString', 'Print Window');
 % set(Toolbar_handles(16), 'TooltipString', 'Save Window');
-StdMenu(1) = uimenu('Position',1,'Label','MATLAB Menu');
+File(1) = uimenu('Position',1,'Label','File');
+File(2) = uimenu(File(1),'Position',1,'Label','Save        Ctrl+S','Callback','filemenufcn(gcbf,''FileSaveAs'')');
+File(3) = uimenu(File(1),'Position',2,'Label','Print        Ctrl+P','Callback','printdlg(gcbf)');
+Separator(1) = uimenu('Position',2,'Label','|');
+StdMenu(1) = uimenu('Position',3,'Label','MATLAB Menu');
 StdMenu(2) = uimenu(StdMenu(1),'Position',1,'Label','Turn on', ...
    'Callback','set(gcf,''MenuBar'',''figure'');');
 StdMenu(3) = uimenu(StdMenu(1),'Position',2,'Label','Turn off', ...
@@ -182,4 +187,21 @@ else
     grid('on');
     xlabel(a_ErrorMonitors_etY,'Time [sec]');
     ylabel(a_ErrorMonitors_etY,'Tracking Indicator [L^2]');
+end
+
+%Callback for shortcut keys
+    function shortcutKeys(source, eventdata)
+        control = 0;
+        for x=1:length(eventdata.Modifier)
+            switch(eventdata.Modifier{x})
+                case 'control'
+                    control = 1;
+            end
+        end
+        if (control == 1 && strcmp(eventdata.Key,'s'))
+            filemenufcn(gcbf,'FileSaveAs');
+        elseif (control == 1 && strcmp(eventdata.Key,'p'))
+            printdlg(gcbf);
+        end
+    end
 end

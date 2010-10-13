@@ -41,36 +41,67 @@ end
 C = Model.alphaM*M + Model.betaK*K;
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Load GroundMotion Data
-%%%%%%%%%%%%%%%%%%%%%%%%%%
-% find longest motion
-numMotions = length(GroundMotion.dt);
-tEnd = 0.0;
-for mo=1:numMotions
-    tEndi = GroundMotion.scalet{mo}(end);
-    if tEndi > tEnd
-        tEnd = tEndi;
+%%%%%%%%%%%%%%%%%%%%%%
+% Setup Loading Data
+%%%%%%%%%%%%%%%%%%%%%%
+switch GroundMotion.loadType
+case 'Ground Motions'
+    % find longest motion
+    numMotions = length(GroundMotion.dt);
+    tEnd = 0.0;
+    for mo=1:numMotions
+        tEndi = GroundMotion.scalet{mo}(end);
+        if tEndi > tEnd
+            tEnd = tEndi;
+        end
     end
-end
-% change to analysis deltaT
-deltaT = GroundMotion.dtAnalysis;
-t = deltaT*(0:floor(tEnd/deltaT));
-iStart = 1;
-iEnd = length(t);
-ag = zeros(iEnd,numMotions);
-for mo=1:numMotions
-    ag(:,mo) = interp1(GroundMotion.scalet{mo},GroundMotion.scaleag{mo},t,'linear',0.0);
+    % change ground accelerations to analysis deltaT
+    deltaT = GroundMotion.dtAnalysis;
+    t = deltaT*(0:floor(tEnd/deltaT));
+    iStart = 1;
+    iEnd = length(t);
+    ag = zeros(iEnd,numMotions);
+    for mo=1:numMotions
+        ag(:,mo) = interp1(GroundMotion.scalet{mo},GroundMotion.scaleag{mo},t,'linear',0.0);
+    end
+    % set imposed displacements to zero
+    Uimp = zeros(ndf,1);
+    iImpEnd = 1;
+case 'Initial Conditions'
+    % load analysis times for the two loading phases
+    numMotions = length(GroundMotion.dt);
+    deltaT = GroundMotion.dtAnalysis;
+    tImposed = deltaT*(0:floor(GroundMotion.rampTime(1)/deltaT));
+    tFree = deltaT*(length(tImposed)+1:floor((GroundMotion.rampTime(1)+GroundMotion.vibTime(1))/deltaT));
+    t = [tImposed tFree];
+    iStart = 1;
+    iEnd = length(t);
+    % set ground accelerations to zero
+    ag = zeros(length(t),numMotions);
+    % setup imposed displacements
+    uMax = GroundMotion.initialDisp';
+    Uimp = repmat((0:length(tImposed)-1),ndf,1).*repmat(uMax./(length(tImposed)-1),1,length(tImposed));
+    iImpEnd = size(Uimp,2);
+case 'None'
+    % load total analysis time
+    numMotions = length(GroundMotion.dt);
+    tEnd = GroundMotion.tEnd;
+    deltaT = GroundMotion.dtAnalysis;
+    t = deltaT*(0:floor(tEnd/deltaT));
+    iStart = 1;
+    iEnd = length(t);
+    % set ground accelerations to zero
+    ag = zeros(length(t),numMotions);
+    % set imposed displacements to zero
+    Uimp = zeros(ndf,1);
+    iImpEnd = 1;
 end
 b = Model.b;
-% animation downsampling factor (to animate at 10 Hz)
-downSampFact = round(0.1/deltaT);
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Perform Transient Analysis
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-tic;
 % analysis parameters
 gamma = 0.50;
 
@@ -106,8 +137,11 @@ c2 = gamma*deltaT;
 c3 = 1.0;
 a1 = 0.5*deltaT*deltaT;
 a2 = deltaT*(1.0 - gamma);
+% animation downsampling factor (to animate at 10 Hz)
+downSampFact = round(0.1/deltaT);
 
 % calculations for each time step, i
+tic;
 for i=iStart:iEnd-1
     
     % check if pause button is pressed
@@ -135,10 +169,15 @@ for i=iStart:iEnd-1
     % get new response quantities
     U(:,i+1) = U(:,i) + deltaT*Udot(:,i) + a1*Udotdot(:,i);
     Udot(:,i+1) = Udot(:,i) + a2*Udotdot(:,i);
-    Udotdot(:,i+1) = 0.0;
+    Udotdot(:,i+1) = zeros(ndf,1);
     
     % get applied loads
     Ptp1 = -M*b*ag(i+1,:)';
+    
+    % impose displacements statically
+    if (i < iImpEnd)
+        U(:,i+1) = Uimp(:,i+1);
+    end
     
     % Linear algorithm
     % set trial response in elements
@@ -162,8 +201,13 @@ for i=iStart:iEnd-1
     % solve for accelerations at t+deltaT
     Udotdot(:,i+1) = DF\(-F);
     
-    % update response quantities
-    Udot(:,i+1) = Udot(:,i+1) + c2*Udotdot(:,i+1);
+    if (i >= iImpEnd)
+        % update Udot
+        Udot(:,i+1) = Udot(:,i+1) + c2*Udotdot(:,i+1);
+    else
+        % zero Udot because U is imposed statically
+        Udot(:,i+1) = zeros(ndf,1);
+    end
     
     % commit the elements
     for j=el:numElem

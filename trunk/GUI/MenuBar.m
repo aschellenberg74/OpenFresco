@@ -3,7 +3,8 @@ function MenuBar(action,varargin)
 
 switch action
     case 'load'
-        file = uigetfile('*.mat');
+        [file path] = uigetfile('*.mat');
+        file = fullfile(path,file);
         %Break from function if load file is cancelled
         if file == 0
             return
@@ -28,8 +29,19 @@ switch action
         if ~isempty(findobj('Tag','StructOutDOF2'))
             close(findobj('Tag','StructOutDOF2'))
         end        
+        if ~isempty(findobj('Tag','AnalysisControls'))
+            close(findobj('Tag','AnalysisControls'))
+        end
+        
+        %Check for .tcl file and delete if found
+        if exist('OPFAnalysis.tcl','file') == 2
+            delete('OPFAnalysis.tcl');
+        end
+
         set(handles.Analysis(6),'SelectedObject',[]);
-%         set(handles.Sidebar(3),'SelectedObject',[]);
+        set(handles.Analysis(7),'CData',handles.Store.Start0a);
+        set(handles.Analysis(8),'CData',handles.Store.Pause0a);
+        set(handles.Analysis(9),'CData',handles.Store.Stop0a);
         
         %Store directory
         handles.Model.DIR = pwd;
@@ -38,6 +50,7 @@ switch action
         %Adjust display
         active_color = [0 0 0];
         inactive_color = [0.6 0.6 0.6];
+        panelDefault = [0.941176 0.941176 0.941176];
         dof1_children = [get(handles.Structure(6),'Children')' get(handles.Structure(8),'Children')'];
         dof2_children = [get(handles.Structure(14),'Children')' get(handles.Structure(16),'Children')'];
         dof3_children = [get(handles.Structure(22),'Children')' get(handles.Structure(24),'Children')'];
@@ -55,23 +68,29 @@ switch action
         switch handles.Model.Type;
             case '1 DOF'
                 %Adjust colors to emphasize active/inactive fields
+                set(handles.Structure(3),'CData',handles.Store.Model1A1);
+                set(handles.Structure(4),'CData',handles.Store.Model2A0);
+                set(handles.Structure(5),'CData',handles.Store.Model2B0);
                 set(handles.Structure(7),'BackgroundColor',[1 1 1],'Style','edit');
                 set(handles.Structure(9),'BackgroundColor',[1 1 1],'Style','edit');
                 set(handles.Structure(12),'BackgroundColor',[1 1 1]);
                 set(handles.Structure(13),'BackgroundColor',[1 1 1],'Style','edit');
-                set(handles.Structure(15),'BackgroundColor','default','Style','text','String','[m1 0; 0 m2]');
-                set(handles.Structure(17),'BackgroundColor','default','Style','text','String','[k11 k12; k21 k22]');
-                set(handles.Structure(19),'BackgroundColor','default','Style','text','String','Period');                
-                set(handles.Structure(20),'BackgroundColor','default');
-                set(handles.Structure(21),'BackgroundColor','default','Style','text','String','zeta');
-                set(handles.Structure(23),'BackgroundColor','default','Style','text','String','[m1 0; 0 m2]');
-                set(handles.Structure(25),'BackgroundColor','default','Style','text','String','[k11 k12; k21 k22]');
-                set(handles.Structure(27),'BackgroundColor','default','Style','text','String','Period');                
-                set(handles.Structure(28),'BackgroundColor','default');
-                set(handles.Structure(29),'BackgroundColor','default','Style','text','String','zeta');
+                set(handles.Structure(15),'BackgroundColor',panelDefault,'Style','text','String','[m1 0; 0 m2]');
+                set(handles.Structure(17),'BackgroundColor',panelDefault,'Style','text','String','[k11 k12; k21 k22]');
+                set(handles.Structure(19),'BackgroundColor',panelDefault,'Style','text','String','Period');                
+                set(handles.Structure(20),'BackgroundColor',panelDefault);
+                set(handles.Structure(21),'BackgroundColor',panelDefault,'Style','text','String','zeta');
+                set(handles.Structure(23),'BackgroundColor',panelDefault,'Style','text','String','[m1 0; 0 m2]');
+                set(handles.Structure(25),'BackgroundColor',panelDefault,'Style','text','String','[k11 k12; k21 k22]');
+                set(handles.Structure(27),'BackgroundColor',panelDefault,'Style','text','String','Period');                
+                set(handles.Structure(28),'BackgroundColor',panelDefault);
+                set(handles.Structure(29),'BackgroundColor',panelDefault,'Style','text','String','zeta');
                 set(dof1_children,'ForegroundColor',active_color);
                 set(dof2_children,'ForegroundColor',inactive_color);
                 set(dof3_children,'ForegroundColor',inactive_color);
+                set(findobj('Tag','help1'),'CData',handles.Store.Question1);
+                set(findobj('Tag','help2A'),'CData',handles.Store.Question0);
+                set(findobj('Tag','help2B'),'CData',handles.Store.Question0);
                 
                 %Remove unnecessary plots
                 cla(handles.GroundMotions(15));
@@ -92,14 +111,23 @@ switch action
                 set(handles.Structure(13),'String',num2str(handles.Model.Zeta));
                 
                 %Update Ground Motions
-                if length(handles.GM.t{1}) > 1
-                    plot(handles.GroundMotions(7), handles.GM.scalet{1}, handles.GM.scaleag{1});
-                    set(handles.GroundMotions(3),'String',handles.GM.store.filepath{1},'TooltipString',handles.GM.store.filepath{1});
-                    set(handles.GroundMotions(4),'String',num2str(handles.GM.AmpFact(1)));
-                    set(handles.GroundMotions(5),'String',num2str(handles.GM.TimeFact(1)));
-                    %Store analysis dt
-                    handles.GM.dtAnalysis = min(handles.GM.dt);
-                    set(handles.Analysis(3),'String',num2str(handles.GM.dtAnalysis));
+                switch handles.GM.loadType
+                    case 'Ground Motions'
+                        if length(handles.GM.t{1}) > 1
+                            plot(handles.GroundMotions(7), handles.GM.scalet{1}, handles.GM.scaleag{1});
+                            set(handles.GroundMotions(3),'String',handles.GM.store.filepath{1},'TooltipString',handles.GM.store.filepath{1});
+                            set(handles.GroundMotions(4),'String',num2str(handles.GM.AmpFact(1)));
+                            set(handles.GroundMotions(5),'String',num2str(handles.GM.TimeFact(1)));
+                            %Store analysis dt
+                            handles.GM.dtAnalysis = min(handles.GM.dt);
+                            set(handles.Analysis(3),'String',num2str(handles.GM.dtAnalysis));
+                        end
+                    case 'Initial Conditions'
+                        set(handles.GroundMotions(19),'Value',0,'CData',handles.Store.GM0);
+                        set(handles.GroundMotions(20),'Value',1,'CData',handles.Store.IC1);
+                        set(handles.GroundMotions(23),'String',num2str(handles.GM.initialDisp));
+                        set(handles.GroundMotions(24),'String',num2str(handles.GM.rampTime));
+                        set(handles.GroundMotions(25),'String',num2str(handles.GM.vibTime));
                 end
                 
                 %Update ExpControl and ExpSetup
@@ -217,7 +245,7 @@ switch action
                 set(handles.EC([60 61 66 67 72 73 78 79]),'Value',1);
                 set(handles.EC([62 68 74 80]),'String','1');
                 set(handles.EC([63 69 75 81]),'Value',0);
-                set(handles.EC([64 65 70 71 76 77 82 83]),'BackgroundColor','default','Style','text','String','');
+                set(handles.EC([64 65 70 71 76 77 82 83]),'BackgroundColor',panelDefault,'Style','text','String','');
                 
                 %Set Structure page on
                 h = guihandles(gcf);
@@ -233,8 +261,14 @@ switch action
                 set(handles.Structure([10 18 26]),'Visible','off');
                 set(handles.Structure(30),'Value',0);
                 set(handles.GroundMotions,'Visible','off');
-                set(handles.GroundMotions(19),'Value',1);
-                set(handles.GroundMotions(20),'Value',0);
+                switch handles.GM.loadType
+                    case 'Ground Motions'
+                        set(handles.GroundMotions(19),'Value',1,'CData',handles.Store.GM1);
+                        set(handles.GroundMotions(20),'Value',0,'CData',handles.Store.IC0);
+                    case 'Initial Conditions'
+                        set(handles.GroundMotions(19),'Value',0,'CData',handles.Store.GM0);
+                        set(handles.GroundMotions(20),'Value',1,'CData',handles.Store.IC1);
+                end
                 set(get(handles.GroundMotions(7), 'Children'), 'Visible', 'off');
                 set(get(handles.GroundMotions(8), 'Children'), 'Visible', 'off');
                 set(get(handles.GroundMotions(9), 'Children'), 'Visible', 'off');
@@ -247,23 +281,29 @@ switch action
                 
             case '2 DOF A'
                 %Adjust colors to emphasize active/inactive fields
-                set(handles.Structure(7),'BackgroundColor','default','Style','text','String','Enter mass here');
-                set(handles.Structure(9),'BackgroundColor','default','Style','text','String','Enter stiffness here');
-                set(handles.Structure(11),'BackgroundColor','default','Style','text','String','Period');
-                set(handles.Structure(12),'BackgroundColor','default');
-                set(handles.Structure(13),'BackgroundColor','default','Style','text','String','zeta');
+                set(handles.Structure(3),'CData',handles.Store.Model1A0);
+                set(handles.Structure(4),'CData',handles.Store.Model2A1);
+                set(handles.Structure(5),'CData',handles.Store.Model2B0);
+                set(handles.Structure(7),'BackgroundColor',panelDefault,'Style','text','String','Enter mass here');
+                set(handles.Structure(9),'BackgroundColor',panelDefault,'Style','text','String','Enter stiffness here');
+                set(handles.Structure(11),'BackgroundColor',panelDefault,'Style','text','String','Period');
+                set(handles.Structure(12),'BackgroundColor',panelDefault);
+                set(handles.Structure(13),'BackgroundColor',panelDefault,'Style','text','String','zeta');
                 set(handles.Structure(15),'BackgroundColor',[1 1 1],'Style','edit');
                 set(handles.Structure(17),'BackgroundColor',[1 1 1],'Style','edit');
                 set(handles.Structure(20),'BackgroundColor',[1 1 1]);
                 set(handles.Structure(21),'BackgroundColor',[1 1 1],'Style','edit');
-                set(handles.Structure(23),'BackgroundColor','default','Style','text','String','[m1 0; 0 m2]');
-                set(handles.Structure(25),'BackgroundColor','default','Style','text','String','[k11 k12; k21 k22]');
-                set(handles.Structure(27),'BackgroundColor','default','Style','text','String','Period');                
-                set(handles.Structure(28),'BackgroundColor','default');
-                set(handles.Structure(29),'BackgroundColor','default','Style','text','String','zeta');
+                set(handles.Structure(23),'BackgroundColor',panelDefault,'Style','text','String','[m1 0; 0 m2]');
+                set(handles.Structure(25),'BackgroundColor',panelDefault,'Style','text','String','[k11 k12; k21 k22]');
+                set(handles.Structure(27),'BackgroundColor',panelDefault,'Style','text','String','Period');                
+                set(handles.Structure(28),'BackgroundColor',panelDefault);
+                set(handles.Structure(29),'BackgroundColor',panelDefault,'Style','text','String','zeta');
                 set(dof1_children,'ForegroundColor',inactive_color);
                 set(dof2_children,'ForegroundColor',active_color);
                 set(dof3_children,'ForegroundColor',inactive_color);
+                set(findobj('Tag','help1'),'CData',handles.Store.Question0);
+                set(findobj('Tag','help2A'),'CData',handles.Store.Question1);
+                set(findobj('Tag','help2B'),'CData',handles.Store.Question0);
                 
                 %Remove unnecessary plots
                 cla(handles.GroundMotions(15));
@@ -288,14 +328,25 @@ switch action
                 set(handles.Structure(21),'String',num2str(handles.Model.Zeta));
                 
                 %Update Ground Motions
-                if length(handles.GM.t{1}) > 1
-                    plot(handles.GroundMotions(7), handles.GM.scalet{1}, handles.GM.scaleag{1});
-                    set(handles.GroundMotions(3),'String',handles.GM.store.filepath{1},'TooltipString',handles.GM.store.filepath{1});
-                    set(handles.GroundMotions(4),'String',num2str(handles.GM.AmpFact(1)));
-                    set(handles.GroundMotions(5),'String',num2str(handles.GM.TimeFact(1)));
-                    %Store analysis dt
-                    handles.GM.dtAnalysis = min(handles.GM.dt);
-                    set(handles.Analysis(3),'String',num2str(handles.GM.dtAnalysis));
+                switch handles.GM.loadType
+                    case 'Ground Motions'
+                        set(handles.GroundMotions(19),'Value',1,'CData',handles.Store.GM1);
+                        set(handles.GroundMotions(20),'Value',0,'CData',handles.Store.IC0);
+                        if length(handles.GM.t{1}) > 1
+                            plot(handles.GroundMotions(7), handles.GM.scalet{1}, handles.GM.scaleag{1});
+                            set(handles.GroundMotions(3),'String',handles.GM.store.filepath{1},'TooltipString',handles.GM.store.filepath{1});
+                            set(handles.GroundMotions(4),'String',num2str(handles.GM.AmpFact(1)));
+                            set(handles.GroundMotions(5),'String',num2str(handles.GM.TimeFact(1)));
+                            %Store analysis dt
+                            handles.GM.dtAnalysis = min(handles.GM.dt);
+                            set(handles.Analysis(3),'String',num2str(handles.GM.dtAnalysis));
+                        end
+                    case 'Initial Conditions'
+                        set(handles.GroundMotions(19),'Value',0,'CData',handles.Store.GM0);
+                        set(handles.GroundMotions(20),'Value',1,'CData',handles.Store.IC1);
+                        set(handles.GroundMotions(23),'String',num2str(handles.GM.initialDisp));
+                        set(handles.GroundMotions(24),'String',num2str(handles.GM.rampTime));
+                        set(handles.GroundMotions(25),'String',num2str(handles.GM.vibTime));
                 end
                 
                 %Update EC and ES strings
@@ -414,7 +465,7 @@ switch action
                 set(handles.EC([60 61 66 67 72 73 78 79]),'Value',1);
                 set(handles.EC([62 68 74 80]),'String','1');
                 set(handles.EC([63 69 75 81]),'Value',0);
-                set(handles.EC([64 65 70 71 76 77 82 83]),'BackgroundColor','default','Style','text','String','');                
+                set(handles.EC([64 65 70 71 76 77 82 83]),'BackgroundColor',panelDefault,'Style','text','String','');                
                 
                 %Set Structure page on
                 h = guihandles(gcf);
@@ -430,8 +481,14 @@ switch action
                 set(handles.Structure([10 18 26]),'Visible','off');
                 set(handles.Structure(30),'Value',0.5);
                 set(handles.GroundMotions,'Visible','off');
-                set(handles.GroundMotions(19),'Value',1);
-                set(handles.GroundMotions(20),'Value',0);
+                switch handles.GM.loadType
+                    case 'Ground Motions'
+                        set(handles.GroundMotions(19),'Value',1,'CData',handles.Store.GM1);
+                        set(handles.GroundMotions(20),'Value',0,'CData',handles.Store.IC0);
+                    case 'Initial Conditions'
+                        set(handles.GroundMotions(19),'Value',0,'CData',handles.Store.GM0);
+                        set(handles.GroundMotions(20),'Value',1,'CData',handles.Store.IC1);
+                end
                 set(get(handles.GroundMotions(7), 'Children'), 'Visible', 'off');
                 set(get(handles.GroundMotions(8), 'Children'), 'Visible', 'off');
                 set(get(handles.GroundMotions(9), 'Children'), 'Visible', 'off');
@@ -444,16 +501,19 @@ switch action
                 
             case '2 DOF B'
                 %Adjust colors to emphasize active/inactive fields
-                set(handles.Structure(7),'BackgroundColor','default','Style','text','String','Enter mass here');
-                set(handles.Structure(9),'BackgroundColor','default','Style','text','String','Enter stiffness here');
-                set(handles.Structure(11),'BackgroundColor','default','Style','text','String','Period');                
-                set(handles.Structure(12),'BackgroundColor','default');
-                set(handles.Structure(13),'BackgroundColor','default','Style','text','String','zeta');
-                set(handles.Structure(15),'BackgroundColor','default','Style','text','String','[m1 0; 0 m2]');
-                set(handles.Structure(17),'BackgroundColor','default','Style','text','String','[k11 k12; k21 k22]');
-                set(handles.Structure(19),'BackgroundColor','default','Style','text','String','Period');                
-                set(handles.Structure(20),'BackgroundColor','default');
-                set(handles.Structure(21),'BackgroundColor','default','Style','text','String','zeta');
+                set(handles.Structure(3),'CData',handles.Store.Model1A0);
+                set(handles.Structure(4),'CData',handles.Store.Model2A0);
+                set(handles.Structure(5),'CData',handles.Store.Model2B1);
+                set(handles.Structure(7),'BackgroundColor',panelDefault,'Style','text','String','Enter mass here');
+                set(handles.Structure(9),'BackgroundColor',panelDefault,'Style','text','String','Enter stiffness here');
+                set(handles.Structure(11),'BackgroundColor',panelDefault,'Style','text','String','Period');                
+                set(handles.Structure(12),'BackgroundColor',panelDefault);
+                set(handles.Structure(13),'BackgroundColor',panelDefault,'Style','text','String','zeta');
+                set(handles.Structure(15),'BackgroundColor',panelDefault,'Style','text','String','[m1 0; 0 m2]');
+                set(handles.Structure(17),'BackgroundColor',panelDefault,'Style','text','String','[k11 k12; k21 k22]');
+                set(handles.Structure(19),'BackgroundColor',panelDefault,'Style','text','String','Period');                
+                set(handles.Structure(20),'BackgroundColor',panelDefault);
+                set(handles.Structure(21),'BackgroundColor',panelDefault,'Style','text','String','zeta');
                 set(handles.Structure(23),'BackgroundColor',[1 1 1],'Style','edit');
                 set(handles.Structure(25),'BackgroundColor',[1 1 1],'Style','edit');
                 set(handles.Structure(28),'BackgroundColor',[1 1 1]);
@@ -461,6 +521,9 @@ switch action
                 set(dof1_children,'ForegroundColor',inactive_color);
                 set(dof2_children,'ForegroundColor',inactive_color);
                 set(dof3_children,'ForegroundColor',active_color);
+                set(findobj('Tag','help1'),'CData',handles.Store.Question0);
+                set(findobj('Tag','help2A'),'CData',handles.Store.Question0);
+                set(findobj('Tag','help2B'),'CData',handles.Store.Question1);
                 
                 %Update Structure strings
                 set(handles.Structure(5),'Value',1);
@@ -480,24 +543,35 @@ switch action
                 set(handles.Structure(29),'String',num2str(handles.Model.Zeta));
                 
                 %Update Ground Motions
-                if length(handles.GM.t{1}) > 1
-                    plot(handles.GroundMotions(7), handles.GM.scalet{1}, handles.GM.scaleag{1});
-                    plot(handles.GroundMotions(8), handles.GM.Spectra{1}.T, handles.GM.Spectra{1}.psdAcc);
-                    plot(handles.GroundMotions(9), handles.GM.Spectra{1}.T, handles.GM.Spectra{1}.dsp);
-                    set(handles.GroundMotions(3),'String',handles.GM.store.filepath{1},'TooltipString',handles.GM.store.filepath{1});
-                    set(handles.GroundMotions(4),'String',num2str(handles.GM.AmpFact(1)));
-                    set(handles.GroundMotions(5),'String',num2str(handles.GM.TimeFact(1)));
-                    %Store analysis dt
-                    handles.GM.dtAnalysis = min(handles.GM.dt);
-                    set(handles.Analysis(3),'String',num2str(handles.GM.dtAnalysis));
-                end
-                if length(handles.GM.t{2}) > 1
-                    plot(handles.GroundMotions(15), handles.GM.scalet{2}, handles.GM.scaleag{2});
-                    plot(handles.GroundMotions(16), handles.GM.Spectra{2}.T, handles.GM.Spectra{2}.psdAcc);
-                    plot(handles.GroundMotions(17), handles.GM.Spectra{2}.T, handles.GM.Spectra{2}.dsp);
-                    set(handles.GroundMotions(11),'String',handles.GM.store.filepath{2},'TooltipString',handles.GM.store.filepath{2});
-                    set(handles.GroundMotions(12),'String',num2str(handles.GM.AmpFact(1)));
-                    set(handles.GroundMotions(13),'String',num2str(handles.GM.TimeFact(1)));
+                switch handles.GM.loadType
+                    case 'Ground Motions'
+                        set(handles.GroundMotions(19),'Value',1,'CData',handles.Store.GM1);
+                        set(handles.GroundMotions(20),'Value',0,'CData',handles.Store.IC0);
+                        if length(handles.GM.t{1}) > 1
+                            plot(handles.GroundMotions(7), handles.GM.scalet{1}, handles.GM.scaleag{1});
+                            plot(handles.GroundMotions(8), handles.GM.Spectra{1}.T, handles.GM.Spectra{1}.psdAcc);
+                            plot(handles.GroundMotions(9), handles.GM.Spectra{1}.T, handles.GM.Spectra{1}.dsp);
+                            set(handles.GroundMotions(3),'String',handles.GM.store.filepath{1},'TooltipString',handles.GM.store.filepath{1});
+                            set(handles.GroundMotions(4),'String',num2str(handles.GM.AmpFact(1)));
+                            set(handles.GroundMotions(5),'String',num2str(handles.GM.TimeFact(1)));
+                            %Store analysis dt
+                            handles.GM.dtAnalysis = min(handles.GM.dt);
+                            set(handles.Analysis(3),'String',num2str(handles.GM.dtAnalysis));
+                        end
+                        if length(handles.GM.t{2}) > 1
+                            plot(handles.GroundMotions(15), handles.GM.scalet{2}, handles.GM.scaleag{2});
+                            plot(handles.GroundMotions(16), handles.GM.Spectra{2}.T, handles.GM.Spectra{2}.psdAcc);
+                            plot(handles.GroundMotions(17), handles.GM.Spectra{2}.T, handles.GM.Spectra{2}.dsp);
+                            set(handles.GroundMotions(11),'String',handles.GM.store.filepath{2},'TooltipString',handles.GM.store.filepath{2});
+                            set(handles.GroundMotions(12),'String',num2str(handles.GM.AmpFact(1)));
+                            set(handles.GroundMotions(13),'String',num2str(handles.GM.TimeFact(1)));
+                        end
+                    case 'Initial Conditions'
+                        set(handles.GroundMotions(19),'Value',0,'CData',handles.Store.GM0);
+                        set(handles.GroundMotions(20),'Value',1,'CData',handles.Store.IC1);
+                        set(handles.GroundMotions(23),'String',num2str(handles.GM.initialDisp));
+                        set(handles.GroundMotions(24),'String',num2str(handles.GM.rampTime));
+                        set(handles.GroundMotions(25),'String',num2str(handles.GM.vibTime));
                 end
                 
                 %Update EC and ES strings
@@ -616,7 +690,7 @@ switch action
                 set(handles.EC([60 61 66 67 72 73 78 79]),'Value',1);
                 set(handles.EC([62 68 74 80]),'String','1');
                 set(handles.EC([63 69 75 81]),'Value',0);
-                set(handles.EC([64 65 70 71 76 77 82 83]),'BackgroundColor','default','Style','text','String','');
+                set(handles.EC([64 65 70 71 76 77 82 83]),'BackgroundColor',panelDefault,'Style','text','String','');
                 
                 %Set Structure page on
                 h = guihandles(gcf);
@@ -632,8 +706,6 @@ switch action
                 set(handles.Structure([10 18 26]),'Visible','off');
                 set(handles.Structure(30),'Value',1);
                 set(handles.GroundMotions,'Visible','off');
-                set(handles.GroundMotions(19),'Value',1);
-                set(handles.GroundMotions(20),'Value',0);
                 set(get(handles.GroundMotions(7), 'Children'), 'Visible', 'off');
                 set(get(handles.GroundMotions(8), 'Children'), 'Visible', 'off');
                 set(get(handles.GroundMotions(9), 'Children'), 'Visible', 'off');

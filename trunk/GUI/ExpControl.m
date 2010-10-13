@@ -7,7 +7,7 @@ handles = guidata(gcbf);
 
 
 %Store which tab is selected
-Tab_Selection = get(gcbo,'String');
+Tab_Selection = get(gcbo,'Tag');
 
 switch action
     case 'tab toggle'
@@ -15,18 +15,24 @@ switch action
         switch Tab_Selection
             case 'Control Point'
                 msgbox('Control points only need to be defined when using LabView Controller','Control Point','warn');
-                set(handles.EC(3:4),'Value',0);
+                set(handles.EC(2),'CData',handles.Store.CP1);
+                set(handles.EC(3),'Value',0,'CData',handles.Store.Sim0);
+                set(handles.EC(4),'Value',0,'CData',handles.Store.Real0);
                 set(handles.EC([5 25]),'Visible','off');
                 set(handles.EC([53:65 96]),'Visible','on');
                 handles.ExpControl.Type = 'Real';
             case 'Simulation'
-                set(handles.EC([2 4]),'Value',0);
+                set(handles.EC(2),'Value',0,'CData',handles.Store.CP0);
+                set(handles.EC(3),'CData',handles.Store.Sim1);
+                set(handles.EC(4),'Value',0,'CData',handles.Store.Real0);
                 set(handles.EC(5:6),'Visible','on');
                 set(handles.EC([25 53]),'Visible','off');
                 handles.ExpControl.Type = 'Simulation';
                 set(handles.EC(handles.ExpControl.store.SimActive),'Visible','on');
             case 'Real Controller'
-                set(handles.EC(2:3),'Value',0);
+                set(handles.EC(2),'Value',0,'CData',handles.Store.CP0);
+                set(handles.EC(3),'Value',0,'CData',handles.Store.Sim0);
+                set(handles.EC(4),'CData',handles.Store.Real1);
                 set(handles.EC([5 53]),'Visible','off');
                 set(handles.EC(25:27),'Visible','on');
                 handles.ExpControl.Type = 'Real';
@@ -276,8 +282,14 @@ switch action
     case 'E'
         switch handles.ExpControl.CtrlDOF
             case 'DOF 1'
-                if ~strcmp(get(gcbo,'String'),num2str(handles.Model.K(1,1)))
-                    msgbox(sprintf(['Modulus does not match with structure stiffness (' num2str(handles.Model.K(1,1)) ')\nConsider revising']),'Warning','warn');
+                if strcmp(handles.Model.Type, '2 DOF A')
+                    if ~strcmp(get(gcbo,'String'),num2str(handles.Model.K(1,1)-handles.Model.K(2,2)))
+                        msgbox(sprintf(['Modulus does not match with structure stiffness (' num2str(handles.Model.K(1,1)-handles.Model.K(2,2)) ')\nConsider revising']),'Warning','warn');
+                    end
+                else
+                    if ~strcmp(get(gcbo,'String'),num2str(handles.Model.K(1,1)))
+                        msgbox(sprintf(['Modulus does not match with structure stiffness (' num2str(handles.Model.K(1,1)) ')\nConsider revising']),'Warning','warn');
+                    end
                 end
                 handles.ExpControl.DOF1.E = str2num(get(gcbo,'String'));
             case 'DOF 2'
@@ -306,10 +318,16 @@ switch action
     case 'E0'
         switch handles.ExpControl.CtrlDOF
             case 'DOF 1'
-                if ~strcmp(get(gcbo,'String'),num2str(handles.Model.K(1,1)))
-                    msgbox(sprintf(['Modulus does not match with structure stiffness (' num2str(handles.Model.K(1,1)) ')\nConsider revising']),'Warning','warn');
+                if strcmp(handles.Model.Type, '2 DOF A')
+                    if ~strcmp(get(gcbo,'String'),num2str(handles.Model.K(1,1)-handles.Model.K(2,2)))
+                        msgbox(sprintf(['Modulus does not match with structure stiffness (' num2str(handles.Model.K(1,1)-handles.Model.K(2,2)) ')\nConsider revising']),'Warning','warn');
+                    end
+                else
+                    if ~strcmp(get(gcbo,'String'),num2str(handles.Model.K(1,1)))
+                        msgbox(sprintf(['Modulus does not match with structure stiffness (' num2str(handles.Model.K(1,1)) ')\nConsider revising']),'Warning','warn');
+                    end
                 end
-                handles.ExpControl.DOF1.E0 = str2num(get(gcbo,'String'));
+                handles.ExpControl.DOF1.E = str2num(get(gcbo,'String'));
             case 'DOF 2'
                 if ~strcmp(get(gcbo,'String'),num2str(handles.Model.K(2,2)))
                     msgbox(sprintf(['Modulus does not match with structure stiffness (' num2str(handles.Model.K(2,2)) ')\nConsider revising']),'Warning','warn');
@@ -514,6 +532,17 @@ switch action
             set(handles.EC(60:(65+6*(handles.ExpControl.store.RQ-1))),'Visible','on');
             set(handles.EC((66+6*(handles.ExpControl.store.RQ-1)):95),'Visible','off');
             handles.ExpControl.store.CPActive = (60:(65+6*(handles.ExpControl.store.RQ-1)));
+            id = [63 69 75 81];
+            for i = 1:4
+                checked = get(handles.EC(id(i)),'Value');
+                if (checked == 1) && (i <=RQ)
+                    set(handles.EC(id(i)+1:id(i)+2),'BackgroundColor',[1 1 1],'Style','edit');
+                    set(handles.EC(id(i)+1:id(i)+2),'Visible','on');
+                else
+                    set(handles.EC(id(i)+1:id(i)+2),'Visible','off');
+                end
+            end
+        
         elseif RQ == 5
             %store
             handles.ExpControl.store.RQ = RQ;
@@ -567,6 +596,17 @@ switch action
             set(handles.EC(60:89),'Visible','on');
             set(handles.EC(90:95),'Visible','off');
             handles.ExpControl.store.CPActive = (60:89);
+            id = [63 69 75 81 87];
+            for i = 1:5
+                checked = get(handles.EC(id(i)),'Value');
+                if (checked == 1) && (i <=RQ)
+                    set(handles.EC(id(i)+1:id(i)+2),'BackgroundColor',[1 1 1],'Style','edit');
+                    set(handles.EC(id(i)+1:id(i)+2),'Visible','on');
+                else
+                    set(handles.EC(id(i)+1:id(i)+2),'Visible','off');
+                end
+            end
+            
         elseif RQ == 6
             %store
             handles.ExpControl.store.RQ = RQ;
@@ -619,6 +659,16 @@ switch action
             
             set(handles.EC(60:95),'Visible','on');
             handles.ExpControl.store.CPActive = (60:95);
+            id = [63 69 75 81 87 93];
+            for i = 1:6
+                checked = get(handles.EC(id(i)),'Value');
+                if (checked == 1) && (i <=RQ)
+                    set(handles.EC(id(i)+1:id(i)+2),'BackgroundColor',[1 1 1],'Style','edit');
+                    set(handles.EC(id(i)+1:id(i)+2),'Visible','on');
+                else
+                    set(handles.EC(id(i)+1:id(i)+2),'Visible','off');
+                end
+            end
         else
             msgbox(sprintf('Defining more than six response quantities for one\ncontrol point is not supported at this time'),'Error','error');
             set(handles.EC(58),'String',num2str(handles.ExpControl.store.RQ));
