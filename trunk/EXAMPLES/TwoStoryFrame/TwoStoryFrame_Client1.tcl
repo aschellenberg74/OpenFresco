@@ -75,15 +75,15 @@ expElement beamColumn 4 4 5 1 -site 2 -initStif 1213 0 0 0 11.2 -302.4 0 -302.4 
 # set time series to be passed to uniform excitation
 set dt 0.01
 #set scale 1.0
-#set accelSeries "Path -filePath CosinePulse.txt -dt $dt -factor [expr 386.1*$scale]"
+#timeSeries Path 1 -filePath CosinePulse.txt -dt $dt -factor [expr 386.1*$scale]
 #set scale 1.4
-#set accelSeries "Path -filePath SACNF01.txt -dt $dt -factor [expr 386.1*$scale]"
+#timeSeries Path 1 -filePath SACNF01.txt -dt $dt -factor [expr 386.1*$scale]
 set scale 2.5
-set accelSeries "Path -filePath ELC270.txt -dt $dt -factor [expr 386.1*$scale]"
+timeSeries Path 1 -filePath ELC270.txt -dt $dt -factor [expr 386.1*$scale]
 
 # Ccreate UniformExcitation load pattern
-# pattern UniformExcitation $tag $dir 
-pattern UniformExcitation  1 1 -accel $accelSeries
+# pattern UniformExcitation $tag $dir -accel $tsTag <-vel0 $vel0>
+pattern UniformExcitation 1 1 -accel 1
 
 # calculate the rayleigh damping factors for nodes & elements
 set alphaM     0.0;       # D = alphaM*M

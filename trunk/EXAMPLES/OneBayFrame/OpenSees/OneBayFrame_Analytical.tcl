@@ -48,8 +48,8 @@ uniaxialMaterial Elastic 3 [expr 2.0*100.0/1.0]
 # ---------------
 # left and right columns
 # element twoNodeLink $eleTag $iNode $jNode -mat $matTags -dir $dirs <-orient <$x1 $x2 $x3> $y1 $y2 $y3> <-pDelta Mratios> <-mass $m>
-element twoNodeLink 1 1 3 -mat 1 -dir 2 -orient -1 0 0
-element twoNodeLink 2 2 4 -mat 2 -dir 2 -orient -1 0 0
+element twoNodeLink 1 1 3 -mat 1 -dir 2
+element twoNodeLink 2 2 4 -mat 2 -dir 2
 
 # spring
 # element truss $eleTag $iNode $jNode $A $matTag
@@ -60,11 +60,11 @@ element truss 3 3 4 1.0 3
 # set time series to be passed to uniform excitation
 set dt 0.02
 set scale 1.0
-set accelSeries "Path -filePath elcentro.txt -dt $dt -factor [expr 386.1*$scale]"
+timeSeries Path 1 -filePath elcentro.txt -dt $dt -factor [expr 386.1*$scale]
 
 # create UniformExcitation load pattern
-# pattern UniformExcitation $tag $dir 
-pattern UniformExcitation  1 1 -accel $accelSeries
+# pattern UniformExcitation $tag $dir -accel $tsTag <-vel0 $vel0>
+pattern UniformExcitation 1 1 -accel 1
 
 # calculate the rayleigh damping factors for nodes & elements
 set alphaM     1.010017396536;  # D = alphaM*M
@@ -73,7 +73,7 @@ set betaKinit  0.0;             # D = beatKinit*Kinit
 set betaKcomm  0.0;             # D = betaKcomm*KlastCommit
 
 # set the rayleigh damping 
-rayleigh $alphaM $betaK $betaKinit $betaKcomm;
+rayleigh $alphaM $betaK $betaKinit $betaKcomm
 # ------------------------------
 # End of model generation
 # ------------------------------
@@ -144,7 +144,7 @@ set tTot [time {
     for {set i 1} {$i < 1600} {incr i} {
         set t [time {analyze  1  $dt}]
         puts $outFileID $t
- 	      #puts "step $i"
+        #puts "step $i"
     }
 }]
 puts "\nElapsed Time = $tTot \n"

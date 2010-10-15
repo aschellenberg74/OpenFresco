@@ -1,4 +1,4 @@
-# File: OneBayFrame_Local.tcl
+# File: OneBayFrame_Local_xml.tcl
 #
 # $Revision: $
 # $Date: $
@@ -52,18 +52,13 @@ uniaxialMaterial Elastic 2 5.6
 #uniaxialMaterial Steel02 2 3.0 5.6 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0 
 uniaxialMaterial Elastic 3 [expr 2.0*100.0/1.0]
 
-# Define experimental signal filter
-# ---------------------------------
-# expSignalFilter ErrorSimUndershoot $tag $error
-expSignalFilter ErrorSimUndershoot 1 0.01
-# expSignalFilter ErrorSimRandomGauss $tag $avg $std
-#expSignalFilter ErrorSimRandomGauss 1 0.0 0.01
-
 # Define experimental control
 # ---------------------------
-# expControl SimUniaxialMaterials $tag $matTags <-ctrlFilters (5 $cfTag)> <-daqFilters (5 $dfTag)>
-expControl SimUniaxialMaterials 1 1 -ctrlFilters 1 0 0 0 0
-expControl SimUniaxialMaterials 2 2 -ctrlFilters 1 0 0 0 0
+# expControl SimUniaxialMaterials $tag $matTags
+expControl SimUniaxialMaterials 1 1
+#expControl xPCtarget 1 1 "192.168.2.20" 22222 HybridControllerD3D3_1Act "D:/PredictorCorrector/RTActualTestModels/cmAPI-xPCTarget-STS"
+#expControl SCRAMNet 1 381020 8
+expControl SimUniaxialMaterials 2 2
 
 # Define experimental setup
 # -------------------------
@@ -147,13 +142,48 @@ analysis Transient
 # Start of recorder generation
 # ------------------------------
 # create the recorder objects
-recorder Node -file Node_Dsp.out -time -node 3 4 -dof 1 disp
-recorder Node -file Node_Vel.out -time -node 3 4 -dof 1 vel
-recorder Node -file Node_Acc.out -time -node 3 4 -dof 1 accel
+recorder Node -xml Node_Dsp.xml -time -node 3 4 -dof 1 disp
+recorder Node -xml Node_Vel.xml -time -node 3 4 -dof 1 vel
+recorder Node -xml Node_Acc.xml -time -node 3 4 -dof 1 accel
 
-recorder Element -file Elmt_Frc.out     -time -ele 1 2 3 forces
-recorder Element -file Elmt_ctrlDsp.out -time -ele 1 2   ctrlDisp
-recorder Element -file Elmt_daqDsp.out  -time -ele 1 2   daqDisp
+recorder Element -xml Elmt_Frc.xml     -time -ele 1 2 3 forces
+recorder Element -xml Elmt_ctrlDsp.xml -time -ele 1 2   ctrlDisp
+recorder Element -xml Elmt_daqDsp.xml  -time -ele 1 2   daqDisp
+
+expRecorder Site -xml Site_trialDsp.xml -time -site 1 2 trialDisp
+expRecorder Site -xml Site_trialVel.xml -time -site 1 2 trialVel
+expRecorder Site -xml Site_trialAcc.xml -time -site 1 2 trialAccel
+expRecorder Site -xml Site_trialTme.xml -time -site 1 2 trialTime
+expRecorder Site -xml Site_outDsp.xml -time -site 1 2 outDisp
+expRecorder Site -xml Site_outVel.xml -time -site 1 2 outVel
+expRecorder Site -xml Site_outAcc.xml -time -site 1 2 outAccel
+expRecorder Site -xml Site_outFrc.xml -time -site 1 2 outForce
+expRecorder Site -xml Site_outTme.xml -time -site 1 2 outTime
+
+expRecorder Setup -xml Setup_trialDsp.xml -time -setup 1 2 trialDisp
+expRecorder Setup -xml Setup_trialVel.xml -time -setup 1 2 trialVel
+expRecorder Setup -xml Setup_trialAcc.xml -time -setup 1 2 trialAccel
+expRecorder Setup -xml Setup_trialTme.xml -time -setup 1 2 trialTime
+expRecorder Setup -xml Setup_outDsp.xml -time -setup 1 2 outDisp
+expRecorder Setup -xml Setup_outVel.xml -time -setup 1 2 outVel
+expRecorder Setup -xml Setup_outAcc.xml -time -setup 1 2 outAccel
+expRecorder Setup -xml Setup_outFrc.xml -time -setup 1 2 outForce
+expRecorder Setup -xml Setup_outTme.xml -time -setup 1 2 outTime
+expRecorder Setup -xml Setup_ctrlDsp.xml -time -setup 1 2 ctrlDisp
+expRecorder Setup -xml Setup_ctrlVel.xml -time -setup 1 2 ctrlVel
+expRecorder Setup -xml Setup_ctrlAcc.xml -time -setup 1 2 ctrlAccel
+expRecorder Setup -xml Setup_ctrlTme.xml -time -setup 1 2 ctrlTime
+expRecorder Setup -xml Setup_daqDsp.xml -time -setup 1 2 daqDisp
+expRecorder Setup -xml Setup_daqVel.xml -time -setup 1 2 daqVel
+expRecorder Setup -xml Setup_daqAcc.xml -time -setup 1 2 daqAccel
+expRecorder Setup -xml Setup_daqFrc.xml -time -setup 1 2 daqForce
+expRecorder Setup -xml Setup_daqTme.xml -time -setup 1 2 daqTime
+
+expRecorder Control -xml Control_ctrlDsp.xml -time -control 1 2 ctrlDisp
+expRecorder Control -xml Control_ctrlVel.xml -time -control 1 2 ctrlVel
+expRecorder Control -xml Control_daqDsp.xml -time -control 1 2 daqDisp
+expRecorder Control -xml Control_daqVel.xml -time -control 1 2 daqVel
+expRecorder Control -xml Control_daqFrc.xml -time -control 1 2 daqForce
 # --------------------------------
 # End of recorder generation
 # --------------------------------

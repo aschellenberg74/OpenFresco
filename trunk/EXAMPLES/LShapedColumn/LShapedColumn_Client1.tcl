@@ -66,11 +66,11 @@ element elasticBeamColumn 2 2 3 2.26 29000 5.067806896551724 1
 # set time series to be passed to uniform excitation
 set dt 0.02
 set scale 1.0
-set accelSeries "Path -filePath elcentro.txt -dt $dt -factor [expr 386.1*$scale]"
+timeSeries Path 1 -filePath elcentro.txt -dt $dt -factor [expr 386.1*$scale]
 
 # create UniformExcitation load pattern
-# pattern UniformExcitation $tag $dir 
-pattern UniformExcitation  1 1 -accel $accelSeries
+# pattern UniformExcitation $tag $dir -accel $tsTag <-vel0 $vel0>
+pattern UniformExcitation 1 1 -accel 1
 
 # calculate the rayleigh damping factors for nodes & elements
 set alphaM     1.010017396536;  # D = alphaM*M
@@ -79,7 +79,7 @@ set betaKinit  0.0;             # D = beatKinit*Kinit
 set betaKcomm  0.0;             # D = betaKcomm*KlastCommit
 
 # set the rayleigh damping 
-#rayleigh $alphaM $betaK $betaKinit $betaKcomm;
+#rayleigh $alphaM $betaK $betaKinit $betaKcomm
 # ------------------------------
 # End of model generation
 # ------------------------------

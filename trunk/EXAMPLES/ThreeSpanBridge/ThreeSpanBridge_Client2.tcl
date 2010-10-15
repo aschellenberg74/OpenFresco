@@ -103,15 +103,15 @@ expElement beamColumn 3 3 10 1 -site 2 -initStif 1560 0 0 0 24.0 -504.0 0 -504.0
 # set time series to be passed to uniform excitation
 set dt 0.01
 #set scale 1.0
-#set accelSeries "Path -filePath CosinePulse.txt -dt $dt -factor [expr 386.1*$scale]"
+#timeSeries Path 1 -filePath CosinePulse.txt -dt $dt -factor [expr 386.1*$scale]
 #set scale 0.6
-#set accelSeries "Path -filePath SACNF01.txt -dt $dt -factor [expr 386.1*$scale]"
+#timeSeries Path 1 -filePath SACNF01.txt -dt $dt -factor [expr 386.1*$scale]
 set scale 1.0
-set accelSeries "Path -filePath ELC270.txt -dt $dt -factor [expr 386.1*$scale]"
+timeSeries Path 1 -filePath ELC270.txt -dt $dt -factor [expr 386.1*$scale]
 
 # create UniformExcitation load pattern
-# pattern UniformExcitation $tag $dir 
-pattern UniformExcitation  1 1 -accel $accelSeries
+# pattern UniformExcitation $tag $dir -accel $tsTag <-vel0 $vel0>
+pattern UniformExcitation 1 1 -accel 1
 
 # calculate the rayleigh damping factors for nodes & elements
 set alphaM     0.0;       # D = alphaM*M
@@ -120,7 +120,7 @@ set betaKinit  0.014836;  # D = beatKinit*Kinit
 set betaKcomm  0.0;       # D = betaKcomm*KlastCommit
 
 # set the rayleigh damping 
-#rayleigh $alphaM $betaK $betaKinit $betaKcomm;
+#rayleigh $alphaM $betaK $betaKinit $betaKcomm
 # ------------------------------
 # End of model generation
 # ------------------------------
@@ -192,7 +192,7 @@ set tTot [time {
     for {set i 1} {$i < 4000} {incr i} {
         set t [time {analyze  1  $dt}]
         puts $outFileID $t
- 	      #puts "step $i"
+        #puts "step $i"
     }
 }]
 puts "\nElapsed Time = $tTot \n"
