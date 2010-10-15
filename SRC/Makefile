@@ -31,6 +31,7 @@ EXPERIMENTALTEST_OBJS = $(OPENFRESCO)/utility/ExperimentalCP.o \
 	   $(OPENFRESCO)/experimentalControl/ECSimUniaxialMaterials.o \
 	   $(OPENFRESCO)/experimentalControl/ECSimDomain.o \
 	   $(OPENFRESCO)/experimentalControl/ECSimFEAdapter.o \
+	   $(OPENFRESCO)/experimentalControl/ECSimSimulink.o \
 	   $(OPENFRESCO)/experimentalSignalFilter/ExperimentalSignalFilter.o \
 	   $(OPENFRESCO)/experimentalSignalFilter/ESFErrorSimRandomGauss.o \
 	   $(OPENFRESCO)/experimentalSignalFilter/ESFErrorSimulation.o \
