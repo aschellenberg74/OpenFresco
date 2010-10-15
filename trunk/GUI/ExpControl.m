@@ -245,6 +245,9 @@ switch action
                 handles.ExpControl.store.RealActive = (25:33);
                 set(handles.EC(25:52),'Visible','off');
                 set(handles.EC(handles.ExpControl.store.RealActive),'Visible','on');
+                set(handles.EC(29),'String',handles.ExpControl.RealControl.ipAddr);
+%                 set(handles.EC(30),'String',handles.ExpControl.RealContro
+%                 l.ipPort);
             case 3
             %MTSCsi
                 handles.ExpControl.RealControl.Controller = 'MTSCsi';
@@ -269,6 +272,7 @@ switch action
                 handles.ExpControl.store.RealActive = [25:27 45:52];
                 set(handles.EC(25:52),'Visible','off');
                 set(handles.EC(handles.ExpControl.store.RealActive),'Visible','on');
+                handles.ExpControl.RealControl.ipPort = get(handles.EC(49),'String');
         end
         
     %%%%%%%%%%%%%%%%%%    
@@ -327,7 +331,7 @@ switch action
                         msgbox(sprintf(['Modulus does not match with structure stiffness (' num2str(handles.Model.K(1,1)) ')\nConsider revising']),'Warning','warn');
                     end
                 end
-                handles.ExpControl.DOF1.E = str2num(get(gcbo,'String'));
+                handles.ExpControl.DOF1.E0 = str2num(get(gcbo,'String'));
             case 'DOF 2'
                 if ~strcmp(get(gcbo,'String'),num2str(handles.Model.K(2,2)))
                     msgbox(sprintf(['Modulus does not match with structure stiffness (' num2str(handles.Model.K(2,2)) ')\nConsider revising']),'Warning','warn');
@@ -359,10 +363,10 @@ switch action
         handles.ExpControl.RealControl.ipPort = get(gcbo,'String');
         
     case 'TrialCP'
-        handles.ExpControl.RealControl.TrialCPs = get(gcbo,'Value');
+        handles.ExpControl.RealControl.TrialCP = get(gcbo,'Value');
         
     case 'OutputCP'
-        handles.ExpControl.RealControl.OutputCPs = get(gcbo,'Value');
+        handles.ExpControl.RealControl.OutputCP = get(gcbo,'Value');
         
     case 'ConfigName'
         handles.ExpControl.RealControl.ConfigName = get(gcbo,'String');

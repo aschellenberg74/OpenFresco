@@ -12,11 +12,16 @@ handles = guidata(gcbf);
 
 % find longest motion
 tEnd = 0.0;
-for mo=1:length(handles.GM.dt)
-    tEndi = handles.GM.scalet{mo}(end);
-    if tEndi > tEnd
-        tEnd = tEndi;
-    end
+switch handles.GM.loadType
+    case 'Ground Motions'
+        for mo=1:length(handles.GM.dt)
+            tEndi = handles.GM.scalet{mo}(end);
+            if tEndi > tEnd
+                tEnd = tEndi;
+            end
+        end
+    case 'Initial Conditions'
+        tEnd = handles.GM.rampTime + handles.GM.vibTime;
 end
 
 %%%%%%%%%%%%%%%
