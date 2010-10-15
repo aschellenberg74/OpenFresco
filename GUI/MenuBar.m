@@ -33,9 +33,12 @@ switch action
             close(findobj('Tag','AnalysisControls'))
         end
         
-        %Check for .tcl file and delete if found
+        %Check for .tcl and report files and delete if found
         if exist('OPFAnalysis.tcl','file') == 2
             delete('OPFAnalysis.tcl');
+        end
+        if exist('OPFReport.txt','file') == 2
+            delete('OPFReport.txt');
         end
 
         set(handles.Analysis(6),'SelectedObject',[]);
@@ -111,6 +114,7 @@ switch action
                 set(handles.Structure(13),'String',num2str(handles.Model.Zeta));
                 
                 %Update Ground Motions
+                set(handles.GroundMotions(27),'String',{'Choose Mode...','Mode 1','User Defined'});
                 switch handles.GM.loadType
                     case 'Ground Motions'
                         if length(handles.GM.t{1}) > 1
@@ -240,6 +244,8 @@ switch action
                 end
                 
                 %Initialize Control Points Page
+                set(handles.EC(32),'Value',1);
+                set(handles.EC(33),'Value',1);
                 set(handles.EC(54),'Value',1);
                 set(handles.EC(56),'String','');
                 set(handles.EC([60 61 66 67 72 73 78 79]),'Value',1);
@@ -328,6 +334,7 @@ switch action
                 set(handles.Structure(21),'String',num2str(handles.Model.Zeta));
                 
                 %Update Ground Motions
+                set(handles.GroundMotions(27),'String',{'Choose Mode...','Mode 1','Mode 2','User Defined'});
                 switch handles.GM.loadType
                     case 'Ground Motions'
                         set(handles.GroundMotions(19),'Value',1,'CData',handles.Store.GM1);
@@ -460,6 +467,8 @@ switch action
                 end
                 
                 %Initialize Control Points Page
+                set(handles.EC(32),'Value',1);
+                set(handles.EC(33),'Value',1);
                 set(handles.EC(54),'Value',1);
                 set(handles.EC(56),'String','');
                 set(handles.EC([60 61 66 67 72 73 78 79]),'Value',1);
@@ -543,6 +552,7 @@ switch action
                 set(handles.Structure(29),'String',num2str(handles.Model.Zeta));
                 
                 %Update Ground Motions
+                set(handles.GroundMotions(27),'String',{'Choose Mode...','Mode 1','Mode 2','User Defined'});
                 switch handles.GM.loadType
                     case 'Ground Motions'
                         set(handles.GroundMotions(19),'Value',1,'CData',handles.Store.GM1);
@@ -685,6 +695,8 @@ switch action
                 end
 
                 %Initialize Control Points Page
+                set(handles.EC(32),'Value',1);
+                set(handles.EC(33),'Value',1);
                 set(handles.EC(54),'Value',1);
                 set(handles.EC(56),'String','');
                 set(handles.EC([60 61 66 67 72 73 78 79]),'Value',1);

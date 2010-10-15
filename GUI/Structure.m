@@ -114,6 +114,10 @@ switch action
                 handles.GM.scaleag = handles.GM.scaleag(1);
                 handles.GM.Spectra = handles.GM.Spectra(1);
                 
+                %Initialize Loading Page
+                set(handles.GroundMotions(23),'String','Enter displacement here');
+                set(handles.GroundMotions(27),'String',{'Choose Mode...','Mode 1','User Defined'},'Value',1);
+                
                 %Initialize Control Points Page
                 set(handles.EC(54),'Value',1);
                 set(handles.EC(56),'String','');
@@ -228,6 +232,10 @@ switch action
                 handles.GM.scalet = handles.GM.scalet(1);
                 handles.GM.scaleag = handles.GM.scaleag(1);
                 handles.GM.Spectra = handles.GM.Spectra(1);
+                
+                %Initialize Loading Page
+                set(handles.GroundMotions(23),'String','[U1 U2]');
+                set(handles.GroundMotions(27),'String',{'Choose Mode...','Mode 1','Mode 2','User Defined'},'Value',1);
                 
                 %Initialize Control Points Page
                 set(handles.EC(54),'Value',1);
@@ -359,6 +367,10 @@ switch action
                 handles.GM.AmpFact(2) = str2num(get(handles.GroundMotions(12),'String'));
                 handles.GM.TimeFact(2) = str2num(get(handles.GroundMotions(13),'String'));
                 
+                %Initialize Loading Page
+                set(handles.GroundMotions(23),'String','[U1 U2]');
+                set(handles.GroundMotions(27),'String',{'Choose Mode...','Mode 1','Mode 2','User Defined'},'Value',1);
+                
                 %Initialize Control Points Page
                 set(handles.EC(54),'Value',1);
                 set(handles.EC(56),'String','');
@@ -446,6 +458,15 @@ switch action
         if isempty(handles.Model.K)
             return;
         else
+            %Calculate mode shapes and periods
+            if strcmp(handles.Model.Type, '1 DOF')
+                handles.Model.Modes = 1;
+            else
+                [Phi OmegaSq] = eig(handles.Model.K, handles.Model.M);
+                Mode1 = Phi(:,1)./Phi(2,1);
+                Mode2 = Phi(:,2)./Phi(2,2);
+                handles.Model.Modes = [Mode1 Mode2];
+            end
             handles.Model.Omega = sqrt(eig(handles.Model.K, handles.Model.M));
             if size(handles.Model.Omega) == [2 1];
                 if handles.Model.Omega(1) < handles.Model.Omega(2)
@@ -492,6 +513,15 @@ switch action
         if isempty(handles.Model.M)
             return;
         else
+            %Calculate mode shapes and periods
+            if strcmp(handles.Model.Type, '1 DOF')
+                handles.Model.Modes = 1;
+            else
+                [Phi OmegaSq] = eig(handles.Model.K, handles.Model.M);
+                Mode1 = Phi(:,1)./Phi(2,1);
+                Mode2 = Phi(:,2)./Phi(2,2);
+                handles.Model.Modes = [Mode1 Mode2];
+            end
             handles.Model.Omega = sqrt(eig(handles.Model.K, handles.Model.M));
             if size(handles.Model.Omega) == [2 1];
                 if handles.Model.Omega(1) < handles.Model.Omega(2)

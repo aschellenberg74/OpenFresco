@@ -13,7 +13,7 @@ switch action
             grid('on');
             xlabel('Time [sec]');
             ylabel('ag [L/sec^2]');
-            text(0.7*handles.GM.scalet{1}(end),0.94*pga,sprintf('PGA: %1.4E',pga));
+            text(0.7*handles.GM.scalet{1}(end),0.94*pga,sprintf('PGA: %1.4f',pga),'BackgroundColor',[1 1 1]);
         end
         
     case 'Sa1'
@@ -38,7 +38,7 @@ switch action
                     tol = tol + 0.01;
                 end
                 psdAcc = handles.GM.Spectra{1}.psdAcc(id1(1),1);
-                text(handles.Model.T*1.2,psdAcc*1.1,sprintf('T = %1.4E\nSa = %1.4E',handles.Model.T,psdAcc));
+                text(handles.Model.T*1.2,psdAcc*1.1,sprintf('T = %1.4f\nSa = %1.4f',handles.Model.T,psdAcc),'BackgroundColor',[1 1 1]);
                 hold on
                 plot(handles.Model.T,psdAcc,'ro');
                 hold off
@@ -57,13 +57,14 @@ switch action
                 else
                     psdAcc1 = handles.GM.Spectra{1}.psdAcc(id1(1),1);
                     psdAcc2 = handles.GM.Spectra{1}.psdAcc(id2(1),2);
+                    legend(sprintf([num2str(handles.Model.Zeta(1)) '%% Damping']),sprintf([num2str(handles.Model.Zeta(2)) '%% Damping']));
                 end
                 if psdAcc1 > psdAcc2
-                    text(handles.Model.T(1)*1.1,psdAcc1*1.1,sprintf('T = %1.4E\nSa = %1.4E',handles.Model.T(1),psdAcc1));
-                    text(handles.Model.T(2)*0.9,psdAcc2*0.8,sprintf('T = %1.4E\nSa = %1.4E',handles.Model.T(2),psdAcc2));
+                    text(handles.Model.T(1)*1.1,psdAcc1*1.1,sprintf('T = %1.4f\nSa = %1.4f',handles.Model.T(1),psdAcc1),'BackgroundColor',[1 1 1]);
+                    text(handles.Model.T(2)*0.9,psdAcc2*0.8,sprintf('T = %1.4f\nSa = %1.4f',handles.Model.T(2),psdAcc2),'BackgroundColor',[1 1 1]);
                 else
-                    text(handles.Model.T(1)*1.1,psdAcc1*0.8,sprintf('T = %1.4E\nSa = %1.4E',handles.Model.T(1),psdAcc1));
-                    text(handles.Model.T(2)*0.9,psdAcc2*1.1,sprintf('T = %1.4E\nSa = %1.4E',handles.Model.T(2),psdAcc2));
+                    text(handles.Model.T(1)*1.1,psdAcc1*0.8,sprintf('T = %1.4f\nSa = %1.4f',handles.Model.T(1),psdAcc1),'BackgroundColor',[1 1 1]);
+                    text(handles.Model.T(2)*0.9,psdAcc2*1.1,sprintf('T = %1.4f\nSa = %1.4f',handles.Model.T(2),psdAcc2),'BackgroundColor',[1 1 1]);
                 end
                 hold on
                 plot(handles.Model.T(1),psdAcc1,'ro');
@@ -94,7 +95,7 @@ switch action
                     tol = tol + 0.01;
                 end
                 dsp = handles.GM.Spectra{1}.dsp(id1(1),1);
-                text(handles.Model.T*1.2,dsp*1.1,sprintf('T = %1.4E\nSa = %1.4E',handles.Model.T,dsp));
+                text(handles.Model.T*1.2,dsp*1.1,sprintf('T = %1.4f\nSa = %1.4f',handles.Model.T,dsp),'BackgroundColor',[1 1 1]);
                 hold on
                 plot(handles.Model.T,dsp,'ro');
                 hold off
@@ -113,9 +114,10 @@ switch action
                 else
                     dsp1 = handles.GM.Spectra{1}.dsp(id1(1),1);
                     dsp2 = handles.GM.Spectra{1}.dsp(id2(1),2);
+                    legend(sprintf([num2str(handles.Model.Zeta(1)) '%% Damping']),sprintf([num2str(handles.Model.Zeta(2)) '%% Damping']));
                 end
-                text(handles.Model.T(1)*1.1,dsp1*1.1,sprintf('T = %1.4E\nSd = %1.4E',handles.Model.T(1),dsp1));
-                text(handles.Model.T(2)*1.3,dsp2,sprintf('T = %1.4E\nSd = %1.4E',handles.Model.T(2),dsp2));
+                text(handles.Model.T(1)*1.1,dsp1*1.1,sprintf('T = %1.4f\nSd = %1.4f',handles.Model.T(1),dsp1),'BackgroundColor',[1 1 1]);
+                text(handles.Model.T(2)*1.3,dsp2*1.25,sprintf('T = %1.4f\nSd = %1.4f',handles.Model.T(2),dsp2),'BackgroundColor',[1 1 1]);
                 hold on
                 plot(handles.Model.T(1),dsp1,'ro');
                 plot(handles.Model.T(2),dsp2,'ro');
@@ -133,7 +135,7 @@ switch action
             grid('on');
             xlabel('Time [sec]');
             ylabel('ag [L/sec^2]');
-            text(0.7*handles.GM.scalet{2}(end),0.94*pga,sprintf('PGA: %1.4E',pga));
+            text(0.7*handles.GM.scalet{2}(end),0.94*pga,sprintf('PGA: %1.4f',pga),'BackgroundColor',[1 1 1]);
         end
         
     case 'Sa2'
@@ -158,7 +160,7 @@ switch action
                     tol = tol + 0.01;
                 end
                 psdAcc = handles.GM.Spectra{2}.psdAcc(id1(1),1);
-                text(handles.Model.T*1.2,psdAcc*1.1,sprintf('T = %1.4E\nSa = %1.4E',handles.Model.T,psdAcc));
+                text(handles.Model.T*1.2,psdAcc*1.1,sprintf('T = %1.4f\nSa = %1.4f',handles.Model.T,psdAcc),'BackgroundColor',[1 1 1]);
                 hold on
                 plot(handles.Model.T,psdAcc,'ro');
                 hold off
@@ -177,13 +179,14 @@ switch action
                 else
                     psdAcc1 = handles.GM.Spectra{2}.psdAcc(id1(1),1);
                     psdAcc2 = handles.GM.Spectra{2}.psdAcc(id2(1),2);
+                    legend(sprintf([num2str(handles.Model.Zeta(1)) '%% Damping']),sprintf([num2str(handles.Model.Zeta(2)) '%% Damping']));
                 end
                 if psdAcc1 > psdAcc2
-                    text(handles.Model.T(1)*1.1,psdAcc1*1.1,sprintf('T = %1.4E\nSa = %1.4E',handles.Model.T(1),psdAcc1));
-                    text(handles.Model.T(2)*0.9,psdAcc2*0.8,sprintf('T = %1.4E\nSa = %1.4E',handles.Model.T(2),psdAcc2));
+                    text(handles.Model.T(1)*1.1,psdAcc1*1.1,sprintf('T = %1.4f\nSa = %1.4f',handles.Model.T(1),psdAcc1),'BackgroundColor',[1 1 1]);
+                    text(handles.Model.T(2)*0.9,psdAcc2*0.8,sprintf('T = %1.4f\nSa = %1.4f',handles.Model.T(2),psdAcc2),'BackgroundColor',[1 1 1]);
                 else
-                    text(handles.Model.T(1)*1.1,psdAcc1*0.95,sprintf('T = %1.4E\nSa = %1.4E',handles.Model.T(1),psdAcc1));
-                    text(handles.Model.T(2)*1.1,psdAcc2*1.1,sprintf('T = %1.4E\nSa = %1.4E',handles.Model.T(2),psdAcc2));
+                    text(handles.Model.T(1)*1.1,psdAcc1*0.95,sprintf('T = %1.4f\nSa = %1.4f',handles.Model.T(1),psdAcc1),'BackgroundColor',[1 1 1]);
+                    text(handles.Model.T(2)*1.1,psdAcc2*1.1,sprintf('T = %1.4f\nSa = %1.4f',handles.Model.T(2),psdAcc2),'BackgroundColor',[1 1 1]);
                 end
                 hold on
                 plot(handles.Model.T(1),psdAcc1,'ro');
@@ -214,7 +217,7 @@ switch action
                     tol = tol + 0.01;
                 end
                 dsp = handles.GM.Spectra{2}.dsp(id1(1),1);
-                text(handles.Model.T*1.2,dsp*1.1,sprintf('T = %1.4E\nSa = %1.4E',handles.Model.T,dsp));
+                text(handles.Model.T*1.2,dsp*1.1,sprintf('T = %1.4f\nSa = %1.4f',handles.Model.T,dsp),'BackgroundColor',[1 1 1]);
                 hold on
                 plot(handles.Model.T,dsp,'ro');
                 hold off
@@ -233,9 +236,10 @@ switch action
                 else
                     dsp1 = handles.GM.Spectra{2}.dsp(id1(1),1);
                     dsp2 = handles.GM.Spectra{2}.dsp(id2(1),2);
+                    legend(sprintf([num2str(handles.Model.Zeta(1)) '%% Damping']),sprintf([num2str(handles.Model.Zeta(2)) '%% Damping']));
                 end
-                text(handles.Model.T(1)*1.1,dsp1*1.1,sprintf('T = %1.4E\nSd = %1.4E',handles.Model.T(1),dsp1));
-                text(handles.Model.T(2)*1.3,dsp2,sprintf('T = %1.4E\nSd = %1.4E',handles.Model.T(2),dsp2));
+                text(handles.Model.T(1)*1.1,dsp1*1.1,sprintf('T = %1.4f\nSd = %1.4f',handles.Model.T(1),dsp1),'BackgroundColor',[1 1 1]);
+                text(handles.Model.T(2)*1.3,dsp2*1.25,sprintf('T = %1.4f\nSd = %1.4f',handles.Model.T(2),dsp2),'BackgroundColor',[1 1 1]);
                 hold on
                 plot(handles.Model.T(1),dsp1,'ro');
                 plot(handles.Model.T(2),dsp2,'ro');

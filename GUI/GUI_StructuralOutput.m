@@ -17,11 +17,16 @@ handles = guidata(gcbf);
 
 % find longest motion
 tEnd = 0.0;
-for mo=1:length(handles.GM.dt)
-    tEndi = handles.GM.scalet{mo}(end);
-    if tEndi > tEnd
-        tEnd = tEndi;
-    end
+switch handles.GM.loadType
+    case 'Ground Motions'
+        for mo=1:length(handles.GM.dt)
+            tEndi = handles.GM.scalet{mo}(end);
+            if tEndi > tEnd
+                tEnd = tEndi;
+            end
+        end
+    case 'Initial Conditions'
+        tEnd = handles.GM.rampTime + handles.GM.vibTime;
 end
 
 %%%%%%%%%%%%%%%%%
@@ -91,10 +96,22 @@ a_StructuralOutput_agX = axes('Parent',f_StructOut1,...
     'Tag','SO1ag',...
     'NextPlot','replacechildren',...
     'Position',[0.06 0.09 0.56 0.15],'Box','on');
-line(handles.GM.scalet{1}, handles.GM.scaleag{1});
-grid('on');
-ylabel(a_StructuralOutput_agX,'Ground Accel [L/sec^2]');
-xlabel(a_StructuralOutput_agX,'Time [sec]');
+switch handles.GM.loadType
+    case 'Ground Motions'
+        line(handles.GM.scalet{1}, handles.GM.scaleag{1});
+        grid('on');
+        ylabel(a_StructuralOutput_agX,'Ground Accel [L/sec^2]');
+        xlabel(a_StructuralOutput_agX,'Time [sec]');
+    case 'Initial Conditions'
+        set(findobj('Tag','SO1ag'),'YLimMode','manual','Ylim',[-100 100],'YTick', [-100 0 100])
+        xValues = [0 handles.GM.rampTime handles.GM.rampTime (handles.GM.rampTime+handles.GM.vibTime)];
+        yValues = [0 100 0 0];
+        line(xValues, yValues);
+        grid('on');
+        ylabel(a_StructuralOutput_agX,'% Total Displacement');
+        xlabel(a_StructuralOutput_agX,'Time [sec]');
+end
+
 a_StructuralOutput_fdX = axes('Parent',f_StructOut1,...
     'Tag','SO1fd',...
     'NextPlot','replacechildren',...
@@ -182,14 +199,26 @@ if ~strcmp(handles.Model.Type, '1 DOF')
         'Tag','SO2ag',...
         'NextPlot','replacechildren',...
         'Position',[0.06 0.09 0.56 0.15],'Box','on');
-    if strcmp(handles.Model.Type, '2 DOF A')
-        line(handles.GM.scalet{1}, handles.GM.scaleag{1});
-    elseif strcmp(handles.Model.Type, '2 DOF B')
-        line(handles.GM.scalet{2}, handles.GM.scaleag{2});
+    switch handles.GM.loadType
+        case 'Ground Motions'
+            if strcmp(handles.Model.Type, '2 DOF A')
+                line(handles.GM.scalet{1}, handles.GM.scaleag{1});
+            elseif strcmp(handles.Model.Type, '2 DOF B')
+                line(handles.GM.scalet{2}, handles.GM.scaleag{2});
+            end
+            grid('on');
+            ylabel(a_StructuralOutput_agY,'Ground Accel [L/sec^2]');
+            xlabel(a_StructuralOutput_agY,'Time [sec]');
+        case 'Initial Conditions'
+            set(findobj('Tag','SO2ag'),'YLimMode','manual','Ylim',[-100 100],'YTick', [-100 0 100])
+            xValues = [0 handles.GM.rampTime handles.GM.rampTime (handles.GM.rampTime+handles.GM.vibTime)];
+            yValues = [0 100 0 0];
+            line(xValues, yValues);
+            grid('on');
+            ylabel(a_StructuralOutput_agY,'% Total Displacement');
+            xlabel(a_StructuralOutput_agY,'Time [sec]');
     end
-    grid('on');
-    ylabel(a_StructuralOutput_agY,'Ground Accel [L/sec^2]');
-    xlabel(a_StructuralOutput_agY,'Time [sec]');
+    
     a_StructuralOutput_fdY = axes('Parent',f_StructOut2,...
         'Tag','SO2fd',...
         'NextPlot','replacechildren',...

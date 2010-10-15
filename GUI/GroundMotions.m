@@ -25,7 +25,7 @@ switch action
                 set(handles.GroundMotions(19),'Value',1,'CData',handles.Store.GM1);
                 set(handles.GroundMotions(20),'Value',0,'CData',handles.Store.IC0);
                 set(handles.GroundMotions(2:9),'Visible','on');
-                set(handles.GroundMotions(21:26),'Visible','off');
+                set(handles.GroundMotions(21:27),'Visible','off');
                 set(get(handles.GroundMotions(7), 'Children'), 'Visible', 'on');
                 set(get(handles.GroundMotions(8), 'Children'), 'Visible', 'on');
                 set(get(handles.GroundMotions(9), 'Children'), 'Visible', 'on');
@@ -43,6 +43,9 @@ switch action
                     set(findobj('Tag','Scalehelp'),'Position',[0.85 0.35 0.083 0.132]);
                 end
             case 'Initial Conditions'
+                if isempty(handles.Model.M) || isempty(handles.Model.K)
+                    msgbox(sprintf('Please define structural properties before\n setting initial conditions.'),'Error','error');
+                end
                 switch handles.Model.Type
                     case '1 DOF'
 %                         msgbox('Specify one value for each field');
@@ -55,9 +58,14 @@ switch action
                 set(handles.GroundMotions(19),'Value',0,'CData',handles.Store.GM0);
                 set(handles.GroundMotions(20),'Value',1,'CData',handles.Store.IC1);
                 set(handles.GroundMotions(2:17),'Visible','off');
-                set(handles.GroundMotions(21:26),'Visible','on');
+                set(handles.GroundMotions(21:27),'Visible','on');
+                
                 if ~isfield(handles.GM, 'initialDisp') || isempty(handles.GM.initialDisp)
-                    set(handles.GroundMotions(23),'String','');
+                    if strcmp(handles.Model.Type, '1 DOF')
+                        set(handles.GroundMotions(23),'String','Enter displacement here');
+                    else
+                        set(handles.GroundMotions(23),'String','[U1 U2]');
+                    end
                 end
                 if ~isfield(handles.GM, 'rampTime') || isempty(handles.GM.rampTime)
                     set(handles.GroundMotions(24),'String','');
@@ -271,12 +279,37 @@ switch action
                 plot(handles.GroundMotions(17), handles.GM.Spectra{2}.T, handles.GM.Spectra{2}.dsp);
         end
         
+    case 'initialDispType'
+        options = get(gcbo,'String');
+        modeSelection = options(get(gcbo,'Value'));
+        switch modeSelection{1}
+            case 'Choose Mode...'
+                if strcmp(handles.Model.Type, '1 DOF')
+                    set(handles.GroundMotions(23),'String','Enter displacement here');
+                else
+                    set(handles.GroundMotions(23),'String','[U1 U2]');
+                end
+                handles.GM.initialDisp = [];
+            case 'Mode 1'
+                set(handles.GroundMotions(23),'String',num2str(handles.Model.Modes(:,1)'));
+                handles.GM.initialDisp = handles.Model.Modes(:,1)';
+            case 'Mode 2'
+                set(handles.GroundMotions(23),'String',num2str(handles.Model.Modes(:,2)'));
+                handles.GM.initialDisp = handles.Model.Modes(:,2)';
+            case 'User Defined'
+                if strcmp(handles.Model.Type, '1 DOF')
+                    set(handles.GroundMotions(23),'String','Enter displacement here');
+                else
+                    set(handles.GroundMotions(23),'String','[U1 U2]');
+                end
+                handles.GM.initialDisp = [];
+        end
     case 'initialDisp'
         input_val = str2num(get(gcbo,'String'));
         if strcmp(handles.Model.Type, '1 DOF')
             if length(input_val) ~= 1
                 msgbox('Please specify a single displacement value','Error','error');
-            elseif isempty(input_val) || (input_val<0)
+            elseif isempty(input_val) || (input_val==0)
                 msgbox('Invalid initial displacement specified!','Error','error');
                 handles.GM.initialDisp = [];
             else
@@ -285,7 +318,7 @@ switch action
         else
             if length(input_val) ~= 2
                 msgbox('Please specify two displacement values','Error','error');
-            elseif isempty(input_val) || (input_val(1)<0) || (input_val(2)<0)
+            elseif isempty(input_val) || (input_val(1)==0) || (input_val(2)==0)
                 msgbox('Invalid initial displacement specified!','Error','error');
                 handles.GM.initialDisp = [];
             else
@@ -294,47 +327,24 @@ switch action
         end
     case 'rampTime'
         input_val = str2num(get(gcbo,'String'));
-        if strcmp(handles.Model.Type, '1 DOF')
-            if length(input_val) ~= 1
-                msgbox('Please specify a single ramp time value','Error','error');
-            elseif isempty(input_val) || (input_val<0)
-                msgbox('Invalid ramp time specified!','Error','error');
-                handles.GM.rampTime = [];
-            else
-                handles.GM.rampTime = input_val;
-            end
+        if length(input_val) ~= 1
+            msgbox('Please specify a single ramp time value','Error','error');
+        elseif isempty(input_val) || (input_val<=0)
+            msgbox('Invalid ramp time specified!','Error','error');
+            handles.GM.rampTime = [];
         else
-            if length(input_val) ~= 2
-                msgbox('Please specify two ramp time values','Error','error');
-            elseif isempty(input_val) || (input_val(1)<0) || (input_val(2)<0)
-                msgbox('Invalid ramp time specified!','Error','error');
-                handles.GM.rampTime = [];
-            else
-                handles.GM.rampTime = input_val;
-            end
+            handles.GM.rampTime = input_val;
         end
     case 'vibTime'
         input_val = str2num(get(gcbo,'String'));
-        if strcmp(handles.Model.Type, '1 DOF')
-            if length(input_val) ~= 1
-                msgbox('Please specify a single vibration time value','Error','error');
-            elseif isempty(input_val) || (input_val<0)
-                msgbox('Invalid vibration time specified!','Error','error');
-                handles.GM.vibTime = [];
-            else
-                handles.GM.vibTime = input_val;
-            end
+        if length(input_val) ~= 1
+            msgbox('Please specify a single vibration time value','Error','error');
+        elseif isempty(input_val) || (input_val<=0)
+            msgbox('Invalid vibration time specified!','Error','error');
+            handles.GM.vibTime = [];
         else
-            if length(input_val) ~= 2
-                msgbox('Please specify two vibration time values','Error','error');
-            elseif isempty(input_val) || (input_val(1)<0) || (input_val(2)<0)
-                msgbox('Invalid vibration time specified!','Error','error');
-                handles.GM.vibTime = [];
-            else
-                handles.GM.vibTime = input_val;
-            end
+            handles.GM.vibTime = input_val;
         end
-        
 end
 
 %Update handles structure

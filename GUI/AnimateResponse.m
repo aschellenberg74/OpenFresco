@@ -20,7 +20,19 @@ switch Type
         set(handles.Plots.SO1fddot,'Xdata',U(1,end),'YData',Pr(1,end));
         
         %Routine for tracing ag plot
-        set(handles.Plots.SO1agdot,'Xdata',t(end),'YData',ag(1));
+        switch handles.GM.loadType
+            case 'Ground Motions'
+                set(handles.Plots.SO1agdot,'Xdata',t(end),'YData',ag(1));
+            case 'Initial Conditions'
+                if t(end) <= handles.GM.rampTime
+                    y1 = U(1,:);
+                    set(handles.Plots.SO1agdot,'Xdata',t(end),'YData',U(end)/handles.GM.initialDisp(1)*100);
+                else
+                    set(handles.Plots.SO1agdot,'Xdata',t(end),'YData',0);
+                end
+        end
+        
+        
         
         %Error Monitors
         set(handles.Plots.EM1eplot,'Xdata',t,'YData',error(1,:));
@@ -50,8 +62,22 @@ switch Type
         set(handles.Plots.SO2ffdot,'Xdata',Pr(1,end),'YData',Pr(2,end));
         
         %Routine for tracing ag plots
-        set(handles.Plots.SO1agdot,'Xdata',t(end),'YData',ag(1));
-        set(handles.Plots.SO2agdot,'Xdata',t(end),'YData',ag(1));
+        switch handles.GM.loadType
+            case 'Ground Motions'
+                set(handles.Plots.SO1agdot,'Xdata',t(end),'YData',ag(1));
+                set(handles.Plots.SO2agdot,'Xdata',t(end),'YData',ag(1));
+            case 'Initial Conditions'
+                if t(end) <= handles.GM.rampTime
+                    y1 = U(1,:);
+                    y2 = U(2,:);
+                    set(handles.Plots.SO1agdot,'Xdata',t(end),'YData',y1(end)/handles.GM.initialDisp(1)*100);
+                    set(handles.Plots.SO2agdot,'Xdata',t(end),'YData',y2(end)/handles.GM.initialDisp(2)*100);
+                else
+                    set(handles.Plots.SO1agdot,'Xdata',t(end),'YData',0);
+                    set(handles.Plots.SO2agdot,'Xdata',t(end),'YData',0);
+                end
+        end
+        
 
         %Calculate TI for second DOF
         TI(2,:) = 0.5*(cumtrapz(U(2,:),Um(2,:)) - cumtrapz(Um(2,:),U(2,:)));
@@ -89,8 +115,22 @@ switch Type
         set(handles.Plots.SO2ffdot,'Xdata',Pr(1,end),'YData',Pr(2,end));
         
         %Routine for tracing ag plots
-        set(handles.Plots.SO1agdot,'Xdata',t(end),'YData',ag(1));
-        set(handles.Plots.SO2agdot,'Xdata',t(end),'YData',ag(2));
+        switch handles.GM.loadType
+            case 'Ground Motions'
+                set(handles.Plots.SO1agdot,'Xdata',t(end),'YData',ag(1));
+                set(handles.Plots.SO2agdot,'Xdata',t(end),'YData',ag(2));
+            case 'Initial Conditions'
+                if t(end) <= handles.GM.rampTime
+                    y1 = U(1,:);
+                    y2 = U(2,:);
+                    set(handles.Plots.SO1agdot,'Xdata',t(end),'YData',y1(end)/handles.GM.initialDisp(1)*100);
+                    set(handles.Plots.SO2agdot,'Xdata',t(end),'YData',y2(end)/handles.GM.initialDisp(2)*100);
+                else
+                    set(handles.Plots.SO1agdot,'Xdata',t(end),'YData',0);
+                    set(handles.Plots.SO2agdot,'Xdata',t(end),'YData',0);
+                end
+        end
+        
         
         %Calculate TI for second DOF
         TI(2,:) = 0.5*(cumtrapz(U(2,:),Um(2,:)) - cumtrapz(Um(2,:),U(2,:)));
