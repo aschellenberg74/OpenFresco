@@ -37,7 +37,7 @@ expSite ShadowSite 1 "127.0.0.1" 8091
 # ---------------------------
 # left column
 # expElement twoNodeLink $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-orient <$x1 $x2 $x3> $y1 $y2 $y3> <-pDelta Mratios> <-iMod> <-mass $m>
-expElement twoNodeLink 1 1 3 -dir 2 -site 1 -initStif 2.8 -orient -1 0 0
+expElement twoNodeLink 1 1 3 -dir 2 -site 1 -initStif 2.8
 # ------------------------------
 # End of model generation
 # ------------------------------

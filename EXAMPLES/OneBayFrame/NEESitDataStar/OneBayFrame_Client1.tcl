@@ -51,7 +51,7 @@ if {$pid == 0}  {
     # ----------------------------
     # left column
     # expElement twoNodeLink $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-orient <$x1 $x2 $x3> $y1 $y2 $y3> <-pDelta Mratios> <-iMod> <-mass $m>
-    expElement twoNodeLink 1 1 3 -dir 2 -site 1 -initStif 2.8 -orient -1 0 0
+    expElement twoNodeLink 1 1 3 -dir 2 -site 1 -initStif 2.8
 
     # Define numerical elements
     # -------------------------
@@ -89,11 +89,11 @@ if {$pid == 0}  {
 # set time series to be passed to uniform excitation
 set dt 0.02
 set scale 1.0
-set accelSeries "Path -filePath elcentro.txt -dt $dt -factor [expr 386.1*$scale]"
+timeSeries Path 1 -filePath elcentro.txt -dt $dt -factor [expr 386.1*$scale]
 
 # create UniformExcitation load pattern
-# pattern UniformExcitation $tag $dir
-pattern UniformExcitation  1 1 -accel $accelSeries
+# pattern UniformExcitation $tag $dir -accel $tsTag <-vel0 $vel0>
+pattern UniformExcitation 1 1 -accel 1
 
 # calculate the rayleigh damping factors for nodes & elements
 set alphaM     1.010017396536;  # D = alphaM*M
@@ -102,7 +102,7 @@ set betaKinit  0.0;             # D = beatKinit*Kinit
 set betaKcomm  0.0;             # D = betaKcomm*KlastCommit
 
 # set the rayleigh damping
-rayleigh $alphaM $betaK $betaKinit $betaKcomm;
+rayleigh $alphaM $betaK $betaKinit $betaKcomm
 # ------------------------------
 # End of model generation
 # ------------------------------

@@ -82,11 +82,11 @@ expElement twoNodeLink 2 2 3 -dir 1 -site 1 -initStif $E2 -orient 1 0 0 0 1 0
 # set time series to be passed to uniform excitation
 set dt 0.02
 set scale 0.01
-set accelSeries "Path -filePath elc.dat -dt $dt -factor [expr 1*$scale]"
+timeSeries Path 1 -filePath elc.dat -dt $dt -factor [expr 1.0*$scale]
 
 # create UniformExcitation load pattern
-# pattern UniformExcitation $tag $dir 
-pattern UniformExcitation  1 1 -accel $accelSeries
+# pattern UniformExcitation $tag $dir -accel $tsTag <-vel0 $vel0>
+pattern UniformExcitation 1 1 -accel 1
 
 # calculate the rayleigh damping factors for nodes & elements
 set alphaM     0.0;       # D = alphaM*M
@@ -95,7 +95,7 @@ set betaKinit  0.004751;  # D = beatKinit*Kinit
 set betaKcomm  0.0;       # D = betaKcomm*KlastCommit
 
 # set the rayleigh damping 
-#rayleigh $alphaM $betaK $betaKinit $betaKcomm;
+#rayleigh $alphaM $betaK $betaKinit $betaKcomm
 # ------------------------------
 # End of model generation
 # ------------------------------

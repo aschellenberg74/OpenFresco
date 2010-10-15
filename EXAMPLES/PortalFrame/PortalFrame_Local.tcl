@@ -160,11 +160,11 @@ if {$withGravity} {
 # set time series to be passed to uniform excitation
 set dt 0.01
 set scale 1.2
-set accelSeries "Path -filePath SACNF01.txt -dt $dt -factor [expr 386.1*$scale]"
+timeSeries Path 1 -filePath SACNF01.txt -dt $dt -factor [expr 386.1*$scale]
 
 # create UniformExcitation load pattern
-# pattern UniformExcitation $tag $dir 
-pattern UniformExcitation  2 1 -accel $accelSeries
+# pattern UniformExcitation $tag $dir -accel $tsTag <-vel0 $vel0>
+pattern UniformExcitation 2 1 -accel 1
 
 # calculate the rayleigh damping factors for nodes & elements
 set alphaM     1.2797;    # D = alphaM*M
@@ -173,7 +173,7 @@ set betaKinit  0.0;       # D = beatKinit*Kinit
 set betaKcomm  0.0;       # D = betaKcomm*KlastCommit
 
 # set the rayleigh damping 
-rayleigh $alphaM $betaK $betaKinit $betaKcomm;
+rayleigh $alphaM $betaK $betaKinit $betaKcomm
 # ------------------------------
 # End of model generation
 # ------------------------------
@@ -256,7 +256,7 @@ set tTot [time {
     for {set i 1} {$i < 2500} {incr i} {
         set t [time {analyze  1  [expr $dt/1.0]}]
         puts $outFileID $t
- 	      #puts "step $i"
+        #puts "step $i"
     }
 }]
 puts "\nElapsed Time = $tTot \n"

@@ -52,7 +52,7 @@ uniaxialMaterial Elastic 3 [expr 2.0*100.0/1.0]
 element adapter 1 -node 4 -dof 1 -stif 1E12 44000
 
 # element twoNodeLink $eleTag $iNode $jNode -mat $matTags -dir $dirs <-orient <$x1 $x2 $x3> $y1 $y2 $y3> <-pDelta $Mratios> <-mass $m>
-element twoNodeLink 2 2 4 -mat 2 -dir 2 -orient -1 0 0
+element twoNodeLink 2 2 4 -mat 2 -dir 2
 
 # element truss $eleTag $iNode $jNode $A $matTag
 #element truss 3 3 4 1.0 3
@@ -62,11 +62,11 @@ element twoNodeLink 2 2 4 -mat 2 -dir 2 -orient -1 0 0
 # set time series to be passed to uniform excitation
 set dt 0.02
 set scale 1.0
-set accelSeries "Path -filePath elcentro.txt -dt $dt -factor [expr 386.1*$scale]"
+timeSeries Path 1 -filePath elcentro.txt -dt $dt -factor [expr 386.1*$scale]
 
 # create UniformExcitation load pattern
-# pattern UniformExcitation $tag $dir 
-pattern UniformExcitation  1 1 -accel $accelSeries
+# pattern UniformExcitation $tag $dir -accel $tsTag <-vel0 $vel0>
+pattern UniformExcitation 1 1 -accel 1
 
 # calculate the rayleigh damping factors for nodes & elements
 set alphaM     1.010017396536;  # D = alphaM*M

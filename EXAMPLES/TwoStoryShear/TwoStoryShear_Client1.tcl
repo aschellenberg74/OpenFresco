@@ -49,25 +49,25 @@ expSite ShadowSite 2 "127.0.0.1" 8091
 # Define elments
 # --------------
 # columns of first story S4x7.7
-# expElement twoNodeLink $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-orient <$x1 $x2 $x3> $y1 $y2 $y3> <-iMod> <-mass $m>
-expElement twoNodeLink 1 1 2 -dir 1 2 -site 1 -initStif 1213 0 0 2.8 -orient -1 0 0
+# expElement twoNodeLink $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-orient <$x1 $x2 $x3> $y1 $y2 $y3> <-pDelta Mratios> <-iMod> <-mass $m>
+expElement twoNodeLink 1 1 2 -dir 1 2 -site 1 -initStif 1213 0 0 2.8
 # columns of second story S4x7.7                                  
-expElement twoNodeLink 2 2 3 -dir 1 2 -site 2 -initStif 1213 0 0 2.8 -orient -1 0 0
+expElement twoNodeLink 2 2 3 -dir 1 2 -site 2 -initStif 1213 0 0 2.8
 
 # Define dynamic loads
 # --------------------
 # set time series to be passed to uniform excitation
 set dt 0.01
 #set scale 1.0
-#set accelSeries "Path -filePath CosinePulse.txt -dt $dt -factor [expr 386.1*$scale]"
+#timeSeries Path 1 -filePath CosinePulse.txt -dt $dt -factor [expr 386.1*$scale]
 #set scale 1.0
-#set accelSeries "Path -filePath SACNF01.txt -dt $dt -factor [expr 386.1*$scale]"
+#timeSeries Path 1 -filePath SACNF01.txt -dt $dt -factor [expr 386.1*$scale]
 set scale 2.0
-set accelSeries "Path -filePath ELC270.txt -dt $dt -factor [expr 386.1*$scale]"
+timeSeries Path 1 -filePath ELC270.txt -dt $dt -factor [expr 386.1*$scale]
 
 # create UniformExcitation load pattern
-# pattern UniformExcitation $tag $dir 
-pattern UniformExcitation  1 1 -accel $accelSeries
+# pattern UniformExcitation $tag $dir -accel $tsTag <-vel0 $vel0>
+pattern UniformExcitation 1 1 -accel 1
 
 # calculate the rayleigh damping factors for nodes & elements
 set alphaM     0.0;       # D = alphaM*M
