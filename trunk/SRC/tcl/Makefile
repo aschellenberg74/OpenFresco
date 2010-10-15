@@ -32,6 +32,7 @@ EXPERIMENTALTEST_OBJS = $(OPENFRESCO)/utility/ExperimentalCP.o \
 	   $(OPENFRESCO)/experimentalControl/ECSimUniaxialMaterials.o \
 	   $(OPENFRESCO)/experimentalControl/ECSimDomain.o \
 	   $(OPENFRESCO)/experimentalControl/ECSimFEAdapter.o \
+	   $(OPENFRESCO)/experimentalControl/ECSimSimulink.o \
 	   $(OPENFRESCO)/experimentalSignalFilter/ESFErrorSimRandomGauss.o \
 	   $(OPENFRESCO)/experimentalSignalFilter/ESFErrorSimulation.o \
 	   $(OPENFRESCO)/experimentalSignalFilter/ESFErrorSimUndershoot.o \
@@ -44,30 +45,29 @@ EXPERIMENTALTEST_OBJS = $(OPENFRESCO)/utility/ExperimentalCP.o \
 	   $(OPENFRESCO)/experimentalRecorder/response/ExpSetupResponse.o \
 	   $(OPENFRESCO)/experimentalRecorder/response/ExpSignalFilterResponse.o \
 	   $(OPENFRESCO)/experimentalRecorder/response/ExpSiteResponse.o
-	   #$(OPENFRESCO)/experimentalControl/ECSCRAMNet.o
 
 OPENFRESCO_TCLFILES = \
 	$(OPENFRESCO)/utility/TclExpCPCommand.o \
 	$(OPENFRESCO)/experimentalElement/TclEEBeamColumnCommand.o \
 	$(OPENFRESCO)/experimentalElement/TclEEGenericCommand.o \
-	$(OPENFRESCO)/experimentalElement/TclEETrussCommand.o \
-	$(OPENFRESCO)/experimentalElement/TclExpElementCommands.o \
 	$(OPENFRESCO)/experimentalElement/TclEEInvertedVBraceCommand.o \
+	$(OPENFRESCO)/experimentalElement/TclEETrussCommand.o \
 	$(OPENFRESCO)/experimentalElement/TclEETwoNodeLinkCommand.o \
-	$(OPENFRESCO)/experimentalControl/TclExpControlCommand.o \
+	$(OPENFRESCO)/experimentalElement/TclExpElementCommands.o \
 	$(OPENFRESCO)/experimentalSite/TclExpSiteCommand.o \
-	$(OPENFRESCO)/experimentalSignalFilter/TclExpSignalFilterCommand.o \
 	$(OPENFRESCO)/experimentalSetup/TclExpSetupCommand.o \
+	$(OPENFRESCO)/experimentalControl/TclExpControlCommand.o \
+	$(OPENFRESCO)/experimentalSignalFilter/TclExpSignalFilterCommand.o \
 	$(OPENFRESCO)/experimentalRecorder/TclExpRecorderCommands.o \
 	$(FE)/tcl/TclFeViewer.o
 
 
 all: $(OBJS) $(DYLIBOBJS)
 	@$(CD) $(OPENFRESCO)/utility; $(MAKE) tcl;
+	@$(CD) $(OPENFRESCO)/experimentalElement; $(MAKE) tcl;
 	@$(CD) $(OPENFRESCO)/experimentalSetup; $(MAKE) tcl;
 	@$(CD) $(OPENFRESCO)/experimentalSite; $(MAKE) tcl;
 	@$(CD) $(OPENFRESCO)/experimentalControl; $(MAKE) tcl;
-	@$(CD) $(OPENFRESCO)/experimentalElement; $(MAKE) tcl;
 	@$(CD) $(OPENFRESCO)/experimentalSignalFilter; $(MAKE) tcl;
 	@$(CD) $(OPENFRESCO)/experimentalRecorder; $(MAKE) tcl;
 	echo $(TCL_LIBRARY)
