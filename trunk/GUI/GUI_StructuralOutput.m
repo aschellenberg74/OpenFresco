@@ -55,9 +55,9 @@ File(3) = uimenu(File(1),'Position',2,'Label','Print        Ctrl+P','Callback','
 Separator(1) = uimenu('Position',2,'Label','|');
 StdMenu(1) = uimenu('Position',3,'Label','MATLAB Menu');
 StdMenu(2) = uimenu(StdMenu(1),'Position',1,'Label','Turn on', ...
-   'Callback','set(gcf,''MenuBar'',''figure'');');
+   'Callback','set(gcf,''MenuBar'',''figure''); set(gcf,''Toolbar'',''figure'');');
 StdMenu(3) = uimenu(StdMenu(1),'Position',2,'Label','Turn off', ...
-   'Callback','set(gcf,''MenuBar'',''none'');');
+   'Callback','set(gcf,''MenuBar'',''none''); set(gcf,''Toolbar'',''none'');');
 % =========================================================================
 
 %Title
@@ -159,9 +159,9 @@ if ~strcmp(handles.Model.Type, '1 DOF')
     Separator(1) = uimenu('Position',2,'Label','|');
     StdMenu(1) = uimenu('Position',3,'Label','MATLAB Menu');
     StdMenu(2) = uimenu(StdMenu(1),'Position',1,'Label','Turn on', ...
-        'Callback','set(gcf,''MenuBar'',''figure'');');
+        'Callback','set(gcf,''MenuBar'',''figure''); set(gcf,''Toolbar'',''figure'');');
     StdMenu(3) = uimenu(StdMenu(1),'Position',2,'Label','Turn off', ...
-        'Callback','set(gcf,''MenuBar'',''none'');');
+        'Callback','set(gcf,''MenuBar'',''none''); set(gcf,''Toolbar'',''none'');');
     
     %Title
     uicontrol(f_StructOut2,'Style','text',...
