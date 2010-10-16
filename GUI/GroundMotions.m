@@ -55,6 +55,8 @@ switch action
 %                         msgbox(sprintf('Specify two values for each field;\none for each DOF.'));
                 end
                 handles.GM.loadType = 'Initial Conditions';
+                handles.GM.dtAnalysis = 0.005;
+                set(handles.Analysis(3),'String',num2str(handles.GM.dtAnalysis));
                 set(handles.GroundMotions(19),'Value',0,'CData',handles.Store.GM0);
                 set(handles.GroundMotions(20),'Value',1,'CData',handles.Store.IC1);
                 set(handles.GroundMotions(2:17),'Visible','off');

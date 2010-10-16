@@ -148,7 +148,7 @@ switch action
                         if exist('OpenFrescoPath.txt','file')==0
                             fprintf(1,'Using GUI-internal OpenFresco executable.\n');
                             pathOPF = which('Pnpscr.dll');
-                            pathOPF = pathOPF(1:end-15);
+                            pathOPF = pathOPF(1:end-11);
                         else
                             fprintf(1,'Using user-specified OpenFresco executable.\n');
                             FID = fopen(fullfile(DIR,'OpenFrescoPath.txt'),'r');
