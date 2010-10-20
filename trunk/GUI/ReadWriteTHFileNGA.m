@@ -61,6 +61,9 @@ switch action
    case 'readDT'
       if strcmp(handles.GM.databaseType, 'Unknown')
           answer = inputdlg(['Unrecognized time history database'; 'Please enter dt manually          '],'Input dt');
+          while isempty(answer) || strcmp(answer, '')
+              answer = inputdlg(['Unrecognized time history database'; 'Please enter dt manually          '],'Input dt');
+          end
           dt = str2num(answer{1});
       else
           fin = fopen(fileIN,'r');
@@ -95,7 +98,7 @@ switch action
           end
       end
       fclose(fin);
-      varargout = {dt};
+      varargout = {dt handles.GM.databaseType};
    %=========================================================================
    case 'readTHF'
       fin  = fopen(fileIN,'r');
