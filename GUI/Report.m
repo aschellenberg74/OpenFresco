@@ -331,7 +331,7 @@ switch handles.Model.Type
                 fprintf(FID,'Amplitude Scale Factor: %1.4f\n',handles.GM.AmpFact(2));
                 fprintf(FID,'Time Scale Factor: %1.4f\n\n',handles.GM.TimeFact(2));
             case 'Initial Conditions'
-                fprintf(FID,'Initial Displacement: %1.4f %1.4f\n',handles.GM.initialDisp(1), handles.GM.initialDisp(2));
+                fprintf(FID,'Initial Displacement [L]: %1.4f %1.4f\n',handles.GM.initialDisp(1), handles.GM.initialDisp(2));
                 fprintf(FID,'Ramp Time [sec]: %1.4f\n',handles.GM.rampTime);
                 fprintf(FID,'Vibration Time [sec]: %1.4f\n\n',handles.GM.vibTime);
         end

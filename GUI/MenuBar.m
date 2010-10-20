@@ -122,6 +122,13 @@ switch action
                             set(handles.GroundMotions(3),'String',handles.GM.store.filepath{1},'TooltipString',handles.GM.store.filepath{1});
                             set(handles.GroundMotions(4),'String',num2str(handles.GM.AmpFact(1)));
                             set(handles.GroundMotions(5),'String',num2str(handles.GM.TimeFact(1)));
+                            
+                            if strcmp(handles.GM.databaseType,'Unknown')
+                                set(handles.GroundMotions(28),'String',handles.GM.dt(1),'Style','edit','BackgroundColor',[1 1 1]);
+                            else
+                                set(handles.GroundMotions(28),'String',handles.GM.dt(1),'Style','text','BackgroundColor',[0.941176 0.941176 0.941176]);
+                            end
+                            
                             %Store analysis dt
                             handles.GM.dtAnalysis = min(handles.GM.dt);
                             set(handles.Analysis(3),'String',num2str(handles.GM.dtAnalysis));
@@ -344,6 +351,13 @@ switch action
                             set(handles.GroundMotions(3),'String',handles.GM.store.filepath{1},'TooltipString',handles.GM.store.filepath{1});
                             set(handles.GroundMotions(4),'String',num2str(handles.GM.AmpFact(1)));
                             set(handles.GroundMotions(5),'String',num2str(handles.GM.TimeFact(1)));
+                            
+                            if strcmp(handles.GM.databaseType,'Unknown')
+                                set(handles.GroundMotions(28),'String',handles.GM.dt(1),'Style','edit','BackgroundColor',[1 1 1]);
+                            else
+                                set(handles.GroundMotions(28),'String',handles.GM.dt(1),'Style','text','BackgroundColor',[0.941176 0.941176 0.941176]);
+                            end
+                            
                             %Store analysis dt
                             handles.GM.dtAnalysis = min(handles.GM.dt);
                             set(handles.Analysis(3),'String',num2str(handles.GM.dtAnalysis));
@@ -564,6 +578,13 @@ switch action
                             set(handles.GroundMotions(3),'String',handles.GM.store.filepath{1},'TooltipString',handles.GM.store.filepath{1});
                             set(handles.GroundMotions(4),'String',num2str(handles.GM.AmpFact(1)));
                             set(handles.GroundMotions(5),'String',num2str(handles.GM.TimeFact(1)));
+                            
+                            if strcmp(handles.GM.databaseType,'Unknown')
+                                set(handles.GroundMotions(28),'String',handles.GM.dt(1),'Style','edit','BackgroundColor',[1 1 1]);
+                            else
+                                set(handles.GroundMotions(28),'String',handles.GM.dt(1),'Style','text','BackgroundColor',[0.941176 0.941176 0.941176]);
+                            end
+                            
                             %Store analysis dt
                             handles.GM.dtAnalysis = min(handles.GM.dt);
                             set(handles.Analysis(3),'String',num2str(handles.GM.dtAnalysis));
@@ -575,6 +596,13 @@ switch action
                             set(handles.GroundMotions(11),'String',handles.GM.store.filepath{2},'TooltipString',handles.GM.store.filepath{2});
                             set(handles.GroundMotions(12),'String',num2str(handles.GM.AmpFact(1)));
                             set(handles.GroundMotions(13),'String',num2str(handles.GM.TimeFact(1)));
+                            
+                            if strcmp(handles.GM.databaseType,'Unknown')
+                                set(handles.GroundMotions(29),'String',handles.GM.dt(2),'Style','edit','BackgroundColor',[1 1 1]);
+                            else
+                                set(handles.GroundMotions(29),'String',handles.GM.dt(2),'Style','text','BackgroundColor',[0.941176 0.941176 0.941176]);
+                            end
+                            
                         end
                     case 'Initial Conditions'
                         set(handles.GroundMotions(19),'Value',0,'CData',handles.Store.GM0);

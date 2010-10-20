@@ -10,6 +10,28 @@ if isempty(handles.Model.Type)
     message = sprintf('Writing of the .tcl file failed!\nModel type not specified.');
     return
 else
+    switch handles.GM.loadType
+        case 'Ground Motions'
+            if handles.GM.ag{1} == 0
+                error = 1;
+                message = sprintf('Writing of the .tcl file failed!\nNo ground motion loaded.');
+                return
+            end
+            if strcmp(handles.Model.Type, '2 DOF B')
+                s = size(handles.GM.ag);
+                if s(2) ~= 2
+                    error = 1;
+                    message = sprintf('Writing of the .tcl file failed!\nGround motion data missing.');
+                    return
+                end
+            end
+        case 'Initial Conditions'
+            if isempty(handles.GM.initialDisp) || isempty(handles.GM.rampTime) || isempty(handles.GM.vibTime)
+                error = 1;
+                message = sprintf('Writing of the .tcl file failed!\nIncomplete free vibration parameters.');
+                return
+            end
+    end
     switch handles.Model.Type
         %%%%%%%%%%%%
         %1 DOF Case%
