@@ -1210,14 +1210,14 @@ ExpControl(5) = uipanel('Parent',ph_Main,...
                     'BackgroundColor',[1 1 1],...
                     'Position',[0.31 0.11 0.4 0.13],...
                     'Callback','ExpControl(''R0'')');
-                GMP_help = uicontrol(ExpControl(20),'Style','pushbutton',...
-                    'Units','normalized',...
-                    'FontSize',10,...
-                    'Tag','GMP_help',...
-                    'ToolTipString',sprintf('The variable R0 controls the elastic-plastic transition\nRecommended values range between 10 and 20'),...
-                    'Position',[0.75 0.11 0.032 0.097],...
-                    'CData',Question1,...
-                    'Callback',@helpCallback);
+%                 GMP_help = uicontrol(ExpControl(20),'Style','pushbutton',...
+%                     'Units','normalized',...
+%                     'FontSize',10,...
+%                     'Tag','GMP_help',...
+%                     'ToolTipString',sprintf('The variable R0 controls the elastic-plastic transition\nRecommended values range between 10 and 20'),...
+%                     'Position',[0.75 0.11 0.032 0.097],...
+%                     'CData',Question1,...
+%                     'Callback',@helpCallback);
                 Steel02Help = uicontrol(ExpControl(20),'Style','pushbutton',...
                     'Units','normalized',...
                     'FontSize',10,...
@@ -2235,6 +2235,12 @@ guidata(gcf,handles);
         Page_selection = get(get(source,'SelectedObject'),'Tag');
         switch Page_selection;
             case 'Structure'
+                if handles.Model.StopFlag == 1
+                    msgbox(sprintf('Experiment has ended!\nChoose run new test to make changes'),'Error','error');
+                    set(handles.Sidebar(7),'Value',0);
+                    set(handles.Sidebar(11),'Value',1);
+                    return
+                end
                 set(handles.Sidebar(7),'CData',handles.Store.Structure1);
                 set(handles.Sidebar(8),'CData',handles.Store.Loading0);
                 set(handles.Sidebar(9),'CData',handles.Store.ExpSetup0);
@@ -2269,6 +2275,12 @@ guidata(gcf,handles);
                 end
                 
             case 'Loading'
+                if handles.Model.StopFlag == 1
+                    msgbox(sprintf('Experiment has ended!\nChoose run new test to make changes'),'Error','error');
+                    set(handles.Sidebar(8),'Value',0);
+                    set(handles.Sidebar(11),'Value',1);
+                    return
+                end
                 set(handles.Sidebar(7),'CData',handles.Store.Structure0);
                 set(handles.Sidebar(8),'CData',handles.Store.Loading1);
                 set(handles.Sidebar(9),'CData',handles.Store.ExpSetup0);
@@ -2379,6 +2391,12 @@ guidata(gcf,handles);
                         
                 
             case 'Experimental Setup'
+                if handles.Model.StopFlag == 1
+                    msgbox(sprintf('Experiment has ended!\nChoose run new test to make changes'),'Error','error');
+                    set(handles.Sidebar(9),'Value',0);
+                    set(handles.Sidebar(11),'Value',1);
+                    return
+                end
                 set(handles.Sidebar(7),'CData',handles.Store.Structure0);
                 set(handles.Sidebar(8),'CData',handles.Store.Loading0);
                 set(handles.Sidebar(9),'CData',handles.Store.ExpSetup1);
@@ -2413,6 +2431,12 @@ guidata(gcf,handles);
                 end
                 
             case 'Experimental Control'
+                if handles.Model.StopFlag == 1
+                    msgbox(sprintf('Experiment has ended!\nChoose run new test to make changes'),'Error','error');
+                    set(handles.Sidebar(10),'Value',0);
+                    set(handles.Sidebar(11),'Value',1);
+                    return
+                end
                 set(handles.Sidebar(7),'CData',handles.Store.Structure0);
                 set(handles.Sidebar(8),'CData',handles.Store.Loading0);
                 set(handles.Sidebar(9),'CData',handles.Store.ExpSetup0);
