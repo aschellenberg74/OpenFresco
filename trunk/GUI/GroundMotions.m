@@ -304,10 +304,10 @@ switch action
                 handles.GM.scaleag{2} = handles.GM.AmpFact(2).*handles.GM.ag{2};
                 
                 %Calculate spectral response quantities and plot
-               handles.GM.Spectra{2} = ResponseSpectraElastic(handles.GM.scaleag{2},handles.GM.scaledt(2),m,handles.Model.Zeta,minT,maxT,numTvalues);
-               plot(handles.GroundMotions(15), handles.GM.scalet{2}, handles.GM.scaleag{2});
-               plot(handles.GroundMotions(16), handles.GM.Spectra{2}.T, handles.GM.Spectra{2}.psdAcc);
-               plot(handles.GroundMotions(17), handles.GM.Spectra{2}.T, handles.GM.Spectra{2}.dsp);
+                handles.GM.Spectra{2} = ResponseSpectraElastic(handles.GM.scaleag{2},handles.GM.scaledt(2),m,handles.Model.Zeta,minT,maxT,numTvalues);
+                plot(handles.GroundMotions(15), handles.GM.scalet{2}, handles.GM.scaleag{2});
+                plot(handles.GroundMotions(16), handles.GM.Spectra{2}.T, handles.GM.Spectra{2}.psdAcc);
+                plot(handles.GroundMotions(17), handles.GM.Spectra{2}.T, handles.GM.Spectra{2}.dsp);
                 
                 %Store analysis dt
                 handles.GM.dtAnalysis = min(handles.GM.dt);
@@ -317,6 +317,17 @@ switch action
         
 
     case 'scale'
+        if strcmp(GM_direction,'Direction 1')
+            if length(handles.GM.t{1}) == 1
+                msgbox('Please load a ground motion first!','Error','error');
+                return
+            end
+        elseif strcmp(GM_direction,'Direction 2')
+            if length(handles.GM.t) == 1
+                msgbox('Please load a ground motion first!','Error','error');
+                return
+            end
+        end
         cbo_tag = get(gcbo,'Tag');
         switch cbo_tag
             case 'edit_amp1'

@@ -14,7 +14,7 @@ switch action
     %Switch panel display based on tab selection
         switch Tab_Selection
             case 'Control Point'
-                msgbox('Control points only need to be defined when using LabView Controller','Control Point','warn');
+%                 msgbox('Control points only need to be defined when using LabView Controller','Control Point','warn');
                 set(handles.EC(2),'CData',handles.Store.CP1);
                 set(handles.EC(3),'Value',0,'CData',handles.Store.Sim0);
                 set(handles.EC(4),'Value',0,'CData',handles.Store.Real0);
@@ -241,8 +241,10 @@ switch action
         switch control_selection
             case 2
             %LabVIEW
+            msgbox('When using LabView controller, control points need to be defined','Control Point','warn');
                 handles.ExpControl.RealControl.Controller = 'LabVIEW';
                 handles.ExpControl.store.RealActive = (25:33);
+                set(handles.EC(2),'Visible','on');
                 set(handles.EC(25:52),'Visible','off');
                 set(handles.EC(handles.ExpControl.store.RealActive),'Visible','on');
                 set(handles.EC(29),'String',handles.ExpControl.RealControl.ipAddr);
@@ -252,24 +254,28 @@ switch action
             %MTSCsi
                 handles.ExpControl.RealControl.Controller = 'MTSCsi';
                 handles.ExpControl.store.RealActive = [25:27 34:38];
+                set(handles.EC(2),'Visible','off');
                 set(handles.EC(25:52),'Visible','off');
                 set(handles.EC(handles.ExpControl.store.RealActive),'Visible','on');
             case 4
             %SCRAMNet
                 handles.ExpControl.RealControl.Controller = 'SCRAMNet';
                 handles.ExpControl.store.RealActive = [25:27 39:41];
+                set(handles.EC(2),'Visible','off');
                 set(handles.EC(25:52),'Visible','off');
                 set(handles.EC(handles.ExpControl.store.RealActive),'Visible','on');
             case 5
             %dSpace
                 handles.ExpControl.RealControl.Controller = 'dSpace';
                 handles.ExpControl.store.RealActive = [25:27 42:44];
+                set(handles.EC(2),'Visible','off');
                 set(handles.EC(25:52),'Visible','off');
                 set(handles.EC(handles.ExpControl.store.RealActive),'Visible','on');
             case 6
             %xPCtarget
                 handles.ExpControl.RealControl.Controller = 'xPCtarget';
                 handles.ExpControl.store.RealActive = [25:27 45:52];
+                set(handles.EC(2),'Visible','off');
                 set(handles.EC(25:52),'Visible','off');
                 set(handles.EC(handles.ExpControl.store.RealActive),'Visible','on');
                 handles.ExpControl.RealControl.ipPort = get(handles.EC(49),'String');
