@@ -325,10 +325,11 @@ switch action
                 
                 %Update Structure strings
                 set(handles.Structure(4),'Value',1);
-                m = num2str(handles.Model.M);
-                k = num2str(handles.Model.K);
-                set(handles.Structure(15),'String',[m(1,:) ';' m(2,:)]);
-                set(handles.Structure(17),'String',[k(1,:) ';' k(2,:)])
+                k1 = handles.Model.K(1,1) - handles.Model.K(2,2);
+                set(handles.Structure(15),'String',num2str(handles.Model.M(1,1)));
+                set(handles.Structure(31),'String',num2str(handles.Model.M(2,2)));
+                set(handles.Structure(17),'String',num2str(k1));
+                set(handles.Structure(32),'String',num2str(handles.Model.K(2,2)));
                 set(handles.Structure(19),'String',sprintf(['Period:    ' num2str(handles.Model.T')]));
                 switch handles.Model.DampType
                     case 'Stiffness Proportional'
@@ -550,10 +551,10 @@ switch action
                 
                 %Update Structure strings
                 set(handles.Structure(5),'Value',1);
-                m = num2str(handles.Model.M);
-                k = num2str(handles.Model.K);
-                set(handles.Structure(23),'String',[m(1,:) ';' m(2,:)]);
-                set(handles.Structure(25),'String',[k(1,:) ';' k(2,:)])
+                set(handles.Structure(23),'String',num2str(handles.Model.M(1,1)));
+                set(handles.Structure(33),'String',num2str(handles.Model.M(2,2)));
+                set(handles.Structure(25),'String',num2str(handles.Model.K(1,1)));
+                set(handles.Structure(34),'String',num2str(handles.Model.K(2,2)));
                 set(handles.Structure(27),'String',sprintf(['Period:    ' num2str(handles.Model.T')]));
                 switch handles.Model.DampType
                     case 'Stiffness Proportional'
