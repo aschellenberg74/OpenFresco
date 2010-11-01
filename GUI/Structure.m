@@ -32,7 +32,7 @@ switch action
             set(handles.Structure([10 18 26]),'Visible','off');
             
             handles.Model.StructActive = [3 6:13];
-            handles.Model.StructInactive = [4 5 14:29];
+            handles.Model.StructInactive = [4 5 14:29 31:34];
             %Adjust colors to emphasize active/inactive fields
             set(handles.Structure(3),'CData',handles.Store.Model1A1);
             set(handles.Structure(4),'CData',handles.Store.Model2A0);
@@ -41,13 +41,13 @@ switch action
             set(handles.Structure(9),'BackgroundColor',[1 1 1],'Style','edit');
             set(handles.Structure(12),'BackgroundColor',[1 1 1]);
             set(handles.Structure(13),'BackgroundColor',[1 1 1],'Style','edit');
-            set(handles.Structure(15),'BackgroundColor',panelDefault,'Style','text','String','[m1 0; 0 m2]');
-            set(handles.Structure(17),'BackgroundColor',panelDefault,'Style','text','String','[k11 k12; k21 k22]');
+            set(handles.Structure(15),'BackgroundColor',panelDefault,'Style','text');
+            set(handles.Structure(17),'BackgroundColor',panelDefault,'Style','text');
             set(handles.Structure(19),'BackgroundColor',panelDefault,'Style','text','String','Period');
             set(handles.Structure(20),'BackgroundColor',panelDefault);
             set(handles.Structure(21),'BackgroundColor',panelDefault,'Style','text','String','zeta');
-            set(handles.Structure(23),'BackgroundColor',panelDefault,'Style','text','String','[m1 0; 0 m2]');
-            set(handles.Structure(25),'BackgroundColor',panelDefault,'Style','text','String','[k11 k12; k21 k22]');
+            set(handles.Structure(23),'BackgroundColor',panelDefault,'Style','text');
+            set(handles.Structure(25),'BackgroundColor',panelDefault,'Style','text');
             set(handles.Structure(27),'BackgroundColor',panelDefault,'Style','text','String','Period');
             set(handles.Structure(28),'BackgroundColor',panelDefault);
             set(handles.Structure(29),'BackgroundColor',panelDefault,'Style','text','String','zeta');
@@ -155,12 +155,12 @@ switch action
             structTag = findobj('Tag','2 DOF A');
             set(handles.Structure(2),'SelectedObject',structTag(2));
             set(handles.Structure([3 6:13]),'Visible','off');
-            set(handles.Structure([4 14:21]),'Visible','on');
-            set(handles.Structure([5 22:29]),'Visible','off');
+            set(handles.Structure([4 14:21 31 32]),'Visible','on');
+            set(handles.Structure([5 22:29 33 34]),'Visible','off');
             set(handles.Structure([10 18 26]),'Visible','off');
             
-            handles.Model.StructActive = [4 14:21];
-            handles.Model.StructInactive = [3 5 6:13 22:29];
+            handles.Model.StructActive = [4 14:21 31 32];
+            handles.Model.StructInactive = [3 5 6:13 22:29 33 34];
             %Adjust colors to emphasize active/inactive fields
             set(handles.Structure(3),'CData',handles.Store.Model1A0);
             set(handles.Structure(4),'CData',handles.Store.Model2A1);
@@ -171,11 +171,13 @@ switch action
             set(handles.Structure(12),'BackgroundColor',panelDefault);
             set(handles.Structure(13),'BackgroundColor',panelDefault,'Style','text','String','zeta');
             set(handles.Structure(15),'BackgroundColor',[1 1 1],'Style','edit');
+            set(handles.Structure(31),'BackgroundColor',[1 1 1],'Style','edit');
             set(handles.Structure(17),'BackgroundColor',[1 1 1],'Style','edit');
+            set(handles.Structure(32),'BackgroundColor',[1 1 1],'Style','edit');
             set(handles.Structure(20),'BackgroundColor',[1 1 1]);
             set(handles.Structure(21),'BackgroundColor',[1 1 1],'Style','edit');
-            set(handles.Structure(23),'BackgroundColor',panelDefault,'Style','text','String','[m1 0; 0 m2]');
-            set(handles.Structure(25),'BackgroundColor',panelDefault,'Style','text','String','[k11 k12; k21 k22]');
+            set(handles.Structure(23),'BackgroundColor',panelDefault,'Style','text');
+            set(handles.Structure(25),'BackgroundColor',panelDefault,'Style','text');
             set(handles.Structure(27),'BackgroundColor',panelDefault,'Style','text','String','Period');
             set(handles.Structure(28),'BackgroundColor',panelDefault);
             set(handles.Structure(29),'BackgroundColor',panelDefault,'Style','text','String','zeta');
@@ -310,12 +312,12 @@ switch action
             structTag = findobj('Tag','2 DOF B');
             set(handles.Structure(2),'SelectedObject',structTag(2));
             set(handles.Structure([3 6:13]),'Visible','off');
-            set(handles.Structure([4 14:21]),'Visible','off');
-            set(handles.Structure([5 22:29]),'Visible','on');
+            set(handles.Structure([4 14:21 31 32]),'Visible','off');
+            set(handles.Structure([5 22:29 33 34]),'Visible','on');
             set(handles.Structure([10 18 26]),'Visible','off');
             
-            handles.Model.StructActive = [5 22:29];
-            handles.Model.StructInactive = [3 4 6:21];
+            handles.Model.StructActive = [5 22:29 33 34];
+            handles.Model.StructInactive = [3 4 6:21 31 32];
             
             %Adjust colors to emphasize active/inactive fields
             set(handles.Structure(3),'CData',handles.Store.Model1A0);
@@ -326,13 +328,15 @@ switch action
             set(handles.Structure(11),'BackgroundColor',panelDefault,'Style','text','String','Period');
             set(handles.Structure(12),'BackgroundColor',panelDefault);
             set(handles.Structure(13),'BackgroundColor',panelDefault,'Style','text','String','zeta');
-            set(handles.Structure(15),'BackgroundColor',panelDefault,'Style','text','String','[m1 0; 0 m2]');
-            set(handles.Structure(17),'BackgroundColor',panelDefault,'Style','text','String','[k11 k12; k21 k22]');
+            set(handles.Structure(15),'BackgroundColor',panelDefault,'Style','text');
+            set(handles.Structure(17),'BackgroundColor',panelDefault,'Style','text');
             set(handles.Structure(19),'BackgroundColor',panelDefault,'Style','text','String','Period');
             set(handles.Structure(20),'BackgroundColor',panelDefault);
             set(handles.Structure(21),'BackgroundColor',panelDefault,'Style','text','String','zeta');
             set(handles.Structure(23),'BackgroundColor',[1 1 1],'Style','edit');
+            set(handles.Structure(33),'BackgroundColor',[1 1 1],'Style','edit');
             set(handles.Structure(25),'BackgroundColor',[1 1 1],'Style','edit');
+            set(handles.Structure(34),'BackgroundColor',[1 1 1],'Style','edit');
             set(handles.Structure(28),'BackgroundColor',[1 1 1]);
             set(handles.Structure(29),'BackgroundColor',[1 1 1],'Style','edit');
             set(dof1_children,'ForegroundColor',inactive_color);
@@ -457,7 +461,7 @@ switch action
         switch DOF_selection;
             case '1 DOF'
                 handles.Model.StructActive = [3 6:13];
-                handles.Model.StructInactive = [4 5 14:29];
+                handles.Model.StructInactive = [4 5 14:29 31:34];
                 %Adjust colors to emphasize active/inactive fields
                 set(handles.Structure(3),'CData',handles.Store.Model1A1);
                 set(handles.Structure(4),'CData',handles.Store.Model2A0);
@@ -466,13 +470,13 @@ switch action
                 set(handles.Structure(9),'BackgroundColor',[1 1 1],'Style','edit');
                 set(handles.Structure(12),'BackgroundColor',[1 1 1]);
                 set(handles.Structure(13),'BackgroundColor',[1 1 1],'Style','edit');
-                set(handles.Structure(15),'BackgroundColor',panelDefault,'Style','text','String','[m1 0; 0 m2]');
-                set(handles.Structure(17),'BackgroundColor',panelDefault,'Style','text','String','[k11 k12; k21 k22]');
+                set(handles.Structure(15),'BackgroundColor',panelDefault,'Style');
+                set(handles.Structure(17),'BackgroundColor',panelDefault,'Style');
                 set(handles.Structure(19),'BackgroundColor',panelDefault,'Style','text','String','Period');                
                 set(handles.Structure(20),'BackgroundColor',panelDefault);
                 set(handles.Structure(21),'BackgroundColor',panelDefault,'Style','text','String','zeta');
-                set(handles.Structure(23),'BackgroundColor',panelDefault,'Style','text','String','[m1 0; 0 m2]');
-                set(handles.Structure(25),'BackgroundColor',panelDefault,'Style','text','String','[k11 k12; k21 k22]');
+                set(handles.Structure(23),'BackgroundColor',panelDefault,'Style');
+                set(handles.Structure(25),'BackgroundColor',panelDefault,'Style');
                 set(handles.Structure(27),'BackgroundColor',panelDefault,'Style','text','String','Period');                
                 set(handles.Structure(28),'BackgroundColor',panelDefault);
                 set(handles.Structure(29),'BackgroundColor',panelDefault,'Style','text','String','zeta');
@@ -574,8 +578,8 @@ switch action
                 set(handles.EC(33),'String',handles.ExpControl.store.CPOptions(2:end));
                 
             case '2 DOF A'
-                handles.Model.StructActive = [4 14:21];
-                handles.Model.StructInactive = [3 5 6:13 22:29];
+                handles.Model.StructActive = [4 14:21 31 32];
+                handles.Model.StructInactive = [3 5 6:13 22:29 33 34];
                 %Adjust colors to emphasize active/inactive fields
                 set(handles.Structure(3),'CData',handles.Store.Model1A0);
                 set(handles.Structure(4),'CData',handles.Store.Model2A1);
@@ -586,11 +590,13 @@ switch action
                 set(handles.Structure(12),'BackgroundColor',panelDefault);
                 set(handles.Structure(13),'BackgroundColor',panelDefault,'Style','text','String','zeta');
                 set(handles.Structure(15),'BackgroundColor',[1 1 1],'Style','edit');
+                set(handles.Structure(31),'BackgroundColor',[1 1 1],'Style','edit');
                 set(handles.Structure(17),'BackgroundColor',[1 1 1],'Style','edit');
+                set(handles.Structure(32),'BackgroundColor',[1 1 1],'Style','edit');
                 set(handles.Structure(20),'BackgroundColor',[1 1 1]);
                 set(handles.Structure(21),'BackgroundColor',[1 1 1],'Style','edit');
-                set(handles.Structure(23),'BackgroundColor',panelDefault,'Style','text','String','[m1 0; 0 m2]');
-                set(handles.Structure(25),'BackgroundColor',panelDefault,'Style','text','String','[k11 k12; k21 k22]');
+                set(handles.Structure(23),'BackgroundColor',panelDefault,'Style','text');
+                set(handles.Structure(25),'BackgroundColor',panelDefault,'Style','text');
                 set(handles.Structure(27),'BackgroundColor',panelDefault,'Style','text','String','Period');                
                 set(handles.Structure(28),'BackgroundColor',panelDefault);
                 set(handles.Structure(29),'BackgroundColor',panelDefault,'Style','text','String','zeta');
@@ -720,8 +726,8 @@ switch action
                 
                 
             case '2 DOF B'
-                handles.Model.StructActive = [5 22:29];
-                handles.Model.StructInactive = [3 4 6:21];
+                handles.Model.StructActive = [5 22:29 33 34];
+                handles.Model.StructInactive = [3 4 6:21 31 32];
                 
                 %Adjust colors to emphasize active/inactive fields
                 set(handles.Structure(3),'CData',handles.Store.Model1A0);
@@ -732,13 +738,15 @@ switch action
                 set(handles.Structure(11),'BackgroundColor',panelDefault,'Style','text','String','Period');                
                 set(handles.Structure(12),'BackgroundColor',panelDefault);
                 set(handles.Structure(13),'BackgroundColor',panelDefault,'Style','text','String','zeta');
-                set(handles.Structure(15),'BackgroundColor',panelDefault,'Style','text','String','[m1 0; 0 m2]');
-                set(handles.Structure(17),'BackgroundColor',panelDefault,'Style','text','String','[k11 k12; k21 k22]');
+                set(handles.Structure(15),'BackgroundColor',panelDefault,'Style','text');
+                set(handles.Structure(17),'BackgroundColor',panelDefault,'Style','text');
                 set(handles.Structure(19),'BackgroundColor',panelDefault,'Style','text','String','Period');                
                 set(handles.Structure(20),'BackgroundColor',panelDefault);
                 set(handles.Structure(21),'BackgroundColor',panelDefault,'Style','text','String','zeta');
                 set(handles.Structure(23),'BackgroundColor',[1 1 1],'Style','edit');
+                set(handles.Structure(33),'BackgroundColor',[1 1 1],'Style','edit');
                 set(handles.Structure(25),'BackgroundColor',[1 1 1],'Style','edit');
+                set(handles.Structure(34),'BackgroundColor',[1 1 1],'Style','edit');
                 set(handles.Structure(28),'BackgroundColor',[1 1 1]);
                 set(handles.Structure(29),'BackgroundColor',[1 1 1],'Style','edit');
                 set(dof1_children,'ForegroundColor',inactive_color);
@@ -849,107 +857,123 @@ switch action
     
     %Store input values
     case 'mass_input'
-        input_val = str2num(get(handles.Structure(handles.Model.Mass_field),'String'));
-        if isempty(input_val)
+        input_val = str2num(get(gcbo,'String'));
+        if isempty(input_val) || length(input_val) ~= 1 || input_val <= 0
             msgbox('Must enter valid mass value(s)','Invalid Input','error');
+            return
         else
-            if strcmp(DOF_selection, '1 DOF')
-                if size(input_val) ~= [1 1]
-                    msgbox('Must enter valid mass value(s)','Invalid Input','error');
-                else
+            switch get(gcbo,'Tag')
+                case 'Mass'
                     handles.Model.M = input_val;
-                    guidata(gcbf, handles);
-                end
-            else
-                if size(input_val) ~= [2 2]
-                    msgbox('Must enter valid mass value(s)','Invalid Input','error');
-                elseif input_val(1,2) ~= 0 || input_val(2,1) ~= 0
-                    msgbox('Mass matrix must be diagonal','Invalid Input','error');
-                else
-                    handles.Model.M = input_val;
-                    guidata(gcbf, handles);
-                end
+                case 'm1A'
+                    handles.Model.M(1,1) = input_val;
+                case 'm2A'
+                    handles.Model.M(2,2) = input_val;
+                case 'm1B'
+                    handles.Model.M(1,1) = input_val;
+                case 'm2B'
+                    handles.Model.M(2,2) = input_val;
             end
+            guidata(gcbf, handles);
         end
         if isempty(handles.Model.K)
             return;
         else
             %Calculate mode shapes and periods
-            if strcmp(handles.Model.Type, '1 DOF')
-                handles.Model.Modes = 1;
-            else
-                [Phi OmegaSq] = eig(handles.Model.K, handles.Model.M);
-                Mode1 = Phi(:,1)./Phi(2,1);
-                Mode2 = Phi(:,2)./Phi(2,2);
-                handles.Model.Modes = [Mode1 Mode2];
-            end
-            handles.Model.Omega = sqrt(eig(handles.Model.K, handles.Model.M));
-            if size(handles.Model.Omega) == [2 1];
-                if handles.Model.Omega(1) < handles.Model.Omega(2)
-                    handles.Model.minTDOF = 2;
+            if ~strcmp(handles.Model.Type, '1 DOF')
+                if length(handles.Model.M) ~= 2 || handles.Model.M(1,1) == 0
+                    return
                 else
-                    handles.Model.minTDOF = 1;
+                    [Phi OmegaSq] = eig(handles.Model.K, handles.Model.M);
+                    Mode1 = Phi(:,1)./Phi(2,1);
+                    Mode2 = Phi(:,2)./Phi(2,2);
+                    handles.Model.Modes = [Mode1 Mode2];
+                    
+                    handles.Model.Omega = sqrt(eig(handles.Model.K, handles.Model.M));
+                    if handles.Model.Omega(1) < handles.Model.Omega(2)
+                        handles.Model.minTDOF = 2;
+                    else
+                        handles.Model.minTDOF = 1;
+                    end
+                    handles.Model.T = 2*pi./(handles.Model.Omega);
+                    set(handles.Structure(handles.Model.Period_field),'String',sprintf(['Period:    ' num2str(handles.Model.T')]));
                 end
             else
+                handles.Model.Modes = 1;
+                
+                handles.Model.Omega = sqrt(eig(handles.Model.K, handles.Model.M));
                 handles.Model.minTDOF = 1;
+                handles.Model.T = 2*pi./(handles.Model.Omega);
+                set(handles.Structure(handles.Model.Period_field),'String',sprintf(['Period:    ' num2str(handles.Model.T')]));
             end
-            handles.Model.T = 2*pi./(handles.Model.Omega);
-            set(handles.Structure(handles.Model.Period_field),'String',sprintf(['Period:    ' num2str(handles.Model.T')]));
+            guidata(gcbf, handles);
         end
 
     case 'stiffness_input'
-        input_val = str2num(get(handles.Structure(handles.Model.Stiffness_field),'String'));
-        if isempty(input_val)
-            msgbox('Must enter valid stiffness value(s)','Invalid Input','error');
+        input_val = str2num(get(gcbo,'String'));
+        if isempty(input_val) || length(input_val) ~= 1 || input_val <= 0
+            msgbox('Must enter valid stiffness value','Invalid Input','error');
+            return
         else
-            if strcmp(DOF_selection, '1 DOF')
-                if size(input_val) ~= [1 1]
-                    msgbox('Must enter valid stiffness value(s)','Invalid Input','error');
-                elseif input_val < 0
-                    msgbox('Must enter valid stiffness value(s)','Invalid Input','error');
-                else
+            switch get(gcbo,'Tag')
+                case 'Stiffness'
                     handles.Model.K = input_val;
-                    handles.Model.Element{1}.kInit = handles.Model.K;
-                    guidata(gcbf, handles);
-                end
-            else
-                if size(input_val) ~= [2 2]
-                    msgbox('Must enter valid stiffness value(s)','Invalid Input','error');
-                elseif input_val(1,2) > 0 | input_val(2,1) > 0
-                    msgbox('Must enter valid stiffness value(s)','Invalid Input','error');
-                elseif input_val(1,2) ~= input_val(2,1)
-                    msgbox('Stiffness matrix must be symmetric','Invalid Input','error');
-                else
-                    handles.Model.K = input_val;
-                    handles.Model.Element{1}.kInit = handles.Model.K;
-                    guidata(gcbf, handles);
-                end
+                case 'k1A'
+                    if length(handles.Model.K) == 2
+                        handles.Model.K(1,1) = handles.Model.K(2,2) + input_val;
+                    else
+                        handles.Model.K(1,1) = input_val;
+                    end
+                case 'k2A'
+                    if isempty(handles.Model.K)
+                        msgbox('Please enter k1 first','Error','error');
+%                         set Structure string to be blank here
+                        return
+                    else
+                    handles.Model.K(1,1) = handles.Model.K(1,1) + input_val;
+                    end
+                    handles.Model.K(1,2) = -input_val;
+                    handles.Model.K(2,1) = -input_val;
+                    handles.Model.K(2,2) = input_val;
+                case 'k1B'
+                    handles.Model.K(1,1) = input_val;
+                case 'k2B'
+                    handles.Model.K(2,2) = input_val;
             end
+            handles.Model.Element{1}.kInit = handles.Model.K;
+            guidata(gcbf, handles);   
         end
+        
         if isempty(handles.Model.M)
             return;
         else
             %Calculate mode shapes and periods
-            if strcmp(handles.Model.Type, '1 DOF')
-                handles.Model.Modes = 1;
-            else
-                [Phi OmegaSq] = eig(handles.Model.K, handles.Model.M);
-                Mode1 = Phi(:,1)./Phi(2,1);
-                Mode2 = Phi(:,2)./Phi(2,2);
-                handles.Model.Modes = [Mode1 Mode2];
-            end
-            handles.Model.Omega = sqrt(eig(handles.Model.K, handles.Model.M));
-            if size(handles.Model.Omega) == [2 1];
-                if handles.Model.Omega(1) < handles.Model.Omega(2)
-                    handles.Model.minTDOF = 2;
+            if ~strcmp(handles.Model.Type, '1 DOF')
+                if length(handles.Model.K) ~= 2 || handles.Model.K(1,1) == 0
+                    return
                 else
-                    handles.Model.minTDOF = 1;
+                    [Phi OmegaSq] = eig(handles.Model.K, handles.Model.M);
+                    Mode1 = Phi(:,1)./Phi(2,1);
+                    Mode2 = Phi(:,2)./Phi(2,2);
+                    handles.Model.Modes = [Mode1 Mode2];
+                    
+                    handles.Model.Omega = sqrt(eig(handles.Model.K, handles.Model.M));
+                    if handles.Model.Omega(1) < handles.Model.Omega(2)
+                        handles.Model.minTDOF = 2;
+                    else
+                        handles.Model.minTDOF = 1;
+                    end
+                    handles.Model.T = 2*pi./(handles.Model.Omega);
+                    set(handles.Structure(handles.Model.Period_field),'String',sprintf(['Period:    ' num2str(handles.Model.T')]));
                 end
             else
+                handles.Model.Modes = 1;
+                handles.Model.Omega = sqrt(eig(handles.Model.K, handles.Model.M));
                 handles.Model.minTDOF = 1;
+                handles.Model.T = 2*pi./(handles.Model.Omega);
+                set(handles.Structure(handles.Model.Period_field),'String',sprintf(['Period:    ' num2str(handles.Model.T')]));
             end
-            handles.Model.T = 2*pi./(handles.Model.Omega);
-            set(handles.Structure(handles.Model.Period_field),'String',sprintf(['Period:    ' num2str(handles.Model.T')]));
+            
         end
         guidata(gcbf, handles);
         
