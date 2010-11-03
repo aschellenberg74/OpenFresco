@@ -22,6 +22,16 @@ switch action
             case 'Steel02Help'
                 web('http://opensees.berkeley.edu/wiki/index.php/Steel02_Material_--_Giuffr%C3%A9-Menegotto-Pinto_Model_with_Isotropic_Strain_Hardening', '-browser');
         end
+    case 'GM'
+        GMchoice = questdlg(sprintf('You can find ground motions from PEER or\nCESMD by following the links below or you\ncan upload your own file.\nNote that unrecognized formats require the\ntime step to be input manually.'),...
+            'Ground Motions','PEER','CESMD','OK','OK');
+        switch GMchoice
+            case 'PEER'
+                web('http://peer.berkeley.edu/nga/', '-browser');
+            case 'CESMD'
+                web('http://www.strongmotioncenter.org/', '-browser');
+            case 'OK'
+        end
 end
 
 

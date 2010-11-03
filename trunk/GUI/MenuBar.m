@@ -303,7 +303,9 @@ switch action
                 set(handles.Structure(12),'BackgroundColor',panelDefault);
                 set(handles.Structure(13),'BackgroundColor',panelDefault,'Style','text','String','zeta');
                 set(handles.Structure(15),'BackgroundColor',[1 1 1],'Style','edit');
+                set(handles.Structure(31),'BackgroundColor',[1 1 1],'Style','edit');
                 set(handles.Structure(17),'BackgroundColor',[1 1 1],'Style','edit');
+                set(handles.Structure(32),'BackgroundColor',[1 1 1],'Style','edit');
                 set(handles.Structure(20),'BackgroundColor',[1 1 1]);
                 set(handles.Structure(21),'BackgroundColor',[1 1 1],'Style','edit');
                 set(handles.Structure(23),'BackgroundColor',panelDefault,'Style','text','String','[m1 0; 0 m2]');
@@ -539,7 +541,9 @@ switch action
                 set(handles.Structure(20),'BackgroundColor',panelDefault);
                 set(handles.Structure(21),'BackgroundColor',panelDefault,'Style','text','String','zeta');
                 set(handles.Structure(23),'BackgroundColor',[1 1 1],'Style','edit');
+                set(handles.Structure(33),'BackgroundColor',[1 1 1],'Style','edit');
                 set(handles.Structure(25),'BackgroundColor',[1 1 1],'Style','edit');
+                set(handles.Structure(34),'BackgroundColor',[1 1 1],'Style','edit');
                 set(handles.Structure(28),'BackgroundColor',[1 1 1]);
                 set(handles.Structure(29),'BackgroundColor',[1 1 1],'Style','edit');
                 set(dof1_children,'ForegroundColor',inactive_color);

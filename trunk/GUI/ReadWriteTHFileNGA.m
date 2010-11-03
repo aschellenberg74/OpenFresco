@@ -142,6 +142,15 @@ switch action
               end
           end
       end
+       if strcmp(handles.GM.databaseType, 'Unknown')
+           direction = handles.GM.store.direction;
+           switch direction
+               case 'Direction 1'
+                   dt = handles.GM.dt(1);
+               case 'Direction 2'
+                   dt = handles.GM.dt(2);
+           end
+       end
        t = [0:length(ag)-1]'*dt;
        fclose(fin);
        varargout = {t ag};
