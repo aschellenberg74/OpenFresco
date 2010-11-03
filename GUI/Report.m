@@ -1,5 +1,5 @@
 function Report(varargin)
-% GUI_Analysis layout of analysis page of GUI
+% Report generate report page
 %       Comments displayed at the command line in response 
 %       to the help command. 
 
@@ -438,4 +438,6 @@ switch handles.Model.Type
         fprintf(FID,'Analysis Time Step Limit [sec]: %1.4f\n',handles.Model.Maxdt);
 end
 fclose(FID);
+%Update handles structure
+guidata(gcbf, handles);
 end

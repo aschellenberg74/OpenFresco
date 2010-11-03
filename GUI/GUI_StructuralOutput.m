@@ -102,6 +102,7 @@ switch handles.GM.loadType
         grid('on');
         ylabel(a_StructuralOutput_agX,'Ground Accel [L/sec^2]');
         xlabel(a_StructuralOutput_agX,'Time [sec]');
+        set(findobj('Tag','SO1ag'),'XLimMode','manual','Xlim',[0.0 tEnd]);
     case 'Initial Conditions'
         set(findobj('Tag','SO1ag'),'YLimMode','manual','Ylim',[-100 100],'YTick', [-100 0 100])
         xValues = [0 handles.GM.rampTime handles.GM.rampTime (handles.GM.rampTime+handles.GM.vibTime)];
@@ -209,6 +210,7 @@ if ~strcmp(handles.Model.Type, '1 DOF')
             grid('on');
             ylabel(a_StructuralOutput_agY,'Ground Accel [L/sec^2]');
             xlabel(a_StructuralOutput_agY,'Time [sec]');
+            set(findobj('Tag','SO1ag'),'XLimMode','manual','Xlim',[0.0 tEnd]);
         case 'Initial Conditions'
             set(findobj('Tag','SO2ag'),'YLimMode','manual','Ylim',[-100 100],'YTick', [-100 0 100])
             xValues = [0 handles.GM.rampTime handles.GM.rampTime (handles.GM.rampTime+handles.GM.vibTime)];

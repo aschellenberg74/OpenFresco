@@ -239,6 +239,10 @@ switch action
     %Display options for various controller types
         control_selection = get(gcbo,'Value');
         switch control_selection
+            case 1
+            %Default
+                set(handles.EC(28:52),'Visible','off');
+                set(handles.EC(2),'Visible','off');
             case 2
             %LabVIEW
             msgbox('When using LabView controller, control points need to be defined','Control Point','warn');
