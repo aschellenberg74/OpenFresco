@@ -113,6 +113,8 @@ switch handles.GM.loadType
         xlabel(a_StructuralOutput_agX,'Time [sec]');
 end
 
+linkaxes([a_StructuralOutput_dX, a_StructuralOutput_fX, a_StructuralOutput_aX, a_StructuralOutput_agX],'x');
+
 a_StructuralOutput_fdX = axes('Parent',f_StructOut1,...
     'Tag','SO1fd',...
     'NextPlot','replacechildren',...
@@ -220,6 +222,8 @@ if ~strcmp(handles.Model.Type, '1 DOF')
             ylabel(a_StructuralOutput_agY,'% Total Displacement');
             xlabel(a_StructuralOutput_agY,'Time [sec]');
     end
+    
+    linkaxes([a_StructuralOutput_dY, a_StructuralOutput_fY, a_StructuralOutput_aY, a_StructuralOutput_agY],'x');
     
     a_StructuralOutput_fdY = axes('Parent',f_StructOut2,...
         'Tag','SO2fd',...
