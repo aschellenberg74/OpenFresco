@@ -2627,9 +2627,8 @@ end
 
 %#function Analysis AnimateResponse Element_ExpGeneric ExpControl 
 %#function ExpSetup GUI_AnalysisControls GUI_ErrorMonitors GUI_Output 
-%#function GUI_Report GUI_StructuralOutput GUI_Template GetFileList 
-%#function GroundMotions InputCheck Integrator_AlphaOS Integrator_NewmarkExplicit 
-%#function Links MenuBar ReadWriteTHFileNGA Report 
-%#function RunOpenFresco SetOPFPath Structure TCPSocket 
-%#function TerminateAnalysis UpdatePragmaList WriteTCL displayAxes 
-%#function getFFT 
+%#function GUI_StructuralOutput GUI_Template GetFileList GroundMotions 
+%#function InputCheck Integrator_AlphaOS Integrator_NewmarkExplicit Links 
+%#function MenuBar ReadWriteTHFileNGA Report RunOpenFresco 
+%#function SetOPFPath Structure TCPSocket TerminateAnalysis 
+%#function UpdatePragmaList WriteTCL displayAxes getFFT 

@@ -164,7 +164,7 @@ else
                             id = strfind(appPath,filesep);
                             appPath(id) = '/';
                             fprintf(FID,'# Define experimental control\n# ---------------------------\n');
-                            fprintf(FID,'expControl %s 1 %1.0f "%s" %5.0f %s "%s"\n\n',handles.ExpControl.RealControl.Controller,handles.ExpControl.RealControl.PCvalue,handles.ExpControl.RealControl.ipAddr,handles.ExpControl.RealControl.ipPort,handles.ExpControl.RealControl.appName,appPath(1:end-1));
+                            fprintf(FID,'expControl %s 1 %1.0f "%s" %s %s "%s"\n\n',handles.ExpControl.RealControl.Controller,handles.ExpControl.RealControl.PCvalue,handles.ExpControl.RealControl.ipAddr,handles.ExpControl.RealControl.ipPort,handles.ExpControl.RealControl.appName,appPath(1:end-1));
                     end
             end
             
