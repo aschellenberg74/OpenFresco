@@ -27,7 +27,7 @@ switch action
             'Ground Motions','PEER','CESMD','OK','OK');
         switch GMchoice
             case 'PEER'
-                web('http://peer.berkeley.edu/nga/', '-browser');
+                web('http://peer.berkeley.edu/nga/search.html', '-browser');
             case 'CESMD'
                 web('http://www.strongmotioncenter.org/', '-browser');
             case 'OK'
