@@ -24,7 +24,7 @@ switch action
                 handles.GM.loadType = 'Ground Motions';
                 set(handles.GroundMotions(19),'Value',1,'CData',handles.Store.GM1);
                 set(handles.GroundMotions(20),'Value',0,'CData',handles.Store.IC0);
-                set(handles.GroundMotions(2:9),'Visible','on');
+                set(handles.GroundMotions([2:9 28]),'Visible','on');
                 set(handles.GroundMotions(21:27),'Visible','off');
                 set(get(handles.GroundMotions(7), 'Children'), 'Visible', 'on');
                 set(get(handles.GroundMotions(8), 'Children'), 'Visible', 'on');

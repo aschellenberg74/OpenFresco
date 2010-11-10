@@ -243,6 +243,7 @@ Struct(30) = uicontrol('Parent',ph_Main,...
    'Min',0,'Max',1, ...
    'SliderStep',[0.5 0.5],...
    'Value',0,...
+   'ToolTipString',sprintf('Move the slider to access\ndifferent structure types'),...
    'Visible','off',...
    'Callback','Structure(''scroll'')');
 
@@ -2364,6 +2365,31 @@ guidata(gcf,handles);
                     set(handles.Sidebar(11),'Value',1);
                     return
                 end
+                if isempty(handles.Model.M) || isempty(handles.Model.K) || isempty(handles.Model.Zeta)
+                    msgbox('Must define structural properties first','Error','error');
+                    %Return to structure page
+                    set(handles.Sidebar(7), 'Value', 1)
+                    set(handles.Sidebar(7),'CData',handles.Store.Structure1);
+                    set(handles.Sidebar(8),'CData',handles.Store.Loading0);
+                    set(handles.Sidebar(9),'CData',handles.Store.ExpSetup0);
+                    set(handles.Sidebar(10),'CData',handles.Store.ExpControl0);
+                    set(handles.Sidebar(11),'CData',handles.Store.Analysis0);
+                    set(handles.Structure([1 2 30]),'Visible','on');
+                    set(handles.Structure(handles.Model.StructActive),'Visible','on');
+                    set(handles.Structure(handles.Model.StructInactive),'Visible','off');
+                    set(handles.Structure([10 18 26]),'Visible','off');
+                    set(handles.Structure(30),'Value',0);
+                    set(handles.GroundMotions,'Visible','off');
+                    set(get(handles.GroundMotions(7), 'Children'), 'Visible', 'off');
+                    set(get(handles.GroundMotions(8), 'Children'), 'Visible', 'off');
+                    set(get(handles.GroundMotions(9), 'Children'), 'Visible', 'off');
+                    set(get(handles.GroundMotions(15), 'Children'), 'Visible', 'off');
+                    set(get(handles.GroundMotions(16), 'Children'), 'Visible', 'off');
+                    set(get(handles.GroundMotions(17), 'Children'), 'Visible', 'off');
+                    %Turn off all other pages
+                    return
+                end
+                
                 set(handles.Sidebar(7),'CData',handles.Store.Structure0);
                 set(handles.Sidebar(8),'CData',handles.Store.Loading1);
                 set(handles.Sidebar(9),'CData',handles.Store.ExpSetup0);
