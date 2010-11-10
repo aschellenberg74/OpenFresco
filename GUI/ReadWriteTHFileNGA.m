@@ -61,7 +61,7 @@ switch action
    case 'readDT'
       if strcmp(handles.GM.databaseType, 'Unknown')
           answer = inputdlg(['Unrecognized time history database'; 'Please enter dt manually          '],'Input dt');
-          while isempty(answer) || strcmp(answer, '')
+          while isempty(answer) || strcmp(answer, '') || str2num(answer{1}) <= 0
               answer = inputdlg(['Unrecognized time history database'; 'Please enter dt manually          '],'Input dt');
           end
           dt = str2num(answer{1});

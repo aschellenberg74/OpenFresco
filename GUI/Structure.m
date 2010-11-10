@@ -24,6 +24,7 @@ switch action
         slider = round(get(gcbo,'Value')*10)/10;
         %1 DOF
         if slider <= 0.3
+            set(handles.Structure(30),'Value',0);
             structTag = findobj('Tag','1 DOF');
             set(handles.Structure(2),'SelectedObject',structTag(2));
             set(handles.Structure([3 6:13]),'Visible','on');
@@ -152,6 +153,7 @@ switch action
             
         %2 DOF A
         elseif slider <= 0.6
+            set(handles.Structure(30),'Value',0.5);
             structTag = findobj('Tag','2 DOF A');
             set(handles.Structure(2),'SelectedObject',structTag(2));
             set(handles.Structure([3 6:13]),'Visible','off');
@@ -310,6 +312,7 @@ switch action
         %2 DOF B
         else
             structTag = findobj('Tag','2 DOF B');
+            set(handles.Structure(30),'Value',1);
             set(handles.Structure(2),'SelectedObject',structTag(2));
             set(handles.Structure([3 6:13]),'Visible','off');
             set(handles.Structure([4 14:21 31 32]),'Visible','off');

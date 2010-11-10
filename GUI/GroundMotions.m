@@ -269,6 +269,11 @@ switch action
         cbo_tag = get(gcbo,'Tag');
         switch cbo_tag
             case 'dt1'
+                if str2num(get(gcbo,'String')) <= 0
+                    msgbox('Time step must be positive!','Error','error');
+                    set(handles.GroundMotions(28),'String',num2str(handles.GM.dt(1)));
+                    return
+                end
                 handles.GM.dt(1) = str2num(get(gcbo,'String'));
                 guidata(gcbf,handles);
                 
@@ -292,6 +297,11 @@ switch action
                 guidata(gcbf, handles);
                 
             case 'dt2'
+                if str2num(get(gcbo,'String')) <= 0
+                    msgbox('Time step must be positive!','Error','error');
+                    set(handles.GroundMotions(29),'String',num2str(handles.GM.dt(1)));
+                    return
+                end
                 handles.GM.dt(2) = str2num(get(gcbo,'String'));
                 guidata(gcbf,handles);
                 
