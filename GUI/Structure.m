@@ -921,27 +921,37 @@ switch action
             switch get(gcbo,'Tag')
                 case 'Stiffness'
                     handles.Model.K = input_val;
+                    handles.ExpControl.DOF1.E = handles.Model.K;
+                    handles.ExpControl.DOF1.E0 = handles.Model.K;
                 case 'k1A'
                     if length(handles.Model.K) == 2
                         handles.Model.K(1,1) = handles.Model.K(2,2) + input_val;
                     else
                         handles.Model.K(1,1) = input_val;
                     end
+                    handles.ExpControl.DOF1.E = input_val;
+                    handles.ExpControl.DOF1.E0 = input_val;
                 case 'k2A'
                     if isempty(handles.Model.K)
                         msgbox('Please enter k1 first','Error','error');
-%                         set Structure string to be blank here
+                        set(handles.Structure(32),'String','');
                         return
                     else
-                    handles.Model.K(1,1) = handles.Model.K(1,1) + input_val;
+                    handles.Model.K(1,1) = str2num(get(handles.Structure(17),'String')) + input_val;
                     end
                     handles.Model.K(1,2) = -input_val;
                     handles.Model.K(2,1) = -input_val;
                     handles.Model.K(2,2) = input_val;
+                    handles.ExpControl.DOF2.E = handles.Model.K(2,2);
+                    handles.ExpControl.DOF2.E0 = handles.Model.K(2,2);
                 case 'k1B'
                     handles.Model.K(1,1) = input_val;
+                    handles.ExpControl.DOF1.E = handles.Model.K(1,1);
+                    handles.ExpControl.DOF1.E0 = handles.Model.K(1,1);
                 case 'k2B'
                     handles.Model.K(2,2) = input_val;
+                    handles.ExpControl.DOF2.E = handles.Model.K(2,2);
+                    handles.ExpControl.DOF2.E0 = handles.Model.K(2,2);
             end
             handles.Model.Element{1}.kInit = handles.Model.K;
             guidata(gcbf, handles);   

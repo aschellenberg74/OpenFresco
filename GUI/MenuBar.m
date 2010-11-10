@@ -4,12 +4,12 @@ function MenuBar(action,varargin)
 switch action
     case 'load'
         [file path] = uigetfile('*.mat');
-        file = fullfile(path,file);
         %Break from function if load file is cancelled
         if file == 0
             return
         %Otherwise...
         else
+        file = fullfile(path,file);
         load(file);
         handles = guidata(gcf);
         handles.Model = saveData.Model;
