@@ -313,11 +313,11 @@ switch action
         end    
         
         %Check for .tcl and report files and delete if found
-        if exist('OPFAnalysis.tcl','file') == 2
-            delete('OPFAnalysis.tcl');
+        if exist('OPFAnalysis.tcl','file')
+            delete(which('OPFAnalysis.tcl'));
         end
-        if exist('OPFReport.txt','file') == 2
-            delete('OPFReport.txt');
+        if exist('OPFReport.txt','file')
+            delete(which('OPFReport.txt'));
         end
 
         %Select structure tab
