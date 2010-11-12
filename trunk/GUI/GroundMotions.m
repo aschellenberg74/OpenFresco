@@ -42,6 +42,8 @@ switch action
                     set(findobj('Tag','GMhelp'),'Position',[0.85 0.65 0.083 0.132]);
                     set(findobj('Tag','Scalehelp'),'Position',[0.85 0.35 0.083 0.132]);
                 end
+                handles.GM.dtAnalysis = min(handles.GM.scaledt);
+                set(handles.Analysis(3),'String',num2str(handles.GM.dtAnalysis));
             case 'Initial Conditions'
                 if isempty(handles.Model.M) || isempty(handles.Model.K)
                     msgbox(sprintf('Please define structural properties before\n setting initial conditions.'),'Error','error');
@@ -111,9 +113,12 @@ switch action
                     set(handles.GroundMotions(28),'String',num2str(dt));
                     if strcmp(databaseType,'Unknown')
                         set(handles.GroundMotions(28),'Style','edit','BackgroundColor',[1 1 1]);
+                        handles.GM.AmpFact(1) = 1;
                     else
                         set(handles.GroundMotions(28),'Style','text','BackgroundColor',[0.941176 0.941176 0.941176]);
+                        handles.GM.AmpFact(1) = 386.1;
                     end
+                    set(handles.GroundMotions(4),'String',handles.GM.AmpFact(1));
                     guidata(gcbf,handles);
                     
                     [t ag] = ReadWriteTHFileNGA('readTHF',filepath);
@@ -134,8 +139,8 @@ switch action
                     plot(handles.GroundMotions(9), handles.GM.Spectra{1}.T, handles.GM.Spectra{1}.dsp);
                     
                     %Store analysis dt
-                    handles.GM.dtAnalysis = min(handles.GM.dt);
-                    set(handles.Analysis(3),'String',[num2str(handles.GM.dtAnalysis)]);
+                    handles.GM.dtAnalysis = min(handles.GM.scaledt);
+                    set(handles.Analysis(3),'String',num2str(handles.GM.dtAnalysis));
                     guidata(gcbf, handles);
                     
                 case 'Direction 2'
@@ -149,9 +154,12 @@ switch action
                     set(handles.GroundMotions(29),'String',num2str(dt));
                     if strcmp(databaseType,'Unknown')
                         set(handles.GroundMotions(29),'Style','edit','BackgroundColor',[1 1 1]);
+                        handles.GM.AmpFact(2) = 1;
                     else
                         set(handles.GroundMotions(29),'Style','text','BackgroundColor',[0.941176 0.941176 0.941176]);
+                        handles.GM.AmpFact(2) = 386.1;
                     end
+                    set(handles.GroundMotions(12),'String',handles.GM.AmpFact(2));
                     guidata(gcbf,handles);
                     
                     [t ag] = ReadWriteTHFileNGA('readTHF',filepath);
@@ -170,8 +178,8 @@ switch action
                     plot(handles.GroundMotions(17), handles.GM.Spectra{2}.T, handles.GM.Spectra{2}.dsp);
                     
                     %Store analysis dt
-                    handles.GM.dtAnalysis = min(handles.GM.dt);
-                    set(handles.Analysis(3),'String',[num2str(handles.GM.dtAnalysis)]);
+                    handles.GM.dtAnalysis = min(handles.GM.scaledt);
+                    set(handles.Analysis(3),'String',num2str(handles.GM.dtAnalysis));
                     guidata(gcbf, handles);
             end
         end
@@ -344,9 +352,6 @@ switch action
                 input_val = str2num(get(gcbo,'String'));
                 handles.GM.AmpFact(1) = input_val;
                 handles.GM.scaleag{1} = handles.GM.ag{1}.*handles.GM.AmpFact(1);
-                handles.GM.scalet{1} = handles.GM.t{1}.*handles.GM.TimeFact(1);
-                handles.GM.scaledt(1) = handles.GM.dt(1).*handles.GM.TimeFact(1);
-                set(handles.Analysis(3),'String',[num2str(handles.GM.scaledt(1))]);
                 %Calculate spectral response quantities and plot
                 handles.GM.Spectra{1} = ResponseSpectraElastic(handles.GM.scaleag{1},handles.GM.scaledt(1),m,handles.Model.Zeta,minT,maxT,numTvalues);
                 plot(handles.GroundMotions(7), handles.GM.scalet{1}, handles.GM.scaleag{1});
@@ -356,10 +361,11 @@ switch action
             case 'edit_time1'
                 input_val = str2num(get(gcbo,'String'));
                 handles.GM.TimeFact(1) = input_val;
-                handles.GM.scaleag{1} = handles.GM.ag{1}.*handles.GM.AmpFact(1);
+                %handles.GM.scaleag{1} = handles.GM.ag{1}.*handles.GM.AmpFact(1);
                 handles.GM.scalet{1} = handles.GM.t{1}.*handles.GM.TimeFact(1);
                 handles.GM.scaledt(1) = handles.GM.dt(1).*handles.GM.TimeFact(1);
-                set(handles.Analysis(3),'String',[num2str(handles.GM.scaledt(1))]);
+                handles.GM.dtAnalysis = min(handles.GM.scaledt);
+                set(handles.Analysis(3),'String',num2str(handles.GM.dtAnalysis));
                 %Calculate spectral response quantities and plot
                 handles.GM.Spectra{1} = ResponseSpectraElastic(handles.GM.scaleag{1},handles.GM.scaledt(1),m,handles.Model.Zeta,minT,maxT,numTvalues);
                 plot(handles.GroundMotions(7), handles.GM.scalet{1}, handles.GM.scaleag{1});
@@ -380,8 +386,6 @@ switch action
                 input_val = str2num(get(gcbo,'String'));
                 handles.GM.AmpFact(2) = input_val;
                 handles.GM.scaleag{2} = handles.GM.ag{2}.*handles.GM.AmpFact(2);
-                handles.GM.scalet{2} = handles.GM.t{2}.*handles.GM.TimeFact(2);
-                handles.GM.scaledt(2) = handles.GM.dt(2).*handles.GM.TimeFact(2);
                 %Calculate spectral response quantities and plot
                 handles.GM.Spectra{2} = ResponseSpectraElastic(handles.GM.scaleag{2},handles.GM.scaledt(2),m,handles.Model.Zeta,minT,maxT,numTvalues);
                 plot(handles.GroundMotions(15), handles.GM.scalet{2}, handles.GM.scaleag{2});
@@ -391,9 +395,10 @@ switch action
             case 'edit_time2'
                 input_val = str2num(get(gcbo,'String'));
                 handles.GM.TimeFact(2) = input_val;
-                handles.GM.scaleag{2} = handles.GM.ag{2}.*handles.GM.AmpFact(2);
                 handles.GM.scalet{2} = handles.GM.t{2}.*handles.GM.TimeFact(2);
                 handles.GM.scaledt(2) = handles.GM.dt(2).*handles.GM.TimeFact(2);
+                handles.GM.dtAnalysis = min(handles.GM.scaledt);
+                set(handles.Analysis(3),'String',num2str(handles.GM.dtAnalysis));
                 %Calculate spectral response quantities and plot
                 handles.GM.Spectra{2} = ResponseSpectraElastic(handles.GM.scaleag{2},handles.GM.scaledt(2),m,handles.Model.Zeta,minT,maxT,numTvalues);
                 plot(handles.GroundMotions(15), handles.GM.scalet{2}, handles.GM.scaleag{2});
