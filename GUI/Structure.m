@@ -38,8 +38,8 @@ switch action
             set(handles.Structure(3),'CData',handles.Store.Model1A1);
             set(handles.Structure(4),'CData',handles.Store.Model2A0);
             set(handles.Structure(5),'CData',handles.Store.Model2B0);
-            set(handles.Structure(7),'BackgroundColor',[1 1 1],'Style','edit');
-            set(handles.Structure(9),'BackgroundColor',[1 1 1],'Style','edit');
+            set(handles.Structure(7),'BackgroundColor',[1 1 1],'Style','edit','String','');
+            set(handles.Structure(9),'BackgroundColor',[1 1 1],'Style','edit','String','');
             set(handles.Structure(12),'BackgroundColor',[1 1 1]);
             set(handles.Structure(13),'BackgroundColor',[1 1 1],'Style','edit');
             set(handles.Structure(15),'BackgroundColor',panelDefault,'Style','text');
@@ -167,8 +167,8 @@ switch action
             set(handles.Structure(3),'CData',handles.Store.Model1A0);
             set(handles.Structure(4),'CData',handles.Store.Model2A1);
             set(handles.Structure(5),'CData',handles.Store.Model2B0);
-            set(handles.Structure(7),'BackgroundColor',panelDefault,'Style','text','String','Enter mass here');
-            set(handles.Structure(9),'BackgroundColor',panelDefault,'Style','text','String','Enter stiffness here');
+            set(handles.Structure(7),'BackgroundColor',panelDefault,'Style','text');
+            set(handles.Structure(9),'BackgroundColor',panelDefault,'Style','text');
             set(handles.Structure(11),'BackgroundColor',panelDefault,'Style','text','String','Period');
             set(handles.Structure(12),'BackgroundColor',panelDefault);
             set(handles.Structure(13),'BackgroundColor',panelDefault,'Style','text','String','zeta');
@@ -326,8 +326,8 @@ switch action
             set(handles.Structure(3),'CData',handles.Store.Model1A0);
             set(handles.Structure(4),'CData',handles.Store.Model2A0);
             set(handles.Structure(5),'CData',handles.Store.Model2B1);
-            set(handles.Structure(7),'BackgroundColor',panelDefault,'Style','text','String','Enter mass here');
-            set(handles.Structure(9),'BackgroundColor',panelDefault,'Style','text','String','Enter stiffness here');
+            set(handles.Structure(7),'BackgroundColor',panelDefault,'Style','text');
+            set(handles.Structure(9),'BackgroundColor',panelDefault,'Style','text');
             set(handles.Structure(11),'BackgroundColor',panelDefault,'Style','text','String','Period');
             set(handles.Structure(12),'BackgroundColor',panelDefault);
             set(handles.Structure(13),'BackgroundColor',panelDefault,'Style','text','String','zeta');
