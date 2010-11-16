@@ -19,6 +19,7 @@ switch action
         %Execute run new test commands to reset test
         handles.Model.StopFlag = 0;
         handles.Model.firstStart = 1;
+        handles.Store.Structview = 1;
         %Clear existing figures
         if ~isempty(findobj('Tag','ErrMon'))
             close(findobj('Tag','ErrMon'))
@@ -34,11 +35,12 @@ switch action
         end
         
         %Check for .tcl and report files and delete if found
-        if exist('OPFAnalysis.tcl','file') == 2
-            delete('OPFAnalysis.tcl');
+        fclose('all');
+        if exist('OPFAnalysis.tcl','file')
+            delete(which('OPFAnalysis.tcl'));
         end
-        if exist('OPFReport.txt','file') == 2
-            delete('OPFReport.txt');
+        if exist('OPFReport.txt','file')
+            delete(which('OPFReport.txt'));
         end
 
         set(handles.Analysis(6),'SelectedObject',[]);
@@ -78,13 +80,13 @@ switch action
                 set(handles.Structure(9),'BackgroundColor',[1 1 1],'Style','edit');
                 set(handles.Structure(12),'BackgroundColor',[1 1 1]);
                 set(handles.Structure(13),'BackgroundColor',[1 1 1],'Style','edit');
-                set(handles.Structure(15),'BackgroundColor',panelDefault,'Style','text','String','[m1 0; 0 m2]');
-                set(handles.Structure(17),'BackgroundColor',panelDefault,'Style','text','String','[k11 k12; k21 k22]');
+                set(handles.Structure(15),'BackgroundColor',panelDefault,'Style','text');
+                set(handles.Structure(17),'BackgroundColor',panelDefault,'Style','text');
                 set(handles.Structure(19),'BackgroundColor',panelDefault,'Style','text','String','Period');                
                 set(handles.Structure(20),'BackgroundColor',panelDefault);
                 set(handles.Structure(21),'BackgroundColor',panelDefault,'Style','text','String','zeta');
-                set(handles.Structure(23),'BackgroundColor',panelDefault,'Style','text','String','[m1 0; 0 m2]');
-                set(handles.Structure(25),'BackgroundColor',panelDefault,'Style','text','String','[k11 k12; k21 k22]');
+                set(handles.Structure(23),'BackgroundColor',panelDefault,'Style','text');
+                set(handles.Structure(25),'BackgroundColor',panelDefault,'Style','text');
                 set(handles.Structure(27),'BackgroundColor',panelDefault,'Style','text','String','Period');                
                 set(handles.Structure(28),'BackgroundColor',panelDefault);
                 set(handles.Structure(29),'BackgroundColor',panelDefault,'Style','text','String','zeta');
@@ -297,8 +299,8 @@ switch action
                 set(handles.Structure(3),'CData',handles.Store.Model1A0);
                 set(handles.Structure(4),'CData',handles.Store.Model2A1);
                 set(handles.Structure(5),'CData',handles.Store.Model2B0);
-                set(handles.Structure(7),'BackgroundColor',panelDefault,'Style','text','String','Enter mass here');
-                set(handles.Structure(9),'BackgroundColor',panelDefault,'Style','text','String','Enter stiffness here');
+                set(handles.Structure(7),'BackgroundColor',panelDefault,'Style','text');
+                set(handles.Structure(9),'BackgroundColor',panelDefault,'Style','text');
                 set(handles.Structure(11),'BackgroundColor',panelDefault,'Style','text','String','Period');
                 set(handles.Structure(12),'BackgroundColor',panelDefault);
                 set(handles.Structure(13),'BackgroundColor',panelDefault,'Style','text','String','zeta');
@@ -308,8 +310,8 @@ switch action
                 set(handles.Structure(32),'BackgroundColor',[1 1 1],'Style','edit');
                 set(handles.Structure(20),'BackgroundColor',[1 1 1]);
                 set(handles.Structure(21),'BackgroundColor',[1 1 1],'Style','edit');
-                set(handles.Structure(23),'BackgroundColor',panelDefault,'Style','text','String','[m1 0; 0 m2]');
-                set(handles.Structure(25),'BackgroundColor',panelDefault,'Style','text','String','[k11 k12; k21 k22]');
+                set(handles.Structure(23),'BackgroundColor',panelDefault,'Style','text');
+                set(handles.Structure(25),'BackgroundColor',panelDefault,'Style','text');
                 set(handles.Structure(27),'BackgroundColor',panelDefault,'Style','text','String','Period');                
                 set(handles.Structure(28),'BackgroundColor',panelDefault);
                 set(handles.Structure(29),'BackgroundColor',panelDefault,'Style','text','String','zeta');
@@ -530,13 +532,13 @@ switch action
                 set(handles.Structure(3),'CData',handles.Store.Model1A0);
                 set(handles.Structure(4),'CData',handles.Store.Model2A0);
                 set(handles.Structure(5),'CData',handles.Store.Model2B1);
-                set(handles.Structure(7),'BackgroundColor',panelDefault,'Style','text','String','Enter mass here');
-                set(handles.Structure(9),'BackgroundColor',panelDefault,'Style','text','String','Enter stiffness here');
+                set(handles.Structure(7),'BackgroundColor',panelDefault,'Style','text');
+                set(handles.Structure(9),'BackgroundColor',panelDefault,'Style','text');
                 set(handles.Structure(11),'BackgroundColor',panelDefault,'Style','text','String','Period');                
                 set(handles.Structure(12),'BackgroundColor',panelDefault);
                 set(handles.Structure(13),'BackgroundColor',panelDefault,'Style','text','String','zeta');
-                set(handles.Structure(15),'BackgroundColor',panelDefault,'Style','text','String','[m1 0; 0 m2]');
-                set(handles.Structure(17),'BackgroundColor',panelDefault,'Style','text','String','[k11 k12; k21 k22]');
+                set(handles.Structure(15),'BackgroundColor',panelDefault,'Style','text');
+                set(handles.Structure(17),'BackgroundColor',panelDefault,'Style','text');
                 set(handles.Structure(19),'BackgroundColor',panelDefault,'Style','text','String','Period');                
                 set(handles.Structure(20),'BackgroundColor',panelDefault);
                 set(handles.Structure(21),'BackgroundColor',panelDefault,'Style','text','String','zeta');
