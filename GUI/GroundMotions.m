@@ -113,7 +113,7 @@ switch action
                     set(handles.GroundMotions(28),'String',num2str(dt));
                     if strcmp(databaseType,'Unknown')
                         set(handles.GroundMotions(28),'Style','edit','BackgroundColor',[1 1 1]);
-                        handles.GM.AmpFact(1) = 1;
+                        handles.GM.AmpFact(1) = 1.0;
                     else
                         set(handles.GroundMotions(28),'Style','text','BackgroundColor',[0.941176 0.941176 0.941176]);
                         handles.GM.AmpFact(1) = 386.1;
@@ -154,7 +154,7 @@ switch action
                     set(handles.GroundMotions(29),'String',num2str(dt));
                     if strcmp(databaseType,'Unknown')
                         set(handles.GroundMotions(29),'Style','edit','BackgroundColor',[1 1 1]);
-                        handles.GM.AmpFact(2) = 1;
+                        handles.GM.AmpFact(2) = 1.0;
                     else
                         set(handles.GroundMotions(29),'Style','text','BackgroundColor',[0.941176 0.941176 0.941176]);
                         handles.GM.AmpFact(2) = 386.1;
