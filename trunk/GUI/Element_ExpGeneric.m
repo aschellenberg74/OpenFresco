@@ -45,7 +45,7 @@ switch action
         if (length(socketID)<tag || socketID(tag)<=0)
             numTrials = 0;
             socketID(tag) = -1;
-            while (numTrials<30 && socketID(tag)<0)
+            while (numTrials<20 && socketID(tag)<0)
                 try
                     socketID(tag) = TCPSocket('openConnection',ipAddr,ipPort);
                     pause(1.0);

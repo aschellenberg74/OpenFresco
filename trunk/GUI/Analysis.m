@@ -55,7 +55,7 @@ switch action
                                 handles.Plots.SO1fddot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','SO1fd'));
                                 switch handles.GM.loadType
                                     case 'Ground Motions'
-                                        handles.Plots.SO1agplot = line(handles.GM.t{1},handles.GM.scaleag{1},'LineWidth',1.0,'Parent',findobj('Tag','SO1ag'));
+                                        handles.Plots.SO1agplot = line(handles.GM.scalet{1},handles.GM.scaleag{1},'LineWidth',1.0,'Parent',findobj('Tag','SO1ag'));
                                         handles.Plots.SO1agdot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','SO1ag'));
                                     case 'Initial Conditions'
                                         handles.Plots.SO1agdot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','SO1ag'));
@@ -74,9 +74,9 @@ switch action
                                 handles.Plots.SO1fddot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','SO1fd'));
                                 switch handles.GM.loadType
                                     case 'Ground Motions'
-                                        handles.Plots.SO1agplot = line(handles.GM.t{1},handles.GM.scaleag{1},'LineWidth',1.0,'Parent',findobj('Tag','SO1ag'));
+                                        handles.Plots.SO1agplot = line(handles.GM.scalet{1},handles.GM.scaleag{1},'LineWidth',1.0,'Parent',findobj('Tag','SO1ag'));
                                         handles.Plots.SO1agdot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','SO1ag'));
-                                        handles.Plots.SO2agplot = line(handles.GM.t{1},handles.GM.scaleag{1},'LineWidth',1.0,'Parent',findobj('Tag','SO2ag'));
+                                        handles.Plots.SO2agplot = line(handles.GM.scalet{1},handles.GM.scaleag{1},'LineWidth',1.0,'Parent',findobj('Tag','SO2ag'));
                                         handles.Plots.SO2agdot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','SO2ag'));
                                     case 'Initial Conditions'
                                         handles.Plots.SO1agdot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','SO1ag'));
@@ -111,9 +111,9 @@ switch action
                                 handles.Plots.SO1fddot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','SO1fd'));
                                 switch handles.GM.loadType
                                     case 'Ground Motions'
-                                        handles.Plots.SO1agplot = line(handles.GM.t{1},handles.GM.scaleag{1},'LineWidth',1.0,'Parent',findobj('Tag','SO1ag'));
+                                        handles.Plots.SO1agplot = line(handles.GM.scalet{1},handles.GM.scaleag{1},'LineWidth',1.0,'Parent',findobj('Tag','SO1ag'));
                                         handles.Plots.SO1agdot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','SO1ag'));
-                                        handles.Plots.SO2agplot = line(handles.GM.t{2},handles.GM.scaleag{2},'LineWidth',1.0,'Parent',findobj('Tag','SO2ag'));
+                                        handles.Plots.SO2agplot = line(handles.GM.scalet{2},handles.GM.scaleag{2},'LineWidth',1.0,'Parent',findobj('Tag','SO2ag'));
                                         handles.Plots.SO2agdot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','SO2ag'));
                                     case 'Initial Conditions'
                                         handles.Plots.SO1agdot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','SO1ag'));
@@ -313,6 +313,7 @@ switch action
         end    
         
         %Check for .tcl and report files and delete if found
+        fclose('all');
         if exist('OPFAnalysis.tcl','file')
             delete(which('OPFAnalysis.tcl'));
         end
