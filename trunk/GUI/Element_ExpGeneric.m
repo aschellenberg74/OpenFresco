@@ -45,12 +45,12 @@ switch action
         if (length(socketID)<tag || socketID(tag)<=0)
             numTrials = 0;
             socketID(tag) = -1;
-            while (numTrials<20 && socketID(tag)<0)
+            while (numTrials<10 && socketID(tag)<0)
                 try
                     socketID(tag) = TCPSocket('openConnection',ipAddr,ipPort);
                     pause(1.0);
                     numTrials = numTrials+1;
-                    if (numTrials==30)
+                    if (numTrials==10)
                         continueTrial = questdlg(sprintf('The program cannot establish a connection to OpenFresco.\nContinue trying to connect?'),'Continue?','Yes','No','Yes');
                         if strcmp(continueTrial,'Yes')
                             numTrials = 0;
