@@ -1,16 +1,28 @@
-function [error, f, MX, TI] = AnimateResponse(Type,t,ag,U,Udotdot,Pr,Um)
+function ReplayResults(step)
 %AnimateResponse switches over the model type to choose which plots to
 %populate with the structural response and error monitoring data
+if rem(step,5) ~= 0
+    return
+end
 
 % Initialization tasks
-handles = guidata(gcbf);
+handles = guidata(findobj('Tag','OpenFresco Quick Start'));
+if step > length(handles.Response.error) || step > length(handles.Response.TI)
+    return
+end
+t = handles.Response.Time(:,1:step);
+ag = handles.Response.ag(step,:);
+U = handles.Response.U(:,1:step);
+Udotdot = handles.Response.Udotdot(:,1:step);
+Pr = handles.Response.Pr(:,1:step);
+Um = handles.Response.Um(:,1:step);
+error = handles.Response.error(:,1:step);
+f = handles.Response.f;
+MX = handles.Response.MX;
+TI = handles.Response.TI(:,1:step);
 
-%Calculate necessary quantities
-error = Um-U;
-[f,MX] = getFFT(error',t(2)-t(1));
-TI(1,:) = 0.5*(cumtrapz(U(1,:),Um(1,:)) - cumtrapz(Um(1,:),U(1,:)));
 
-switch Type
+switch handles.Model.Type
     case '1 DOF'
         %Structural Outputs
         set(handles.Plots.SO1dplot,'Xdata',t,'YData',U(1,:));
@@ -79,9 +91,6 @@ switch Type
         end
         
 
-        %Calculate TI for second DOF
-        TI(2,:) = 0.5*(cumtrapz(U(2,:),Um(2,:)) - cumtrapz(Um(2,:),U(2,:)));
-
         %Error Monitors
         set(handles.Plots.EM1eplot,'Xdata',t,'YData',error(1,:));
         set(handles.Plots.EM1ffteplot,'Xdata',f,'YData',MX(:,1));
@@ -131,10 +140,6 @@ switch Type
                 end
         end
         
-        
-        %Calculate TI for second DOF
-        TI(2,:) = 0.5*(cumtrapz(U(2,:),Um(2,:)) - cumtrapz(Um(2,:),U(2,:)));
-
         %Error Monitors
         set(handles.Plots.EM1eplot,'Xdata',t,'YData',error(1,:));
         set(handles.Plots.EM1ffteplot,'Xdata',f,'YData',MX(:,1));

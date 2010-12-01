@@ -216,7 +216,7 @@ for i=iStart:iEnd-1
     
     % animate response
     if ~rem(i,downSampFact)
-        AnimateResponse(Model.Type,t(:,1:i+1),ag(i+1,:),U(:,1:i+1),Udotdot(:,1:i+1),Pr(:,1:i+1),Um(:,1:i+1));
+        [err, f, MX, TI] = AnimateResponse(Model.Type,t(:,1:i+1),ag(i+1,:),U(:,1:i+1),Udotdot(:,1:i+1),Pr(:,1:i+1),Um(:,1:i+1));
     end
 end
 toc;
@@ -235,3 +235,8 @@ Response.Udot = Udot;
 Response.Udotdot = Udotdot;
 Response.Pr = Pr;
 Response.Um = Um;
+Response.error = err;
+Response.f = f;
+Response.MX = MX;
+Response.TI = TI;
+Response.ag = ag;
