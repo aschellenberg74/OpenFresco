@@ -95,7 +95,7 @@ switch action
                     tol = tol + 0.01;
                 end
                 dsp = handles.GM.Spectra{1}.dsp(id1(1),1);
-                text(handles.Model.T*1.2,dsp*1.1,sprintf('T = %1.4f\nSa = %1.4f',handles.Model.T,dsp),'BackgroundColor',[1 1 1]);
+                text(handles.Model.T*1.2,dsp*1.1,sprintf('T = %1.4f\nSd = %1.4f',handles.Model.T,dsp),'BackgroundColor',[1 1 1]);
                 hold on
                 plot(handles.Model.T,dsp,'ro');
                 hold off
