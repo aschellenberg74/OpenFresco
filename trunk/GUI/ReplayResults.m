@@ -7,11 +7,11 @@ end
 
 % Initialization tasks
 handles = guidata(findobj('Tag','OpenFresco Quick Start'));
-if step > length(handles.Response.error) || step > length(handles.Response.TI)
-    return
-end
+% if step > length(handles.Response.error) || step > length(handles.Response.TI)
+%     return
+% end
 t = handles.Response.Time(:,1:step);
-ag = handles.Response.ag(step,:);
+ag = handles.Response.ag(:,step);
 U = handles.Response.U(:,1:step);
 Udotdot = handles.Response.Udotdot(:,1:step);
 Pr = handles.Response.Pr(:,1:step);
@@ -48,7 +48,7 @@ switch handles.Model.Type
         
         %Error Monitors
         set(handles.Plots.EM1eplot,'Xdata',t,'YData',error(1,:));
-        set(handles.Plots.EM1ffteplot,'Xdata',f,'YData',MX(:,1));
+        set(handles.Plots.EM1ffteplot,'Xdata',f,'YData',MX(1,:));
         set(handles.Plots.EM1MeasCmdplot,'Xdata',U(1,:),'YData',Um(1,:));
         set(handles.Plots.EM1MeasCmddot,'Xdata',U(1,end),'YData',Um(1,end));
         set(handles.Plots.EM1trackplot,'Xdata',t,'YData',TI(1,:));
@@ -93,12 +93,12 @@ switch handles.Model.Type
 
         %Error Monitors
         set(handles.Plots.EM1eplot,'Xdata',t,'YData',error(1,:));
-        set(handles.Plots.EM1ffteplot,'Xdata',f,'YData',MX(:,1));
+        set(handles.Plots.EM1ffteplot,'Xdata',f,'YData',MX(1,:));
         set(handles.Plots.EM1MeasCmdplot,'Xdata',U(1,:),'YData',Um(1,:));
         set(handles.Plots.EM1MeasCmddot,'Xdata',U(1,end),'YData',Um(1,end));
         set(handles.Plots.EM1trackplot,'Xdata',t,'YData',TI(1,:));
         set(handles.Plots.EM2eplot,'Xdata',t,'YData',error(2,:));
-        set(handles.Plots.EM2ffteplot,'Xdata',f,'YData',MX(:,2));
+        set(handles.Plots.EM2ffteplot,'Xdata',f,'YData',MX(2,:));
         set(handles.Plots.EM2MeasCmdplot,'Xdata',U(2,:),'YData',Um(2,:));
         set(handles.Plots.EM2MeasCmddot,'Xdata',U(2,end),'YData',Um(2,end));
         set(handles.Plots.EM2trackplot,'Xdata',t,'YData',TI(2,:));
@@ -142,12 +142,12 @@ switch handles.Model.Type
         
         %Error Monitors
         set(handles.Plots.EM1eplot,'Xdata',t,'YData',error(1,:));
-        set(handles.Plots.EM1ffteplot,'Xdata',f,'YData',MX(:,1));
+        set(handles.Plots.EM1ffteplot,'Xdata',f,'YData',MX(1,:));
         set(handles.Plots.EM1MeasCmdplot,'Xdata',U(1,:),'YData',Um(1,:));
         set(handles.Plots.EM1MeasCmddot,'Xdata',U(1,end),'YData',Um(1,end));
         set(handles.Plots.EM1trackplot,'Xdata',t,'YData',TI(1,:));
         set(handles.Plots.EM2eplot,'Xdata',t,'YData',error(2,:));
-        set(handles.Plots.EM2ffteplot,'Xdata',f,'YData',MX(:,2));
+        set(handles.Plots.EM2ffteplot,'Xdata',f,'YData',MX(2,:));
         set(handles.Plots.EM2MeasCmdplot,'Xdata',U(2,:),'YData',Um(2,:));
         set(handles.Plots.EM2MeasCmddot,'Xdata',U(2,end),'YData',Um(2,end));
         set(handles.Plots.EM2trackplot,'Xdata',t,'YData',TI(2,:));
