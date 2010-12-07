@@ -32,6 +32,10 @@ switch action
                 web('http://www.strongmotioncenter.org/', '-browser');
             case 'OK'
         end
+    case 'MTS'
+        web('http://www.mts.com/', '-browser');
+    case 'PEER'
+        web('http://peer.berkeley.edu/', '-browser');
 end
 
 

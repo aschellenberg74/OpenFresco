@@ -131,11 +131,11 @@ set(Background,'XTick',[],'YTick',[]);
 %Menubar
 Menu(1) = uimenu('Position',1,'Label','File');
 Menu(2) = uimenu(Menu(1),'Position',1,'Label','Load', ...
-   'Accelerator','L','Callback','MenuBar(''load'')');
+   'Accelerator','L');
 Menu(3) = uimenu(Menu(1),'Position',2,'Label','Save', ...
-   'Accelerator','S','Callback','MenuBar(''save'')');
+   'Accelerator','S');
 Menu(4) = uimenu(Menu(1),'Position',3,'Label','Quit',...
-   'Accelerator','Q','Callback',@Quit_Program);
+   'Accelerator','Q');
 Menu(5) = uimenu('Position',2,'Label','Help');
 Menu(6) = uimenu(Menu(5),'Position',1,'Label','About', ...
    'Callback','SplashScreen(''about'')');
@@ -207,12 +207,14 @@ Sidebar(12) = axes('Parent',f,...
     'XTick',[],'YTick',[]);
 image(MTS)
 axis off;
+% set(Sidebar(12),'ButtonDownFcn','Links(''MTS'')')
 
 Sidebar(13) = axes('Parent',f,...
     'Position',[0.04 0.10 0.08 0.1],...
     'XTick',[],'YTick',[]);
 image(PEER)
 axis off;
+% set(Sidebar(13),'ButtonDownFcn','Links(''PEER'')')
          
 %Main Display Panel
 ph_Main = uipanel('Parent',f,...
@@ -2374,33 +2376,55 @@ handles.Model.DIR = pwd;
 %Save the structure of handles
 guidata(gcf,handles);
 
+%Switch on the structure page
+set(handles.Sidebar(7),'CData',handles.Store.Structure1);
+set(handles.Sidebar(8),'CData',handles.Store.Loading0);
+set(handles.Sidebar(9),'CData',handles.Store.ExpSetup0);
+set(handles.Sidebar(10),'CData',handles.Store.ExpControl0);
+set(handles.Sidebar(11),'CData',handles.Store.Analysis0);
+set(handles.Structure([1 2 30]),'Visible','on');
+set(handles.Structure(handles.Model.StructActive),'Visible','on');
+set(handles.Structure(handles.Model.StructInactive),'Visible','off');
+set(handles.Structure([10 18 26]),'Visible','off');
+set(handles.GroundMotions,'Visible','off');
+set(get(handles.GroundMotions(7), 'Children'), 'Visible', 'off');
+set(get(handles.GroundMotions(8), 'Children'), 'Visible', 'off');
+set(get(handles.GroundMotions(9), 'Children'), 'Visible', 'off');
+set(get(handles.GroundMotions(15), 'Children'), 'Visible', 'off');
+set(get(handles.GroundMotions(16), 'Children'), 'Visible', 'off');
+set(get(handles.GroundMotions(17), 'Children'), 'Visible', 'off');
+set(handles.ES,'Visible','off');
+set(handles.EC,'Visible','off');
+set(handles.Analysis,'Visible','off');
+set(handles.Structure(30),'Value',0);
+                
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %Callback for main template tabs
     function template_toggle_Callback(source, eventdata)
         handles = guidata(gcf);
         Page_selection = get(get(source,'SelectedObject'),'Tag');
-        if ~strcmp(Page_selection, 'Structure')
-            if handles.Store.Structview == 0
-                msgbox('Must define structural properties first!','Error','error');
-                set(handles.Sidebar(7),'Value',1,'CData',handles.Store.Structure1);
-                set(handles.Sidebar(8),'CData',handles.Store.Loading0);
-                set(handles.Sidebar(9),'CData',handles.Store.ExpSetup0);
-                set(handles.Sidebar(10),'CData',handles.Store.ExpControl0);
-                set(handles.Sidebar(11),'CData',handles.Store.Analysis0);
-                set(handles.Structure([1 2 30]),'Visible','on');
-                set(handles.Structure(handles.Model.StructActive),'Visible','on');
-                set(handles.Structure(handles.Model.StructInactive),'Visible','off');
-                set(handles.Structure([10 18 26]),'Visible','off');
-                handles.Store.Structview = 1;
-                set(handles.GroundMotions,'Visible','off');
-                set(handles.ES,'Visible','off');
-                set(handles.EC,'Visible','off');
-                set(handles.Analysis,'Visible','off');
-                guidata(gcbf, handles);
-                return
-            end
-        end
+%         if ~strcmp(Page_selection, 'Structure')
+%             if handles.Store.Structview == 0
+%                 msgbox('Must define structural properties first!','Error','error');
+%                 set(handles.Sidebar(7),'Value',1,'CData',handles.Store.Structure1);
+%                 set(handles.Sidebar(8),'CData',handles.Store.Loading0);
+%                 set(handles.Sidebar(9),'CData',handles.Store.ExpSetup0);
+%                 set(handles.Sidebar(10),'CData',handles.Store.ExpControl0);
+%                 set(handles.Sidebar(11),'CData',handles.Store.Analysis0);
+%                 set(handles.Structure([1 2 30]),'Visible','on');
+%                 set(handles.Structure(handles.Model.StructActive),'Visible','on');
+%                 set(handles.Structure(handles.Model.StructInactive),'Visible','off');
+%                 set(handles.Structure([10 18 26]),'Visible','off');
+%                 handles.Store.Structview = 1;
+%                 set(handles.GroundMotions,'Visible','off');
+%                 set(handles.ES,'Visible','off');
+%                 set(handles.EC,'Visible','off');
+%                 set(handles.Analysis,'Visible','off');
+%                 guidata(gcbf, handles);
+%                 return
+%             end
+%         end
         switch Page_selection;
             case 'Structure'
                 if handles.Model.StopFlag == 1

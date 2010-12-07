@@ -12,57 +12,76 @@ analysis_option = get(gcbo,'Tag');
 switch action
     case 'choose option'
         %If the analysis has already been stopped (StopFlag == 1)
-        if handles.Model.StopFlag == 1      
-            replay = questdlg(sprintf('The experiment has ended.\nWould you like to replay\nthe results?'), ...
-                'Replay', ...
-                'Yes','No','Yes');
-            switch replay
-                case 'Yes'
-                    disp('Replaying...');
-                    handles.Model.StopFlag = 0;
-                    set(findobj('Tag','Start'),'Value',1);
-                    set(handles.Analysis(7),'Value',1);
-                    set(handles.Analysis(7),'CData',handles.Store.Start1a);
-                    set(handles.Analysis(8),'CData',handles.Store.Pause0a);
-                    set(handles.Analysis(9),'CData',handles.Store.Stop0a);
-                    set(handles.Sidebar(4),'CData',handles.Store.Start1b);
-                    set(handles.Sidebar(5),'CData',handles.Store.Pause0b);
-                    set(handles.Sidebar(6),'CData',handles.Store.Stop0b);
-                    %Update handles structure
-                    guidata(findobj('Tag','OpenFresco Quick Start'), handles);
-                    
-                    figure(findobj('Tag','ErrMon'));
-                    if ~isempty(findobj('Tag','StructOutDOF2'))
-                        figure(findobj('Tag','StructOutDOF2'));
-                    end
-                    figure(findobj('Tag','StructOutDOF1'));
-                    
-                    %Proceed with plotting
-                    for i = 1:length(handles.Response.Time)
-                        ReplayResults(i)
-                    end
-                    
-                    set(findobj('Tag','StopControl'),'Value',1);
-                    set(handles.Analysis(9),'Value',1);
-                    set(handles.Analysis(7),'CData',handles.Store.Start0a);
-                    set(handles.Analysis(8),'CData',handles.Store.Pause0a);
-                    set(handles.Analysis(9),'CData',handles.Store.Stop1a);
-                    set(handles.Sidebar(4),'CData',handles.Store.Start0b);
-                    set(handles.Sidebar(5),'CData',handles.Store.Pause0b);
-                    set(handles.Sidebar(6),'CData',handles.Store.Stop1b,'Value',1);
-                    handles.Model.StopFlag = 1;
-                    %Update handles structure
-                    guidata(findobj('Tag','OpenFresco Quick Start'), handles);
-                case 'No'
-                    msgbox(sprintf('Experiment has ended.\nChoose "Run New Test" to start a new test.'),'Error','error');
-                    set(handles.Sidebar(6),'Value',1);
-                    set(handles.Analysis(9),'Value',1);
-                    set(handles.Analysis(7),'CData',handles.Store.Start0a);
-                    set(handles.Analysis(8),'CData',handles.Store.Pause0a);
-                    set(handles.Analysis(9),'CData',handles.Store.Stop1a);
-                    set(handles.Sidebar(4),'CData',handles.Store.Start0b);
-                    set(handles.Sidebar(5),'CData',handles.Store.Pause0b);
-                    set(handles.Sidebar(6),'CData',handles.Store.Stop1b);
+        if handles.Model.StopFlag == 1 
+            if strcmp(analysis_option,'Start')
+                replay = questdlg(sprintf('The experiment has ended.\nWould you like to replay\nthe results?'), ...
+                    'Replay', ...
+                    'Yes','No','Yes');
+                switch replay
+                    case 'Yes'
+                        disp('Replaying...');
+                        handles.Model.StopFlag = 0;
+                        startCall1 = get(handles.Analysis(7),'Callback');
+                        pauseCall1 = get(handles.Analysis(8),'Callback');
+                        stopCall1 = get(handles.Analysis(9),'Callback');
+                        startCall2 = get(handles.Sidebar(4),'Callback');
+                        pauseCall2 = get(handles.Sidebar(5),'Callback');
+                        stopCall2 = get(handles.Sidebar(6),'Callback');
+                        set(findobj('Tag','Start'),'Value',1);
+                        set(handles.Analysis(7),'Value',1);
+                        set(handles.Analysis(7),'CData',handles.Store.Start1a,'Callback','');
+                        set(handles.Analysis(8),'CData',handles.Store.Pause0a,'Callback','');
+                        set(handles.Analysis(9),'CData',handles.Store.Stop0a,'Callback','');
+                        set(handles.Sidebar(4),'CData',handles.Store.Start1b,'Callback','');
+                        set(handles.Sidebar(5),'CData',handles.Store.Pause0b,'Callback','');
+                        set(handles.Sidebar(6),'CData',handles.Store.Stop0b,'Callback','');
+                        
+                        %Update handles structure
+                        guidata(findobj('Tag','OpenFresco Quick Start'), handles);
+                        
+                        figure(findobj('Tag','ErrMon'));
+                        if ~isempty(findobj('Tag','StructOutDOF2'))
+                            figure(findobj('Tag','StructOutDOF2'));
+                        end
+                        figure(findobj('Tag','StructOutDOF1'));
+                        
+                        %Proceed with plotting
+                        for i = 1:length(handles.Response.Time)
+                            ReplayResults(i)
+                        end
+                        
+                        set(findobj('Tag','StopControl'),'Value',1);
+                        set(handles.Analysis(9),'Value',1);
+                        set(handles.Analysis(7),'CData',handles.Store.Start0a,'Callback',startCall1);
+                        set(handles.Analysis(8),'CData',handles.Store.Pause0a,'Callback',pauseCall1);
+                        set(handles.Analysis(9),'CData',handles.Store.Stop1a,'Callback',stopCall1);
+                        set(handles.Sidebar(4),'CData',handles.Store.Start0b,'Callback',startCall2);
+                        set(handles.Sidebar(5),'CData',handles.Store.Pause0b,'Callback',pauseCall2);
+                        set(handles.Sidebar(6),'CData',handles.Store.Stop1b,'Value',1,'Callback',stopCall2);
+                        handles.Model.StopFlag = 1;
+                        %Update handles structure
+                        guidata(findobj('Tag','OpenFresco Quick Start'), handles);
+                    case 'No'
+                        msgbox(sprintf('Experiment has ended.\nChoose "Run New Test" to start a new test.'),'Error','error');
+                        set(handles.Sidebar(6),'Value',1);
+                        set(handles.Analysis(9),'Value',1);
+                        set(handles.Analysis(7),'CData',handles.Store.Start0a);
+                        set(handles.Analysis(8),'CData',handles.Store.Pause0a);
+                        set(handles.Analysis(9),'CData',handles.Store.Stop1a);
+                        set(handles.Sidebar(4),'CData',handles.Store.Start0b);
+                        set(handles.Sidebar(5),'CData',handles.Store.Pause0b);
+                        set(handles.Sidebar(6),'CData',handles.Store.Stop1b);
+                end
+            else
+                msgbox(sprintf('Experiment has ended.\nChoose "Run New Test" to start a new test.'),'Error','error');
+                set(handles.Sidebar(6),'Value',1);
+                set(handles.Analysis(9),'Value',1);
+                set(handles.Analysis(7),'CData',handles.Store.Start0a);
+                set(handles.Analysis(8),'CData',handles.Store.Pause0a);
+                set(handles.Analysis(9),'CData',handles.Store.Stop1a);
+                set(handles.Sidebar(4),'CData',handles.Store.Start0b);
+                set(handles.Sidebar(5),'CData',handles.Store.Pause0b);
+                set(handles.Sidebar(6),'CData',handles.Store.Stop1b);
             end
             %Otherwise...
         else

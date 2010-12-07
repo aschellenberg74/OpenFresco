@@ -228,6 +228,14 @@ for el=1:numElem
     end
 end
 
+%Calculate final error values
+err = Um-U;
+TI = [];
+TI(1,:) = 0.5*(cumtrapz(U(1,:),Um(1,:)) - cumtrapz(Um(1,:),U(1,:)));
+if ~strcmp(Model.Type,'1 DOF')
+    TI(2,:) = 0.5*(cumtrapz(U(2,:),Um(2,:)) - cumtrapz(Um(2,:),U(2,:)));
+end
+
 % assign response quantities
 Response.Time = t;
 Response.U = U;
@@ -236,7 +244,7 @@ Response.Udotdot = Udotdot;
 Response.Pr = Pr;
 Response.Um = Um;
 Response.error = err;
-Response.f = f;
-Response.MX = MX;
+Response.f = f';
+Response.MX = MX';
 Response.TI = TI;
-Response.ag = ag;
+Response.ag = ag';
