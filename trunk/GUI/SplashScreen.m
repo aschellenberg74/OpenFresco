@@ -1,5 +1,10 @@
 function SplashScreen(action)
 
+if ~isempty(findobj('Tag','SplashScreen'))
+   figure(findobj('Tag','SplashScreen'));
+   return
+end
+
 % show splash screen
 SS = get(0,'screensize');
 Width = 0.8*0.81*0.92*SS(3);

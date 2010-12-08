@@ -4,6 +4,11 @@ if (nargin==0)
     action = 'startup';
 end
 
+if ~isempty(findobj('Tag','Disclaimer'))
+   figure(findobj('Tag','Disclaimer'));
+   return
+end
+
 % text for disclaimer
 TEXT = ['\nThe University of California, the Pacific Earthquake Engineering Research Center (PEER) and the authors ' ...
         'provide this software without a signed license. It is distributed by The Regents of the ' ...

@@ -1,7 +1,7 @@
 function ReplayResults(step)
 %AnimateResponse switches over the model type to choose which plots to
 %populate with the structural response and error monitoring data
-if rem(step,5) ~= 0
+if rem(step,10) ~= 0
     return
 end
 
