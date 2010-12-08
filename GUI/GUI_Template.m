@@ -131,11 +131,11 @@ set(Background,'XTick',[],'YTick',[]);
 %Menubar
 Menu(1) = uimenu('Position',1,'Label','File');
 Menu(2) = uimenu(Menu(1),'Position',1,'Label','Load', ...
-   'Accelerator','L');
+   'Accelerator','L','Callback','MenuBar(''load'')');
 Menu(3) = uimenu(Menu(1),'Position',2,'Label','Save', ...
-   'Accelerator','S');
+   'Accelerator','S','Callback','MenuBar(''save'')');
 Menu(4) = uimenu(Menu(1),'Position',3,'Label','Quit',...
-   'Accelerator','Q');
+   'Accelerator','Q','Callback',@Quit_Program);
 Menu(5) = uimenu('Position',2,'Label','Help');
 Menu(6) = uimenu(Menu(5),'Position',1,'Label','About', ...
    'Callback','SplashScreen(''about'')');
