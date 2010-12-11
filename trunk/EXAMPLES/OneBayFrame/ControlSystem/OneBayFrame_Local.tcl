@@ -45,9 +45,7 @@ fix 4   0  1
 
 # Define materials
 # ----------------
-# uniaxialMaterial Steel02 $matTag $Fy $E $b $R0 $cR1 $cR2 $a1 $a2 $a3 $a4 
-uniaxialMaterial Elastic 1 2.8
-#uniaxialMaterial Steel02 1 1.5 2.8 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0
+# uniaxialMaterial Elastic $matTag $E <$eta> 
 uniaxialMaterial Elastic 2 5.6
 #uniaxialMaterial Steel02 2 3.0 5.6 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0 
 uniaxialMaterial Elastic 3 [expr 2.0*100.0/1.0]
