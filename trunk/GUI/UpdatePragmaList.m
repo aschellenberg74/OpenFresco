@@ -1,5 +1,5 @@
 function UpdatePragmaList(pathOPF)
-%UPDATEPRAGMALIST to update pragmalist in GUI_Template.m
+%UPDATEPRAGMALIST to update pragmalist in OPFQuickStart.m
 % UpdatePragmaList(pathOPF)
 %
 % pathOPF : path to the OpenFresco GUI directory
@@ -13,10 +13,10 @@ function UpdatePragmaList(pathOPF)
 % $URL: $
 
 % open files
-FIDr = fopen('GUI_Template.m','r');
-FIDw = fopen('GUI_Template.tmp','w');
+FIDr = fopen('OPFQuickStart.m','r');
+FIDw = fopen('OPFQuickStart.tmp','w');
 
-% copy GUI_Template.m to GUI_Template.tmp except for '%#'
+% copy OPFQuickStart.m to OPFQuickStart.tmp except for '%#'
 while feof(FIDr)==0
    txtLine = fgetl(FIDr);
    if ~isempty(txtLine) && length(txtLine)>2 && isequal(txtLine(1:2),'%#')
@@ -45,7 +45,7 @@ end
 % close all files
 fclose('all');
 
-% replace GUI_Template.m with GUI_Template.tmp
+% replace OPFQuickStart.m with OPFQuickStart.tmp
 cd(pathOPF);
-copyfile('GUI_Template.tmp','GUI_Template.m','f');
-delete('GUI_Template.tmp');
+copyfile('OPFQuickStart.tmp','OPFQuickStart.m','f');
+delete('OPFQuickStart.tmp');

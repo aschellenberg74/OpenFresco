@@ -35,7 +35,6 @@ f_ErrorMon = figure('Visible','on','Name','Error Monitors',...
     'MenuBar','none',...
     'Tag','ErrMon',...
     'Color',[0.3 0.5 0.7],...
-    'KeyPressFcn',@shortcutKeys,...
     'Position',[SS(3)*0.12,SS(4)*0.05,SS(3)*0.88,SS(4)*0.87]);
 
 %Toolbar
@@ -45,8 +44,10 @@ f_ErrorMon = figure('Visible','on','Name','Error Monitors',...
 % set(Toolbar_handles(15), 'TooltipString', 'Print Window');
 % set(Toolbar_handles(16), 'TooltipString', 'Save Window');
 File(1) = uimenu('Position',1,'Label','File');
-File(2) = uimenu(File(1),'Position',1,'Label','Save        Ctrl+S','Callback','filemenufcn(gcbf,''FileSaveAs'')');
-File(3) = uimenu(File(1),'Position',2,'Label','Print        Ctrl+P','Callback','printdlg(gcbf)');
+File(2) = uimenu(File(1),'Position',1,'Label','Save',...
+    'Accelerator','S','Callback','filemenufcn(gcbf,''FileSaveAs'')');
+File(3) = uimenu(File(1),'Position',2,'Label','Print',...
+    'Accelerator','P','Callback','printdlg(gcbf)');
 Help(1) = uimenu('Position',2,'Label','Help');
 Help(2) = uimenu(Help(1),'Position',1,'Label','About Error Plots','Callback','axesHelp(''about error'')');
 Separator(1) = uimenu('Position',3,'Label','|');
@@ -218,21 +219,4 @@ else
     grid('on');
     xlabel(a_ErrorMonitors_etY,'Time [sec]');
     ylabel(a_ErrorMonitors_etY,'Tracking Indicator [L^2]');
-end
-
-%Callback for shortcut keys
-    function shortcutKeys(source, eventdata)
-        control = 0;
-        for x=1:length(eventdata.Modifier)
-            switch(eventdata.Modifier{x})
-                case 'control'
-                    control = 1;
-            end
-        end
-        if (control == 1 && strcmp(eventdata.Key,'s'))
-            filemenufcn(gcbf,'FileSaveAs');
-        elseif (control == 1 && strcmp(eventdata.Key,'p'))
-            printdlg(gcbf);
-        end
-    end
 end

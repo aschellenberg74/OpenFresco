@@ -121,7 +121,6 @@ f = figure('Visible','off',...
            'Color',fig_color,...
            'Position',[0.1*SS(3) 0.1*SS(4) 0.8*SS(3) 0.8*SS(4)],...
            'Resize','off',...
-           'KeyPressFcn',@shortcutKeys,...
            'CloseRequestFcn',@Quit_Program);
        
 Background = axes('Parent',f,'Position',[0 0 1 1]);
@@ -247,7 +246,7 @@ BackgroundPanel = uipanel('Parent',ph_Main,...
     'Position',[0.04 0.06 0.92 0.88],...
     'Visible','on');
 Background = axes('Parent',BackgroundPanel,'Position',[0 0 1 1]);
-imagesc(imread(which('greyGradient.png')));
+imagesc(imread(which('GreyGradient.png')));
 set(Background,'XTick',[],'YTick',[]); 
 
 
@@ -298,7 +297,7 @@ Struct(8) = uipanel('Parent',ph_Main,...
     'Visible','off');    
 
 %          Background = axes('Parent',Struct(8),'Position',[0 0 1 1]);
-%          imagesc(imread(which('greyGradient.png')));
+%          imagesc(imread(which('GreyGradient.png')));
 %          % imagesc(imread(which('Metal.jpg')));
 %          set(Background,'XTick',[],'YTick',[]);
 
@@ -773,18 +772,18 @@ GM(2) = uipanel('Parent',GM(18),...
 %              'Callback','GroundMotions(''scale'')');
          GM(7) = axes('Parent',GM(18),'Position',[0.12 0.47 0.35 0.15],'Box','on',...
              'Tag','a_GM_Xag','Visible','off','NextPlot','replacechildren',...
-             'ButtonDownFcn','displayAxes(''ag1'')','FontWeight','bold');
+             'ButtonDownFcn','DisplayAxes(''ag1'')','FontWeight','bold');
              grid('on');
              xlabel(GM(7),'Time [sec]');
              ylabel(GM(7),'ag [L/sec^2]');
          GM(8) = axes('Parent',GM(18),'Position',[0.12 0.25 0.35 0.15],'Box','on',...
              'Tag','a_GM_XSa','Visible','off','NextPlot','replacechildren','XTickLabel',[],...
-             'ButtonDownFcn','displayAxes(''Sa1'')','FontWeight','bold');
+             'ButtonDownFcn','DisplayAxes(''Sa1'')','FontWeight','bold');
              grid('on');
              ylabel(GM(8),'Sa [L/sec^2]');         
          GM(9) = axes('Parent',GM(18),'Position',[0.12 0.08 0.35 0.15],'Box','on',...
              'Tag','a_GM_XSd','Visible','off','NextPlot','replacechildren',...
-             'ButtonDownFcn','displayAxes(''Sd1'')','FontWeight','bold');
+             'ButtonDownFcn','DisplayAxes(''Sd1'')','FontWeight','bold');
              grid('on');
              xlabel(GM(9),'Period [sec]');
              ylabel(GM(9),'Sd [L]');         
@@ -894,18 +893,18 @@ GM(10) = uipanel('Parent',GM(18),...
 %              'Callback','GroundMotions(''scale'')');
          GM(15) = axes('Parent',GM(18),'Position',[0.56 0.47 0.35 0.15],'Box','on',...
              'Tag','a_GM_Yag','Visible','off','NextPlot','replacechildren',...
-             'ButtonDownFcn','displayAxes(''ag2'')','FontWeight','bold');
+             'ButtonDownFcn','DisplayAxes(''ag2'')','FontWeight','bold');
              grid('on');
              xlabel(GM(15),'Time [sec]');
              ylabel(GM(15),'ag [L/sec^2]');
          GM(16) = axes('Parent',GM(18),'Position',[0.56 0.25 0.35 0.15],'Box','on',...
              'Tag','a_GM_YSa','Visible','off','XTickLabel',[],'NextPlot','replacechildren',...
-             'ButtonDownFcn','displayAxes(''Sa2'')','FontWeight','bold');
+             'ButtonDownFcn','DisplayAxes(''Sa2'')','FontWeight','bold');
              grid('on');
              ylabel(GM(16),'Sa [L/sec^2]');         
          GM(17) = axes('Parent',GM(18),'Position',[0.56 0.08 0.35 0.15],'Box','on',...
              'Tag','a_GM_YSd','Visible','off','NextPlot','replacechildren',...
-             'ButtonDownFcn','displayAxes(''Sd2'')','FontWeight','bold');
+             'ButtonDownFcn','DisplayAxes(''Sd2'')','FontWeight','bold');
              grid('on');
              xlabel(GM(17),'Period [sec]');
              ylabel(GM(17),'Sd [L]');   
@@ -1037,7 +1036,7 @@ ExpSetup(2) = uibuttongroup('Parent',ph_Main,...
          set(ExpSetup(2),'SelectionChangeFcn','ExpSetup(''choose DOF'')');
          
 Background = axes('Parent',ExpSetup(2),'Position',[0 0 1 1]);
-imagesc(imread(which('greyGradient.png')));
+imagesc(imread(which('GreyGradient.png')));
 % imagesc(imread(which('Metal.jpg')));
 set(Background,'XTick',[],'YTick',[]);          
                      
@@ -1064,7 +1063,7 @@ ExpControl(1) = uicontrol(ph_Main,'Style','text',...
 %     'Position',[0.05 0.03 0.9 0.89],...
 %     'Visible','off');
 % Background = axes('Parent',ExpControl(97),'Position',[0 0 1 1]);
-% imagesc(imread(which('greyGradient.png')));
+% imagesc(imread(which('GreyGradient.png')));
 % % imagesc(imread(which('Metal.jpg')));
 % set(Background,'XTick',[],'YTick',[]); 
 
@@ -2146,7 +2145,7 @@ Analysis(6) = uibuttongroup('Parent',ph_Main,...
          set(Analysis(6),'SelectedObject',[]);
          
 Background = axes('Parent',Analysis(6),'Position',[0 0 1 1]);
-imagesc(imread(which('greyGradient.png')));
+imagesc(imread(which('GreyGradient.png')));
 % imagesc(imread(which('Metal.jpg')));
 set(Background,'XTick',[],'YTick',[]);          
          
@@ -2761,26 +2760,6 @@ set(handles.Structure(30),'Value',0);
         end
     end
 
-%Callback for shortcut keys
-    function shortcutKeys(source, eventdata)
-        control = 0;
-        for x=1:length(eventdata.Modifier)
-            switch(eventdata.Modifier{x})
-                case 'control'
-                    control = 1;
-            end
-        end
-        if (control == 1 && strcmp(eventdata.Key,'s'))
-            MenuBar('save');
-        elseif (control == 1 && strcmp(eventdata.Key,'l'))
-            MenuBar('load');
-        elseif (control == 1 && strcmp(eventdata.Key,'q'))
-            Quit_Program;
-        end
-
-
-    end
-
 %Callback for help buttons
     function helpCallback(source, eventdata)
         helpString = get(gcbo,'ToolTipString');
@@ -2788,11 +2767,3 @@ set(handles.Structure(30),'Value',0);
     end
 
 end
-
-%#function Analysis AnimateResponse Element_ExpGeneric ExpControl 
-%#function ExpSetup GUI_AnalysisControls GUI_ErrorMonitors GUI_Output 
-%#function GUI_StructuralOutput GUI_Template GetFileList GroundMotions 
-%#function InputCheck Integrator_AlphaOS Integrator_NewmarkExplicit Links 
-%#function MenuBar ReadWriteTHFileNGA Report RunOpenFresco 
-%#function SetOPFPath Structure TCPSocket TerminateAnalysis 
-%#function UpdatePragmaList WriteTCL displayAxes getFFT 

@@ -7,7 +7,7 @@ handles = guidata(gcbf);
 
 %Calculate necessary quantities
 error = Um-U;
-[f,MX] = getFFT(error',t(2)-t(1));
+[f,MX] = GetFFT(error',t(2)-t(1));
 TI(1,:) = 0.5*(cumtrapz(U(1,:),Um(1,:)) - cumtrapz(Um(1,:),U(1,:)));
 
 switch Type
@@ -25,14 +25,12 @@ switch Type
                 set(handles.Plots.SO1agdot,'Xdata',t(end),'YData',ag(1));
             case 'Initial Conditions'
                 if t(end) <= handles.GM.rampTime
-                    y1 = U(1,:);
-                    set(handles.Plots.SO1agdot,'Xdata',t(end),'YData',U(end)/handles.GM.initialDisp(1)*100);
+                    set(handles.Plots.SO1agdot,'Xdata',t(end), ...
+                        'YData',U(1,end)/handles.GM.initialDisp(1)*100);
                 else
                     set(handles.Plots.SO1agdot,'Xdata',t(end),'YData',0);
                 end
         end
-        
-        
         
         %Error Monitors
         set(handles.Plots.EM1eplot,'Xdata',t,'YData',error(1,:));
@@ -40,6 +38,13 @@ switch Type
         set(handles.Plots.EM1MeasCmdplot,'Xdata',U(1,:),'YData',Um(1,:));
         set(handles.Plots.EM1MeasCmddot,'Xdata',U(1,end),'YData',Um(1,end));
         set(handles.Plots.EM1trackplot,'Xdata',t,'YData',TI(1,:));
+        
+        %Animate Structure
+        if handles.Store.Animate
+            set(handles.Plots.StructAnim, ...
+                'Vertices',[0.0 0.0; U(1,end) 10.0], ...
+                'FaceVertexCData',[0; abs(U(1,end))]);
+        end
         
         % update all the plots
         drawnow;
@@ -68,20 +73,19 @@ switch Type
                 set(handles.Plots.SO2agdot,'Xdata',t(end),'YData',ag(1));
             case 'Initial Conditions'
                 if t(end) <= handles.GM.rampTime
-                    y1 = U(1,:);
-                    y2 = U(2,:);
-                    set(handles.Plots.SO1agdot,'Xdata',t(end),'YData',y1(end)/handles.GM.initialDisp(1)*100);
-                    set(handles.Plots.SO2agdot,'Xdata',t(end),'YData',y2(end)/handles.GM.initialDisp(2)*100);
+                    set(handles.Plots.SO1agdot,'Xdata',t(end), ...
+                        'YData',U(1,end)/handles.GM.initialDisp(1)*100);
+                    set(handles.Plots.SO2agdot,'Xdata',t(end), ...
+                        'YData',U(2,end)/handles.GM.initialDisp(2)*100);
                 else
                     set(handles.Plots.SO1agdot,'Xdata',t(end),'YData',0);
                     set(handles.Plots.SO2agdot,'Xdata',t(end),'YData',0);
                 end
         end
         
-
         %Calculate TI for second DOF
         TI(2,:) = 0.5*(cumtrapz(U(2,:),Um(2,:)) - cumtrapz(Um(2,:),U(2,:)));
-
+        
         %Error Monitors
         set(handles.Plots.EM1eplot,'Xdata',t,'YData',error(1,:));
         set(handles.Plots.EM1ffteplot,'Xdata',f,'YData',MX(:,1));
@@ -93,6 +97,13 @@ switch Type
         set(handles.Plots.EM2MeasCmdplot,'Xdata',U(2,:),'YData',Um(2,:));
         set(handles.Plots.EM2MeasCmddot,'Xdata',U(2,end),'YData',Um(2,end));
         set(handles.Plots.EM2trackplot,'Xdata',t,'YData',TI(2,:));
+        
+        %Animate Structure
+        if handles.Store.Animate
+            set(handles.Plots.StructAnim, ...
+                'Vertices',[0.0 0.0; U(1,end) 5.0; U(2,end) 10.0], ...
+                'FaceVertexCData',[0; abs(U(:,end))]);
+        end
         
         % update all the plots
         drawnow;
@@ -121,20 +132,19 @@ switch Type
                 set(handles.Plots.SO2agdot,'Xdata',t(end),'YData',ag(2));
             case 'Initial Conditions'
                 if t(end) <= handles.GM.rampTime
-                    y1 = U(1,:);
-                    y2 = U(2,:);
-                    set(handles.Plots.SO1agdot,'Xdata',t(end),'YData',y1(end)/handles.GM.initialDisp(1)*100);
-                    set(handles.Plots.SO2agdot,'Xdata',t(end),'YData',y2(end)/handles.GM.initialDisp(2)*100);
+                    set(handles.Plots.SO1agdot,'Xdata',t(end), ...
+                        'YData',U(1,end)/handles.GM.initialDisp(1)*100);
+                    set(handles.Plots.SO2agdot,'Xdata',t(end), ...
+                        'YData',U(2,end)/handles.GM.initialDisp(2)*100);
                 else
                     set(handles.Plots.SO1agdot,'Xdata',t(end),'YData',0);
                     set(handles.Plots.SO2agdot,'Xdata',t(end),'YData',0);
                 end
         end
         
-        
         %Calculate TI for second DOF
         TI(2,:) = 0.5*(cumtrapz(U(2,:),Um(2,:)) - cumtrapz(Um(2,:),U(2,:)));
-
+        
         %Error Monitors
         set(handles.Plots.EM1eplot,'Xdata',t,'YData',error(1,:));
         set(handles.Plots.EM1ffteplot,'Xdata',f,'YData',MX(:,1));
@@ -146,6 +156,13 @@ switch Type
         set(handles.Plots.EM2MeasCmdplot,'Xdata',U(2,:),'YData',Um(2,:));
         set(handles.Plots.EM2MeasCmddot,'Xdata',U(2,end),'YData',Um(2,end));
         set(handles.Plots.EM2trackplot,'Xdata',t,'YData',TI(2,:));
+        
+        %Animate Structure
+        if handles.Store.Animate
+            set(handles.Plots.StructAnim, ...
+                'Vertices',[0.0 0.0 0.0; U(1,end) U(2,end) 10.0], ...
+                'FaceVertexCData',[0; norm(U(:,end))]);
+        end
         
         % update all the plots
         drawnow;
