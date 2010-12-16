@@ -88,7 +88,7 @@ switch action
             switch analysis_option
                 case 'Start'
                     DIR = handles.Model.DIR;
-                    if exist(fullfile(DIR,'OPFAnalysis.tcl')) == 0
+                    if ~exist(fullfile(DIR,'OPFAnalysis.tcl'),'file')
                         msgbox(sprintf('No .tcl file found!\nPlease write .tcl first.'),'Error','error')
                         set(handles.Analysis(7),'Value',0);
                         return
@@ -102,7 +102,10 @@ switch action
                         guidata(findobj('Tag','OpenFresco Quick Start'), handles);
                         GUI_ErrorMonitors;
                         GUI_StructuralOutput;
-                        GUI_AnalysisControls
+                        if handles.Store.Animate
+                            GUI_AnimateStructure;
+                        end
+                        GUI_AnalysisControls;
                         handles = guidata(findobj('Tag','OpenFresco Quick Start'));
                         set(handles.Sidebar(4),'CData',handles.Store.Start1b);
                         
@@ -368,10 +371,13 @@ switch action
         end
         if ~isempty(findobj('Tag','StructOutDOF2'))
             close(findobj('Tag','StructOutDOF2'))
-        end        
+        end
+        if ~isempty(findobj('Tag','StructAnim'))
+            close(findobj('Tag','StructAnim'))
+        end
         if ~isempty(findobj('Tag','AnalysisControls'))
             close(findobj('Tag','AnalysisControls'))
-        end    
+        end
         
         %Check for .tcl and report files and delete if found
         fclose('all');
@@ -381,7 +387,7 @@ switch action
         if exist('OPFReport.txt','file')
             delete(which('OPFReport.txt'));
         end
-
+        
         %Select structure tab
         tabs = get(handles.Sidebar(1),'Children');
         set(handles.Sidebar(1),'SelectedObject',tabs(5));
@@ -422,7 +428,7 @@ switch action
         
         %Update handles structure
         guidata(findobj('Tag','OpenFresco Quick Start'), handles);
-    
+        
     case 'animate'
         answer = get(gcbo,'String');
         if strcmp(answer,'Yes')

@@ -1,6 +1,6 @@
-function [f,MX] = getFFT(data,dt)
+function [f,MX] = GetFFT(data,dt)
 %GETFFT to get the scaled FFT and plot it if requested
-% [f,MX] = getFFT(data,dt)
+% [f,MX] = GetFFT(data,dt)
 %
 % f        : frequency vector [Hz]
 % MX       : scaled magnitude vector

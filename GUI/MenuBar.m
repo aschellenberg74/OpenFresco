@@ -20,6 +20,7 @@ switch action
         handles.Model.StopFlag = 0;
         handles.Model.firstStart = 1;
         handles.Store.Structview = 1;
+        
         %Clear existing figures
         if ~isempty(findobj('Tag','ErrMon'))
             close(findobj('Tag','ErrMon'))
@@ -29,7 +30,10 @@ switch action
         end
         if ~isempty(findobj('Tag','StructOutDOF2'))
             close(findobj('Tag','StructOutDOF2'))
-        end        
+        end
+        if ~isempty(findobj('Tag','StructAnim'))
+            close(findobj('Tag','StructAnim'))
+        end
         if ~isempty(findobj('Tag','AnalysisControls'))
             close(findobj('Tag','AnalysisControls'))
         end

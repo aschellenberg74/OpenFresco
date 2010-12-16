@@ -3,12 +3,10 @@ function GUI_StructuralOutput(varargin)
 
 % Check if window already exists
 if ~isempty(findobj('Tag','StructOutDOF1'))
-    figure(findobj('Tag','StructOutDOF1'));
     if ~isempty(findobj('Tag','StructOutDOF2'))
         figure(findobj('Tag','StructOutDOF2'));
-        figure(findobj('Tag','StructOutDOF1'));
-        return
     end
+    figure(findobj('Tag','StructOutDOF1'));
     return
 end
 
@@ -40,7 +38,6 @@ f_StructOut1 = figure('Visible','on','Name','Structural Output',...
     'MenuBar','none',...
     'Tag','StructOutDOF1',...
     'Color',[0.3 0.5 0.7],...
-    'KeyPressFcn',@shortcutKeys,...
     'Position',[SS(3)*0.12,SS(4)*0.05,SS(3)*0.88,SS(4)*0.87]);
 
 %Toolbar
@@ -50,13 +47,15 @@ f_StructOut1 = figure('Visible','on','Name','Structural Output',...
 % set(Toolbar_handles(15), 'TooltipString', 'Print Window');
 % set(Toolbar_handles(16), 'TooltipString', 'Save Window');
 File(1) = uimenu('Position',1,'Label','File');
-File(2) = uimenu(File(1),'Position',1,'Label','Save        Ctrl+S','Callback','filemenufcn(gcbf,''FileSaveAs'')');
-File(3) = uimenu(File(1),'Position',2,'Label','Print        Ctrl+P','Callback','printdlg(gcbf)');
+File(2) = uimenu(File(1),'Position',1,'Label','Save',...
+    'Accelerator','S','Callback','filemenufcn(gcbf,''FileSaveAs'')');
+File(3) = uimenu(File(1),'Position',2,'Label','Print',...
+    'Accelerator','P','Callback','printdlg(gcbf)');
 Separator(1) = uimenu('Position',2,'Label','|');
 StdMenu(1) = uimenu('Position',3,'Label','MATLAB Menu');
-StdMenu(2) = uimenu(StdMenu(1),'Position',1,'Label','Turn on', ...
+StdMenu(2) = uimenu(StdMenu(1),'Position',1,'Label','Turn on',...
    'Callback','set(gcf,''MenuBar'',''figure''); set(gcf,''Toolbar'',''figure'');');
-StdMenu(3) = uimenu(StdMenu(1),'Position',2,'Label','Turn off', ...
+StdMenu(3) = uimenu(StdMenu(1),'Position',2,'Label','Turn off',...
    'Callback','set(gcf,''MenuBar'',''none''); set(gcf,''Toolbar'',''none'');');
 % =========================================================================
 
@@ -153,7 +152,6 @@ if ~strcmp(handles.Model.Type, '1 DOF')
         'MenuBar','none',...
         'Tag','StructOutDOF2',...
         'Color',[0.3 0.5 0.7],...
-        'KeyPressFcn',@shortcutKeys,...
         'Position',[SS(3)*0.12,SS(4)*0.05,SS(3)*0.88,SS(4)*0.87]);
     
     %Toolbar
@@ -163,8 +161,10 @@ if ~strcmp(handles.Model.Type, '1 DOF')
 %     set(Toolbar_handles(15), 'TooltipString', 'Print Report');
 %     set(Toolbar_handles(16), 'TooltipString', 'Save Report');
     File(1) = uimenu('Position',1,'Label','File');
-    File(2) = uimenu(File(1),'Position',1,'Label','Save        Ctrl+S','Callback','filemenufcn(gcbf,''FileSaveAs'')');
-    File(3) = uimenu(File(1),'Position',2,'Label','Print        Ctrl+P','Callback','printdlg(gcbf)');
+    File(2) = uimenu(File(1),'Position',1,'Label','Save',...
+        'Accelerator','S','Callback','filemenufcn(gcbf,''FileSaveAs'')');
+    File(3) = uimenu(File(1),'Position',2,'Label','Print',...
+        'Accelerator','P','Callback','printdlg(gcbf)');
     Separator(1) = uimenu('Position',2,'Label','|');
     StdMenu(1) = uimenu('Position',3,'Label','MATLAB Menu');
     StdMenu(2) = uimenu(StdMenu(1),'Position',1,'Label','Turn on', ...
@@ -255,22 +255,4 @@ if ~strcmp(handles.Model.Type, '1 DOF')
     
     %Bring DOF 1 image to the foreground
     figure(findobj('Tag','StructOutDOF1'));
-end
-
-%Callback for shortcut keys
-    function shortcutKeys(source, eventdata)
-        control = 0;
-        for x=1:length(eventdata.Modifier)
-            switch(eventdata.Modifier{x})
-                case 'control'
-                    control = 1;
-            end
-        end
-        if (control == 1 && strcmp(eventdata.Key,'s'))
-            filemenufcn(gcbf,'FileSaveAs');
-        elseif (control == 1 && strcmp(eventdata.Key,'p'))
-            printdlg(gcbf);
-        end
-    end
-
 end
