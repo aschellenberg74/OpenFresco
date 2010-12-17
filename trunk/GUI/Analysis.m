@@ -4,7 +4,7 @@ function Analysis(action, varargin)
 %profile on;
 
 %  Initialization tasks
-handles = guidata(findobj('Tag','OpenFresco Quick Start'));
+handles = guidata(findobj('Tag','OpenFrescoExpress'));
 
 %Store which button is pressed
 analysis_option = get(gcbo,'Tag');
@@ -37,7 +37,7 @@ switch action
                         set(handles.Sidebar(6),'CData',handles.Store.Stop0b,'Callback','');
                         
                         %Update handles structure
-                        guidata(findobj('Tag','OpenFresco Quick Start'), handles);
+                        guidata(findobj('Tag','OpenFrescoExpress'), handles);
                         
                         figure(findobj('Tag','ErrMon'));
                         if ~isempty(findobj('Tag','StructOutDOF2'))
@@ -60,7 +60,7 @@ switch action
                         set(handles.Sidebar(6),'CData',handles.Store.Stop1b,'Value',1,'Callback',stopCall2);
                         handles.Model.StopFlag = 1;
                         %Update handles structure
-                        guidata(findobj('Tag','OpenFresco Quick Start'), handles);
+                        guidata(findobj('Tag','OpenFrescoExpress'), handles);
                     case 'No'
                         msgbox(sprintf('Experiment has ended.\nChoose "Run New Test" to start a new test.'),'Error','error');
                         set(handles.Sidebar(6),'Value',1);
@@ -95,18 +95,18 @@ switch action
                     end
                     set(handles.Analysis(7),'CData',handles.Store.Start1a);
                     handles.Store.AnalysisOption = analysis_option;
-                    guidata(findobj('Tag','OpenFresco Quick Start'), handles);
+                    guidata(findobj('Tag','OpenFrescoExpress'), handles);
                     disp('Starting...');
                     if handles.Model.firstStart
                         handles.Model.firstStart = 0;
-                        guidata(findobj('Tag','OpenFresco Quick Start'), handles);
+                        guidata(findobj('Tag','OpenFrescoExpress'), handles);
                         GUI_ErrorMonitors;
                         GUI_StructuralOutput;
                         if handles.Store.Animate
                             GUI_AnimateStructure;
                         end
                         GUI_AnalysisControls;
-                        handles = guidata(findobj('Tag','OpenFresco Quick Start'));
+                        handles = guidata(findobj('Tag','OpenFrescoExpress'));
                         set(handles.Sidebar(4),'CData',handles.Store.Start1b);
                         
                         %Initialize plots
@@ -206,7 +206,7 @@ switch action
                         end
                         set(findobj('Tag','StartControl'),'Value',1)
                         set(handles.Analysis(7),'Value',1);
-                        guidata(findobj('Tag','OpenFresco Quick Start'), handles);
+                        guidata(findobj('Tag','OpenFrescoExpress'), handles);
                         DIR = handles.Model.DIR;
                         % load path to OpenFresco executable
                         if exist('OpenFrescoPath.txt','file')==0
@@ -350,7 +350,7 @@ switch action
                             figure(findobj('Tag','StructOutDOF1'));
                     end
             end
-            guidata(findobj('Tag','OpenFresco Quick Start'), handles);
+            guidata(findobj('Tag','OpenFrescoExpress'), handles);
         end
         
     case 'generate report'
@@ -415,7 +415,7 @@ switch action
         set(handles.Analysis(7),'CData',handles.Store.Start0a);
         set(handles.Analysis(8),'CData',handles.Store.Pause0a);
         set(handles.Analysis(9),'CData',handles.Store.Stop0a);
-        guidata(findobj('Tag','OpenFresco Quick Start'), handles);
+        guidata(findobj('Tag','OpenFrescoExpress'), handles);
         
     case 'dtAnalysis'
         input_val = str2num(get(gcbo,'String'));
@@ -427,7 +427,7 @@ switch action
         end
         
         %Update handles structure
-        guidata(findobj('Tag','OpenFresco Quick Start'), handles);
+        guidata(findobj('Tag','OpenFrescoExpress'), handles);
         
     case 'animate'
         answer = get(gcbo,'String');
@@ -437,5 +437,5 @@ switch action
             handles.Store.Animate = 0;
         end
         %Update handles structure
-        guidata(findobj('Tag','OpenFresco Quick Start'), handles);
+        guidata(findobj('Tag','OpenFrescoExpress'), handles);
 end

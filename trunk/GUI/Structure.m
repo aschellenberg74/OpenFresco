@@ -891,8 +891,7 @@ switch action
                     Mode1 = Phi(:,1)./Phi(2,1);
                     Mode2 = Phi(:,2)./Phi(2,2);
                     handles.Model.Modes = [Mode1 Mode2];
-                    
-                    handles.Model.Omega = sqrt(eig(handles.Model.K, handles.Model.M));
+                    handles.Model.Omega = sqrt(diag(OmegaSq));
                     if handles.Model.Omega(1) < handles.Model.Omega(2)
                         handles.Model.minTDOF = 2;
                     else
@@ -969,8 +968,7 @@ switch action
                     Mode1 = Phi(:,1)./Phi(2,1);
                     Mode2 = Phi(:,2)./Phi(2,2);
                     handles.Model.Modes = [Mode1 Mode2];
-                    
-                    handles.Model.Omega = sqrt(eig(handles.Model.K, handles.Model.M));
+                    handles.Model.Omega = sqrt(diag(OmegaSq));
                     if handles.Model.Omega(1) < handles.Model.Omega(2)
                         handles.Model.minTDOF = 2;
                     else

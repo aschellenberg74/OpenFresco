@@ -10,6 +10,7 @@ switch action
         %Otherwise...
         else
         file = fullfile(path,file);
+        saveData = [];
         load(file);
         handles = guidata(gcf);
         handles.Model = saveData.Model;

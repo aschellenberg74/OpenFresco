@@ -1,5 +1,5 @@
 function UpdatePragmaList(pathOPF)
-%UPDATEPRAGMALIST to update pragmalist in OPFQuickStart.m
+%UPDATEPRAGMALIST to update pragmalist in OpenFrescoExpress.m
 % UpdatePragmaList(pathOPF)
 %
 % pathOPF : path to the OpenFresco GUI directory
@@ -13,10 +13,10 @@ function UpdatePragmaList(pathOPF)
 % $URL: $
 
 % open files
-FIDr = fopen('OPFQuickStart.m','r');
-FIDw = fopen('OPFQuickStart.tmp','w');
+FIDr = fopen('OpenFrescoExpress.m','r');
+FIDw = fopen('OpenFrescoExpress.tmp','w');
 
-% copy OPFQuickStart.m to OPFQuickStart.tmp except for '%#'
+% copy OpenFrescoExpress.m to OpenFrescoExpress.tmp except for '%#'
 while feof(FIDr)==0
    txtLine = fgetl(FIDr);
    if ~isempty(txtLine) && length(txtLine)>2 && isequal(txtLine(1:2),'%#')
@@ -26,7 +26,7 @@ while feof(FIDr)==0
    end
 end
 
-% write pragma list to GUI_Template.tmp
+% write pragma list to OpenFrescoExpress.tmp
 list = GetFileList('.m',pathOPF);
 k = 1;
 tmp = list{1};
@@ -45,7 +45,7 @@ end
 % close all files
 fclose('all');
 
-% replace OPFQuickStart.m with OPFQuickStart.tmp
+% replace OpenFrescoExpress.m with OpenFrescoExpress.tmp
 cd(pathOPF);
-copyfile('OPFQuickStart.tmp','OPFQuickStart.m','f');
-delete('OPFQuickStart.tmp');
+copyfile('OpenFrescoExpress.tmp','OpenFrescoExpress.m','f');
+delete('OpenFrescoExpress.tmp');

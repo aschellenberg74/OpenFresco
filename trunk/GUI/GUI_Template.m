@@ -5,8 +5,8 @@ function GUI_Template(varargin)
 %%%%%%%%%%%%%%%%%%%%%
 
 % Check if window already exists
-if ~isempty(findobj('Tag','OpenFresco Quick Start'))
-   figure(findobj('Tag','OpenFresco Quick Start'));
+if ~isempty(findobj('Tag','OpenFresco Express'))
+   figure(findobj('Tag','OpenFresco Express'));
    return
 end
 
@@ -106,18 +106,16 @@ Question0 = imresize(imread(which('Question0.png')),[questHeight questWidth]);
 Question1 = imresize(imread(which('Question1.png')),[questHeight questWidth]);
 
 %Logos
-logoWidth = SS(3)*0.8*0.05;
-logoHeight = SS(4)*0.8*0.08;
-MTS = imresize(imread(which('MTSMetal.png')),[logoHeight logoWidth]);
-PEER = imresize(imread(which('PEERMetal.png')),[logoHeight logoWidth]);
+MTS = imread(which('MTSMetal.png'));
+PEER = imread(which('PEERMetal.png'));
 
 
 %Main Figure
 f = figure('Visible','off',...
-           'Name','OpenFresco Quick Start',...
+           'Name','OpenFresco Express',...
            'NumberTitle','off',...
            'MenuBar','none',...
-           'Tag','OpenFresco Quick Start',...
+           'Tag','OpenFrescoExpress',...
            'Color',fig_color,...
            'Position',[0.1*SS(3) 0.1*SS(4) 0.8*SS(3) 0.8*SS(4)],...
            'Resize','off',...
@@ -139,7 +137,7 @@ Menu(5) = uimenu('Position',2,'Label','Help');
 Menu(6) = uimenu(Menu(5),'Position',1,'Label','About', ...
    'Callback','SplashScreen(''about'')');
 Menu(7) = uimenu(Menu(5),'Position',2,'Label','Disclaimer', ...
-   'Callback','OPFQuickStart(''about'')');
+   'Callback','OpenFrescoExpress(''about'')');
 
 
 %Sidebar Tabs
@@ -187,34 +185,21 @@ Sidebar(2) = uicontrol('Parent',f,...
     'Callback','Links(''User Tips'')',...
     'Position',[0.03 0.36 0.1 0.04]);
 
-%Horizontal Logos
-% Sidebar(12) = axes('Parent',f,...
-%     'Position',[0.03 0.235 0.05 0.08],...
-%     'XTick',[],'YTick',[]);
-% image(MTS)
-% axis off;
-% 
-% Sidebar(13) = axes('Parent',f,...
-%     'Position',[0.08 0.235 0.05 0.08],...
-%     'XTick',[],'YTick',[]);
-% image(PEER)
-% axis off;
-
 %Vertical Logos
 Sidebar(12) = axes('Parent',f,...
     'Position',[0.04 0.22 0.08 0.08],...
     'XTick',[],'YTick',[]);
-image(MTS)
-axis off;
-% set(Sidebar(12),'ButtonDownFcn','Links(''MTS'')')
+image(MTS);
+axis equal; axis off;
+set(get(Sidebar(12),'Children'),'ButtonDownFcn','Links(''MTS'');');
 
 Sidebar(13) = axes('Parent',f,...
-    'Position',[0.04 0.10 0.08 0.1],...
+    'Position',[0.02 0.08 0.12 0.12],...
     'XTick',[],'YTick',[]);
-image(PEER)
-axis off;
-% set(Sidebar(13),'ButtonDownFcn','Links(''PEER'')')
-         
+image(PEER);
+axis equal; axis off;
+set(get(Sidebar(13),'Children'),'ButtonDownFcn','Links(''PEER'');');
+
 %Main Display Panel
 ph_Main = uipanel('Parent',f,...
     'BackgroundColor',panel_color,...

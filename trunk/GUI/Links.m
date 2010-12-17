@@ -33,7 +33,7 @@ switch action
             case 'OK'
         end
     case 'MTS'
-        web('http://www.mts.com/', '-browser');
+        web('http://www.mts.com/en/civil/index.asp', '-browser');
     case 'PEER'
         web('http://peer.berkeley.edu/', '-browser');
 end

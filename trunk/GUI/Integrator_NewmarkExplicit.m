@@ -216,7 +216,7 @@ for i=iStart:iEnd-1
     
     % animate response
     if ~rem(i,downSampFact)
-        [err, f, MX, TI] = AnimateResponse(Model.Type,t(:,1:i+1),ag(i+1,:),U(:,1:i+1),Udotdot(:,1:i+1),Pr(:,1:i+1),Um(:,1:i+1));
+        [~, f, MX] = AnimateResponse(Model.Type,t(:,1:i+1),ag(i+1,:),U(:,1:i+1),Udotdot(:,1:i+1),Pr(:,1:i+1),Um(:,1:i+1));
     end
 end
 toc;
@@ -228,7 +228,7 @@ for el=1:numElem
     end
 end
 
-%Calculate final error values
+% calculate final error values
 err = Um-U;
 TI = [];
 TI(1,:) = 0.5*(cumtrapz(U(1,:),Um(1,:)) - cumtrapz(Um(1,:),U(1,:)));
