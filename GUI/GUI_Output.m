@@ -28,7 +28,7 @@ function GUI_Output(text,title,figtitle,width,height)
 % $Revision: 409 $
 % $Date: 2010-09-22 22:52:11 -0700 (Wed, 22 Sep 2010) $
 % $URL: $ 
-% $Modified for use with OpenFresco Quick Start
+% $Modified for use with OpenFrescoExpress
 
 % set some default parameters
 if nargin<2

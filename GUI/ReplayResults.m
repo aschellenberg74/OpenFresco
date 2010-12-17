@@ -6,7 +6,7 @@ if rem(step,10) ~= 0
 end
 
 % Initialization tasks
-handles = guidata(findobj('Tag','OpenFresco Quick Start'));
+handles = guidata(findobj('Tag','OpenFrescoExpress'));
 % if step > length(handles.Response.error) || step > length(handles.Response.TI)
 %     return
 % end
@@ -37,7 +37,6 @@ switch handles.Model.Type
                 set(handles.Plots.SO1agdot,'Xdata',t(end),'YData',ag(1));
             case 'Initial Conditions'
                 if t(end) <= handles.GM.rampTime
-                    y1 = U(1,:);
                     set(handles.Plots.SO1agdot,'Xdata',t(end),'YData',U(end)/handles.GM.initialDisp(1)*100);
                 else
                     set(handles.Plots.SO1agdot,'Xdata',t(end),'YData',0);

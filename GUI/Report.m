@@ -12,12 +12,12 @@ DIR = handles.Model.DIR;
 FID = fopen(fullfile(DIR,'OPFReport.txt'),'w');
 
 % Print header
-fprintf(FID,'##########################################################\n');
-fprintf(FID,'# File: OPFReport.txt                                    #\n');
-fprintf(FID,'#                                                        #\n');
-fprintf(FID,'# Purpose: Summary of inputs for use with OpenFresco GUI #\n');
-fprintf(FID,'#                                                        #\n');
-fprintf(FID,'##########################################################\n\n\n');
+fprintf(FID,'##############################################################\n');
+fprintf(FID,'# File: OPFReport.txt                                        #\n');
+fprintf(FID,'#                                                            #\n');
+fprintf(FID,'# Purpose: Summary of inputs for use with OpenFresco Express #\n');
+fprintf(FID,'#                                                            #\n');
+fprintf(FID,'##############################################################\n\n\n');
 
 switch handles.Model.Type
     %%%%%%%%%%%%
@@ -45,6 +45,8 @@ switch handles.Model.Type
                 fprintf(FID,'Ground Motion: %s\n',GMName);
                 fprintf(FID,'Database Type: %s\n',handles.GM.databaseType);
                 fprintf(FID,'PGA [L/sec^2]: %3.4f\n',handles.GM.Spectra{1}.pga);
+                fprintf(FID,'PGV [L/sec]: %3.4f\n',max(abs(handles.GM.scalevg{1})));
+                fprintf(FID,'PGD [L]: %3.4f\n',max(abs(handles.GM.scaledg{1})));
                 fprintf(FID,'Ground Motion Time Step [sec]: %1.4f\n',handles.GM.dt);
                 fprintf(FID,'Amplitude Scale Factor: %1.4f\n',handles.GM.AmpFact);
                 fprintf(FID,'Time Scale Factor: %1.4f\n\n',handles.GM.TimeFact);
@@ -161,6 +163,8 @@ switch handles.Model.Type
                 fprintf(FID,'Ground Motion: %s\n',GMName);
                 fprintf(FID,'Database Type: %s\n',handles.GM.databaseType);
                 fprintf(FID,'PGA [L/sec^2]: %3.4f\n',handles.GM.Spectra{1}.pga);
+                fprintf(FID,'PGV [L/sec]: %3.4f\n',max(abs(handles.GM.scalevg{1})));
+                fprintf(FID,'PGD [L]: %3.4f\n',max(abs(handles.GM.scaledg{1})));
                 fprintf(FID,'Ground Motion Time Step Limit [sec]: %1.4f\n',handles.Model.Maxdt);
                 fprintf(FID,'Amplitude Scale Factor: %1.4f\n',handles.GM.AmpFact);
                 fprintf(FID,'Time Scale Factor: %1.4f\n\n',handles.GM.TimeFact);
@@ -315,6 +319,8 @@ switch handles.Model.Type
                 fprintf(FID,'Ground Motion: %s\n',GMName);
                 fprintf(FID,'Database Type: %s\n',handles.GM.databaseType);
                 fprintf(FID,'PGA [L/sec^2]: %1.4f\n',handles.GM.Spectra{1}.pga);
+                fprintf(FID,'PGV [L/sec]: %1.4f\n',max(abs(handles.GM.scalevg{1})));
+                fprintf(FID,'PGD [L]: %1.4f\n',max(abs(handles.GM.scaledg{1})));
                 fprintf(FID,'Ground Motion Time Step [sec]: %1.4f\n',handles.GM.dt(1));
                 fprintf(FID,'Amplitude Scale Factor: %1.4f\n',handles.GM.AmpFact(1));
                 fprintf(FID,'Time Scale Factor: %1.4f\n\n',handles.GM.TimeFact(1));
@@ -327,6 +333,8 @@ switch handles.Model.Type
                 fprintf(FID,'Ground Motion: %s\n',GMName);
                 fprintf(FID,'Database Type: %s\n',handles.GM.databaseType);
                 fprintf(FID,'PGA [L/sec^2]: %1.4f\n',handles.GM.Spectra{2}.pga);
+                fprintf(FID,'PGV [L/sec]: %1.4f\n',max(abs(handles.GM.scalevg{2})));
+                fprintf(FID,'PGD [L]: %1.4f\n',max(abs(handles.GM.scaledg{2})));
                 fprintf(FID,'Ground Motion Time Step [sec]: %1.4f\n',handles.GM.dt(2));
                 fprintf(FID,'Amplitude Scale Factor: %1.4f\n',handles.GM.AmpFact(2));
                 fprintf(FID,'Time Scale Factor: %1.4f\n\n',handles.GM.TimeFact(2));

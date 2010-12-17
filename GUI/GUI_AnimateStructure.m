@@ -108,4 +108,4 @@ switch handles.Model.Type
 end
 
 % save the handles
-guidata(findobj('Tag','OpenFresco Quick Start'), handles);
+guidata(findobj('Tag','OpenFrescoExpress'), handles);

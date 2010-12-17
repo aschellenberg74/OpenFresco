@@ -13,7 +13,7 @@ function Response = TerminateAnalysis(Model,GroundMotion,LastState,Analysis)
 % Revision: A
 
 % get handles of main window
-handles = guidata(findobj('Tag','OpenFresco Quick Start'));
+handles = guidata(findobj('Tag','OpenFrescoExpress'));
 
 switch handles.Store.StopOption
     case 'Unload'
@@ -36,7 +36,7 @@ switch handles.Store.StopOption
         
         % reset stop flag
         handles.Model.StopFlag = 0;
-        guidata(findobj('Tag','OpenFresco Quick Start'), handles);
+        guidata(findobj('Tag','OpenFrescoExpress'), handles);
         
         % execute free vibration analysis
         Response = Integrator_NewmarkExplicit(Model,GroundMotion,LastState,Analysis);
