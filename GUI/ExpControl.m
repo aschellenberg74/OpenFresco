@@ -1,6 +1,6 @@
 function ExpControl(action, varargin)
-% ExpControl contains callbacks for the various objects on the ExpControl
-% page of the GUI
+% EXPCONTROL handles user inputs related to the Experimental Control 
+% action     : selected action on the Experimental Control page
 
 %  Initialization tasks
 handles = guidata(gcbf);
@@ -14,7 +14,6 @@ switch action
     %Switch panel display based on tab selection
         switch Tab_Selection
             case 'Control Point'
-%                 msgbox('Control points only need to be defined when using LabView Controller','Control Point','warn');
                 set(handles.EC(2),'CData',handles.Store.CP1);
                 set(handles.EC(3),'Value',0,'CData',handles.Store.Sim0);
                 set(handles.EC(4),'Value',0,'CData',handles.Store.Real0);
@@ -40,15 +39,17 @@ switch action
         end
 
     case 'CtrlDOF'
-    %Display appropriate data for DOF selection
+    %Adjust panel display for DOF selection
         selection = get(gcbo,'Value');
         set(handles.EC(7:10),'Visible','on');
         switch selection
             case 1
+                %no DOF selected
                 handles.ExpControl.store.SimActive = 6;
                 set(handles.EC(7:24),'Visible','off');
                 set(handles.EC(handles.ExpControl.store.SimActive),'Visible','on');
             case 2
+                %DOF 1 selected
                 handles.ExpControl.CtrlDOF = 'DOF 1';
                 set(handles.EC(12),'String',handles.ExpControl.DOF1.E);
                 set(handles.EC(14),'String',handles.ExpControl.DOF1.E);
@@ -92,6 +93,7 @@ switch action
                     set(handles.EC(handles.ExpControl.store.SimActive),'Visible','on');
                 end
             case 3
+                %DOF 2 selected
                 handles.ExpControl.CtrlDOF = 'DOF 2';
                 set(handles.EC(12),'String',handles.ExpControl.DOF2.E);
                 set(handles.EC(14),'String',handles.ExpControl.DOF2.E);
@@ -137,7 +139,6 @@ switch action
         end
         
     case 'Sim control'
-    %Store info when simulation control chosen
         control_selection = get(gcbo,'Value');
         switch control_selection
             case 2
@@ -147,7 +148,6 @@ switch action
         end
 
     case 'Sim Material'
-    %First, check to ensure a sim control type has been chosen
         if get(handles.EC(8),'Value') == 1
             msgbox('Must choose control type first!','Choose Control','error');
             set(handles.EC(10),'Value',1);
@@ -156,6 +156,7 @@ switch action
             material_selection = get(gcbo,'Value');
             switch material_selection
                 case 1
+                    %no selection
                     handles.ExpControl.store.SimActive = (7:10);
                     set(handles.EC(11:24),'Visible','off');
                     switch handles.ExpControl.CtrlDOF
@@ -236,11 +237,11 @@ switch action
         end
         
     case 'Real control'
-    %Display options for various controller types
+    %Display options for real controllers
         control_selection = get(gcbo,'Value');
         switch control_selection
             case 1
-            %Default
+            %no selection
                 set(handles.EC(28:52),'Visible','off');
                 set(handles.EC(2),'Visible','off');
             case 2
@@ -252,8 +253,6 @@ switch action
                 set(handles.EC(25:52),'Visible','off');
                 set(handles.EC(handles.ExpControl.store.RealActive),'Visible','on');
                 set(handles.EC(29),'String',handles.ExpControl.RealControl.ipAddr);
-%                 set(handles.EC(30),'String',handles.ExpControl.RealContro
-%                 l.ipPort);
             case 3
             %MTSCsi
                 handles.ExpControl.RealControl.Controller = 'MTSCsi';
@@ -285,10 +284,12 @@ switch action
                 handles.ExpControl.RealControl.ipPort = get(handles.EC(49),'String');
         end
         
+        
     %%%%%%%%%%%%%%%%%%    
     %Data input cases%
     %%%%%%%%%%%%%%%%%%
-    %Sim Controller
+    
+    %%%Sim Controller
     case 'NumAct'
         msgbox({'Cannot change number of actuators!','Can only change structure type!'},'Error','error');
         set(handles.EC(9),'String',handles.ExpControl.NumAct);
@@ -365,7 +366,8 @@ switch action
                 handles.ExpControl.DOF2.R0 = str2num(get(gcbo,'String'));
         end
 
-    %Real Controller
+        
+    %%%Real Controller
     case 'ipAddr'
         handles.ExpControl.RealControl.ipAddr = get(gcbo,'String');
         
@@ -462,7 +464,9 @@ switch action
                 'TooltipString',pathname);
         end
     
-    %Control Points
+        
+        
+    %%%Control Points
     case 'assign limits'
         switch get(gcbo,'Tag')
             case 'Line1'
@@ -500,7 +504,7 @@ switch action
         elseif RQ < 5
             %store
             handles.ExpControl.store.RQ = RQ;
-            %resize to default positioning
+            %resize to default positioning and display fields
             set(handles.EC(60),'Position',[0.31 0.56 0.1 0.15]);
             set(handles.EC(61),'Position',[0.43 0.56 0.1 0.15]);
             set(handles.EC(62),'Position',[0.56 0.59 0.08 0.1]);
@@ -560,7 +564,7 @@ switch action
         elseif RQ == 5
             %store
             handles.ExpControl.store.RQ = RQ;
-            %resize to fit extra rows
+            %resize to fit extra rows and display fields
             botDist1 = 0.67;
             botDist2 = 0.62;
             height1 = 0.06;
@@ -624,7 +628,7 @@ switch action
         elseif RQ == 6
             %store
             handles.ExpControl.store.RQ = RQ;
-            %resize to fit extra rows
+            %resize to fit extra rows an display fields
             botDist1 = 0.735;
             botDist2 = 0.67;
             height1 = 0.04;
@@ -711,7 +715,7 @@ switch action
             handles.ExpControl.store.RQ = handles.ExpControl.CP.NumResp{id-1};
             set(handles.EC(58),'String',handles.ExpControl.store.RQ);
             handles.ExpControl.store.CPActive = (60:(65+6*(handles.ExpControl.store.RQ-1)));
-            %resize to fit extra rows
+            %resize to fit extra rows and display fields
             if handles.ExpControl.store.RQ == 5
                 botDist1 = 0.67;
                 botDist2 = 0.62;
@@ -834,15 +838,10 @@ switch action
             end
         end
         
-    %============
     case 'saveCP'
-    %============
         id = length(handles.ExpControl.store.CPOptions);
-%         dir_ind = [60 66 72 78];
-%         NumResp = 0;
         error_flag = 0;
         NumResp = handles.ExpControl.store.RQ;
-        
         %Check if name already exists
         for k = 2:length(handles.ExpControl.store.CPOptions)
             if strcmp(get(handles.EC(56),'String'),handles.ExpControl.store.CPOptions(k))
@@ -854,15 +853,8 @@ switch action
                         error_flag = 1;
                 end
             end
-        end          
-%         %Count number of responses defined
-%         for j = 1:4
-%             if get(handles.EC(dir_ind(j)),'Value') ~= 1
-%                 NumResp = NumResp + 1;
-%             end
-%         end        
-
-        %Store node selected if 2 DOF A type
+        end                
+        %Store selected node if 2 DOF A type
         if strcmp(handles.Model.Type, '2 DOF A');
             nn = get(handles.EC(57),'Value');
             if nn == 1
@@ -915,9 +907,10 @@ switch action
                 LimU = [];
             end            
             if error_flag == 1
+                %return if errors are found
                 return
             elseif error_flag == 2
-                %Overwrite existing CP
+                %if names are identical overwrite existing CP
                 id = find(strcmp(get(handles.EC(56),'String'),handles.ExpControl.store.CPOptions)) - 1;
                 handles.ExpControl.CP.Name{id} = get(handles.EC(56),'String');
                 handles.ExpControl.CP.NumResp{id} = NumResp;
@@ -930,7 +923,7 @@ switch action
                 handles.ExpControl.CP.LimU{i,id} = LimU;
                 set(handles.EC(54),'String',handles.ExpControl.store.CPOptions,'Value',id+1);
             else
-                %Store new CP
+                %otherwise, store new CP
                 handles.ExpControl.CP.Name{id} = get(handles.EC(56),'String');
                 handles.ExpControl.CP.NumResp{id} = NumResp;
                 handles.ExpControl.CP.Node{id} = Node;

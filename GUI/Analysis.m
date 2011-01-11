@@ -1,7 +1,6 @@
 function Analysis(action, varargin)
-% Analysis stores the callbacks for the varous buttons on the analysis page
-
-%profile on;
+% ANALYSIS handles user inputs related to the analysis options
+% action     : selected analysis action
 
 %  Initialization tasks
 handles = guidata(findobj('Tag','OpenFrescoExpress'));
@@ -11,8 +10,9 @@ analysis_option = get(gcbo,'Tag');
 
 switch action
     case 'choose option'
-        %If the analysis has already been stopped (StopFlag == 1)
-        if handles.Model.StopFlag == 1 
+        %check if the analysis has already been stopped
+        if handles.Model.StopFlag == 1
+            %provide replay options
             if strcmp(analysis_option,'Start')
                 replay = questdlg(sprintf('The experiment has ended.\nWould you like to replay\nthe results?'), ...
                     'Replay', ...
@@ -83,20 +83,27 @@ switch action
                 set(handles.Sidebar(5),'CData',handles.Store.Pause0b);
                 set(handles.Sidebar(6),'CData',handles.Store.Stop1b);
             end
-            %Otherwise...
+            
         else
+            %if the analysis has NOT been previously stopped
             switch analysis_option
+                %%%%%%%
+                %Start%
+                %%%%%%%
                 case 'Start'
                     DIR = handles.Model.DIR;
+                    %return if TCL does not exist
                     if ~exist(fullfile(DIR,'OPFAnalysis.tcl'),'file')
                         msgbox(sprintf('No .tcl file found!\nPlease write .tcl first.'),'Error','error')
                         set(handles.Analysis(7),'Value',0);
                         return
                     end
+                    %initialize GUI display
                     set(handles.Analysis(7),'CData',handles.Store.Start1a);
                     handles.Store.AnalysisOption = analysis_option;
                     guidata(findobj('Tag','OpenFrescoExpress'), handles);
                     disp('Starting...');
+                    %start new analysis
                     if handles.Model.firstStart
                         handles.Model.firstStart = 0;
                         guidata(findobj('Tag','OpenFrescoExpress'), handles);
@@ -223,6 +230,7 @@ switch action
                         RunOpenFresco(pathOPF,fullfile(DIR,'OPFAnalysis.tcl'));
                         clear functions;
                         handles.Response = Integrator_NewmarkExplicit(handles.Model,handles.GM,[],handles.Analysis);
+                        %set analysis to "stopped"
                         set(findobj('Tag','StopControl'),'Value',1);
                         set(handles.Analysis(9),'Value',1);
                         set(handles.Analysis(7),'CData',handles.Store.Start0a);
@@ -233,13 +241,15 @@ switch action
                         set(handles.Sidebar(6),'CData',handles.Store.Stop1b);
                         handles.Model.StopFlag = 1;
                         handles.Store.AnalysisOption = 'Stop';
+                        %save results
                         saveResults = questdlg(sprintf('Analysis complete!\nWould you like to save the test results?'),'Save?','Yes','No','Yes');
                         switch saveResults
                             case 'Yes'
                                 Response = handles.Response;
                                 uisave('Response');
                             case 'No'
-                        end                        
+                        end
+                    %resume paused analysis
                     else
                         set(findobj('Tag','Start'),'Value',1);
                         set(handles.Analysis(7),'Value',1);
@@ -257,11 +267,16 @@ switch action
                         figure(findobj('Tag','AnalysisControls'));
                     end
                     
+                %%%%%%%
+                %Pause%
+                %%%%%%%
                 case 'Pause'
+                    %return if test not yet started
                     if handles.Model.firstStart
                         msgbox('Test not yet started!','Error','error');
                         return
                     end
+                    
                     handles.Store.AnalysisOption = analysis_option;
                     disp('Paused...');
                     set(findobj('Tag','Pause'),'Value',1);
@@ -272,17 +287,23 @@ switch action
                     set(handles.Sidebar(4),'CData',handles.Store.Start0b);
                     set(handles.Sidebar(5),'CData',handles.Store.Pause1b);
                     set(handles.Sidebar(6),'CData',handles.Store.Stop0b);
+                    %bring figures to front
                     figure(findobj('Tag','ErrMon'));
                     if ~isempty(findobj('Tag','StructOutDOF2'))
                         figure(findobj('Tag','StructOutDOF2'));
                     end
                     figure(findobj('Tag','StructOutDOF1'));
                     
+                %%%%%%
+                %Stop%
+                %%%%%%
                 case 'Stop'
+                    %return if test not yet started
                     if handles.Model.firstStart
                         msgbox('Test not yet started!','Error','error');
                         return
                     end
+                    
                     set(findobj('Tag','Stop'),'Value',1);
                     set(handles.Analysis(9),'Value',1);
                     set(handles.Analysis(7),'CData',handles.Store.Start0a);
@@ -291,13 +312,13 @@ switch action
                     set(handles.Sidebar(4),'CData',handles.Store.Start0b);
                     set(handles.Sidebar(5),'CData',handles.Store.Pause0b);
                     set(handles.Sidebar(6),'CData',handles.Store.Stop1b);
-                    %Bring figures to front
+                    %bring figures to front
                     figure(findobj('Tag','ErrMon'));
                     if ~isempty(findobj('Tag','StructOutDOF2'))
                         figure(findobj('Tag','StructOutDOF2'));
                     end
                     figure(findobj('Tag','StructOutDOF1'));
-                    
+                    %determine stopping method
                     stop_option = questdlg('How would you like to proceed?', ...
                         'Stop Test', ...
                         'Unload', 'Save State', 'Cancel', 'Unload');
@@ -354,6 +375,7 @@ switch action
         end
         
     case 'generate report'
+        %display report summarizing inputs
         Report;
         DIR = handles.Model.DIR;
         reportText = fileread(fullfile(DIR,'OPFReport.txt'));
@@ -388,7 +410,7 @@ switch action
             delete(which('OPFReport.txt'));
         end
         
-        %Select structure tab
+        %Return user to structure page
         tabs = get(handles.Sidebar(1),'Children');
         set(handles.Sidebar(1),'SelectedObject',tabs(5));
         set(handles.Sidebar(7),'CData',handles.Store.Structure1);
@@ -396,7 +418,6 @@ switch action
         set(handles.Sidebar(9),'CData',handles.Store.ExpSetup0);
         set(handles.Sidebar(10),'CData',handles.Store.ExpControl0);
         set(handles.Sidebar(11),'CData',handles.Store.Analysis0);
-        %Return user to structure page using code from GUI_Template
         set(handles.Structure,'Visible','on');
         set(handles.Structure(handles.Model.StructActive),'Visible','on');
         set(handles.Structure(handles.Model.StructInactive),'Visible','off');
@@ -415,6 +436,7 @@ switch action
         set(handles.Analysis(7),'CData',handles.Store.Start0a);
         set(handles.Analysis(8),'CData',handles.Store.Pause0a);
         set(handles.Analysis(9),'CData',handles.Store.Stop0a);
+        %Update handles structure
         guidata(findobj('Tag','OpenFrescoExpress'), handles);
         
     case 'dtAnalysis'
@@ -425,7 +447,6 @@ switch action
         else
             handles.GM.dtAnalysis = input_val;
         end
-        
         %Update handles structure
         guidata(findobj('Tag','OpenFrescoExpress'), handles);
         

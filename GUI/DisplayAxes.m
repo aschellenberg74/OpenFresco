@@ -1,5 +1,8 @@
 function DisplayAxes(action,varargin)
+%DISPLAYAXES expands certain plots for better visibility
+% action     : selected plot to expand
 
+%  Initialization tasks
 handles = guidata(gcf);
 
 switch action
@@ -7,6 +10,7 @@ switch action
         if length(handles.GM.scalet{1}) == 1 || length(handles.GM.scaleag{1}) == 1
             return
         else
+            %add pga, pgv and pgd labels
             pga = handles.GM.Spectra{1}.pga;
             pgv = max(abs(handles.GM.scalevg{1}));
             pgd = max(abs(handles.GM.scaledg{1}));
@@ -36,6 +40,7 @@ switch action
             id1 = [];
             id2 = [];
             tol = 0.01;
+            %label Sa values
             if length(handles.Model.T) == 1
                 while isempty(id1)
                     id1 = find(abs(handles.GM.Spectra{1}.T-handles.Model.T) < tol);
@@ -93,6 +98,7 @@ switch action
             id1 = [];
             id2 = [];
             tol = 0.01;
+            %label Sd values
             if length(handles.Model.T) == 1
                 while isempty(id1)
                     id1 = find(abs(handles.GM.Spectra{1}.T-handles.Model.T) < tol);
@@ -133,6 +139,7 @@ switch action
         if length(handles.GM.scalet) == 1 || length(handles.GM.scaleag) == 1
             return
         else
+            %add pga, pgv and pgd labels
             pga = handles.GM.Spectra{2}.pga;
             pgv = max(abs(handles.GM.scalevg{2}));
             pgd = max(abs(handles.GM.scaledg{2}));
@@ -162,6 +169,7 @@ switch action
             id1 = [];
             id2 = [];
             tol = 0.01;
+            %label Sa values
             if length(handles.Model.T) == 1
                 while isempty(id1)
                     id1 = find(abs(handles.GM.Spectra{2}.T-handles.Model.T) < tol);
@@ -219,6 +227,7 @@ switch action
             id1 = [];
             id2 = [];
             tol = 0.01;
+            %label Sd values
             if length(handles.Model.T) == 1
                 while isempty(id1)
                     id1 = find(abs(handles.GM.Spectra{2}.T-handles.Model.T) < tol);

@@ -1,10 +1,14 @@
 function [error message] = InputCheck(varargin)
+%INPUTCHECK checks inputs for completeness before writing the TCL file
+% error        : returns the flag for errors found
+% message      : returns the relevant error message
 
 %  Initialization tasks
 handles = guidata(gcbf);
 error = 0;
 message = 'Writing of the .tcl file failed!';
 
+%check for model chosen and loading
 if isempty(handles.Model.Type)
     error = 1;
     message = sprintf('Writing of the .tcl file failed!\nModel type not specified.');
@@ -32,6 +36,7 @@ else
                 return
             end
     end
+    
     switch handles.Model.Type
         %%%%%%%%%%%%
         %1 DOF Case%
@@ -118,10 +123,7 @@ else
                         end
                     end
             end                                    
-            
-            
-            
-            
+
         %%%%%%%%%%%%%%%
         %2 DOF A  Case%
         %%%%%%%%%%%%%%%

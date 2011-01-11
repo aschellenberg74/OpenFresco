@@ -38,11 +38,6 @@ f_ErrorMon = figure('Visible','on','Name','Error Monitors',...
     'Position',[SS(3)*0.12,SS(4)*0.05,SS(3)*0.88,SS(4)*0.87]);
 
 %Toolbar
-% set(f_ErrorMon,'Toolbar','figure');
-% Toolbar_handles = findall(gcf);
-% delete(Toolbar_handles([3:14 17:18]));
-% set(Toolbar_handles(15), 'TooltipString', 'Print Window');
-% set(Toolbar_handles(16), 'TooltipString', 'Save Window');
 File(1) = uimenu('Position',1,'Label','File');
 File(2) = uimenu(File(1),'Position',1,'Label','Save',...
     'Accelerator','S','Callback','filemenufcn(gcbf,''FileSaveAs'')');
@@ -97,7 +92,6 @@ if strcmp(handles.Model.Type, '1 DOF')
         'FontWeight','bold',...
         'ButtonDownFcn','axesHelp(''dd1'')',...
         'Position',[0.06 0.07 0.42 0.41],'Box','on');
-    %axis(a_ErrorMonitors_ddX,'equal');
     grid('on');
     xlabel(a_ErrorMonitors_ddX,'Command Disp [L]');
     ylabel(a_ErrorMonitors_ddX,'Measured Disp [L]');
@@ -114,8 +108,7 @@ if strcmp(handles.Model.Type, '1 DOF')
     
 else
     %2 DOF Case
-%     set(f_ErrorMon,'Position',[SS(3)*0.12,0,SS(3)*0.88,SS(4)]);
-    
+
     %Title
     uicontrol(f_ErrorMon,'Style','text',...
         'String','Error Monitors',...
@@ -157,7 +150,6 @@ else
         'FontWeight','bold',...
         'ButtonDownFcn','axesHelp(''dd1'')',...
         'Position',[0.06 0.08 0.19 0.38],'Box','on');
-    %axis(a_ErrorMonitors_ddX,'equal');
     grid('on');
     xlabel(a_ErrorMonitors_ddX,'Command Disp [L]');
     ylabel(a_ErrorMonitors_ddX,'Measured Disp [L]');
@@ -205,7 +197,6 @@ else
         'FontWeight','bold',...
         'ButtonDownFcn','axesHelp(''dd2'')',...
         'Position',[0.55 0.08 0.19 0.38],'Box','on');
-    %axis(a_ErrorMonitors_ddY,'equal');
     grid('on');
     xlabel(a_ErrorMonitors_ddY,'Command Disp [L]');
     ylabel(a_ErrorMonitors_ddY,'Measured Disp [L]');

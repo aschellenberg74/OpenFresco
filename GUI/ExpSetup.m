@@ -1,12 +1,12 @@
 function ExpSetup(action, varargin)
-% ExpSetup stores callbacks for the buttons on the ExpSetup page of the GUI 
+% EXPSETUP handles user inputs related to the Experimental Setup 
+% action     : selected action on the Experimental Setup page
 
 %  Initialization tasks
 handles = guidata(gcbf);
 
 %Identify Chosen DOF
 DOF_selection = handles.Model.Type;
-
 
 switch action
     case 'choose DOF'
@@ -25,8 +25,8 @@ switch action
         end
 
     case 'extra options'
-        %This callback has not been fully checked for functionality yet
-        %Prevent user from choosing in 1 DOF or 2 DOF A cases
+        %%%This callback has not been fully checked for functionality yet
+        %nonlinear options for 2 DOF B case
         if strcmp(DOF_selection, '2 DOF B')
             nonlinear = questdlg('Would you like to perform nonlinear analysis?','Nonlinear?','Yes','No','Yes');
             switch nonlinear
@@ -54,7 +54,6 @@ end
             
     %Based on setup chosen, return setup type to ExpSetup.Type
     %Example: ExpSetup.Type = 'OneActuator'
-
 
 %Update handles structure
 guidata(gcbf, handles);

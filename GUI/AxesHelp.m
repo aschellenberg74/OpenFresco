@@ -1,7 +1,10 @@
 function AxesHelp(action, varargin)
+%AXESHELP displays help messages on the analysis plots
+% action     : selected analysis plot
 
 switch action
     case 'about error'
+        %general error monitors help
         if ~isempty(findobj('Tag','EMHelp'))
             figure(findobj('Tag','EMHelp'));
             return

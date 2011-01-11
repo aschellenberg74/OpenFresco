@@ -1,5 +1,5 @@
 function GUI_AnalysisControls(varargin)
-% GUI_StructuralOutput provides layout of the GUI structural output page
+% GUI_ANALYSISCONTROLS defines the layout of of the analysis control tool
 
 % Check if window already exists
 if ~isempty(findobj('Tag','AnalysisControls'))
@@ -9,7 +9,6 @@ end
 
 %  Initialization tasks
 handles = guidata(gcbf);
-
 panel_color = [0.3 0.5 0.7];%Replace with handles.panelColor
 
 %Main Figure

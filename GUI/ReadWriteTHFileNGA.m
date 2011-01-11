@@ -1,5 +1,6 @@
 function varargout = ReadWriteTHFileNGA(action,fileIN,fileOUT)
-%READWRITETHFILE to read and write a time history file
+%READWRITETHFILE to read and write a time history file, modified for use
+%with OpenFresco Express
 % varargout = ReadWriteTHFile(action,fileIN,fileOUT)
 %
 % action  : switch with following possible values

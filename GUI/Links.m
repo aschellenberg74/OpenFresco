@@ -1,5 +1,6 @@
 function Links(action, varargin)
-% Links stores the web addresses which the GUI links to
+% LINKS stores the web addresses which the GUI links to
+% action        : defines which link to follow
 
 %  Initialization tasks
 handles = guidata(gcbf);

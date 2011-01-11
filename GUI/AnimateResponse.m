@@ -1,6 +1,18 @@
 function [error, f, MX, TI] = AnimateResponse(Type,t,ag,U,Udotdot,Pr,Um)
-%AnimateResponse switches over the model type to choose which plots to
+%ANIMATERESPONSE switches over the model type to choose which plots to
 %populate with the structural response and error monitoring data
+% error        : displacement error
+% f            : error frequency vector
+% MX           : fourier amplitude of the error
+% TI           : error tracking indicator
+%
+% Type         : structural model type
+% t            : vector of time steps for analysis
+% ag           : vector of ground motion values
+% U            : command displacement values
+% Udotdot      : acceleration values
+% Pr           : resisting force
+% Um           : measured displacement values
 
 % Initialization tasks
 handles = guidata(gcbf);

@@ -1,7 +1,7 @@
 function GroundMotions(action,varargin)
-% GroundMotions contains callbacks for the objects on the Ground Motions
-% page of the GUI
-                 
+% GROUNDMOTIONS handles user inputs related to the ground motions
+% action     : selected action on the ground motions page
+
 %  Initialization tasks
 handles = guidata(gcbf);
 
@@ -9,7 +9,7 @@ handles = guidata(gcbf);
 GM_direction = get(get(gcbo,'Parent'), 'Tag');
 handles.GM.store.direction = GM_direction;
 
-% Pre-define input values of mass and period for calculating spectra
+% Pre-define input values of mass and period range for calculating spectra
 m = 1.0;
 minT = 0.01;
 maxT = 4.99;
@@ -48,14 +48,6 @@ switch action
                 if isempty(handles.Model.M) || isempty(handles.Model.K)
                     msgbox(sprintf('Please define structural properties before\n setting initial conditions.'),'Error','error');
                 end
-                switch handles.Model.Type
-                    case '1 DOF'
-%                         msgbox('Specify one value for each field');
-                    case '2 DOF A'
-%                         msgbox(sprintf('Specify two values for each field;\none for each DOF.'));
-                    case '2 DOF B'
-%                         msgbox(sprintf('Specify two values for each field;\none for each DOF.'));
-                end
                 handles.GM.loadType = 'Initial Conditions';
                 handles.GM.dtAnalysis = 0.005;
                 set(handles.Analysis(3),'String',num2str(handles.GM.dtAnalysis));
@@ -88,7 +80,7 @@ switch action
         
     case 'load'
         [filename, pathname] = uigetfile({'*.txt;*.AT2'});
-        %Break from function if load file is cancelled
+        %return from function if load file is cancelled
         if filename == 0
             return
         %Check that damping has been selected
@@ -96,7 +88,6 @@ switch action
             msgbox(sprintf('Must specify damping values before\nloading ground motion!'),'Error','error');
             set(handles.GroundMotions([3 11]),'String','...');
             return
-        %Otherwise...
         else
             filepath = fullfile(pathname, filename);
             handles.GM.store.setGM = 1;            
@@ -198,6 +189,7 @@ switch action
                 return
             end
             switch GM_direction
+                %Switch based on which direction is chosen
                 case 'Direction 1'
                     handles.GM.store.filepath{1} = filepath;
                     set(handles.GroundMotions(3),...
@@ -277,6 +269,7 @@ switch action
                     guidata(gcbf, handles);
             end
         else
+            %return if filepath is invalid
             msgbox('Invalid file path specified','Path Not Found','warn')
             return
         end
@@ -285,6 +278,7 @@ switch action
         cbo_tag = get(gcbo,'Tag');
         switch cbo_tag
             case 'dt1'
+                %adjust dt for GM 1
                 if str2num(get(gcbo,'String')) <= 0
                     msgbox('Time step must be positive!','Error','error');
                     set(handles.GroundMotions(28),'String',num2str(handles.GM.dt(1)));
@@ -315,6 +309,7 @@ switch action
                 guidata(gcbf, handles);
                 
             case 'dt2'
+                %adjust dt for GM 2
                 if str2num(get(gcbo,'String')) <= 0
                     msgbox('Time step must be positive!','Error','error');
                     set(handles.GroundMotions(29),'String',num2str(handles.GM.dt(1)));
@@ -347,6 +342,7 @@ switch action
         
 
     case 'scale'
+        %check for necessary ground motions
         if strcmp(GM_direction,'Direction 1')
             if length(handles.GM.t{1}) == 1
                 msgbox('Please load a ground motion first!','Error','error');
@@ -417,6 +413,7 @@ switch action
         end
         
     case 'initialDispType'
+        %adjust display of initial displacement options
         options = get(gcbo,'String');
         modeSelection = options(get(gcbo,'Value'));
         switch modeSelection{1}
