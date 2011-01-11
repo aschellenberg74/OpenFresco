@@ -1,7 +1,5 @@
 function WriteTCL(varargin)
-% GUI_Analysis layout of analysis page of GUI
-%       Comments displayed at the command line in response 
-%       to the help command. 
+%WRITETCL writes the necessary TCL file based on user inputs
 
 %  Initialization tasks
 handles = guidata(gcbf);
@@ -16,7 +14,7 @@ else
     
     % get the path
     DIR = handles.Model.DIR;
-    
+    % open file for writing
     FID = fopen(fullfile(DIR,'OPFAnalysis.tcl'),'w');
     
     % Print header
@@ -35,12 +33,11 @@ else
             %Start of model generation
             fprintf(FID,'# ------------------------------\n# Start of model generation\n# ------------------------------\n# create ModelBuilder (with two-dimensions and 1 DOF/node)\n');
             fprintf(FID,'model BasicBuilder -ndm 2 -ndf %g\n\n',handles.Model.ndf);
-            
             %         %Define geometry
             %         fprintf(FID,'# Define geometry for model\n# -------------------------\n# node $tag $xCrd $yCrd $mass\n');
             %         fprintf(FID,'node  1     0.0   0.0\nnode  2     0.0   1.0  -mass  %+1.6E  0.0\n',handles.Model.M);
             %         fprintf(FID,'fix   1      1     1\nfix   2      0     1\n\n');
-            
+
             switch handles.ExpControl.Type
                 case 'Simulation'
                     %Define materials
@@ -55,14 +52,12 @@ else
                         case 'Steel - Giuffré-Menegotto-Pinto'
                             fprintf(FID,'uniaxialMaterial Steel02 1 %+1.6E %+1.6E %+1.6E %+1.6E %+1.6E %+1.6E\n\n',handles.ExpControl.DOF1.Fy,handles.ExpControl.DOF1.E,handles.ExpControl.DOF1.b,handles.ExpControl.DOF1.R0, handles.ExpControl.DOF1.cR1, handles.ExpControl.DOF1.cR2);
                     end
-                    
                     %Define experimental control
                     fprintf(FID,'# Define experimental control\n# ---------------------------\n');
                     fprintf(FID,'expControl %s 1 1\n\n',handles.ExpControl.SimControl.SimType);
                     
                 case 'Real'
                     %Define experimental control
-                    
                     switch handles.ExpControl.RealControl.Controller
                         case 'LabVIEW'
                             %Define experimental control points
@@ -141,7 +136,6 @@ else
                                 end
                                 j = j+1;
                             end
-                            
                             %fprintf(FID,'expControlPoint 1 1  ux disp -fact 1.0 -lim -7.5 7.5\n');
                             %fprintf(FID,'expControlPoint 2 1  ux disp -fact 1.0 -lim -7.5 7.5  ux force -fact 1.0 -lim -12.0 12.0\n\n');
                             
@@ -199,9 +193,9 @@ else
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             
             
-            %%%%%%%%%%%%%%%
-            %2 DOF A  Case%
-            %%%%%%%%%%%%%%%
+        %%%%%%%%%%%%%%%
+        %2 DOF A  Case%
+        %%%%%%%%%%%%%%%
         case '2 DOF A'
             %Start of model generation
             fprintf(FID,'# ------------------------------\n# Start of model generation\n# ------------------------------\n# create ModelBuilder (with two-dimensions and 2 DOF/node)\n');
@@ -218,7 +212,6 @@ else
                     
                     %Define materials
                     fprintf(FID,'# Define materials\n# ----------------\n');
-                    
                     switch handles.ExpControl.DOF1.SimMaterial
                         case 'Elastic'
                             fprintf(FID,'uniaxialMaterial Elastic 1 %+1.6E\n',handles.ExpControl.DOF1.E);
@@ -229,7 +222,6 @@ else
                         case 'Steel - Giuffré-Menegotto-Pinto'
                             fprintf(FID,'uniaxialMaterial Steel02 1 %+1.6E %+1.6E %+1.6E %+1.6E %+1.6E %+1.6E\n',handles.ExpControl.DOF1.Fy,handles.ExpControl.DOF1.E,handles.ExpControl.DOF1.b,handles.ExpControl.DOF1.R0, handles.ExpControl.DOF1.cR1, handles.ExpControl.DOF1.cR2);
                     end
-                    
                     switch handles.ExpControl.DOF2.SimMaterial
                         case 'Elastic'
                             fprintf(FID,'uniaxialMaterial Elastic 2 %+1.6E\n\n',handles.ExpControl.DOF2.E);
@@ -262,7 +254,6 @@ else
                     
                 case 'Real'
                     %Define experimental control
-                    
                     switch handles.ExpControl.RealControl.Controller
                         case 'LabVIEW'
                             %Define experimental control points
@@ -341,12 +332,10 @@ else
                                 end
                                 j = j+1;
                             end
-                            
                             %fprintf(FID,'expControlPoint 1 1  ux disp -fact 1.0 -lim -7.5 7.5\n');
                             %fprintf(FID,'expControlPoint 2 1  ux disp -fact 1.0 -lim -7.5 7.5  ux force -fact 1.0 -lim -12.0 12.0\n');
                             %fprintf(FID,'expControlPoint 3 2  ux disp -fact 1.0 -lim -7.5 7.5\n');
                             %fprintf(FID,'expControlPoint 4 2  ux disp -fact 1.0 -lim -7.5 7.5  ux force -fact 1.0 -lim -12.0 12.0\n\n');
-                            
                             fprintf(FID,'# Define experimental control\n# ---------------------------\n');
                             fprintf(FID,'expControl %s 1 "%s" %s\n\n',handles.ExpControl.RealControl.Controller,handles.ExpControl.RealControl.ipAddr,handles.ExpControl.RealControl.ipPort);
                         case 'MTSCsi'
@@ -404,14 +393,13 @@ else
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             
             
-            %%%%%%%%%%%%%%%
-            %2 DOF B  Case%
-            %%%%%%%%%%%%%%%
+        %%%%%%%%%%%%%%%
+        %2 DOF B  Case%
+        %%%%%%%%%%%%%%%
         case '2 DOF B'
             %Start of model generation
             fprintf(FID,'# ------------------------------\n# Start of model generation\n# ------------------------------\n# create ModelBuilder (with three-dimensions and 2 DOF/node)\n');
             fprintf(FID,'model BasicBuilder -ndm 3 -ndf 3\n\n');
-            
             %         %Define geometry
             %         fprintf(FID,'# Define geometry for model\n# -------------------------\n# node $tag $xCrd $yCrd $mass\n');
             %         fprintf(FID,'node  1     0.0   0.0   0.0\nnode  2     0.0   0.0   1.0  -mass  %+1.6E  %+1.6E   0.0\n',handles.Model.M(1,1),handles.Model.M(2,2));
@@ -421,7 +409,6 @@ else
                 case 'Simulation'
                     %Define materials
                     fprintf(FID,'# Define materials\n# ----------------\n');
-                    
                     switch handles.ExpControl.DOF1.SimMaterial
                         case 'Elastic'
                             fprintf(FID,'uniaxialMaterial Elastic 1 %+1.6E\n',handles.ExpControl.DOF1.E);
@@ -432,7 +419,6 @@ else
                         case 'Steel - Giuffré-Menegotto-Pinto'
                             fprintf(FID,'uniaxialMaterial Steel02 1 %+1.6E %+1.6E %+1.6E %+1.6E %+1.6E %+1.6E\n',handles.ExpControl.DOF1.Fy,handles.ExpControl.DOF1.E,handles.ExpControl.DOF1.b,handles.ExpControl.DOF1.R0, handles.ExpControl.DOF1.cR1, handles.ExpControl.DOF1.cR2);
                     end
-                    
                     switch handles.ExpControl.DOF2.SimMaterial
                         case 'Elastic'
                             fprintf(FID,'uniaxialMaterial Elastic 2 %+1.6E\n\n',handles.ExpControl.DOF2.E);
@@ -531,10 +517,8 @@ else
                                 end
                                 j = j+1;
                             end
-                            
                             %fprintf(FID,'expControlPoint 1 1  ux disp -fact 1.0 -lim -7.5 7.5  uy disp -fact 1.0 -lim -7.5 7.5\n');
                             %fprintf(FID,'expControlPoint 2 1  ux disp -fact 1.0 -lim -7.5 7.5  uy disp -fact 1.0 -lim -7.5 7.5  ux force -fact 1.0 -lim -12.0 12.0  uy force -fact 1.0 -lim -12.0 12.0\n\n');
-                            
                             fprintf(FID,'# Define experimental control\n# ---------------------------\n');
                             fprintf(FID,'expControl %s 1 "%s" %s\n\n',handles.ExpControl.RealControl.Controller,handles.ExpControl.RealControl.ipAddr,handles.ExpControl.RealControl.ipPort);
                         case 'MTSCsi'
@@ -570,7 +554,6 @@ else
             %         fprintf(FID,'# Define experimental element\n# ---------------------------\n');
             %         fprintf(FID,'expElement generic 1 -node 2 -dof 1 2 -site 1 -initStif %+1.6E %+1.6E %+1.6E %+1.6E\n',handles.Model.K(1,1),handles.Model.K(1,2),handles.Model.K(2,1),handles.Model.K(2,2));
             fprintf(FID,'# ------------------------------\n# End of model generation\n# ------------------------------\n\n\n\n');
-            %
             %         %Start of recorder generation
             %         fprintf(FID,'# ------------------------------\n# Start of recorder generation\n# ------------------------------\n# create the recorder objects\n');
             %         fprintf(FID,'recorder Node -file NodeDsp.out -time -node 2 -dof 1 disp\n');

@@ -1,7 +1,6 @@
 function Response = TerminateAnalysis(Model,GroundMotion,LastState,Analysis)
-%INTEGRATOR_NEWMARKEXPLICIT to perform a direct integration analysis using
-% the second order explicit Newmark method
-% Response = Integrator_NewmarkExplicit(Model,GroundMotion,Analysis)
+%TERMINATEANALYSIS to stop a running analysis in OpenFresco Express
+% Response = TerminateAnalysis(Model,GroundMotion,LastState,Analysis)
 %
 % Model        : data structure with structural model information
 % GroundMotion : data structure with ground motion information

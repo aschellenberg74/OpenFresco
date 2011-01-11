@@ -1,12 +1,11 @@
 function Report(varargin)
-% Report generate report page
-%       Comments displayed at the command line in response 
-%       to the help command. 
+% REPORT generate report page for overview of model definition
+% 
 
 %  Initialization tasks
 handles = guidata(gcbf);
 
-% get the path
+% get the path and open file for writing
 DIR = handles.Model.DIR;
 
 FID = fopen(fullfile(DIR,'OPFReport.txt'),'w');
@@ -101,13 +100,11 @@ switch handles.Model.Type
                         fprintf(FID,'Controller: %s\n',handles.ExpControl.RealControl.Controller);
                         fprintf(FID,'IP Address: %s\n',handles.ExpControl.RealControl.ipAddr);
                         fprintf(FID,'IP Port: %s\n\n',handles.ExpControl.RealControl.ipPort);
-                        
 %                         %Define experimental control points
 %                         fprintf(FID,'# Define control points\n# ---------------------\n');
 %                         fprintf(FID,'# expControlPoint tag nodeTag dir resp <-fact f> <-lim l u> ...\n');
 %                         fprintf(FID,'expControlPoint 1 1  ux disp -fact 1.0 -lim -7.5 7.5\n');
 %                         fprintf(FID,'expControlPoint 2 1  ux disp -fact 1.0 -lim -7.5 7.5  ux force -fact 1.0 -lim -12.0 12.0\n\n');
-                        
                     case 'MTSCsi'
                         fprintf(FID,'Controller: %s\n',handles.ExpControl.RealControl.Controller);
                         fprintf(FID,'Configuration File: %s\n',strcat(handles.ExpControl.RealControl.ConfigName,handles.ExpControl.RealControl.ConfigType));
@@ -234,16 +231,13 @@ switch handles.Model.Type
                         fprintf(FID,'cR1: %1.4f\n',handles.ExpControl.DOF2.cR1);
                         fprintf(FID,'cR2: %1.4f\n\n',handles.ExpControl.DOF2.cR2);
                 end  
-                
-                %                         %Define experimental control points
-                %                         fprintf(FID,'# Define control points\n# ---------------------\n');
-                %                         fprintf(FID,'# expControlPoint tag nodeTag dir resp <-fact f> <-lim l u> ...\n');
-                %                         fprintf(FID,'expControlPoint 1 2  ux disp\n');
-                %                         fprintf(FID,'expControlPoint 2 2  ux disp  ux force\n');
-                %                         fprintf(FID,'expControlPoint 3 3  ux disp\n');
-                %                         fprintf(FID,'expControlPoint 4 3  ux disp  ux
-                %                         force\n\n');
-
+%                         %Define experimental control points
+%                         fprintf(FID,'# Define control points\n# ---------------------\n');
+%                         fprintf(FID,'# expControlPoint tag nodeTag dir resp <-fact f> <-lim l u> ...\n');
+%                         fprintf(FID,'expControlPoint 1 2  ux disp\n');
+%                         fprintf(FID,'expControlPoint 2 2  ux disp  ux force\n');
+%                         fprintf(FID,'expControlPoint 3 3  ux disp\n');
+%                         fprintf(FID,'expControlPoint 4 3  ux disp  ux force\n\n');
             case 'Real'
                 fprintf(FID,'Control Type: %s\n',handles.ExpControl.Type);
                 switch handles.ExpControl.RealControl.Controller
@@ -251,18 +245,13 @@ switch handles.Model.Type
                         fprintf(FID,'Controller: %s\n',handles.ExpControl.RealControl.Controller);
                         fprintf(FID,'IP Address: %s\n',handles.ExpControl.RealControl.ipAddr);
                         fprintf(FID,'IP Port: %s\n\n',handles.ExpControl.RealControl.ipPort);
-                        
 %                         %Define experimental control points
 %                         fprintf(FID,'# Define control points\n# ---------------------\n');
 %                         fprintf(FID,'# expControlPoint tag nodeTag dir resp <-fact f> <-lim l u> ...\n');
 %                         fprintf(FID,'expControlPoint 1 1  ux disp -fact 1.0 -lim -7.5 7.5\n');
 %                         fprintf(FID,'expControlPoint 2 1  ux disp -fact 1.0 -lim -7.5 7.5  ux force -fact 1.0 -lim -12.0 12.0\n');
 %                         fprintf(FID,'expControlPoint 3 2  ux disp -fact 1.0 -lim -7.5 7.5\n');
-%                         fprintf(FID,'expControlPoint 4 2  ux disp -fact
-%                         1.0 -lim -7.5 7.5  ux force -fact 1.0 -lim -12.0 12.0\n\n');
-
-
-                        
+%                         fprintf(FID,'expControlPoint 4 2  ux disp -fact 1.0 -lim -7.5 7.5  ux force -fact 1.0 -lim -12.0 12.0\n\n');                        
                     case 'MTSCsi'
                         fprintf(FID,'Controller: %s\n',handles.ExpControl.RealControl.Controller);
                         fprintf(FID,'Configuration File: %s\n',strcat(handles.ExpControl.RealControl.ConfigName,handles.ExpControl.RealControl.ConfigType));
@@ -412,14 +401,12 @@ switch handles.Model.Type
                     case 'LabVIEW'
                         fprintf(FID,'Controller: %s\n',handles.ExpControl.RealControl.Controller);
                         fprintf(FID,'IP Address: %s\n',handles.ExpControl.RealControl.ipAddr);
-                        fprintf(FID,'IP Port: %s\n\n',handles.ExpControl.RealControl.ipPort);
-                        
+                        fprintf(FID,'IP Port: %s\n\n',handles.ExpControl.RealControl.ipPort); 
 %                         %Define experimental control points
 %                         fprintf(FID,'# Define control points\n# ---------------------\n');
 %                         fprintf(FID,'# expControlPoint tag nodeTag dir resp <-fact f> <-lim l u> ...\n');
 %                         fprintf(FID,'expControlPoint 1 1  ux disp -fact 1.0 -lim -7.5 7.5  uy disp -fact 1.0 -lim -7.5 7.5\n');
 %                         fprintf(FID,'expControlPoint 2 1  ux disp -fact 1.0 -lim -7.5 7.5  uy disp -fact 1.0 -lim -7.5 7.5  ux force -fact 1.0 -lim -12.0 12.0  uy force -fact 1.0 -lim -12.0 12.0\n\n');
-                        
                     case 'MTSCsi'
                         fprintf(FID,'Controller: %s\n',handles.ExpControl.RealControl.Controller);
                         fprintf(FID,'Configuration File: %s\n',strcat(handles.ExpControl.RealControl.ConfigName,handles.ExpControl.RealControl.ConfigType));

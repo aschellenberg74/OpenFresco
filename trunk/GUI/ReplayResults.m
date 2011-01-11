@@ -1,15 +1,13 @@
 function ReplayResults(step)
-%AnimateResponse switches over the model type to choose which plots to
-%populate with the structural response and error monitoring data
+%REPLAYRESULTS replay results of analysis
+% step        : the current analysis step
+
 if rem(step,10) ~= 0
     return
 end
 
 % Initialization tasks
 handles = guidata(findobj('Tag','OpenFrescoExpress'));
-% if step > length(handles.Response.error) || step > length(handles.Response.TI)
-%     return
-% end
 t = handles.Response.Time(:,1:step);
 ag = handles.Response.ag(:,step);
 U = handles.Response.U(:,1:step);
@@ -42,8 +40,6 @@ switch handles.Model.Type
                     set(handles.Plots.SO1agdot,'Xdata',t(end),'YData',0);
                 end
         end
-        
-        
         
         %Error Monitors
         set(handles.Plots.EM1eplot,'Xdata',t,'YData',error(1,:));

@@ -41,11 +41,6 @@ f_StructOut1 = figure('Visible','on','Name','Structural Output',...
     'Position',[SS(3)*0.12,SS(4)*0.05,SS(3)*0.88,SS(4)*0.87]);
 
 %Toolbar
-% set(f_StructOut1,'Toolbar','figure');
-% Toolbar_handles = findall(gcf);
-% delete(Toolbar_handles([3:14 17:18]));
-% set(Toolbar_handles(15), 'TooltipString', 'Print Window');
-% set(Toolbar_handles(16), 'TooltipString', 'Save Window');
 File(1) = uimenu('Position',1,'Label','File');
 File(2) = uimenu(File(1),'Position',1,'Label','Save',...
     'Accelerator','S','Callback','filemenufcn(gcbf,''FileSaveAs'')');
@@ -155,11 +150,6 @@ if ~strcmp(handles.Model.Type, '1 DOF')
         'Position',[SS(3)*0.12,SS(4)*0.05,SS(3)*0.88,SS(4)*0.87]);
     
     %Toolbar
-%     set(f_StructOut2,'Toolbar','figure');
-%     Toolbar_handles = findall(gcf);
-%     delete(Toolbar_handles([3:14 17:18]));
-%     set(Toolbar_handles(15), 'TooltipString', 'Print Report');
-%     set(Toolbar_handles(16), 'TooltipString', 'Save Report');
     File(1) = uimenu('Position',1,'Label','File');
     File(2) = uimenu(File(1),'Position',1,'Label','Save',...
         'Accelerator','S','Callback','filemenufcn(gcbf,''FileSaveAs'')');
@@ -253,6 +243,6 @@ if ~strcmp(handles.Model.Type, '1 DOF')
     xlabel(a_StructuralOutput_ff,'Force 1 [F]');
     ylabel(a_StructuralOutput_ff,'Force 2 [F]');
     
-    %Bring DOF 1 image to the foreground
+    %Bring DOF 1 output to the foreground
     figure(findobj('Tag','StructOutDOF1'));
 end

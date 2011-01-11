@@ -1,4 +1,6 @@
 function OpenFrescoExpress(action)
+%OPENFRESCOEXPRESS launches disclaimer and OpenFrescoExpress program
+% action        : defines how to proceed
 
 if (nargin==0)
     action = 'startup';

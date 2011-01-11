@@ -1,5 +1,6 @@
 function MenuBar(action,varargin)
-% MenuBar contains the callbacks for the various menubar options
+% MENUBAR contains the callbacks for the various menubar options
+% action        : selected action under menubar
 
 switch action
     case 'load'
@@ -7,8 +8,8 @@ switch action
         %Break from function if load file is cancelled
         if file == 0
             return
-        %Otherwise...
         else
+        %load saved Model, GM and ExpControl into handles
         file = fullfile(path,file);
         saveData = [];
         load(file);
@@ -48,6 +49,7 @@ switch action
             delete(which('OPFReport.txt'));
         end
 
+        %Reset analysis buttons
         set(handles.Analysis(6),'SelectedObject',[]);
         set(handles.Analysis(7),'CData',handles.Store.Start0a);
         set(handles.Analysis(8),'CData',handles.Store.Pause0a);
@@ -57,7 +59,7 @@ switch action
         handles.Model.DIR = pwd;
         guidata(gcf,handles);
         
-        %Adjust display
+        %define colors and identify children plots
         active_color = [0 0 0];
         inactive_color = [0.6 0.6 0.6];
         panelDefault = [0.941176 0.941176 0.941176];
@@ -68,16 +70,12 @@ switch action
         set(handles.EC(32),'String',handles.ExpControl.store.CPOptions(2:end));
         set(handles.EC(33),'String',handles.ExpControl.store.CPOptions(2:end));
         
-%         %Check ExpControl type
-%         if get(handles.EC(3),'Value')
-%             handles.ExpControl.Type = 'Simulation';
-%         elseif get(handles.EC(4),'Value') || get(handles.EC(2),'Value')
-%             handles.ExpControl.Type = 'Real';
-%         end
-        
         switch handles.Model.Type;
+            %%%%%%%
+            %1 DOF%
+            %%%%%%%
             case '1 DOF'
-                %Adjust colors to emphasize active/inactive fields
+                % initialize structure page and adjust button and field colors
                 set(handles.Structure(3),'CData',handles.Store.Model1A1);
                 set(handles.Structure(4),'CData',handles.Store.Model2A0);
                 set(handles.Structure(5),'CData',handles.Store.Model2B0);
@@ -299,8 +297,11 @@ switch action
                 set(handles.EC,'Visible','off');
                 set(handles.Analysis,'Visible','off');
                 
+            %%%%%%%%%
+            %2 DOF A%
+            %%%%%%%%%
             case '2 DOF A'
-                %Adjust colors to emphasize active/inactive fields
+                % initialize structure page and adjust button and field colors
                 set(handles.Structure(3),'CData',handles.Store.Model1A0);
                 set(handles.Structure(4),'CData',handles.Store.Model2A1);
                 set(handles.Structure(5),'CData',handles.Store.Model2B0);
@@ -531,9 +532,12 @@ switch action
                 set(handles.ES,'Visible','off');
                 set(handles.EC,'Visible','off');
                 set(handles.Analysis,'Visible','off');
-                
+            
+            %%%%%%%%%
+            %2 DOF B%
+            %%%%%%%%%
             case '2 DOF B'
-                %Adjust colors to emphasize active/inactive fields
+                % initialize structure page and adjust button and field colors
                 set(handles.Structure(3),'CData',handles.Store.Model1A0);
                 set(handles.Structure(4),'CData',handles.Store.Model2A0);
                 set(handles.Structure(5),'CData',handles.Store.Model2B1);

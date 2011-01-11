@@ -1,4 +1,7 @@
 function Structure(action, varargin)
+%STRUCTURE handles user inputs related to the structural properties of the
+% model
+% action     : selected action on the structure page
 
 %  Initialization tasks
 handles = guidata(gcbf);
@@ -9,6 +12,8 @@ handles.Model.Type = DOF_selection;
 
 switch action
     case 'scroll'
+        %switch between structural models
+        %define colors and identify children plots
         active_color = [0 0 0];
         inactive_color = [0.6 0.6 0.6];
         panelDefault = [0.941176 0.941176 0.941176];
@@ -22,8 +27,12 @@ switch action
         handles.Model.Zeta = [];
         
         slider = round(get(gcbo,'Value')*10)/10;
-        %1 DOF
+        
+        %%%%%%%
+        %1 DOF%
+        %%%%%%%
         if slider <= 0.3
+            % initialize structure page and adjust button and field colors
             set(handles.Structure(30),'Value',0);
             structTag = findobj('Tag','1 DOF');
             set(handles.Structure(2),'SelectedObject',structTag(2));
@@ -34,7 +43,6 @@ switch action
             
             handles.Model.StructActive = [3 6:13];
             handles.Model.StructInactive = [4 5 14:29 31:34];
-            %Adjust colors to emphasize active/inactive fields
             set(handles.Structure(3),'CData',handles.Store.Model1A1);
             set(handles.Structure(4),'CData',handles.Store.Model2A0);
             set(handles.Structure(5),'CData',handles.Store.Model2B0);
@@ -73,7 +81,6 @@ switch action
             set(handles.EC(57),'Style','edit','String','1');
             handles.ExpControl.store.NodeOptions = get(handles.EC(57),'String');
             set(handles.EC(58),'String','1');
-            %                 handles.ExpControl.CtrlDOF = 'DOF 1';
             handles.ExpControl.store.DOFOptions = {'Choose DOF...','DOF 1'}';
             handles.ExpControl.NumAct = 1;
             handles.ExpControl.store.SimActive = 6;
@@ -150,9 +157,11 @@ switch action
             set(handles.EC(33),'String',handles.ExpControl.store.CPOptions(2:end));
                 
             
-            
-        %2 DOF A
+        %%%%%%%%%    
+        %2 DOF A%
+        %%%%%%%%%
         elseif slider <= 0.6
+            % initialize structure page and adjust button and field colors
             set(handles.Structure(30),'Value',0.5);
             structTag = findobj('Tag','2 DOF A');
             set(handles.Structure(2),'SelectedObject',structTag(2));
@@ -163,7 +172,6 @@ switch action
             
             handles.Model.StructActive = [4 14:21 31 32];
             handles.Model.StructInactive = [3 5 6:13 22:29 33 34];
-            %Adjust colors to emphasize active/inactive fields
             set(handles.Structure(3),'CData',handles.Store.Model1A0);
             set(handles.Structure(4),'CData',handles.Store.Model2A1);
             set(handles.Structure(5),'CData',handles.Store.Model2B0);
@@ -205,7 +213,6 @@ switch action
             set(handles.EC(57),'Style','popupmenu','String',{'Choose Node...','Node 1','Node 2'});
             handles.ExpControl.store.NodeOptions = get(handles.EC(57),'String');
             set(handles.EC(58),'String','1');
-            %                 handles.ExpControl.CtrlDOF = 'DOF 1';
             handles.ExpControl.store.DOFOptions = {'Choose Story...','Story 1','Story 2'}';
             handles.ExpControl.NumAct = 2;
             handles.ExpControl.store.SimActive = 6;
@@ -308,9 +315,11 @@ switch action
             set(handles.EC(33),'String',handles.ExpControl.store.CPOptions(2:end));
             
             
-            
-        %2 DOF B
+        %%%%%%%%%    
+        %2 DOF B%
+        %%%%%%%%%
         else
+            % initialize structure page and adjust button and field colors
             structTag = findobj('Tag','2 DOF B');
             set(handles.Structure(30),'Value',1);
             set(handles.Structure(2),'SelectedObject',structTag(2));
@@ -321,8 +330,6 @@ switch action
             
             handles.Model.StructActive = [5 22:29 33 34];
             handles.Model.StructInactive = [3 4 6:21 31 32];
-            
-            %Adjust colors to emphasize active/inactive fields
             set(handles.Structure(3),'CData',handles.Store.Model1A0);
             set(handles.Structure(4),'CData',handles.Store.Model2A0);
             set(handles.Structure(5),'CData',handles.Store.Model2B1);
@@ -443,9 +450,7 @@ switch action
             handles.ExpControl.CP.LimU{4,2} = 12;
             
             set(handles.EC(32),'String',handles.ExpControl.store.CPOptions(2:end));
-            set(handles.EC(33),'String',handles.ExpControl.store.CPOptions(2:end));
-            
-            
+            set(handles.EC(33),'String',handles.ExpControl.store.CPOptions(2:end)); 
         end
         guidata(gcbf, handles);
         
@@ -861,11 +866,14 @@ switch action
     %Store input values
     case 'mass_input'
         input_val = str2num(get(gcbo,'String'));
+        
+        % return if invalid mass entered
         if isempty(input_val) || length(input_val) ~= 1 || input_val <= 0
             msgbox('Must enter valid mass value(s)','Invalid Input','error');
             return
         else
             switch get(gcbo,'Tag')
+                % store input value
                 case 'Mass'
                     handles.Model.M = input_val;
                 case 'm1A'
@@ -902,7 +910,6 @@ switch action
                 end
             else
                 handles.Model.Modes = 1;
-                
                 handles.Model.Omega = sqrt(eig(handles.Model.K, handles.Model.M));
                 handles.Model.minTDOF = 1;
                 handles.Model.T = 2*pi./(handles.Model.Omega);
@@ -913,11 +920,13 @@ switch action
 
     case 'stiffness_input'
         input_val = str2num(get(gcbo,'String'));
+        % return if invalid stiffness entered
         if isempty(input_val) || length(input_val) ~= 1 || input_val <= 0
             msgbox('Must enter valid stiffness value','Invalid Input','error');
             return
         else
             switch get(gcbo,'Tag')
+                % store/update input values
                 case 'Stiffness'
                     handles.Model.K = input_val;
                     handles.ExpControl.DOF1.E = handles.Model.K;
@@ -987,29 +996,9 @@ switch action
             
         end
         guidata(gcbf, handles);
-        
-%     case 'period_calc'
-%         if isempty(handles.Model.M)
-%             msgbox('Must enter valid mass value(s)','Invalid Input','error');
-%         elseif isempty(handles.Model.K)
-%             msgbox('Must enter valid stiffness value(s)','Invalid Input','error');
-%         else
-%             handles.Model.Omega = sqrt(eig(handles.Model.K, handles.Model.M));
-%             if size(handles.Model.Omega) == [2 1];
-%                 if handles.Model.Omega(1) < handles.Model.Omega(2)
-%                     handles.Model.minTDOF = 2;
-%                 else
-%                     handles.Model.minTDOF = 1;
-%                 end
-%             else
-%                 handles.Model.minTDOF = 1;
-%             end
-%             handles.Model.T = sort(2*pi./(handles.Model.Omega));
-%             set(handles.Structure(handles.Model.Period_field),'String',num2str(handles.Model.T'));
-%             guidata(gcbf, handles);
-%         end
 
     case 'choose damping'
+        % return if mass or stiffness not specified
         if ~isfield(handles.Model, 'T')
             msgbox('Must specify model mass and stiffness first!','Error','error');
             set(handles.Structure([12 20 28]),'Value',1);
@@ -1017,6 +1006,7 @@ switch action
         end
         damp_type = get(gcbo,'Value');
         switch damp_type
+            % calculate damping parameters, if possible
             case 2
                 handles.Model.DampType = 'Stiffness Proportional';
                 if ~isempty(handles.Model.Zeta)
@@ -1036,6 +1026,7 @@ switch action
         guidata(gcbf, handles);
 
     case 'damping_input'
+        % return if mass,stiffness or damping type not specified
         if ~isfield(handles.Model, 'T')
             msgbox('Must specify model mass and stiffness first!','Error','error');
             set(handles.Structure([13 21 29]),'String','zeta');
@@ -1051,6 +1042,7 @@ switch action
         guidata(gcbf, handles);
         damp_type = handles.Model.DampType;
         switch damp_type
+            %calculate damping parameters
             case 'Stiffness Proportional'
                 handles.Model.alphaM = 0;
                 handles.Model.betaK = handles.Model.Zeta*handles.Model.T(1)/pi;
