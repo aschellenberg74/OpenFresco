@@ -819,7 +819,8 @@ int openFresco_wipeModel(ClientData clientData,
         theDatabase = 0;
     }*/
     
-    theDomain->clearAll();
+    if (theDomain != 0)
+        theDomain->clearAll();
     
     clearExperimentalCPs(interp);
     clearExperimentalSignalFilters(interp);
