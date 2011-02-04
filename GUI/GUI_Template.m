@@ -15,9 +15,11 @@ end
 fclose('all');
 if exist('OPFAnalysis.tcl','file')
     delete(which('OPFAnalysis.tcl'));
+    clc;
 end
 if exist('OPFReport.txt','file')
     delete(which('OPFReport.txt'));
+    clc;
 end
 
 %Get window size
@@ -31,7 +33,6 @@ font = 'Lucinda Sans';
          
 %Load Buttons
 %Sidebar
-DIR = pwd;
 sideButWidth  = 0.8*SS(3)*0.1*0.84;
 sideButHeight = 0.8*SS(4)*0.5*0.16;
 Analysis0     = imresize(imread(which('Analysis0.png')), [(sideButHeight) (sideButWidth)]);
@@ -62,6 +63,13 @@ GM0 = imresize(imread(which('GroundMotions0.png')), [loadingHeight loadingWidth]
 GM1 = imresize(imread(which('GroundMotions1.png')), [loadingHeight loadingWidth]);
 IC0 = imresize(imread(which('InitialConditions0.png')), [loadingHeight loadingWidth]);
 IC1 = imresize(imread(which('InitialConditions1.png')), [loadingHeight loadingWidth]);
+
+% Experimental Setup Page
+setupWidth  = 0.8*SS(3)*0.81*0.5;
+setupHeight = 0.8*SS(4)*0.9*0.6;
+ESModel1A1 = imresize(imread(which('ESModel1A1.png')), [setupHeight setupWidth]);
+ESModel2A1 = imresize(imread(which('ESModel2A1.png')), [setupHeight setupWidth]);
+ESModel2B1 = imresize(imread(which('ESModel2B1.png')), [setupHeight setupWidth]);
 
 %Experimental Control Page
 ECWidth  = 0.8*SS(3)*0.81*0.1;
@@ -981,19 +989,22 @@ ExpSetup(2) = uibuttongroup('Parent',ph_Main,...
          ExpSetup(3) = uicontrol(ExpSetup(2),'Style','togglebutton',...
              'Tag','1 DOF',...
              'Units','normalized',...
-             'Position',[0 0 1 1]);
+             'Position',[0 0 1 1],...
+             'CData',ESModel1A1);
          ExpSetup(4) = uicontrol(ExpSetup(2),'Style','togglebutton',...
              'Tag','2 DOF A',...
              'Units','normalized',...
-             'Position',[0 0 1 1]);
+             'Position',[0 0 1 1],...
+             'CData',ESModel2A1);
          ExpSetup(5) = uicontrol(ExpSetup(2),'Style','togglebutton',...
              'Tag','2 DOF B',...
              'Units','normalized',...
-             'Position',[0 0 1 1]);
+             'Position',[0 0 1 1],...
+             'CData',ESModel2B1);
          ExpSetup(6) = uicontrol(ExpSetup(2),'Style','pushbutton',...
              'Units','normalized',...
              'String','!',...
-             'Position',[0.8 0 0.2 0.2],...
+             'Position',[0 0 0.1 0.1],...
              'Callback','ExpSetup(''extra options'')');
          set(ExpSetup(2),'SelectionChangeFcn','ExpSetup(''choose DOF'')');
          
@@ -2050,14 +2061,14 @@ Analysis(13) = uibuttongroup('Parent',ph_Main,...
             'FontSize',10,...
             'Position',[0.25 0.75 0.5 0.2]);
          Analysis(14) = uicontrol(Analysis(13),'Style','radiobutton',...
-             'String','Yes',...
+             'String','No',...
              'Units','normalized',...
              'FontSize',10,...
              'BackgroundColor',panelDefault,...
              'Visible','off',...
              'Position',[0.45 0.35 0.2 0.2]);
          Analysis(15) = uicontrol(Analysis(13),'Style','radiobutton',...
-             'String','No',...
+             'String','Yes',...
              'Units','normalized',...
              'FontSize',10,...
              'BackgroundColor',panelDefault,...
@@ -2207,7 +2218,7 @@ handles.Store.Question1 = Question1;
 
 handles.Store.Structview = 0;
 handles.Store.GMview = 0;
-handles.Store.Animate = 1;
+handles.Store.Animate = 0;
 
 %%%%%%%%%%%%%%%%%%%
 %Initialize Fields%
@@ -2357,7 +2368,7 @@ set(handles.Structure(30),'Value',0);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %Callback for main template tab selection
-    function template_toggle_Callback(source, eventdata)
+    function template_toggle_Callback(source,~)
         handles = guidata(gcf);
         Page_selection = get(get(source,'SelectedObject'),'Tag');
         switch Page_selection;
@@ -2518,7 +2529,7 @@ set(handles.Structure(30),'Value',0);
                             %Update spectral response quantity plots if zeta has been
                             %changed
                             if isfield(handles.GM.Spectra{1},'psdAcc')
-                                [rows cols] = size(get(handles.GroundMotions(8),'Children'));
+                                rows = size(get(handles.GroundMotions(8),'Children'),1);
                                 if (rows ~= length(handles.Model.Zeta)) && ~isempty(handles.Model.Zeta)
                                     m = 1.0;
                                     minT = 0.01;
@@ -2701,7 +2712,7 @@ set(handles.Structure(30),'Value',0);
 %%%%%%%%%%%%%%%%%%%
 
 %Callback for program quit
-    function Quit_Program(source, eventdata)
+    function Quit_Program(~,~)
         close_program = questdlg('Are you sure you want to quit?','Quit?','Yes','Cancel','Yes');
         switch close_program
             case 'Yes'
@@ -2713,7 +2724,7 @@ set(handles.Structure(30),'Value',0);
     end
 
 %Callback for help buttons
-    function helpCallback(source, eventdata)
+    function helpCallback(~,~)
         helpString = get(gcbo,'ToolTipString');
         msgbox(helpString);
     end

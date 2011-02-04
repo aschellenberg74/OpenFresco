@@ -243,11 +243,9 @@ switch action
                         handles.Store.AnalysisOption = 'Stop';
                         %save results
                         saveResults = questdlg(sprintf('Analysis complete!\nWould you like to save the test results?'),'Save?','Yes','No','Yes');
-                        switch saveResults
-                            case 'Yes'
-                                Response = handles.Response;
-                                uisave('Response');
-                            case 'No'
+                        if strcmp(saveResults,'Yes')
+                            Response = handles.Response;
+                            uisave('Response');
                         end
                     %resume paused analysis
                     else

@@ -15,12 +15,7 @@ function [error, f, MX, TI] = AnimateResponse(Type,t,ag,U,Udotdot,Pr,Um)
 % Um           : measured displacement values
 
 % Initialization tasks
-handles = guidata(gcbf);
-
-%Calculate necessary quantities
-error = Um-U;
-[f,MX] = GetFFT(error',t(2)-t(1));
-TI(1,:) = 0.5*(cumtrapz(U(1,:),Um(1,:)) - cumtrapz(Um(1,:),U(1,:)));
+handles = guidata(findobj('Tag','OpenFrescoExpress'));
 
 switch Type
     case '1 DOF'
@@ -45,6 +40,9 @@ switch Type
         end
         
         %Error Monitors
+        error = Um-U;
+        [f,MX] = GetFFT(error',t(2)-t(1));
+        TI(1,:) = 0.5*(cumtrapz(U(1,:),Um(1,:)) - cumtrapz(Um(1,:),U(1,:)));
         set(handles.Plots.EM1eplot,'Xdata',t,'YData',error(1,:));
         set(handles.Plots.EM1ffteplot,'Xdata',f,'YData',MX(:,1));
         set(handles.Plots.EM1MeasCmdplot,'Xdata',U(1,:),'YData',Um(1,:));
@@ -52,7 +50,7 @@ switch Type
         set(handles.Plots.EM1trackplot,'Xdata',t,'YData',TI(1,:));
         
         %Animate Structure
-        if handles.Store.Animate
+        if findobj('Tag','StructAnim')
             set(handles.Plots.StructAnim, ...
                 'Vertices',[0.0 0.0; U(1,end) 10.0], ...
                 'FaceVertexCData',[0; abs(U(1,end))]);
@@ -95,10 +93,11 @@ switch Type
                 end
         end
         
-        %Calculate TI for second DOF
-        TI(2,:) = 0.5*(cumtrapz(U(2,:),Um(2,:)) - cumtrapz(Um(2,:),U(2,:)));
-        
         %Error Monitors
+        error = Um-U;
+        [f,MX] = GetFFT(error',t(2)-t(1));
+        TI(1,:) = 0.5*(cumtrapz(U(1,:),Um(1,:)) - cumtrapz(Um(1,:),U(1,:)));
+        TI(2,:) = 0.5*(cumtrapz(U(2,:),Um(2,:)) - cumtrapz(Um(2,:),U(2,:)));
         set(handles.Plots.EM1eplot,'Xdata',t,'YData',error(1,:));
         set(handles.Plots.EM1ffteplot,'Xdata',f,'YData',MX(:,1));
         set(handles.Plots.EM1MeasCmdplot,'Xdata',U(1,:),'YData',Um(1,:));
@@ -111,7 +110,7 @@ switch Type
         set(handles.Plots.EM2trackplot,'Xdata',t,'YData',TI(2,:));
         
         %Animate Structure
-        if handles.Store.Animate
+        if findobj('Tag','StructAnim')
             set(handles.Plots.StructAnim, ...
                 'Vertices',[0.0 0.0; U(1,end) 5.0; U(2,end) 10.0], ...
                 'FaceVertexCData',[0; abs(U(:,end))]);
@@ -154,10 +153,11 @@ switch Type
                 end
         end
         
-        %Calculate TI for second DOF
-        TI(2,:) = 0.5*(cumtrapz(U(2,:),Um(2,:)) - cumtrapz(Um(2,:),U(2,:)));
-        
         %Error Monitors
+        error = Um-U;
+        [f,MX] = GetFFT(error',t(2)-t(1));
+        TI(1,:) = 0.5*(cumtrapz(U(1,:),Um(1,:)) - cumtrapz(Um(1,:),U(1,:)));
+        TI(2,:) = 0.5*(cumtrapz(U(2,:),Um(2,:)) - cumtrapz(Um(2,:),U(2,:)));
         set(handles.Plots.EM1eplot,'Xdata',t,'YData',error(1,:));
         set(handles.Plots.EM1ffteplot,'Xdata',f,'YData',MX(:,1));
         set(handles.Plots.EM1MeasCmdplot,'Xdata',U(1,:),'YData',Um(1,:));
@@ -170,7 +170,7 @@ switch Type
         set(handles.Plots.EM2trackplot,'Xdata',t,'YData',TI(2,:));
         
         %Animate Structure
-        if handles.Store.Animate
+        if findobj('Tag','StructAnim')
             set(handles.Plots.StructAnim, ...
                 'Vertices',[0.0 0.0 0.0; U(1,end) U(2,end) 10.0], ...
                 'FaceVertexCData',[0; norm(U(:,end))]);

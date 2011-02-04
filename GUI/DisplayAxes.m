@@ -4,6 +4,7 @@ function DisplayAxes(action,varargin)
 
 %  Initialization tasks
 handles = guidata(gcf);
+SS = get(0,'screensize');
 
 switch action
     case 'ag1'
@@ -14,8 +15,8 @@ switch action
             pga = handles.GM.Spectra{1}.pga;
             pgv = max(abs(handles.GM.scalevg{1}));
             pgd = max(abs(handles.GM.scaledg{1}));
-            figure;
-            plot(handles.GM.scalet{1}, handles.GM.scaleag{1});
+            figure('Position',[0.277*SS(3) 0.215*SS(4) 0.55*SS(3) 0.5*SS(4)]);
+            plot(handles.GM.scalet{1}, handles.GM.scaleag{1}, 'LineWidth', 1.0);
             grid('on');
             xlabel('Time [sec]');
             ylabel('ag [L/sec^2]');
@@ -28,11 +29,11 @@ switch action
         if ~isfield(handles.GM.Spectra{1}, 'T') || ~isfield(handles.GM.Spectra{1}, 'psdAcc');
             return
         else
-            figure;
+            figure('Position',[0.277*SS(3) 0.215*SS(4) 0.55*SS(3) 0.5*SS(4)]);
             if length(handles.Model.Zeta) == 1
-                plot(handles.GM.Spectra{1}.T, handles.GM.Spectra{1}.psdAcc(:,1));
+                plot(handles.GM.Spectra{1}.T, handles.GM.Spectra{1}.psdAcc(:,1), 'LineWidth', 1.0);
             else
-                plot(handles.GM.Spectra{1}.T, handles.GM.Spectra{1}.psdAcc);
+                plot(handles.GM.Spectra{1}.T, handles.GM.Spectra{1}.psdAcc, 'LineWidth', 1.0);
             end
             grid('on');
             xlabel('Period [sec]');
@@ -49,7 +50,7 @@ switch action
                 psdAcc = handles.GM.Spectra{1}.psdAcc(id1(1),1);
                 text(handles.Model.T*1.2,psdAcc*1.1,sprintf('T = %1.4f\nSa = %1.4f',handles.Model.T,psdAcc),'BackgroundColor',[1 1 1]);
                 hold on
-                plot(handles.Model.T,psdAcc,'ro');
+                plot(handles.Model.T,psdAcc,'ro', 'LineWidth', 1.0);
                 hold off
             else
                 while isempty(id1)
@@ -76,8 +77,8 @@ switch action
                     text(handles.Model.T(2)*0.9,psdAcc2*1.1,sprintf('T = %1.4f\nSa = %1.4f',handles.Model.T(2),psdAcc2),'BackgroundColor',[1 1 1]);
                 end
                 hold on
-                plot(handles.Model.T(1),psdAcc1,'ro');
-                plot(handles.Model.T(2),psdAcc2,'ro');
+                plot(handles.Model.T(1),psdAcc1,'ro', 'LineWidth', 1.0);
+                plot(handles.Model.T(2),psdAcc2,'ro', 'LineWidth', 1.0);
                 hold off
             end
         end
@@ -86,11 +87,11 @@ switch action
         if ~isfield(handles.GM.Spectra{1}, 'T') || ~isfield(handles.GM.Spectra{1}, 'dsp');
             return
         else
-            figure;
+            figure('Position',[0.277*SS(3) 0.215*SS(4) 0.55*SS(3) 0.5*SS(4)]);
             if length(handles.Model.Zeta) == 1
-                plot(handles.GM.Spectra{1}.T, handles.GM.Spectra{1}.dsp(:,1));
+                plot(handles.GM.Spectra{1}.T, handles.GM.Spectra{1}.dsp(:,1), 'LineWidth', 1.0);
             else
-                plot(handles.GM.Spectra{1}.T, handles.GM.Spectra{1}.dsp);
+                plot(handles.GM.Spectra{1}.T, handles.GM.Spectra{1}.dsp, 'LineWidth', 1.0);
             end
             grid('on');
             xlabel('Period [sec]');
@@ -107,7 +108,7 @@ switch action
                 dsp = handles.GM.Spectra{1}.dsp(id1(1),1);
                 text(handles.Model.T*1.2,dsp*1.1,sprintf('T = %1.4f\nSd = %1.4f',handles.Model.T,dsp),'BackgroundColor',[1 1 1]);
                 hold on
-                plot(handles.Model.T,dsp,'ro');
+                plot(handles.Model.T,dsp,'ro', 'LineWidth', 1.0);
                 hold off
             else
                 while isempty(id1)
@@ -129,8 +130,8 @@ switch action
                 text(handles.Model.T(1)*1.1,dsp1*1.1,sprintf('T = %1.4f\nSd = %1.4f',handles.Model.T(1),dsp1),'BackgroundColor',[1 1 1]);
                 text(handles.Model.T(2)*1.3,dsp2*1.25,sprintf('T = %1.4f\nSd = %1.4f',handles.Model.T(2),dsp2),'BackgroundColor',[1 1 1]);
                 hold on
-                plot(handles.Model.T(1),dsp1,'ro');
-                plot(handles.Model.T(2),dsp2,'ro');
+                plot(handles.Model.T(1),dsp1,'ro', 'LineWidth', 1.0);
+                plot(handles.Model.T(2),dsp2,'ro', 'LineWidth', 1.0);
                 hold off
             end
         end
@@ -143,8 +144,8 @@ switch action
             pga = handles.GM.Spectra{2}.pga;
             pgv = max(abs(handles.GM.scalevg{2}));
             pgd = max(abs(handles.GM.scaledg{2}));
-            figure;
-            plot(handles.GM.scalet{2}, handles.GM.scaleag{2});
+            figure('Position',[0.277*SS(3) 0.215*SS(4) 0.55*SS(3) 0.5*SS(4)]);
+            plot(handles.GM.scalet{2}, handles.GM.scaleag{2}, 'LineWidth', 1.0);
             grid('on');
             xlabel('Time [sec]');
             ylabel('ag [L/sec^2]');
@@ -157,11 +158,11 @@ switch action
         if length(handles.GM.Spectra) == 1
             return
         else
-            figure;
+            figure('Position',[0.277*SS(3) 0.215*SS(4) 0.55*SS(3) 0.5*SS(4)]);
             if length(handles.Model.Zeta) == 1
-                plot(handles.GM.Spectra{2}.T, handles.GM.Spectra{2}.psdAcc(:,1));
+                plot(handles.GM.Spectra{2}.T, handles.GM.Spectra{2}.psdAcc(:,1), 'LineWidth', 1.0);
             else
-                plot(handles.GM.Spectra{2}.T, handles.GM.Spectra{2}.psdAcc);
+                plot(handles.GM.Spectra{2}.T, handles.GM.Spectra{2}.psdAcc, 'LineWidth', 1.0);
             end
             grid('on');
             xlabel('Period [sec]');
@@ -178,7 +179,7 @@ switch action
                 psdAcc = handles.GM.Spectra{2}.psdAcc(id1(1),1);
                 text(handles.Model.T*1.2,psdAcc*1.1,sprintf('T = %1.4f\nSa = %1.4f',handles.Model.T,psdAcc),'BackgroundColor',[1 1 1]);
                 hold on
-                plot(handles.Model.T,psdAcc,'ro');
+                plot(handles.Model.T,psdAcc,'ro', 'LineWidth', 1.0);
                 hold off
             else
                 while isempty(id1)
@@ -205,8 +206,8 @@ switch action
                     text(handles.Model.T(2)*1.1,psdAcc2*1.1,sprintf('T = %1.4f\nSa = %1.4f',handles.Model.T(2),psdAcc2),'BackgroundColor',[1 1 1]);
                 end
                 hold on
-                plot(handles.Model.T(1),psdAcc1,'ro');
-                plot(handles.Model.T(2),psdAcc2,'ro');
+                plot(handles.Model.T(1),psdAcc1,'ro', 'LineWidth', 1.0);
+                plot(handles.Model.T(2),psdAcc2,'ro', 'LineWidth', 1.0);
                 hold off
             end
         end
@@ -215,11 +216,11 @@ switch action
         if length(handles.GM.Spectra) == 1
             return
         else
-            figure;
+            figure('Position',[0.277*SS(3) 0.215*SS(4) 0.55*SS(3) 0.5*SS(4)]);
             if length(handles.Model.Zeta) == 1
-                plot(handles.GM.Spectra{2}.T, handles.GM.Spectra{2}.dsp(:,1));
+                plot(handles.GM.Spectra{2}.T, handles.GM.Spectra{2}.dsp(:,1), 'LineWidth', 1.0);
             else
-                plot(handles.GM.Spectra{2}.T, handles.GM.Spectra{2}.dsp);
+                plot(handles.GM.Spectra{2}.T, handles.GM.Spectra{2}.dsp, 'LineWidth', 1.0);
             end
             grid('on');
             xlabel('Period [sec]');
@@ -236,7 +237,7 @@ switch action
                 dsp = handles.GM.Spectra{2}.dsp(id1(1),1);
                 text(handles.Model.T*1.2,dsp*1.1,sprintf('T = %1.4f\nSa = %1.4f',handles.Model.T,dsp),'BackgroundColor',[1 1 1]);
                 hold on
-                plot(handles.Model.T,dsp,'ro');
+                plot(handles.Model.T,dsp,'ro', 'LineWidth', 1.0);
                 hold off
             else
                 while isempty(id1)
@@ -258,8 +259,8 @@ switch action
                 text(handles.Model.T(1)*1.1,dsp1*1.1,sprintf('T = %1.4f\nSd = %1.4f',handles.Model.T(1),dsp1),'BackgroundColor',[1 1 1]);
                 text(handles.Model.T(2)*1.3,dsp2*1.25,sprintf('T = %1.4f\nSd = %1.4f',handles.Model.T(2),dsp2),'BackgroundColor',[1 1 1]);
                 hold on
-                plot(handles.Model.T(1),dsp1,'ro');
-                plot(handles.Model.T(2),dsp2,'ro');
+                plot(handles.Model.T(1),dsp1,'ro', 'LineWidth', 1.0);
+                plot(handles.Model.T(2),dsp2,'ro', 'LineWidth', 1.0);
                 hold off
             end
         end

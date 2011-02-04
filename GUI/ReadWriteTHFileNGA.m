@@ -71,7 +71,7 @@ switch action
           dt = [];
           while feof(fin)==0
               txtLine = fgetl(fin);
-              if ~isempty(txtLine) & ~isequal(txtLine,-1)
+              if ~isempty(txtLine) && ~isequal(txtLine,-1)
                   numLine = str2num(txtLine);
                   if isempty(numLine)
                       switch handles.GM.databaseType
@@ -107,7 +107,7 @@ switch action
       ag = [];
       while feof(fin)==0
           txtLine = fgetl(fin);
-          if ~isempty(txtLine) & ~isequal(txtLine,-1)
+          if ~isempty(txtLine) && ~isequal(txtLine,-1)
               numLine = str2num(txtLine);
               if isempty(numLine)
                   switch handles.GM.databaseType
@@ -152,7 +152,7 @@ switch action
                    dt = handles.GM.dt(2);
            end
        end
-       t = [0:length(ag)-1]'*dt;
+       t = (0:length(ag)-1)'*dt;
        fclose(fin);
        varargout = {t ag};
    %=========================================================================
@@ -164,7 +164,7 @@ switch action
       fout = fopen(fileOUT,'w');
       while feof(fin)==0
          txtLine = fgetl(fin);
-         if ~isempty(txtLine) & ~isequal(txtLine,-1)
+         if ~isempty(txtLine) && ~isequal(txtLine,-1)
             numLine = str2num(txtLine);
             if ~isempty(numLine)
                fprintf(fout,'%s\n',txtLine);

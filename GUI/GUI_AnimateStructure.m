@@ -1,14 +1,29 @@
 function GUI_AnimateStructure(varargin)
 % GUI_AnimateStructure provides the layout of the GUI structural animation page
 
+% Initialization tasks
+handles = guidata(findobj('Tag','OpenFrescoExpress'));
+
+% update the axis limits and the color bar
+if (nargin > 0 && strcmp(varargin{1},'update'))
+    xlim = str2num(get(handles.Plots.ColorBarMax,'String'));
+    if (xlim > 0)
+        switch handles.Model.Type
+            case {'1 DOF','2 DOF A'}
+                set(gca,'XLim',[-3*xlim,3*xlim],'YLim',[-1,11], ...
+                    'CLim',[0,xlim]);
+            case '2 DOF B'
+                set(gca,'XLim',[-3*xlim,3*xlim],'YLim',[-3*xlim,3*xlim], ...
+                    'ZLim',[-1,11],'CLim',[0,xlim]);
+        end
+    end
+end
+
 % Check if window already exists
 if ~isempty(findobj('Tag','StructAnim'))
     figure(findobj('Tag','StructAnim'));
     return
 end
-
-% Initialization tasks
-handles = guidata(gcbf);
 
 % Main Figure
 SS = get(0,'screensize');
@@ -24,15 +39,15 @@ set(gca,'Visible','off','Position',[0,0,1,1]);
 
 % Toolbar
 File(1) = uimenu('Position',1,'Label','File');
-File(2) = uimenu(File(1),'Position',1,'Label','Save', ...
+uimenu(File(1),'Position',1,'Label','Save', ...
     'Accelerator','S','Callback','filemenufcn(gcbf,''FileSaveAs'')');
-File(3) = uimenu(File(1),'Position',2,'Label','Print', ...
+uimenu(File(1),'Position',2,'Label','Print', ...
     'Accelerator','P','Callback','printdlg(gcbf)');
-Separator(1) = uimenu('Position',2,'Label','|');
+uimenu('Position',2,'Label','|');
 StdMenu(1) = uimenu('Position',3,'Label','MATLAB Menu');
-StdMenu(2) = uimenu(StdMenu(1),'Position',1,'Label','Turn on', ...
+uimenu(StdMenu(1),'Position',1,'Label','Turn on', ...
    'Callback','set(gcf,''MenuBar'',''figure''); set(gcf,''Toolbar'',''figure'');');
-StdMenu(3) = uimenu(StdMenu(1),'Position',2,'Label','Turn off', ...
+uimenu(StdMenu(1),'Position',2,'Label','Turn off', ...
    'Callback','set(gcf,''MenuBar'',''none''); set(gcf,''Toolbar'',''none'');');
 % =========================================================================
 
@@ -41,8 +56,20 @@ a = axes('Parent',f_StructAnim, ...
     'Visible','off', ...
     'Tag','AxesStructAnim', ...
     'Position',[0.05 0.05 0.90 0.90]);
-colorbar;
+colorbar('Position',[0.8935 0.0467 0.036 0.863]);
+%colorbar('Position',[0.8935 0.0467 0.0317 0.835]);
+set(a,'Position',[0.05 0.05 0.81746 0.9]);
 colormap(hot(128));
+
+% Colorbar Maximum
+handles.Plots.ColorBarMax = uicontrol(f_StructAnim,'Style','edit',...
+    'Units','normalized',...
+    'FontSize',10,...
+    'String','1.0',...
+    'BackgroundColor',[1 1 1],...
+    'Position',[0.8935 0.908 0.038 0.05],...
+    'Tag','ColorBarMax',...
+    'Callback','GUI_AnimateStructure(''update'')');
 
 % Plot Model
 switch handles.Model.Type
@@ -62,7 +89,8 @@ switch handles.Model.Type
         id = find(handles.GM.Spectra{1}.T > handles.Model.T(1));
         xlim = handles.GM.Spectra{1}.dsp(id(1),1);
         set(a,'XLim',[-3*xlim,3*xlim],'YLim',[-1,11], ...
-            'CLim',[0,floor(xlim)]);
+            'CLim',[0,xlim]);
+        set(handles.Plots.ColorBarMax,'String',num2str(xlim,3));
         
     case '2 DOF A'
         xyzNodes(1,:) = [0.0  0.0];  % node 1
@@ -82,7 +110,8 @@ switch handles.Model.Type
         id = find(handles.GM.Spectra{1}.T > handles.Model.T(1));
         xlim = handles.GM.Spectra{1}.dsp(id(1),1);
         set(a,'XLim',[-3*xlim,3*xlim],'YLim',[-1,11], ...
-            'CLim',[0,floor(xlim)]);
+            'CLim',[0,xlim]);
+        set(handles.Plots.ColorBarMax,'String',num2str(xlim,3));
         
     case '2 DOF B'
         xyzNodes(1,:) = [0.0  0.0  0.0];  % node 1
@@ -102,7 +131,8 @@ switch handles.Model.Type
         ylim = handles.GM.Spectra{2}.dsp(id(1),1);
         xylim = max(xlim,ylim);
         set(a,'XLim',[-3*xylim,3*xylim],'YLim',[-3*xylim,3*xylim], ...
-            'ZLim',[-1,11],'CLim',[0,floor(xlim)]);
+            'ZLim',[-1,11],'CLim',[0,xlim]);
+        set(handles.Plots.ColorBarMax,'String',num2str(xlim,3));
         view(3);
         
 end

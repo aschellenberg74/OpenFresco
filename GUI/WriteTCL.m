@@ -580,4 +580,3 @@ else
     %Update handles structure
     guidata(gcbf, handles);
 end
-end

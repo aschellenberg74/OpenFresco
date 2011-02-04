@@ -1069,4 +1069,3 @@ end
 
 %Update handles structure
 guidata(gcbf, handles);
-end

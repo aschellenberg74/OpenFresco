@@ -8,65 +8,48 @@ function GUI_Output(text,title,figtitle,width,height)
 % width    : width of window (optional)
 % height   : height of window (optional)
 %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%                          OpenSees Navigator                          %%
-%% Matlab Engineering Toolbox for Analysis of Structures using OpenSees %%
-%%                                                                      %%
-%%                   Andreas Schellenberg & Tony Yang                   %%
-%%        andreas.schellenberg@gmail.com, yangtony2004@gmail.com        %%
-%%                                                                      %%
-%%    Department of Civil and Environmental Engineering, UC Berkeley    %%
-%%   (C) Copyright 2004, The Regents of the University of California    %%
-%%                         All Rights Reserved                          %%
-%%                                                                      %%
-%%   Commercial use of this program without express permission of the   %%
-%%     University of California, Berkeley, is strictly prohibited.      %%
-%%     See Help -> OpenSees Navigator Disclaimer for information on     %%
-%%  usage and redistribution,  and for a DISCLAIMER OF ALL WARRANTIES.  %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+% Created: 09/10
+% Revision: A
 %
 % $Revision: 409 $
 % $Date: 2010-09-22 22:52:11 -0700 (Wed, 22 Sep 2010) $
 % $URL: $ 
-% $Modified for use with OpenFrescoExpress
 
 % set some default parameters
 if nargin<2
    title    = 'Output';
    figtitle = 'Output';
-   width    = 0.60;
-   height   = 0.50;
+   width    = 0.55;
+   height   = 0.52;
 elseif nargin<3
    figtitle = 'Output';
-   width    = 0.60;
-   height   = 0.50;
+   width    = 0.55;
+   height   = 0.52;
 elseif nargin<4
-   width    = 0.60;
-   height   = 0.50;
+   width    = 0.55;
+   height   = 0.52;
 elseif nargin<5
-   width    = 0.60;
+   width    = 0.55;
 end
-
-% % load the preferences from file
-% load(which('OSNPreferences.mat'));
-
 
 %%%%%%%%%%%%%%%%%%%%%%
 % Figure properties
 %%%%%%%%%%%%%%%%%%%%%%
 SS = get(0,'screensize');
-figure('Position',[0.2*SS(3) 0.25*SS(4) width*SS(3) height*SS(4)],...
+figure('Position',[0.277*SS(3) 0.215*SS(4) width*SS(3) height*SS(4)], ...
     'MenuBar','none', ...
     'NumberTitle','off', ...
     'Name',figtitle, ...
-    'Color',[0.3 0.5 0.7],...
+    'Color',[0.3 0.5 0.7], ...
     'Tag','GUIOutput');
 
-%Add Print Button
+% add print button
 set(gcf,'Toolbar','figure');
 Toolbar_handles = findall(gcf);
 delete(Toolbar_handles([3:14 16:18]));
-set(Toolbar_handles(15), 'TooltipString', 'Print Window', 'ClickedCallback', 'printpreview(gcbf)');
+set(Toolbar_handles(15), 'TooltipString', ...
+    'Print Window', 'ClickedCallback', 'printpreview(gcbf)');
 
 % define some normalized parameters to partition the figure
 dy = 0.04;  % distance between each block

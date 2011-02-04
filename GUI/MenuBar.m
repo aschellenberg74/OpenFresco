@@ -774,8 +774,7 @@ switch action
         end
         guidata(gcbf, handles);
         end
-
-        
+    
     case 'save'
         saveData = guidata(gcf);
         uisave('saveData');
