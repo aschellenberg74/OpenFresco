@@ -161,11 +161,12 @@ ECSimDomain::~ECSimDomain()
     if (theAnalysis != 0)  {
         theAnalysis->clearAll();
         delete theAnalysis;
+        theAnalysis = 0;
     }
     
     // cleanup the domain
     if (theDomain != 0)
-        delete theDomain;
+        theDomain->clearAll();
     
     // delete memory of SP constraints and nodes
     if (theSPs != 0)

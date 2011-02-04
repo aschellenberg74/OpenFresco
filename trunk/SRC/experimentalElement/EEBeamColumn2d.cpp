@@ -539,7 +539,7 @@ const Matrix& EEBeamColumn2d::getTangentStiff()
         this->applyIMod();
     
     // use elastic axial force if axial force from test is zero
-    if ((*qDaq)[0] == 0.0)  {
+    if (fabs((*qDaq)[0]) < 1.0E-12)  {
         double qA0 = kbInit(0,0)*(sqrt(pow(L+(*db)[0],2)+pow((*db)[1],2))-L);
         (*qDaq)[0] = cos(alpha)*qA0;
         (*qDaq)[1] += sin(alpha)*qA0;
@@ -722,7 +722,7 @@ const Vector& EEBeamColumn2d::getResistingForce()
         this->applyIMod();
     
     // use elastic axial force if axial force from test is zero
-    if ((*qDaq)[0] == 0.0)  {
+    if (fabs((*qDaq)[0]) < 1.0E-12)  {
         double qA0 = kbInit(0,0)*(sqrt(pow(L+(*db)[0],2)+pow((*db)[1],2))-L);
         (*qDaq)[0] = cos(alpha)*qA0;
         (*qDaq)[1] += sin(alpha)*qA0;

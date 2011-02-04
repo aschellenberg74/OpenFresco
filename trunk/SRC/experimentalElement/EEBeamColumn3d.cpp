@@ -561,10 +561,10 @@ const Matrix& EEBeamColumn3d::getTangentStiff()
         this->applyIMod();
     
     // use elastic axial force if axial force from test is zero
-    if ((*qDaq)[0] == 0.0)
+    if (fabs((*qDaq)[0]) < 1.0E-12)
         (*qDaq)[0] = kbInit(0,0)*(*db)[0];
     // use elastic torsion if torsion from test is zero
-    if ((*qDaq)[5] == 0.0)
+    if (fabs((*qDaq)[5]) < 1.0E-12)
         (*qDaq)[5] = kbInit(5,5)*(*db)[5];
     
     // transform forces from basic sys B to basic sys A (linear)
@@ -773,10 +773,10 @@ const Vector& EEBeamColumn3d::getResistingForce()
         this->applyIMod();
     
     // use elastic axial force if axial force from test is zero
-    if ((*qDaq)[0] == 0.0)
+    if (fabs((*qDaq)[0]) < 1.0E-12)
         (*qDaq)[0] = kbInit(0,0)*(*db)[0];
     // use elastic torsion if torsion from test is zero
-    if ((*qDaq)[5] == 0.0)
+    if (fabs((*qDaq)[5]) < 1.0E-12)
         (*qDaq)[5] = kbInit(5,5)*(*db)[5];
     
     // save corresponding ctrl displacements for recorder
