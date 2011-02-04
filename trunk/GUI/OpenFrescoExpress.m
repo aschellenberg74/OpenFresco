@@ -88,3 +88,13 @@ switch action
             'Horizontal','center','Callback',callbackStr);
    %=========================================================================
 end
+
+%#function Analysis AnimateResponse AxesHelp DisplayAxes 
+%#function Element_ExpGeneric ExpControl ExpSetup GUI_AnalysisControls 
+%#function GUI_AnimateStructure GUI_ErrorMonitors GUI_Output GUI_StructuralOutput 
+%#function GUI_Template GetFFT GetFileList GroundMotions 
+%#function InputCheck Integrator_AlphaOS Integrator_NewmarkExplicit Links 
+%#function MenuBar OpenFrescoExpress ReadWriteTHFileNGA ReplayResults 
+%#function Report RunOpenFresco SetOPFPath SplashScreen 
+%#function Structure TCPSocket TerminateAnalysis UpdatePragmaList 
+%#function WriteTCL 
