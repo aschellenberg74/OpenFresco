@@ -11,19 +11,17 @@ DIR = handles.Model.DIR;
 FID = fopen(fullfile(DIR,'OPFReport.txt'),'w');
 
 % Print header
-fprintf(FID,'##############################################################\n');
-fprintf(FID,'# File: OPFReport.txt                                        #\n');
-fprintf(FID,'#                                                            #\n');
-fprintf(FID,'# Purpose: Summary of inputs for use with OpenFresco Express #\n');
-fprintf(FID,'#                                                            #\n');
-fprintf(FID,'##############################################################\n\n\n');
+fprintf(FID,'==============================================================\n');
+fprintf(FID,'| File   : OPFReport.txt                                     |\n');
+fprintf(FID,'| Purpose: Summary of inputs for use with OpenFresco Express |\n');
+fprintf(FID,'==============================================================\n\n');
 
 switch handles.Model.Type
     %%%%%%%%%%%%
     %1 DOF Case%
     %%%%%%%%%%%%
     case '1 DOF'
-        fprintf(FID,'# ------------------------------\n# Model Properties\n# ------------------------------\n');
+        fprintf(FID,'Model Properties:\n=================\n');
         fprintf(FID,'Model Type: 1 DOF Column\n');
         fprintf(FID,'Mass [m]: %1.4f\n',handles.Model.M);
         fprintf(FID,'Stiffness [F/L]: %1.4f\n',handles.Model.K);
@@ -34,7 +32,7 @@ switch handles.Model.Type
         fprintf(FID,'Mass Proportional Damping Factor: %1.4f\n',handles.Model.alphaM);
         fprintf(FID,'Stiffness Proportional Damping Factor: %1.4f\n\n',handles.Model.betaK);
         
-        fprintf(FID,'# ------------------------------\n# Loading\n# ------------------------------\n');
+        fprintf(FID,'Loading:\n========\n');
         switch handles.GM.loadType
             case 'Ground Motions'
                 strLength = length(handles.GM.store.filepath{1});
@@ -55,7 +53,7 @@ switch handles.Model.Type
                 fprintf(FID,'Vibration Time [sec]: %1.4f\n\n',handles.GM.vibTime);
         end
         
-        fprintf(FID,'# ------------------------------\n# Experimental Setup\n# ------------------------------\n');
+        fprintf(FID,'Experimental Setup:\n===================\n');
         fprintf(FID,'Setup Type: No Transformation\n');
         if strcmp(handles.ExpControl.Type,'Simulation')
             fprintf(FID,'Control: %s\n',handles.ExpControl.SimControl.SimType);
@@ -66,7 +64,7 @@ switch handles.Model.Type
         fprintf(FID,'Size Trial: 1\n');
         fprintf(FID,'Size Output: 1\n\n');
         
-        fprintf(FID,'# ------------------------------\n# Experimental Control\n# ------------------------------\n');
+        fprintf(FID,'Experimental Control:\n=====================\n');
         switch handles.ExpControl.Type
             case 'Simulation'
                 fprintf(FID,'Control Type: %s\n',handles.ExpControl.Type);
@@ -126,7 +124,7 @@ switch handles.Model.Type
                 end
         end
         
-        fprintf(FID,'# ------------------------------\n# Analysis Properties\n# ------------------------------\n');
+        fprintf(FID,'Analysis Properties:\n====================\n');
         fprintf(FID,'Analysis Time Step [sec]: %1.4f\n',handles.GM.dtAnalysis);
         fprintf(FID,'Analysis Time Step Limit [sec]: %1.4f\n',handles.Model.Maxdt);
         
@@ -135,7 +133,7 @@ switch handles.Model.Type
     %2 DOF A  Case%
     %%%%%%%%%%%%%%%
     case '2 DOF A'
-        fprintf(FID,'# ------------------------------\n# Model Properties\n# ------------------------------\n');
+        fprintf(FID,'Model Properties:\n=================\n');
         fprintf(FID,'Model Type: 2 DOF Shear Building\n');
         fprintf(FID,'Mass [M]: [%1.4f  %1.4f; %1.4f  %1.4f]\n',handles.Model.M(1,1),handles.Model.M(2,1),handles.Model.M(1,2),handles.Model.M(2,2));
         fprintf(FID,'Stiffness [F/L]: [%1.4f  %1.4f; %1.4f  %1.4f]\n',handles.Model.K(1,1),handles.Model.K(2,1),handles.Model.K(1,2),handles.Model.K(2,2));
@@ -150,7 +148,7 @@ switch handles.Model.Type
         fprintf(FID,'Mass Proportional Damping Factor: %1.4f\n',handles.Model.alphaM);
         fprintf(FID,'Stiffness Proportional Damping Factor: %1.4f\n\n',handles.Model.betaK);
         
-        fprintf(FID,'# ------------------------------\n# Loading\n# ------------------------------\n');
+        fprintf(FID,'Loading:\n========\n');
         switch handles.GM.loadType
             case 'Ground Motions'
                 strLength = length(handles.GM.store.filepath{1});
@@ -171,7 +169,7 @@ switch handles.Model.Type
                 fprintf(FID,'Vibration Time [sec]: %1.4f\n\n',handles.GM.vibTime);
         end
         
-        fprintf(FID,'# ------------------------------\n# Experimental Setup\n# ------------------------------\n');
+        fprintf(FID,'Experimental Setup:\n===================\n');
         fprintf(FID,'Setup Type: No Transformation\n');
         if strcmp(handles.ExpControl.Type,'Simulation')
             fprintf(FID,'Control: %s\n',handles.ExpControl.SimControl.SimType);
@@ -182,7 +180,7 @@ switch handles.Model.Type
         fprintf(FID,'Size Trial: 2\n');
         fprintf(FID,'Size Output: 2\n\n');
         
-        fprintf(FID,'# ------------------------------\n# Experimental Control\n# ------------------------------\n');
+        fprintf(FID,'Experimental Control:\n=====================\n');
         switch handles.ExpControl.Type
             case 'Simulation'
                 fprintf(FID,'Control Type: %s\n',handles.ExpControl.Type);
@@ -273,7 +271,7 @@ switch handles.Model.Type
                 end
         end
         
-        fprintf(FID,'# ------------------------------\n# Analysis Properties\n# ------------------------------\n');
+        fprintf(FID,'Analysis Properties:\n====================\n');
         fprintf(FID,'Analysis Time Step [sec]: %1.4f\n',handles.GM.dtAnalysis);
         fprintf(FID,'Analysis Time Step Limit [sec]: %1.4f\n',handles.Model.Maxdt);
         
@@ -282,7 +280,7 @@ switch handles.Model.Type
     %2 DOF B  Case%
     %%%%%%%%%%%%%%%
     case '2 DOF B'
-        fprintf(FID,'# ------------------------------\n# Model Properties\n# ------------------------------\n');
+        fprintf(FID,'Model Properties:\n=================\n');
         fprintf(FID,'Model Type: 2 DOF Column\n');
         fprintf(FID,'Mass [M]: [%1.4f  %1.4f; %1.4f  %1.4f]\n',handles.Model.M(1,1),handles.Model.M(2,1),handles.Model.M(1,2),handles.Model.M(2,2));
         fprintf(FID,'Stiffness [F/L]: [%1.4f  %1.4f; %1.4f  %1.4f]\n',handles.Model.K(1,1),handles.Model.K(2,1),handles.Model.K(1,2),handles.Model.K(2,2));
@@ -297,7 +295,7 @@ switch handles.Model.Type
         fprintf(FID,'Mass Proportional Damping Factor: %1.4f\n',handles.Model.alphaM);
         fprintf(FID,'Stiffness Proportional Damping Factor: %1.4f\n\n',handles.Model.betaK);
         
-        fprintf(FID,'# ------------------------------\n# Loading\n# ------------------------------\n');
+        fprintf(FID,'Loading:\n========\n');
         switch handles.GM.loadType
             case 'Ground Motions'
                 fprintf(FID,'Direction 1\n');
@@ -333,7 +331,7 @@ switch handles.Model.Type
                 fprintf(FID,'Vibration Time [sec]: %1.4f\n\n',handles.GM.vibTime);
         end
         
-        fprintf(FID,'# ------------------------------\n# Experimental Setup\n# ------------------------------\n');
+        fprintf(FID,'Experimental Setup:\n===================\n');
         fprintf(FID,'Setup Type: No Transformation\n');
         if strcmp(handles.ExpControl.Type,'Simulation')
             fprintf(FID,'Control: %s\n',handles.ExpControl.SimControl.SimType);
@@ -345,7 +343,7 @@ switch handles.Model.Type
         fprintf(FID,'Size Output: 2\n\n');
         
         
-        fprintf(FID,'# ------------------------------\n# Experimental Control\n# ------------------------------\n');
+        fprintf(FID,'Experimental Control:\n=====================\n');
         switch handles.ExpControl.Type
             case 'Simulation'
                 fprintf(FID,'Control Type: %s\n',handles.ExpControl.Type);
@@ -428,7 +426,7 @@ switch handles.Model.Type
                 end
         end
         
-        fprintf(FID,'# ------------------------------\n# Analysis Properties\n# ------------------------------\n');
+        fprintf(FID,'Analysis Properties:\n====================\n');
         fprintf(FID,'Analysis Time Step [sec]: %1.4f\n',handles.GM.dtAnalysis);
         fprintf(FID,'Analysis Time Step Limit [sec]: %1.4f\n',handles.Model.Maxdt);
 end
