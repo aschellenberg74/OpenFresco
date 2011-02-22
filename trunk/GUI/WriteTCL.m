@@ -18,12 +18,10 @@ else
     FID = fopen(fullfile(DIR,'OPFAnalysis.tcl'),'w');
     
     % Print header
-    fprintf(FID,'####################################################\n');
-    fprintf(FID,'# File: OPFAnalysis.tcl                            #\n');
-    fprintf(FID,'#                                                  #\n');
-    fprintf(FID,'# Purpose: Script file for use with OpenFresco GUI #\n');
-    fprintf(FID,'#                                                  #\n');
-    fprintf(FID,'####################################################\n\n\n');
+    fprintf(FID,'# =========================================================\n');
+    fprintf(FID,'# File   : OPFAnalysis.tcl                                 \n');
+    fprintf(FID,'# Purpose: Tcl script file for use with OpenFresco Express \n');
+    fprintf(FID,'# =========================================================\n\n');
     
     switch handles.Model.Type
         %%%%%%%%%%%%
@@ -173,7 +171,7 @@ else
             %         %Define experimental element
             %         fprintf(FID,'# Define experimental element\n# ---------------------------\n');
             %         fprintf(FID,'expElement generic 1 -node 2 -dof 1 -site 1 -initStif %4.0f\n',handles.Model.K);
-            fprintf(FID,'# ------------------------------\n# End of model generation\n# ------------------------------\n\n\n\n');
+            fprintf(FID,'# ------------------------------\n# End of model generation\n# ------------------------------\n\n\n');
             
             %         %Start of recorder generation
             %         fprintf(FID,'# ------------------------------\n# Start of recorder generation\n# ------------------------------\n# create the recorder objects\n');
@@ -188,8 +186,8 @@ else
             
             %Start the server process
             fprintf(FID,'# ------------------------------\n# Start the server process\n# ------------------------------\n');
-            fprintf(FID,'# startSimAppSiteServer $siteTag $port <-ssl>\nstartSimAppSiteServer 1 8090;  # use with experimental element in FEA\n');
-            fprintf(FID,'# --------------------------------\n# End of analysis\n# --------------------------------\n');
+            fprintf(FID,'# startSimAppSiteServer $siteTag $port <-ssl>\nstartSimAppSiteServer 1 8090\n');
+            fprintf(FID,'# ------------------------------\n# End of analysis\n# ------------------------------\n');
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             
             
@@ -355,7 +353,7 @@ else
                             id = strfind(appPath,filesep);
                             appPath(id) = '/';
                             fprintf(FID,'# Define experimental control\n# ---------------------------\n');
-                            fprintf(FID,'expControl %s 1 %1.0f "%s" %5.0f %s "%s"\n\n',handles.ExpControl.RealControl.Controller,handles.ExpControl.RealControl.PCvalue,handles.ExpControl.RealControl.ipAddr,handles.ExpControl.RealControl.ipPort,handles.ExpControl.RealControl.appName,appPath(1:end-1));
+                            fprintf(FID,'expControl %s 1 %1.0f "%s" %s %s "%s"\n\n',handles.ExpControl.RealControl.Controller,handles.ExpControl.RealControl.PCvalue,handles.ExpControl.RealControl.ipAddr,handles.ExpControl.RealControl.ipPort,handles.ExpControl.RealControl.appName,appPath(1:end-1));
                     end
             end
             
@@ -370,7 +368,7 @@ else
             %Define experimental element
             %         fprintf(FID,'# Define experimental element\n# ---------------------------\n');
             %         fprintf(FID,'expElement generic 1 -node 2 3 -dof 1 -dof 1 -site 1 -initStif %4.0f %4.0f %4.0f %4.0f\n',handles.Model.K(1,1),handles.Model.K(1,2),handles.Model.K(2,1),handles.Model.K(2,2));
-            fprintf(FID,'# ------------------------------\n# End of model generation\n# ------------------------------\n\n\n\n');
+            fprintf(FID,'# ------------------------------\n# End of model generation\n# ------------------------------\n\n\n');
             
             %         %Start of recorder generation
             %         fprintf(FID,'# ------------------------------\n# Start of recorder generation\n# ------------------------------\n# create the recorder objects\n');
@@ -388,8 +386,8 @@ else
             
             %Start the server process
             fprintf(FID,'# ------------------------------\n# Start the server process\n# ------------------------------\n');
-            fprintf(FID,'# startSimAppSiteServer $siteTag $port <-ssl>\nstartSimAppSiteServer 1 8090;  # use with experimental element in FEA\n');
-            fprintf(FID,'# --------------------------------\n# End of analysis\n# --------------------------------\n');
+            fprintf(FID,'# startSimAppSiteServer $siteTag $port <-ssl>\nstartSimAppSiteServer 1 8090\n');
+            fprintf(FID,'# ------------------------------\n# End of analysis\n# ------------------------------\n');
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             
             
@@ -538,7 +536,7 @@ else
                             id = strfind(appPath,filesep);
                             appPath(id) = '/';
                             fprintf(FID,'# Define experimental control\n# ---------------------------\n');
-                            fprintf(FID,'expControl %s 1 %1.0f "%s" %5.0f %s "%s"\n\n',handles.ExpControl.RealControl.Controller,handles.ExpControl.RealControl.PCvalue,handles.ExpControl.RealControl.ipAddr,handles.ExpControl.RealControl.ipPort,handles.ExpControl.RealControl.appName,appPath(1:end-1));
+                            fprintf(FID,'expControl %s 1 %1.0f "%s" %s %s "%s"\n\n',handles.ExpControl.RealControl.Controller,handles.ExpControl.RealControl.PCvalue,handles.ExpControl.RealControl.ipAddr,handles.ExpControl.RealControl.ipPort,handles.ExpControl.RealControl.appName,appPath(1:end-1));
                     end
             end
             
@@ -553,7 +551,7 @@ else
             %         %Define experimental element
             %         fprintf(FID,'# Define experimental element\n# ---------------------------\n');
             %         fprintf(FID,'expElement generic 1 -node 2 -dof 1 2 -site 1 -initStif %+1.6E %+1.6E %+1.6E %+1.6E\n',handles.Model.K(1,1),handles.Model.K(1,2),handles.Model.K(2,1),handles.Model.K(2,2));
-            fprintf(FID,'# ------------------------------\n# End of model generation\n# ------------------------------\n\n\n\n');
+            fprintf(FID,'# ------------------------------\n# End of model generation\n# ------------------------------\n\n\n');
             %         %Start of recorder generation
             %         fprintf(FID,'# ------------------------------\n# Start of recorder generation\n# ------------------------------\n# create the recorder objects\n');
             %         fprintf(FID,'recorder Node -file NodeDsp.out -time -node 2 -dof 1 disp\n');
@@ -570,8 +568,8 @@ else
             
             %Start the server process
             fprintf(FID,'# ------------------------------\n# Start the server process\n# ------------------------------\n');
-            fprintf(FID,'# startSimAppSiteServer $siteTag $port <-ssl>\nstartSimAppSiteServer 1 8090;  # use with experimental element in FEA\n');
-            fprintf(FID,'# --------------------------------\n# End of analysis\n# --------------------------------\n');
+            fprintf(FID,'# startSimAppSiteServer $siteTag $port <-ssl>\nstartSimAppSiteServer 1 8090\n');
+            fprintf(FID,'# ------------------------------\n# End of analysis\n# ------------------------------\n');
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     end
     
