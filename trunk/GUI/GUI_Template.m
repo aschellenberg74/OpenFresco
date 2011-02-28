@@ -13,13 +13,13 @@ end
 
 %Check for .tcl and report files and delete if found
 fclose('all');
-if exist('OPFAnalysis.tcl','file')
-    delete(which('OPFAnalysis.tcl'));
-    clc;
+DIR = which('OpenFrescoExpress.m');
+DIR = DIR(1:end-20);
+if exist(fullfile(DIR,'OPFAnalysis.tcl'),'file')
+    delete(fullfile(DIR,'OPFAnalysis.tcl'));
 end
-if exist('OPFReport.txt','file')
-    delete(which('OPFReport.txt'));
-    clc;
+if exist(fullfile(DIR,'OPFReport.txt'),'file')
+    delete(fullfile(DIR,'OPFReport.txt'));
 end
 
 %Get window size
@@ -2335,10 +2335,6 @@ handles.ExpControl.CP.F{2,2} = 1;
 handles.ExpControl.CP.Lim{2,2} = 1;
 handles.ExpControl.CP.LimL{2,2} = -12;
 handles.ExpControl.CP.LimU{2,2} = 12;
-
-%Store directory
-handles.Model.DIR = pwd;
-
 
 %Save the structure of handles
 guidata(gcf,handles);
