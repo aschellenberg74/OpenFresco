@@ -42,21 +42,22 @@ switch action
         
         %Check for .tcl and report files and delete if found
         fclose('all');
-        if exist('OPFAnalysis.tcl','file')
-            delete(which('OPFAnalysis.tcl'));
+        DIR = which('OpenFrescoExpress.m');
+        DIR = DIR(1:end-20);
+        if exist(fullfile(DIR,'OPFAnalysis.tcl'),'file')
+            delete(fullfile(DIR,'OPFAnalysis.tcl'));
         end
-        if exist('OPFReport.txt','file')
-            delete(which('OPFReport.txt'));
+        if exist(fullfile(DIR,'OPFReport.txt'),'file')
+            delete(fullfile(DIR,'OPFReport.txt'));
         end
-
+        
         %Reset analysis buttons
         set(handles.Analysis(6),'SelectedObject',[]);
         set(handles.Analysis(7),'CData',handles.Store.Start0a);
         set(handles.Analysis(8),'CData',handles.Store.Pause0a);
         set(handles.Analysis(9),'CData',handles.Store.Stop0a);
         
-        %Store directory
-        handles.Model.DIR = pwd;
+        %Store handles
         guidata(gcf,handles);
         
         %define colors and identify children plots

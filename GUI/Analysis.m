@@ -91,7 +91,8 @@ switch action
                 %Start%
                 %%%%%%%
                 case 'Start'
-                    DIR = handles.Model.DIR;
+                    DIR = which('OpenFrescoExpress.m');
+                    DIR = DIR(1:end-20);
                     %return if TCL does not exist
                     if ~exist(fullfile(DIR,'OPFAnalysis.tcl'),'file')
                         msgbox(sprintf('No .tcl file found!\nPlease write .tcl first.'),'Error','error')
@@ -214,17 +215,24 @@ switch action
                         set(findobj('Tag','StartControl'),'Value',1)
                         set(handles.Analysis(7),'Value',1);
                         guidata(findobj('Tag','OpenFrescoExpress'), handles);
-                        DIR = handles.Model.DIR;
+                        DIR = which('OpenFrescoExpress.m');
+                        DIR = DIR(1:end-20);
                         % load path to OpenFresco executable
-                        if exist('OpenFrescoPath.txt','file')==0
-                            fprintf(1,'Using GUI-internal OpenFresco executable.\n');
+                        if ~exist('OpenFrescoPath.txt','file')
+                            fprintf(1,'Using GUI-internal OpenFresco executable at:\n');
                             pathOPF = which('Pnpscr.dll');
                             pathOPF = pathOPF(1:end-11);
+                            fprintf(1,'%s\n',pathOPF);
                         else
-                            fprintf(1,'Using user-specified OpenFresco executable.\n');
-                            FID = fopen(fullfile(DIR,'OpenFrescoPath.txt'),'r');
-                            pathOPF = fscanf(FID,'%c');
+                            fprintf(1,'Using user-specified OpenFresco executable at:\n');
+                            s = which('OpenFrescoPath.txt');
+                            if isempty(s)
+                                s = fullfile(pwd,'OpenFrescoPath.txt');
+                            end
+                            FID = fopen(s,'r');
+                            pathOPF = fgetl(FID);
                             fclose(FID);
+                            fprintf(1,'%s\n',pathOPF);
                         end
                         % now run OpenFresco
                         RunOpenFresco(pathOPF,fullfile(DIR,'OPFAnalysis.tcl'));
@@ -375,7 +383,8 @@ switch action
     case 'generate report'
         %display report summarizing inputs
         Report;
-        DIR = handles.Model.DIR;
+        DIR = which('OpenFrescoExpress.m');
+        DIR = DIR(1:end-20);
         reportText = fileread(fullfile(DIR,'OPFReport.txt'));
         GUI_Output(reportText,'Input Summary','Report');
         
@@ -401,11 +410,13 @@ switch action
         
         %Check for .tcl and report files and delete if found
         fclose('all');
-        if exist('OPFAnalysis.tcl','file')
-            delete(which('OPFAnalysis.tcl'));
+        DIR = which('OpenFrescoExpress.m');
+        DIR = DIR(1:end-20);
+        if exist(fullfile(DIR,'OPFAnalysis.tcl'),'file')
+            delete(fullfile(DIR,'OPFAnalysis.tcl'));
         end
-        if exist('OPFReport.txt','file')
-            delete(which('OPFReport.txt'));
+        if exist(fullfile(DIR,'OPFReport.txt'),'file')
+            delete(fullfile(DIR,'OPFReport.txt'));
         end
         
         %Return user to structure page

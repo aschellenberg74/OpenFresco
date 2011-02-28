@@ -13,7 +13,8 @@ if error == 1
 else
     
     % get the path
-    DIR = handles.Model.DIR;
+    DIR = which('OpenFrescoExpress.m');
+    DIR = DIR(1:end-20);
     % open file for writing
     FID = fopen(fullfile(DIR,'OPFAnalysis.tcl'),'w');
     

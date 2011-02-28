@@ -6,8 +6,8 @@ function Report(varargin)
 handles = guidata(gcbf);
 
 % get the path and open file for writing
-DIR = handles.Model.DIR;
-
+DIR = which('OpenFrescoExpress.m');
+DIR = DIR(1:end-20);
 FID = fopen(fullfile(DIR,'OPFReport.txt'),'w');
 
 % Print header
