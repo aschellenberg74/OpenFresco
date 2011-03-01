@@ -32,5 +32,5 @@ echo "------------------------------------------"
   export XAPPLRESDIR;
   echo DYLD_LIBRARY_PATH is ${DYLD_LIBRARY_PATH};
   shift 1
-${exe_dir}/GUI_Template $*
+${exe_dir}/OpenFrescoExpress $*
 exit
