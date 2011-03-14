@@ -1,16 +1,16 @@
 Model {
   Name			  "HybridControllerD3D3_nAct"
-  Version		  7.3
+  Version		  7.5
   MdlSubVersion		  0
   GraphicalInterface {
     NumRootInports	    0
     NumRootOutports	    0
     ParameterArgumentNames  ""
-    ComputedModelVersion    "1.414"
+    ComputedModelVersion    "1.415"
     NumModelReferences	    0
     NumTestPointedSignals   0
   }
-  SavedCharacterEncoding  "ibm-5348_P100-1997"
+  SavedCharacterEncoding  "windows-1252"
   PreLoadFcn		  "initializeSimulation"
   SaveDefaultBlockParams  on
   ScopeRefreshTime	  0.035000
@@ -19,6 +19,7 @@ Model {
   DataTypeOverride	  "UseLocalSettings"
   MinMaxOverflowLogging	  "UseLocalSettings"
   MinMaxOverflowArchiveMode "Overwrite"
+  MaxMDLFileLineLength	  120
   CloseFcn		  "rtwprivate ssgencode ModelCloseRequest scrnet_receiver"
   Created		  "Thu Aug 30 07:20:16 2001"
   Creator		  "mvetsch"
@@ -26,9 +27,9 @@ Model {
   ModifiedByFormat	  "%<Auto>"
   LastModifiedBy	  "Andreas"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Thu Jul 16 15:49:15 2009"
-  RTWModifiedTimeStamp	  0
-  ModelVersionFormat	  "1.%<AutoIncrement:414>"
+  LastModifiedDate	  "Fri Mar 11 17:59:47 2011"
+  RTWModifiedTimeStamp	  221767179
+  ModelVersionFormat	  "1.%<AutoIncrement:415>"
   ConfigurationManager	  "None"
   SampleTimeColors	  off
   SampleTimeAnnotations	  off
@@ -66,6 +67,7 @@ Model {
   CovMetricSettings	  "dw"
   CovNameIncrementing	  off
   CovHtmlReporting	  on
+  CovForceBlockReductionOff on
   covSaveCumulativeToWorkspaceVar on
   CovSaveSingleToWorkspaceVar on
   CovCumulativeVarName	  "covCumulativeData"
@@ -102,13 +104,13 @@ Model {
     Dimension		    1
     Simulink.ConfigSet {
       $ObjectID		      1
-      Version		      "1.6.0"
+      Version		      "1.10.0"
       Array {
 	Type			"Handle"
 	Dimension		8
 	Simulink.SolverCC {
 	  $ObjectID		  2
-	  Version		  "1.6.0"
+	  Version		  "1.10.0"
 	  StartTime		  "0.0"
 	  StopTime		  "inf"
 	  AbsTol		  "auto"
@@ -128,6 +130,7 @@ Model {
 	  SolverMode		  "Auto"
 	  Solver		  "FixedStepDiscrete"
 	  SolverName		  "FixedStepDiscrete"
+	  SolverJacobianMethodControl "auto"
 	  ShapePreserveControl	  "DisableAll"
 	  ZeroCrossControl	  "UseLocalSettings"
 	  ZeroCrossAlgorithm	  "Nonadaptive"
@@ -137,11 +140,10 @@ Model {
 	  AutoInsertRateTranBlk	  off
 	  SampleTimeConstraint	  "Unconstrained"
 	  InsertRTBMode		  "Whenever possible"
-	  SignalSizeVariationType "Allow only fixed size"
 	}
 	Simulink.DataIOCC {
 	  $ObjectID		  3
-	  Version		  "1.6.0"
+	  Version		  "1.10.0"
 	  Decimation		  "1"
 	  ExternalInput		  "[t, u]"
 	  FinalStateName	  "xFinal"
@@ -156,19 +158,23 @@ Model {
 	  SaveOutput		  off
 	  SaveState		  off
 	  SignalLogging		  off
+	  DSMLogging		  on
 	  InspectSignalLogs	  off
 	  SaveTime		  off
+	  ReturnWorkspaceOutputs  off
 	  StateSaveName		  "xout"
 	  TimeSaveName		  "tout"
 	  OutputSaveName	  "yout"
 	  SignalLoggingName	  "sigsOut"
+	  DSMLoggingName	  "dsmout"
 	  OutputOption		  "RefineOutputTimes"
 	  OutputTimes		  "[]"
+	  ReturnWorkspaceOutputsName "out"
 	  Refine		  "1"
 	}
 	Simulink.OptimizationCC {
 	  $ObjectID		  4
-	  Version		  "1.6.0"
+	  Version		  "1.10.0"
 	  Array {
 	    Type		    "Cell"
 	    Dimension		    7
@@ -185,6 +191,7 @@ Model {
 	  BooleanDataType	  on
 	  ConditionallyExecuteInputs on
 	  InlineParams		  off
+	  UseIntDivNetSlope	  off
 	  InlineInvariantSignals  off
 	  OptimizeBlockIOStorage  off
 	  BufferReuse		  off
@@ -192,6 +199,8 @@ Model {
 	  StrengthReduction	  off
 	  EnforceIntegerDowncast  off
 	  ExpressionFolding	  off
+	  BooleansAsBitfields	  off
+	  BitfieldContainerType	  "uint_T"
 	  EnableMemcpy		  on
 	  MemcpyThreshold	  64
 	  PassReuseOutputArgsAs	  "Structure reference"
@@ -211,13 +220,14 @@ Model {
 	  EfficientMapNaN2IntZero on
 	  OptimizeModelRefInitCode off
 	  LifeSpan		  "inf"
+	  MaxStackSize		  "Inherit from target"
 	  BufferReusableBoundary  on
 	  SimCompilerOptimization "On"
 	  AccelVerboseBuild	  off
 	}
 	Simulink.DebuggingCC {
 	  $ObjectID		  5
-	  Version		  "1.6.0"
+	  Version		  "1.10.0"
 	  RTPrefix		  "error"
 	  ConsistencyChecking	  "none"
 	  ArrayBoundsChecking	  "none"
@@ -257,6 +267,9 @@ Model {
 	  ParameterUnderflowMsg	  "none"
 	  ParameterPrecisionLossMsg "warning"
 	  ParameterTunabilityLossMsg "warning"
+	  FixptConstUnderflowMsg  "none"
+	  FixptConstOverflowMsg	  "none"
+	  FixptConstPrecisionLossMsg "none"
 	  UnderSpecifiedDataTypeMsg "none"
 	  UnnecessaryDatatypeConvMsg "none"
 	  VectorMatrixConversionMsg "none"
@@ -281,13 +294,16 @@ Model {
 	  ModelReferenceSymbolNameMessage "warning"
 	  ModelReferenceExtraNoncontSigs "error"
 	  StateNameClashWarn	  "warning"
+	  SimStateInterfaceChecksumMismatchMsg "warning"
 	  StrictBusMsg		  "None"
+	  BusNameAdapt		  "WarnAndRepair"
+	  NonBusSignalsTreatedAsBus "none"
 	  LoggingUnavailableSignals "error"
 	  BlockIODiagnostic	  "none"
 	}
 	Simulink.HardwareCC {
 	  $ObjectID		  6
-	  Version		  "1.6.0"
+	  Version		  "1.10.0"
 	  ProdBitPerChar	  8
 	  ProdBitPerShort	  16
 	  ProdBitPerInt		  32
@@ -314,16 +330,21 @@ Model {
 	}
 	Simulink.ModelReferenceCC {
 	  $ObjectID		  7
-	  Version		  "1.6.0"
+	  Version		  "1.10.0"
 	  UpdateModelReferenceTargets "IfOutOfDateOrStructuralChange"
 	  CheckModelReferenceTargetMessage "error"
+	  EnableParallelModelReferenceBuilds off
+	  ParallelModelReferenceMATLABWorkerInit "None"
 	  ModelReferenceNumInstancesAllowed "Multi"
+	  PropagateVarSize	  "Infer from blocks in model"
 	  ModelReferencePassRootInputsByReference on
 	  ModelReferenceMinAlgLoopOccurrences off
+	  PropagateSignalLabelsOutOfModel off
+	  SupportModelReferenceSimTargetCustomCode off
 	}
 	Simulink.SFSimCC {
 	  $ObjectID		  8
-	  Version		  "1.6.0"
+	  Version		  "1.10.0"
 	  SimCustomHeaderCode	  "#include \"PredictorCorrector.h\""
 	  SimUserSources	  "PredictorCorrector.c"
 	  SimUserIncludeDirs	  "D:\\PredictorCorrector\\HybridSimToolbox"
@@ -331,13 +352,16 @@ Model {
 	  SFSimOverflowDetection  on
 	  SFSimEcho		  on
 	  SimBlas		  on
+	  SimCtrlC		  on
+	  SimExtrinsic		  on
+	  SimIntegrity		  on
 	  SimUseLocalCustomCode	  off
 	  SimBuildMode		  "sf_incremental_build"
 	}
 	Simulink.RTWCC {
 	  $BackupClass		  "Simulink.RTWCC"
 	  $ObjectID		  9
-	  Version		  "1.6.0"
+	  Version		  "1.10.0"
 	  Array {
 	    Type		    "Cell"
 	    Dimension		    2
@@ -381,12 +405,13 @@ Model {
 	  GenerateCodeInfo	  off
 	  RTWCompilerOptimization "On"
 	  CheckMdlBeforeBuild	  "Off"
+	  CustomRebuildMode	  "OnUpdate"
 	  Array {
 	    Type		    "Handle"
 	    Dimension		    2
 	    Simulink.CodeAppCC {
 	      $ObjectID		      10
-	      Version		      "1.6.0"
+	      Version		      "1.10.0"
 	      Array {
 		Type			"Cell"
 		Dimension		16
@@ -426,6 +451,7 @@ Model {
 	      CustomSymbolStrType     "$N$R$M"
 	      CustomSymbolStrField    "$N$M"
 	      CustomSymbolStrFcn      "$R$N$M$F"
+	      CustomSymbolStrFcnArg   "rt$I$N$M"
 	      CustomSymbolStrBlkIO    "rtb_$N$M"
 	      CustomSymbolStrTmpVar   "$N$M"
 	      CustomSymbolStrMacro    "$R$N$M"
@@ -442,7 +468,7 @@ Model {
 	    xpctarget.xpcTargetCC {
 	      $BackupClass	      "Simulink.TargetCC"
 	      $ObjectID		      11
-	      Version		      "1.6.0"
+	      Version		      "1.10.0"
 	      Array {
 		Type			"Cell"
 		Dimension		15
@@ -469,6 +495,7 @@ Model {
 	      TargetFunctionLibrary   "ANSI_C"
 	      UtilityFuncGeneration   "Auto"
 	      ERTMultiwordTypeDef     "System defined"
+	      ERTCodeCoverageTool     "None"
 	      ERTMultiwordLength      256
 	      MultiwordLength	      2048
 	      GenerateFullHeader      on
@@ -479,6 +506,7 @@ Model {
 	      ParMdlRefBuildCompliant off
 	      CompOptLevelCompliant   on
 	      IncludeMdlTerminateFcn  on
+	      GeneratePreprocessorConditionals "Disable all"
 	      CombineOutputUpdateFcns off
 	      SuppressErrorStatus     off
 	      ERTFirstTimeCompliant   off
@@ -493,6 +521,7 @@ Model {
 	      PurelyIntegerCode	      off
 	      SupportContinuousTime   on
 	      SupportNonInlinedSFcns  on
+	      SupportVariableSizeSignals off
 	      EnableShiftOperators    on
 	      ParenthesesLevel	      "Nominal"
 	      PortableWordSizes	      off
@@ -518,6 +547,7 @@ Model {
 	      xPCisDefaultEnv	      on
 	      xPCisModelTimeout	      on
 	      xPCModelTimeoutSecs     "5"
+	      xPCLoadParamSetFile     off
 	    }
 	    PropName		    "Components"
 	  }
@@ -569,7 +599,7 @@ Model {
     Block {
       BlockType		      ActionPort
       InitializeStates	      "held"
-      SignalSizeVariationType "Allow only fixed size"
+      PropagateVarSize	      "Only when execution is resumed"
       ActionType	      "unset"
     }
     Block {
@@ -595,6 +625,7 @@ Model {
       LockScale		      off
       SampleTime	      "inf"
       FramePeriod	      "inf"
+      PreserveConstantTs      off
     }
     Block {
       BlockType		      DataStoreMemory
@@ -612,6 +643,12 @@ Model {
       OutDataTypeStr	      "Inherit: auto"
       LockScale		      off
       SignalType	      "auto"
+      DataLogging	      off
+      DataLoggingLimitDataPoints off
+      DataLoggingMaxPoints    "5000"
+      DataLoggingDecimateData off
+      DataLoggingDecimation   "2"
+      DataLoggingNameMode     "SignalName"
     }
     Block {
       BlockType		      DataStoreRead
@@ -693,6 +730,7 @@ Model {
       BusObject		      "BusObject"
       BusOutputAsStruct	      off
       PortDimensions	      "-1"
+      VarSizeSig	      "Inherit"
       SampleTime	      "-1"
       OutMin		      "[]"
       OutMax		      "[]"
@@ -704,9 +742,8 @@ Model {
       SignalType	      "auto"
       SamplingMode	      "auto"
       LatchByDelayingOutsideSignal off
-      LatchByCopyingInsideSignal off
+      LatchInputForFeedbackSignals off
       Interpolate	      on
-      DimensionsMode	      "auto"
     }
     Block {
       BlockType		      Mux
@@ -723,6 +760,7 @@ Model {
       BusObject		      "BusObject"
       BusOutputAsStruct	      off
       PortDimensions	      "-1"
+      VarSizeSig	      "Inherit"
       SampleTime	      "-1"
       OutMin		      "[]"
       OutMax		      "[]"
@@ -736,7 +774,6 @@ Model {
       SourceOfInitialOutputValue "Dialog"
       OutputWhenDisabled      "held"
       InitialOutput	      "[]"
-      DimensionsMode	      "auto"
     }
     Block {
       BlockType		      "S-Function"
@@ -806,7 +843,7 @@ Model {
       SaturateOnIntegerOverflow	on
       ZeroCross		      on
       SampleTime	      "-1"
-      OutputVariableDimensions off
+      AllowDiffInputSizes     off
     }
     Block {
       BlockType		      Terminator
@@ -815,12 +852,18 @@ Model {
       BlockType		      TriggerPort
       TriggerType	      "rising"
       StatesWhenEnabling      "inherit"
-      SignalSizeVariationType "Allow only fixed size"
+      PropagateVarSize	      "During execution"
       ShowOutputPort	      off
       OutputDataType	      "auto"
       SampleTimeType	      "triggered"
       SampleTime	      "1"
       ZeroCross		      on
+      PortDimensions	      "-1"
+      TriggerSignalSampleTime "-1"
+      OutMin		      "[]"
+      OutMax		      "[]"
+      OutDataTypeStr	      "Inherit: auto"
+      Interpolate	      on
     }
     Block {
       BlockType		      ZeroOrderHold
@@ -843,12 +886,15 @@ Model {
     ShowPageBoundaries	    off
     ZoomFactor		    "100"
     ReportName		    "simulink-default.rpt"
+    SIDHighWatermark	    227
     Block {
       BlockType		      Reference
       Name		      "SC150 init"
+      SID		      1
       Ports		      []
       Position		      [30, 79, 125, 119]
       NamePlacement	      "alternate"
+      LibraryVersion	      "1.4"
       SourceBlock	      "xpcsystranlib/Shared\nMemory/SC150 init "
       SourceType	      "SC150 Init"
       node		      "node"
@@ -857,6 +903,7 @@ Model {
     Block {
       BlockType		      SubSystem
       Name		      "assemble"
+      SID		      2
       Ports		      [1, 1]
       Position		      [555, 244, 610, 276]
       ShowName		      off
@@ -876,7 +923,6 @@ Model {
       MaskEnableString	      "on,on"
       MaskVisibilityString    "on,on"
       MaskToolTipString	      "on,on"
-      MaskVarAliasString      ","
       MaskVariables	      "id=@1;size=@2;"
       MaskDisplay	      "disp('Assemble')"
       MaskIconFrame	      on
@@ -885,7 +931,6 @@ Model {
       MaskPortRotate	      "default"
       MaskIconUnits	      "autoscale"
       MaskValueString	      "[2 3 4 1 5 6]|nAct"
-      MaskTabNameString	      ","
       System {
 	Name			"assemble"
 	Location		[381, 524, 665, 639]
@@ -904,6 +949,7 @@ Model {
 	Block {
 	  BlockType		  Inport
 	  Name			  "In1"
+	  SID			  3
 	  Position		  [20, 28, 50, 42]
 	  IconDisplay		  "Port number"
 	  OutDataType		  "sfix(16)"
@@ -912,6 +958,7 @@ Model {
 	Block {
 	  BlockType		  Assignment
 	  Name			  "Assignment"
+	  SID			  4
 	  Ports			  [2, 1]
 	  Position		  [120, 21, 190, 79]
 	  OutputInitialize	  "Specify size for each dimension in table"
@@ -922,6 +969,7 @@ Model {
 	Block {
 	  BlockType		  Constant
 	  Name			  "Constant"
+	  SID			  5
 	  Position		  [65, 50, 95, 80]
 	  Value			  "id"
 	  OutDataType		  "sfix(16)"
@@ -930,6 +978,7 @@ Model {
 	Block {
 	  BlockType		  Outport
 	  Name			  "Out1"
+	  SID			  6
 	  Position		  [225, 43, 255, 57]
 	  IconDisplay		  "Port number"
 	  OutDataType		  "sfix(16)"
@@ -958,6 +1007,7 @@ Model {
     Block {
       BlockType		      SubSystem
       Name		      "assemble1"
+      SID		      7
       Ports		      [1, 1]
       Position		      [555, 529, 610, 561]
       ShowName		      off
@@ -977,7 +1027,6 @@ Model {
       MaskEnableString	      "on,on"
       MaskVisibilityString    "on,on"
       MaskToolTipString	      "on,on"
-      MaskVarAliasString      ","
       MaskVariables	      "id=@1;size=@2;"
       MaskDisplay	      "disp('Assemble')"
       MaskIconFrame	      on
@@ -986,7 +1035,6 @@ Model {
       MaskPortRotate	      "default"
       MaskIconUnits	      "autoscale"
       MaskValueString	      "[2 3 4 1 5 6]|nAct"
-      MaskTabNameString	      ","
       System {
 	Name			"assemble1"
 	Location		[381, 524, 665, 639]
@@ -1005,6 +1053,7 @@ Model {
 	Block {
 	  BlockType		  Inport
 	  Name			  "In1"
+	  SID			  8
 	  Position		  [20, 28, 50, 42]
 	  IconDisplay		  "Port number"
 	  OutDataType		  "sfix(16)"
@@ -1013,6 +1062,7 @@ Model {
 	Block {
 	  BlockType		  Assignment
 	  Name			  "Assignment"
+	  SID			  9
 	  Ports			  [2, 1]
 	  Position		  [120, 21, 190, 79]
 	  OutputInitialize	  "Specify size for each dimension in table"
@@ -1023,6 +1073,7 @@ Model {
 	Block {
 	  BlockType		  Constant
 	  Name			  "Constant"
+	  SID			  10
 	  Position		  [65, 50, 95, 80]
 	  Value			  "id"
 	  OutDataType		  "sfix(16)"
@@ -1031,6 +1082,7 @@ Model {
 	Block {
 	  BlockType		  Outport
 	  Name			  "Out1"
+	  SID			  11
 	  Position		  [225, 43, 255, 57]
 	  IconDisplay		  "Port number"
 	  OutDataType		  "sfix(16)"
@@ -1059,6 +1111,7 @@ Model {
     Block {
       BlockType		      SubSystem
       Name		      "assemble2"
+      SID		      12
       Ports		      [1, 1]
       Position		      [555, 679, 610, 711]
       ShowName		      off
@@ -1078,7 +1131,6 @@ Model {
       MaskEnableString	      "on,on"
       MaskVisibilityString    "on,on"
       MaskToolTipString	      "on,on"
-      MaskVarAliasString      ","
       MaskVariables	      "id=@1;size=@2;"
       MaskDisplay	      "disp('Assemble')"
       MaskIconFrame	      on
@@ -1087,7 +1139,6 @@ Model {
       MaskPortRotate	      "default"
       MaskIconUnits	      "autoscale"
       MaskValueString	      "[2 3 4 1 5 6]|nAct"
-      MaskTabNameString	      ","
       System {
 	Name			"assemble2"
 	Location		[381, 524, 665, 639]
@@ -1106,6 +1157,7 @@ Model {
 	Block {
 	  BlockType		  Inport
 	  Name			  "In1"
+	  SID			  13
 	  Position		  [20, 28, 50, 42]
 	  IconDisplay		  "Port number"
 	  OutDataType		  "sfix(16)"
@@ -1114,6 +1166,7 @@ Model {
 	Block {
 	  BlockType		  Assignment
 	  Name			  "Assignment"
+	  SID			  14
 	  Ports			  [2, 1]
 	  Position		  [120, 21, 190, 79]
 	  OutputInitialize	  "Specify size for each dimension in table"
@@ -1124,6 +1177,7 @@ Model {
 	Block {
 	  BlockType		  Constant
 	  Name			  "Constant"
+	  SID			  15
 	  Position		  [65, 50, 95, 80]
 	  Value			  "id"
 	  OutDataType		  "sfix(16)"
@@ -1132,6 +1186,7 @@ Model {
 	Block {
 	  BlockType		  Outport
 	  Name			  "Out1"
+	  SID			  16
 	  Position		  [225, 43, 255, 57]
 	  IconDisplay		  "Port number"
 	  OutDataType		  "sfix(16)"
@@ -1160,6 +1215,7 @@ Model {
     Block {
       BlockType		      Constant
       Name		      "ctl modes"
+      SID		      17
       Position		      [580, 195, 610, 225]
       Value		      "zeros(nAct,1)"
       OutDataType	      "sfix(16)"
@@ -1168,6 +1224,7 @@ Model {
     Block {
       BlockType		      Constant
       Name		      "dAccel"
+      SID		      18
       Position		      [580, 630, 610, 660]
       Value		      "zeros(nAct,1)"
       OutDataType	      "sfix(16)"
@@ -1176,6 +1233,7 @@ Model {
     Block {
       BlockType		      Constant
       Name		      "dTime"
+      SID		      19
       Position		      [580, 730, 610, 760]
       Value		      "zeros(nAct,1)"
       OutDataType	      "sfix(16)"
@@ -1184,6 +1242,7 @@ Model {
     Block {
       BlockType		      Constant
       Name		      "dVel"
+      SID		      20
       Position		      [580, 580, 610, 610]
       Value		      "zeros(nAct,1)"
       OutDataType	      "sfix(16)"
@@ -1192,6 +1251,7 @@ Model {
     Block {
       BlockType		      Constant
       Name		      "dig outs"
+      SID		      21
       Position		      [580, 345, 610, 375]
       Value		      "zeros(nDout, 1)"
       OutDataTypeMode	      "uint32"
@@ -1202,6 +1262,7 @@ Model {
     Block {
       BlockType		      SubSystem
       Name		      "extract"
+      SID		      22
       Ports		      [1, 1]
       Position		      [195, 529, 250, 561]
       ShowName		      off
@@ -1221,7 +1282,6 @@ Model {
       MaskEnableString	      "on,on"
       MaskVisibilityString    "on,on"
       MaskToolTipString	      "on,on"
-      MaskVarAliasString      ","
       MaskVariables	      "id=@1;size=@2;"
       MaskDisplay	      "disp('Extract')"
       MaskIconFrame	      on
@@ -1230,7 +1290,6 @@ Model {
       MaskPortRotate	      "default"
       MaskIconUnits	      "autoscale"
       MaskValueString	      "[2 3 4 1 5 6]|nAct"
-      MaskTabNameString	      ","
       System {
 	Name			"extract"
 	Location		[603, 584, 810, 687]
@@ -1249,6 +1308,7 @@ Model {
 	Block {
 	  BlockType		  Inport
 	  Name			  "In1"
+	  SID			  23
 	  Position		  [25, 38, 55, 52]
 	  IconDisplay		  "Port number"
 	  OutDataType		  "sfix(16)"
@@ -1257,6 +1317,7 @@ Model {
 	Block {
 	  BlockType		  Selector
 	  Name			  "Selector"
+	  SID			  24
 	  Ports			  [1, 1]
 	  Position		  [80, 26, 120, 64]
 	  InputPortWidth	  "size"
@@ -1267,6 +1328,7 @@ Model {
 	Block {
 	  BlockType		  Outport
 	  Name			  "Out1"
+	  SID			  25
 	  Position		  [145, 38, 175, 52]
 	  IconDisplay		  "Port number"
 	  OutDataType		  "sfix(16)"
@@ -1289,6 +1351,7 @@ Model {
     Block {
       BlockType		      SubSystem
       Name		      "extract1"
+      SID		      26
       Ports		      [1, 1]
       Position		      [195, 564, 250, 596]
       ShowName		      off
@@ -1308,7 +1371,6 @@ Model {
       MaskEnableString	      "on,on"
       MaskVisibilityString    "on,on"
       MaskToolTipString	      "on,on"
-      MaskVarAliasString      ","
       MaskVariables	      "id=@1;size=@2;"
       MaskDisplay	      "disp('Extract')"
       MaskIconFrame	      on
@@ -1317,7 +1379,6 @@ Model {
       MaskPortRotate	      "default"
       MaskIconUnits	      "autoscale"
       MaskValueString	      "[2 3 4 1 5 6]|nAct"
-      MaskTabNameString	      ","
       System {
 	Name			"extract1"
 	Location		[603, 584, 810, 687]
@@ -1336,6 +1397,7 @@ Model {
 	Block {
 	  BlockType		  Inport
 	  Name			  "In1"
+	  SID			  27
 	  Position		  [25, 38, 55, 52]
 	  IconDisplay		  "Port number"
 	  OutDataType		  "sfix(16)"
@@ -1344,6 +1406,7 @@ Model {
 	Block {
 	  BlockType		  Selector
 	  Name			  "Selector"
+	  SID			  28
 	  Ports			  [1, 1]
 	  Position		  [80, 26, 120, 64]
 	  InputPortWidth	  "size"
@@ -1354,6 +1417,7 @@ Model {
 	Block {
 	  BlockType		  Outport
 	  Name			  "Out1"
+	  SID			  29
 	  Position		  [145, 38, 175, 52]
 	  IconDisplay		  "Port number"
 	  OutDataType		  "sfix(16)"
@@ -1376,6 +1440,7 @@ Model {
     Block {
       BlockType		      SubSystem
       Name		      "extract2"
+      SID		      30
       Ports		      [1, 1]
       Position		      [195, 184, 250, 216]
       ShowName		      off
@@ -1395,7 +1460,6 @@ Model {
       MaskEnableString	      "on,on"
       MaskVisibilityString    "on,on"
       MaskToolTipString	      "on,on"
-      MaskVarAliasString      ","
       MaskVariables	      "id=@1;size=@2;"
       MaskDisplay	      "disp('Extract')"
       MaskIconFrame	      on
@@ -1404,7 +1468,6 @@ Model {
       MaskPortRotate	      "default"
       MaskIconUnits	      "autoscale"
       MaskValueString	      "[2 3 4 1 5 6]|nAct"
-      MaskTabNameString	      ","
       System {
 	Name			"extract2"
 	Location		[603, 584, 810, 687]
@@ -1423,6 +1486,7 @@ Model {
 	Block {
 	  BlockType		  Inport
 	  Name			  "In1"
+	  SID			  31
 	  Position		  [25, 38, 55, 52]
 	  IconDisplay		  "Port number"
 	  OutDataType		  "sfix(16)"
@@ -1431,6 +1495,7 @@ Model {
 	Block {
 	  BlockType		  Selector
 	  Name			  "Selector"
+	  SID			  32
 	  Ports			  [1, 1]
 	  Position		  [80, 26, 120, 64]
 	  InputPortWidth	  "size"
@@ -1441,6 +1506,7 @@ Model {
 	Block {
 	  BlockType		  Outport
 	  Name			  "Out1"
+	  SID			  33
 	  Position		  [145, 38, 175, 52]
 	  IconDisplay		  "Port number"
 	  OutDataType		  "sfix(16)"
@@ -1463,6 +1529,7 @@ Model {
     Block {
       BlockType		      Constant
       Name		      "force cmds"
+      SID		      34
       Position		      [580, 295, 610, 325]
       Value		      "zeros(nAct,1)"
       OutDataType	      "sfix(16)"
@@ -1471,6 +1538,7 @@ Model {
     Block {
       BlockType		      SubSystem
       Name		      "input from MTS (STS)"
+      SID		      35
       Ports		      [0, 12]
       Position		      [30, 385, 125, 810]
       NamePlacement	      "alternate"
@@ -1499,8 +1567,10 @@ Model {
 	Block {
 	  BlockType		  Reference
 	  Name			  "SC150 read"
+	  SID			  36
 	  Ports			  [0, 1]
 	  Position		  [20, 225, 105, 265]
+	  LibraryVersion	  "1.4"
 	  SourceBlock		  "xpcsystranlib/Shared\nMemory/SC150 read "
 	  SourceType		  "SC150 Read"
 	  partition		  "node.Partitions(12:23)"
@@ -1511,8 +1581,10 @@ Model {
 	Block {
 	  BlockType		  Reference
 	  Name			  "SC150 unpack"
+	  SID			  37
 	  Ports			  [1, 12]
 	  Position		  [155, 17, 235, 473]
+	  LibraryVersion	  "1.1656"
 	  SourceBlock		  "xpclib/Shared\nMemory/Shared Memory Unpack "
 	  SourceType		  "Shared Memory Partition Unpacking"
 	  partition		  "node.Partitions(12:23)"
@@ -1520,6 +1592,7 @@ Model {
 	Block {
 	  BlockType		  DataTypeConversion
 	  Name			  "typeConv1"
+	  SID			  38
 	  Position		  [285, 16, 340, 34]
 	  OutDataTypeMode	  "double"
 	  OutDataType		  "sfix(16)"
@@ -1529,6 +1602,7 @@ Model {
 	Block {
 	  BlockType		  DataTypeConversion
 	  Name			  "typeConv10"
+	  SID			  39
 	  Position		  [285, 376, 340, 394]
 	  OutDataTypeMode	  "double"
 	  OutDataType		  "sfix(16)"
@@ -1538,6 +1612,7 @@ Model {
 	Block {
 	  BlockType		  DataTypeConversion
 	  Name			  "typeConv11"
+	  SID			  40
 	  Position		  [285, 416, 340, 434]
 	  OutDataTypeMode	  "double"
 	  OutDataType		  "sfix(16)"
@@ -1547,6 +1622,7 @@ Model {
 	Block {
 	  BlockType		  DataTypeConversion
 	  Name			  "typeConv12"
+	  SID			  41
 	  Position		  [285, 456, 340, 474]
 	  OutDataTypeMode	  "uint32"
 	  OutDataType		  "sfix(16)"
@@ -1556,6 +1632,7 @@ Model {
 	Block {
 	  BlockType		  DataTypeConversion
 	  Name			  "typeConv2"
+	  SID			  42
 	  Position		  [285, 56, 340, 74]
 	  OutDataTypeMode	  "uint32"
 	  OutDataType		  "sfix(16)"
@@ -1565,6 +1642,7 @@ Model {
 	Block {
 	  BlockType		  DataTypeConversion
 	  Name			  "typeConv3"
+	  SID			  43
 	  Position		  [285, 96, 340, 114]
 	  OutDataTypeMode	  "double"
 	  OutDataType		  "sfix(16)"
@@ -1574,6 +1652,7 @@ Model {
 	Block {
 	  BlockType		  DataTypeConversion
 	  Name			  "typeConv4"
+	  SID			  44
 	  Position		  [285, 136, 340, 154]
 	  OutDataTypeMode	  "double"
 	  OutDataType		  "sfix(16)"
@@ -1583,6 +1662,7 @@ Model {
 	Block {
 	  BlockType		  DataTypeConversion
 	  Name			  "typeConv5"
+	  SID			  45
 	  Position		  [285, 176, 340, 194]
 	  OutDataTypeMode	  "double"
 	  OutDataType		  "sfix(16)"
@@ -1592,6 +1672,7 @@ Model {
 	Block {
 	  BlockType		  DataTypeConversion
 	  Name			  "typeConv6"
+	  SID			  46
 	  Position		  [285, 216, 340, 234]
 	  OutDataTypeMode	  "double"
 	  OutDataType		  "sfix(16)"
@@ -1601,6 +1682,7 @@ Model {
 	Block {
 	  BlockType		  DataTypeConversion
 	  Name			  "typeConv7"
+	  SID			  47
 	  Position		  [285, 256, 340, 274]
 	  OutDataTypeMode	  "double"
 	  OutDataType		  "sfix(16)"
@@ -1610,6 +1692,7 @@ Model {
 	Block {
 	  BlockType		  DataTypeConversion
 	  Name			  "typeConv8"
+	  SID			  48
 	  Position		  [285, 296, 340, 314]
 	  OutDataTypeMode	  "double"
 	  OutDataType		  "sfix(16)"
@@ -1619,6 +1702,7 @@ Model {
 	Block {
 	  BlockType		  DataTypeConversion
 	  Name			  "typeConv9"
+	  SID			  49
 	  Position		  [285, 336, 340, 354]
 	  OutDataTypeMode	  "double"
 	  OutDataType		  "sfix(16)"
@@ -1628,6 +1712,7 @@ Model {
 	Block {
 	  BlockType		  Outport
 	  Name			  "master span"
+	  SID			  50
 	  Position		  [375, 18, 405, 32]
 	  IconDisplay		  "Port number"
 	  OutDataType		  "sfix(16)"
@@ -1636,6 +1721,7 @@ Model {
 	Block {
 	  BlockType		  Outport
 	  Name			  "ctl modes"
+	  SID			  51
 	  Position		  [375, 58, 405, 72]
 	  Port			  "2"
 	  IconDisplay		  "Port number"
@@ -1645,6 +1731,7 @@ Model {
 	Block {
 	  BlockType		  Outport
 	  Name			  "displ cmds"
+	  SID			  52
 	  Position		  [375, 98, 405, 112]
 	  Port			  "3"
 	  IconDisplay		  "Port number"
@@ -1654,6 +1741,7 @@ Model {
 	Block {
 	  BlockType		  Outport
 	  Name			  "force cmds"
+	  SID			  53
 	  Position		  [375, 138, 405, 152]
 	  Port			  "4"
 	  IconDisplay		  "Port number"
@@ -1663,6 +1751,7 @@ Model {
 	Block {
 	  BlockType		  Outport
 	  Name			  "displ fbks"
+	  SID			  54
 	  Position		  [375, 178, 405, 192]
 	  Port			  "5"
 	  IconDisplay		  "Port number"
@@ -1672,6 +1761,7 @@ Model {
 	Block {
 	  BlockType		  Outport
 	  Name			  "force fbks"
+	  SID			  55
 	  Position		  [375, 218, 405, 232]
 	  Port			  "6"
 	  IconDisplay		  "Port number"
@@ -1681,6 +1771,7 @@ Model {
 	Block {
 	  BlockType		  Outport
 	  Name			  "deltaP fbks"
+	  SID			  56
 	  Position		  [375, 258, 405, 272]
 	  Port			  "7"
 	  IconDisplay		  "Port number"
@@ -1690,6 +1781,7 @@ Model {
 	Block {
 	  BlockType		  Outport
 	  Name			  "valve cmds"
+	  SID			  57
 	  Position		  [375, 298, 405, 312]
 	  Port			  "8"
 	  IconDisplay		  "Port number"
@@ -1699,6 +1791,7 @@ Model {
 	Block {
 	  BlockType		  Outport
 	  Name			  "user adcs"
+	  SID			  58
 	  Position		  [375, 338, 405, 352]
 	  Port			  "9"
 	  IconDisplay		  "Port number"
@@ -1708,6 +1801,7 @@ Model {
 	Block {
 	  BlockType		  Outport
 	  Name			  "user ducs"
+	  SID			  59
 	  Position		  [375, 378, 405, 392]
 	  Port			  "10"
 	  IconDisplay		  "Port number"
@@ -1717,6 +1811,7 @@ Model {
 	Block {
 	  BlockType		  Outport
 	  Name			  "user encs"
+	  SID			  60
 	  Position		  [375, 418, 405, 432]
 	  Port			  "11"
 	  IconDisplay		  "Port number"
@@ -1726,6 +1821,7 @@ Model {
 	Block {
 	  BlockType		  Outport
 	  Name			  "dig inps"
+	  SID			  61
 	  Position		  [375, 458, 405, 472]
 	  Port			  "12"
 	  IconDisplay		  "Port number"
@@ -1887,6 +1983,7 @@ Model {
     Block {
       BlockType		      SubSystem
       Name		      "input from OpenFresco"
+      SID		      62
       Ports		      [0, 6]
       Position		      [30, 142, 125, 363]
       NamePlacement	      "alternate"
@@ -1915,8 +2012,10 @@ Model {
 	Block {
 	  BlockType		  Reference
 	  Name			  "SC150 read1"
+	  SID			  63
 	  Ports			  [0, 1]
 	  Position		  [25, 35, 110, 75]
+	  LibraryVersion	  "1.4"
 	  SourceBlock		  "xpcsystranlib/Shared\nMemory/SC150 read "
 	  SourceType		  "SC150 Read"
 	  partition		  "node.Partitions(26)"
@@ -1927,8 +2026,10 @@ Model {
 	Block {
 	  BlockType		  Reference
 	  Name			  "SC150 read2"
+	  SID			  64
 	  Ports			  [0, 1]
 	  Position		  [25, 180, 110, 220]
+	  LibraryVersion	  "1.4"
 	  SourceBlock		  "xpcsystranlib/Shared\nMemory/SC150 read "
 	  SourceType		  "SC150 Read"
 	  partition		  "node.Partitions(29:33)"
@@ -1939,8 +2040,10 @@ Model {
 	Block {
 	  BlockType		  Reference
 	  Name			  "SC150 unpack1"
+	  SID			  65
 	  Ports			  [1, 1]
 	  Position		  [155, 35, 235, 75]
+	  LibraryVersion	  "1.1656"
 	  SourceBlock		  "xpclib/Shared\nMemory/Shared Memory Unpack "
 	  SourceType		  "Shared Memory Partition Unpacking"
 	  partition		  "node.Partitions(26)"
@@ -1948,8 +2051,10 @@ Model {
 	Block {
 	  BlockType		  Reference
 	  Name			  "SC150 unpack2"
+	  SID			  66
 	  Ports			  [1, 5]
 	  Position		  [155, 98, 235, 302]
+	  LibraryVersion	  "1.1656"
 	  SourceBlock		  "xpclib/Shared\nMemory/Shared Memory Unpack "
 	  SourceType		  "Shared Memory Partition Unpacking"
 	  partition		  "node.Partitions(29:33)"
@@ -1957,6 +2062,7 @@ Model {
 	Block {
 	  BlockType		  DataTypeConversion
 	  Name			  "typeConv1"
+	  SID			  67
 	  Position		  [285, 46, 340, 64]
 	  OutDataTypeMode	  "uint32"
 	  OutDataType		  "sfix(16)"
@@ -1966,6 +2072,7 @@ Model {
 	Block {
 	  BlockType		  DataTypeConversion
 	  Name			  "typeConv2"
+	  SID			  68
 	  Position		  [285, 111, 340, 129]
 	  OutDataTypeMode	  "double"
 	  OutDataType		  "sfix(16)"
@@ -1975,6 +2082,7 @@ Model {
 	Block {
 	  BlockType		  DataTypeConversion
 	  Name			  "typeConv3"
+	  SID			  69
 	  Position		  [285, 151, 340, 169]
 	  OutDataTypeMode	  "double"
 	  OutDataType		  "sfix(16)"
@@ -1984,6 +2092,7 @@ Model {
 	Block {
 	  BlockType		  DataTypeConversion
 	  Name			  "typeConv4"
+	  SID			  70
 	  Position		  [285, 191, 340, 209]
 	  OutDataTypeMode	  "double"
 	  OutDataType		  "sfix(16)"
@@ -1993,6 +2102,7 @@ Model {
 	Block {
 	  BlockType		  DataTypeConversion
 	  Name			  "typeConv5"
+	  SID			  71
 	  Position		  [285, 231, 340, 249]
 	  OutDataTypeMode	  "double"
 	  OutDataType		  "sfix(16)"
@@ -2002,6 +2112,7 @@ Model {
 	Block {
 	  BlockType		  DataTypeConversion
 	  Name			  "typeConv6"
+	  SID			  72
 	  Position		  [285, 271, 340, 289]
 	  OutDataTypeMode	  "double"
 	  OutDataType		  "sfix(16)"
@@ -2011,6 +2122,7 @@ Model {
 	Block {
 	  BlockType		  Outport
 	  Name			  "newTarget"
+	  SID			  73
 	  Position		  [375, 48, 405, 62]
 	  IconDisplay		  "Port number"
 	  OutDataType		  "sfix(16)"
@@ -2019,6 +2131,7 @@ Model {
 	Block {
 	  BlockType		  Outport
 	  Name			  "cDisp"
+	  SID			  74
 	  Position		  [375, 113, 405, 127]
 	  Port			  "2"
 	  IconDisplay		  "Port number"
@@ -2028,6 +2141,7 @@ Model {
 	Block {
 	  BlockType		  Outport
 	  Name			  "cVel"
+	  SID			  75
 	  Position		  [375, 153, 405, 167]
 	  Port			  "3"
 	  IconDisplay		  "Port number"
@@ -2037,6 +2151,7 @@ Model {
 	Block {
 	  BlockType		  Outport
 	  Name			  "cAccel"
+	  SID			  76
 	  Position		  [375, 193, 405, 207]
 	  Port			  "4"
 	  IconDisplay		  "Port number"
@@ -2046,6 +2161,7 @@ Model {
 	Block {
 	  BlockType		  Outport
 	  Name			  "cForce"
+	  SID			  77
 	  Position		  [375, 233, 405, 247]
 	  Port			  "5"
 	  IconDisplay		  "Port number"
@@ -2055,6 +2171,7 @@ Model {
 	Block {
 	  BlockType		  Outport
 	  Name			  "cTime"
+	  SID			  78
 	  Position		  [375, 273, 405, 287]
 	  Port			  "6"
 	  IconDisplay		  "Port number"
@@ -2156,6 +2273,7 @@ Model {
     Block {
       BlockType		      Constant
       Name		      "master span"
+      SID		      79
       Position		      [580, 145, 610, 175]
       Value		      "0"
       OutDataType	      "sfix(16)"
@@ -2164,6 +2282,7 @@ Model {
     Block {
       BlockType		      SubSystem
       Name		      "output to MTS (STS)"
+      SID		      80
       Ports		      [5]
       Position		      [640, 129, 735, 391]
       NamePlacement	      "alternate"
@@ -2192,6 +2311,7 @@ Model {
 	Block {
 	  BlockType		  Inport
 	  Name			  "master span"
+	  SID			  81
 	  Position		  [25, 33, 55, 47]
 	  IconDisplay		  "Port number"
 	  OutDataType		  "sfix(16)"
@@ -2200,6 +2320,7 @@ Model {
 	Block {
 	  BlockType		  Inport
 	  Name			  "ctl modes"
+	  SID			  82
 	  Position		  [25, 68, 55, 82]
 	  Port			  "2"
 	  IconDisplay		  "Port number"
@@ -2209,6 +2330,7 @@ Model {
 	Block {
 	  BlockType		  Inport
 	  Name			  "displ cmds"
+	  SID			  83
 	  Position		  [25, 103, 55, 117]
 	  Port			  "3"
 	  IconDisplay		  "Port number"
@@ -2218,6 +2340,7 @@ Model {
 	Block {
 	  BlockType		  Inport
 	  Name			  "force cmds"
+	  SID			  84
 	  Position		  [25, 138, 55, 152]
 	  Port			  "4"
 	  IconDisplay		  "Port number"
@@ -2227,6 +2350,7 @@ Model {
 	Block {
 	  BlockType		  Inport
 	  Name			  "dig outs"
+	  SID			  85
 	  Position		  [25, 218, 55, 232]
 	  Port			  "5"
 	  IconDisplay		  "Port number"
@@ -2236,8 +2360,10 @@ Model {
 	Block {
 	  BlockType		  Reference
 	  Name			  "SC150 pack1"
+	  SID			  86
 	  Ports			  [4, 1]
 	  Position		  [190, 17, 275, 168]
+	  LibraryVersion	  "1.1656"
 	  SourceBlock		  "xpclib/Shared\nMemory/Shared Memory Pack "
 	  SourceType		  "Shared-memory Pack"
 	  partition		  "node.Partitions(1:4)"
@@ -2245,8 +2371,10 @@ Model {
 	Block {
 	  BlockType		  Reference
 	  Name			  "SC150 pack2"
+	  SID			  87
 	  Ports			  [1, 1]
 	  Position		  [190, 198, 275, 252]
+	  LibraryVersion	  "1.1656"
 	  SourceBlock		  "xpclib/Shared\nMemory/Shared Memory Pack "
 	  SourceType		  "Shared-memory Pack"
 	  partition		  "node.Partitions(11)"
@@ -2254,8 +2382,10 @@ Model {
 	Block {
 	  BlockType		  Reference
 	  Name			  "SC150 write1"
+	  SID			  88
 	  Ports			  [1]
 	  Position		  [310, 77, 395, 113]
+	  LibraryVersion	  "1.4"
 	  SourceBlock		  "xpcsystranlib/Shared\nMemory/SC150 write "
 	  SourceType		  "SC150 Write"
 	  partition		  "node.Partitions(1:4)"
@@ -2266,8 +2396,10 @@ Model {
 	Block {
 	  BlockType		  Reference
 	  Name			  "SC150 write2"
+	  SID			  89
 	  Ports			  [1]
 	  Position		  [310, 207, 395, 243]
+	  LibraryVersion	  "1.4"
 	  SourceBlock		  "xpcsystranlib/Shared\nMemory/SC150 write "
 	  SourceType		  "SC150 Write"
 	  partition		  "node.Partitions(11)"
@@ -2278,6 +2410,7 @@ Model {
 	Block {
 	  BlockType		  DataTypeConversion
 	  Name			  "typeConv1"
+	  SID			  90
 	  Position		  [95, 31, 150, 49]
 	  OutDataTypeMode	  "single"
 	  OutDataType		  "sfix(16)"
@@ -2287,6 +2420,7 @@ Model {
 	Block {
 	  BlockType		  DataTypeConversion
 	  Name			  "typeConv2"
+	  SID			  91
 	  Position		  [95, 66, 150, 84]
 	  OutDataTypeMode	  "uint32"
 	  OutDataType		  "sfix(16)"
@@ -2296,6 +2430,7 @@ Model {
 	Block {
 	  BlockType		  DataTypeConversion
 	  Name			  "typeConv3"
+	  SID			  92
 	  Position		  [95, 101, 150, 119]
 	  OutDataTypeMode	  "single"
 	  OutDataType		  "sfix(16)"
@@ -2305,6 +2440,7 @@ Model {
 	Block {
 	  BlockType		  DataTypeConversion
 	  Name			  "typeConv4"
+	  SID			  93
 	  Position		  [95, 136, 150, 154]
 	  OutDataTypeMode	  "single"
 	  OutDataType		  "sfix(16)"
@@ -2314,6 +2450,7 @@ Model {
 	Block {
 	  BlockType		  DataTypeConversion
 	  Name			  "typeConv5"
+	  SID			  94
 	  Position		  [95, 216, 150, 234]
 	  OutDataTypeMode	  "uint32"
 	  OutDataType		  "sfix(16)"
@@ -2397,6 +2534,7 @@ Model {
     Block {
       BlockType		      SubSystem
       Name		      "output to OpenFresco"
+      SID		      95
       Ports		      [7]
       Position		      [640, 414, 735, 776]
       NamePlacement	      "alternate"
@@ -2425,6 +2563,7 @@ Model {
 	Block {
 	  BlockType		  Inport
 	  Name			  "switchPC"
+	  SID			  96
 	  Position		  [25, 38, 55, 52]
 	  IconDisplay		  "Port number"
 	  OutDataType		  "sfix(16)"
@@ -2433,6 +2572,7 @@ Model {
 	Block {
 	  BlockType		  Inport
 	  Name			  "atTarget"
+	  SID			  97
 	  Position		  [25, 78, 55, 92]
 	  Port			  "2"
 	  IconDisplay		  "Port number"
@@ -2442,6 +2582,7 @@ Model {
 	Block {
 	  BlockType		  Inport
 	  Name			  "dDisp"
+	  SID			  98
 	  Position		  [25, 148, 55, 162]
 	  Port			  "3"
 	  IconDisplay		  "Port number"
@@ -2451,6 +2592,7 @@ Model {
 	Block {
 	  BlockType		  Inport
 	  Name			  "dVel"
+	  SID			  99
 	  Position		  [25, 188, 55, 202]
 	  Port			  "4"
 	  IconDisplay		  "Port number"
@@ -2460,6 +2602,7 @@ Model {
 	Block {
 	  BlockType		  Inport
 	  Name			  "dAccel"
+	  SID			  100
 	  Position		  [25, 228, 55, 242]
 	  Port			  "5"
 	  IconDisplay		  "Port number"
@@ -2469,6 +2612,7 @@ Model {
 	Block {
 	  BlockType		  Inport
 	  Name			  "dForce"
+	  SID			  101
 	  Position		  [25, 268, 55, 282]
 	  Port			  "6"
 	  IconDisplay		  "Port number"
@@ -2478,6 +2622,7 @@ Model {
 	Block {
 	  BlockType		  Inport
 	  Name			  "dTime"
+	  SID			  102
 	  Position		  [25, 308, 55, 322]
 	  Port			  "7"
 	  IconDisplay		  "Port number"
@@ -2487,8 +2632,10 @@ Model {
 	Block {
 	  BlockType		  Reference
 	  Name			  "SC150 pack1"
+	  SID			  103
 	  Ports			  [2, 1]
 	  Position		  [190, 27, 275, 103]
+	  LibraryVersion	  "1.1656"
 	  SourceBlock		  "xpclib/Shared\nMemory/Shared Memory Pack "
 	  SourceType		  "Shared-memory Pack"
 	  partition		  "node.Partitions(27:28)"
@@ -2496,8 +2643,10 @@ Model {
 	Block {
 	  BlockType		  Reference
 	  Name			  "SC150 pack2"
+	  SID			  104
 	  Ports			  [5, 1]
 	  Position		  [190, 128, 275, 342]
+	  LibraryVersion	  "1.1656"
 	  SourceBlock		  "xpclib/Shared\nMemory/Shared Memory Pack "
 	  SourceType		  "Shared-memory Pack"
 	  partition		  "node.Partitions(34:38)"
@@ -2505,8 +2654,10 @@ Model {
 	Block {
 	  BlockType		  Reference
 	  Name			  "SC150 write1"
+	  SID			  105
 	  Ports			  [1]
 	  Position		  [315, 47, 400, 83]
+	  LibraryVersion	  "1.4"
 	  SourceBlock		  "xpcsystranlib/Shared\nMemory/SC150 write "
 	  SourceType		  "SC150 Write"
 	  partition		  "node.Partitions(27:28)"
@@ -2517,8 +2668,10 @@ Model {
 	Block {
 	  BlockType		  Reference
 	  Name			  "SC150 write2"
+	  SID			  106
 	  Ports			  [1]
 	  Position		  [315, 217, 400, 253]
+	  LibraryVersion	  "1.4"
 	  SourceBlock		  "xpcsystranlib/Shared\nMemory/SC150 write "
 	  SourceType		  "SC150 Write"
 	  partition		  "node.Partitions(34:38)"
@@ -2529,6 +2682,7 @@ Model {
 	Block {
 	  BlockType		  DataTypeConversion
 	  Name			  "typeConv1"
+	  SID			  107
 	  Position		  [95, 36, 150, 54]
 	  OutDataTypeMode	  "uint32"
 	  OutDataType		  "sfix(16)"
@@ -2538,6 +2692,7 @@ Model {
 	Block {
 	  BlockType		  DataTypeConversion
 	  Name			  "typeConv2"
+	  SID			  108
 	  Position		  [95, 76, 150, 94]
 	  OutDataTypeMode	  "uint32"
 	  OutDataType		  "sfix(16)"
@@ -2547,6 +2702,7 @@ Model {
 	Block {
 	  BlockType		  DataTypeConversion
 	  Name			  "typeConv3"
+	  SID			  109
 	  Position		  [95, 146, 150, 164]
 	  OutDataTypeMode	  "single"
 	  OutDataType		  "sfix(16)"
@@ -2556,6 +2712,7 @@ Model {
 	Block {
 	  BlockType		  DataTypeConversion
 	  Name			  "typeConv4"
+	  SID			  110
 	  Position		  [95, 186, 150, 204]
 	  OutDataTypeMode	  "single"
 	  OutDataType		  "sfix(16)"
@@ -2565,6 +2722,7 @@ Model {
 	Block {
 	  BlockType		  DataTypeConversion
 	  Name			  "typeConv5"
+	  SID			  111
 	  Position		  [95, 226, 150, 244]
 	  OutDataTypeMode	  "single"
 	  OutDataType		  "sfix(16)"
@@ -2574,6 +2732,7 @@ Model {
 	Block {
 	  BlockType		  DataTypeConversion
 	  Name			  "typeConv6"
+	  SID			  112
 	  Position		  [95, 266, 150, 284]
 	  OutDataTypeMode	  "single"
 	  OutDataType		  "sfix(16)"
@@ -2583,6 +2742,7 @@ Model {
 	Block {
 	  BlockType		  DataTypeConversion
 	  Name			  "typeConv7"
+	  SID			  113
 	  Position		  [95, 306, 150, 324]
 	  OutDataTypeMode	  "single"
 	  OutDataType		  "sfix(16)"
@@ -2690,76 +2850,91 @@ Model {
     Block {
       BlockType		      Terminator
       Name		      "term10"
+      SID		      114
       Position		      [155, 500, 175, 520]
     }
     Block {
       BlockType		      Terminator
       Name		      "term13"
+      SID		      115
       Position		      [155, 605, 175, 625]
     }
     Block {
       BlockType		      Terminator
       Name		      "term14"
+      SID		      116
       Position		      [155, 640, 175, 660]
     }
     Block {
       BlockType		      Terminator
       Name		      "term15"
+      SID		      117
       Position		      [155, 675, 175, 695]
     }
     Block {
       BlockType		      Terminator
       Name		      "term16"
+      SID		      118
       Position		      [155, 710, 175, 730]
     }
     Block {
       BlockType		      Terminator
       Name		      "term17"
+      SID		      119
       Position		      [155, 745, 175, 765]
     }
     Block {
       BlockType		      Terminator
       Name		      "term18"
+      SID		      120
       Position		      [155, 780, 175, 800]
     }
     Block {
       BlockType		      Terminator
       Name		      "term3"
+      SID		      121
       Position		      [155, 225, 175, 245]
     }
     Block {
       BlockType		      Terminator
       Name		      "term4"
+      SID		      122
       Position		      [155, 260, 175, 280]
     }
     Block {
       BlockType		      Terminator
       Name		      "term5"
+      SID		      123
       Position		      [155, 295, 175, 315]
     }
     Block {
       BlockType		      Terminator
       Name		      "term6"
+      SID		      124
       Position		      [155, 330, 175, 350]
     }
     Block {
       BlockType		      Terminator
       Name		      "term7"
+      SID		      125
       Position		      [155, 395, 175, 415]
     }
     Block {
       BlockType		      Terminator
       Name		      "term8"
+      SID		      126
       Position		      [155, 430, 175, 450]
     }
     Block {
       BlockType		      Terminator
       Name		      "term9"
+      SID		      127
       Position		      [155, 465, 175, 485]
     }
     Block {
       BlockType		      SubSystem
       Name		      "xPC HC"
+      SID		      128
       Ports		      [4, 5]
       Position		      [350, 424, 460, 496]
       MinAlgLoopOccurrences   off
@@ -2780,7 +2955,6 @@ Model {
       MaskEnableString	      "on,on,on,on,on,on"
       MaskVisibilityString    "on,on,on,on,on,on"
       MaskToolTipString	      "on,on,on,on,on,on"
-      MaskVarAliasString      ",,,,,"
       MaskVariables	      "nAct=@1;dtInt=@2;dtSim=@3;dtCon=@4;N=@5;iDelay=@6;"
       MaskDisplay	      "disp('xPC Target\\nHybrid Controller\\n(D3/D3)')"
       MaskIconFrame	      on
@@ -2790,7 +2964,6 @@ Model {
       MaskIconUnits	      "autoscale"
       MaskValueString	      "6|HybridCtrlParameters.dtInt|HybridCtrlParameters.dtSim|HybridCtrlParameters.dtCon|Hybrid"
       "CtrlParameters.N|HybridCtrlParameters.iDelay"
-      MaskTabNameString	      ",,,,,"
       System {
 	Name			"xPC HC"
 	Location		[6, 83, 808, 523]
@@ -2809,6 +2982,7 @@ Model {
 	Block {
 	  BlockType		  Inport
 	  Name			  "newTarget"
+	  SID			  129
 	  Position		  [25, 188, 55, 202]
 	  IconDisplay		  "Port number"
 	  OutDataType		  "sfix(16)"
@@ -2817,6 +2991,7 @@ Model {
 	Block {
 	  BlockType		  Inport
 	  Name			  "targDsp"
+	  SID			  130
 	  Position		  [25, 118, 55, 132]
 	  Port			  "2"
 	  IconDisplay		  "Port number"
@@ -2826,6 +3001,7 @@ Model {
 	Block {
 	  BlockType		  Inport
 	  Name			  "dspIn"
+	  SID			  131
 	  Position		  [25, 283, 55, 297]
 	  Port			  "3"
 	  IconDisplay		  "Port number"
@@ -2835,6 +3011,7 @@ Model {
 	Block {
 	  BlockType		  Inport
 	  Name			  "frcIn"
+	  SID			  132
 	  Position		  [25, 343, 55, 357]
 	  Port			  "4"
 	  IconDisplay		  "Port number"
@@ -2844,6 +3021,7 @@ Model {
 	Block {
 	  BlockType		  From
 	  Name			  "From"
+	  SID			  133
 	  Position		  [680, 156, 720, 184]
 	  ShowName		  off
 	  GotoTag		  "s"
@@ -2853,6 +3031,7 @@ Model {
 	Block {
 	  BlockType		  From
 	  Name			  "From1"
+	  SID			  134
 	  Position		  [680, 206, 720, 234]
 	  ShowName		  off
 	  GotoTag		  "t"
@@ -2862,6 +3041,7 @@ Model {
 	Block {
 	  BlockType		  Goto
 	  Name			  "Goto"
+	  SID			  135
 	  Position		  [195, 15, 235, 45]
 	  ShowName		  off
 	  GotoTag		  "s"
@@ -2870,6 +3050,7 @@ Model {
 	Block {
 	  BlockType		  Goto
 	  Name			  "Goto1"
+	  SID			  136
 	  Position		  [315, 15, 355, 45]
 	  ShowName		  off
 	  GotoTag		  "t"
@@ -2878,6 +3059,7 @@ Model {
 	Block {
 	  BlockType		  SubSystem
 	  Name			  "Offset"
+	  SID			  137
 	  Ports			  [1, 1]
 	  Position		  [115, 274, 170, 306]
 	  ShowName		  off
@@ -2897,7 +3079,6 @@ Model {
 	  MaskEnableString	  "on,on,on"
 	  MaskVisibilityString	  "on,on,on"
 	  MaskToolTipString	  "on,on,on"
-	  MaskVarAliasString	  ",,"
 	  MaskVariables		  "nS=@1;nOffset=@2;dt=@3;"
 	  MaskDisplay		  "fprintf('Signal\\nOffset')"
 	  MaskIconFrame		  on
@@ -2906,7 +3087,6 @@ Model {
 	  MaskPortRotate	  "default"
 	  MaskIconUnits		  "autoscale"
 	  MaskValueString	  "nAct|1024|dtCon"
-	  MaskTabNameString	  ",,"
 	  System {
 	    Name		    "Offset"
 	    Location		    [725, 381, 1251, 667]
@@ -2925,6 +3105,7 @@ Model {
 	    Block {
 	      BlockType		      Inport
 	      Name		      "In1"
+	      SID		      138
 	      Position		      [25, 113, 55, 127]
 	      IconDisplay	      "Port number"
 	      OutDataType	      "sfix(16)"
@@ -2933,6 +3114,7 @@ Model {
 	    Block {
 	      BlockType		      Constant
 	      Name		      "Constant"
+	      SID		      139
 	      Position		      [75, 220, 105, 250]
 	      Value		      "zeros(1,nS)"
 	      OutDataType	      "sfix(16)"
@@ -2941,6 +3123,7 @@ Model {
 	    Block {
 	      BlockType		      DataStoreMemory
 	      Name		      "Data Store\nMemory"
+	      SID		      140
 	      Position		      [370, 205, 402, 235]
 	      DataStoreName	      "x0"
 	      InitialValue	      "zeros(1,nS)"
@@ -2955,6 +3138,7 @@ Model {
 	    Block {
 	      BlockType		      DataStoreRead
 	      Name		      "Data Store\nRead"
+	      SID		      141
 	      Position		      [75, 150, 105, 180]
 	      DataStoreName	      "x0"
 	      SampleTime	      "dt"
@@ -2962,6 +3146,7 @@ Model {
 	    Block {
 	      BlockType		      If
 	      Name		      "If"
+	      SID		      142
 	      Ports		      [1, 1]
 	      Position		      [240, 31, 355, 79]
 	      FontName		      "Arial"
@@ -2973,6 +3158,7 @@ Model {
 	    Block {
 	      BlockType		      SubSystem
 	      Name		      "If Action"
+	      SID		      143
 	      Ports		      [1, 0, 0, 0, 0, 0, 0, 1]
 	      Position		      [345, 100, 425, 140]
 	      TreatAsAtomicUnit	      on
@@ -3001,6 +3187,7 @@ Model {
 		Block {
 		  BlockType		  Inport
 		  Name			  "In1"
+		  SID			  144
 		  Position		  [30, 78, 60, 92]
 		  IconDisplay		  "Port number"
 		  OutDataType		  "sfix(16)"
@@ -3009,11 +3196,14 @@ Model {
 		Block {
 		  BlockType		  ActionPort
 		  Name			  "Action Port"
+		  SID			  145
 		  Position		  [170, 15, 229, 43]
+		  PropagateVarSize	  "During execution"
 		}
 		Block {
 		  BlockType		  DataStoreRead
 		  Name			  "Data Store\nRead"
+		  SID			  146
 		  Position		  [125, 130, 155, 160]
 		  DataStoreName		  "x0"
 		  SampleTime		  "dt"
@@ -3021,6 +3211,7 @@ Model {
 		Block {
 		  BlockType		  DataStoreWrite
 		  Name			  "Data Store\nWrite"
+		  SID			  147
 		  Position		  [310, 70, 340, 100]
 		  DataStoreName		  "x0"
 		  SampleTime		  "-1"
@@ -3028,6 +3219,7 @@ Model {
 		Block {
 		  BlockType		  Gain
 		  Name			  "Gain"
+		  SID			  148
 		  Position		  [125, 70, 155, 100]
 		  Gain			  "1/nOffset"
 		  ParameterDataType	  "sfix(16)"
@@ -3038,6 +3230,7 @@ Model {
 		Block {
 		  BlockType		  Sum
 		  Name			  "Sum"
+		  SID			  149
 		  Ports			  [2, 1]
 		  Position		  [210, 75, 230, 95]
 		  ShowName		  off
@@ -3076,8 +3269,10 @@ Model {
 	    Block {
 	      BlockType		      Reference
 	      Name		      "Ramp"
+	      SID		      150
 	      Ports		      [0, 1]
 	      Position		      [25, 40, 55, 70]
+	      LibraryVersion	      "1.216"
 	      SourceBlock	      "simulink/Sources/Ramp"
 	      SourceType	      "Ramp"
 	      ShowPortLabels	      "FromPortIcon"
@@ -3096,6 +3291,7 @@ Model {
 	    Block {
 	      BlockType		      Sum
 	      Name		      "Sum1"
+	      SID		      151
 	      Ports		      [2, 1]
 	      Position		      [145, 155, 165, 175]
 	      ShowName		      off
@@ -3107,18 +3303,21 @@ Model {
 	    Block {
 	      BlockType		      Switch
 	      Name		      "Switch"
+	      SID		      152
 	      Position		      [275, 160, 305, 190]
 	      Threshold		      "nOffset"
 	    }
 	    Block {
 	      BlockType		      ZeroOrderHold
 	      Name		      "Zero-Order\nHold"
+	      SID		      153
 	      Position		      [110, 40, 140, 70]
 	      SampleTime	      "dt"
 	    }
 	    Block {
 	      BlockType		      Outport
 	      Name		      "Out1"
+	      SID		      154
 	      Position		      [460, 168, 490, 182]
 	      IconDisplay	      "Port number"
 	      OutDataType	      "sfix(16)"
@@ -3194,6 +3393,7 @@ Model {
 	Block {
 	  BlockType		  SubSystem
 	  Name			  "Offset1"
+	  SID			  155
 	  Ports			  [1, 1]
 	  Position		  [115, 334, 170, 366]
 	  ShowName		  off
@@ -3213,7 +3413,6 @@ Model {
 	  MaskEnableString	  "on,on,on"
 	  MaskVisibilityString	  "on,on,on"
 	  MaskToolTipString	  "on,on,on"
-	  MaskVarAliasString	  ",,"
 	  MaskVariables		  "nS=@1;nOffset=@2;dt=@3;"
 	  MaskDisplay		  "fprintf('Signal\\nOffset')"
 	  MaskIconFrame		  on
@@ -3222,7 +3421,6 @@ Model {
 	  MaskPortRotate	  "default"
 	  MaskIconUnits		  "autoscale"
 	  MaskValueString	  "nAct|1024|dtCon"
-	  MaskTabNameString	  ",,"
 	  System {
 	    Name		    "Offset1"
 	    Location		    [725, 381, 1251, 667]
@@ -3241,6 +3439,7 @@ Model {
 	    Block {
 	      BlockType		      Inport
 	      Name		      "In1"
+	      SID		      156
 	      Position		      [25, 113, 55, 127]
 	      IconDisplay	      "Port number"
 	      OutDataType	      "sfix(16)"
@@ -3249,6 +3448,7 @@ Model {
 	    Block {
 	      BlockType		      Constant
 	      Name		      "Constant"
+	      SID		      157
 	      Position		      [75, 220, 105, 250]
 	      Value		      "zeros(1,nS)"
 	      OutDataType	      "sfix(16)"
@@ -3257,6 +3457,7 @@ Model {
 	    Block {
 	      BlockType		      DataStoreMemory
 	      Name		      "Data Store\nMemory"
+	      SID		      158
 	      Position		      [370, 205, 402, 235]
 	      DataStoreName	      "x0"
 	      InitialValue	      "zeros(1,nS)"
@@ -3271,6 +3472,7 @@ Model {
 	    Block {
 	      BlockType		      DataStoreRead
 	      Name		      "Data Store\nRead"
+	      SID		      159
 	      Position		      [75, 150, 105, 180]
 	      DataStoreName	      "x0"
 	      SampleTime	      "dt"
@@ -3278,6 +3480,7 @@ Model {
 	    Block {
 	      BlockType		      If
 	      Name		      "If"
+	      SID		      160
 	      Ports		      [1, 1]
 	      Position		      [240, 31, 355, 79]
 	      FontName		      "Arial"
@@ -3289,6 +3492,7 @@ Model {
 	    Block {
 	      BlockType		      SubSystem
 	      Name		      "If Action"
+	      SID		      161
 	      Ports		      [1, 0, 0, 0, 0, 0, 0, 1]
 	      Position		      [345, 100, 425, 140]
 	      TreatAsAtomicUnit	      on
@@ -3317,6 +3521,7 @@ Model {
 		Block {
 		  BlockType		  Inport
 		  Name			  "In1"
+		  SID			  162
 		  Position		  [30, 78, 60, 92]
 		  IconDisplay		  "Port number"
 		  OutDataType		  "sfix(16)"
@@ -3325,11 +3530,14 @@ Model {
 		Block {
 		  BlockType		  ActionPort
 		  Name			  "Action Port"
+		  SID			  163
 		  Position		  [170, 15, 229, 43]
+		  PropagateVarSize	  "During execution"
 		}
 		Block {
 		  BlockType		  DataStoreRead
 		  Name			  "Data Store\nRead"
+		  SID			  164
 		  Position		  [125, 130, 155, 160]
 		  DataStoreName		  "x0"
 		  SampleTime		  "dt"
@@ -3337,6 +3545,7 @@ Model {
 		Block {
 		  BlockType		  DataStoreWrite
 		  Name			  "Data Store\nWrite"
+		  SID			  165
 		  Position		  [310, 70, 340, 100]
 		  DataStoreName		  "x0"
 		  SampleTime		  "-1"
@@ -3344,6 +3553,7 @@ Model {
 		Block {
 		  BlockType		  Gain
 		  Name			  "Gain"
+		  SID			  166
 		  Position		  [125, 70, 155, 100]
 		  Gain			  "1/nOffset"
 		  ParameterDataType	  "sfix(16)"
@@ -3354,6 +3564,7 @@ Model {
 		Block {
 		  BlockType		  Sum
 		  Name			  "Sum"
+		  SID			  167
 		  Ports			  [2, 1]
 		  Position		  [210, 75, 230, 95]
 		  ShowName		  off
@@ -3392,8 +3603,10 @@ Model {
 	    Block {
 	      BlockType		      Reference
 	      Name		      "Ramp"
+	      SID		      168
 	      Ports		      [0, 1]
 	      Position		      [25, 40, 55, 70]
+	      LibraryVersion	      "1.216"
 	      SourceBlock	      "simulink/Sources/Ramp"
 	      SourceType	      "Ramp"
 	      ShowPortLabels	      "FromPortIcon"
@@ -3412,6 +3625,7 @@ Model {
 	    Block {
 	      BlockType		      Sum
 	      Name		      "Sum1"
+	      SID		      169
 	      Ports		      [2, 1]
 	      Position		      [145, 155, 165, 175]
 	      ShowName		      off
@@ -3423,18 +3637,21 @@ Model {
 	    Block {
 	      BlockType		      Switch
 	      Name		      "Switch"
+	      SID		      170
 	      Position		      [275, 160, 305, 190]
 	      Threshold		      "nOffset"
 	    }
 	    Block {
 	      BlockType		      ZeroOrderHold
 	      Name		      "Zero-Order\nHold"
+	      SID		      171
 	      Position		      [110, 40, 140, 70]
 	      SampleTime	      "dt"
 	    }
 	    Block {
 	      BlockType		      Outport
 	      Name		      "Out1"
+	      SID		      172
 	      Position		      [460, 168, 490, 182]
 	      IconDisplay	      "Port number"
 	      OutDataType	      "sfix(16)"
@@ -3510,9 +3727,11 @@ Model {
 	Block {
 	  BlockType		  SubSystem
 	  Name			  "Predictor-Corrector"
+	  SID			  173
 	  Ports			  [2, 3]
 	  Position		  [215, 92, 355, 228]
 	  PermitHierarchicalResolution "ExplicitOnly"
+	  TreatAsAtomicUnit	  on
 	  MinAlgLoopOccurrences	  off
 	  PropExecContextOutsideSubsystem off
 	  RTWSystemCode		  "Auto"
@@ -3544,9 +3763,11 @@ Model {
 	    TiledPageScale	    1
 	    ShowPageBoundaries	    off
 	    ZoomFactor		    "100"
+	    SIDHighWatermark	    12
 	    Block {
 	      BlockType		      Inport
 	      Name		      "dsp"
+	      SID		      1
 	      Position		      [20, 101, 40, 119]
 	      IconDisplay	      "Port number"
 	      OutDataType	      "sfix(16)"
@@ -3555,6 +3776,7 @@ Model {
 	    Block {
 	      BlockType		      Inport
 	      Name		      "flag"
+	      SID		      2
 	      Position		      [20, 136, 40, 154]
 	      Port		      "2"
 	      IconDisplay	      "Port number"
@@ -3564,6 +3786,7 @@ Model {
 	    Block {
 	      BlockType		      Demux
 	      Name		      " Demux "
+	      SID		      10
 	      Ports		      [1, 1]
 	      Position		      [270, 205, 320, 245]
 	      Outputs		      "1"
@@ -3571,6 +3794,7 @@ Model {
 	    Block {
 	      BlockType		      "S-Function"
 	      Name		      " SFunction "
+	      SID		      9
 	      Tag		      "Stateflow S-Function HybridControllerD3D3_nAct 2"
 	      Ports		      [2, 4]
 	      Position		      [180, 102, 230, 203]
@@ -3600,11 +3824,13 @@ Model {
 	    Block {
 	      BlockType		      Terminator
 	      Name		      " Terminator "
+	      SID		      12
 	      Position		      [460, 216, 480, 234]
 	    }
 	    Block {
 	      BlockType		      Outport
 	      Name		      "com"
+	      SID		      6
 	      Position		      [460, 101, 480, 119]
 	      IconDisplay	      "Port number"
 	      OutDataType	      "sfix(16)"
@@ -3613,6 +3839,7 @@ Model {
 	    Block {
 	      BlockType		      Outport
 	      Name		      "state"
+	      SID		      7
 	      Position		      [460, 136, 480, 154]
 	      Port		      "2"
 	      IconDisplay	      "Port number"
@@ -3622,6 +3849,7 @@ Model {
 	    Block {
 	      BlockType		      Outport
 	      Name		      "i"
+	      SID		      8
 	      Position		      [460, 171, 480, 189]
 	      Port		      "3"
 	      IconDisplay	      "Port number"
@@ -3681,9 +3909,11 @@ Model {
 	Block {
 	  BlockType		  Reference
 	  Name			  "Scope (xPC) "
+	  SID			  174
 	  Ports			  [1]
 	  Position		  [460, 144, 540, 176]
 	  ShowName		  off
+	  LibraryVersion	  "1.1656"
 	  SourceBlock		  "xpclib/Misc./Scope (xPC) "
 	  SourceType		  "xpcscopeblock"
 	  ShowPortLabels	  "FromPortIcon"
@@ -3714,13 +3944,17 @@ Model {
 	  mode			  "Lazy"
 	  writesize		  "512"
 	  autorestart		  on
+	  dynamicfilemode	  off
+	  maxwritefilesize	  "512*1024^2"
 	}
 	Block {
 	  BlockType		  Reference
 	  Name			  "Scope (xPC) 1"
+	  SID			  175
 	  Ports			  [1]
 	  Position		  [695, 59, 775, 91]
 	  ShowName		  off
+	  LibraryVersion	  "1.1656"
 	  SourceBlock		  "xpclib/Misc./Scope (xPC) "
 	  SourceType		  "xpcscopeblock"
 	  ShowPortLabels	  "FromPortIcon"
@@ -3751,13 +3985,17 @@ Model {
 	  mode			  "Lazy"
 	  writesize		  "512"
 	  autorestart		  on
+	  dynamicfilemode	  off
+	  maxwritefilesize	  "512*1024^2"
 	}
 	Block {
 	  BlockType		  Reference
 	  Name			  "Scope (xPC) 2"
+	  SID			  176
 	  Ports			  [1]
 	  Position		  [460, 189, 540, 221]
 	  ShowName		  off
+	  LibraryVersion	  "1.1656"
 	  SourceBlock		  "xpclib/Misc./Scope (xPC) "
 	  SourceType		  "xpcscopeblock"
 	  ShowPortLabels	  "FromPortIcon"
@@ -3788,14 +4026,18 @@ Model {
 	  mode			  "Lazy"
 	  writesize		  "512"
 	  autorestart		  on
+	  dynamicfilemode	  off
+	  maxwritefilesize	  "512*1024^2"
 	}
 	Block {
 	  BlockType		  Reference
 	  Name			  "Scope (xPC) 4"
+	  SID			  177
 	  Ports			  [1]
 	  Position		  [555, 144, 635, 176]
 	  BlockMirror		  on
 	  ShowName		  off
+	  LibraryVersion	  "1.1656"
 	  SourceBlock		  "xpclib/Misc./Scope (xPC) "
 	  SourceType		  "xpcscopeblock"
 	  ShowPortLabels	  "FromPortIcon"
@@ -3826,14 +4068,18 @@ Model {
 	  mode			  "Lazy"
 	  writesize		  "512"
 	  autorestart		  on
+	  dynamicfilemode	  off
+	  maxwritefilesize	  "512*1024^2"
 	}
 	Block {
 	  BlockType		  Reference
 	  Name			  "Scope (xPC) 5"
+	  SID			  178
 	  Ports			  [1]
 	  Position		  [555, 189, 635, 221]
 	  BlockMirror		  on
 	  ShowName		  off
+	  LibraryVersion	  "1.1656"
 	  SourceBlock		  "xpclib/Misc./Scope (xPC) "
 	  SourceType		  "xpcscopeblock"
 	  ShowPortLabels	  "FromPortIcon"
@@ -3864,13 +4110,17 @@ Model {
 	  mode			  "Lazy"
 	  writesize		  "512"
 	  autorestart		  on
+	  dynamicfilemode	  off
+	  maxwritefilesize	  "512*1024^2"
 	}
 	Block {
 	  BlockType		  Reference
 	  Name			  "Scope (xPC) 6"
+	  SID			  179
 	  Ports			  [1]
 	  Position		  [695, 379, 775, 411]
 	  ShowName		  off
+	  LibraryVersion	  "1.1656"
 	  SourceBlock		  "xpclib/Misc./Scope (xPC) "
 	  SourceType		  "xpcscopeblock"
 	  ShowPortLabels	  "FromPortIcon"
@@ -3901,10 +4151,13 @@ Model {
 	  mode			  "Lazy"
 	  writesize		  "512"
 	  autorestart		  on
+	  dynamicfilemode	  off
+	  maxwritefilesize	  "512*1024^2"
 	}
 	Block {
 	  BlockType		  SubSystem
 	  Name			  "SubSystem0"
+	  SID			  180
 	  Ports			  [1, 1]
 	  Position		  [150, 179, 185, 211]
 	  ShowName		  off
@@ -3933,6 +4186,7 @@ Model {
 	    Block {
 	      BlockType		      Inport
 	      Name		      "In"
+	      SID		      181
 	      Position		      [50, 103, 80, 117]
 	      IconDisplay	      "Port number"
 	      OutDataType	      "sfix(16)"
@@ -3941,8 +4195,10 @@ Model {
 	    Block {
 	      BlockType		      Reference
 	      Name		      "Detect Fall\nNonpositive"
+	      SID		      182
 	      Ports		      [1, 1]
 	      Position		      [170, 200, 230, 250]
+	      LibraryVersion	      "1.216"
 	      SourceBlock	      "simulink/Logic and Bit\nOperations/Detect Fall\nNonpositive"
 	      SourceType	      "Detect Fall Nonpositive"
 	      ShowPortLabels	      "FromPortIcon"
@@ -3958,8 +4214,10 @@ Model {
 	    Block {
 	      BlockType		      Reference
 	      Name		      "Detect Rise\nPositive"
+	      SID		      183
 	      Ports		      [1, 1]
 	      Position		      [170, 85, 230, 135]
+	      LibraryVersion	      "1.216"
 	      SourceBlock	      "simulink/Logic and Bit\nOperations/Detect Rise\nPositive"
 	      SourceType	      "Detect Rise Positive"
 	      ShowPortLabels	      "FromPortIcon"
@@ -3975,6 +4233,7 @@ Model {
 	    Block {
 	      BlockType		      From
 	      Name		      "From"
+	      SID		      184
 	      Position		      [120, 341, 160, 369]
 	      ShowName		      off
 	      GotoTag		      "s"
@@ -3984,6 +4243,7 @@ Model {
 	    Block {
 	      BlockType		      From
 	      Name		      "From1"
+	      SID		      185
 	      Position		      [120, 376, 160, 404]
 	      ShowName		      off
 	      GotoTag		      "t"
@@ -3993,6 +4253,7 @@ Model {
 	    Block {
 	      BlockType		      SubSystem
 	      Name		      "If Action\nSubsystem0"
+	      SID		      186
 	      Ports		      [0, 0, 0, 0, 0, 0, 0, 1]
 	      Position		      [415, 137, 485, 173]
 	      TreatAsAtomicUnit	      on
@@ -4021,12 +4282,15 @@ Model {
 		Block {
 		  BlockType		  ActionPort
 		  Name			  "Action Port"
+		  SID			  187
 		  Position		  [150, 20, 209, 48]
+		  PropagateVarSize	  "During execution"
 		  ActionType		  "then"
 		}
 		Block {
 		  BlockType		  DataStoreWrite
 		  Name			  "Data Store\nWrite0"
+		  SID			  188
 		  Position		  [270, 100, 300, 130]
 		  DataStoreName		  "sFlag"
 		  SampleTime		  "-1"
@@ -4034,6 +4298,7 @@ Model {
 		Block {
 		  BlockType		  DataStoreWrite
 		  Name			  "Data Store\nWrite1"
+		  SID			  189
 		  Position		  [270, 190, 300, 220]
 		  DataStoreName		  "tFlag"
 		  SampleTime		  "-1"
@@ -4041,6 +4306,7 @@ Model {
 		Block {
 		  BlockType		  Constant
 		  Name			  "atTargetFlag"
+		  SID			  190
 		  Position		  [55, 190, 85, 220]
 		  Value			  "0"
 		  OutDataTypeMode	  "uint32"
@@ -4052,6 +4318,7 @@ Model {
 		Block {
 		  BlockType		  Constant
 		  Name			  "switchFlag"
+		  SID			  191
 		  Position		  [55, 100, 85, 130]
 		  OutDataTypeMode	  "uint32"
 		  OutDataType		  "sfix(16)"
@@ -4076,6 +4343,7 @@ Model {
 	    Block {
 	      BlockType		      SubSystem
 	      Name		      "If Action\nSubsystem1"
+	      SID		      192
 	      Ports		      [0, 0, 0, 0, 0, 0, 0, 1]
 	      Position		      [415, 252, 485, 288]
 	      TreatAsAtomicUnit	      on
@@ -4104,12 +4372,15 @@ Model {
 		Block {
 		  BlockType		  ActionPort
 		  Name			  "Action Port"
+		  SID			  193
 		  Position		  [150, 20, 209, 48]
+		  PropagateVarSize	  "During execution"
 		  ActionType		  "then"
 		}
 		Block {
 		  BlockType		  DataStoreWrite
 		  Name			  "Data Store\nWrite0"
+		  SID			  194
 		  Position		  [270, 100, 300, 130]
 		  DataStoreName		  "sFlag"
 		  SampleTime		  "-1"
@@ -4117,6 +4388,7 @@ Model {
 		Block {
 		  BlockType		  Constant
 		  Name			  "switchFlag"
+		  SID			  195
 		  Position		  [55, 100, 85, 130]
 		  Value			  "0"
 		  OutDataTypeMode	  "uint32"
@@ -4136,6 +4408,7 @@ Model {
 	    Block {
 	      BlockType		      If
 	      Name		      "If0"
+	      SID		      196
 	      Ports		      [1, 1]
 	      Position		      [280, 91, 380, 129]
 	      IfExpression	      "u1 == 1"
@@ -4144,6 +4417,7 @@ Model {
 	    Block {
 	      BlockType		      If
 	      Name		      "If1"
+	      SID		      197
 	      Ports		      [1, 1]
 	      Position		      [280, 206, 380, 244]
 	      IfExpression	      "u1 == 1"
@@ -4152,6 +4426,7 @@ Model {
 	    Block {
 	      BlockType		      Mux
 	      Name		      "Mux1"
+	      SID		      198
 	      Ports		      [3, 1]
 	      Position		      [195, 305, 200, 405]
 	      NamePlacement	      "alternate"
@@ -4162,9 +4437,11 @@ Model {
 	    Block {
 	      BlockType		      Reference
 	      Name		      "Scope (xPC) 3"
+	      SID		      199
 	      Ports		      [1]
 	      Position		      [240, 339, 320, 371]
 	      ShowName		      off
+	      LibraryVersion	      "1.1656"
 	      SourceBlock	      "xpclib/Misc./Scope (xPC) "
 	      SourceType	      "xpcscopeblock"
 	      ShowPortLabels	      "FromPortIcon"
@@ -4195,10 +4472,13 @@ Model {
 	      mode		      "Lazy"
 	      writesize		      "512"
 	      autorestart	      on
+	      dynamicfilemode	      off
+	      maxwritefilesize	      "512*1024^2"
 	    }
 	    Block {
 	      BlockType		      DataTypeConversion
 	      Name		      "typeConv"
+	      SID		      200
 	      Position		      [305, 31, 360, 49]
 	      OutDataTypeMode	      "uint32"
 	      OutDataType	      "sfix(16)"
@@ -4208,6 +4488,7 @@ Model {
 	    Block {
 	      BlockType		      Outport
 	      Name		      "Out"
+	      SID		      201
 	      Position		      [435, 33, 465, 47]
 	      IconDisplay	      "Port number"
 	      OutDataType	      "sfix(16)"
@@ -4297,6 +4578,7 @@ Model {
 	Block {
 	  BlockType		  SubSystem
 	  Name			  "SubSystem1"
+	  SID			  202
 	  Ports			  [3, 2]
 	  Position		  [430, 236, 565, 364]
 	  ShowName		  off
@@ -4325,6 +4607,7 @@ Model {
 	    Block {
 	      BlockType		      Inport
 	      Name		      "counter"
+	      SID		      203
 	      Position		      [70, 48, 100, 62]
 	      IconDisplay	      "Port number"
 	      OutDataType	      "sfix(16)"
@@ -4333,6 +4616,7 @@ Model {
 	    Block {
 	      BlockType		      Inport
 	      Name		      "measDsp In"
+	      SID		      204
 	      Position		      [70, 128, 100, 142]
 	      Port		      "2"
 	      IconDisplay	      "Port number"
@@ -4342,6 +4626,7 @@ Model {
 	    Block {
 	      BlockType		      Inport
 	      Name		      "measFrc In"
+	      SID		      205
 	      Position		      [70, 173, 100, 187]
 	      Port		      "3"
 	      IconDisplay	      "Port number"
@@ -4351,14 +4636,16 @@ Model {
 	    Block {
 	      BlockType		      HitCross
 	      Name		      "Hit \nCrossing"
+	      SID		      206
 	      Ports		      [1, 1]
 	      Position		      [180, 40, 210, 70]
 	      HitCrossingOffset	      "iDelay"
-	      HitCrossingDirection    "either"
+	      HitCrossingDirection    "rising"
 	    }
 	    Block {
 	      BlockType		      SubSystem
 	      Name		      "SubSystem"
+	      SID		      207
 	      Ports		      [2, 2, 0, 1]
 	      Position		      [210, 111, 350, 204]
 	      ShowName		      off
@@ -4388,6 +4675,7 @@ Model {
 		Block {
 		  BlockType		  Inport
 		  Name			  "measDsp In"
+		  SID			  208
 		  Position		  [75, 78, 105, 92]
 		  IconDisplay		  "Port number"
 		  OutDataType		  "sfix(16)"
@@ -4396,6 +4684,7 @@ Model {
 		Block {
 		  BlockType		  Inport
 		  Name			  "measFrc In"
+		  SID			  209
 		  Position		  [75, 128, 105, 142]
 		  Port			  "2"
 		  IconDisplay		  "Port number"
@@ -4405,6 +4694,7 @@ Model {
 		Block {
 		  BlockType		  TriggerPort
 		  Name			  "Trigger"
+		  SID			  210
 		  Ports			  []
 		  Position		  [155, 25, 175, 45]
 		  StatesWhenEnabling	  "held"
@@ -4412,6 +4702,7 @@ Model {
 		Block {
 		  BlockType		  DataStoreWrite
 		  Name			  "Data Store\nWrite"
+		  SID			  211
 		  Position		  [230, 185, 260, 215]
 		  DataStoreName		  "tFlag"
 		  SampleTime		  "-1"
@@ -4419,6 +4710,7 @@ Model {
 		Block {
 		  BlockType		  Constant
 		  Name			  "atTargetFlag"
+		  SID			  212
 		  Position		  [75, 185, 105, 215]
 		  OutDataTypeMode	  "uint32"
 		  OutDataType		  "sfix(16)"
@@ -4429,6 +4721,7 @@ Model {
 		Block {
 		  BlockType		  Outport
 		  Name			  "measDsp Out"
+		  SID			  213
 		  Position		  [230, 78, 260, 92]
 		  IconDisplay		  "Port number"
 		  OutDataType		  "sfix(16)"
@@ -4438,6 +4731,7 @@ Model {
 		Block {
 		  BlockType		  Outport
 		  Name			  "measFrc Out"
+		  SID			  214
 		  Position		  [230, 128, 260, 142]
 		  Port			  "2"
 		  IconDisplay		  "Port number"
@@ -4468,6 +4762,7 @@ Model {
 	    Block {
 	      BlockType		      Outport
 	      Name		      "measDsp Out"
+	      SID		      215
 	      Position		      [470, 128, 500, 142]
 	      IconDisplay	      "Port number"
 	      OutDataType	      "sfix(16)"
@@ -4476,6 +4771,7 @@ Model {
 	    Block {
 	      BlockType		      Outport
 	      Name		      "measFrc Out"
+	      SID		      216
 	      Position		      [470, 173, 500, 187]
 	      Port		      "2"
 	      IconDisplay	      "Port number"
@@ -4524,6 +4820,7 @@ Model {
 	Block {
 	  BlockType		  DataStoreRead
 	  Name			  "atTarget"
+	  SID			  217
 	  Position		  [255, 15, 285, 45]
 	  DataStoreName		  "tFlag"
 	  SampleTime		  "dtCon"
@@ -4531,6 +4828,7 @@ Model {
 	Block {
 	  BlockType		  Gain
 	  Name			  "gain1"
+	  SID			  218
 	  Position		  [90, 110, 120, 140]
 	  ShowName		  off
 	  ParameterDataTypeMode	  "Inherit via internal rule"
@@ -4546,6 +4844,7 @@ Model {
 	Block {
 	  BlockType		  Gain
 	  Name			  "gain2"
+	  SID			  219
 	  Position		  [90, 180, 120, 210]
 	  ShowName		  off
 	  ParameterDataType	  "sfix(16)"
@@ -4557,6 +4856,7 @@ Model {
 	Block {
 	  BlockType		  DataStoreMemory
 	  Name			  "sMem"
+	  SID			  220
 	  Position		  [25, 15, 57, 45]
 	  DataStoreName		  "sFlag"
 	  RTWStateStorageClass	  "Auto"
@@ -4570,6 +4870,7 @@ Model {
 	Block {
 	  BlockType		  DataStoreRead
 	  Name			  "switchPC"
+	  SID			  221
 	  Position		  [135, 15, 165, 45]
 	  DataStoreName		  "sFlag"
 	  SampleTime		  "dtCon"
@@ -4577,6 +4878,7 @@ Model {
 	Block {
 	  BlockType		  DataStoreMemory
 	  Name			  "tMem"
+	  SID			  222
 	  Position		  [80, 15, 112, 45]
 	  DataStoreName		  "tFlag"
 	  RTWStateStorageClass	  "Auto"
@@ -4590,6 +4892,7 @@ Model {
 	Block {
 	  BlockType		  Outport
 	  Name			  "dspOut"
+	  SID			  223
 	  Position		  [745, 108, 775, 122]
 	  IconDisplay		  "Port number"
 	  OutDataType		  "sfix(16)"
@@ -4598,6 +4901,7 @@ Model {
 	Block {
 	  BlockType		  Outport
 	  Name			  "sOut"
+	  SID			  224
 	  Position		  [745, 163, 775, 177]
 	  Port			  "2"
 	  IconDisplay		  "Port number"
@@ -4607,6 +4911,7 @@ Model {
 	Block {
 	  BlockType		  Outport
 	  Name			  "tOut"
+	  SID			  225
 	  Position		  [745, 213, 775, 227]
 	  Port			  "3"
 	  IconDisplay		  "Port number"
@@ -4616,6 +4921,7 @@ Model {
 	Block {
 	  BlockType		  Outport
 	  Name			  "measDsp"
+	  SID			  226
 	  Position		  [745, 263, 775, 277]
 	  Port			  "4"
 	  IconDisplay		  "Port number"
@@ -4625,6 +4931,7 @@ Model {
 	Block {
 	  BlockType		  Outport
 	  Name			  "measFrc"
+	  SID			  227
 	  Position		  [745, 328, 775, 342]
 	  Port			  "5"
 	  IconDisplay		  "Port number"
@@ -5041,7 +5348,7 @@ Model {
 }
 # Finite State Machines
 #
-#    Stateflow Version 7.1 (R2009a) dated Jan 28 2009, 05:16:58
+#    Stateflow Version 7.5 (R2010a) dated Jan 19 2010, 19:48:30
 #
 #
 
@@ -5053,7 +5360,7 @@ Stateflow {
     created		    "21-May-2004 09:28:42"
     isLibrary		    0
     firstTarget		    27
-    sfVersion		    71014000.000008
+    sfVersion		    75014000
   }
   chart {
     id			    2
@@ -5075,6 +5382,7 @@ Stateflow {
     firstData		    14
     chartFileNumber	    2
     disableImplicitCasting  1
+    supportVariableSizing   0
   }
   state {
     id			    3
@@ -5255,8 +5563,6 @@ Stateflow {
     dataLimits		    [190.821 251.845 162.993 167.793]
     subviewer		    2
     drawStyle		    SMART
-    slide {
-    }
     executionOrder	    1
     ssIdNumber		    9
   }
@@ -5279,8 +5585,6 @@ Stateflow {
     dataLimits		    [465.909 470.709 245.872 326.578]
     subviewer		    2
     drawStyle		    SMART
-    slide {
-    }
     executionOrder	    1
     ssIdNumber		    10
   }
@@ -5303,8 +5607,6 @@ Stateflow {
     dataLimits		    [645.884 650.683 246.408 326.578]
     subviewer		    2
     drawStyle		    SMART
-    slide {
-    }
     executionOrder	    1
     ssIdNumber		    11
   }
