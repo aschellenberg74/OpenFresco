@@ -1,13 +1,13 @@
 # $Revision: 1.2 $
 Model {
-  Name			  "HybridControllerD3D3_nAct"
+  Name			  "HybridControllerD3D3"
   Version		  7.5
   MdlSubVersion		  0
   GraphicalInterface {
     NumRootInports	    0
     NumRootOutports	    0
     ParameterArgumentNames  ""
-    ComputedModelVersion    "1.589"
+    ComputedModelVersion    "1.598"
     NumModelReferences	    0
     NumTestPointedSignals   0
   }
@@ -29,9 +29,9 @@ Model {
   ModifiedByFormat	  "%<Auto>"
   LastModifiedBy	  "Andreas"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Fri Mar 11 17:55:27 2011"
-  RTWModifiedTimeStamp	  221766921
-  ModelVersionFormat	  "1.%<AutoIncrement:589>"
+  LastModifiedDate	  "Fri Mar 25 21:45:32 2011"
+  RTWModifiedTimeStamp	  222990320
+  ModelVersionFormat	  "1.%<AutoIncrement:598>"
   ConfigurationManager	  "None"
   SampleTimeColors	  off
   SampleTimeAnnotations	  off
@@ -884,14 +884,6 @@ Model {
       SampleTime	      "-1"
     }
     Block {
-      BlockType		      HitCross
-      HitCrossingOffset	      "0"
-      HitCrossingDirection    "either"
-      ShowOutputPort	      on
-      ZeroCross		      on
-      SampleTime	      "-1"
-    }
-    Block {
       BlockType		      If
       NumInputs		      "1"
       IfExpression	      "u1 > 0"
@@ -922,6 +914,14 @@ Model {
       Interpolate	      on
     }
     Block {
+      BlockType		      Mux
+      Inputs		      "4"
+      DisplayOption	      "none"
+      UseBusObject	      off
+      BusObject		      "BusObject"
+      NonVirtualBus	      off
+    }
+    Block {
       BlockType		      Outport
       Port		      "1"
       UseBusObject	      off
@@ -950,6 +950,16 @@ Model {
       SampleTimeMode	      "continuous"
       InitialCondition	      "0"
       LinearizeAsGain	      on
+    }
+    Block {
+      BlockType		      RelationalOperator
+      Operator		      ">="
+      InputSameDT	      on
+      LogicOutDataTypeMode    "Logical (see Configuration Parameters: Optimization)"
+      LogicDataType	      "uint(8)"
+      OutDataTypeStr	      "Inherit: Logical (see Configuration Parameters: Optimization)"
+      ZeroCross		      on
+      SampleTime	      "-1"
     }
     Block {
       BlockType		      "S-Function"
@@ -1056,7 +1066,7 @@ Model {
     }
   }
   System {
-    Name		    "HybridControllerD3D3_nAct"
+    Name		    "HybridControllerD3D3"
     Location		    [6, 82, 730, 339]
     Open		    on
     ModelBrowserVisibility  off
@@ -1071,7 +1081,7 @@ Model {
     ShowPageBoundaries	    off
     ZoomFactor		    "100"
     ReportName		    "simulink-default.rpt"
-    SIDHighWatermark	    104
+    SIDHighWatermark	    153
     Block {
       BlockType		      Reference
       Name		      "DS1104DAC_C1"
@@ -1625,7 +1635,7 @@ Model {
 	  BlockType		  Gain
 	  Name			  "Gain3"
 	  SID			  21
-	  Position		  [570, 99, 610, 131]
+	  Position		  [585, 99, 625, 131]
 	  ShowName		  off
 	  Gain			  "0.1"
 	  ParameterDataType	  "sfix(16)"
@@ -2396,7 +2406,7 @@ Model {
 	      BlockType		      "S-Function"
 	      Name		      " SFunction "
 	      SID		      9
-	      Tag		      "Stateflow S-Function HybridControllerD3D3_nAct 1"
+	      Tag		      "Stateflow S-Function HybridControllerD3D3 1"
 	      Ports		      [2, 4]
 	      Position		      [180, 102, 230, 203]
 	      FunctionName	      "sf_sfun"
@@ -2909,15 +2919,6 @@ Model {
 	      OutScaling	      "2^0"
 	    }
 	    Block {
-	      BlockType		      HitCross
-	      Name		      "Hit \nCrossing"
-	      SID		      82
-	      Ports		      [1, 1]
-	      Position		      [180, 40, 210, 70]
-	      HitCrossingOffset	      "iDelay"
-	      HitCrossingDirection    "rising"
-	    }
-	    Block {
 	      BlockType		      SubSystem
 	      Name		      "SubSystem"
 	      SID		      83
@@ -3035,6 +3036,358 @@ Model {
 	      }
 	    }
 	    Block {
+	      BlockType		      SubSystem
+	      Name		      "Subsystem"
+	      SID		      105
+	      Ports		      [1, 1]
+	      Position		      [175, 36, 215, 74]
+	      ShowName		      off
+	      MinAlgLoopOccurrences   off
+	      PropExecContextOutsideSubsystem off
+	      RTWSystemCode	      "Auto"
+	      FunctionWithSeparateData off
+	      Opaque		      off
+	      RequestExecContextInheritance off
+	      MaskHideContents	      off
+	      System {
+		Name			"Subsystem"
+		Location		[600, 636, 1136, 895]
+		Open			off
+		ModelBrowserVisibility	off
+		ModelBrowserWidth	200
+		ScreenColor		"white"
+		PaperOrientation	"landscape"
+		PaperPositionMode	"auto"
+		PaperType		"usletter"
+		PaperUnits		"inches"
+		TiledPaperMargins	[0.500000, 0.500000, 0.500000, 0.500000]
+		TiledPageScale		1
+		ShowPageBoundaries	off
+		ZoomFactor		"100"
+		Block {
+		  BlockType		  Inport
+		  Name			  "i"
+		  SID			  106
+		  Position		  [30, 123, 60, 137]
+		  IconDisplay		  "Port number"
+		}
+		Block {
+		  BlockType		  Sum
+		  Name			  "Add"
+		  SID			  107
+		  Ports			  [2, 1]
+		  Position		  [420, 112, 450, 143]
+		  InputSameDT		  off
+		  OutDataTypeMode	  "Inherit via internal rule"
+		  OutDataType		  "fixdt(1, 16)"
+		  OutScaling		  "2^-10"
+		  OutDataTypeStr	  "Inherit: Inherit via internal rule"
+		  SaturateOnIntegerOverflow off
+		}
+		Block {
+		  BlockType		  Constant
+		  Name			  "Constant"
+		  SID			  108
+		  Position		  [105, 114, 145, 146]
+		  ShowName		  off
+		  Value			  "iDelay"
+		  OutDataType		  "fixdt(1, 16)"
+		  OutScaling		  "2^0"
+		}
+		Block {
+		  BlockType		  Constant
+		  Name			  "Constant1"
+		  SID			  109
+		  Position		  [30, 50, 60, 80]
+		  ShowName		  off
+		  Value			  "N"
+		  OutDataType		  "fixdt(1, 16)"
+		  OutScaling		  "2^0"
+		}
+		Block {
+		  BlockType		  If
+		  Name			  "If"
+		  SID			  110
+		  Ports			  [1, 2]
+		  Position		  [175, 111, 275, 149]
+		  IfExpression		  "u1 == 0"
+		}
+		Block {
+		  BlockType		  SubSystem
+		  Name			  "If Action\nSubsystem1"
+		  SID			  111
+		  Ports			  [2, 1, 0, 0, 0, 0, 0, 1]
+		  Position		  [295, 57, 365, 93]
+		  NamePlacement		  "alternate"
+		  LibraryVersion	  "1.216"
+		  TreatAsAtomicUnit	  on
+		  MinAlgLoopOccurrences	  off
+		  PropExecContextOutsideSubsystem off
+		  RTWSystemCode		  "Auto"
+		  FunctionWithSeparateData off
+		  Opaque		  off
+		  RequestExecContextInheritance	off
+		  MaskHideContents	  off
+		  System {
+		    Name		    "If Action\nSubsystem1"
+		    Location		    [569, 347, 840, 549]
+		    Open		    off
+		    ModelBrowserVisibility  off
+		    ModelBrowserWidth	    200
+		    ScreenColor		    "white"
+		    PaperOrientation	    "landscape"
+		    PaperPositionMode	    "auto"
+		    PaperType		    "usletter"
+		    PaperUnits		    "inches"
+		    TiledPaperMargins	    [0.500000, 0.500000, 0.500000, 0.500000]
+		    TiledPageScale	    1
+		    ShowPageBoundaries	    off
+		    ZoomFactor		    "100"
+		    Block {
+		    BlockType		    Inport
+		    Name		    "In1"
+		    SID			    112
+		    Position		    [20, 63, 50, 77]
+		    IconDisplay		    "Port number"
+		    OutDataType		    "fixdt(1, 16)"
+		    OutScaling		    "2^0"
+		    }
+		    Block {
+		    BlockType		    Inport
+		    Name		    "In2"
+		    SID			    113
+		    Position		    [20, 108, 50, 122]
+		    Port		    "2"
+		    IconDisplay		    "Port number"
+		    OutDataType		    "fixdt(1, 16)"
+		    OutScaling		    "2^0"
+		    }
+		    Block {
+		    BlockType		    ActionPort
+		    Name		    "Action Port"
+		    SID			    114
+		    Position		    [115, 15, 174, 43]
+		    }
+		    Block {
+		    BlockType		    RelationalOperator
+		    Name		    "Relational\nOperator"
+		    SID			    115
+		    Ports		    [2, 1]
+		    Position		    [125, 77, 155, 108]
+		    Operator		    "=="
+		    InputSameDT		    off
+		    LogicOutDataTypeMode    "boolean"
+		    LogicDataType	    "fixdt(0, 8)"
+		    OutDataTypeStr	    "boolean"
+		    }
+		    Block {
+		    BlockType		    Outport
+		    Name		    "Out1"
+		    SID			    116
+		    Position		    [220, 88, 250, 102]
+		    IconDisplay		    "Port number"
+		    OutDataType		    "fixdt(1, 16)"
+		    OutScaling		    "2^0"
+		    }
+		    Line {
+		    SrcBlock		    "Relational\nOperator"
+		    SrcPort		    1
+		    DstBlock		    "Out1"
+		    DstPort		    1
+		    }
+		    Line {
+		    SrcBlock		    "In1"
+		    SrcPort		    1
+		    Points		    [25, 0; 0, 15]
+		    DstBlock		    "Relational\nOperator"
+		    DstPort		    1
+		    }
+		    Line {
+		    SrcBlock		    "In2"
+		    SrcPort		    1
+		    Points		    [25, 0; 0, -15]
+		    DstBlock		    "Relational\nOperator"
+		    DstPort		    2
+		    }
+		  }
+		}
+		Block {
+		  BlockType		  SubSystem
+		  Name			  "If Action\nSubsystem2"
+		  SID			  117
+		  Ports			  [2, 1, 0, 0, 0, 0, 0, 1]
+		  Position		  [295, 167, 365, 203]
+		  LibraryVersion	  "1.216"
+		  TreatAsAtomicUnit	  on
+		  MinAlgLoopOccurrences	  off
+		  PropExecContextOutsideSubsystem off
+		  RTWSystemCode		  "Auto"
+		  FunctionWithSeparateData off
+		  Opaque		  off
+		  RequestExecContextInheritance	off
+		  MaskHideContents	  off
+		  System {
+		    Name		    "If Action\nSubsystem2"
+		    Location		    [569, 366, 840, 549]
+		    Open		    off
+		    ModelBrowserVisibility  off
+		    ModelBrowserWidth	    200
+		    ScreenColor		    "white"
+		    PaperOrientation	    "landscape"
+		    PaperPositionMode	    "auto"
+		    PaperType		    "usletter"
+		    PaperUnits		    "inches"
+		    TiledPaperMargins	    [0.500000, 0.500000, 0.500000, 0.500000]
+		    TiledPageScale	    1
+		    ShowPageBoundaries	    off
+		    ZoomFactor		    "100"
+		    Block {
+		    BlockType		    Inport
+		    Name		    "In1"
+		    SID			    118
+		    Position		    [20, 63, 50, 77]
+		    IconDisplay		    "Port number"
+		    OutDataType		    "fixdt(1, 16)"
+		    OutScaling		    "2^0"
+		    }
+		    Block {
+		    BlockType		    Inport
+		    Name		    "In2"
+		    SID			    119
+		    Position		    [20, 108, 50, 122]
+		    Port		    "2"
+		    IconDisplay		    "Port number"
+		    OutDataType		    "fixdt(1, 16)"
+		    OutScaling		    "2^0"
+		    }
+		    Block {
+		    BlockType		    ActionPort
+		    Name		    "Action Port"
+		    SID			    120
+		    Position		    [115, 15, 174, 43]
+		    }
+		    Block {
+		    BlockType		    RelationalOperator
+		    Name		    "Relational\nOperator"
+		    SID			    121
+		    Ports		    [2, 1]
+		    Position		    [125, 77, 155, 108]
+		    Operator		    "=="
+		    InputSameDT		    off
+		    LogicOutDataTypeMode    "boolean"
+		    LogicDataType	    "fixdt(0, 8)"
+		    OutDataTypeStr	    "boolean"
+		    }
+		    Block {
+		    BlockType		    Outport
+		    Name		    "Out1"
+		    SID			    122
+		    Position		    [220, 88, 250, 102]
+		    IconDisplay		    "Port number"
+		    OutDataType		    "fixdt(1, 16)"
+		    OutScaling		    "2^0"
+		    }
+		    Line {
+		    SrcBlock		    "Relational\nOperator"
+		    SrcPort		    1
+		    DstBlock		    "Out1"
+		    DstPort		    1
+		    }
+		    Line {
+		    SrcBlock		    "In1"
+		    SrcPort		    1
+		    Points		    [25, 0; 0, 15]
+		    DstBlock		    "Relational\nOperator"
+		    DstPort		    1
+		    }
+		    Line {
+		    SrcBlock		    "In2"
+		    SrcPort		    1
+		    Points		    [25, 0; 0, -15]
+		    DstBlock		    "Relational\nOperator"
+		    DstPort		    2
+		    }
+		  }
+		}
+		Block {
+		  BlockType		  Outport
+		  Name			  "trig"
+		  SID			  123
+		  Position		  [475, 123, 505, 137]
+		  IconDisplay		  "Port number"
+		}
+		Line {
+		  SrcBlock		  "Constant"
+		  SrcPort		  1
+		  Points		  [5, 0]
+		  Branch {
+		    DstBlock		    "If"
+		    DstPort		    1
+		  }
+		  Branch {
+		    Points		    [0, 65]
+		    DstBlock		    "If Action\nSubsystem2"
+		    DstPort		    2
+		  }
+		}
+		Line {
+		  SrcBlock		  "If"
+		  SrcPort		  1
+		  Points		  [50, 0]
+		  DstBlock		  "If Action\nSubsystem1"
+		  DstPort		  ifaction
+		}
+		Line {
+		  SrcBlock		  "If"
+		  SrcPort		  2
+		  Points		  [50, 0]
+		  DstBlock		  "If Action\nSubsystem2"
+		  DstPort		  ifaction
+		}
+		Line {
+		  SrcBlock		  "If Action\nSubsystem1"
+		  SrcPort		  1
+		  Points		  [15, 0; 0, 45]
+		  DstBlock		  "Add"
+		  DstPort		  1
+		}
+		Line {
+		  SrcBlock		  "If Action\nSubsystem2"
+		  SrcPort		  1
+		  Points		  [15, 0; 0, -50]
+		  DstBlock		  "Add"
+		  DstPort		  2
+		}
+		Line {
+		  SrcBlock		  "Add"
+		  SrcPort		  1
+		  DstBlock		  "trig"
+		  DstPort		  1
+		}
+		Line {
+		  SrcBlock		  "i"
+		  SrcPort		  1
+		  Points		  [20, 0]
+		  Branch {
+		    Points		    [0, -45]
+		    DstBlock		    "If Action\nSubsystem1"
+		    DstPort		    2
+		  }
+		  Branch {
+		    Points		    [0, 45]
+		    DstBlock		    "If Action\nSubsystem2"
+		    DstPort		    1
+		  }
+		}
+		Line {
+		  SrcBlock		  "Constant1"
+		  SrcPort		  1
+		  DstBlock		  "If Action\nSubsystem1"
+		  DstPort		  1
+		}
+	      }
+	    }
+	    Block {
 	      BlockType		      Outport
 	      Name		      "measDsp Out"
 	      SID		      91
@@ -3080,15 +3433,197 @@ Model {
 	    Line {
 	      SrcBlock		      "counter"
 	      SrcPort		      1
-	      DstBlock		      "Hit \nCrossing"
+	      DstBlock		      "Subsystem"
 	      DstPort		      1
 	    }
 	    Line {
-	      SrcBlock		      "Hit \nCrossing"
+	      SrcBlock		      "Subsystem"
 	      SrcPort		      1
-	      Points		      [65, 0]
+	      Points		      [60, 0]
 	      DstBlock		      "SubSystem"
 	      DstPort		      trigger
+	    }
+	  }
+	}
+	Block {
+	  BlockType		  SubSystem
+	  Name			  "Subsystem"
+	  SID			  144
+	  Ports			  [1, 1]
+	  Position		  [175, 113, 200, 137]
+	  ShowName		  off
+	  MinAlgLoopOccurrences	  off
+	  PropExecContextOutsideSubsystem off
+	  RTWSystemCode		  "Auto"
+	  FunctionWithSeparateData off
+	  Opaque		  off
+	  RequestExecContextInheritance	off
+	  MaskHideContents	  off
+	  MaskDisplay		  "disp('I/O')"
+	  MaskIconFrame		  on
+	  MaskIconOpaque	  on
+	  MaskIconRotate	  "none"
+	  MaskPortRotate	  "default"
+	  MaskIconUnits		  "autoscale"
+	  System {
+	    Name		    "Subsystem"
+	    Location		    [111, 339, 295, 468]
+	    Open		    off
+	    ModelBrowserVisibility  off
+	    ModelBrowserWidth	    200
+	    ScreenColor		    "white"
+	    PaperOrientation	    "landscape"
+	    PaperPositionMode	    "auto"
+	    PaperType		    "usletter"
+	    PaperUnits		    "inches"
+	    TiledPaperMargins	    [0.500000, 0.500000, 0.500000, 0.500000]
+	    TiledPageScale	    1
+	    ShowPageBoundaries	    off
+	    ZoomFactor		    "100"
+	    Block {
+	      BlockType		      Inport
+	      Name		      "I"
+	      SID		      145
+	      Position		      [25, 33, 55, 47]
+	      IconDisplay	      "Port number"
+	      PortDimensions	      "nAct"
+	    }
+	    Block {
+	      BlockType		      Mux
+	      Name		      "Dummy Aug"
+	      SID		      146
+	      Ports		      [2, 1]
+	      Position		      [90, 19, 95, 106]
+	      ShowName		      off
+	      Inputs		      "[nAct 1]"
+	      DisplayOption	      "bar"
+	    }
+	    Block {
+	      BlockType		      Constant
+	      Name		      "Dummy Zero"
+	      SID		      147
+	      Position		      [25, 70, 55, 100]
+	      Value		      "0"
+	      OutDataTypeMode	      "double"
+	      OutDataType	      "sfix(16)"
+	      OutScaling	      "2^0"
+	      OutDataTypeStr	      "double"
+	      SampleTime	      "dtCon"
+	    }
+	    Block {
+	      BlockType		      Outport
+	      Name		      "O"
+	      SID		      148
+	      Position		      [135, 58, 165, 72]
+	      IconDisplay	      "Port number"
+	      PortDimensions	      "nAct+1"
+	    }
+	    Line {
+	      SrcBlock		      "Dummy Zero"
+	      SrcPort		      1
+	      DstBlock		      "Dummy Aug"
+	      DstPort		      2
+	    }
+	    Line {
+	      SrcBlock		      "I"
+	      SrcPort		      1
+	      DstBlock		      "Dummy Aug"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "Dummy Aug"
+	      SrcPort		      1
+	      DstBlock		      "O"
+	      DstPort		      1
+	    }
+	  }
+	}
+	Block {
+	  BlockType		  SubSystem
+	  Name			  "Subsystem1"
+	  SID			  149
+	  Ports			  [1, 1]
+	  Position		  [370, 103, 395, 127]
+	  ShowName		  off
+	  MinAlgLoopOccurrences	  off
+	  PropExecContextOutsideSubsystem off
+	  RTWSystemCode		  "Auto"
+	  FunctionWithSeparateData off
+	  Opaque		  off
+	  RequestExecContextInheritance	off
+	  MaskHideContents	  off
+	  MaskDisplay		  "disp('I/O')"
+	  MaskIconFrame		  on
+	  MaskIconOpaque	  on
+	  MaskIconRotate	  "none"
+	  MaskPortRotate	  "default"
+	  MaskIconUnits		  "autoscale"
+	  System {
+	    Name		    "Subsystem1"
+	    Location		    [308, 340, 479, 468]
+	    Open		    off
+	    ModelBrowserVisibility  off
+	    ModelBrowserWidth	    200
+	    ScreenColor		    "white"
+	    PaperOrientation	    "landscape"
+	    PaperPositionMode	    "auto"
+	    PaperType		    "usletter"
+	    PaperUnits		    "inches"
+	    TiledPaperMargins	    [0.500000, 0.500000, 0.500000, 0.500000]
+	    TiledPageScale	    1
+	    ShowPageBoundaries	    off
+	    ZoomFactor		    "100"
+	    Block {
+	      BlockType		      Inport
+	      Name		      "In"
+	      SID		      150
+	      Position		      [25, 58, 55, 72]
+	      IconDisplay	      "Port number"
+	      PortDimensions	      "nAct+1"
+	    }
+	    Block {
+	      BlockType		      Demux
+	      Name		      "Dummy Trn"
+	      SID		      151
+	      Ports		      [1, 2]
+	      Position		      [85, 19, 90, 106]
+	      BackgroundColor	      "black"
+	      ShowName		      off
+	      Outputs		      "[nAct 1]"
+	      DisplayOption	      "bar"
+	    }
+	    Block {
+	      BlockType		      Terminator
+	      Name		      "Terminator3"
+	      SID		      152
+	      Position		      [120, 75, 140, 95]
+	      ShowName		      off
+	    }
+	    Block {
+	      BlockType		      Outport
+	      Name		      "Out"
+	      SID		      153
+	      Position		      [115, 33, 145, 47]
+	      IconDisplay	      "Port number"
+	      PortDimensions	      "nAct"
+	    }
+	    Line {
+	      SrcBlock		      "Dummy Trn"
+	      SrcPort		      2
+	      DstBlock		      "Terminator3"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "Dummy Trn"
+	      SrcPort		      1
+	      DstBlock		      "Out"
+	      DstPort		      1
+	    }
+	    Line {
+	      SrcBlock		      "In"
+	      SrcPort		      1
+	      DstBlock		      "Dummy Trn"
+	      DstPort		      1
 	    }
 	  }
 	}
@@ -3132,7 +3667,7 @@ Model {
 	  Name			  "disp_limit"
 	  SID			  98
 	  Ports			  [1, 1]
-	  Position		  [400, 100, 430, 130]
+	  Position		  [425, 100, 455, 130]
 	  UpperLimit		  "dspLim"
 	  LowerLimit		  "-dspLim"
 	}
@@ -3190,7 +3725,7 @@ Model {
 	  BlockType		  RateLimiter
 	  Name			  "vel_limit"
 	  SID			  103
-	  Position		  [470, 100, 500, 130]
+	  Position		  [485, 100, 515, 130]
 	  RisingSlewLimit	  "velLim"
 	  FallingSlewLimit	  "-velLim"
 	  Port {
@@ -3276,7 +3811,7 @@ Model {
 	Line {
 	  SrcBlock		  "targDsp"
 	  SrcPort		  1
-	  DstBlock		  "Predictor-Corrector"
+	  DstBlock		  "Subsystem"
 	  DstPort		  1
 	}
 	Line {
@@ -3303,7 +3838,7 @@ Model {
 	Line {
 	  SrcBlock		  "Predictor-Corrector"
 	  SrcPort		  1
-	  DstBlock		  "disp_limit"
+	  DstBlock		  "Subsystem1"
 	  DstPort		  1
 	}
 	Line {
@@ -3339,6 +3874,18 @@ Model {
 	  SrcPort		  1
 	  Points		  [0, 0]
 	  DstBlock		  "Terminator5"
+	  DstPort		  1
+	}
+	Line {
+	  SrcBlock		  "Subsystem1"
+	  SrcPort		  1
+	  DstBlock		  "disp_limit"
+	  DstPort		  1
+	}
+	Line {
+	  SrcBlock		  "Subsystem"
+	  SrcPort		  1
+	  DstBlock		  "Predictor-Corrector"
 	  DstPort		  1
 	}
       }
@@ -3418,10 +3965,10 @@ Model {
 Stateflow {
   machine {
     id			    1
-    name		    "HybridControllerD3D3_nAct"
+    name		    "HybridControllerD3D3"
     created		    "15-Oct-2001 17:10:46"
     isLibrary		    0
-    firstTarget		    27
+    firstTarget		    26
     debug {
       breakOn		      [0 0 1]
     }
@@ -3664,7 +4211,7 @@ Stateflow {
     machine		    1
     props {
       array {
-	size			"nAct"
+	size			"nAct+1"
       }
       type {
 	primitive		SF_DOUBLE_TYPE
@@ -3701,7 +4248,7 @@ Stateflow {
     machine		    1
     props {
       array {
-	size			"nAct"
+	size			"nAct+1"
       }
       type {
 	primitive		SF_DOUBLE_TYPE
@@ -3789,12 +4336,10 @@ Stateflow {
   }
   data {
     id			    21
-    ssIdNumber		    19
-    name		    "iDelay"
+    ssIdNumber		    20
+    name		    "di"
     linkNode		    [2 20 22]
     scope		    LOCAL_DATA
-    initFromWorkspace	    1
-    paramIndexForInitFromWorkspace 1
     machine		    1
     props {
       type {
@@ -3808,8 +4353,8 @@ Stateflow {
   }
   data {
     id			    22
-    ssIdNumber		    20
-    name		    "di"
+    ssIdNumber		    21
+    name		    "diSD"
     linkNode		    [2 21 23]
     scope		    LOCAL_DATA
     machine		    1
@@ -3825,8 +4370,8 @@ Stateflow {
   }
   data {
     id			    23
-    ssIdNumber		    21
-    name		    "diSD"
+    ssIdNumber		    22
+    name		    "iSD"
     linkNode		    [2 22 24]
     scope		    LOCAL_DATA
     machine		    1
@@ -3842,31 +4387,14 @@ Stateflow {
   }
   data {
     id			    24
-    ssIdNumber		    22
-    name		    "iSD"
-    linkNode		    [2 23 25]
-    scope		    LOCAL_DATA
-    machine		    1
-    props {
-      type {
-	primitive		SF_DOUBLE_TYPE
-	fixpt {
-	  scalingMode		  SF_FIXPT_BINARY_POINT
-	}
-      }
-    }
-    dataType		    "double"
-  }
-  data {
-    id			    25
     ssIdNumber		    23
     name		    "dspLocal"
-    linkNode		    [2 24 0]
+    linkNode		    [2 23 0]
     scope		    LOCAL_DATA
     machine		    1
     props {
       array {
-	size			"nAct"
+	size			"nAct+1"
       }
       type {
 	primitive		SF_DOUBLE_TYPE
@@ -3878,31 +4406,31 @@ Stateflow {
     dataType		    "double"
   }
   instance {
-    id			    26
+    id			    25
     name		    "dSpace HC/Predictor-Corrector"
     machine		    1
     chart		    2
   }
   target {
-    id			    27
+    id			    26
     name		    "sfun"
     codeFlags		    ""
     machine		    1
-    linkNode		    [1 0 28]
+    linkNode		    [1 0 27]
   }
   target {
-    id			    28
+    id			    27
     codeFlags		    " comments=1 statebitsets=1 databitsets=1 emitlogicalops=1 elseifdetection=1 constantfolding=1 redu"
     "ndantloadelimination=0 preservenames=0 preservenameswithparent=0 exportcharts=0 ioformat=0 initializer=0 multiinst"
     "anced=0 ppcomments=0"
     machine		    1
-    linkNode		    [1 27 29]
+    linkNode		    [1 26 28]
   }
   target {
-    id			    29
+    id			    28
     name		    "rtw"
     codeFlags		    " comments=1 preservenames=0 preservenameswithparent=0 exportcharts=0 statebitsets=1 databitsets=1"
     machine		    1
-    linkNode		    [1 28 0]
+    linkNode		    [1 27 0]
   }
 }
