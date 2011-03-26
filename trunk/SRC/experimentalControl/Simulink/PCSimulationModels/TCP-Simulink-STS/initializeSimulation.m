@@ -22,25 +22,23 @@ HybridCtrlParameters.N = round(HybridCtrlParameters.dtSim/HybridCtrlParameters.d
 HybridCtrlParameters.dtSim = HybridCtrlParameters.N*HybridCtrlParameters.dtCon;
 
 % calculate number of delay steps
-if (HybridCtrlParameters.delay == 0.0)
-   HybridCtrlParameters.iDelay = HybridCtrlParameters.N;
-else
-   HybridCtrlParameters.iDelay = round(HybridCtrlParameters.delay./HybridCtrlParameters.dtCon);
-   % check that finite state machine does not deadlock
-   delayRatio = HybridCtrlParameters.iDelay/HybridCtrlParameters.N;
-   if (delayRatio>0.6 && delayRatio<0.8)
-      warndlg(['The delay compensation exceeds 60% of the simulation time step.', ...
-         'Please consider increasing the simulation time step in order to avoid oscillations.'], ...
-         'WARNING');
-   elseif (delayRatio>=0.8)
-      errordlg(['The delay compensation exceeds 80% of the simulation time step.', ...
-         'The simulation time step must be increased in order to avoid deadlock.'], ...
-         'ERROR');
-      return
-   end
-   % update delay time
-   HybridCtrlParameters.delay = HybridCtrlParameters.iDelay*HybridCtrlParameters.dtCon;
+HybridCtrlParameters.iDelay = round(HybridCtrlParameters.delay./HybridCtrlParameters.dtCon);
+
+% check that finite state machine does not deadlock
+delayRatio = HybridCtrlParameters.iDelay/HybridCtrlParameters.N;
+if (delayRatio>0.6 && delayRatio<0.8)
+    warndlg(['The delay compensation exceeds 60% of the simulation time step.', ...
+        'Please consider increasing the simulation time step in order to avoid oscillations.'], ...
+        'WARNING');
+elseif (delayRatio>=0.8)
+    errordlg(['The delay compensation exceeds 80% of the simulation time step.', ...
+        'The simulation time step must be increased in order to avoid deadlock.'], ...
+        'ERROR');
+    return
 end
+
+% update delay time
+HybridCtrlParameters.delay = HybridCtrlParameters.iDelay*HybridCtrlParameters.dtCon;
 
 % calculate testing rate
 HybridCtrlParameters.Rate = HybridCtrlParameters.dtSim/HybridCtrlParameters.dtInt;

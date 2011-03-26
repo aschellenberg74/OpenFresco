@@ -1,4 +1,4 @@
-function data = plotOutputXPCtarget(fileName,actID,iDelay,tStart)
+function data = plotOutputXPCtarget(fileName,actID,tStart)
 %PLOTOUTPUTXPCTARGET to plot the xPC-Target output from a hybrid simulation
 % data = plotOutputXPCtarget(fileName,actID,iDelay,tStart)
 %
@@ -12,21 +12,15 @@ function data = plotOutputXPCtarget(fileName,actID,iDelay,tStart)
 
 if (nargin<2)
    actID = 1;
-   iDelay = 0;
    id = 1024;
 elseif (nargin<3)
-   iDelay = 0;
    id = 1024;
-elseif (nargin<4)
-   id = 1024;   
 else
    id = tStart*1024;
 end
 
 % load the file and extract data
 data = [];
-%iDelay = 93;
-%iDelay = 118;
 load(fileName);
 targDsp = data(1).values;
 commDsp = data(2).values;
@@ -48,7 +42,7 @@ end
 grid('on');
 xlabel('Time [sec]');
 ylabel('Command Displacement [in.]');
-title('Command Displacement from xPC-Target');
+title(sprintf('Command Displacement from xPC-Target: Actuator %02d',actID));
 %==========================================================================
 % target, command and measured displacements
 CreateWindow('cen',0.80*SS(4)/3*4,0.80*SS(4));
@@ -68,19 +62,14 @@ end
 grid('on');
 xlabel('Time [sec]');
 ylabel('Displacement [in.]');
-title('Displacements from xPC-Target');
-legend('targDsp','commDsp','measDsp');
+title(sprintf('Displacements from xPC-Target: Actuator %02d',actID));
+legend('target','command','measured');
 %==========================================================================
 % error between measured and target displacements
 CreateWindow('cen',0.80*SS(4)/3*4,0.80*SS(4));
 try
-   if (iDelay==0)
-      N = max(counter(:,1));
-      targID = find(counter(:,1) == N);
-   else      
-      targID = find(counter(:,1) >= 1+iDelay & counter(:,1) < 2+iDelay);
-   end
-   tID = find(targID >= id);
+   targID = find(diff(flag(:,3)) > 0) + 1;
+   tID = (targID >= id);
    targID = targID(tID);
    error = measDsp(targID,actID) - targDsp(targID,actID);
    plot(measDsp(targID,end),targDsp(targID,actID),'-b');
@@ -90,36 +79,29 @@ try
 end
 grid('on');
 xlabel('Time [sec]');
-ylabel('Displacements [in.]');
-title('Displacement Errors from xPC-Target');
-legend('targDsp','measDsp','error');
+ylabel('Displacement [in.]');
+title(sprintf('Error between Measured and Target Displacements from xPC-Target: Actuator %02d',actID));
+legend('target','measured','error');
 %==========================================================================
-% fft of error
+% fft of error between measured and target displacements
 CreateWindow('cen',0.80*SS(4)/3*4,0.80*SS(4));
 try
-   N = max(counter(:,1));
-   if (iDelay==0)
-      targID = find(counter(:,1) == N);
-   else      
-      targID = find(counter(:,1) >= 1+iDelay & counter(:,1) < 2+iDelay);
-   end
-   tID = find(targID >= id);
+   targID = find(diff(flag(:,3)) > 0) + 1;
+   tID = targID >= id; tID(1) = 0;
    targID = targID(tID);
+   t = measDsp(targID,end);
    error = measDsp(targID,actID) - targDsp(targID,actID);
-   dt = N/1024;
-   getFFT(error,dt,'Error between Measured and Target Displacement');
+   tIP = linspace(t(1),t(end),length(t))';
+   errorIP = interp1(t,error,tIP,'linear');
+   dt = tIP(2) - tIP(1);
+   getFFT(errorIP,dt,sprintf('Error between Measured and Target Displacements: Actuator %02d',actID));
 end
 %==========================================================================
-% measured vs. target displacements
+% subspace plot of measured vs. target displacements
 CreateWindow('cen',0.80*SS(4)/3*4,0.80*SS(4));
 try
-   if (iDelay==0)
-      N = max(counter(:,1));
-      targID = find(counter(:,1) == N);
-   else      
-      targID = find(counter(:,1) >= 1+iDelay & counter(:,1) < 2+iDelay);
-   end
-   tID = find(targID >= id);
+   targID = find(diff(flag(:,3)) > 0) + 1;
+   tID = targID >= id;
    targID = targID(tID);
    plot(targDsp(targID,actID),measDsp(targID,actID),'-b');
    hold('on');
@@ -127,7 +109,15 @@ end
 grid('on');
 xlabel('Target Displacement [in.]');
 ylabel('Measured Displacement [in.]');
-title('Displacements from xPC-Target');
+title(sprintf('Subspace Plot of Measured vs. Target Displacements from xPC-Target: Actuator %02d',actID));
+%==========================================================================
+% fft of error between measured and commmand displacements
+CreateWindow('cen',0.80*SS(4)/3*4,0.80*SS(4));
+try
+   error = measDsp(id:end,actID) - commDsp(id:end,actID);
+   dt = 1/1024;
+   getFFT(error,dt,sprintf('Error between Measured and Command Displacements: Actuator %02d',actID));
+end
 %==========================================================================
 % measured force
 CreateWindow('cen',0.80*SS(4)/3*4,0.80*SS(4));
@@ -137,13 +127,13 @@ end
 grid('on');
 xlabel('Time [sec]');
 ylabel('Measured Force [kip]');
-title('Measured Force from xPC-Target');
+title(sprintf('Measured Force from xPC-Target: Actuator %02d',actID));
 %==========================================================================
 % fft of measured force
 CreateWindow('cen',0.80*SS(4)/3*4,0.80*SS(4));
 try
    dt = 1/1024;
-   getFFT(measFrc(id:end,actID),dt,'Measured Force');
+   getFFT(measFrc(id:end,actID),dt,sprintf('Measured Force: Actuator %02d',actID));
    set(gca,'YScale','log');
 end
 %==========================================================================
@@ -155,7 +145,7 @@ end
 grid('on');
 xlabel('Time [sec]');
 ylabel('State [-]');
-title('State from xPC-Target');
+title('State of Predictor-Corrector from xPC-Target');
 %==========================================================================
 % counter of predictor-corrector
 CreateWindow('cen',0.80*SS(4)/3*4,0.80*SS(4));
@@ -165,9 +155,9 @@ end
 grid('on');
 xlabel('Time [sec]');
 ylabel('Counter [-]');
-title('Counter from xPC-Target');
+title('Counter of Predictor-Corrector from xPC-Target');
 %==========================================================================
-% update and target flags of predictor-corrector
+% flags of predictor-corrector
 CreateWindow('cen',0.80*SS(4)/3*4,0.80*SS(4));
 try
    plot(flag(id:end,end),flag(id:end,1),'-b');
@@ -182,6 +172,6 @@ end
 grid('on');
 xlabel('Time [sec]');
 ylabel('Flag [-]');
-title('Flags from xPC-Target');
+title('Flags of Predictor-Corrector from xPC-Target');
 legend('newTarget','switchPC','atTarget');
 %==========================================================================
