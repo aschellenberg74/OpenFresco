@@ -41,7 +41,8 @@ class ECxPCtarget : public ExperimentalControl
 public:
     // constructors
     ECxPCtarget(int tag, int pcType, char *ipAddress,
-        char *ipPort, char *appName, char *appPath = 0);
+        char *ipPort, char *appName, char *appPath = 0,
+        int timeOut = 10);
     ECxPCtarget(const ECxPCtarget &ec);
     
     // destructor
@@ -85,7 +86,7 @@ protected:
 private:
     void sleep(const clock_t wait);
     
-    int pcType, port;
+    int pcType, port, timeOut;
     char *ipAddress, *ipPort, *appName, *appPath;
     char errMsg[256];
 
