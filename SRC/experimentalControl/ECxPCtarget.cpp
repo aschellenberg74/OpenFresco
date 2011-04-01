@@ -37,10 +37,10 @@
 
 
 ECxPCtarget::ECxPCtarget(int tag, int pctype, char *ipaddress,
-    char *ipport, char *appname, char *apppath)
+    char *ipport, char *appname, char *apppath, int timeout)
     : ExperimentalControl(tag),
     pcType(pctype), ipAddress(ipaddress), ipPort(ipport),
-    appName(appname), appPath(apppath),
+    appName(appname), appPath(apppath), timeOut(timeout),
     ctrlDisp(0), ctrlVel(0), ctrlAccel(0), daqDisp(0), daqForce(0),
     daqDispId(0), daqForceId(0)
 {    
@@ -58,6 +58,16 @@ ECxPCtarget::ECxPCtarget(int tag, int pctype, char *ipaddress,
         xPCErrorMsg(xPCGetLastError(), errMsg);
         opserr << "ECxPCtarget::ECxPCtarget()"
             << " - xPCOpenTcpIpPort: error = " << errMsg << endln;
+        xPCFreeAPI();
+        exit(OF_ReturnType_failed);
+    }
+
+    // set timeout value between host and target PC
+    xPCSetLoadTimeOut(port, timeOut);
+    if (xPCGetLastError())  {
+        xPCErrorMsg(xPCGetLastError(), errMsg);
+        opserr << "ECxPCtarget::ECxPCtarget()"
+            << " - xPCSetLoadTimeOut: error = " << errMsg << endln;
         xPCFreeAPI();
         exit(OF_ReturnType_failed);
     }
@@ -127,7 +137,8 @@ ECxPCtarget::ECxPCtarget(int tag, int pctype, char *ipaddress,
     
     opserr << "****************************************************************\n";
     opserr << "* The application '" << appName << "' has been loaded and is stopped\n";
-    opserr << "* sample time = " << xPCGetSampleTime(port) << ", stop time = " << xPCGetStopTime(port) << endln;
+    opserr << "* sample time = " << xPCGetSampleTime(port) << ", stop time = ";
+    opserr << xPCGetStopTime(port) << ", timeout time = " << xPCGetLoadTimeOut(port) << endln;
     opserr << "****************************************************************\n";
     opserr << endln;
 }
@@ -144,6 +155,7 @@ ECxPCtarget::ECxPCtarget(const ECxPCtarget &ec)
     ipPort = ec.ipPort;
     appName = ec.appName;
     appPath = ec.appPath;
+    timeOut = ec.timeOut;
 }
 
 
@@ -787,7 +799,7 @@ int ECxPCtarget::acquire()
         if (xPCGetLastError())  {
             xPCErrorMsg(xPCGetLastError(), errMsg);
             opserr << "ECxPCtarget::acquire() - "
-                << "xPCGetSignal(daqDisp): error = " << errMsg << endln;
+                << "xPCGetSignals(daqDisp): error = " << errMsg << endln;
             xPCClosePort(port);
             xPCFreeAPI();
             exit(OF_ReturnType_failed);
@@ -798,7 +810,7 @@ int ECxPCtarget::acquire()
         if (xPCGetLastError())  {
             xPCErrorMsg(xPCGetLastError(), errMsg);
             opserr << "ECxPCtarget::acquire() - "
-                << "xPCGetSignal(daqForce): error = " << errMsg << endln;
+                << "xPCGetSignals(daqForce): error = " << errMsg << endln;
             xPCClosePort(port);
             xPCFreeAPI();
             exit(OF_ReturnType_failed);

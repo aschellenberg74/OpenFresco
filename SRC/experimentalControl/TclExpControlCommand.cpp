@@ -424,7 +424,7 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
 			return TCL_ERROR;
 		}    
 		
-		int type;
+		int type, i, timeOut = 10;
 		char *ipAddr, *ipPort, *appName, *appPath = 0;
 		
         argi = 2;
@@ -450,14 +450,25 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
         argi++;
         if (argc > 7 &&
             strcmp(argv[argi],"-ctrlFilters") != 0 &&
-            strcmp(argv[argi],"-daqFilters") != 0)  {
+            strcmp(argv[argi],"-daqFilters") != 0 &&
+            strcmp(argv[argi],"-timeOut") != 0)  {
             appPath = new char [strlen(argv[argi])+1];
             strcpy(appPath,argv[argi]);
             argi++;
         }
+        for (i = argi; i < argc; i++)  {
+            if (i+1 < argc && strcmp(argv[i], "-timeOut") == 0)  {
+                if (Tcl_GetInt(interp, argv[i+1], &timeOut) != TCL_OK)  {
+                    opserr << "WARNING invalid timeOut value\n";
+                    opserr << "expControl xPCtarget " << tag << endln;
+                    return TCL_ERROR;	
+                }
+            }
+        }
 		
 		// parsing was successful, allocate the control
-		theControl = new ECxPCtarget(tag, type, ipAddr, ipPort, appName, appPath);
+		theControl = new ECxPCtarget(tag, type, ipAddr, ipPort,
+            appName, appPath, timeOut);
     }
 	
     // ----------------------------------------------------------------------------	
