@@ -1,9 +1,9 @@
 # File: OneBayFrame_Distr_LabServer.tcl
 # (use with OneBayFrame_Distr_Client.tcl & OneBayFrame_Distr_SimAppServer.tcl)
 #
-# $Revision: $
-# $Date: $
-# $URL: $
+# $Revision$
+# $Date$
+# $URL$
 #
 # Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
 # Created: 11/06

@@ -24,7 +24,7 @@
 
 // $Revision$
 // $Date$
-// $URL: $
+// $URL$
 
 #ifndef ExperimentalControl_h
 #define ExperimentalControl_h

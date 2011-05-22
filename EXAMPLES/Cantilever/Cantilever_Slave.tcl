@@ -1,8 +1,8 @@
 # File: Cantilever_Slave.tcl (use with Cantilever_Master.tcl)
 #
-# $Revision: $
-# $Date: $
-# $URL: $
+# $Revision$
+# $Date$
+# $URL$
 #
 # Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
 # Created: 09/07

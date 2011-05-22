@@ -21,7 +21,7 @@
 
 // $Revision$
 // $Date$
-// $URL: $
+// $URL$
 
 #ifndef ECxPCtarget_h
 #define ECxPCtarget_h

@@ -24,7 +24,7 @@
 
 // $Revision$
 // $Date$
-// $URL: $
+// $URL$
 
 #ifndef FrescoGlobals_h
 #define FrescoGlobals_h
@@ -35,7 +35,7 @@
 //
 // Description: This file contains the global values in Fresco
 
-#define OPF_VERSION "2.6"
+#define OPF_VERSION "2.6.1"
 
 #ifndef _bool_h
 #include "bool.h"

@@ -19,9 +19,9 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision: $
-// $Date: $
-// $URL: $
+// $Revision$
+// $Date$
+// $URL$
 
 // Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
 // Created: 02/07
@@ -30,12 +30,12 @@
 // Description: This file contains the function invoked when the user
 // invokes the expControlPoint command in the interpreter. 
 
-#include <TclModelBuilder.h>
+#include <string.h>
+#include <tcl.h>
 #include <ArrayOfTaggedObjects.h>
+#include <elementAPI.h>
 
 #include <ExperimentalCP.h>
-
-#include <string.h>
 
 static ArrayOfTaggedObjects *theExperimentalCPs(0);
 
@@ -91,8 +91,8 @@ static void printCommand(int argc, TCL_Char **argv)
 } 
 
 
-int TclExpCPCommand(ClientData clientData, Tcl_Interp *interp, int argc,
-    TCL_Char **argv, Domain *theDomain, TclModelBuilder *theTclBuilder)
+int TclExpCPCommand(ClientData clientData, Tcl_Interp *interp,
+    int argc, TCL_Char **argv, Domain *theDomain)
 {
     if (theExperimentalCPs == 0)
         theExperimentalCPs = new ArrayOfTaggedObjects(32);
@@ -105,8 +105,8 @@ int TclExpCPCommand(ClientData clientData, Tcl_Interp *interp, int argc,
         return TCL_ERROR;
     }    
 
-	int ndm = theTclBuilder->getNDM();
-	int ndf = theTclBuilder->getNDF();
+	int ndm = OPS_GetNDM();
+	int ndf = OPS_GetNDF();
     int tag, nodeTag, numDir = 0, numLim = 0, argi = 1, i;
     double f, lim;
     ExperimentalCP *theCP = 0;

@@ -19,9 +19,9 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision: $
-// $Date: $
-// $URL: $
+// $Revision$
+// $Date$
+// $URL$
 
 // Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
 // Created: 08/08
@@ -30,10 +30,11 @@
 // Description: This file contains the function invoked when the user
 // invokes the expRecorder command in the interpreter. 
 
-#include <TclModelBuilder.h>
+#include <tcl.h>
 #include <ID.h>
 #include <Domain.h>
 #include <SimulationInformation.h>
+#include <elementAPI.h>
 #include <ExperimentalSite.h>
 
 // recorders
@@ -52,23 +53,16 @@
 
 enum outputMode {STANDARD_STREAM, DATA_STREAM, XML_STREAM, DATABASE_STREAM, BINARY_STREAM, DATA_STREAM_CSV, TCP_STREAM};
 
-extern const char * getInterpPWD(Tcl_Interp *interp);  // commands.cpp
+extern SimulationInformation *theSimulationInfo;
 extern ExperimentalSite *getExperimentalSite(int tag);
 extern ExperimentalSite *getExperimentalSiteFirst();
 extern ExperimentalSetup *getExperimentalSetup(int tag);
 extern ExperimentalControl *getExperimentalControl(int tag);
 extern ExperimentalSignalFilter *getExperimentalSignalFilter(int tag);
-#ifdef _WIN32
-extern SimulationInformation simulationInfo;
-extern FE_Datastore *theDatabase;
-#else
-SimulationInformation simulationInfo;
-FE_Datastore *theDatabase;
-#endif
+
 
 int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
-    TCL_Char **argv, Domain *theDomain, TclModelBuilder *theTclBuilder,
-    Recorder **theRecorder)
+    TCL_Char **argv, Domain *theDomain, Recorder **theRecorder)
 {
     // make sure there is a minimum number of arguments
     if (argc < 2)  {
@@ -151,13 +145,13 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
                     start = swap;
                 }
                 
-                siteTags = new ID(end-start);	  
+                siteTags = new ID(end-start);
                 if (siteTags == 0)  {
                     opserr << "WARNING expRecorder Site -siteRange start end - out of memory\n";
                     return TCL_ERROR;
                 }
                 for (i=start; i<=end; i++)
-                    (*siteTags)[numSites++] = i;	    
+                    (*siteTags)[numSites++] = i;
                 argi += 3;
             } 
             
@@ -168,46 +162,46 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
             
             else if ((strcmp(argv[argi],"-dT") == 0) || (strcmp(argv[argi],"-dt") == 0))  {
                 argi++;
-                if (Tcl_GetDouble(interp, argv[argi], &deltaT) != TCL_OK)	
-                    return TCL_ERROR;	
+                if (Tcl_GetDouble(interp, argv[argi], &deltaT) != TCL_OK)
+                    return TCL_ERROR;
                 argi++;
             } 
             
             else if (strcmp(argv[argi],"-precision") == 0)  {
                 argi++;
-                if (Tcl_GetInt(interp, argv[argi], &precision) != TCL_OK)	
-                    return TCL_ERROR;		  
+                if (Tcl_GetInt(interp, argv[argi], &precision) != TCL_OK)
+                    return TCL_ERROR;
                 argi++;
             }
             
             else if (strcmp(argv[argi],"-file") == 0)  {
                 fileName = argv[argi+1];
-                const char *pwd = getInterpPWD(interp);
-                simulationInfo.addOutputFile(fileName,pwd);
+                const char *pwd = OPS_GetInterpPWD();
+                theSimulationInfo->addOutputFile(fileName,pwd);
                 eMode = DATA_STREAM;
                 argi += 2;
             }
             
             else if ((strcmp(argv[argi],"-csv") == 0) || (strcmp(argv[argi],"-fileCSV") == 0))  {
                 fileName = argv[argi+1];
-                const char *pwd = getInterpPWD(interp);
-                simulationInfo.addOutputFile(fileName,pwd);
+                const char *pwd = OPS_GetInterpPWD();
+                theSimulationInfo->addOutputFile(fileName,pwd);
                 eMode = DATA_STREAM_CSV;
                 argi += 2;
             }
             
             else if ((strcmp(argv[argi],"-xml") == 0) || (strcmp(argv[argi],"-nees") == 0))  {
                 fileName = argv[argi+1];
-                const char *pwd = getInterpPWD(interp);
-                simulationInfo.addOutputFile(fileName,pwd);
+                const char *pwd = OPS_GetInterpPWD();
+                theSimulationInfo->addOutputFile(fileName,pwd);
                 eMode = XML_STREAM;
                 argi += 2;
             }	    
             
             else if ((strcmp(argv[argi],"-binary") == 0))  {
                 fileName = argv[argi+1];
-                const char *pwd = getInterpPWD(interp);
-                simulationInfo.addOutputFile(fileName,pwd);
+                const char *pwd = OPS_GetInterpPWD();
+                theSimulationInfo->addOutputFile(fileName,pwd);
                 eMode = BINARY_STREAM;
                 argi += 2;
             }	    
@@ -221,7 +215,7 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
             }	    
             
             else if (strcmp(argv[argi],"-database") == 0)  {
-                theRecorderDatabase = theDatabase;
+                theRecorderDatabase = OPS_GetFEDatastore();
                 if (theRecorderDatabase != 0)  {
                     tableName = argv[argi+1];
                     eMode = DATABASE_STREAM;
@@ -260,7 +254,7 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         } else if (eMode == TCP_STREAM && inetAddr != 0)  {
 	        theOutputStream = new TCP_Stream(inetPort, inetAddr);
         } else if (eMode == DATABASE_STREAM && tableName != 0)  {
-            theOutputStream = new DatabaseStream(theDatabase,tableName);
+            theOutputStream = new DatabaseStream(OPS_GetFEDatastore(),tableName);
         } else
             theOutputStream = new StandardStream();
         
@@ -390,32 +384,32 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
             
             else if (strcmp(argv[argi],"-file") == 0)  {
                 fileName = argv[argi+1];
-                const char *pwd = getInterpPWD(interp);
-                simulationInfo.addOutputFile(fileName,pwd);
+                const char *pwd = OPS_GetInterpPWD();
+                theSimulationInfo->addOutputFile(fileName,pwd);
                 eMode = DATA_STREAM;
                 argi += 2;
             }
             
             else if ((strcmp(argv[argi],"-csv") == 0) || (strcmp(argv[argi],"-fileCSV") == 0))  {
                 fileName = argv[argi+1];
-                const char *pwd = getInterpPWD(interp);
-                simulationInfo.addOutputFile(fileName,pwd);
+                const char *pwd = OPS_GetInterpPWD();
+                theSimulationInfo->addOutputFile(fileName,pwd);
                 eMode = DATA_STREAM_CSV;
                 argi += 2;
             }
             
             else if ((strcmp(argv[argi],"-xml") == 0) || (strcmp(argv[argi],"-nees") == 0))  {
                 fileName = argv[argi+1];
-                const char *pwd = getInterpPWD(interp);
-                simulationInfo.addOutputFile(fileName,pwd);
+                const char *pwd = OPS_GetInterpPWD();
+                theSimulationInfo->addOutputFile(fileName,pwd);
                 eMode = XML_STREAM;
                 argi += 2;
             }	    
             
             else if ((strcmp(argv[argi],"-binary") == 0))  {
                 fileName = argv[argi+1];
-                const char *pwd = getInterpPWD(interp);
-                simulationInfo.addOutputFile(fileName,pwd);
+                const char *pwd = OPS_GetInterpPWD();
+                theSimulationInfo->addOutputFile(fileName,pwd);
                 eMode = BINARY_STREAM;
                 argi += 2;
             }	    
@@ -429,7 +423,7 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
             }	    
             
             else if (strcmp(argv[argi],"-database") == 0)  {
-                theRecorderDatabase = theDatabase;
+                theRecorderDatabase = OPS_GetFEDatastore();
                 if (theRecorderDatabase != 0)  {
                     tableName = argv[argi+1];
                     eMode = DATABASE_STREAM;
@@ -468,7 +462,7 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         } else if (eMode == TCP_STREAM && inetAddr != 0)  {
 	        theOutputStream = new TCP_Stream(inetPort, inetAddr);
         } else if (eMode == DATABASE_STREAM && tableName != 0)  {
-            theOutputStream = new DatabaseStream(theDatabase,tableName);
+            theOutputStream = new DatabaseStream(OPS_GetFEDatastore(),tableName);
         } else
             theOutputStream = new StandardStream();
         
@@ -598,32 +592,32 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
             
             else if (strcmp(argv[argi],"-file") == 0)  {
                 fileName = argv[argi+1];
-                const char *pwd = getInterpPWD(interp);
-                simulationInfo.addOutputFile(fileName,pwd);
+                const char *pwd = OPS_GetInterpPWD();
+                theSimulationInfo->addOutputFile(fileName,pwd);
                 eMode = DATA_STREAM;
                 argi += 2;
             }
             
             else if ((strcmp(argv[argi],"-csv") == 0) || (strcmp(argv[argi],"-fileCSV") == 0))  {
                 fileName = argv[argi+1];
-                const char *pwd = getInterpPWD(interp);
-                simulationInfo.addOutputFile(fileName,pwd);
+                const char *pwd = OPS_GetInterpPWD();
+                theSimulationInfo->addOutputFile(fileName,pwd);
                 eMode = DATA_STREAM_CSV;
                 argi += 2;
             }
             
             else if ((strcmp(argv[argi],"-xml") == 0) || (strcmp(argv[argi],"-nees") == 0))  {
                 fileName = argv[argi+1];
-                const char *pwd = getInterpPWD(interp);
-                simulationInfo.addOutputFile(fileName,pwd);
+                const char *pwd = OPS_GetInterpPWD();
+                theSimulationInfo->addOutputFile(fileName,pwd);
                 eMode = XML_STREAM;
                 argi += 2;
             }	    
             
             else if ((strcmp(argv[argi],"-binary") == 0))  {
                 fileName = argv[argi+1];
-                const char *pwd = getInterpPWD(interp);
-                simulationInfo.addOutputFile(fileName,pwd);
+                const char *pwd = OPS_GetInterpPWD();
+                theSimulationInfo->addOutputFile(fileName,pwd);
                 eMode = BINARY_STREAM;
                 argi += 2;
             }	    
@@ -637,7 +631,7 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
             }	    
             
             else if (strcmp(argv[argi],"-database") == 0)  {
-                theRecorderDatabase = theDatabase;
+                theRecorderDatabase = OPS_GetFEDatastore();
                 if (theRecorderDatabase != 0)  {
                     tableName = argv[argi+1];
                     eMode = DATABASE_STREAM;
@@ -676,7 +670,7 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         } else if (eMode == TCP_STREAM && inetAddr != 0)  {
 	        theOutputStream = new TCP_Stream(inetPort, inetAddr);
         } else if (eMode == DATABASE_STREAM && tableName != 0)  {
-            theOutputStream = new DatabaseStream(theDatabase,tableName);
+            theOutputStream = new DatabaseStream(OPS_GetFEDatastore(),tableName);
         } else
             theOutputStream = new StandardStream();
         
@@ -806,32 +800,32 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
             
             else if (strcmp(argv[argi],"-file") == 0)  {
                 fileName = argv[argi+1];
-                const char *pwd = getInterpPWD(interp);
-                simulationInfo.addOutputFile(fileName,pwd);
+                const char *pwd = OPS_GetInterpPWD();
+                theSimulationInfo->addOutputFile(fileName,pwd);
                 eMode = DATA_STREAM;
                 argi += 2;
             }
             
             else if ((strcmp(argv[argi],"-csv") == 0) || (strcmp(argv[argi],"-fileCSV") == 0))  {
                 fileName = argv[argi+1];
-                const char *pwd = getInterpPWD(interp);
-                simulationInfo.addOutputFile(fileName,pwd);
+                const char *pwd = OPS_GetInterpPWD();
+                theSimulationInfo->addOutputFile(fileName,pwd);
                 eMode = DATA_STREAM_CSV;
                 argi += 2;
             }
             
             else if ((strcmp(argv[argi],"-xml") == 0) || (strcmp(argv[argi],"-nees") == 0))  {
                 fileName = argv[argi+1];
-                const char *pwd = getInterpPWD(interp);
-                simulationInfo.addOutputFile(fileName,pwd);
+                const char *pwd = OPS_GetInterpPWD();
+                theSimulationInfo->addOutputFile(fileName,pwd);
                 eMode = XML_STREAM;
                 argi += 2;
             }	    
             
             else if ((strcmp(argv[argi],"-binary") == 0))  {
                 fileName = argv[argi+1];
-                const char *pwd = getInterpPWD(interp);
-                simulationInfo.addOutputFile(fileName,pwd);
+                const char *pwd = OPS_GetInterpPWD();
+                theSimulationInfo->addOutputFile(fileName,pwd);
                 eMode = BINARY_STREAM;
                 argi += 2;
             }	    
@@ -845,7 +839,7 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
             }	    
             
             else if (strcmp(argv[argi],"-database") == 0)  {
-                theRecorderDatabase = theDatabase;
+                theRecorderDatabase = OPS_GetFEDatastore();
                 if (theRecorderDatabase != 0)  {
                     tableName = argv[argi+1];
                     eMode = DATABASE_STREAM;
@@ -884,7 +878,7 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         } else if (eMode == TCP_STREAM && inetAddr != 0)  {
 	        theOutputStream = new TCP_Stream(inetPort, inetAddr);
         } else if (eMode == DATABASE_STREAM && tableName != 0)  {
-            theOutputStream = new DatabaseStream(theDatabase,tableName);
+            theOutputStream = new DatabaseStream(OPS_GetFEDatastore(),tableName);
         } else
             theOutputStream = new StandardStream();
         
@@ -933,12 +927,12 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
 }
 
 
-int TclAddExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc, 
-    TCL_Char **argv, Domain *theDomain, TclModelBuilder *theTclBuilder)
+int TclAddExpRecorder(ClientData clientData, Tcl_Interp *interp,
+    int argc, TCL_Char **argv, Domain *theDomain)
 {
     Recorder *theRecorder = 0;
     
-    TclCreateExpRecorder(clientData, interp, argc, argv, theDomain, theTclBuilder, &theRecorder);
+    TclCreateExpRecorder(clientData, interp, argc, argv, theDomain, &theRecorder);
     
     if (theRecorder != 0)  {
         ExperimentalSite *theSite = getExperimentalSiteFirst();
@@ -959,34 +953,3 @@ int TclAddExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
     
     return TCL_OK;
 }
-
-#ifndef _WIN32
-const char * getInterpPWD(Tcl_Interp *interp) {
-    static char *pwd = 0;
-
-    if (pwd != 0)
-        delete [] pwd;
-
-#ifdef _TCL84
-    Tcl_Obj *cwd = Tcl_FSGetCwd(interp);
-    if (cwd != NULL) {
-        int length;
-        const char *objPWD = Tcl_GetStringFromObj(cwd, &length);
-        pwd = new char[length+1];
-        strcpy(pwd, objPWD);
-        Tcl_DecrRefCount(cwd);	
-    }
-#else
-
-    Tcl_DString buf;
-    const char *objPWD = Tcl_GetCwd(interp, &buf);
-
-    pwd = new char[strlen(objPWD)+1];
-    strcpy(pwd, objPWD);
-
-    Tcl_DStringFree(&buf);
-
-#endif
-    return pwd;
-}
-#endif

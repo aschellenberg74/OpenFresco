@@ -33,9 +33,9 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision: $
-// $Date: $
-// $URL: $
+// $Revision$
+// $Date$
+// $URL$
 
 // Modified: Frank McKenna & Andreas Schellenberg
 // Created: 10/06

@@ -19,9 +19,9 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision: $
-// $Date: $
-// $URL: $
+// $Revision$
+// $Date$
+// $URL$
 
 #ifndef ECSimSimulink_h
 #define ECSimSimulink_h

@@ -1,8 +1,8 @@
 # File: PortalFrame_Local.tcl
 #
-# $Revision: $
-# $Date: $
-# $URL: $
+# $Revision$
+# $Date$
+# $URL$
 #
 # Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
 # Created: 10/07

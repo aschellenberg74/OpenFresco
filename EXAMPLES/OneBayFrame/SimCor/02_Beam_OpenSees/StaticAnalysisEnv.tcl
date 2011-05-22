@@ -1,8 +1,8 @@
 # File: StaticAnalysisEnv.tcl
 #
-# $Revision: $
-# $Date: $
-# $URL: $
+# $Revision$
+# $Date$
+# $URL$
 #
 # Written: Hong Kim (hongkim@ce.berkeley.edu)
 # Created: 1/08

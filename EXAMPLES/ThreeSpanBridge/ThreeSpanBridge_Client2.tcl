@@ -1,9 +1,9 @@
 # File: TreeSpanBridge_Client2.tcl
 # (use with TreeSpanBridge_Server2a.tcl & TreeSpanBridge_Server2b.tcl)
 #
-# $Revision: $
-# $Date: $
-# $URL: $
+# $Revision$
+# $Date$
+# $URL$
 #
 # Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
 # Created: 09/06

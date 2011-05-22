@@ -19,9 +19,9 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision: 83 $
-// $Date: 2007-07-30 21:06:42 -0700 (Mon, 30 Jul 2007) $
-// $URL: $
+// $Revision$
+// $Date$
+// $URL$
 
 // Written: Vesna Terzic (vesna@berkeley.edu)
 // Created: 01/08

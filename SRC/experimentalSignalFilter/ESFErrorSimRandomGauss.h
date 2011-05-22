@@ -24,7 +24,7 @@
 
 // $Revision$
 // $Date$
-// $URL: $
+// $URL$
 
 #ifndef ESFErrorSimRandomGauss_h
 #define ESFErrorSimRandomGauss_h

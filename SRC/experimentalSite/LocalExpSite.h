@@ -24,7 +24,7 @@
 
 // $Revision$
 // $Date$
-// $URL: $
+// $URL$
 
 #ifndef LocalExpSite_h
 #define LocalExpSite_h

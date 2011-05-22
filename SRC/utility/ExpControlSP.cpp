@@ -19,9 +19,9 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision: 76 $
-// $Date: 2007-07-03 00:29:57 -0700 (Tue, 03 Jul 2007) $
-// $URL: $
+// $Revision$
+// $Date$
+// $URL$
 
 // Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
 // Created: 07/07

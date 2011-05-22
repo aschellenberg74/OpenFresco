@@ -1,8 +1,8 @@
 # File: OneBayFrame_LeftCol.tcl (use with Simulink)
 #
-# $Revision: $
-# $Date: $
-# $URL: $
+# $Revision$
+# $Date$
+# $URL$
 #
 # Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
 # Created: 02/10

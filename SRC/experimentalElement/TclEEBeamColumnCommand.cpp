@@ -21,7 +21,7 @@
 
 // $Revision$
 // $Date$
-// $URL: $
+// $URL$
 
 // Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
 // Created: 09/06
@@ -30,34 +30,33 @@
 // Description: This file contains the function to parse the TCL input
 // for the EEBeamColumn element.
 
-#include <TclModelBuilder.h>
-
 #include <stdlib.h>
 #include <string.h>
+#include <tcl.h>
 #include <Domain.h>
+#include <elementAPI.h>
 
 #include <EEBeamColumn2d.h>
 #include <EEBeamColumn3d.h>
-#include <CrdTransf2d.h>
-#include <CrdTransf3d.h>
 
-extern void printCommand(int argc, TCL_Char **argv);
 extern ExperimentalSite *getExperimentalSite(int tag);
 
 
-int addEEBeamColumn(ClientData clientData, Tcl_Interp *interp, int argc, 
-    TCL_Char **argv, Domain *theTclDomain, TclModelBuilder *theTclBuilder,
-    int eleArgStart)
+static void printCommand(int argc, TCL_Char **argv)
 {
-	// ensure the destructor has not been called
-	if (theTclBuilder == 0)  {
-		opserr << "WARNING builder has been destroyed - expElement beamColumn\n";    
-		return TCL_ERROR;
-	}
-	
+    opserr << "Input command: ";
+    for (int i=0; i<argc; i++)
+        opserr << argv[i] << " ";
+    opserr << endln;
+} 
+
+
+int addEEBeamColumn(ClientData clientData, Tcl_Interp *interp, int argc, 
+    TCL_Char **argv, Domain *theTclDomain, int eleArgStart)
+{
 	ExperimentalElement *theExpElement = 0;
-	int ndm = theTclBuilder->getNDM();
-	int ndf = theTclBuilder->getNDF();
+	int ndm = OPS_GetNDM();
+	int ndf = OPS_GetNDF();
 	int tag;
 	
 	if (ndm == 2)  {
@@ -79,6 +78,7 @@ int addEEBeamColumn(ClientData clientData, Tcl_Interp *interp, int argc,
 		
 		// get the id and end nodes
 		int iNode, jNode, transId, siteTag, ipPort, i, j, k;
+        CrdTransf *theTrans = 0;
         ExperimentalSite *theSite = 0;
         char *ipAddr = 0;
         int ssl = 0;
@@ -105,7 +105,7 @@ int addEEBeamColumn(ClientData clientData, Tcl_Interp *interp, int argc,
 			opserr << "expElement beamColumn element: " << tag << endln;
 			return TCL_ERROR;
 		}
-		CrdTransf2d *theTrans = theTclBuilder->getCrdTransf2d(transId);
+		theTrans = OPS_GetCrdTransfPtr(transId);
 		if (theTrans == 0)  {
 			opserr << "WARNING transformation object not found\n";
 	        opserr << "expElement beamColumn element: " << tag << endln;
@@ -173,7 +173,7 @@ int addEEBeamColumn(ClientData clientData, Tcl_Interp *interp, int argc,
 				}
 			}
 		}
-
+        
 		// now create the EEBeamColumn
         if (theSite != 0)
 		    theExpElement = new EEBeamColumn2d(tag, iNode, jNode, *theTrans, theSite, iMod, rho);
@@ -185,7 +185,7 @@ int addEEBeamColumn(ClientData clientData, Tcl_Interp *interp, int argc,
 			opserr << "expElement beamColumn element: " << tag << endln;
 			return TCL_ERROR;
 		}
-
+        
 		// then add the EEBeamColumn to the domain
 		if (theTclDomain->addElement(theExpElement) == false)  {
 			opserr << "WARNING could not add element to domain\n";
@@ -244,6 +244,7 @@ int addEEBeamColumn(ClientData clientData, Tcl_Interp *interp, int argc,
 		
 		// get the id and end nodes
 		int iNode, jNode, transId, siteTag, ipPort, i, j, k;
+        CrdTransf *theTrans = 0;
         ExperimentalSite *theSite = 0;
         char *ipAddr = 0;
         int ssl = 0;
@@ -270,7 +271,7 @@ int addEEBeamColumn(ClientData clientData, Tcl_Interp *interp, int argc,
 			opserr << "expElement beamColumn element: " << tag << endln;
 			return TCL_ERROR;
 		}
-		CrdTransf3d *theTrans = theTclBuilder->getCrdTransf3d(transId);
+		theTrans = OPS_GetCrdTransfPtr(transId);
 		if (theTrans == 0)  {
 			opserr << "WARNING transformation object not found\n";
 	        opserr << "expElement beamColumn element: " << tag << endln;

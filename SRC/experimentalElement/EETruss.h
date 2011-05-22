@@ -21,7 +21,7 @@
 
 // $Revision$
 // $Date$
-// $URL: $
+// $URL$
 
 #ifndef EETruss_h
 #define EETruss_h

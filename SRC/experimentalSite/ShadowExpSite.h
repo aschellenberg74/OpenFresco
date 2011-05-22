@@ -24,7 +24,7 @@
 
 // $Revision$
 // $Date$
-// $URL: $
+// $URL$
 
 #ifndef ShadowExpSite_h
 #define ShadowExpSite_h

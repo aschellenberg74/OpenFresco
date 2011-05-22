@@ -1,9 +1,9 @@
 # File: TwoStoryShear_Client1.tcl
 # (use with TwoStoryShear_Server1a.tcl & TwoStoryShear_Server1b.tcl)
 #
-# $Revision: $
-# $Date: $
-# $URL: $
+# $Revision$
+# $Date$
+# $URL$
 #
 # Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
 # Created: 09/06

@@ -21,7 +21,7 @@
 
 // $Revision$
 // $Date$
-// $URL: $
+// $URL$
 
 #ifndef EEInvertedVBrace2d_h
 #define EEInvertedVBrace2d_h

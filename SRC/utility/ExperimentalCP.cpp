@@ -21,7 +21,7 @@
 
 // $Revision$
 // $Date$
-// $URL: $
+// $URL$
 
 // Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
 // Created: 02/07

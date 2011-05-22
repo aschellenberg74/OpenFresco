@@ -19,9 +19,9 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision: 69 $
-// $Date: 2007-04-23 02:00:57 -0700 (Mon, 23 Apr 2007) $
-// $URL: $
+// $Revision$
+// $Date$
+// $URL$
 
 #ifndef ExpControlSP_h
 #define ExpControlSP_h
