@@ -25,8 +25,8 @@
 **                                                                    **
 ** ****************************************************************** **
 
-** $Revision: $
-** $Date: $
+** $Revision$
+** $Date$
 ** $Source: $
 
 ** Written: Andreas Schellenberg

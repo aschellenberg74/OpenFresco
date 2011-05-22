@@ -21,7 +21,7 @@
 
 // $Revision$
 // $Date$
-// $URL: $
+// $URL$
 
 // Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
 // Created: 09/06
@@ -30,8 +30,11 @@
 // Description: This file contains the function invoked when the user
 // invokes the expControl command in the interpreter. 
 
-#include <TclModelBuilder.h>
+#include <string.h>
+#include <tcl.h>
 #include <ArrayOfTaggedObjects.h>
+#include <Vector.h>
+#include <elementAPI.h>
 
 #include <ECSimUniaxialMaterials.h>
 //#include <ECSimUniaxialMaterialsForce.h>
@@ -47,9 +50,6 @@
 //#include <ECNIEseries.h>
 #include <ECSCRAMNet.h>
 #endif
-
-#include <Vector.h>
-#include <string.h>
 
 extern ExperimentalCP *getExperimentalCP(int tag);
 extern ExperimentalSignalFilter *getExperimentalSignalFilter(int tag);
@@ -107,8 +107,8 @@ static void printCommand(int argc, TCL_Char **argv)
 } 
 
 
-int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
-    TCL_Char **argv, Domain *theDomain, TclModelBuilder *theTclBuilder)
+int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
+    int argc, TCL_Char **argv, Domain *theDomain)
 {
     if (theExperimentalControls == 0)
         theExperimentalControls = new ArrayOfTaggedObjects(32);
@@ -168,7 +168,7 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
                 opserr << "expControl SimUniaxialMaterials " << tag << endln;
                 return TCL_ERROR;	
             }
-            theSpecimen[i] = theTclBuilder->getUniaxialMaterial(matTag);
+            theSpecimen[i] = OPS_GetUniaxialMaterial(matTag);
             if (theSpecimen[i] == 0)  {
 				opserr << "WARNING uniaxial material not found\n";
 	            opserr << "uniaxialMaterial " << matTag << endln;
@@ -229,7 +229,7 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp, int argc,
                 opserr << "expControl SimUniaxialMaterialsForce " << tag << endln;
                 return TCL_ERROR;	
             }
-            theSpecimen[i] = theTclBuilder->getUniaxialMaterial(matTag);
+            theSpecimen[i] = OPS_GetUniaxialMaterial(matTag);
             if (theSpecimen[i] == 0)  {
 				opserr << "WARNING uniaxial material not found\n";
 	            opserr << "uniaxialMaterial " << matTag << endln;

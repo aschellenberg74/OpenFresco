@@ -21,7 +21,7 @@
 
 // $Revision$
 // $Date$
-// $URL: $
+// $URL$
 
 // Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
 // Created: 09/06
@@ -30,26 +30,25 @@
 // Description: This file contains the function invoked when the user
 // invokes the expElement command in the interpreter. 
 
-#include <TclModelBuilder.h>
+#include <string.h>
+#include <tcl.h>
 #include <ArrayOfTaggedObjects.h>
 
-#include <string.h>
 
+extern int addEETruss(ClientData clientData, Tcl_Interp *interp,
+    int argc, TCL_Char **argv, Domain*, int argStart); 
 
-extern int addEETruss(ClientData clientData, Tcl_Interp *interp,  int argc, 
-    TCL_Char **argv, Domain*, TclModelBuilder*, int argStart); 
+extern int addEEBeamColumn(ClientData clientData, Tcl_Interp *interp,
+    int argc, TCL_Char **argv, Domain*, int argStart); 
 
-extern int addEEBeamColumn(ClientData clientData, Tcl_Interp *interp,  int argc, 
-    TCL_Char **argv, Domain*, TclModelBuilder*, int argStart); 
+extern int addEETwoNodeLink(ClientData clientData, Tcl_Interp *interp,
+    int argc, TCL_Char **argv, Domain*, int argStart); 
 
-extern int addEETwoNodeLink(ClientData clientData, Tcl_Interp *interp,  int argc, 
-    TCL_Char **argv, Domain*, TclModelBuilder*, int argStart); 
+extern int addEEGeneric(ClientData clientData, Tcl_Interp *interp,
+    int argc, TCL_Char **argv, Domain*, int argStart); 
 
-extern int addEEGeneric(ClientData clientData, Tcl_Interp *interp,  int argc, 
-    TCL_Char **argv, Domain*, TclModelBuilder*, int argStart); 
-
-extern int addEEInvertedVBrace(ClientData clientData, Tcl_Interp *interp,  int argc, 
-    TCL_Char **argv, Domain*, TclModelBuilder*, int argStart); 
+extern int addEEInvertedVBrace(ClientData clientData, Tcl_Interp *interp,
+    int argc, TCL_Char **argv, Domain*, int argStart); 
 
 
 static void printCommand(int argc, TCL_Char **argv)
@@ -62,14 +61,8 @@ static void printCommand(int argc, TCL_Char **argv)
 
 
 int TclExpElementCommand(ClientData clientData, Tcl_Interp *interp, int argc,
-    TCL_Char **argv, Domain *theTclDomain, TclModelBuilder *theTclBuilder)
+    TCL_Char **argv, Domain *theTclDomain)
 {
-    // ensure the destructor has not been called
-    if (theTclBuilder == 0) {
-        opserr << "WARNING builder has been destroyed\n";    
-        return TCL_ERROR;
-    }
-
     // check that there is at least two arguments
     if (argc < 2)  {
         opserr << "WARNING need to specify an element type\n";
@@ -82,35 +75,35 @@ int TclExpElementCommand(ClientData clientData, Tcl_Interp *interp, int argc,
     if (strcmp(argv[1],"truss") == 0 || strcmp(argv[1],"corotTruss") == 0)  {
         int eleArgStart = 1;
         int result = addEETruss(clientData, interp, argc, argv,
-            theTclDomain, theTclBuilder, eleArgStart);
+            theTclDomain, eleArgStart);
         return result;
     }
     // ----------------------------------------------------------------------------	
     else if (strcmp(argv[1],"beamColumn") == 0) {
         int eleArgStart = 1;
         int result = addEEBeamColumn(clientData, interp, argc, argv,
-            theTclDomain, theTclBuilder, eleArgStart);
+            theTclDomain, eleArgStart);
         return result;
     }
     // ----------------------------------------------------------------------------	
     else if (strcmp(argv[1],"twoNodeLink") == 0) {
         int eleArgStart = 1;
         int result = addEETwoNodeLink(clientData, interp, argc, argv,
-            theTclDomain, theTclBuilder, eleArgStart);
+            theTclDomain, eleArgStart);
         return result;
     }
     // ----------------------------------------------------------------------------	
     else if (strcmp(argv[1],"generic") == 0) {
         int eleArgStart = 1;
         int result = addEEGeneric(clientData, interp, argc, argv,
-            theTclDomain, theTclBuilder, eleArgStart);
+            theTclDomain, eleArgStart);
         return result;
     }
     // ----------------------------------------------------------------------------	
     else if (strcmp(argv[1],"invertedVBrace") == 0) {
         int eleArgStart = 1;
         int result = addEEInvertedVBrace(clientData, interp, argc, argv,
-            theTclDomain, theTclBuilder, eleArgStart);
+            theTclDomain, eleArgStart);
         return result;
     }
     // ----------------------------------------------------------------------------	

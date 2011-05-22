@@ -1,8 +1,8 @@
 # File: OneBayFrame_Slave.tcl (use with OneBayFrame_Master.tcl)
 #
-# $Revision: $
-# $Date: $
-# $URL: $
+# $Revision$
+# $Date$
+# $URL$
 #
 # Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
 # Created: 08/08

@@ -1,4 +1,4 @@
-# $Revision: 1.2 $
+# $Revision$
 Model {
   Name			  "HybridControllerD3D3"
   Version		  7.5
@@ -1261,12 +1261,12 @@ Model {
 	  HorizontalAlignment	  "left"
 	}
 	Annotation {
-	  Name			  "$Date: 15.05.01 13:54 $ "
+	  Name			  "$Date$ "
 	  Position		  [11, 26]
 	  HorizontalAlignment	  "left"
 	}
 	Annotation {
-	  Name			  "$Revision: 3 $ "
+	  Name			  "$Revision$ "
 	  Position		  [11, 41]
 	  HorizontalAlignment	  "left"
 	}

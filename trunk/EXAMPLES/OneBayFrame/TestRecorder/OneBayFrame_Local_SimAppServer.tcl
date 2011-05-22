@@ -1,8 +1,8 @@
 # File: OneBayFrame_Local_SimAppServer.tcl (use with OneBayFrame_Local_Client.tcl)
 #
-# $Revision: $
-# $Date: $
-# $URL: $
+# $Revision$
+# $Date$
+# $URL$
 #
 # Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
 # Created: 11/06
@@ -63,13 +63,13 @@ expElement twoNodeLink 1 1 3 -dir 2 -site 1 -initStif 2.8
 # Start of recorder generation
 # ------------------------------
 # create the recorder objects
-recorder Node -file ServerNode_Dsp.out -time -node 1 3 -dof 1 disp
-recorder Node -file ServerNode_Vel.out -time -node 1 3 -dof 1 vel
-recorder Node -file ServerNode_Acc.out -time -node 1 3 -dof 1 accel
+#recorder Node -file ServerNode_Dsp.out -time -node 1 3 -dof 1 disp
+#recorder Node -file ServerNode_Vel.out -time -node 1 3 -dof 1 vel
+#recorder Node -file ServerNode_Acc.out -time -node 1 3 -dof 1 accel
 
-recorder Element -file ServerElmt_Frc.out     -time -ele 1 forces
-recorder Element -file ServerElmt_ctrlDsp.out -time -ele 1 ctrlDisp
-recorder Element -file ServerElmt_daqDsp.out  -time -ele 1 daqDisp
+#recorder Element -file ServerElmt_Frc.out     -time -ele 1 forces
+#recorder Element -file ServerElmt_ctrlDsp.out -time -ele 1 ctrlDisp
+#recorder Element -file ServerElmt_daqDsp.out  -time -ele 1 daqDisp
 
 expRecorder Site -file ServerSite_trialDsp.out -time -site 1 trialDisp
 expRecorder Site -file ServerSite_trialVel.out -time -site 1 trialVel

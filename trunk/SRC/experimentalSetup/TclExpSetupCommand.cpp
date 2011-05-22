@@ -21,7 +21,7 @@
 
 // $Revision$
 // $Date$
-// $URL: $
+// $URL$
 
 // Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
 // Created: 09/06
@@ -30,8 +30,12 @@
 // Description: This file contains the function invoked when the user
 // invokes the expSetup command in the interpreter. 
 
-#include <TclModelBuilder.h>
+#include <string.h>
+#include <tcl.h>
 #include <ArrayOfTaggedObjects.h>
+#include <ID.h>
+#include <Vector.h>
+#include <elementAPI.h>
 
 #include <ESNoTransformation.h>
 #include <ESOneActuator.h>
@@ -42,10 +46,6 @@
 #include <ESInvertedVBraceJntOff2d.h>
 #include <ESAggregator.h>
 #include <ESFourActuators3d.h>
-
-#include <ID.h>
-#include <Vector.h>
-#include <string.h>
 
 extern ExperimentalControl *getExperimentalControl(int tag);
 static ArrayOfTaggedObjects *theExperimentalSetups(0);
@@ -102,8 +102,8 @@ static void printCommand(int argc, TCL_Char **argv)
 } 
 
 
-int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp, int argc,
-    TCL_Char **argv, Domain *theDomain, TclModelBuilder *theTclBuilder)
+int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp,
+    int argc, TCL_Char **argv, Domain *theDomain)
 {
     if (theExperimentalSetups == 0)
         theExperimentalSetups = new ArrayOfTaggedObjects(32);
@@ -119,7 +119,7 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp, int argc,
     ExperimentalSetup *theSetup = 0;
     ExperimentalControl *theControl = 0;
 
-    int ndm = theTclBuilder->getNDM();
+    int ndm = OPS_GetNDM();
     int tag, argi;
     
     // ----------------------------------------------------------------------------	

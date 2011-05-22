@@ -19,9 +19,9 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision: 76 $
-// $Date: 2007-07-03 00:29:57 -0700 (Tue, 03 Jul 2007) $
-// $URL: $
+// $Revision$
+// $Date$
+// $URL$
 
 // Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
 // Created: 07/07
@@ -49,34 +49,34 @@
 
 #include <AnalysisModel.h>
 #include <CTestNormDispIncr.h>
-#include <CTestNormUnbalance.h>
-#include <CTestEnergyIncr.h>
+//#include <CTestNormUnbalance.h>
+//#include <CTestEnergyIncr.h>
 #include <NewtonRaphson.h>
 #include <LoadControl.h>
-#include <DisplacementControl.h>
+//#include <DisplacementControl.h>
 
-#include <TransformationConstraintHandler.h>
+//#include <TransformationConstraintHandler.h>
 #include <PenaltyConstraintHandler.h>
-#include <LagrangeConstraintHandler.h>
+//#include <LagrangeConstraintHandler.h>
 
 #include <PlainNumberer.h>
-#include <RCM.h>
+//#include <RCM.h>
 
-#include <BandSPDLinSOE.h>
-#include <BandSPDLinLapackSolver.h>
+//#include <BandSPDLinSOE.h>
+//#include <BandSPDLinLapackSolver.h>
 #include <BandGenLinSOE.h>
 #include <BandGenLinLapackSolver.h>
-#include <ProfileSPDLinSOE.h>
-#include <ProfileSPDLinDirectSolver.h>
-#include <SymSparseLinSOE.h>
-#include <SymSparseLinSolver.h>
-#include <UmfpackGenLinSOE.h>
-#include <UmfpackGenLinSolver.h>
+//#include <ProfileSPDLinSOE.h>
+//#include <ProfileSPDLinDirectSolver.h>
+//#include <SymSparseLinSOE.h>
+//#include <SymSparseLinSolver.h>
+//#include <UmfpackGenLinSOE.h>
+//#include <UmfpackGenLinSolver.h>
 #include <StaticAnalysis.h>
 
-#include <DataOutputFileHandler.h>
-#include <NodeRecorder.h>
-#include <ElementRecorder.h>
+//#include <DataOutputFileHandler.h>
+//#include <NodeRecorder.h>
+//#include <ElementRecorder.h>
 
 
 ECSimDomain::ECSimDomain(int tag,

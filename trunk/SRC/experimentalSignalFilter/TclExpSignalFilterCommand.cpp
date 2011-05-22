@@ -19,9 +19,9 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision: $
-// $Date: $
-// $URL: $
+// $Revision$
+// $Date$
+// $URL$
 
 // Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
 // Created: 11/06
@@ -30,13 +30,12 @@
 // Description: This file contains the function invoked when the user
 // invokes the expSignalFilter command in the interpreter. 
 
-#include <TclModelBuilder.h>
+#include <string.h>
+#include <tcl.h>
 #include <ArrayOfTaggedObjects.h>
 
 #include <ESFErrorSimRandomGauss.h>
 #include <ESFErrorSimUndershoot.h>
-
-#include <string.h>
 
 static ArrayOfTaggedObjects *theExperimentalSignalFilters(0);
 
@@ -92,8 +91,8 @@ static void printCommand(int argc, TCL_Char **argv)
 } 
 
 
-int TclExpSignalFilterCommand(ClientData clientData, Tcl_Interp *interp, int argc,
-    TCL_Char **argv, Domain *theDomain, TclModelBuilder *theTclBuilder)
+int TclExpSignalFilterCommand(ClientData clientData, Tcl_Interp *interp,
+    int argc, TCL_Char **argv, Domain *theDomain)
 {
     if (theExperimentalSignalFilters == 0)
         theExperimentalSignalFilters = new ArrayOfTaggedObjects(32);

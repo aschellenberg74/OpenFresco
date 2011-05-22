@@ -1,9 +1,9 @@
 # File: TwoStoryFrame_Client1.tcl
 # (use with TwoStoryFrame_Server1a.tcl & TwoStoryFrame_Server1b.tcl)
 #
-# $Revision: $
-# $Date: $
-# $URL: $
+# $Revision$
+# $Date$
+# $URL$
 #
 # Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
 # Created: 11/06

@@ -24,7 +24,7 @@
 
 // $Revision$
 // $Date$
-// $URL: $
+// $URL$
 
 #ifndef ExperimentalSignalFilter_h
 #define ExperimentalSignalFilter_h

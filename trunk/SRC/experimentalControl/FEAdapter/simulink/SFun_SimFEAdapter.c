@@ -19,8 +19,8 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision: $
-// $Date: $
+// $Revision$
+// $Date$
 // $Source: $
 
 // Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)

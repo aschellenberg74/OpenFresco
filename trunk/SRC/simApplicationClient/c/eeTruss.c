@@ -19,8 +19,8 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision: $
-// $Date: $
+// $Revision$
+// $Date$
 // $Source: $
 
 // Written: Frank McKenna & Andreas Schellenberg

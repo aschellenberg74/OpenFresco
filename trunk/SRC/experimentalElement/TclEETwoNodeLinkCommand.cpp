@@ -21,7 +21,7 @@
 
 // $Revision$
 // $Date$
-// $URL: $
+// $URL$
 
 // Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
 // Created: 09/06
@@ -30,33 +30,34 @@
 // Description: This file contains the function to parse the TCL input
 // for the EETwoNodeLink element.
 
-#include <TclModelBuilder.h>
-
 #include <stdlib.h>
 #include <string.h>
+#include <tcl.h>
 #include <Domain.h>
 #include <ID.h>
 #include <Vector.h>
+#include <elementAPI.h>
 
 #include <EETwoNodeLink.h>
 
-extern void printCommand(int argc, TCL_Char **argv);
 extern ExperimentalSite *getExperimentalSite(int tag);
 
 
-int addEETwoNodeLink(ClientData clientData, Tcl_Interp *interp, int argc,
-    TCL_Char **argv, Domain *theTclDomain, TclModelBuilder *theTclBuilder,
-    int eleArgStart)
+static void printCommand(int argc, TCL_Char **argv)
 {
-    // ensure the destructor has not been called
-    if (theTclBuilder == 0)  {
-        opserr << "WARNING builder has been destroyed - expElement twoNodeLink\n";    
-        return TCL_ERROR;
-    }
-    
+    opserr << "Input command: ";
+    for (int i=0; i<argc; i++)
+        opserr << argv[i] << " ";
+    opserr << endln;
+} 
+
+
+int addEETwoNodeLink(ClientData clientData, Tcl_Interp *interp, int argc,
+    TCL_Char **argv, Domain *theTclDomain, int eleArgStart)
+{    
     ExperimentalElement *theExpElement = 0;
-    int ndm = theTclBuilder->getNDM();
-    int ndf = theTclBuilder->getNDF();
+    int ndm = OPS_GetNDM();
+    int ndf = OPS_GetNDF();
     
     // check the number of arguments is correct
     if ((argc-eleArgStart) < 10)  {

@@ -1,8 +1,8 @@
 # File: ThreeSpanBridge_Server2b.tcl (use with ThreeSpanBridge_Client2.tcl)
 #
-# $Revision: $
-# $Date: $
-# $URL: $
+# $Revision$
+# $Date$
+# $URL$
 #
 # Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
 # Created: 09/06

@@ -21,7 +21,7 @@
 
 // $Revision$
 // $Date$
-// $URL: $
+// $URL$
 
 // Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
 // Created: 09/06
@@ -38,7 +38,7 @@
 #include <Renderer.h>
 #include <Information.h>
 #include <ElementResponse.h>
-#include <CrdTransf2d.h>
+#include <CrdTransf.h>
 #include <ElementalLoad.h>
 #include <TCP_Socket.h>
 #include <TCP_SocketSSL.h>
@@ -57,7 +57,7 @@ Vector EEBeamColumn2d::theLoad(6);
 // responsible for allocating the necessary space needed
 // by each object and storing the tags of the end nodes.
 EEBeamColumn2d::EEBeamColumn2d(int tag, int Nd1, int Nd2,
-    CrdTransf2d &coordTransf,
+    CrdTransf &coordTransf,
     ExperimentalSite *site,
     bool iM, double r)
     : ExperimentalElement(tag, ELE_TAG_EEBeamColumn2d, site),
@@ -118,7 +118,7 @@ EEBeamColumn2d::EEBeamColumn2d(int tag, int Nd1, int Nd2,
     theInitStiff.resize(6,6);
     
     // get a copy of the coordinate transformation
-    theCoordTransf = coordTransf.getCopy();
+    theCoordTransf = coordTransf.getCopy2d();
     if (!theCoordTransf)  {
         opserr << "EEBeamColumn2d::EEBeamColumn2d() - "
             << "failed to get copy of the coordinate transformation\n";
@@ -140,7 +140,7 @@ EEBeamColumn2d::EEBeamColumn2d(int tag, int Nd1, int Nd2,
 // responsible for allocating the necessary space needed
 // by each object and storing the tags of the end nodes.
 EEBeamColumn2d::EEBeamColumn2d(int tag, int Nd1, int Nd2,
-    CrdTransf2d &coordTransf,
+    CrdTransf &coordTransf,
     int port, char *machineInetAddr, int ssl, int dataSize,
     bool iM, double r)
     : ExperimentalElement(tag, ELE_TAG_EEBeamColumn2d),
@@ -248,7 +248,7 @@ EEBeamColumn2d::EEBeamColumn2d(int tag, int Nd1, int Nd2,
     theInitStiff.resize(6,6);
     
     // get a copy of the coordinate transformation
-    theCoordTransf = coordTransf.getCopy();
+    theCoordTransf = coordTransf.getCopy2d();
     if (!theCoordTransf)  {
         opserr << "EEBeamColumn2d::EEBeamColumn2d() - "
             << "failed to get copy of the coordinate transformation\n";

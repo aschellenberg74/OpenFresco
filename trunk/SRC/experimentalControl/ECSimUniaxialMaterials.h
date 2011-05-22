@@ -21,7 +21,7 @@
 
 // $Revision$
 // $Date$
-// $URL: $
+// $URL$
 
 #ifndef ECSimUniaxialMaterials_h
 #define ECSimUniaxialMaterials_h

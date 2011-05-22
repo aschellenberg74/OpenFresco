@@ -1,8 +1,8 @@
 # File: SDOF_MiniMost_Local.tcl
 #
-# $Revision: $
-# $Date: $
-# $URL: $
+# $Revision$
+# $Date$
+# $URL$
 #
 # Written: Hong Kim (hong_kim@berkeley.edu)
 # Created: 03/07

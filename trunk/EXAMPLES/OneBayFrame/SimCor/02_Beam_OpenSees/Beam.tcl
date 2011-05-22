@@ -1,8 +1,8 @@
 # File: Beam.tcl
 #
-# $Revision: $
-# $Date: $
-# $URL: $
+# $Revision$
+# $Date$
+# $URL$
 #
 # Written: Hong Kim (hongkim@berkeley.edu)
 # Created: 1/08

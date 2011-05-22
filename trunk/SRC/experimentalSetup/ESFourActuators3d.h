@@ -19,9 +19,9 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision: 50 $
-// $Date: 2007-02-02 00:57:43 -0800 (Fri, 02 Feb 2007) $
-// $URL: $
+// $Revision$
+// $Date$
+// $URL$
 
 #ifndef ESFourActuators3d_h
 #define ESFourActuators3d_h

@@ -1,9 +1,9 @@
 # File: LShapedColumn_Client1.tcl
 # (use with LShapedColumn_Server1a.tcl or LShapedColumn_Server1b.tcl)
 #
-# $Revision: $
-# $Date: $
-# $URL: $
+# $Revision$
+# $Date$
+# $URL$
 #
 # Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
 # Created: 07/07

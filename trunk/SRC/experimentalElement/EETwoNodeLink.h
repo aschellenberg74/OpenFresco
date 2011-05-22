@@ -21,7 +21,7 @@
 
 // $Revision$
 // $Date$
-// $URL: $
+// $URL$
 
 #ifndef EETwoNodeLink_h
 #define EETwoNodeLink_h

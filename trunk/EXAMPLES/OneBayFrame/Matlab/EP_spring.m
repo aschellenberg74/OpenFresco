@@ -29,9 +29,9 @@ function ElementPost = EP_spring(u, ElementData)
 %**                                                                    **
 %** ****************************************************************** */
 
-% $Revision: $
-% $Date: $
-% $URL: $
+% $Revision$
+% $Date$
+% $URL$
 
 % Written: Hong Kim (hong_kim@berkeley.edu)
 % Created: 10/06

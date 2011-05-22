@@ -21,7 +21,7 @@
 
 // $Revision$
 // $Date$
-// $URL: $
+// $URL$
 
 #ifndef ESInvertedVBraceJntOff2d_h
 #define ESInvertedVBraceJntOff2d_h

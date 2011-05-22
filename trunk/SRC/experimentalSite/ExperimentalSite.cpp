@@ -24,7 +24,7 @@
 
 // $Revision$
 // $Date$
-// $URL: $
+// $URL$
 
 // Written: Yoshi (yos@catfish.dpri.kyoto-u.ac.jp)
 // Created: 09/06

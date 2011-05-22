@@ -21,7 +21,7 @@
 
 // $Revision$
 // $Date$
-// $URL: $
+// $URL$
 
 #ifndef EEBeamColumn2d_h
 #define EEBeamColumn2d_h
@@ -36,7 +36,7 @@
 
 #include "ExperimentalElement.h"
 
-class CrdTransf2d;
+class CrdTransf;
 class Channel;
 
 #define ELE_TAG_EEBeamColumn2d 9951
@@ -47,11 +47,11 @@ class EEBeamColumn2d : public ExperimentalElement
 public:
     // constructors
     EEBeamColumn2d(int tag, int Nd1, int Nd2,
-        CrdTransf2d &coordTransf,
+        CrdTransf &coordTransf,
         ExperimentalSite *site,
         bool iMod = false, double rho = 0.0);
     EEBeamColumn2d(int tag, int Nd1, int Nd2,
-        CrdTransf2d &coordTransf,
+        CrdTransf &coordTransf,
         int port, char *machineInetAddress = 0,
         int ssl = 0, int dataSize = OF_Network_dataSize,
         bool iMod = false, double rho = 0.0);
@@ -111,7 +111,7 @@ private:
     
     // private attributes - a copy for each object of the class
     ID connectedExternalNodes;      // contains the tags of the end nodes
-    CrdTransf2d *theCoordTransf;
+    CrdTransf *theCoordTransf;
     
     bool iMod;      // I-Modification flag
     double rho;     // rho: mass per unit length

@@ -1,9 +1,9 @@
 # File: OneBayFrame_Client1.tcl
 # (use with OneBayFrame_Server1a.tcl & OneBayFrame_Server1b.tcl)
 #
-# $Revision: $
-# $Date: $
-# $URL: $
+# $Revision$
+# $Date$
+# $URL$
 #
 # Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
 # Created: 07/07

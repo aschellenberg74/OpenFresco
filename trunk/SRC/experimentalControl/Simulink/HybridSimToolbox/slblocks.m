@@ -48,7 +48,7 @@ function blkStruct = slblocks
 %   See also FINDBLIB, LIBBROWSE.
 
 %   Copyright 1990-2004 The MathWorks, Inc.
-%   $Revision: 1.20.2.5 $
+%   $Revision$
 %   Modified by Andreas Schellenberg (andreas.schellenberg@gmx.net) 11/2004
 
 %
