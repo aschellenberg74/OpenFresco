@@ -1,0 +1,1116 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+    <Filter Include="experimentalControl">
+      <UniqueIdentifier>{e754a337-56b0-4dc6-8ac3-a9e5def1cabb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="experimentalSetup">
+      <UniqueIdentifier>{c3c7577e-de10-4656-9164-7e2e8adaf4a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="experimentalSignalFilter">
+      <UniqueIdentifier>{bba9b6c8-3c2f-4981-af9b-62b4b0982b88}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="experimentalSite">
+      <UniqueIdentifier>{75ff73af-9939-4915-981c-401bb902cf45}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="tcl">
+      <UniqueIdentifier>{2e10bc71-0f3c-40fe-a322-40b178fe602b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="experimentalElement">
+      <UniqueIdentifier>{e2ae0171-4afc-476f-9879-473f511c92ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="experimentalRecorder">
+      <UniqueIdentifier>{a60e9c11-a2df-411a-8ff9-a8b3a7358d8e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="experimentalRecorder\response">
+      <UniqueIdentifier>{684ac5df-8b77-47b9-afdf-ef8c5d2f0f74}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="openseesCore">
+      <UniqueIdentifier>{1819f53b-e110-4c30-807c-efeadf0923fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="openseesExtra">
+      <UniqueIdentifier>{aa933cc7-8a59-4742-bfe2-ca75c6f773be}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\SRC\utility\ExpControlSP.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\utility\ExperimentalCP.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\utility\TclExpCPCommand.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalControl\xPCtarget\xpcinitfree.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalControl\ECdSpace.cpp">
+      <Filter>experimentalControl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalControl\ECLabVIEW.cpp">
+      <Filter>experimentalControl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalControl\ECMtsCsi.cpp">
+      <Filter>experimentalControl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalControl\ECNIEseries.cpp">
+      <Filter>experimentalControl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalControl\ECSCRAMNet.cpp">
+      <Filter>experimentalControl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalControl\ECSimDomain.cpp">
+      <Filter>experimentalControl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalControl\ECSimFEAdapter.cpp">
+      <Filter>experimentalControl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalControl\ECSimSimulink.cpp">
+      <Filter>experimentalControl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalControl\ECSimulation.cpp">
+      <Filter>experimentalControl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalControl\ECSimUniaxialMaterials.cpp">
+      <Filter>experimentalControl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalControl\ECxPCtarget.cpp">
+      <Filter>experimentalControl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalControl\ExperimentalControl.cpp">
+      <Filter>experimentalControl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalControl\TclExpControlCommand.cpp">
+      <Filter>experimentalControl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalSetup\ESAggregator.cpp">
+      <Filter>experimentalSetup</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalSetup\ESFourActuators3d.cpp">
+      <Filter>experimentalSetup</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalSetup\ESInvertedVBrace2d.cpp">
+      <Filter>experimentalSetup</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalSetup\ESInvertedVBraceJntOff2d.cpp">
+      <Filter>experimentalSetup</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalSetup\ESNoTransformation.cpp">
+      <Filter>experimentalSetup</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalSetup\ESOneActuator.cpp">
+      <Filter>experimentalSetup</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalSetup\ESThreeActuators2d.cpp">
+      <Filter>experimentalSetup</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalSetup\ESThreeActuatorsJntOff2d.cpp">
+      <Filter>experimentalSetup</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalSetup\ESTwoActuators2d.cpp">
+      <Filter>experimentalSetup</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalSetup\ExperimentalSetup.cpp">
+      <Filter>experimentalSetup</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalSetup\TclExpSetupCommand.cpp">
+      <Filter>experimentalSetup</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalSignalFilter\ESFErrorSimRandomGauss.cpp">
+      <Filter>experimentalSignalFilter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalSignalFilter\ESFErrorSimulation.cpp">
+      <Filter>experimentalSignalFilter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalSignalFilter\ESFErrorSimUndershoot.cpp">
+      <Filter>experimentalSignalFilter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalSignalFilter\ExperimentalSignalFilter.cpp">
+      <Filter>experimentalSignalFilter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalSignalFilter\TclExpSignalFilterCommand.cpp">
+      <Filter>experimentalSignalFilter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalSite\ActorExpSite.cpp">
+      <Filter>experimentalSite</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalSite\ExperimentalSite.cpp">
+      <Filter>experimentalSite</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalSite\LocalExpSite.cpp">
+      <Filter>experimentalSite</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalSite\ShadowExpSite.cpp">
+      <Filter>experimentalSite</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalSite\TclExpSiteCommand.cpp">
+      <Filter>experimentalSite</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\tcl\tclAppInit.cpp">
+      <Filter>tcl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\tcl\tclMain.cpp">
+      <Filter>tcl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalElement\EEBeamColumn2d.cpp">
+      <Filter>experimentalElement</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalElement\EEBeamColumn3d.cpp">
+      <Filter>experimentalElement</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalElement\EEGeneric.cpp">
+      <Filter>experimentalElement</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalElement\EEInvertedVBrace2d.cpp">
+      <Filter>experimentalElement</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalElement\EETruss.cpp">
+      <Filter>experimentalElement</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalElement\EETrussCorot.cpp">
+      <Filter>experimentalElement</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalElement\EETwoNodeLink.cpp">
+      <Filter>experimentalElement</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalElement\ExperimentalElement.cpp">
+      <Filter>experimentalElement</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalElement\TclEEBeamColumnCommand.cpp">
+      <Filter>experimentalElement</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalElement\TclEEGenericCommand.cpp">
+      <Filter>experimentalElement</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalElement\TclEEInvertedVBraceCommand.cpp">
+      <Filter>experimentalElement</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalElement\TclEETrussCommand.cpp">
+      <Filter>experimentalElement</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalElement\TclEETwoNodeLinkCommand.cpp">
+      <Filter>experimentalElement</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalElement\TclExpElementCommands.cpp">
+      <Filter>experimentalElement</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalRecorder\ExpControlRecorder.cpp">
+      <Filter>experimentalRecorder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalRecorder\ExpSetupRecorder.cpp">
+      <Filter>experimentalRecorder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalRecorder\ExpSignalFilterRecorder.cpp">
+      <Filter>experimentalRecorder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalRecorder\ExpSiteRecorder.cpp">
+      <Filter>experimentalRecorder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalRecorder\TclExpRecorderCommands.cpp">
+      <Filter>experimentalRecorder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalRecorder\response\ExpControlResponse.cpp">
+      <Filter>experimentalRecorder\response</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalRecorder\response\ExpSetupResponse.cpp">
+      <Filter>experimentalRecorder\response</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalRecorder\response\ExpSignalFilterResponse.cpp">
+      <Filter>experimentalRecorder\response</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalRecorder\response\ExpSiteResponse.cpp">
+      <Filter>experimentalRecorder\response</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\tcl\TclStartSimAppSiteServer.cpp">
+      <Filter>tcl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\tcl\TclStartLabServer.cpp">
+      <Filter>tcl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\tcl\TclStartSimAppElemServer.cpp">
+      <Filter>tcl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\tcl\TclModelBuilder.cpp">
+      <Filter>tcl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\Analysis.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\AnalysisModel.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\ArrayOfTaggedObjects.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\ArrayOfTaggedObjectsIter.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\basics.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\BinaryFileStream.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\BJmatrix.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\BJtensor.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\Channel.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\ConstraintHandler.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\DataFileStream.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\DOF_Group.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\DOF_GrpIter.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\Domain.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\DomainComponent.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\Element.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\ElementalLoad.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\ElementalLoadIter.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\ElementResponse.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\FE_Datastore.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\FE_EleIter.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\FE_Element.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\FEM_ObjectBroker.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\FiberResponse.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\Graph.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\ID.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\IncrementalIntegrator.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\Information.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\Integrator.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\LinearSOE.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\LinearSOESolver.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\Load.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\LoadPatternIter.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\MapOfTaggedObjects.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\MapOfTaggedObjectsIter.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\Material.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\MaterialResponse.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\Matrix.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\Message.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\MovableObject.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\MP_Constraint.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\nDarray.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\NodalLoad.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\NodalLoadIter.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\Node.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\ObjectBroker.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\OPS_Stream.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\Parameter.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\Recorder.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\Renderer.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\Response.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\SingleDomAllSP_Iter.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\SingleDomEleIter.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\SingleDomMP_Iter.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\SingleDomNodIter.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\SingleDomParamIter.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\SingleDomSP_Iter.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\SolutionAlgorithm.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\SP_Constraint.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\StandardStream.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\StaticIntegrator.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\Subdomain.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\SubdomainNodIter.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\TaggedObject.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\TransientIntegrator.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\UniaxialMaterial.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\Vector.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\Vertex.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\VertexIter.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\Actor.cpp">
+      <Filter>openseesExtra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\BandGenLinLapackSolver.cpp">
+      <Filter>openseesExtra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\BandGenLinSOE.cpp">
+      <Filter>openseesExtra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\BandGenLinSolver.cpp">
+      <Filter>openseesExtra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\ConvergenceTest.cpp">
+      <Filter>openseesExtra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\CTestNormDispIncr.cpp">
+      <Filter>openseesExtra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\DatabaseStream.cpp">
+      <Filter>openseesExtra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\DOF_Numberer.cpp">
+      <Filter>openseesExtra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\EquiSolnAlgo.cpp">
+      <Filter>openseesExtra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\File.cpp">
+      <Filter>openseesExtra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\FileIter.cpp">
+      <Filter>openseesExtra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\LinearSeries.cpp">
+      <Filter>openseesExtra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\LoadControl.cpp">
+      <Filter>openseesExtra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\LoadPattern.cpp">
+      <Filter>openseesExtra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\ModelBuilder.cpp">
+      <Filter>openseesExtra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\NewtonRaphson.cpp">
+      <Filter>openseesExtra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\PenaltyConstraintHandler.cpp">
+      <Filter>openseesExtra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\PenaltyMP_FE.cpp">
+      <Filter>openseesExtra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\PenaltySP_FE.cpp">
+      <Filter>openseesExtra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\PlainNumberer.cpp">
+      <Filter>openseesExtra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\Shadow.cpp">
+      <Filter>openseesExtra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\SimulationInformation.cpp">
+      <Filter>openseesExtra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\Socket.cpp">
+      <Filter>openseesExtra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\StaticAnalysis.cpp">
+      <Filter>openseesExtra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\StringContainer.cpp">
+      <Filter>openseesExtra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\TCP_Socket.cpp">
+      <Filter>openseesExtra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\TCP_SocketSSL.cpp">
+      <Filter>openseesExtra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\TCP_Stream.cpp">
+      <Filter>openseesExtra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\TimeSeries.cpp">
+      <Filter>openseesExtra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\UDP_Socket.cpp">
+      <Filter>openseesExtra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\XmlFileStream.cpp">
+      <Filter>openseesExtra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\DummyStream.cpp">
+      <Filter>openseesExtra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\MSVCerrno.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\tcl\elementAPI.cpp">
+      <Filter>tcl</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\SRC\utility\ExpControlSP.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\utility\ExperimentalCP.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\FrescoGlobals.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalControl\ECdSpace.h">
+      <Filter>experimentalControl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalControl\ECLabVIEW.h">
+      <Filter>experimentalControl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalControl\ECSimFEAdapter.h">
+      <Filter>experimentalControl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalControl\ECSimSimulink.h">
+      <Filter>experimentalControl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalControl\ECSimulation.h">
+      <Filter>experimentalControl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalControl\ECSimUniaxialMaterials.h">
+      <Filter>experimentalControl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalControl\ECxPCtarget.h">
+      <Filter>experimentalControl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalControl\ExperimentalControl.h">
+      <Filter>experimentalControl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalSetup\ESAggregator.h">
+      <Filter>experimentalSetup</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalSetup\ESFourActuators3d.h">
+      <Filter>experimentalSetup</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalSetup\ESInvertedVBrace2d.h">
+      <Filter>experimentalSetup</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalSetup\ESInvertedVBraceJntOff2d.h">
+      <Filter>experimentalSetup</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalSetup\ESNoTransformation.h">
+      <Filter>experimentalSetup</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalSetup\ESOneActuator.h">
+      <Filter>experimentalSetup</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalSetup\ESThreeActuators2d.h">
+      <Filter>experimentalSetup</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalSetup\ESThreeActuatorsJntOff2d.h">
+      <Filter>experimentalSetup</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalSetup\ESTwoActuators2d.h">
+      <Filter>experimentalSetup</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalSetup\ExperimentalSetup.h">
+      <Filter>experimentalSetup</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalSignalFilter\ESFErrorSimRandomGauss.h">
+      <Filter>experimentalSignalFilter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalSignalFilter\ESFErrorSimulation.h">
+      <Filter>experimentalSignalFilter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalSignalFilter\ESFErrorSimUndershoot.h">
+      <Filter>experimentalSignalFilter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalSignalFilter\ExperimentalSignalFilter.h">
+      <Filter>experimentalSignalFilter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalSite\ActorExpSite.h">
+      <Filter>experimentalSite</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalSite\ExperimentalSite.h">
+      <Filter>experimentalSite</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalSite\LocalExpSite.h">
+      <Filter>experimentalSite</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalSite\ShadowExpSite.h">
+      <Filter>experimentalSite</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalElement\EEBeamColumn2d.h">
+      <Filter>experimentalElement</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalElement\EEBeamColumn3d.h">
+      <Filter>experimentalElement</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalElement\EEGeneric.h">
+      <Filter>experimentalElement</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalElement\EEInvertedVBrace2d.h">
+      <Filter>experimentalElement</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalElement\EETruss.h">
+      <Filter>experimentalElement</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalElement\EETrussCorot.h">
+      <Filter>experimentalElement</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalElement\EETwoNodeLink.h">
+      <Filter>experimentalElement</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalElement\ExperimentalElement.h">
+      <Filter>experimentalElement</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalRecorder\ExpControlRecorder.h">
+      <Filter>experimentalRecorder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalRecorder\ExpSetupRecorder.h">
+      <Filter>experimentalRecorder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalRecorder\ExpSignalFilterRecorder.h">
+      <Filter>experimentalRecorder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalRecorder\ExpSiteRecorder.h">
+      <Filter>experimentalRecorder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalRecorder\response\ExpControlResponse.h">
+      <Filter>experimentalRecorder\response</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalRecorder\response\ExpSetupResponse.h">
+      <Filter>experimentalRecorder\response</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalRecorder\response\ExpSignalFilterResponse.h">
+      <Filter>experimentalRecorder\response</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalRecorder\response\ExpSiteResponse.h">
+      <Filter>experimentalRecorder\response</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\tcl\TclModelBuilder.h">
+      <Filter>tcl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\Analysis.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\AnalysisModel.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\ArrayOfTaggedObjects.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\ArrayOfTaggedObjectsIter.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\basics.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\BinaryFileStream.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\BJmatrix.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\BJtensor.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\Channel.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\classTags.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\ColorMap.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\ConstraintHandler.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\CrdTransf.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\DataFileStream.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\DOF_Group.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\DOF_GrpIter.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\Domain.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\DomainComponent.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\DomainDecompositionAnalysis.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\Element.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\ElementalLoad.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\ElementalLoadIter.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\elementAPI.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\ElementIter.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\ElementResponse.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\EquiSolnAlgo.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\FE_Datastore.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\FE_EleIter.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\FE_Element.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\FEM_ObjectBroker.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\Fiber.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\FiberResponse.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\G3Globals.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\Graph.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\ID.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\IncrementalIntegrator.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\Information.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\Integrator.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\LinearSOE.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\LinearSOESolver.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\Load.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\LoadPattern.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\LoadPatternIter.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\MapOfTaggedObjects.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\MapOfTaggedObjectsIter.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\Material.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\MaterialResponse.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\Matrix.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\MeshRegion.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\Message.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\MovableObject.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\MP_Constraint.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\MP_ConstraintIter.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\nDarray.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\NodalLoad.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\NodalLoadIter.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\Node.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\NodeIter.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\ObjectBroker.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\OPS_Globals.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\OPS_Stream.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\Parameter.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\ParameterIter.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\Recorder.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\Renderer.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\Response.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\SingleDomAllSP_Iter.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\SingleDomEleIter.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\SingleDomMP_Iter.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\SingleDomNodIter.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\SingleDomParamIter.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\SingleDomSP_Iter.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\SolutionAlgorithm.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\SP_Constraint.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\SP_ConstraintIter.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\StandardStream.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\StaticIntegrator.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\Subdomain.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\SubdomainNodIter.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\TaggedObject.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\TaggedObjectIter.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\TaggedObjectStorage.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\Tensor.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\TransientIntegrator.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\UniaxialMaterial.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\Vector.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\Vertex.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\VertexIter.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\Actor.h">
+      <Filter>openseesExtra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\BandGenLinLapackSolver.h">
+      <Filter>openseesExtra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\BandGenLinSOE.h">
+      <Filter>openseesExtra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\BandGenLinSolver.h">
+      <Filter>openseesExtra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\ChannelAddress.h">
+      <Filter>openseesExtra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\ConvergenceTest.h">
+      <Filter>openseesExtra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\CTestNormDispIncr.h">
+      <Filter>openseesExtra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\DatabaseStream.h">
+      <Filter>openseesExtra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\DOF_Numberer.h">
+      <Filter>openseesExtra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\EigenSOE.h">
+      <Filter>openseesExtra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\EquiSolnAlgo.h">
+      <Filter>openseesExtra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\File.h">
+      <Filter>openseesExtra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\FileIter.h">
+      <Filter>openseesExtra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\GraphNumberer.h">
+      <Filter>openseesExtra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\GroundMotion.h">
+      <Filter>openseesExtra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\LinearSeries.h">
+      <Filter>openseesExtra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\LoadControl.h">
+      <Filter>openseesExtra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\LoadPattern.h">
+      <Filter>openseesExtra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\MachineBroker.h">
+      <Filter>openseesExtra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\ModelBuilder.h">
+      <Filter>openseesExtra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\NewtonRaphson.h">
+      <Filter>openseesExtra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\PenaltyConstraintHandler.h">
+      <Filter>openseesExtra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\PenaltyMP_FE.h">
+      <Filter>openseesExtra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\PenaltySP_FE.h">
+      <Filter>openseesExtra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\PlainNumberer.h">
+      <Filter>openseesExtra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\Shadow.h">
+      <Filter>openseesExtra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\SimulationInformation.h">
+      <Filter>openseesExtra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\Socket.h">
+      <Filter>openseesExtra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\SocketAddress.h">
+      <Filter>openseesExtra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\StaticAnalysis.h">
+      <Filter>openseesExtra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\StringContainer.h">
+      <Filter>openseesExtra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\TCP_Socket.h">
+      <Filter>openseesExtra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\TCP_SocketSSL.h">
+      <Filter>openseesExtra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\TCP_Stream.h">
+      <Filter>openseesExtra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\Timer.h">
+      <Filter>openseesExtra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\TimeSeries.h">
+      <Filter>openseesExtra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\TimeSeriesIntegrator.h">
+      <Filter>openseesExtra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\UDP_Socket.h">
+      <Filter>openseesExtra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\XmlFileStream.h">
+      <Filter>openseesExtra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\DummyStream.h">
+      <Filter>openseesExtra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra2\packages.h">
+      <Filter>openseesExtra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\bool.h">
+      <Filter>openseesExtra</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="OpenFresco.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="openFrescoExe.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuildStep Include="..\..\..\SRC\experimentalControl\ECMtsCsi.h">
+      <Filter>experimentalControl</Filter>
+    </CustomBuildStep>
+    <CustomBuildStep Include="..\..\..\SRC\experimentalControl\ECNIEseries.h">
+      <Filter>experimentalControl</Filter>
+    </CustomBuildStep>
+    <CustomBuildStep Include="..\..\..\SRC\experimentalControl\ECSCRAMNet.h">
+      <Filter>experimentalControl</Filter>
+    </CustomBuildStep>
+    <CustomBuildStep Include="..\..\..\SRC\experimentalControl\ECSimDomain.h">
+      <Filter>experimentalControl</Filter>
+    </CustomBuildStep>
+  </ItemGroup>
+</Project>
