@@ -112,7 +112,7 @@ protected:
 private:
     SSL *ssl;
     SSL_CTX *ctx;
-    SSL_METHOD *meth;
+    const SSL_METHOD *meth;
     X509 *cert;
 
     socket_type sockfd;
