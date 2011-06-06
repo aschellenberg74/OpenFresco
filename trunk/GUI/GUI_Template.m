@@ -109,7 +109,7 @@ Question1 = imresize(imread(which('Question1.png')),[questHeight questWidth]);
 
 %Logos
 MTS = imread(which('MTSMetal.png'));
-PEER = imread(which('PEERMetal.png'));
+PEER = imread(which('PEERBoldMetal.png'));
 
 
 %Create Main Figure
@@ -192,18 +192,18 @@ Sidebar(2) = uicontrol('Parent',f,...
 
 %Add Logos
 Sidebar(12) = axes('Parent',f,...
-    'Position',[0.04 0.22 0.08 0.08],...
-    'XTick',[],'YTick',[]);
-image(MTS);
-axis equal; axis off;
-set(get(Sidebar(12),'Children'),'ButtonDownFcn','Links(''MTS'');');
-
-Sidebar(13) = axes('Parent',f,...
-    'Position',[0.02 0.08 0.12 0.12],...
+    'Position',[0.019 0.199 0.121 0.121],...
     'XTick',[],'YTick',[]);
 image(PEER);
 axis equal; axis off;
-set(get(Sidebar(13),'Children'),'ButtonDownFcn','Links(''PEER'');');
+set(get(Sidebar(12),'Children'),'ButtonDownFcn','Links(''PEER'');');
+
+Sidebar(13) = axes('Parent',f,...
+    'Position',[0.044 0.089 0.081 0.081],...
+    'XTick',[],'YTick',[]);
+image(MTS);
+axis equal; axis off;
+set(get(Sidebar(13),'Children'),'ButtonDownFcn','Links(''MTS'');');
 
 %Create Main Display Panel
 ph_Main = uipanel('Parent',f,...
