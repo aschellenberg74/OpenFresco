@@ -11,9 +11,9 @@ function fileList = GetFileList(fileExt,searchDir)
 % Created: 09/10
 % Revision: A
 %
-% $Revision: $
-% $Date: $
-% $URL: $
+% $Revision$
+% $Date$
+% $URL$
 
 p = path;
 semiCol = strfind(p,pathsep);

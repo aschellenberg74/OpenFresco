@@ -896,7 +896,7 @@ switch action
                     return
                 else
                     [Phi OmegaSq] = eig(handles.Model.K, handles.Model.M);
-                    Mode1 = Phi(:,1)./Phi(2,1);
+                    Mode1 = Phi(:,1)./Phi(1,1);
                     Mode2 = Phi(:,2)./Phi(2,2);
                     handles.Model.Modes = [Mode1 Mode2];
                     handles.Model.Omega = sqrt(diag(OmegaSq));
@@ -974,7 +974,7 @@ switch action
                     return
                 else
                     [Phi OmegaSq] = eig(handles.Model.K, handles.Model.M);
-                    Mode1 = Phi(:,1)./Phi(2,1);
+                    Mode1 = Phi(:,1)./Phi(1,1);
                     Mode2 = Phi(:,2)./Phi(2,2);
                     handles.Model.Modes = [Mode1 Mode2];
                     handles.Model.Omega = sqrt(diag(OmegaSq));

@@ -32,6 +32,8 @@ else
             %Start of model generation
             fprintf(FID,'# ------------------------------\n# Start of model generation\n# ------------------------------\n# create ModelBuilder (with two-dimensions and 1 DOF/node)\n');
             fprintf(FID,'model BasicBuilder -ndm 2 -ndf %g\n\n',handles.Model.ndf);
+            fprintf(FID,'# Load OpenFresco package\n# -----------------------\n');
+            fprintf(FID,'loadPackage OpenFresco\n\n');
             %         %Define geometry
             %         fprintf(FID,'# Define geometry for model\n# -------------------------\n# node $tag $xCrd $yCrd $mass\n');
             %         fprintf(FID,'node  1     0.0   0.0\nnode  2     0.0   1.0  -mass  %+1.6E  0.0\n',handles.Model.M);
@@ -199,6 +201,8 @@ else
             %Start of model generation
             fprintf(FID,'# ------------------------------\n# Start of model generation\n# ------------------------------\n# create ModelBuilder (with two-dimensions and 2 DOF/node)\n');
             fprintf(FID,'model BasicBuilder -ndm 2 -ndf %g\n\n',handles.Model.ndf);
+            fprintf(FID,'# Load OpenFresco package\n# -----------------------\n');
+            fprintf(FID,'loadPackage OpenFresco\n\n');
             
             switch handles.ExpControl.Type
                 case 'Simulation'
@@ -399,6 +403,8 @@ else
             %Start of model generation
             fprintf(FID,'# ------------------------------\n# Start of model generation\n# ------------------------------\n# create ModelBuilder (with three-dimensions and 2 DOF/node)\n');
             fprintf(FID,'model BasicBuilder -ndm 3 -ndf 3\n\n');
+            fprintf(FID,'# Load OpenFresco package\n# -----------------------\n');
+            fprintf(FID,'loadPackage OpenFresco\n\n');
             %         %Define geometry
             %         fprintf(FID,'# Define geometry for model\n# -------------------------\n# node $tag $xCrd $yCrd $mass\n');
             %         fprintf(FID,'node  1     0.0   0.0   0.0\nnode  2     0.0   0.0   1.0  -mass  %+1.6E  %+1.6E   0.0\n',handles.Model.M(1,1),handles.Model.M(2,2));

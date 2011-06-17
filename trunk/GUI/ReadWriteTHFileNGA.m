@@ -29,8 +29,8 @@ function varargout = ReadWriteTHFileNGA(action,fileIN,fileOUT)
 %
 % $Revised to handle new and old versions of PEER database, as well as
 % unrecognized formats. Designed for use with OpenFresco Express.
-% $Date: 2010-07-13 (Tue, 13 Jul 2010) $
-% $URL: $
+% $Date$
+% $URL$
 
 %  Initialization tasks
 handles = guidata(gcbf);

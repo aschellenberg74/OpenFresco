@@ -12,9 +12,9 @@ function GUI_Output(text,title,figtitle,width,height)
 % Created: 09/10
 % Revision: A
 %
-% $Revision: 409 $
-% $Date: 2010-09-22 22:52:11 -0700 (Wed, 22 Sep 2010) $
-% $URL: $ 
+% $Revision$
+% $Date$
+% $URL$ 
 
 % set some default parameters
 if nargin<2

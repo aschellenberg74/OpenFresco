@@ -8,9 +8,9 @@ function UpdatePragmaList(pathOPF)
 % Created: 09/10
 % Revision: A
 %
-% $Revision: $
-% $Date: $
-% $URL: $
+% $Revision$
+% $Date$
+% $URL$
 
 % open files
 FIDr = fopen('OpenFrescoExpress.m','r');

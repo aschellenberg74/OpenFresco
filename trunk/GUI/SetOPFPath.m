@@ -5,9 +5,9 @@
 % Created: 09/10
 % Revision: A
 %
-% $Revision: $
-% $Date: $
-% $URL: $
+% $Revision$
+% $Date$
+% $URL$
 
 % clean start
 clear all; close all; clc;

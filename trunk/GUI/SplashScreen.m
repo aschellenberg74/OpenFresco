@@ -7,15 +7,22 @@ end
 
 % show splash screen
 SS = get(0,'screensize');
-Width = 0.8*0.81*0.92*SS(3);
-Height = 0.8*0.9*0.88*SS(4);
+if ispc
+   Width = 0.8*0.81*0.92*SS(3);
+   Height = 0.8*0.9*0.88*SS(4);
+   Position = [0.254*SS(3) 0.186*SS(4) Width Height];
+else
+   Width = 0.84*0.81*0.92*SS(3);
+   Height = 0.81*0.9*0.88*SS(4);
+   Position = [0.24*SS(3) 0.186*SS(4) Width Height];
+end
 
 % create window
 figure('NumberTitle','off',...
     'Color','w',...
     'MenuBar','none',...
     'Tag','SplashScreen',...
-    'Position',[0.254*SS(3) 0.186*SS(4) Width Height]);
+    'Position',Position);
 
 uicontrol('Style','text', ...
    'Units','normalized', ...

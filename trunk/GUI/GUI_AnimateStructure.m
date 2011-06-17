@@ -85,9 +85,13 @@ switch handles.Model.Type
             'EdgeColor','interp','LineWidth',5.0, ...
             'Marker','s','MarkerSize',12, ...
             'MarkerFaceColor','k','MarkerEdgeColor','none');
-        
-        id = find(handles.GM.Spectra{1}.T > handles.Model.T(1));
-        xlim = handles.GM.Spectra{1}.dsp(id(1),1);
+
+        if strcmp(handles.GM.loadType,'Ground Motions')
+            id = find(handles.GM.Spectra{1}.T > handles.Model.T(1));
+            xlim = handles.GM.Spectra{1}.dsp(id(1),1);
+        elseif strcmp(handles.GM.loadType,'Initial Conditions')
+            xlim = handles.GM.initialDisp;
+        end
         set(a,'XLim',[-3*xlim,3*xlim],'YLim',[-1,11], ...
             'CLim',[0,xlim]);
         set(handles.Plots.ColorBarMax,'String',num2str(xlim,3));
@@ -107,8 +111,12 @@ switch handles.Model.Type
             'Marker','s','MarkerSize',12, ...
             'MarkerFaceColor','k','MarkerEdgeColor','none');
         
-        id = find(handles.GM.Spectra{1}.T > handles.Model.T(1));
-        xlim = handles.GM.Spectra{1}.dsp(id(1),1);
+        if strcmp(handles.GM.loadType,'Ground Motions')
+            id = find(handles.GM.Spectra{1}.T > handles.Model.T(1));
+            xlim = handles.GM.Spectra{1}.dsp(id(1),1);
+        elseif strcmp(handles.GM.loadType,'Initial Conditions')
+            xlim = handles.GM.initialDisp(2);
+        end
         set(a,'XLim',[-3*xlim,3*xlim],'YLim',[-1,11], ...
             'CLim',[0,xlim]);
         set(handles.Plots.ColorBarMax,'String',num2str(xlim,3));
@@ -126,15 +134,22 @@ switch handles.Model.Type
             'Marker','s','MarkerSize',12, ...
             'MarkerFaceColor','k','MarkerEdgeColor','none');
         
-        id = find(handles.GM.Spectra{1}.T > handles.Model.T(1));
-        xlim = handles.GM.Spectra{1}.dsp(id(1),1);
-        ylim = handles.GM.Spectra{2}.dsp(id(1),1);
-        xylim = max(xlim,ylim);
+        if strcmp(handles.GM.loadType,'Ground Motions')
+            T = 2*pi./sqrt(handles.Model.K(1,1)/handles.Model.M(1,1));
+            id = find(handles.GM.Spectra{1}.T > T);
+            xlim = handles.GM.Spectra{1}.dsp(id(1),1);
+            T = 2*pi./sqrt(handles.Model.K(2,2)/handles.Model.M(2,2));
+            id = find(handles.GM.Spectra{2}.T > T);
+            ylim = handles.GM.Spectra{2}.dsp(id(1),2);
+        elseif strcmp(handles.GM.loadType,'Initial Conditions')
+            xlim = handles.GM.initialDisp(1);
+            ylim = handles.GM.initialDisp(2);
+        end
+        xylim = norm([xlim,ylim]);
         set(a,'XLim',[-3*xylim,3*xylim],'YLim',[-3*xylim,3*xylim], ...
-            'ZLim',[-1,11],'CLim',[0,xlim]);
-        set(handles.Plots.ColorBarMax,'String',num2str(xlim,3));
+            'ZLim',[-1,11],'CLim',[0,xylim]);
+        set(handles.Plots.ColorBarMax,'String',num2str(xylim,3));
         view(3);
-        
 end
 
 % save the handles
