@@ -1,6 +1,6 @@
 function errorCode = RunOpenFresco(opfPath,tclFile)
 %RUNOPENFRESCO to run OpenFresco and source in the provided tcl file
-% RunOpenFresco(opfFile,tclFile)
+% errorCode = RunOpenFresco(opfPath,tclFile)
 %
 % errorCode : error code returned by dos or system command
 % opfPath   : path to OpenFresco.exe executable file
@@ -12,12 +12,12 @@ function errorCode = RunOpenFresco(opfPath,tclFile)
 
 % write the command line for execution
 if ispc
-   command = ['@ "',fullfile(opfPath,'OpenFresco.exe'),'" "',tclFile,'"'];
+   command = ['@ "',fullfile(opfPath,'openSees.exe'),'" "',tclFile,'"'];
 elseif ismac || isunix
-   command = ['"',fullfile(opfPath,'OpenFresco'),'" "',tclFile,'"'];
+   command = ['"',fullfile(opfPath,'OpenSees'),'" "',tclFile,'"'];
 end
 
-% run OpenFresco in console
+% run OpenSees in console (this will load OpenFresco.dll) 
 if ispc
    errorCode = dos([command,' & exit &']);
 elseif ismac || isunix

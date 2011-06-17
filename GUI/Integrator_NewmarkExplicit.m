@@ -44,10 +44,11 @@ C = Model.alphaM*M + Model.betaK*K;
 %%%%%%%%%%%%%%%%%%%%%%
 % Setup Loading Data
 %%%%%%%%%%%%%%%%%%%%%%
+b = Model.b;
+numMotions = size(b,2);
 switch GroundMotion.loadType
 case 'Ground Motions'
     % find longest motion
-    numMotions = length(GroundMotion.dt);
     tEnd = 0.0;
     for mo=1:numMotions
         tEndi = GroundMotion.scalet{mo}(end);
@@ -69,7 +70,6 @@ case 'Ground Motions'
     iImpEnd = 1;
 case 'Initial Conditions'
     % load analysis times for the two loading phases
-    numMotions = length(GroundMotion.dt);
     deltaT = GroundMotion.dtAnalysis;
     tImposed = deltaT*(0:floor(GroundMotion.rampTime(1)/deltaT));
     tFree = deltaT*(length(tImposed)+1:floor((GroundMotion.rampTime(1)+GroundMotion.vibTime(1))/deltaT));
@@ -84,7 +84,6 @@ case 'Initial Conditions'
     iImpEnd = size(Uimp,2);
 case 'None'
     % load total analysis time
-    numMotions = length(GroundMotion.dt);
     tEnd = GroundMotion.tEnd;
     deltaT = GroundMotion.dtAnalysis;
     t = deltaT*(0:floor(tEnd/deltaT));
@@ -96,7 +95,6 @@ case 'None'
     Uimp = zeros(ndf,1);
     iImpEnd = 1;
 end
-b = Model.b;
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
