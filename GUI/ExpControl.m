@@ -1,12 +1,38 @@
-function ExpControl(action, varargin)
-% EXPCONTROL handles user inputs related to the Experimental Control 
-% action     : selected action on the Experimental Control page
+function ExpControl(action,varargin)
+%EXPCONTROL to handle user inputs related to the Experimental Control
+% ExpControl(action,varargin)
+%
+% action   : selected action on the Experimental Control page
+% varargin : variable length input argument list
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                          OpenFresco Express                          %%
+%%    GUI for the Open Framework for Experimental Setup and Control     %%
+%%                                                                      %%
+%%   (C) Copyright 2011, The Pacific Earthquake Engineering Research    %%
+%%            Center (PEER) & MTS Systems Corporation (MTS)             %%
+%%                         All Rights Reserved.                         %%
+%%                                                                      %%
+%%     Commercial use of this program without express permission of     %%
+%%                 PEER and MTS is strictly prohibited.                 %%
+%%     See Help -> OpenFresco Express Disclaimer for information on     %%
+%%   usage and redistribution, and for a DISCLAIMER OF ALL WARRANTIES.  %%
+%%                                                                      %%
+%%   Developed by:                                                      %%
+%%     Andreas Schellenberg (andreas.schellenberg@gmail.com)            %%
+%%     Carl Misra (carl.misra@gmail.com)                                %%
+%%     Stephen A. Mahin (mahin@berkeley.edu)                            %%
+%%                                                                      %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% $Revision$
+% $Date$
+% $URL$
 
-%  Initialization tasks
+% Initialization tasks
 handles = guidata(gcbf);
 
-
-%Store which tab is selected
+% Store which tab is selected
 Tab_Selection = get(gcbo,'Tag');
 
 switch action

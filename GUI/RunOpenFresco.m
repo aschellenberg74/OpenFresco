@@ -1,14 +1,34 @@
 function errorCode = RunOpenFresco(opfPath,tclFile)
-%RUNOPENFRESCO to run OpenFresco and source in the provided tcl file
+%RUNOPENFRESCO to run OpenFresco and source the provided tcl file
 % errorCode = RunOpenFresco(opfPath,tclFile)
 %
 % errorCode : error code returned by dos or system command
 % opfPath   : path to OpenFresco.exe executable file
 % tclFile   : tcl file (including path) to be sourced
-
-% Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
-% Created: 07/10
-% Revision: A
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                          OpenFresco Express                          %%
+%%    GUI for the Open Framework for Experimental Setup and Control     %%
+%%                                                                      %%
+%%   (C) Copyright 2011, The Pacific Earthquake Engineering Research    %%
+%%            Center (PEER) & MTS Systems Corporation (MTS)             %%
+%%                         All Rights Reserved.                         %%
+%%                                                                      %%
+%%     Commercial use of this program without express permission of     %%
+%%                 PEER and MTS is strictly prohibited.                 %%
+%%     See Help -> OpenFresco Express Disclaimer for information on     %%
+%%   usage and redistribution, and for a DISCLAIMER OF ALL WARRANTIES.  %%
+%%                                                                      %%
+%%   Developed by:                                                      %%
+%%     Andreas Schellenberg (andreas.schellenberg@gmail.com)            %%
+%%     Carl Misra (carl.misra@gmail.com)                                %%
+%%     Stephen A. Mahin (mahin@berkeley.edu)                            %%
+%%                                                                      %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% $Revision$
+% $Date$
+% $URL$
 
 % write the command line for execution
 if ispc

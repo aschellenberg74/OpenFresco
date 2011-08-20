@@ -2,13 +2,34 @@ function [f,MX] = GetFFT(data,dt)
 %GETFFT to get the scaled FFT and plot it if requested
 % [f,MX] = GetFFT(data,dt)
 %
-% f        : frequency vector [Hz]
-% MX       : scaled magnitude vector
-% data     : input data (column) vector
-% dt       : sampling time [sec]
+% f    : frequency vector [Hz]
+% MX   : scaled magnitude vector
+% data : input data (column) vector
+% dt   : sampling time [sec]
 %
-% implemented by Tony Yang (yangtony2004@gmail.com) 08/2003
-% modified by Andreas Schellenberg (andreas.schellenberg@gmail.com) 04/2005
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                          OpenFresco Express                          %%
+%%    GUI for the Open Framework for Experimental Setup and Control     %%
+%%                                                                      %%
+%%   (C) Copyright 2011, The Pacific Earthquake Engineering Research    %%
+%%            Center (PEER) & MTS Systems Corporation (MTS)             %%
+%%                         All Rights Reserved.                         %%
+%%                                                                      %%
+%%     Commercial use of this program without express permission of     %%
+%%                 PEER and MTS is strictly prohibited.                 %%
+%%     See Help -> OpenFresco Express Disclaimer for information on     %%
+%%   usage and redistribution, and for a DISCLAIMER OF ALL WARRANTIES.  %%
+%%                                                                      %%
+%%   Developed by:                                                      %%
+%%     Andreas Schellenberg (andreas.schellenberg@gmail.com)            %%
+%%     Carl Misra (carl.misra@gmail.com)                                %%
+%%     Stephen A. Mahin (mahin@berkeley.edu)                            %%
+%%                                                                      %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% $Revision$
+% $Date$
+% $URL$
 
 Fs = 1/dt;              % sampling frequency
 Fn = Fs/2;              % Nyquist frequency

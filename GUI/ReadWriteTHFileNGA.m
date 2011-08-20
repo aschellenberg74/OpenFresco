@@ -1,7 +1,7 @@
 function varargout = ReadWriteTHFileNGA(action,fileIN,fileOUT)
-%READWRITETHFILE to read and write a time history file, modified for use
-%with OpenFresco Express
-% varargout = ReadWriteTHFile(action,fileIN,fileOUT)
+%READWRITETHFILENGA to read and write a time history file, modified for use
+% with OpenFresco Express
+% varargout = ReadWriteTHFileNGA(action,fileIN,fileOUT)
 %
 % action  : switch with following possible values
 %              'readDT'     read time increment dt from file and output dt
@@ -11,31 +11,33 @@ function varargout = ReadWriteTHFileNGA(action,fileIN,fileOUT)
 % fileOUT : text string containing the output time history filename and its path
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%                          OpenSees Navigator                          %%
-%% Matlab Engineering Toolbox for Analysis of Structures using OpenSees %%
+%%                          OpenFresco Express                          %%
+%%    GUI for the Open Framework for Experimental Setup and Control     %%
 %%                                                                      %%
-%%                   Andreas Schellenberg & Tony Yang                   %%
-%%        andreas.schellenberg@gmail.com, yangtony2004@gmail.com        %%
+%%   (C) Copyright 2011, The Pacific Earthquake Engineering Research    %%
+%%            Center (PEER) & MTS Systems Corporation (MTS)             %%
+%%                         All Rights Reserved.                         %%
 %%                                                                      %%
-%%    Department of Civil and Environmental Engineering, UC Berkeley    %%
-%%   (C) Copyright 2004, The Regents of the University of California    %%
-%%                         All Rights Reserved                          %%
+%%     Commercial use of this program without express permission of     %%
+%%                 PEER and MTS is strictly prohibited.                 %%
+%%     See Help -> OpenFresco Express Disclaimer for information on     %%
+%%   usage and redistribution, and for a DISCLAIMER OF ALL WARRANTIES.  %%
 %%                                                                      %%
-%%   Commercial use of this program without express permission of the   %%
-%%     University of California, Berkeley, is strictly prohibited.      %%
-%%     See Help -> OpenSees Navigator Disclaimer for information on     %%
-%%  usage and redistribution,  and for a DISCLAIMER OF ALL WARRANTIES.  %%
+%%   Developed by:                                                      %%
+%%     Andreas Schellenberg (andreas.schellenberg@gmail.com)            %%
+%%     Carl Misra (carl.misra@gmail.com)                                %%
+%%     Stephen A. Mahin (mahin@berkeley.edu)                            %%
+%%                                                                      %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% $Revised to handle new and old versions of PEER database, as well as
-% unrecognized formats. Designed for use with OpenFresco Express.
+% $Revision$
 % $Date$
 % $URL$
 
-%  Initialization tasks
+% Initialization tasks
 handles = guidata(gcbf);
 
-%Identify which PEER database, if any, has been used
+% Identify which PEER database, if any, has been used
 fin = fopen(fileIN,'r');
 firstLine = fgetl(fin);
 words = strread(lower(firstLine),'%s');

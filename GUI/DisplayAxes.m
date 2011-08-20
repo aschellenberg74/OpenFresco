@@ -1,8 +1,35 @@
 function DisplayAxes(action,varargin)
-%DISPLAYAXES expands certain plots for better visibility
-% action     : selected plot to expand
+%DISPLAYAXES to expand certain plots for better visibility
+% DisplayAxes(action,varargin)
+%
+% action   : selected plot to expand
+% varargin : variable length input argument list
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                          OpenFresco Express                          %%
+%%    GUI for the Open Framework for Experimental Setup and Control     %%
+%%                                                                      %%
+%%   (C) Copyright 2011, The Pacific Earthquake Engineering Research    %%
+%%            Center (PEER) & MTS Systems Corporation (MTS)             %%
+%%                         All Rights Reserved.                         %%
+%%                                                                      %%
+%%     Commercial use of this program without express permission of     %%
+%%                 PEER and MTS is strictly prohibited.                 %%
+%%     See Help -> OpenFresco Express Disclaimer for information on     %%
+%%   usage and redistribution, and for a DISCLAIMER OF ALL WARRANTIES.  %%
+%%                                                                      %%
+%%   Developed by:                                                      %%
+%%     Andreas Schellenberg (andreas.schellenberg@gmail.com)            %%
+%%     Carl Misra (carl.misra@gmail.com)                                %%
+%%     Stephen A. Mahin (mahin@berkeley.edu)                            %%
+%%                                                                      %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% $Revision$
+% $Date$
+% $URL$
 
-%  Initialization tasks
+% Initialization tasks
 handles = guidata(gcf);
 SS = get(0,'screensize');
 

@@ -2,14 +2,35 @@ function Response = TerminateAnalysis(Model,GroundMotion,LastState,Analysis)
 %TERMINATEANALYSIS to stop a running analysis in OpenFresco Express
 % Response = TerminateAnalysis(Model,GroundMotion,LastState,Analysis)
 %
+% Response     : data structure with response results
 % Model        : data structure with structural model information
 % GroundMotion : data structure with ground motion information
 % LastState    : data structure with last state conditions
 % Analysis     : handles for analysis page
-
-% Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
-% Created: 07/10
-% Revision: A
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                          OpenFresco Express                          %%
+%%    GUI for the Open Framework for Experimental Setup and Control     %%
+%%                                                                      %%
+%%   (C) Copyright 2011, The Pacific Earthquake Engineering Research    %%
+%%            Center (PEER) & MTS Systems Corporation (MTS)             %%
+%%                         All Rights Reserved.                         %%
+%%                                                                      %%
+%%     Commercial use of this program without express permission of     %%
+%%                 PEER and MTS is strictly prohibited.                 %%
+%%     See Help -> OpenFresco Express Disclaimer for information on     %%
+%%   usage and redistribution, and for a DISCLAIMER OF ALL WARRANTIES.  %%
+%%                                                                      %%
+%%   Developed by:                                                      %%
+%%     Andreas Schellenberg (andreas.schellenberg@gmail.com)            %%
+%%     Carl Misra (carl.misra@gmail.com)                                %%
+%%     Stephen A. Mahin (mahin@berkeley.edu)                            %%
+%%                                                                      %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% $Revision$
+% $Date$
+% $URL$
 
 % get handles of main window
 handles = guidata(findobj('Tag','OpenFrescoExpress'));
