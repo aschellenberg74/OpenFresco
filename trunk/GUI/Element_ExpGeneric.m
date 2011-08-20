@@ -1,8 +1,9 @@
 function varargout = Element_ExpGeneric(action,ElmData,disp)
-%ELEMENT_EXPGENERIC experimental generic element
+%ELEMENT_EXPGENERIC to define an experimental generic element
 % varargout = Element_ExpGeneric(action,ElmData,disp)
 %
-% action  : switch with following possible values
+% varargout : variable length output argument list
+% action    : switch with following possible values
 %              'initialize'         initialize internal variables
 %              'setTrialDisp'       set the trial displacements
 %              'getDisp'            get the current displacements
@@ -11,12 +12,32 @@ function varargout = Element_ExpGeneric(action,ElmData,disp)
 %              'getInitialStiff'    get the initial stiffness
 %              'commitState'        commit state of internal variables
 %              'disconnect'         disconnect from experimental site
-% ElmData : data structure with element information
-% disp    : trial displacement
-
-% Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
-% Created: 07/10
-% Revision: A
+% ElmData   : data structure with element information
+% disp      : trial displacement
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                          OpenFresco Express                          %%
+%%    GUI for the Open Framework for Experimental Setup and Control     %%
+%%                                                                      %%
+%%   (C) Copyright 2011, The Pacific Earthquake Engineering Research    %%
+%%            Center (PEER) & MTS Systems Corporation (MTS)             %%
+%%                         All Rights Reserved.                         %%
+%%                                                                      %%
+%%     Commercial use of this program without express permission of     %%
+%%                 PEER and MTS is strictly prohibited.                 %%
+%%     See Help -> OpenFresco Express Disclaimer for information on     %%
+%%   usage and redistribution, and for a DISCLAIMER OF ALL WARRANTIES.  %%
+%%                                                                      %%
+%%   Developed by:                                                      %%
+%%     Andreas Schellenberg (andreas.schellenberg@gmail.com)            %%
+%%     Carl Misra (carl.misra@gmail.com)                                %%
+%%     Stephen A. Mahin (mahin@berkeley.edu)                            %%
+%%                                                                      %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% $Revision$
+% $Date$
+% $URL$
 
 % socket identifier
 persistent socketID;

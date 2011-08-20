@@ -1,6 +1,34 @@
 function OpenFrescoExpress(action)
-%OPENFRESCOEXPRESS launches disclaimer and OpenFrescoExpress program
-% action        : defines how to proceed
+%OPENFRESCOEXPRESS to launch OpenFrescoExpress and display the disclaimer
+% OpenFrescoExpress(action)
+%
+% action : switch with following possible values
+%             'startup'  to show disclaimer during startup
+%             'about'    to show disclaimer from the help menu
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                          OpenFresco Express                          %%
+%%    GUI for the Open Framework for Experimental Setup and Control     %%
+%%                                                                      %%
+%%   (C) Copyright 2011, The Pacific Earthquake Engineering Research    %%
+%%            Center (PEER) & MTS Systems Corporation (MTS)             %%
+%%                         All Rights Reserved.                         %%
+%%                                                                      %%
+%%     Commercial use of this program without express permission of     %%
+%%                 PEER and MTS is strictly prohibited.                 %%
+%%     See Help -> OpenFresco Express Disclaimer for information on     %%
+%%   usage and redistribution, and for a DISCLAIMER OF ALL WARRANTIES.  %%
+%%                                                                      %%
+%%   Developed by:                                                      %%
+%%     Andreas Schellenberg (andreas.schellenberg@gmail.com)            %%
+%%     Carl Misra (carl.misra@gmail.com)                                %%
+%%     Stephen A. Mahin (mahin@berkeley.edu)                            %%
+%%                                                                      %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% $Revision$
+% $Date$
+% $URL$
 
 if (nargin==0)
     action = 'startup';
@@ -19,6 +47,8 @@ TEXT = ['\nThe Pacific Earthquake Engineering Research Center (PEER), MTS System
         'program has been developed by researchers at PEER. PEER, MTS and the authors ' ...
         'do not warrant that the operation of the program will be uninterrupted or ' ...
         'error-free.\n\n' ...
+        'Please acknowledge in the acknowledgment section of any resulting publications '...
+        'use of OpenFresco Express.\n\n' ...
         'IN NO EVENT SHALL PEER OR MTS OR THE AUTHORS BE LIABLE FOR PERSONAL INJURY, ' ...
         'OR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ' ...
         'WHATSOEVER, INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOST PROFITS, LOSS OF ' ...

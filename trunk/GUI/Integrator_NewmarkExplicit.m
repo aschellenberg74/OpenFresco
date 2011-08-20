@@ -1,17 +1,37 @@
 function Response = Integrator_NewmarkExplicit(Model,GroundMotion,InitialState,Analysis)
 %INTEGRATOR_NEWMARKEXPLICIT to perform a direct integration analysis using
 % the second order explicit Newmark method
-% Response = Integrator_NewmarkExplicit(Model,GroundMotion,InitCond,Analysis)
+% Response = Integrator_NewmarkExplicit(Model,GroundMotion,InitialState,Analysis)
 %
 % Response     : data structure with response results
 % Model        : data structure with structural model information
 % GroundMotion : data structure with ground motion information
 % InitialState : data structure with initial conditions
 % Analysis     : handles for analysis page
-
-% Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
-% Created: 07/10
-% Revision: A
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                          OpenFresco Express                          %%
+%%    GUI for the Open Framework for Experimental Setup and Control     %%
+%%                                                                      %%
+%%   (C) Copyright 2011, The Pacific Earthquake Engineering Research    %%
+%%            Center (PEER) & MTS Systems Corporation (MTS)             %%
+%%                         All Rights Reserved.                         %%
+%%                                                                      %%
+%%     Commercial use of this program without express permission of     %%
+%%                 PEER and MTS is strictly prohibited.                 %%
+%%     See Help -> OpenFresco Express Disclaimer for information on     %%
+%%   usage and redistribution, and for a DISCLAIMER OF ALL WARRANTIES.  %%
+%%                                                                      %%
+%%   Developed by:                                                      %%
+%%     Andreas Schellenberg (andreas.schellenberg@gmail.com)            %%
+%%     Carl Misra (carl.misra@gmail.com)                                %%
+%%     Stephen A. Mahin (mahin@berkeley.edu)                            %%
+%%                                                                      %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% $Revision$
+% $Date$
+% $URL$
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Extract Model Parameters

@@ -1,18 +1,44 @@
 function [error, f, MX, TI] = AnimateResponse(Type,t,ag,U,Udotdot,Pr,Um)
 %ANIMATERESPONSE switches over the model type to choose which plots to
-%populate with the structural response and error monitoring data
-% error        : displacement error
-% f            : error frequency vector
-% MX           : fourier amplitude of the error
-% TI           : error tracking indicator
+% populate with the structural response and error monitoring data
+% [error, f, MX, TI] = AnimateResponse(Type,t,ag,U,Udotdot,Pr,Um)
 %
-% Type         : structural model type
-% t            : vector of time steps for analysis
-% ag           : vector of ground motion values
-% U            : command displacement values
-% Udotdot      : acceleration values
-% Pr           : resisting force
-% Um           : measured displacement values
+% error   : displacement error
+% f       : error frequency vector
+% MX      : fourier amplitude of the error
+% TI      : error tracking indicator
+%
+% Type    : structural model type
+% t       : vector of time steps for analysis
+% ag      : vector of ground motion values
+% U       : command displacement values
+% Udotdot : acceleration values
+% Pr      : resisting force
+% Um      : measured displacement values
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                          OpenFresco Express                          %%
+%%    GUI for the Open Framework for Experimental Setup and Control     %%
+%%                                                                      %%
+%%   (C) Copyright 2011, The Pacific Earthquake Engineering Research    %%
+%%            Center (PEER) & MTS Systems Corporation (MTS)             %%
+%%                         All Rights Reserved.                         %%
+%%                                                                      %%
+%%     Commercial use of this program without express permission of     %%
+%%                 PEER and MTS is strictly prohibited.                 %%
+%%     See Help -> OpenFresco Express Disclaimer for information on     %%
+%%   usage and redistribution, and for a DISCLAIMER OF ALL WARRANTIES.  %%
+%%                                                                      %%
+%%   Developed by:                                                      %%
+%%     Andreas Schellenberg (andreas.schellenberg@gmail.com)            %%
+%%     Carl Misra (carl.misra@gmail.com)                                %%
+%%     Stephen A. Mahin (mahin@berkeley.edu)                            %%
+%%                                                                      %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% $Revision$
+% $Date$
+% $URL$
 
 % Initialization tasks
 handles = guidata(findobj('Tag','OpenFrescoExpress'));

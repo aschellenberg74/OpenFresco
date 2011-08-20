@@ -1,14 +1,41 @@
-function [error message] = InputCheck(varargin)
-%INPUTCHECK checks inputs for completeness before writing the TCL file
-% error        : returns the flag for errors found
-% message      : returns the relevant error message
+function [error,message] = InputCheck(varargin)
+%INPUTCHECK to check inputs for completeness before writing the TCL file
+% [error,message] = InputCheck(varargin)
+%
+% error    : returns the flag for errors found
+% message  : returns the relevant error message
+% varargin : variable length input argument list
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                          OpenFresco Express                          %%
+%%    GUI for the Open Framework for Experimental Setup and Control     %%
+%%                                                                      %%
+%%   (C) Copyright 2011, The Pacific Earthquake Engineering Research    %%
+%%            Center (PEER) & MTS Systems Corporation (MTS)             %%
+%%                         All Rights Reserved.                         %%
+%%                                                                      %%
+%%     Commercial use of this program without express permission of     %%
+%%                 PEER and MTS is strictly prohibited.                 %%
+%%     See Help -> OpenFresco Express Disclaimer for information on     %%
+%%   usage and redistribution, and for a DISCLAIMER OF ALL WARRANTIES.  %%
+%%                                                                      %%
+%%   Developed by:                                                      %%
+%%     Andreas Schellenberg (andreas.schellenberg@gmail.com)            %%
+%%     Carl Misra (carl.misra@gmail.com)                                %%
+%%     Stephen A. Mahin (mahin@berkeley.edu)                            %%
+%%                                                                      %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% $Revision$
+% $Date$
+% $URL$
 
-%  Initialization tasks
+% Initialization tasks
 handles = guidata(gcbf);
 error = 0;
 message = 'Writing of the .tcl file failed!';
 
-%check for model chosen and loading
+% check for model chosen and loading
 if isempty(handles.Model.Type)
     error = 1;
     message = sprintf('Writing of the .tcl file failed!\nModel type not specified.');
