@@ -69,11 +69,11 @@ expSite LocalSite 2 2
 # Define experimental elements
 # ----------------------------
 # left column
-# element genericClient $eleTag -node $Ndi $Ndj ... -dof $dofNdi -dof $dofNdj ... -server $ipPort <$ipAddr> <-ssl> <-dataSize $size>
+# element genericClient $eleTag -node $Ndi $Ndj ... -dof $dofNdi -dof $dofNdj ... -server $ipPort <$ipAddr> <-ssl> <-udp> <-dataSize $size>
 #element genericClient 1 -node 1 3 -dof 1 2 -dof 1 2 -server 8090;  # use with SimAppElemServer
 
-# expElement twoNodeLink $eleTag $iNode $jNode -dir $dirs -server $ipPort <ipAddr> <-ssl> <-dataSize $size> -initStif $Kij <-orient <$x1 $x2 $x3> $y1 $y2 $y3> <-pDelta Mratios> <-iMod> <-mass $m>
-expElement twoNodeLink 1 1 3 -dir 2 -server 8090 -initStif 2.8;  # use with SimAppSiteServer
+# expElement twoNodeLink $eleTag $iNode $jNode -dir $dirs -server $ipPort <ipAddr> <-ssl> <-udp> <-dataSize $size> -initStif $Kij <-orient <$x1 $x2 $x3> $y1 $y2 $y3> <-pDelta Mratios> <-iMod> <-mass $m>
+expElement twoNodeLink 1 1 3 -dir 2 -server 8090 -udp -initStif 2.8;  # use with SimAppSiteServer
 
 # Define numerical elements
 # -------------------------
@@ -182,6 +182,7 @@ puts "\nElapsed Time = $tTot \n"
 close $outFileID
 
 wipe
+exit
 # --------------------------------
 # End of analysis
 # --------------------------------

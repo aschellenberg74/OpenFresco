@@ -50,7 +50,7 @@ uniaxialMaterial Elastic 3 [expr 2.0*100.0/1.0]
 
 # Define experimental site
 # ------------------------
-# expSite ShadowSite $tag <-setup $setupTag> $ipAddr $ipPort <-ssl> <-dataSize $size>
+# expSite ShadowSite $tag <-setup $setupTag> $ipAddr $ipPort <-ssl> <-udp> <-dataSize $size>
 expSite ShadowSite 1 "127.0.0.1" 8090
 expSite ShadowSite 2 "127.0.0.1" 8091
 
@@ -164,6 +164,7 @@ puts "\nElapsed Time = $tTot \n"
 close $outFileID
 
 wipe
+exit
 # --------------------------------
 # End of analysis
 # --------------------------------

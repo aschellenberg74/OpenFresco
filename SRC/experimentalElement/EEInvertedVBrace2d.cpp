@@ -40,6 +40,7 @@
 #include <ElementResponse.h>
 #include <TCP_Socket.h>
 #include <TCP_SocketSSL.h>
+#include <UDP_Socket.h>
 
 #include <math.h>
 #include <stdlib.h>
@@ -125,7 +126,7 @@ EEInvertedVBrace2d::EEInvertedVBrace2d(int tag, int Nd1, int Nd2, int Nd3,
 // responsible for allocating the necessary space needed
 // by each object and storing the tags of the end nodes.
 EEInvertedVBrace2d::EEInvertedVBrace2d(int tag, int Nd1, int Nd2, int Nd3,
-    int port, char *machineInetAddr, int ssl, int dataSize,
+    int port, char *machineInetAddr, int ssl, int udp, int dataSize,
     bool iM, bool nlGeomFlag, double r1, double r2)
     : ExperimentalElement(tag, ELE_TAG_EEInvertedVBrace2d),
     connectedExternalNodes(3),
@@ -153,17 +154,23 @@ EEInvertedVBrace2d::EEInvertedVBrace2d(int tag, int Nd1, int Nd2, int Nd3,
         theNodes[i] = 0;
     
     // setup the connection
-    if (!ssl)  {
-        if (machineInetAddr == 0)
-            theChannel = new TCP_Socket(port, "127.0.0.1");
-        else
-            theChannel = new TCP_Socket(port, machineInetAddr);
-    }
-    else  {
+    if (ssl)  {
         if (machineInetAddr == 0)
             theChannel = new TCP_SocketSSL(port, "127.0.0.1");
         else
             theChannel = new TCP_SocketSSL(port, machineInetAddr);
+    }
+    else if (udp)  {
+        if (machineInetAddr == 0)
+            theChannel = new UDP_Socket(port, "127.0.0.1");
+        else
+            theChannel = new UDP_Socket(port, machineInetAddr);
+    }
+    else  {
+        if (machineInetAddr == 0)
+            theChannel = new TCP_Socket(port, "127.0.0.1");
+        else
+            theChannel = new TCP_Socket(port, machineInetAddr);
     }
     if (!theChannel)  {
         opserr << "EEInvertedVBrace2d::EEInvertedVBrace2d() "

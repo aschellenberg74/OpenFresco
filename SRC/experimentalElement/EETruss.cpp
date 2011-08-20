@@ -40,6 +40,7 @@
 #include <ElementResponse.h>
 #include <TCP_Socket.h>
 #include <TCP_SocketSSL.h>
+#include <UDP_Socket.h>
 
 #include <math.h>
 #include <stdlib.h>
@@ -132,8 +133,8 @@ EETruss::EETruss(int tag, int dim, int Nd1, int Nd2,
 // responsible for allocating the necessary space needed
 // by each object and storing the tags of the end nodes.
 EETruss::EETruss(int tag, int dim, int Nd1, int Nd2, 
-    int port, char *machineInetAddr, int ssl, int dataSize,
-    bool iM, double r)
+    int port, char *machineInetAddr, int ssl, int udp,
+    int dataSize, bool iM, double r)
     : ExperimentalElement(tag, ELE_TAG_EETruss),
     numDIM(dim), numDOF(0),
     connectedExternalNodes(2),
@@ -165,17 +166,23 @@ EETruss::EETruss(int tag, int dim, int Nd1, int Nd2,
     cosX[2] = 0.0;
     
     // setup the connection
-    if (!ssl)  {
-        if (machineInetAddr == 0)
-            theChannel = new TCP_Socket(port, "127.0.0.1");
-        else
-            theChannel = new TCP_Socket(port, machineInetAddr);
-    }
-    else  {
+    if (ssl)  {
         if (machineInetAddr == 0)
             theChannel = new TCP_SocketSSL(port, "127.0.0.1");
         else
             theChannel = new TCP_SocketSSL(port, machineInetAddr);
+    }
+    else if (udp)  {
+        if (machineInetAddr == 0)
+            theChannel = new UDP_Socket(port, "127.0.0.1");
+        else
+            theChannel = new UDP_Socket(port, machineInetAddr);
+    }
+    else  {
+        if (machineInetAddr == 0)
+            theChannel = new TCP_Socket(port, "127.0.0.1");
+        else
+            theChannel = new TCP_Socket(port, machineInetAddr);
     }
     if (!theChannel)  {
         opserr << "EETruss::EETruss() "

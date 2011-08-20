@@ -58,7 +58,7 @@ public:
         const Vector shearDistI = 0, bool iMod = false, double mass = 0.0);
     EETwoNodeLink(int tag, int dimension, int Nd1, int Nd2,
         const ID &direction, int port, char *machineInetAddress = 0,
-        int ssl = 0, int dataSize = OF_Network_dataSize,
+        int ssl = 0, int udp = 0, int dataSize = OF_Network_dataSize,
         const Vector y = 0, const Vector x = 0, const Vector Mratio = 0,
         const Vector shearDistI = 0, bool iMod = false, double mass = 0.0);
     

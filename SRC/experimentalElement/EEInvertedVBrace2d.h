@@ -51,7 +51,8 @@ public:
         double rho1 = 0.0, double rho2 = 0.0);
     EEInvertedVBrace2d(int tag, int Nd1, int Nd2, int Nd3,
         int port, char *machineInetAddress = 0,
-        int ssl = 0, int dataSize = OF_Network_dataSize,
+        int ssl = 0, int udp = 0,
+        int dataSize = OF_Network_dataSize,
         bool iMod = false, bool nlGeom = false,
         double rho1 = 0.0, double rho2 = 0.0);
     

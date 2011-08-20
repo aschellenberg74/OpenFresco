@@ -35,6 +35,7 @@
 #include <Node.h>
 #include <TCP_Socket.h>
 #include <TCP_SocketSSL.h>
+#include <UDP_Socket.h>
 
 #include <ExperimentalElement.h>
 
@@ -49,7 +50,7 @@ int TclStartSimAppElemServer(ClientData clientData, Tcl_Interp *interp,
     }
     
     int eleTag, ipPort;
-    int ssl = 0;
+    int ssl = 0, udp = 0;
     Channel *theChannel = 0;
     
     if (Tcl_GetInt(interp, argv[1], &eleTag) != TCL_OK)  {
@@ -70,26 +71,38 @@ int TclStartSimAppElemServer(ClientData clientData, Tcl_Interp *interp,
     if (argc == 4)  {
         if (strcmp(argv[3], "-ssl") == 0)
             ssl = 1;
+        else if (strcmp(argv[3], "-udp") == 0)
+            udp = 1;
     }
     
     // setup the connection
-    if (!ssl)  {
-        theChannel = new TCP_Socket(ipPort);
-        if (theChannel != 0) {
-            opserr << "\nChannel successfully created: "
-                << "Waiting for Simulation Application Client...\n";
-        } else {
-            opserr << "WARNING could not create channel\n";
-            return TCL_ERROR;
-        }
-    }
-    else  {
+    if (ssl)  {
         theChannel = new TCP_SocketSSL(ipPort);
         if (theChannel != 0) {
             opserr << "\nSSL Channel successfully created: "
                 << "Waiting for Simulation Application Client...\n";
         } else {
             opserr << "WARNING could not create SSL channel\n";
+            return TCL_ERROR;
+        }
+    }
+    else if (udp)  {
+        theChannel = new UDP_Socket(ipPort);
+        if (theChannel != 0) {
+            opserr << "\nUDP Channel successfully created: "
+                << "Waiting for Simulation Application Client...\n";
+        } else {
+            opserr << "WARNING could not create UDP channel\n";
+            return TCL_ERROR;
+        }
+    }
+    else  {
+        theChannel = new TCP_Socket(ipPort);
+        if (theChannel != 0) {
+            opserr << "\nTCP Channel successfully created: "
+                << "Waiting for Simulation Application Client...\n";
+        } else {
+            opserr << "WARNING could not create TCP channel\n";
             return TCL_ERROR;
         }
     }

@@ -42,6 +42,7 @@
 #include <ElementalLoad.h>
 #include <TCP_Socket.h>
 #include <TCP_SocketSSL.h>
+#include <UDP_Socket.h>
 
 #include <math.h>
 #include <stdlib.h>
@@ -141,8 +142,8 @@ EEBeamColumn3d::EEBeamColumn3d(int tag, int Nd1, int Nd2,
 // by each object and storing the tags of the end nodes.
 EEBeamColumn3d::EEBeamColumn3d(int tag, int Nd1, int Nd2,
     CrdTransf &coordTransf,
-    int port, char *machineInetAddr, int ssl, int dataSize,
-    bool iM, double r)
+    int port, char *machineInetAddr, int ssl, int udp,
+    int dataSize, bool iM, double r)
     : ExperimentalElement(tag, ELE_TAG_EEBeamColumn3d),
     connectedExternalNodes(2), theCoordTransf(0),
     iMod(iM), rho(r), L(0.0),
@@ -169,17 +170,23 @@ EEBeamColumn3d::EEBeamColumn3d(int tag, int Nd1, int Nd2,
         theNodes[i] = 0;
     
     // setup the connection
-    if (!ssl)  {
-        if (machineInetAddr == 0)
-            theChannel = new TCP_Socket(port, "127.0.0.1");
-        else
-            theChannel = new TCP_Socket(port, machineInetAddr);
-    }
-    else  {
+    if (ssl)  {
         if (machineInetAddr == 0)
             theChannel = new TCP_SocketSSL(port, "127.0.0.1");
         else
             theChannel = new TCP_SocketSSL(port, machineInetAddr);
+    }
+    else if (udp)  {
+        if (machineInetAddr == 0)
+            theChannel = new UDP_Socket(port, "127.0.0.1");
+        else
+            theChannel = new UDP_Socket(port, machineInetAddr);
+    }
+    else  {
+        if (machineInetAddr == 0)
+            theChannel = new TCP_Socket(port, "127.0.0.1");
+        else
+            theChannel = new TCP_Socket(port, machineInetAddr);
     }
     if (!theChannel)  {
         opserr << "EEBeamColumn3d::EEBeamColumn3d() "

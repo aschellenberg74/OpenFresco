@@ -40,6 +40,7 @@
 #include <ElementResponse.h>
 #include <TCP_Socket.h>
 #include <TCP_SocketSSL.h>
+#include <UDP_Socket.h>
 
 #include <float.h>
 #include <math.h>
@@ -190,8 +191,9 @@ EETwoNodeLink::EETwoNodeLink(int tag, int dim, int Nd1, int Nd2,
 // responsible for allocating the necessary space needed
 // by each object and storing the tags of the end nodes.
 EETwoNodeLink::EETwoNodeLink(int tag, int dim, int Nd1, int Nd2, 
-    const ID &direction, int port, char *machineInetAddr, int ssl,
-    int dataSize, const Vector _y, const Vector _x, const Vector Mr,
+    const ID &direction, int port, char *machineInetAddr,
+    int ssl, int udp, int dataSize,
+    const Vector _y, const Vector _x, const Vector Mr,
     const Vector sdI, bool iM, double m)
     : ExperimentalElement(tag, ELE_TAG_EETwoNodeLink),     
     dimension(dim), numDOF(0), connectedExternalNodes(2),
@@ -280,17 +282,23 @@ EETwoNodeLink::EETwoNodeLink(int tag, int dim, int Nd1, int Nd2,
     }
     
     // setup the connection
-    if (!ssl)  {
-        if (machineInetAddr == 0)
-            theChannel = new TCP_Socket(port, "127.0.0.1");
-        else
-            theChannel = new TCP_Socket(port, machineInetAddr);
-    }
-    else  {
+    if (ssl)  {
         if (machineInetAddr == 0)
             theChannel = new TCP_SocketSSL(port, "127.0.0.1");
         else
             theChannel = new TCP_SocketSSL(port, machineInetAddr);
+    }
+    else if (udp)  {
+        if (machineInetAddr == 0)
+            theChannel = new UDP_Socket(port, "127.0.0.1");
+        else
+            theChannel = new UDP_Socket(port, machineInetAddr);
+    }
+    else  {
+        if (machineInetAddr == 0)
+            theChannel = new TCP_Socket(port, "127.0.0.1");
+        else
+            theChannel = new TCP_Socket(port, machineInetAddr);
     }
     if (!theChannel)  {
         opserr << "EETwoNodeLink::EETwoNodeLink() "

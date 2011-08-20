@@ -42,7 +42,7 @@ expSetup OneActuator 1 -control 1 1 -sizeTrialOut 1 1
 
 # Define experimental site
 # ------------------------
-# expSite ActorSite $tag -setup $setupTag $ipPort <-ssl>
+# expSite ActorSite $tag -setup $setupTag $ipPort <-ssl> <-udp>
 expSite ActorSite 1 -setup 1 8091
 # ------------------------------
 # End of model generation
@@ -54,6 +54,8 @@ expSite ActorSite 1 -setup 1 8091
 # ------------------------------
 # startLabServer $siteTag
 startLabServer  1
+
+exit
 # --------------------------------
 # End of analysis
 # --------------------------------

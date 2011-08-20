@@ -68,7 +68,7 @@ int addEEGeneric(ClientData clientData, Tcl_Interp *interp,  int argc,
     int numNodes = 0, numDOFj = 0, numDOF = 0;
     ExperimentalSite *theSite = 0;
     char *ipAddr = 0;
-    int ssl = 0;
+    int ssl = 0, udp = 0;
     int dataSize = OF_Network_dataSize;
     bool iMod = false;
     Matrix *mass = 0;
@@ -169,6 +169,7 @@ int addEEGeneric(ClientData clientData, Tcl_Interp *interp,  int argc,
         argi++;
         if (strcmp(argv[argi], "-initStif") != 0 &&
             strcmp(argv[argi], "-ssl") != 0 &&
+            strcmp(argv[argi], "-udp") != 0 &&
             strcmp(argv[argi], "-dataSize") != 0)  {
             ipAddr = new char [strlen(argv[argi])+1];
             strcpy(ipAddr,argv[argi]);
@@ -181,6 +182,8 @@ int addEEGeneric(ClientData clientData, Tcl_Interp *interp,  int argc,
         for (i = argi; i < argc; i++)  {
             if (strcmp(argv[i], "-ssl") == 0)
                 ssl = 1;
+            else if (strcmp(argv[i], "-udp") == 0)
+                udp = 1;
             else if (strcmp(argv[i], "-dataSize") == 0)  {
                 if (Tcl_GetInt(interp, argv[i+1], &dataSize) != TCL_OK)  {
 		            opserr << "WARNING invalid dataSize\n";
@@ -234,10 +237,10 @@ int addEEGeneric(ClientData clientData, Tcl_Interp *interp,  int argc,
     }
     else {
         if (mass == 0) {
-	        theExpElement = new EEGeneric(tag, nodes, dofs, ipPort, ipAddr, ssl, dataSize, iMod);
+	        theExpElement = new EEGeneric(tag, nodes, dofs, ipPort, ipAddr, ssl, udp, dataSize, iMod);
         }
         else {
-            theExpElement = new EEGeneric(tag, nodes, dofs, ipPort, ipAddr, ssl, dataSize, iMod, mass);
+            theExpElement = new EEGeneric(tag, nodes, dofs, ipPort, ipAddr, ssl, udp, dataSize, iMod, mass);
         }
     }
 	
