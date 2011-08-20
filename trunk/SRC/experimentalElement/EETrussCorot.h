@@ -52,7 +52,8 @@ public:
         bool iMod = false, double rho = 0.0);
     EETrussCorot(int tag, int dimension, int Nd1, int Nd2, 
 	    int port, char *machineInetAddress = 0,
-        int ssl = 0, int dataSize = OF_Network_dataSize,
+        int ssl = 0, int udp = 0,
+        int dataSize = OF_Network_dataSize,
 	    bool iMod = false, double rho = 0.0);
     
     // destructor

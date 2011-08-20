@@ -62,11 +62,13 @@ expElement twoNodeLink 1 1 3 -dir 2 -site 1 -initStif 2.8
 # ------------------------------
 # Start the server process
 # ------------------------------
-# startSimAppElemServer $eleTag $port <-ssl>
-#startSimAppElemServer 1 8090;  # use with generic client element in FEA
+# startSimAppElemServer $eleTag $port <-ssl> <-udp>
+#startSimAppElemServer 1 8090 -udp;  # use with generic client element in FEA
 
-# startSimAppSiteServer $siteTag $port <-ssl>
-startSimAppSiteServer 1 8090;  # use with experimental element in FEA
+# startSimAppSiteServer $siteTag $port <-ssl> <-udp>
+startSimAppSiteServer 1 8090 -udp;  # use with experimental element in FEA
+
+exit
 # --------------------------------
 # End of analysis
 # --------------------------------

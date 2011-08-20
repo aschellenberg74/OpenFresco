@@ -182,6 +182,7 @@ puts "\nElapsed Time = $tTot \n"
 close $outFileID
 
 wipe
+exit
 # --------------------------------
 # End of analysis
 # --------------------------------

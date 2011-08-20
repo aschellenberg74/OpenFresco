@@ -70,7 +70,7 @@ int addEETruss(ClientData clientData, Tcl_Interp *interp,  int argc,
 	int tag, iNode, jNode, siteTag, ipPort, i;
     ExperimentalSite *theSite = 0;
     char *ipAddr = 0;
-    int ssl = 0;
+    int ssl = 0, udp = 0;
     int dataSize = OF_Network_dataSize;
     bool iMod = false;
 	double rho = 0.0;
@@ -111,6 +111,7 @@ int addEETruss(ClientData clientData, Tcl_Interp *interp,  int argc,
 	    }
         if (strcmp(argv[6+eleArgStart], "-initStif") != 0  &&
             strcmp(argv[6+eleArgStart], "-ssl") != 0  &&
+            strcmp(argv[6+eleArgStart], "-udp") != 0  &&
             strcmp(argv[6+eleArgStart], "-dataSize") != 0)  {
             ipAddr = new char [strlen(argv[6+eleArgStart])+1];
             strcpy(ipAddr,argv[6+eleArgStart]);
@@ -122,6 +123,8 @@ int addEETruss(ClientData clientData, Tcl_Interp *interp,  int argc,
         for (i = 6+eleArgStart; i < argc; i++)  {
             if (strcmp(argv[i], "-ssl") == 0)
                 ssl = 1;
+            else if (strcmp(argv[i], "-udp") == 0)
+                udp = 1;
             else if (strcmp(argv[i], "-dataSize") == 0)  {
                 if (Tcl_GetInt(interp, argv[i+1], &dataSize) != TCL_OK)  {
 		            opserr << "WARNING invalid dataSize\n";
@@ -157,13 +160,13 @@ int addEETruss(ClientData clientData, Tcl_Interp *interp,  int argc,
         if (theSite != 0)
 	        theExpElement = new EETruss(tag, ndm, iNode, jNode, theSite, iMod, rho);
         else
-	        theExpElement = new EETruss(tag, ndm, iNode, jNode, ipPort, ipAddr, ssl, dataSize, iMod, rho);
+	        theExpElement = new EETruss(tag, ndm, iNode, jNode, ipPort, ipAddr, ssl, udp, dataSize, iMod, rho);
     }
     else if (strcmp(argv[eleArgStart], "corotTruss") == 0)  {
         if (theSite != 0)
 	        theExpElement = new EETrussCorot(tag, ndm, iNode, jNode, theSite, iMod, rho);
         else
-	        theExpElement = new EETrussCorot(tag, ndm, iNode, jNode, ipPort, ipAddr, ssl, dataSize, iMod, rho);
+	        theExpElement = new EETrussCorot(tag, ndm, iNode, jNode, ipPort, ipAddr, ssl, udp, dataSize, iMod, rho);
     }
 	
 	if (theExpElement == 0)  {

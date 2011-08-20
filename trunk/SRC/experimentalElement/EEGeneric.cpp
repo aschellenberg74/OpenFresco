@@ -40,6 +40,7 @@
 #include <ElementResponse.h>
 #include <TCP_Socket.h>
 #include <TCP_SocketSSL.h>
+#include <UDP_Socket.h>
 
 #include <math.h>
 #include <stdlib.h>
@@ -146,8 +147,8 @@ EEGeneric::EEGeneric(int tag, ID nodes, ID *dof,
 // responsible for allocating the necessary space needed
 // by each object and storing the tags of the end nodes.
 EEGeneric::EEGeneric(int tag, ID nodes, ID *dof,
-    int port, char *machineInetAddr, int ssl, int dataSize,
-    bool iM, const Matrix *m)
+    int port, char *machineInetAddr, int ssl, int udp,
+    int dataSize, bool iM, const Matrix *m)
     : ExperimentalElement(tag, ELE_TAG_EEGeneric),
     connectedExternalNodes(nodes), basicDOF(1),
     numExternalNodes(0), numDOF(0), numBasicDOF(0),
@@ -190,17 +191,23 @@ EEGeneric::EEGeneric(int tag, ID nodes, ID *dof,
         mass = new Matrix(*m);
     
     // setup the connection
-    if (!ssl)  {
-        if (machineInetAddr == 0)
-            theChannel = new TCP_Socket(port, "127.0.0.1");
-        else
-            theChannel = new TCP_Socket(port, machineInetAddr);
-    }
-    else  {
+    if (ssl)  {
         if (machineInetAddr == 0)
             theChannel = new TCP_SocketSSL(port, "127.0.0.1");
         else
             theChannel = new TCP_SocketSSL(port, machineInetAddr);
+    }
+    else if (udp)  {
+        if (machineInetAddr == 0)
+            theChannel = new UDP_Socket(port, "127.0.0.1");
+        else
+            theChannel = new UDP_Socket(port, machineInetAddr);
+    }
+    else  {
+        if (machineInetAddr == 0)
+            theChannel = new TCP_Socket(port, "127.0.0.1");
+        else
+            theChannel = new TCP_Socket(port, machineInetAddr);
     }
     if (!theChannel)  {
         opserr << "EEGeneric::EEGeneric() "

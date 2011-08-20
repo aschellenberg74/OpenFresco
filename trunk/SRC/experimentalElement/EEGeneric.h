@@ -51,7 +51,8 @@ public:
         bool iMod = false, const Matrix *mass = 0);
     EEGeneric(int tag, ID nodes, ID *dof,
         int port, char *machineInetAddress = 0,
-        int ssl = 0, int dataSize = OF_Network_dataSize,
+        int ssl = 0, int udp = 0, 
+        int dataSize = OF_Network_dataSize,
         bool iMod = false, const Matrix *mass = 0);
     
     // destructor
