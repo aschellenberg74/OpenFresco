@@ -49,7 +49,7 @@ ECSCRAMNet::ECSCRAMNet(int tag, int memoffset, int numactch)
 	// and the SCRAMNet physical memory
 	int rValue = sp_scram_init();
     if (rValue != 0)  {
-        opserr << "ECSCRAMNet::ECSCRAMNet() - sp_scram_init:";
+        opserr << "ECSCRAMNet::ECSCRAMNet() - sp_scram_init():";
 		if (rValue == -4)
             opserr << " could not open driver.\n";
 		if (rValue == -3)
@@ -78,6 +78,16 @@ ECSCRAMNet::ECSCRAMNet(int tag, int memoffset, int numactch)
         exit(rValue);
     }
 #endif
+
+    // set the transaction mode for memory access to Longword (32-bit)
+    // Long_mode = 0 (32-bit), Word_mode = 1 (16-bit), Byte_mode = 2 (8-bit)
+    // | no swap 32-bit | 00 | Q(31:24) | Q(23:16) | Q(15:8)  | Q(7:0)   |
+    // | 16 bit         | 01 | Q(15:8)  | Q(7:0)   | Q(31:24) | Q(23:16) |
+    // | 8 bit          | 10 | Q(7:0)   | Q(15:8)  | Q(23:16) | Q(31:24) |
+    if (sp_stm_mm(Long_mode) != TRUE)  {
+        opserr << "ECSCRAMNet::ECSCRAMNet() - sp_stm_mm():"
+            << " could not set Longword memory access mode.\n";
+    }
 
     // set CSR0 bits so node can receive and transmit data
     unsigned short csrValue = 0x8003;
