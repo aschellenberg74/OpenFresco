@@ -1,12 +1,12 @@
 Model {
-  Name			  "HybridControllerD3D3"
+  Name			  "HybridControllerD3D3_Vconst"
   Version		  7.3
   MdlSubVersion		  0
   GraphicalInterface {
     NumRootInports	    0
     NumRootOutports	    0
     ParameterArgumentNames  ""
-    ComputedModelVersion    "1.441"
+    ComputedModelVersion    "1.447"
     NumModelReferences	    0
     NumTestPointedSignals   0
   }
@@ -26,9 +26,9 @@ Model {
   ModifiedByFormat	  "%<Auto>"
   LastModifiedBy	  "nees"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Fri Sep 02 21:07:29 2011"
-  RTWModifiedTimeStamp	  236898401
-  ModelVersionFormat	  "1.%<AutoIncrement:441>"
+  LastModifiedDate	  "Fri Sep 02 21:11:04 2011"
+  RTWModifiedTimeStamp	  236898555
+  ModelVersionFormat	  "1.%<AutoIncrement:447>"
   ConfigurationManager	  "None"
   SampleTimeColors	  off
   SampleTimeAnnotations	  off
@@ -840,7 +840,7 @@ Model {
     }
   }
   System {
-    Name		    "HybridControllerD3D3"
+    Name		    "HybridControllerD3D3_Vconst"
     Location		    [6, 82, 772, 920]
     Open		    on
     ModelBrowserVisibility  off
@@ -2755,27 +2755,28 @@ Model {
       MaskDescription	      "Hybrid Controller using C0-continuous cubic Lagrange interpolation for prediction and cor"
       "rection"
       MaskPromptString	      "Number of Actuators: nAct|Integration time step: dtInt|Simulation time step: dtSim|Contr"
-      "oller time step: dtCon|Maximum number of substeps: N|Number of delay steps: iDelay"
-      MaskStyleString	      "edit,edit,edit,edit,edit,edit"
-      MaskTunableValueString  "off,on,on,on,on,on"
-      MaskCallbackString      "|||||"
-      MaskEnableString	      "on,on,on,on,on,on"
-      MaskVisibilityString    "on,on,on,on,on,on"
-      MaskToolTipString	      "on,on,on,on,on,on"
-      MaskVarAliasString      ",,,,,"
-      MaskVariables	      "nAct=@1;dtInt=@2;dtSim=@3;dtCon=@4;N=@5;iDelay=@6;"
-      MaskDisplay	      "disp('xPC Target\\nHybrid Controller\\n(D3/D3)')"
+      "oller time step: dtCon|Master Actuator Velocity: vAct|Master Actuator ID: actID|Actuator Velocity Maximum: vActM"
+      "ax|Number of delay steps: iDelay"
+      MaskStyleString	      "edit,edit,edit,edit,edit,edit,edit,edit"
+      MaskTunableValueString  "off,on,on,on,on,on,on,on"
+      MaskCallbackString      "|||||||"
+      MaskEnableString	      "on,on,on,on,on,on,on,on"
+      MaskVisibilityString    "on,on,on,on,on,on,on,on"
+      MaskToolTipString	      "on,on,on,on,on,on,on,on"
+      MaskVarAliasString      ",,,,,,,"
+      MaskVariables	      "nAct=@1;dtInt=@2;dtSim=@3;dtCon=@4;vAct=@5;actID=@6;vActMax=@7;iDelay=@8;"
+      MaskDisplay	      "disp('xPC Target\\nHybrid Controller\\n(D3/D3 Vconst)')"
       MaskIconFrame	      on
       MaskIconOpaque	      on
       MaskIconRotate	      "none"
       MaskPortRotate	      "default"
       MaskIconUnits	      "autoscale"
-      MaskValueString	      "1|HybridCtrlParameters.dtInt|HybridCtrlParameters.dtSim|HybridCtrlParameters.dtCon|Hybrid"
-      "CtrlParameters.N|HybridCtrlParameters.iDelay"
-      MaskTabNameString	      ",,,,,"
+      MaskValueString	      "1|HybridCtrlParameters.dtInt|HybridCtrlParameters.dtSim|HybridCtrlParameters.dtCon|0.1|1|"
+      "1.00|HybridCtrlParameters.iDelay"
+      MaskTabNameString	      ",,,,,,,"
       System {
 	Name			"xPC HC"
-	Location		[5, 83, 807, 523]
+	Location		[6, 82, 806, 522]
 	Open			off
 	ModelBrowserVisibility	off
 	ModelBrowserWidth	200
@@ -2791,7 +2792,7 @@ Model {
 	Block {
 	  BlockType		  Inport
 	  Name			  "newTarget"
-	  Position		  [25, 188, 55, 202]
+	  Position		  [25, 193, 55, 207]
 	  IconDisplay		  "Port number"
 	  OutDataType		  "sfix(16)"
 	  OutScaling		  "2^0"
@@ -2799,7 +2800,7 @@ Model {
 	Block {
 	  BlockType		  Inport
 	  Name			  "targDsp"
-	  Position		  [25, 118, 55, 132]
+	  Position		  [25, 123, 55, 137]
 	  Port			  "2"
 	  IconDisplay		  "Port number"
 	  OutDataType		  "sfix(16)"
@@ -2808,7 +2809,7 @@ Model {
 	Block {
 	  BlockType		  Inport
 	  Name			  "dspIn"
-	  Position		  [25, 283, 55, 297]
+	  Position		  [25, 298, 55, 312]
 	  Port			  "3"
 	  IconDisplay		  "Port number"
 	  OutDataType		  "sfix(16)"
@@ -2817,7 +2818,7 @@ Model {
 	Block {
 	  BlockType		  Inport
 	  Name			  "frcIn"
-	  Position		  [25, 343, 55, 357]
+	  Position		  [25, 348, 55, 362]
 	  Port			  "4"
 	  IconDisplay		  "Port number"
 	  OutDataType		  "sfix(16)"
@@ -2826,7 +2827,7 @@ Model {
 	Block {
 	  BlockType		  From
 	  Name			  "From"
-	  Position		  [680, 156, 720, 184]
+	  Position		  [680, 151, 720, 179]
 	  ShowName		  off
 	  GotoTag		  "s"
 	  IconDisplay		  "Signal name"
@@ -2835,7 +2836,7 @@ Model {
 	Block {
 	  BlockType		  From
 	  Name			  "From1"
-	  Position		  [680, 206, 720, 234]
+	  Position		  [680, 201, 720, 229]
 	  ShowName		  off
 	  GotoTag		  "t"
 	  IconDisplay		  "Signal name"
@@ -2861,7 +2862,7 @@ Model {
 	  BlockType		  SubSystem
 	  Name			  "Offset"
 	  Ports			  [1, 1]
-	  Position		  [115, 274, 170, 306]
+	  Position		  [115, 289, 170, 321]
 	  ShowName		  off
 	  MinAlgLoopOccurrences	  off
 	  PropExecContextOutsideSubsystem off
@@ -3178,7 +3179,7 @@ Model {
 	  BlockType		  SubSystem
 	  Name			  "Offset1"
 	  Ports			  [1, 1]
-	  Position		  [115, 334, 170, 366]
+	  Position		  [115, 339, 170, 371]
 	  ShowName		  off
 	  MinAlgLoopOccurrences	  off
 	  PropExecContextOutsideSubsystem off
@@ -3494,8 +3495,8 @@ Model {
 	Block {
 	  BlockType		  SubSystem
 	  Name			  "Predictor-Corrector"
-	  Ports			  [2, 3]
-	  Position		  [215, 92, 355, 228]
+	  Ports			  [2, 4]
+	  Position		  [215, 94, 355, 231]
 	  PermitHierarchicalResolution "ExplicitOnly"
 	  TreatAsAtomicUnit	  on
 	  MinAlgLoopOccurrences	  off
@@ -3550,18 +3551,18 @@ Model {
 	      BlockType		      Demux
 	      Name		      " Demux "
 	      Ports		      [1, 1]
-	      Position		      [270, 205, 320, 245]
+	      Position		      [270, 220, 320, 260]
 	      Outputs		      "1"
 	    }
 	    Block {
 	      BlockType		      "S-Function"
 	      Name		      " SFunction "
-	      Tag		      "Stateflow S-Function HybridControllerD3D3 1"
-	      Ports		      [2, 4]
-	      Position		      [180, 102, 230, 203]
+	      Tag		      "Stateflow S-Function HybridControllerD3D3_Vconst 2"
+	      Ports		      [2, 5]
+	      Position		      [180, 100, 230, 220]
 	      FunctionName	      "sf_sfun"
-	      Parameters	      "N,nAct"
-	      PortCounts	      "[2 4]"
+	      Parameters	      "actID,dtCon,iDelay,nAct,vAct,vActMax"
+	      PortCounts	      "[2 5]"
 	      EnableBusSupport	      on
 	      Port {
 		PortNumber		2
@@ -3581,11 +3582,17 @@ Model {
 		RTWStorageClass		"Auto"
 		DataLoggingNameMode	"SignalName"
 	      }
+	      Port {
+		PortNumber		5
+		Name			"N"
+		RTWStorageClass		"Auto"
+		DataLoggingNameMode	"SignalName"
+	      }
 	    }
 	    Block {
 	      BlockType		      Terminator
 	      Name		      " Terminator "
-	      Position		      [460, 216, 480, 234]
+	      Position		      [460, 231, 480, 249]
 	    }
 	    Block {
 	      BlockType		      Outport
@@ -3612,6 +3619,13 @@ Model {
 	      IconDisplay	      "Port number"
 	      OutDataType	      "sfix(16)"
 	      OutScaling	      "2^0"
+	    }
+	    Block {
+	      BlockType		      Outport
+	      Name		      "N"
+	      Position		      [460, 206, 480, 224]
+	      Port		      "4"
+	      IconDisplay	      "Port number"
 	    }
 	    Line {
 	      SrcBlock		      " SFunction "
@@ -3656,6 +3670,14 @@ Model {
 	      DstPort		      1
 	    }
 	    Line {
+	      Name		      "N"
+	      Labels		      [0, 0]
+	      SrcBlock		      " SFunction "
+	      SrcPort		      5
+	      DstBlock		      "N"
+	      DstPort		      1
+	    }
+	    Line {
 	      SrcBlock		      " Demux "
 	      SrcPort		      1
 	      DstBlock		      " Terminator "
@@ -3667,7 +3689,7 @@ Model {
 	  BlockType		  Reference
 	  Name			  "Scope (xPC) "
 	  Ports			  [1]
-	  Position		  [460, 144, 540, 176]
+	  Position		  [460, 129, 540, 161]
 	  ShowName		  off
 	  SourceBlock		  "xpclib/Misc./Scope (xPC) "
 	  SourceType		  "xpcscopeblock"
@@ -3741,7 +3763,7 @@ Model {
 	  BlockType		  Reference
 	  Name			  "Scope (xPC) 2"
 	  Ports			  [1]
-	  Position		  [460, 189, 540, 221]
+	  Position		  [460, 164, 540, 196]
 	  ShowName		  off
 	  SourceBlock		  "xpclib/Misc./Scope (xPC) "
 	  SourceType		  "xpcscopeblock"
@@ -3778,7 +3800,7 @@ Model {
 	  BlockType		  Reference
 	  Name			  "Scope (xPC) 4"
 	  Ports			  [1]
-	  Position		  [555, 144, 635, 176]
+	  Position		  [555, 129, 635, 161]
 	  BlockMirror		  on
 	  ShowName		  off
 	  SourceBlock		  "xpclib/Misc./Scope (xPC) "
@@ -3816,7 +3838,7 @@ Model {
 	  BlockType		  Reference
 	  Name			  "Scope (xPC) 5"
 	  Ports			  [1]
-	  Position		  [555, 189, 635, 221]
+	  Position		  [555, 164, 635, 196]
 	  BlockMirror		  on
 	  ShowName		  off
 	  SourceBlock		  "xpclib/Misc./Scope (xPC) "
@@ -3891,7 +3913,7 @@ Model {
 	  BlockType		  SubSystem
 	  Name			  "SubSystem0"
 	  Ports			  [1, 1]
-	  Position		  [150, 179, 185, 211]
+	  Position		  [150, 184, 185, 216]
 	  ShowName		  off
 	  MinAlgLoopOccurrences	  off
 	  PropExecContextOutsideSubsystem off
@@ -3902,7 +3924,7 @@ Model {
 	  MaskHideContents	  off
 	  System {
 	    Name		    "SubSystem0"
-	    Location		    [823, 83, 1357, 523]
+	    Location		    [793, 87, 1327, 523]
 	    Open		    off
 	    ModelBrowserVisibility  off
 	    ModelBrowserWidth	    200
@@ -4282,7 +4304,7 @@ Model {
 	Block {
 	  BlockType		  SubSystem
 	  Name			  "SubSystem1"
-	  Ports			  [3, 2]
+	  Ports			  [4, 2]
 	  Position		  [430, 236, 565, 364]
 	  ShowName		  off
 	  MinAlgLoopOccurrences	  off
@@ -4294,7 +4316,7 @@ Model {
 	  MaskHideContents	  off
 	  System {
 	    Name		    "SubSystem1"
-	    Location		    [7, 635, 587, 895]
+	    Location		    [7, 635, 586, 894]
 	    Open		    off
 	    ModelBrowserVisibility  off
 	    ModelBrowserWidth	    200
@@ -4317,9 +4339,18 @@ Model {
 	    }
 	    Block {
 	      BlockType		      Inport
+	      Name		      "subSteps"
+	      Position		      [70, 88, 100, 102]
+	      Port		      "2"
+	      IconDisplay	      "Port number"
+	      OutDataType	      "sfix(16)"
+	      OutScaling	      "2^0"
+	    }
+	    Block {
+	      BlockType		      Inport
 	      Name		      "measDsp In"
 	      Position		      [70, 128, 100, 142]
-	      Port		      "2"
+	      Port		      "3"
 	      IconDisplay	      "Port number"
 	      OutDataType	      "sfix(16)"
 	      OutScaling	      "2^0"
@@ -4328,7 +4359,7 @@ Model {
 	      BlockType		      Inport
 	      Name		      "measFrc In"
 	      Position		      [70, 173, 100, 187]
-	      Port		      "3"
+	      Port		      "4"
 	      IconDisplay	      "Port number"
 	      OutDataType	      "sfix(16)"
 	      OutScaling	      "2^0"
@@ -4445,8 +4476,8 @@ Model {
 	    Block {
 	      BlockType		      SubSystem
 	      Name		      "Subsystem"
-	      Ports		      [1, 1]
-	      Position		      [175, 36, 215, 74]
+	      Ports		      [2, 1]
+	      Position		      [185, 46, 225, 84]
 	      ShowName		      off
 	      MinAlgLoopOccurrences   off
 	      PropExecContextOutsideSubsystem off
@@ -4477,6 +4508,13 @@ Model {
 		  IconDisplay		  "Port number"
 		}
 		Block {
+		  BlockType		  Inport
+		  Name			  "N"
+		  Position		  [30, 58, 60, 72]
+		  Port			  "2"
+		  IconDisplay		  "Port number"
+		}
+		Block {
 		  BlockType		  Sum
 		  Name			  "Add"
 		  Ports			  [2, 1]
@@ -4494,15 +4532,6 @@ Model {
 		  Position		  [105, 114, 145, 146]
 		  ShowName		  off
 		  Value			  "iDelay"
-		  OutDataType		  "fixdt(1, 16)"
-		  OutScaling		  "2^0"
-		}
-		Block {
-		  BlockType		  Constant
-		  Name			  "Constant1"
-		  Position		  [30, 50, 60, 80]
-		  ShowName		  off
-		  Value			  "N"
 		  OutDataType		  "fixdt(1, 16)"
 		  OutScaling		  "2^0"
 		}
@@ -4529,7 +4558,7 @@ Model {
 		  MaskHideContents	  off
 		  System {
 		    Name		    "If Action\nSubsystem1"
-		    Location		    [569, 347, 840, 549]
+		    Location		    [569, 366, 840, 549]
 		    Open		    off
 		    ModelBrowserVisibility  off
 		    ModelBrowserWidth	    200
@@ -4766,7 +4795,7 @@ Model {
 		  }
 		}
 		Line {
-		  SrcBlock		  "Constant1"
+		  SrcBlock		  "N"
 		  SrcPort		  1
 		  DstBlock		  "If Action\nSubsystem1"
 		  DstPort		  1
@@ -4823,9 +4852,16 @@ Model {
 	    Line {
 	      SrcBlock		      "Subsystem"
 	      SrcPort		      1
-	      Points		      [60, 0]
+	      Points		      [50, 0]
 	      DstBlock		      "SubSystem"
 	      DstPort		      trigger
+	    }
+	    Line {
+	      SrcBlock		      "subSteps"
+	      SrcPort		      1
+	      Points		      [30, 0; 0, -20]
+	      DstBlock		      "Subsystem"
+	      DstPort		      2
 	    }
 	  }
 	}
@@ -4833,7 +4869,7 @@ Model {
 	  BlockType		  SubSystem
 	  Name			  "Subsystem"
 	  Ports			  [1, 1]
-	  Position		  [175, 113, 200, 137]
+	  Position		  [175, 118, 200, 142]
 	  ShowName		  off
 	  MinAlgLoopOccurrences	  off
 	  PropExecContextOutsideSubsystem off
@@ -4921,7 +4957,7 @@ Model {
 	  BlockType		  SubSystem
 	  Name			  "Subsystem1"
 	  Ports			  [1, 1]
-	  Position		  [370, 103, 395, 127]
+	  Position		  [370, 98, 395, 122]
 	  ShowName		  off
 	  MinAlgLoopOccurrences	  off
 	  PropExecContextOutsideSubsystem off
@@ -5011,7 +5047,7 @@ Model {
 	Block {
 	  BlockType		  Gain
 	  Name			  "gain1"
-	  Position		  [90, 110, 120, 140]
+	  Position		  [90, 115, 120, 145]
 	  ShowName		  off
 	  ParameterDataTypeMode	  "Inherit via internal rule"
 	  ParameterDataType	  "sfix(16)"
@@ -5024,10 +5060,12 @@ Model {
 	Block {
 	  BlockType		  Gain
 	  Name			  "gain2"
-	  Position		  [90, 180, 120, 210]
+	  Position		  [90, 185, 120, 215]
 	  ShowName		  off
+	  ParameterDataTypeMode	  "Inherit via internal rule"
 	  ParameterDataType	  "sfix(16)"
 	  ParameterScaling	  "2^0"
+	  ParamDataTypeStr	  "Inherit: Inherit via internal rule"
 	  OutDataType		  "sfix(16)"
 	  OutScaling		  "2^0"
 	  SaturateOnIntegerOverflow off
@@ -5068,7 +5106,7 @@ Model {
 	Block {
 	  BlockType		  Outport
 	  Name			  "dspOut"
-	  Position		  [745, 108, 775, 122]
+	  Position		  [745, 103, 775, 117]
 	  IconDisplay		  "Port number"
 	  OutDataType		  "sfix(16)"
 	  OutScaling		  "2^0"
@@ -5076,7 +5114,7 @@ Model {
 	Block {
 	  BlockType		  Outport
 	  Name			  "sOut"
-	  Position		  [745, 163, 775, 177]
+	  Position		  [745, 158, 775, 172]
 	  Port			  "2"
 	  IconDisplay		  "Port number"
 	  OutDataType		  "sfix(16)"
@@ -5085,7 +5123,7 @@ Model {
 	Block {
 	  BlockType		  Outport
 	  Name			  "tOut"
-	  Position		  [745, 213, 775, 227]
+	  Position		  [745, 208, 775, 222]
 	  Port			  "3"
 	  IconDisplay		  "Port number"
 	  OutDataType		  "sfix(16)"
@@ -5132,7 +5170,7 @@ Model {
 	  SrcPort		  1
 	  Points		  [90, 0]
 	  Branch {
-	    Points		    [0, -65]
+	    Points		    [0, -90]
 	    DstBlock		    "Scope (xPC) 5"
 	    DstPort		    1
 	  }
@@ -5147,7 +5185,7 @@ Model {
 	  Points		  [35, 0]
 	  Branch {
 	    Labels		    [1, 1]
-	    Points		    [0, 55]
+	    Points		    [0, 75]
 	    DstBlock		    "SubSystem1"
 	    DstPort		    1
 	  }
@@ -5173,7 +5211,7 @@ Model {
 	  SrcPort		  1
 	  Points		  [220, 0; 0, 10]
 	  DstBlock		  "SubSystem1"
-	  DstPort		  2
+	  DstPort		  3
 	}
 	Line {
 	  SrcBlock		  "SubSystem0"
@@ -5185,6 +5223,12 @@ Model {
 	  SrcBlock		  "newTarget"
 	  SrcPort		  1
 	  DstBlock		  "gain2"
+	  DstPort		  1
+	}
+	Line {
+	  SrcBlock		  "gain2"
+	  SrcPort		  1
+	  DstBlock		  "SubSystem0"
 	  DstPort		  1
 	}
 	Line {
@@ -5206,19 +5250,60 @@ Model {
 	  DstPort		  1
 	}
 	Line {
+	  SrcBlock		  "gain1"
+	  SrcPort		  1
+	  Points		  [15, 0]
+	  Branch {
+	    Points		    [0, -55]
+	    DstBlock		    "Scope (xPC) 1"
+	    DstPort		    1
+	  }
+	  Branch {
+	    DstBlock		    "Subsystem"
+	    DstPort		    1
+	  }
+	}
+	Line {
 	  SrcBlock		  "Offset1"
 	  SrcPort		  1
 	  Points		  [220, 0]
 	  Branch {
-	    Points		    [0, 45]
+	    Points		    [0, 40]
 	    DstBlock		    "Scope (xPC) 6"
 	    DstPort		    1
 	  }
 	  Branch {
 	    Points		    [0, -10]
 	    DstBlock		    "SubSystem1"
-	    DstPort		    3
+	    DstPort		    4
 	  }
+	}
+	Line {
+	  SrcBlock		  "Predictor-Corrector"
+	  SrcPort		  4
+	  Points		  [15, 0; 0, 70]
+	  DstBlock		  "SubSystem1"
+	  DstPort		  2
+	}
+	Line {
+	  SrcBlock		  "Subsystem1"
+	  SrcPort		  1
+	  Points		  [260, 0]
+	  Branch {
+	    DstBlock		    "dspOut"
+	    DstPort		    1
+	  }
+	  Branch {
+	    Points		    [0, 35]
+	    DstBlock		    "Scope (xPC) 4"
+	    DstPort		    1
+	  }
+	}
+	Line {
+	  SrcBlock		  "Subsystem"
+	  SrcPort		  1
+	  DstBlock		  "Predictor-Corrector"
+	  DstPort		  1
 	}
 	Line {
 	  SrcBlock		  "From"
@@ -5230,46 +5315,6 @@ Model {
 	  SrcBlock		  "From1"
 	  SrcPort		  1
 	  DstBlock		  "tOut"
-	  DstPort		  1
-	}
-	Line {
-	  SrcBlock		  "gain1"
-	  SrcPort		  1
-	  Points		  [15, 0]
-	  Branch {
-	    Points		    [0, -50]
-	    DstBlock		    "Scope (xPC) 1"
-	    DstPort		    1
-	  }
-	  Branch {
-	    DstBlock		    "Subsystem"
-	    DstPort		    1
-	  }
-	}
-	Line {
-	  SrcBlock		  "gain2"
-	  SrcPort		  1
-	  DstBlock		  "SubSystem0"
-	  DstPort		  1
-	}
-	Line {
-	  SrcBlock		  "Subsystem1"
-	  SrcPort		  1
-	  Points		  [260, 0]
-	  Branch {
-	    DstBlock		    "dspOut"
-	    DstPort		    1
-	  }
-	  Branch {
-	    Points		    [0, 45]
-	    DstBlock		    "Scope (xPC) 4"
-	    DstPort		    1
-	  }
-	}
-	Line {
-	  SrcBlock		  "Subsystem"
-	  SrcPort		  1
-	  DstBlock		  "Predictor-Corrector"
 	  DstPort		  1
 	}
       }
@@ -5538,38 +5583,36 @@ Model {
 Stateflow {
   machine {
     id			    1
-    name		    "HybridControllerD3D3"
+    name		    "HybridControllerD3D3_Vconst"
     created		    "21-May-2004 09:28:42"
     isLibrary		    0
-    firstTarget		    26
+    firstTarget		    31
     sfVersion		    71014000.000008
   }
   chart {
     id			    2
     name		    "xPC HC/Predictor-Corrector"
-    windowPosition	    [33.75 183.75 886.5 532.5]
-    viewLimits		    [3.153 844.467 1.042 496.549]
+    windowPosition	    [33.75 171 1010.25 541.5]
+    viewLimits		    [0 964.817 0 504.489]
     zoomFactor		    0.998
     screen		    [1 1 1920 1200 1.333333333333333]
     treeNode		    [0 6 0 0]
     viewObj		    2
     machine		    1
     subviewS {
-      x1		      3.153
-      y1		      1.042
       zoomFactor	      0.998
     }
-    ssIdHighWaterMark	    23
+    ssIdHighWaterMark	    29
     decomposition	    SET_CHART
     firstData		    14
-    chartFileNumber	    1
+    chartFileNumber	    2
     disableImplicitCasting  1
   }
   state {
     id			    3
-    labelString		    "Predict\nen: state = 1;\nen: setCurDsp(com,i/N);\nen: diSD = 1;\nen: i = 1; iSD = 0;\nen: predic"
-    "tD3(com,i/N);\ndu: i++;\ndu: predictD3(com,i/N);"
-    position		    [576.6762 91.2101 214.8435 155.1983]
+    labelString		    "Predict\nen: state = 1;\nen: setCurDsp(com,i/N);\nen: diSD = 1;\nen: i = 1; iSD = 0;\nen: N = ge"
+    "tNumSubSteps(vAct,actID,vActMax,ceil(iDelay/0.6));\nen: predictD3(com,i/N);\ndu: i++;\ndu: predictD3(com,i/N);"
+    position		    [566.3219 92.3328 342.5875 155.1983]
     fontSize		    12
     chart		    2
     treeNode		    [6 0 7 4]
@@ -5585,7 +5628,7 @@ Stateflow {
   state {
     id			    4
     labelString		    "Initialize\nen: i = 1; iSD = 0;\nen: diSD = 1;\nen: initData(nAct,dtCon);\nen: zeroDsp(com);"
-    position		    [51.0855 132.1864 139.7353 82.9349]
+    position		    [40.7312 133.3091 139.7353 82.9349]
     fontSize		    12
     chart		    2
     treeNode		    [6 0 3 5]
@@ -5602,7 +5645,7 @@ Stateflow {
     id			    5
     labelString		    "AutoSlowDown\nen: state = 2;\nen: diSD = 4-i/(0.2*N);\nen: i += diSD; iSD = i;\nen: predictD3(co"
     "m,i/N);\ndu: diSD = 4-i/(0.2*N);\ndu: i += diSD; iSD = i;\ndu: predictD3(com,i/N);"
-    position		    [428.7069 326.5783 258.0199 124.1012]
+    position		    [418.3526 327.7011 258.0199 124.1012]
     fontSize		    12
     chart		    2
     treeNode		    [6 0 4 0]
@@ -5618,7 +5661,7 @@ Stateflow {
   state {
     id			    6
     labelString		    "HybridController"
-    position		    [24.2944 19.0518 799.0304 459.4882]
+    position		    [21.5499 20.1745 908.5609 454.2487]
     fontSize		    12
     chart		    2
     treeNode		    [2 7 0 0]
@@ -5638,7 +5681,7 @@ Stateflow {
     labelString		    "Correct\nen: state = 0;\nen: setCurDsp(com,i/N);\nen: dspLocal = dsp; setNewDsp(dspLocal);\nen: "
     "di = min(max(diSD+1/(0.2*N)*(i-iSD),0.001),1.0);\nen: i = min(i+di,N);\nen: correctD3(com,i/N);\ndu: di = min(max("
     "diSD+1/(0.2*N)*(i-iSD),0.001),1.0);\ndu: i = min(i+di,N);\ndu: correctD3(com,i/N);"
-    position		    [251.8451 90.6156 292.0842 155.2563]
+    position		    [241.4908 91.7383 292.0842 155.2563]
     fontSize		    12
     chart		    2
     treeNode		    [6 0 0 3]
@@ -5654,20 +5697,20 @@ Stateflow {
   transition {
     id			    8
     labelString		    "[i>=N]"
-    labelPosition	    [542.511 32.711 32.17 14.941]
+    labelPosition	    [532.009 33.392 32.17 14.941]
     fontSize		    12
     src {
       id		      7
-      intersection	      [1 0 -1 0.8743 507.2111 90.6156 0 -114.9119]
+      intersection	      [1 0 -1 0.8724 496.2913 91.7383 0 -114.9119]
     }
     dst {
       id		      3
-      intersection	      [1 0 -1 0.1433 607.4704 91.2101 0 108.3933]
+      intersection	      [1 0 -1 0.0915 597.6816 92.3328 0 108.3933]
     }
-    midPoint		    [524.9561 60.2552]
+    midPoint		    [514.2345 61.0343]
     chart		    2
     linkNode		    [6 0 9]
-    dataLimits		    [507.211 609.87 49.744 91.21]
+    dataLimits		    [496.291 597.682 50.416 91.738]
     subviewer		    2
     drawStyle		    SMART
     slide {
@@ -5680,19 +5723,19 @@ Stateflow {
   }
   transition {
     id			    9
-    labelPosition	    [120.209 111.899 8.23 14.941]
+    labelPosition	    [109.855 113.022 8.23 14.941]
     fontSize		    12
     src {
-      intersection	      [0 0 1 0 120.1986 108.5441 0 0]
+      intersection	      [0 0 1 0 109.8443 109.6668 0 0]
     }
     dst {
       id		      4
-      intersection	      [1 0 -1 0.4946 120.1986 132.1864 0 0]
+      intersection	      [1 0 -1 0.4946 109.8443 133.3091 0 0]
     }
-    midPoint		    [120.1986 116.6185]
+    midPoint		    [109.8443 117.7412]
     chart		    2
     linkNode		    [6 8 11]
-    dataLimits		    [117.799 122.599 108.544 132.186]
+    dataLimits		    [109.844 109.844 109.667 125.309]
     subviewer		    2
     drawStyle		    SMART
     executionOrder	    1
@@ -5701,20 +5744,20 @@ Stateflow {
   transition {
     id			    10
     labelString		    "[flag==1]"
-    labelPosition	    [536.984 291.12 46.385 14.941]
+    labelPosition	    [526.874 291.846 46.385 14.941]
     fontSize		    12
     src {
       id		      3
-      intersection	      [3 0 1 0.8401 611.0194 246.4084 0 -111.9424]
+      intersection	      [3 0 1 0.9014 600.0996 247.5312 0 -111.9424]
     }
     dst {
       id		      7
-      intersection	      [3 0 1 0.1342 504.7349 245.872 0 116.2571]
+      intersection	      [3 0 1 0.1323 494.9461 246.9946 0 116.2571]
     }
-    midPoint		    [564.8824 288.2785]
+    midPoint		    [554.4513 288.9532]
     chart		    2
-    linkNode		    [6 12 13]
-    dataLimits		    [502.335 611.019 245.872 288.866]
+    linkNode		    [6 11 13]
+    dataLimits		    [494.946 600.1 247.531 289.536]
     subviewer		    2
     drawStyle		    SMART
     slide {
@@ -5728,20 +5771,20 @@ Stateflow {
   transition {
     id			    11
     labelString		    "[flag==1]"
-    labelPosition	    [197.98 144.817 46.385 14.941]
+    labelPosition	    [187.626 145.94 46.385 14.941]
     fontSize		    12
     src {
       id		      4
-      intersection	      [2 1 -0 0.4004 190.8208 165.3935 0 0.1]
+      intersection	      [2 1 0 0.4004 180.4665 166.5163 0 0.1]
     }
     dst {
       id		      7
-      intersection	      [4 -1 0 0.5184 251.8451 165.3935 0 -0.1]
+      intersection	      [4 -1 0 0.5184 241.4908 166.5163 0 -0.1]
     }
-    midPoint		    [218.3989 165.3897]
+    midPoint		    [208.0446 166.5125]
     chart		    2
-    linkNode		    [6 9 12]
-    dataLimits		    [190.821 251.845 162.993 167.793]
+    linkNode		    [6 9 10]
+    dataLimits		    [180.467 233.491 166.513 166.516]
     subviewer		    2
     drawStyle		    SMART
     executionOrder	    1
@@ -5750,20 +5793,20 @@ Stateflow {
   transition {
     id			    12
     labelString		    "[flag==1]"
-    labelPosition	    [417.878 280.286 46.385 14.941]
+    labelPosition	    [407.524 281.409 46.385 14.941]
     fontSize		    12
     src {
       id		      5
-      intersection	      [1 -0 -1 0.1535 468.3087 326.5783 0 -82.8552]
+      intersection	      [1 0 -1 0.1535 457.9587 327.7011 0 -82.8552]
     }
     dst {
       id		      7
-      intersection	      [3 0 1 0.2589 468.3087 245.8719 0 82.8552]
+      intersection	      [3 0 1 0.2589 457.9587 246.9946 0 82.8552]
     }
-    midPoint		    [468.32 288.7314]
+    midPoint		    [457.9657 289.8542]
     chart		    2
-    linkNode		    [6 11 10]
-    dataLimits		    [465.909 470.709 245.872 326.578]
+    linkNode		    [6 13 0]
+    dataLimits		    [457.959 457.966 254.995 327.701]
     subviewer		    2
     drawStyle		    SMART
     executionOrder	    1
@@ -5772,20 +5815,20 @@ Stateflow {
   transition {
     id			    13
     labelString		    "[i>=0.6*N && flag~=1]"
-    labelPosition	    [653.062 274.575 114.465 14.941]
+    labelPosition	    [642.707 275.698 114.465 14.941]
     fontSize		    12
     src {
       id		      3
-      intersection	      [3 0 1 0.6667 648.2835 246.4084 0 35.8141]
+      intersection	      [3 0 1 0.791 637.9293 247.5312 0 35.8141]
     }
     dst {
       id		      5
-      intersection	      [1 -0 -1 0.851 648.2835 326.5783 0 -35.8141]
+      intersection	      [1 0 -1 0.851 637.9293 327.7011 0 -35.8141]
     }
-    midPoint		    [648.2839 283.9755]
+    midPoint		    [637.9293 285.0982]
     chart		    2
-    linkNode		    [6 10 0]
-    dataLimits		    [645.884 650.683 246.408 326.578]
+    linkNode		    [6 10 12]
+    dataLimits		    [637.929 637.929 247.531 319.701]
     subviewer		    2
     drawStyle		    SMART
     executionOrder	    1
@@ -5884,16 +5927,17 @@ Stateflow {
     ssIdNumber		    17
     name		    "N"
     linkNode		    [2 18 20]
-    scope		    LOCAL_DATA
-    initFromWorkspace	    1
+    scope		    OUTPUT_DATA
     machine		    1
     props {
+      initialValue	      "256"
       array {
 	size			"1"
       }
       type {
 	primitive		SF_DOUBLE_TYPE
       }
+      frame		      SF_FRAME_NO
     }
     dataType		    "double"
   }
@@ -5904,7 +5948,7 @@ Stateflow {
     linkNode		    [2 19 21]
     scope		    PARAMETER_DATA
     initFromWorkspace	    1
-    paramIndexForInitFromWorkspace 1
+    paramIndexForInitFromWorkspace 3
     machine		    1
     props {
       initialValue	      "1"
@@ -5919,10 +5963,12 @@ Stateflow {
   }
   data {
     id			    21
-    ssIdNumber		    20
-    name		    "di"
+    ssIdNumber		    19
+    name		    "iDelay"
     linkNode		    [2 20 22]
     scope		    LOCAL_DATA
+    initFromWorkspace	    1
+    paramIndexForInitFromWorkspace 2
     machine		    1
     props {
       array {
@@ -5936,8 +5982,8 @@ Stateflow {
   }
   data {
     id			    22
-    ssIdNumber		    21
-    name		    "diSD"
+    ssIdNumber		    20
+    name		    "di"
     linkNode		    [2 21 23]
     scope		    LOCAL_DATA
     machine		    1
@@ -5953,8 +5999,8 @@ Stateflow {
   }
   data {
     id			    23
-    ssIdNumber		    22
-    name		    "iSD"
+    ssIdNumber		    21
+    name		    "diSD"
     linkNode		    [2 22 24]
     scope		    LOCAL_DATA
     machine		    1
@@ -5970,9 +6016,26 @@ Stateflow {
   }
   data {
     id			    24
+    ssIdNumber		    22
+    name		    "iSD"
+    linkNode		    [2 23 25]
+    scope		    LOCAL_DATA
+    machine		    1
+    props {
+      array {
+	size			"1"
+      }
+      type {
+	primitive		SF_DOUBLE_TYPE
+      }
+    }
+    dataType		    "double"
+  }
+  data {
+    id			    25
     ssIdNumber		    23
     name		    "dspLocal"
-    linkNode		    [2 23 0]
+    linkNode		    [2 24 26]
     scope		    LOCAL_DATA
     machine		    1
     props {
@@ -5987,25 +6050,109 @@ Stateflow {
     }
     dataType		    "double"
   }
+  data {
+    id			    26
+    ssIdNumber		    26
+    name		    "vAct"
+    linkNode		    [2 25 27]
+    scope		    LOCAL_DATA
+    initFromWorkspace	    1
+    paramIndexForInitFromWorkspace 4
+    machine		    1
+    props {
+      array {
+	size			"1"
+      }
+      type {
+	primitive		SF_DOUBLE_TYPE
+	isSigned		1
+	wordLength		"16"
+      }
+    }
+    dataType		    "double"
+  }
+  data {
+    id			    27
+    ssIdNumber		    27
+    name		    "dtCon"
+    linkNode		    [2 26 28]
+    scope		    LOCAL_DATA
+    initFromWorkspace	    1
+    paramIndexForInitFromWorkspace 1
+    machine		    1
+    props {
+      array {
+	size			"1"
+      }
+      type {
+	primitive		SF_DOUBLE_TYPE
+	isSigned		1
+	wordLength		"16"
+      }
+    }
+    dataType		    "double"
+  }
+  data {
+    id			    28
+    ssIdNumber		    28
+    name		    "actID"
+    linkNode		    [2 27 29]
+    scope		    LOCAL_DATA
+    initFromWorkspace	    1
+    machine		    1
+    props {
+      array {
+	size			"1"
+      }
+      type {
+	primitive		SF_DOUBLE_TYPE
+	isSigned		1
+	wordLength		"16"
+      }
+    }
+    dataType		    "double"
+  }
+  data {
+    id			    29
+    ssIdNumber		    29
+    name		    "vActMax"
+    linkNode		    [2 28 0]
+    scope		    LOCAL_DATA
+    initFromWorkspace	    1
+    paramIndexForInitFromWorkspace 5
+    machine		    1
+    props {
+      initialValue	      "vActMax"
+      array {
+	size			"1"
+      }
+      type {
+	primitive		SF_DOUBLE_TYPE
+	isSigned		1
+	wordLength		"16"
+      }
+    }
+    dataType		    "double"
+  }
   instance {
-    id			    25
+    id			    30
     name		    "xPC HC/Predictor-Corrector"
     machine		    1
     chart		    2
   }
   target {
-    id			    26
+    id			    31
     name		    "sfun"
     codeFlags		    ""
     machine		    1
-    linkNode		    [1 0 27]
+    linkNode		    [1 0 32]
   }
   target {
-    id			    27
+    id			    32
     name		    "rtw"
     codeFlags		    " comments=1 statebitsets=1 databitsets=1 emitlogicalops=1 elseifdetection=1 constantfolding=1 redu"
     "ndantloadelimination=0 preservenames=0 preservenameswithparent=0 exportcharts=0"
     machine		    1
-    linkNode		    [1 26 0]
+    linkNode		    [1 31 0]
   }
 }
