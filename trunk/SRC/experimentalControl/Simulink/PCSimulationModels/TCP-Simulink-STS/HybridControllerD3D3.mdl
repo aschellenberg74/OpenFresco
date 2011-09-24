@@ -7,7 +7,7 @@ Model {
     NumRootInports	    0
     NumRootOutports	    0
     ParameterArgumentNames  ""
-    ComputedModelVersion    "1.332"
+    ComputedModelVersion    "1.333"
     NumModelReferences	    0
     NumTestPointedSignals   5
     TestPointedSignal {
@@ -76,9 +76,9 @@ Model {
   ModifiedByFormat	  "%<Auto>"
   LastModifiedBy	  "Andreas"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Fri Mar 25 20:25:46 2011"
-  RTWModifiedTimeStamp	  222984724
-  ModelVersionFormat	  "1.%<AutoIncrement:332>"
+  LastModifiedDate	  "Fri Sep 23 17:59:39 2011"
+  RTWModifiedTimeStamp	  238701566
+  ModelVersionFormat	  "1.%<AutoIncrement:333>"
   ConfigurationManager	  "none"
   SampleTimeColors	  off
   SampleTimeAnnotations	  off
@@ -15001,7 +15001,7 @@ Model {
 	      OutputInitialize	      "Specify size for each dimension in table"
 	      IndexOptions	      "Index vector (port)"
 	      Indices		      "1"
-	      OutputSizes	      "nAct"
+	      OutputSizes	      "size"
 	    }
 	    Block {
 	      BlockType		      Constant
@@ -16089,11 +16089,6 @@ Model {
 	      RTWSystemCode	      "Auto"
 	      FunctionWithSeparateData off
 	      Opaque		      off
-	      Array {
-		Type			"Handle"
-		Dimension		0
-		PropName		"AvailSigsLoadSave"
-	      }
 	      RequestExecContextInheritance off
 	      MaskHideContents	      off
 	      MaskType		      "Stateflow"
@@ -16174,7 +16169,7 @@ Model {
 		  Ports			  [2, 4]
 		  Position		  [180, 102, 230, 203]
 		  FunctionName		  "sf_sfun"
-		  Parameters		  "N,iDelay,nAct"
+		  Parameters		  "N,nAct"
 		  PortCounts		  "[2 4]"
 		  EnableBusSupport	  on
 		  Port {
@@ -16399,7 +16394,7 @@ Model {
 		  SourceType		  "Detect Fall Nonpositive"
 		  ShowPortLabels	  "FromPortIcon"
 		  SystemSampleTime	  "-1"
-		  FunctionWithSeparateData off
+		  FunctionWithSeparateData "off"
 		  RTWMemSecFuncInitTerm	  "Inherit from model"
 		  RTWMemSecFuncExecute	  "Inherit from model"
 		  RTWMemSecDataConstants  "Inherit from model"
@@ -16418,7 +16413,7 @@ Model {
 		  SourceType		  "Detect Rise Positive"
 		  ShowPortLabels	  "FromPortIcon"
 		  SystemSampleTime	  "-1"
-		  FunctionWithSeparateData off
+		  FunctionWithSeparateData "off"
 		  RTWMemSecFuncInitTerm	  "Inherit from model"
 		  RTWMemSecFuncExecute	  "Inherit from model"
 		  RTWMemSecDataConstants  "Inherit from model"
@@ -18534,7 +18529,7 @@ Stateflow {
     linkNode		    [2 19 21]
     scope		    PARAMETER_DATA
     initFromWorkspace	    1
-    paramIndexForInitFromWorkspace 2
+    paramIndexForInitFromWorkspace 1
     machine		    1
     props {
       initialValue	      "1"
