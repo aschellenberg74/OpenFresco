@@ -6,7 +6,7 @@ Model {
     NumRootInports	    0
     NumRootOutports	    0
     ParameterArgumentNames  ""
-    ComputedModelVersion    "1.288"
+    ComputedModelVersion    "1.289"
     NumModelReferences	    0
     NumTestPointedSignals   0
   }
@@ -27,9 +27,9 @@ Model {
   ModifiedByFormat	  "%<Auto>"
   LastModifiedBy	  "Andreas"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Fri Mar 25 21:46:57 2011"
-  RTWModifiedTimeStamp	  222990351
-  ModelVersionFormat	  "1.%<AutoIncrement:288>"
+  LastModifiedDate	  "Fri Sep 23 17:52:08 2011"
+  RTWModifiedTimeStamp	  238701123
+  ModelVersionFormat	  "1.%<AutoIncrement:289>"
   ConfigurationManager	  "None"
   SampleTimeColors	  off
   SampleTimeAnnotations	  off
@@ -999,7 +999,7 @@ Model {
 	  OutputInitialize	  "Specify size for each dimension in table"
 	  IndexOptions		  "Index vector (port)"
 	  Indices		  "1"
-	  OutputSizes		  "nAct"
+	  OutputSizes		  "size"
 	}
 	Block {
 	  BlockType		  Constant
@@ -1531,7 +1531,7 @@ Model {
 	  SourceBlock		  "xpcsystranlib/Shared\nMemory/SC150 read "
 	  SourceType		  "SC150 Read"
 	  partition		  "node.Partitions(12:23)"
-	  errorport		  off
+	  errorport		  "off"
 	  ts			  "samplePeriod"
 	  pci			  "-1"
 	}
@@ -1545,7 +1545,7 @@ Model {
 	  SourceBlock		  "xpcsystranlib/Shared\nMemory/SC150 read "
 	  SourceType		  "SC150 Read"
 	  partition		  "node.Partitions(25)"
-	  errorport		  off
+	  errorport		  "off"
 	  ts			  "samplePeriod"
 	  pci			  "-1"
 	}
@@ -1559,7 +1559,7 @@ Model {
 	  SourceBlock		  "xpcsystranlib/Shared\nMemory/SC150 read "
 	  SourceType		  "SC150 Read"
 	  partition		  "node.Partitions(26)"
-	  errorport		  off
+	  errorport		  "off"
 	  ts			  "samplePeriod"
 	  pci			  "-1"
 	}
@@ -1573,7 +1573,7 @@ Model {
 	  SourceBlock		  "xpcsystranlib/Shared\nMemory/SC150 read "
 	  SourceType		  "SC150 Read"
 	  partition		  "node.Partitions(29)"
-	  errorport		  off
+	  errorport		  "off"
 	  ts			  "samplePeriod"
 	  pci			  "-1"
 	}
@@ -2258,7 +2258,7 @@ Model {
 	  SourceBlock		  "xpcsystranlib/Shared\nMemory/SC150 write "
 	  SourceType		  "SC150 Write"
 	  partition		  "node.Partitions(1:4)"
-	  errorport		  off
+	  errorport		  "off"
 	  ts			  "samplePeriod"
 	  pci			  "-1"
 	}
@@ -2272,7 +2272,7 @@ Model {
 	  SourceBlock		  "xpcsystranlib/Shared\nMemory/SC150 write "
 	  SourceType		  "SC150 Write"
 	  partition		  "node.Partitions(11)"
-	  errorport		  off
+	  errorport		  "off"
 	  ts			  "samplePeriod"
 	  pci			  "-1"
 	}
@@ -2778,7 +2778,7 @@ Model {
 	      SourceType	      "Ramp"
 	      ShowPortLabels	      "FromPortIcon"
 	      SystemSampleTime	      "-1"
-	      FunctionWithSeparateData off
+	      FunctionWithSeparateData "off"
 	      RTWMemSecFuncInitTerm   "Inherit from model"
 	      RTWMemSecFuncExecute    "Inherit from model"
 	      RTWMemSecDataConstants  "Inherit from model"
@@ -2787,7 +2787,7 @@ Model {
 	      slope		      "1/dt"
 	      start		      "0"
 	      X0		      "0"
-	      VectorParams1D	      on
+	      VectorParams1D	      "on"
 	    }
 	    Block {
 	      BlockType		      Sum
@@ -3112,7 +3112,7 @@ Model {
 	      SourceType	      "Ramp"
 	      ShowPortLabels	      "FromPortIcon"
 	      SystemSampleTime	      "-1"
-	      FunctionWithSeparateData off
+	      FunctionWithSeparateData "off"
 	      RTWMemSecFuncInitTerm   "Inherit from model"
 	      RTWMemSecFuncExecute    "Inherit from model"
 	      RTWMemSecDataConstants  "Inherit from model"
@@ -3121,7 +3121,7 @@ Model {
 	      slope		      "1/dt"
 	      start		      "0"
 	      X0		      "0"
-	      VectorParams1D	      on
+	      VectorParams1D	      "on"
 	    }
 	    Block {
 	      BlockType		      Sum
@@ -3300,7 +3300,7 @@ Model {
 	      Ports		      [2, 4]
 	      Position		      [180, 102, 230, 203]
 	      FunctionName	      "sf_sfun"
-	      Parameters	      "N,iDelay,nAct"
+	      Parameters	      "N,nAct"
 	      PortCounts	      "[2 4]"
 	      EnableBusSupport	      off
 	      Port {
@@ -3419,7 +3419,7 @@ Model {
 	  SourceType		  "xpcscopeblock"
 	  ShowPortLabels	  "FromPortIcon"
 	  SystemSampleTime	  "-1"
-	  FunctionWithSeparateData off
+	  FunctionWithSeparateData "off"
 	  RTWMemSecFuncInitTerm	  "Inherit from model"
 	  RTWMemSecFuncExecute	  "Inherit from model"
 	  RTWMemSecDataConstants  "Inherit from model"
@@ -3427,10 +3427,10 @@ Model {
 	  RTWMemSecDataParameters "Inherit from model"
 	  scopeno		  "4"
 	  scopetype		  "File"
-	  autostart		  on
+	  autostart		  "on"
 	  viewmode		  "Graphical redraw"
 	  formatstr		  "'%15.6f'"
-	  grid			  on
+	  grid			  "on"
 	  ylimits		  "[0,3]"
 	  nosamples		  "4096"
 	  noprepostsamples	  "0"
@@ -3444,8 +3444,8 @@ Model {
 	  filename		  "state.dat"
 	  mode			  "Lazy"
 	  writesize		  "512"
-	  autorestart		  on
-	  dynamicfilemode	  off
+	  autorestart		  "on"
+	  dynamicfilemode	  "off"
 	  maxwritefilesize	  "512*1024^2"
 	}
 	Block {
@@ -3460,7 +3460,7 @@ Model {
 	  SourceType		  "xpcscopeblock"
 	  ShowPortLabels	  "FromPortIcon"
 	  SystemSampleTime	  "-1"
-	  FunctionWithSeparateData off
+	  FunctionWithSeparateData "off"
 	  RTWMemSecFuncInitTerm	  "Inherit from model"
 	  RTWMemSecFuncExecute	  "Inherit from model"
 	  RTWMemSecDataConstants  "Inherit from model"
@@ -3468,10 +3468,10 @@ Model {
 	  RTWMemSecDataParameters "Inherit from model"
 	  scopeno		  "1"
 	  scopetype		  "File"
-	  autostart		  on
+	  autostart		  "on"
 	  viewmode		  "Numerical"
 	  formatstr		  "'%15.6f'"
-	  grid			  on
+	  grid			  "on"
 	  ylimits		  "[-4,4]"
 	  nosamples		  "4096"
 	  noprepostsamples	  "0"
@@ -3485,8 +3485,8 @@ Model {
 	  filename		  "targDsp.dat"
 	  mode			  "Lazy"
 	  writesize		  "512"
-	  autorestart		  on
-	  dynamicfilemode	  off
+	  autorestart		  "on"
+	  dynamicfilemode	  "off"
 	  maxwritefilesize	  "512*1024^2"
 	}
 	Block {
@@ -3501,7 +3501,7 @@ Model {
 	  SourceType		  "xpcscopeblock"
 	  ShowPortLabels	  "FromPortIcon"
 	  SystemSampleTime	  "-1"
-	  FunctionWithSeparateData off
+	  FunctionWithSeparateData "off"
 	  RTWMemSecFuncInitTerm	  "Inherit from model"
 	  RTWMemSecFuncExecute	  "Inherit from model"
 	  RTWMemSecDataConstants  "Inherit from model"
@@ -3509,10 +3509,10 @@ Model {
 	  RTWMemSecDataParameters "Inherit from model"
 	  scopeno		  "5"
 	  scopetype		  "File"
-	  autostart		  on
+	  autostart		  "on"
 	  viewmode		  "Numerical"
 	  formatstr		  "'%15.6f'"
-	  grid			  on
+	  grid			  "on"
 	  ylimits		  "[0,3]"
 	  nosamples		  "4096"
 	  noprepostsamples	  "0"
@@ -3526,8 +3526,8 @@ Model {
 	  filename		  "count.dat"
 	  mode			  "Lazy"
 	  writesize		  "512"
-	  autorestart		  on
-	  dynamicfilemode	  off
+	  autorestart		  "on"
+	  dynamicfilemode	  "off"
 	  maxwritefilesize	  "512*1024^2"
 	}
 	Block {
@@ -3542,7 +3542,7 @@ Model {
 	  SourceType		  "xpcscopeblock"
 	  ShowPortLabels	  "FromPortIcon"
 	  SystemSampleTime	  "-1"
-	  FunctionWithSeparateData off
+	  FunctionWithSeparateData "off"
 	  RTWMemSecFuncInitTerm	  "Inherit from model"
 	  RTWMemSecFuncExecute	  "Inherit from model"
 	  RTWMemSecDataConstants  "Inherit from model"
@@ -3550,10 +3550,10 @@ Model {
 	  RTWMemSecDataParameters "Inherit from model"
 	  scopeno		  "2"
 	  scopetype		  "File"
-	  autostart		  on
+	  autostart		  "on"
 	  viewmode		  "Numerical"
 	  formatstr		  "'%15.6f'"
-	  grid			  on
+	  grid			  "on"
 	  ylimits		  "[-4,4]"
 	  nosamples		  "4096"
 	  noprepostsamples	  "0"
@@ -3567,8 +3567,8 @@ Model {
 	  filename		  "commDsp.dat"
 	  mode			  "Lazy"
 	  writesize		  "512"
-	  autorestart		  on
-	  dynamicfilemode	  off
+	  autorestart		  "on"
+	  dynamicfilemode	  "off"
 	  maxwritefilesize	  "512*1024^2"
 	}
 	Block {
@@ -3583,7 +3583,7 @@ Model {
 	  SourceType		  "xpcscopeblock"
 	  ShowPortLabels	  "FromPortIcon"
 	  SystemSampleTime	  "-1"
-	  FunctionWithSeparateData off
+	  FunctionWithSeparateData "off"
 	  RTWMemSecFuncInitTerm	  "Inherit from model"
 	  RTWMemSecFuncExecute	  "Inherit from model"
 	  RTWMemSecDataConstants  "Inherit from model"
@@ -3591,10 +3591,10 @@ Model {
 	  RTWMemSecDataParameters "Inherit from model"
 	  scopeno		  "3"
 	  scopetype		  "File"
-	  autostart		  on
+	  autostart		  "on"
 	  viewmode		  "Numerical"
 	  formatstr		  "'%15.6f'"
-	  grid			  on
+	  grid			  "on"
 	  ylimits		  "[-4,4]"
 	  nosamples		  "4096"
 	  noprepostsamples	  "0"
@@ -3608,8 +3608,8 @@ Model {
 	  filename		  "measDsp.dat"
 	  mode			  "Lazy"
 	  writesize		  "512"
-	  autorestart		  on
-	  dynamicfilemode	  off
+	  autorestart		  "on"
+	  dynamicfilemode	  "off"
 	  maxwritefilesize	  "512*1024^2"
 	}
 	Block {
@@ -3624,7 +3624,7 @@ Model {
 	  SourceType		  "xpcscopeblock"
 	  ShowPortLabels	  "FromPortIcon"
 	  SystemSampleTime	  "-1"
-	  FunctionWithSeparateData off
+	  FunctionWithSeparateData "off"
 	  RTWMemSecFuncInitTerm	  "Inherit from model"
 	  RTWMemSecFuncExecute	  "Inherit from model"
 	  RTWMemSecDataConstants  "Inherit from model"
@@ -3632,10 +3632,10 @@ Model {
 	  RTWMemSecDataParameters "Inherit from model"
 	  scopeno		  "6"
 	  scopetype		  "File"
-	  autostart		  on
+	  autostart		  "on"
 	  viewmode		  "Numerical"
 	  formatstr		  "'%15.6f'"
-	  grid			  on
+	  grid			  "on"
 	  ylimits		  "[0,3]"
 	  nosamples		  "4096"
 	  noprepostsamples	  "0"
@@ -3649,8 +3649,8 @@ Model {
 	  filename		  "measFrc.dat"
 	  mode			  "Lazy"
 	  writesize		  "512"
-	  autorestart		  on
-	  dynamicfilemode	  off
+	  autorestart		  "on"
+	  dynamicfilemode	  "off"
 	  maxwritefilesize	  "512*1024^2"
 	}
 	Block {
@@ -3702,7 +3702,7 @@ Model {
 	      SourceType	      "Detect Fall Nonpositive"
 	      ShowPortLabels	      "FromPortIcon"
 	      SystemSampleTime	      "-1"
-	      FunctionWithSeparateData off
+	      FunctionWithSeparateData "off"
 	      RTWMemSecFuncInitTerm   "Inherit from model"
 	      RTWMemSecFuncExecute    "Inherit from model"
 	      RTWMemSecDataConstants  "Inherit from model"
@@ -3721,7 +3721,7 @@ Model {
 	      SourceType	      "Detect Rise Positive"
 	      ShowPortLabels	      "FromPortIcon"
 	      SystemSampleTime	      "-1"
-	      FunctionWithSeparateData off
+	      FunctionWithSeparateData "off"
 	      RTWMemSecFuncInitTerm   "Inherit from model"
 	      RTWMemSecFuncExecute    "Inherit from model"
 	      RTWMemSecDataConstants  "Inherit from model"
@@ -3937,7 +3937,7 @@ Model {
 	      SourceType	      "xpcscopeblock"
 	      ShowPortLabels	      "FromPortIcon"
 	      SystemSampleTime	      "-1"
-	      FunctionWithSeparateData off
+	      FunctionWithSeparateData "off"
 	      RTWMemSecFuncInitTerm   "Inherit from model"
 	      RTWMemSecFuncExecute    "Inherit from model"
 	      RTWMemSecDataConstants  "Inherit from model"
@@ -3945,10 +3945,10 @@ Model {
 	      RTWMemSecDataParameters "Inherit from model"
 	      scopeno		      "7"
 	      scopetype		      "File"
-	      autostart		      on
+	      autostart		      "on"
 	      viewmode		      "Numerical"
 	      formatstr		      "'%15.6f'"
-	      grid		      on
+	      grid		      "on"
 	      ylimits		      "[0,3]"
 	      nosamples		      "4096"
 	      noprepostsamples	      "0"
@@ -3962,8 +3962,8 @@ Model {
 	      filename		      "flag.dat"
 	      mode		      "Lazy"
 	      writesize		      "512"
-	      autorestart	      on
-	      dynamicfilemode	      off
+	      autorestart	      "on"
+	      dynamicfilemode	      "off"
 	      maxwritefilesize	      "512*1024^2"
 	    }
 	    Block {
@@ -5678,7 +5678,7 @@ Stateflow {
     linkNode		    [2 19 21]
     scope		    PARAMETER_DATA
     initFromWorkspace	    1
-    paramIndexForInitFromWorkspace 2
+    paramIndexForInitFromWorkspace 1
     machine		    1
     props {
       initialValue	      "1"
