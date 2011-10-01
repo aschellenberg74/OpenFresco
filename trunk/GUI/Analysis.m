@@ -244,24 +244,24 @@ switch action
                         guidata(findobj('Tag','OpenFrescoExpress'), handles);
                         DIR = which('OpenFrescoExpress.m');
                         DIR = DIR(1:end-20);
-                        % load path to OpenFresco executable
-                        if ~exist('OpenFrescoPath.txt','file')
-                            fprintf(1,'Using GUI-internal OpenFresco executable at:\n');
+                        % load path to OpenSees.exe and OpenFresco.dll
+                        if ~exist('OpenSeesPath.txt','file')
+                            fprintf(1,'Using GUI-internal OpenSees/OpenFresco at:\n');
                             pathOPF = which('Pnpscr.dll');
                             pathOPF = pathOPF(1:end-11);
                             fprintf(1,'%s\n',pathOPF);
                         else
-                            fprintf(1,'Using user-specified OpenFresco executable at:\n');
-                            s = which('OpenFrescoPath.txt');
+                            fprintf(1,'Using user-specified OpenSees/OpenFresco at:\n');
+                            s = which('OpenSeesPath.txt');
                             if isempty(s)
-                                s = fullfile(pwd,'OpenFrescoPath.txt');
+                                s = fullfile(pwd,'OpenSeesPath.txt');
                             end
                             FID = fopen(s,'r');
                             pathOPF = fgetl(FID);
                             fclose(FID);
                             fprintf(1,'%s\n',pathOPF);
                         end
-                        % now run OpenFresco
+                        % now run OpenSees/OpenFresco
                         RunOpenFresco(pathOPF,fullfile(DIR,'OPFAnalysis.tcl'));
                         clear functions;
                         handles.Response = Integrator_NewmarkExplicit(handles.Model,handles.GM,[],handles.Analysis);

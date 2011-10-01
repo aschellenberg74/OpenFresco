@@ -133,6 +133,6 @@ end
 %#function GUI_Template GetFFT GetFileList GroundMotions 
 %#function InputCheck Integrator_AlphaOS Integrator_NewmarkExplicit Links 
 %#function MenuBar OpenFrescoExpress ReadWriteTHFileNGA ReplayResults 
-%#function Report RunOpenFresco SetOPFPath SplashScreen 
-%#function Structure TCPSocket TerminateAnalysis UpdatePragmaList 
-%#function WriteTCL 
+%#function Report ResizeImage RunOpenFresco SetOPFPath 
+%#function SplashScreen Structure TCPSocket TerminateAnalysis 
+%#function UpdatePragmaList WriteTCL 
