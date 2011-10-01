@@ -37,7 +37,7 @@ if ~isempty(findobj('Tag','OpenFresco Express'))
    return
 end
 
-%Check for .tcl and report files and delete if found
+% Check for .tcl and report files and delete if found
 fclose('all');
 DIR = which('OpenFrescoExpress.m');
 DIR = DIR(1:end-20);
@@ -48,97 +48,178 @@ if exist(fullfile(DIR,'OPFReport.txt'),'file')
     delete(fullfile(DIR,'OPFReport.txt'));
 end
 
-%Get window size
+% Get window size
 SS = get(0,'screensize');
 
-%Pre-allocate colors and fonts
+% Pre-allocate colors and fonts
 fig_color = [0 0.45 1.0];
 panel_color = [0.3 0.5 0.7];
 panelDefault = [0.941176 0.941176 0.941176];
 font = 'Lucinda Sans';
-         
-%Load Buttons
-%Sidebar
-sideButWidth  = 0.8*SS(3)*0.1*0.84;
-sideButHeight = 0.8*SS(4)*0.5*0.16;
-Analysis0     = imresize(imread(which('Analysis0.png')), [(sideButHeight) (sideButWidth)]);
-Analysis1     = imresize(imread(which('Analysis1.png')), [(sideButHeight) (sideButWidth)]);
-ExpControl0   = imresize(imread(which('ExpControl0.png')), [(sideButHeight) (sideButWidth)]);
-ExpControl1   = imresize(imread(which('ExpControl1.png')), [(sideButHeight) (sideButWidth)]);
-ExpSetup0     = imresize(imread(which('ExpSetup0.png')), [(sideButHeight) (sideButWidth)]);
-ExpSetup1     = imresize(imread(which('ExpSetup1.png')), [(sideButHeight) (sideButWidth)]);
-Loading0      = imresize(imread(which('Loading0.png')), [(sideButHeight) (sideButWidth)]);
-Loading1      = imresize(imread(which('Loading1.png')), [(sideButHeight) (sideButWidth)]);
-Structure0    = imresize(imread(which('Structure0.png')), [(sideButHeight) (sideButWidth)]);
-Structure1    = imresize(imread(which('Structure1.png')), [(sideButHeight) (sideButWidth)]);
 
-%Structure Images
-structureWidth  = 0.8*SS(3)*0.81*0.318;
-structureHeight = 0.8*SS(4)*0.9*0.445;
-Model1A0 = imresize(imread(which('Model1A0.png')), [structureHeight structureWidth]);
-Model1A1 = imresize(imread(which('Model1A1.png')), [structureHeight structureWidth]);
-Model2A0 = imresize(imread(which('Model2A0.png')), [structureHeight structureWidth]);
-Model2A1 = imresize(imread(which('Model2A1.png')), [structureHeight structureWidth]);
-Model2B0 = imresize(imread(which('Model2B0.png')), [structureHeight structureWidth]);
-Model2B1 = imresize(imread(which('Model2B1.png')), [structureHeight structureWidth]);
+% Load Buttons
+if exist('imresize','file')
+    % Sidebar
+    sideButWidth  = 0.8*SS(3)*0.1*0.84;
+    sideButHeight = 0.8*SS(4)*0.5*0.16;
+    Analysis0     = imresize(imread(which('Analysis0.png')), [(sideButHeight) (sideButWidth)]);
+    Analysis1     = imresize(imread(which('Analysis1.png')), [(sideButHeight) (sideButWidth)]);
+    ExpControl0   = imresize(imread(which('ExpControl0.png')), [(sideButHeight) (sideButWidth)]);
+    ExpControl1   = imresize(imread(which('ExpControl1.png')), [(sideButHeight) (sideButWidth)]);
+    ExpSetup0     = imresize(imread(which('ExpSetup0.png')), [(sideButHeight) (sideButWidth)]);
+    ExpSetup1     = imresize(imread(which('ExpSetup1.png')), [(sideButHeight) (sideButWidth)]);
+    Loading0      = imresize(imread(which('Loading0.png')), [(sideButHeight) (sideButWidth)]);
+    Loading1      = imresize(imread(which('Loading1.png')), [(sideButHeight) (sideButWidth)]);
+    Structure0    = imresize(imread(which('Structure0.png')), [(sideButHeight) (sideButWidth)]);
+    Structure1    = imresize(imread(which('Structure1.png')), [(sideButHeight) (sideButWidth)]);
+    
+    % Structure Images
+    structureWidth  = 0.8*SS(3)*0.81*0.318;
+    structureHeight = 0.8*SS(4)*0.9*0.445;
+    Model1A0 = imresize(imread(which('Model1A0.png')), [structureHeight structureWidth]);
+    Model1A1 = imresize(imread(which('Model1A1.png')), [structureHeight structureWidth]);
+    Model2A0 = imresize(imread(which('Model2A0.png')), [structureHeight structureWidth]);
+    Model2A1 = imresize(imread(which('Model2A1.png')), [structureHeight structureWidth]);
+    Model2B0 = imresize(imread(which('Model2B0.png')), [structureHeight structureWidth]);
+    Model2B1 = imresize(imread(which('Model2B1.png')), [structureHeight structureWidth]);
+    
+    % Loading Page
+    loadingWidth  = 0.8*SS(3)*0.81*0.1;
+    loadingHeight = 0.8*SS(4)*0.9*0.08;
+    GM0 = imresize(imread(which('GroundMotions0.png')), [loadingHeight loadingWidth]);
+    GM1 = imresize(imread(which('GroundMotions1.png')), [loadingHeight loadingWidth]);
+    IC0 = imresize(imread(which('InitialConditions0.png')), [loadingHeight loadingWidth]);
+    IC1 = imresize(imread(which('InitialConditions1.png')), [loadingHeight loadingWidth]);
+    
+    % Experimental Setup Page
+    setupWidth  = 0.8*SS(3)*0.81*0.5;
+    setupHeight = 0.8*SS(4)*0.9*0.6;
+    ESModel1A1 = imresize(imread(which('ESModel1A1.png')), [setupHeight setupWidth]);
+    ESModel2A1 = imresize(imread(which('ESModel2A1.png')), [setupHeight setupWidth]);
+    ESModel2B1 = imresize(imread(which('ESModel2B1.png')), [setupHeight setupWidth]);
+    
+    % Experimental Control Page
+    ECWidth  = 0.8*SS(3)*0.81*0.1;
+    ECHeight = 0.8*SS(4)*0.9*0.08;
+    CP0   = imresize(imread(which('ControlPoint0.png')), [ECHeight ECWidth]);
+    CP1   = imresize(imread(which('ControlPoint1.png')), [ECHeight ECWidth]);
+    Sim0  = imresize(imread(which('Simulation0.png')), [ECHeight ECWidth]);
+    Sim1  = imresize(imread(which('Simulation1.png')), [ECHeight ECWidth]);
+    Real0 = imresize(imread(which('RealController0.png')), [ECHeight ECWidth]);
+    Real1 = imresize(imread(which('RealController1.png')), [ECHeight ECWidth]);
+    
+    % Analysis Page
+    analysisWidth1  = 0.8*SS(3)*0.81*0.5*0.3;
+    analysisHeight1 = 0.8*SS(4)*0.9*0.197*0.627;
+    Start0a = imresize(imread(which('Start0.png')), [analysisHeight1 analysisWidth1]);
+    Start1a = imresize(imread(which('Start1.png')), [analysisHeight1 analysisWidth1]);
+    Pause0a = imresize(imread(which('Pause0.png')), [analysisHeight1 analysisWidth1]);
+    Pause1a = imresize(imread(which('Pause1.png')), [analysisHeight1 analysisWidth1]);
+    Stop0a  = imresize(imread(which('Stop0.png')), [analysisHeight1 analysisWidth1]);
+    Stop1a  = imresize(imread(which('Stop1.png')), [analysisHeight1 analysisWidth1]);
+    
+    % Analysis Controls
+    analysisWidth2 = 0.1*SS(3)*0.94*0.835;
+    analysisHeight2 = 0.265*SS(4)*0.94*0.3;
+    Start0b = imresize(imread(which('Start0.png')), [analysisHeight2 analysisWidth2]);
+    Start1b = imresize(imread(which('Start1.png')), [analysisHeight2 analysisWidth2]);
+    Pause0b = imresize(imread(which('Pause0.png')), [analysisHeight2 analysisWidth2]);
+    Pause1b = imresize(imread(which('Pause1.png')), [analysisHeight2 analysisWidth2]);
+    Stop0b  = imresize(imread(which('Stop0.png')), [analysisHeight2 analysisWidth2]);
+    Stop1b  = imresize(imread(which('Stop1.png')), [analysisHeight2 analysisWidth2]);
+    
+    % Question Button
+    questWidth = SS(4)*0.8*0.81*0.32*0.1;
+    questHeight = SS(3)*0.8*0.9*0.28*0.07;
+    Question0 = imresize(imread(which('Question0.png')),[questHeight questWidth]);
+    Question1 = imresize(imread(which('Question1.png')),[questHeight questWidth]);
+    
+    % Logos
+    MTS = imread(which('MTSMetal.png'));
+    PEER = imread(which('PEERBoldMetal.png'));
+else
+    % Sidebar
+    sideButWidth  = 0.8*SS(3)*0.1*0.84;
+    sideButHeight = 0.8*SS(4)*0.5*0.16;
+    Analysis0     = ResizeImage(imread(which('Analysis0.png')), [(sideButHeight) (sideButWidth)]);
+    Analysis1     = ResizeImage(imread(which('Analysis1.png')), [(sideButHeight) (sideButWidth)]);
+    ExpControl0   = ResizeImage(imread(which('ExpControl0.png')), [(sideButHeight) (sideButWidth)]);
+    ExpControl1   = ResizeImage(imread(which('ExpControl1.png')), [(sideButHeight) (sideButWidth)]);
+    ExpSetup0     = ResizeImage(imread(which('ExpSetup0.png')), [(sideButHeight) (sideButWidth)]);
+    ExpSetup1     = ResizeImage(imread(which('ExpSetup1.png')), [(sideButHeight) (sideButWidth)]);
+    Loading0      = ResizeImage(imread(which('Loading0.png')), [(sideButHeight) (sideButWidth)]);
+    Loading1      = ResizeImage(imread(which('Loading1.png')), [(sideButHeight) (sideButWidth)]);
+    Structure0    = ResizeImage(imread(which('Structure0.png')), [(sideButHeight) (sideButWidth)]);
+    Structure1    = ResizeImage(imread(which('Structure1.png')), [(sideButHeight) (sideButWidth)]);
+    
+    % Structure Images
+    structureWidth  = 0.8*SS(3)*0.81*0.318;
+    structureHeight = 0.8*SS(4)*0.9*0.445;
+    Model1A0 = ResizeImage(imread(which('Model1A0.png')), [structureHeight structureWidth]);
+    Model1A1 = ResizeImage(imread(which('Model1A1.png')), [structureHeight structureWidth]);
+    Model2A0 = ResizeImage(imread(which('Model2A0.png')), [structureHeight structureWidth]);
+    Model2A1 = ResizeImage(imread(which('Model2A1.png')), [structureHeight structureWidth]);
+    Model2B0 = ResizeImage(imread(which('Model2B0.png')), [structureHeight structureWidth]);
+    Model2B1 = ResizeImage(imread(which('Model2B1.png')), [structureHeight structureWidth]);
+    
+    % Loading Page
+    loadingWidth  = 0.8*SS(3)*0.81*0.1;
+    loadingHeight = 0.8*SS(4)*0.9*0.08;
+    GM0 = ResizeImage(imread(which('GroundMotions0.png')), [loadingHeight loadingWidth]);
+    GM1 = ResizeImage(imread(which('GroundMotions1.png')), [loadingHeight loadingWidth]);
+    IC0 = ResizeImage(imread(which('InitialConditions0.png')), [loadingHeight loadingWidth]);
+    IC1 = ResizeImage(imread(which('InitialConditions1.png')), [loadingHeight loadingWidth]);
+    
+    % Experimental Setup Page
+    setupWidth  = 0.8*SS(3)*0.81*0.5;
+    setupHeight = 0.8*SS(4)*0.9*0.6;
+    ESModel1A1 = ResizeImage(imread(which('ESModel1A1.png')), [setupHeight setupWidth]);
+    ESModel2A1 = ResizeImage(imread(which('ESModel2A1.png')), [setupHeight setupWidth]);
+    ESModel2B1 = ResizeImage(imread(which('ESModel2B1.png')), [setupHeight setupWidth]);
+    
+    % Experimental Control Page
+    ECWidth  = 0.8*SS(3)*0.81*0.1;
+    ECHeight = 0.8*SS(4)*0.9*0.08;
+    CP0   = ResizeImage(imread(which('ControlPoint0.png')), [ECHeight ECWidth]);
+    CP1   = ResizeImage(imread(which('ControlPoint1.png')), [ECHeight ECWidth]);
+    Sim0  = ResizeImage(imread(which('Simulation0.png')), [ECHeight ECWidth]);
+    Sim1  = ResizeImage(imread(which('Simulation1.png')), [ECHeight ECWidth]);
+    Real0 = ResizeImage(imread(which('RealController0.png')), [ECHeight ECWidth]);
+    Real1 = ResizeImage(imread(which('RealController1.png')), [ECHeight ECWidth]);
+    
+    % Analysis Page
+    analysisWidth1  = 0.8*SS(3)*0.81*0.5*0.3;
+    analysisHeight1 = 0.8*SS(4)*0.9*0.197*0.627;
+    Start0a = ResizeImage(imread(which('Start0.png')), [analysisHeight1 analysisWidth1]);
+    Start1a = ResizeImage(imread(which('Start1.png')), [analysisHeight1 analysisWidth1]);
+    Pause0a = ResizeImage(imread(which('Pause0.png')), [analysisHeight1 analysisWidth1]);
+    Pause1a = ResizeImage(imread(which('Pause1.png')), [analysisHeight1 analysisWidth1]);
+    Stop0a  = ResizeImage(imread(which('Stop0.png')), [analysisHeight1 analysisWidth1]);
+    Stop1a  = ResizeImage(imread(which('Stop1.png')), [analysisHeight1 analysisWidth1]);
+    
+    % Analysis Controls
+    analysisWidth2 = 0.1*SS(3)*0.94*0.835;
+    analysisHeight2 = 0.265*SS(4)*0.94*0.3;
+    Start0b = ResizeImage(imread(which('Start0.png')), [analysisHeight2 analysisWidth2]);
+    Start1b = ResizeImage(imread(which('Start1.png')), [analysisHeight2 analysisWidth2]);
+    Pause0b = ResizeImage(imread(which('Pause0.png')), [analysisHeight2 analysisWidth2]);
+    Pause1b = ResizeImage(imread(which('Pause1.png')), [analysisHeight2 analysisWidth2]);
+    Stop0b  = ResizeImage(imread(which('Stop0.png')), [analysisHeight2 analysisWidth2]);
+    Stop1b  = ResizeImage(imread(which('Stop1.png')), [analysisHeight2 analysisWidth2]);
+    
+    % Question Button
+    questWidth = SS(4)*0.8*0.81*0.32*0.1;
+    questHeight = SS(3)*0.8*0.9*0.28*0.07;
+    Question0 = ResizeImage(imread(which('Question0.png')),[questHeight questWidth]);
+    Question1 = ResizeImage(imread(which('Question1.png')),[questHeight questWidth]);
+    
+    % Logos
+    MTS = imread(which('MTSMetal.png'));
+    PEER = imread(which('PEERBoldMetal.png'));
+end
 
-%Loading Page
-loadingWidth  = 0.8*SS(3)*0.81*0.1;
-loadingHeight = 0.8*SS(4)*0.9*0.08;
-GM0 = imresize(imread(which('GroundMotions0.png')), [loadingHeight loadingWidth]);
-GM1 = imresize(imread(which('GroundMotions1.png')), [loadingHeight loadingWidth]);
-IC0 = imresize(imread(which('InitialConditions0.png')), [loadingHeight loadingWidth]);
-IC1 = imresize(imread(which('InitialConditions1.png')), [loadingHeight loadingWidth]);
 
-% Experimental Setup Page
-setupWidth  = 0.8*SS(3)*0.81*0.5;
-setupHeight = 0.8*SS(4)*0.9*0.6;
-ESModel1A1 = imresize(imread(which('ESModel1A1.png')), [setupHeight setupWidth]);
-ESModel2A1 = imresize(imread(which('ESModel2A1.png')), [setupHeight setupWidth]);
-ESModel2B1 = imresize(imread(which('ESModel2B1.png')), [setupHeight setupWidth]);
-
-%Experimental Control Page
-ECWidth  = 0.8*SS(3)*0.81*0.1;
-ECHeight = 0.8*SS(4)*0.9*0.08;
-CP0   = imresize(imread(which('ControlPoint0.png')), [ECHeight ECWidth]);
-CP1   = imresize(imread(which('ControlPoint1.png')), [ECHeight ECWidth]);
-Sim0  = imresize(imread(which('Simulation0.png')), [ECHeight ECWidth]);
-Sim1  = imresize(imread(which('Simulation1.png')), [ECHeight ECWidth]);
-Real0 = imresize(imread(which('RealController0.png')), [ECHeight ECWidth]);
-Real1 = imresize(imread(which('RealController1.png')), [ECHeight ECWidth]);
-
-%Analysis Page
-analysisWidth1  = 0.8*SS(3)*0.81*0.5*0.3;
-analysisHeight1 = 0.8*SS(4)*0.9*0.197*0.627;
-Start0a = imresize(imread(which('Start0.png')), [analysisHeight1 analysisWidth1]);
-Start1a = imresize(imread(which('Start1.png')), [analysisHeight1 analysisWidth1]);
-Pause0a = imresize(imread(which('Pause0.png')), [analysisHeight1 analysisWidth1]);
-Pause1a = imresize(imread(which('Pause1.png')), [analysisHeight1 analysisWidth1]);
-Stop0a  = imresize(imread(which('Stop0.png')), [analysisHeight1 analysisWidth1]);
-Stop1a  = imresize(imread(which('Stop1.png')), [analysisHeight1 analysisWidth1]);
-
-%Analysis Controls
-analysisWidth2 = 0.1*SS(3)*0.94*0.835;
-analysisHeight2 = 0.265*SS(4)*0.94*0.3;
-Start0b = imresize(imread(which('Start0.png')), [analysisHeight2 analysisWidth2]);
-Start1b = imresize(imread(which('Start1.png')), [analysisHeight2 analysisWidth2]);
-Pause0b = imresize(imread(which('Pause0.png')), [analysisHeight2 analysisWidth2]);
-Pause1b = imresize(imread(which('Pause1.png')), [analysisHeight2 analysisWidth2]);
-Stop0b  = imresize(imread(which('Stop0.png')), [analysisHeight2 analysisWidth2]);
-Stop1b  = imresize(imread(which('Stop1.png')), [analysisHeight2 analysisWidth2]);
-
-%Question Button
-questWidth = SS(4)*0.8*0.81*0.32*0.1;
-questHeight = SS(3)*0.8*0.9*0.28*0.07;
-Question0 = imresize(imread(which('Question0.png')),[questHeight questWidth]);
-Question1 = imresize(imread(which('Question1.png')),[questHeight questWidth]);
-
-%Logos
-MTS = imread(which('MTSMetal.png'));
-PEER = imread(which('PEERBoldMetal.png'));
-
-
-%Create Main Figure
+% Create Main Figure
 f = figure('Visible','off',...
            'Name','OpenFresco Express',...
            'NumberTitle','off',...
@@ -153,7 +234,7 @@ Background = axes('Parent',f,'Position',[0 0 1 1]);
 imagesc(imread(which('Metal.jpg')));
 set(Background,'XTick',[],'YTick',[]);
 
-%Add Menubar
+% Add Menubar
 Menu(1) = uimenu('Position',1,'Label','File');
 Menu(2) = uimenu(Menu(1),'Position',1,'Label','Load', ...
    'Accelerator','L','Callback','MenuBar(''load'')');
@@ -168,7 +249,7 @@ Menu(7) = uimenu(Menu(5),'Position',2,'Label','Disclaimer', ...
    'Callback','OpenFrescoExpress(''about'')');
 
 
-%Create Sidebar Tabs
+% Create Sidebar Tabs
 Sidebar(1) = uibuttongroup('Parent',f,...
     'BackgroundColor',panel_color,...
     'Position',[0.03 .45 .1 .5]);
