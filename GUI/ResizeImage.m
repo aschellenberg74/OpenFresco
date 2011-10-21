@@ -26,9 +26,9 @@ function newimg = ResizeImage(oldimg,newsize)
 %%                                                                      %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% $Revision: $
-% $Date: $
-% $URL: $
+% $Revision$
+% $Date$
+% $URL$
 
 oldsize = size(oldimg);
 newsize = [ceil(newsize),oldsize(3)];
