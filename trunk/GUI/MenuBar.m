@@ -161,10 +161,6 @@ switch action
                             else
                                 set(handles.GroundMotions(28),'String',handles.GM.dt(1),'Style','text','BackgroundColor',[0.941176 0.941176 0.941176]);
                             end
-                            
-                            %Store analysis dt
-                            handles.GM.dtAnalysis = min(handles.GM.dt);
-                            set(handles.Analysis(3),'String',num2str(handles.GM.dtAnalysis));
                         end
                     case 'Initial Conditions'
                         set(handles.GroundMotions(19),'Value',0,'CData',handles.Store.GM0);
@@ -293,6 +289,12 @@ switch action
                 set(handles.EC([63 69 75 81]),'Value',0);
                 set(handles.EC([64 65 70 71 76 77 82 83]),'BackgroundColor',panelDefault,'Style','text','String','');
                 
+                %Analysis
+                if ~isfield(handles.GM,'dtAnalysis')
+                    handles.GM.dtAnalysis = min(handles.GM.dt);
+                end
+                set(handles.Analysis(3),'String',num2str(handles.GM.dtAnalysis));
+                
                 %Set Structure page on
                 h = guihandles(gcf);
                 set(h.Structure,'Value',1);
@@ -396,10 +398,6 @@ switch action
                             else
                                 set(handles.GroundMotions(28),'String',handles.GM.dt(1),'Style','text','BackgroundColor',[0.941176 0.941176 0.941176]);
                             end
-                            
-                            %Store analysis dt
-                            handles.GM.dtAnalysis = min(handles.GM.dt);
-                            set(handles.Analysis(3),'String',num2str(handles.GM.dtAnalysis));
                         end
                     case 'Initial Conditions'
                         set(handles.GroundMotions(19),'Value',0,'CData',handles.Store.GM0);
@@ -529,6 +527,12 @@ switch action
                 set(handles.EC([63 69 75 81]),'Value',0);
                 set(handles.EC([64 65 70 71 76 77 82 83]),'BackgroundColor',panelDefault,'Style','text','String','');                
                 
+                %Analysis
+                if ~isfield(handles.GM,'dtAnalysis')
+                    handles.GM.dtAnalysis = min(handles.GM.dt);
+                end
+                set(handles.Analysis(3),'String',num2str(handles.GM.dtAnalysis));
+                
                 %Set Structure page on
                 h = guihandles(gcf);
                 set(h.Structure,'Value',1);
@@ -628,10 +632,6 @@ switch action
                             else
                                 set(handles.GroundMotions(28),'String',handles.GM.dt(1),'Style','text','BackgroundColor',[0.941176 0.941176 0.941176]);
                             end
-                            
-                            %Store analysis dt
-                            handles.GM.dtAnalysis = min(handles.GM.dt);
-                            set(handles.Analysis(3),'String',num2str(handles.GM.dtAnalysis));
                         end
                         if length(handles.GM.t{2}) > 1
                             plot(handles.GroundMotions(15), handles.GM.scalet{2}, handles.GM.scaleag{2});
@@ -646,7 +646,6 @@ switch action
                             else
                                 set(handles.GroundMotions(29),'String',handles.GM.dt(2),'Style','text','BackgroundColor',[0.941176 0.941176 0.941176]);
                             end
-                            
                         end
                     case 'Initial Conditions'
                         set(handles.GroundMotions(19),'Value',0,'CData',handles.Store.GM0);
@@ -775,6 +774,12 @@ switch action
                 set(handles.EC([62 68 74 80]),'String','1');
                 set(handles.EC([63 69 75 81]),'Value',0);
                 set(handles.EC([64 65 70 71 76 77 82 83]),'BackgroundColor',panelDefault,'Style','text','String','');
+                
+                %Analysis
+                if ~isfield(handles.GM,'dtAnalysis')
+                    handles.GM.dtAnalysis = min(handles.GM.dt);
+                end
+                set(handles.Analysis(3),'String',num2str(handles.GM.dtAnalysis));
                 
                 %Set Structure page on
                 h = guihandles(gcf);
