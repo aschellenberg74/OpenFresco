@@ -123,6 +123,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\SRC\experimentalControl\ECGenericTCP.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\DummyStream.cpp" />
     <ClCompile Include="..\..\..\SRC\tcl\TclStartLabServer.cpp" />
     <ClCompile Include="..\..\..\SRC\tcl\TclStartSimAppElemServer.cpp" />
@@ -294,6 +295,7 @@
     <ClCompile Include="..\..\..\SRC\openseesExtra\XmlFileStream.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\SRC\experimentalControl\ECGenericTCP.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\bool.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\DummyStream.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\packages.h" />

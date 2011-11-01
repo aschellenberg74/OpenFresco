@@ -113,6 +113,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\SRC\experimentalControl\ECGenericTCP.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\Analysis.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\AnalysisModel.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\ArrayOfTaggedObjects.cpp" />
@@ -288,6 +289,7 @@
     <ClCompile Include="..\..\MSVCerrno.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\SRC\experimentalControl\ECGenericTCP.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\Analysis.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\AnalysisModel.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\ArrayOfTaggedObjects.h" />

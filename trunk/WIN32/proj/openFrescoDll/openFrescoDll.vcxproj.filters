@@ -542,6 +542,9 @@
     <ClCompile Include="..\..\..\SRC\openseesExtra\DummyStream.cpp">
       <Filter>openseesExtra</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalControl\ECGenericTCP.cpp">
+      <Filter>experimentalControl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\SRC\utility\ExpControlSP.h">
@@ -1065,6 +1068,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\SRC\openseesExtra\bool.h">
       <Filter>openseesExtra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalControl\ECGenericTCP.h">
+      <Filter>experimentalControl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
