@@ -49,6 +49,7 @@
 #include <ECLabVIEW.h>
 //#include <ECNIEseries.h>
 #include <ECSCRAMNet.h>
+#include <ECGenericTCP.h>
 #endif
 
 extern ExperimentalCP *getExperimentalCP(int tag);
@@ -759,7 +760,79 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
 		theControl = new ECSCRAMNet(tag, memOffset, numActCh);
     }
 #endif
+
+    // ----------------------------------------------------------------------------	
+    else if (strcmp(argv[1],"GenericTCP") == 0)  {
+		if (argc < 8)  {
+			opserr << "WARNING invalid number of arguments\n";
+			printCommand(argc,argv);
+			opserr << "Want: expControl GenericTCP tag ipAddr ipPort -ctrlModes (5 mode) -daqModes (5 mode) "
+                << "<-initFile fileName> <-ctrlFilters (5 filterTag)> <-daqFilters (5 filterTag)>\n";
+			return TCL_ERROR;
+		}
+        
+		char *ipAddr;
+		int ipPort, mode, i;
+        ID ctrlModes(5), daqModes(5);
+        char *initFileName = 0;
 		
+        argi = 2;
+		if (Tcl_GetInt(interp, argv[argi], &tag) != TCL_OK)  {
+			opserr << "WARNING invalid expControl GenericTCP tag\n";
+			return TCL_ERROR;
+		}
+        argi++;
+        ipAddr = new char [strlen(argv[argi])+1];
+		strcpy(ipAddr,argv[argi]);
+        argi++;
+        if (Tcl_GetInt(interp, argv[argi], &ipPort) != TCL_OK)  {
+            opserr << "WARNING invalid ipPort\n";
+            opserr << "expControl GenericTCP " << tag << endln;
+            return TCL_ERROR;
+        }
+        argi++;
+        if (strcmp(argv[argi],"-ctrlModes") != 0)  {
+		    opserr << "WARNING expecting -ctrlModes (5 mode)\n";
+		    opserr << "expControl GenericTCP " << tag << endln;
+		    return TCL_ERROR;
+        }
+        argi++;
+        for (i=0; i<5; i++)  {
+            if (Tcl_GetInt(interp, argv[argi], &mode) != TCL_OK)  {
+                opserr << "WARNING invalid mode\n";
+                opserr << "expControl GenericTCP " << tag << endln;
+                return TCL_ERROR;	
+            }
+            ctrlModes(i) = mode;
+            argi++;
+        }
+        if (strcmp(argv[argi],"-daqModes") != 0)  {
+		    opserr << "WARNING expecting -daqModes (5 mode)\n";
+		    opserr << "expControl GenericTCP " << tag << endln;
+		    return TCL_ERROR;
+        }
+        argi++;
+        for (i=0; i<5; i++)  {
+            if (Tcl_GetInt(interp, argv[argi], &mode) != TCL_OK)  {
+                opserr << "WARNING invalid mode\n";
+                opserr << "expControl GenericTCP " << tag << endln;
+                return TCL_ERROR;	
+            }
+            daqModes(i) = mode;
+            argi++;
+        }
+        for (i = argi; i < argc; i++)  {
+            if (strcmp(argv[i], "-initFile") == 0)  {
+                initFileName = new char [strlen(argv[i+1])+1];
+                strcpy(initFileName,argv[i+1]);
+            }
+        }
+		
+		// parsing was successful, allocate the control
+		theControl = new ECGenericTCP(tag, ipAddr, ipPort,
+            ctrlModes, daqModes, initFileName);
+    }
+
     // ----------------------------------------------------------------------------	
     else  {
         // experimental control type not recognized

@@ -842,12 +842,12 @@ int ECLabVIEW::acquire()
                 opserr << "ECLabVIEW::acquire() - "
                     << "received wrong direction\n"
                     << " direction <= " << ndf
-                    << " but got: " << direction << endln;
+                    << " but got: " << direction+1 << endln;
                 exit(OF_ReturnType_failed);
             }
 
             // assemble displacement and force daq vectors
-            if (response == 0)  {
+            if (response == OF_Resp_Disp)  {
                 int id = dID;
                 for (int j=0; j<numDir; j++)  {
                     if (resp(j) == response)  {
@@ -859,7 +859,7 @@ int ECLabVIEW::acquire()
                     }
                 }
             }
-            else if (response == 3)  {
+            else if (response == OF_Resp_Force)  {
                 int id = fID;
                 for (int j=0; j<numDir; j++)  {
                     if (resp(j) == response)  {
