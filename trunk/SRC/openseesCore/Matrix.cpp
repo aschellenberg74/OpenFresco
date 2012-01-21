@@ -34,7 +34,6 @@
 #include "Matrix.h"
 #include "Vector.h"
 #include "ID.h"
-#include <Tensor.h>
 
 #include <stdlib.h>
 
@@ -643,8 +642,7 @@ Matrix::Invert(Matrix &theInverse) const
 
     return info;
 }
-    
-		    
+
 
 int
 Matrix::addMatrix(double factThis, const Matrix &other, double factOther)
@@ -715,6 +713,81 @@ Matrix::addMatrix(double factThis, const Matrix &other, double factOther)
     return 0;
 }
 
+
+int
+Matrix::addMatrixTranspose(double factThis, const Matrix &other, double factOther)
+{
+    if (factThis == 1.0 && factOther == 0.0)
+      return 0;
+
+#ifdef _G3DEBUG
+    if ((other.numRows != numRows) || (other.numCols != numCols)) {
+      opserr << "Matrix::addMatrixTranspose(): incompatable matrices\n";
+      return -1;
+    }
+#endif
+
+    if (factThis == 1.0) {
+
+      // want: this += other^T * factOther
+      if (factOther == 1.0) {
+    double *dataPtr = data;
+    for (int j=0; j<numCols; j++) {
+      for (int i=0; i<numRows; i++)
+	    *dataPtr++ += (other.data)[j+i*numRows];
+    }
+      } else {
+	double *dataPtr = data;
+    for (int j=0; j<numCols; j++) {
+      for (int i=0; i<numRows; i++)
+	    *dataPtr++ += (other.data)[j+i*numRows] * factOther;
+    }
+      }
+    } 
+
+    else if (factThis == 0.0) {
+
+      // want: this = other^T * factOther
+      if (factOther == 1.0) {
+	double *dataPtr = data;
+    for (int j=0; j<numCols; j++) {
+      for (int i=0; i<numRows; i++)
+	    *dataPtr++ = (other.data)[j+i*numRows];
+    }
+      } else {
+	double *dataPtr = data;
+    for (int j=0; j<numCols; j++) {
+      for (int i=0; i<numRows; i++)
+	    *dataPtr++ = (other.data)[j+i*numRows] * factOther;
+    }
+      }
+    } 
+
+    else {
+
+      // want: this = this * thisFact + other^T * factOther
+      if (factOther == 1.0) {
+	double *dataPtr = data;
+    for (int j=0; j<numCols; j++) {
+      for (int i=0; i<numRows; i++) {
+        double value = *dataPtr * factThis + (other.data)[j+i*numRows];
+	    *dataPtr++ = value;
+      }
+    }
+      } else {
+	double *dataPtr = data;
+    for (int j=0; j<numCols; j++) {
+      for (int i=0; i<numRows; i++) {
+	    double value = *dataPtr * factThis + (other.data)[j+i*numRows] * factOther;
+	    *dataPtr++ = value;
+      }
+    }
+      }
+    } 
+
+    // successfull
+    return 0;
+}
 
 
 int
@@ -1128,102 +1201,6 @@ Matrix::operator=(const Matrix &other)
 
 
 
-Matrix &
-Matrix::operator=(const Tensor &V)
-{
-  int rank = V.rank();
-  if (rank != 4) {
-    opserr << "Matrix::operator=() - tensor must be of rank 4\n";
-      return *this;
-  }
-  int dim = V.dim(1);
-  if (dim != V.dim(2) != V.dim(3) != V.dim(4)) {
-      opserr << "Matrix::operator=() - tensor must have square dimensions\n";
-      return *this;
-  }
-
-  if (dim != 2 || dim != 3 || dim != 1) {
-      opserr << "Matrix::operator=() - tensor must be of dimension 2 or 3\n";
-      return *this;
-  }      
-
-  if (dim == 1) {
-    if ((numCols != 1) || (numRows != 1)) {      
-      opserr << "Matrix::operator=() - matrix must be 1x1 for tensor of dimension 3\n";
-      return *this;
-    }      	  
-    (*this)(0,0) = V.cval(1,1,1,1);
-    
-  } else if (dim == 2) {
-    if ((numCols != 3) || (numRows != 3)) {      
-      opserr << "Matrix::operator=() - matrix must be 1x1 for tensor of dimension 3\n";      
-      
-      return *this;
-    }
-    (*this)(0,0) = V.cval(1,1,1,1);
-    (*this)(0,1) = V.cval(1,1,2,2);
-    (*this)(0,2) = V.cval(1,1,1,2);      
-    
-    (*this)(1,0) = V.cval(2,2,1,1);
-    (*this)(1,1) = V.cval(2,2,2,2);
-    (*this)(1,2) = V.cval(2,2,1,2);      
-    
-    (*this)(2,0) = V.cval(1,2,1,1);
-    (*this)(2,1) = V.cval(1,2,2,2);
-    (*this)(2,2) = V.cval(1,2,1,2);            
-    
-  } else {
-    if ((numCols != 6) || (numRows != 6)) {      
-      opserr << "Matrix::operator=() - matrix must be 1x1 for tensor of dimension 3\n";      
-	
-      return *this;
-    }      
-    (*this)(0,0) = V.cval(1,1,1,1);
-    (*this)(0,1) = V.cval(1,1,2,2);
-    (*this)(0,2) = V.cval(1,1,3,3);      
-    (*this)(0,3) = V.cval(1,1,1,2);
-    (*this)(0,4) = V.cval(1,1,1,3);
-    (*this)(0,5) = V.cval(1,1,2,3);      
-    
-    (*this)(1,0) = V.cval(2,2,1,1);
-    (*this)(1,1) = V.cval(2,2,2,2);
-    (*this)(1,2) = V.cval(2,2,3,3);      
-    (*this)(1,3) = V.cval(2,2,1,2);
-    (*this)(1,4) = V.cval(2,2,1,3);
-    (*this)(1,5) = V.cval(2,2,2,3);            
-    
-    (*this)(2,0) = V.cval(3,3,1,1);
-    (*this)(2,1) = V.cval(3,3,2,2);
-    (*this)(2,2) = V.cval(3,3,3,3);      
-    (*this)(2,3) = V.cval(3,3,1,2);
-    (*this)(2,4) = V.cval(3,3,1,3);
-    (*this)(2,5) = V.cval(3,3,2,3);                  
-    
-    (*this)(3,0) = V.cval(1,2,1,1);
-    (*this)(3,1) = V.cval(1,2,2,2);
-    (*this)(3,2) = V.cval(1,2,3,3);      
-    (*this)(3,3) = V.cval(1,2,1,2);
-    (*this)(3,4) = V.cval(1,2,1,3);
-    (*this)(3,5) = V.cval(1,2,2,3);                        
-    
-    (*this)(4,0) = V.cval(1,3,1,1);
-    (*this)(4,1) = V.cval(1,3,2,2);
-    (*this)(4,2) = V.cval(1,3,3,3);      
-    (*this)(4,3) = V.cval(1,3,1,2);
-    (*this)(4,4) = V.cval(1,3,1,3);
-    (*this)(4,5) = V.cval(1,3,2,3);                              
-    
-    (*this)(5,0) = V.cval(2,3,1,1);
-    (*this)(5,1) = V.cval(2,3,2,2);
-    (*this)(5,2) = V.cval(2,3,3,3);      
-    (*this)(5,3) = V.cval(2,3,1,2);
-    (*this)(5,4) = V.cval(2,3,1,3);
-    (*this)(5,5) = V.cval(2,3,2,3);                                    
-  }
-  return *this;
-}
-
-
 // virtual Matrix &operator+=(double fact);
 // virtual Matrix &operator-=(double fact);
 // virtual Matrix &operator*=(double fact);
@@ -1587,9 +1564,6 @@ istream &operator>>(istream &s, Matrix &V)
 ****************/
 
 
-
-
-
 int
 Matrix::Assemble(const Matrix &V, int init_row, int init_col, double fact) 
 {
@@ -1626,6 +1600,40 @@ Matrix::Assemble(const Matrix &V, int init_row, int init_col, double fact)
 }
 
 
+int
+Matrix::Assemble(const Vector &V, int init_row, int init_col, double fact) 
+{
+  int pos_Rows, pos_Cols;
+  int res = 0;
+  
+  int VnumRows = V.sz;
+  int VnumCols = 1;
+  
+  int final_row = init_row + VnumRows - 1;
+  int final_col = init_col + VnumCols - 1;
+  
+  if ((init_row >= 0) && (final_row < numRows) && (init_col >= 0) && (final_col < numCols))
+  {
+     for (int i=0; i<VnumCols; i++) 
+     {
+        pos_Cols = init_col + i;
+        for (int j=0; j<VnumRows; j++) 
+        {
+           pos_Rows = init_row + j;
+      
+	   (*this)(pos_Rows,pos_Cols) += V(j)*fact;
+        }
+     }
+  }  
+  else 
+  {
+     opserr << "WARNING: Matrix::Assemble(const Matrix &V, int init_row, int init_col, double fact): ";
+     opserr << "position outside bounds \n";
+     res = -1;
+  }
+
+  return res;
+}
 
 
 int
@@ -1664,6 +1672,40 @@ Matrix::AssembleTranspose(const Matrix &V, int init_row, int init_col, double fa
 }
 
 
+int
+Matrix::AssembleTranspose(const Vector &V, int init_row, int init_col, double fact) 
+{
+  int pos_Rows, pos_Cols;
+  int res = 0;
+  
+  int VnumRows = V.sz;
+  int VnumCols = 1;
+  
+  int final_row = init_row + VnumCols - 1;
+  int final_col = init_col + VnumRows - 1;
+  
+  if ((init_row >= 0) && (final_row < numRows) && (init_col >= 0) && (final_col < numCols))
+  {
+     for (int i=0; i<VnumRows; i++) 
+     {
+        pos_Cols = init_col + i;
+        for (int j=0; j<VnumCols; j++) 
+        {
+           pos_Rows = init_row + j;
+      
+	   (*this)(pos_Rows,pos_Cols) += V(i)*fact;
+        }
+     }
+  }  
+  else 
+  {
+     opserr << "WARNING: Matrix::AssembleTranspose(const Matrix &V, int init_row, int init_col, double fact): ";
+     opserr << "position outside bounds \n";
+     res = -1;
+  }
+
+  return res;
+}
 
 
 int

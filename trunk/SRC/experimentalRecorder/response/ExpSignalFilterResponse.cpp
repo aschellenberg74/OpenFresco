@@ -81,14 +81,6 @@ ExpSignalFilterResponse::ExpSignalFilterResponse(ExperimentalSignalFilter *esf,
 }
 
 
-ExpSignalFilterResponse::ExpSignalFilterResponse(ExperimentalSignalFilter *esf,
-    int id, const Tensor &val)
-    : Response(val), theFilter(esf), responseID(id)
-{
-
-}
-
-
 ExpSignalFilterResponse::~ExpSignalFilterResponse()
 {
 

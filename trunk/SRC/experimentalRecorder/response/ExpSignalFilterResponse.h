@@ -50,7 +50,6 @@ public:
     ExpSignalFilterResponse(ExperimentalSignalFilter *esf, int id, const ID &val);
     ExpSignalFilterResponse(ExperimentalSignalFilter *esf, int id, const Vector &val);
     ExpSignalFilterResponse(ExperimentalSignalFilter *esf, int id, const Matrix &val);
-    ExpSignalFilterResponse(ExperimentalSignalFilter *esf, int id, const Tensor &val);
     ~ExpSignalFilterResponse();
     
     int getResponse();

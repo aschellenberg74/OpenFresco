@@ -39,6 +39,8 @@
 #include <Vector.h>
 #include <ID.h>
 
+#include <stdlib.h>
+
 // Actor
 //	constructor to init the list.
 

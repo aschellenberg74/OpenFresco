@@ -81,14 +81,6 @@ ExpSetupResponse::ExpSetupResponse(ExperimentalSetup *es,
 }
 
 
-ExpSetupResponse::ExpSetupResponse(ExperimentalSetup *es,
-    int id, const Tensor &val)
-    : Response(val), theSetup(es), responseID(id)
-{
-
-}
-
-
 ExpSetupResponse::~ExpSetupResponse()
 {
 

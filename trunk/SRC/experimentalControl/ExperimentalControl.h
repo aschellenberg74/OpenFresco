@@ -44,6 +44,8 @@
 #include <ID.h>
 #include <Vector.h>
 
+#include <time.h>
+
 class Response;
 
 class ExperimentalControl : public TaggedObject

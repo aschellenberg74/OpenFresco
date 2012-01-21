@@ -27,6 +27,7 @@
 //
 // Description: This file contains the implementation for BandGenLinSOE
 
+#include <stdlib.h>
 
 #include <BandGenLinSOE.h>
 #include <BandGenLinSolver.h>

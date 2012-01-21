@@ -33,6 +33,7 @@
 // What: "@(#) Domain.C, revA"
 
 #include <stdlib.h>
+#include <math.h>
 
 #include <OPS_Globals.h>
 #include <Domain.h>
@@ -803,6 +804,7 @@ Domain::clearAll(void) {
   theMPs->clearAll();
   theLoadPatterns->clearAll();
   theParameters->clearAll();
+  numParameters = 0;
 
   // remove the recorders
   int i;

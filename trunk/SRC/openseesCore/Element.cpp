@@ -554,7 +554,7 @@ Element::addResistingForceToNodalReaction(int flag)
   // now determine the resisting force
   //
 
-  const Vector *theResistingForce;
+  const Vector *theResistingForce =0;
   if (flag == 0)
     theResistingForce = &(this->getResistingForce());
   else if (flag == 1)

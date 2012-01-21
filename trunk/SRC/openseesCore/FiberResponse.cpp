@@ -66,11 +66,6 @@ Response(val), theFiber(fib), responseID(id)
 
 }
 
-FiberResponse::FiberResponse(Fiber *fib, int id, const Tensor &val):
-Response(val), theFiber(fib), responseID(id)
-{
-
-}
 
 FiberResponse::~FiberResponse()
 {

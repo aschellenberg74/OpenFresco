@@ -65,13 +65,6 @@ Response::Response(const Matrix &val)
 
 }
 
-Response::Response(const Tensor &val)
- :myInfo(val)
-{
-
-}
-
-
 Response::Response(const Vector &val1, const ID &val2)
  :myInfo(val2,val1)
 {

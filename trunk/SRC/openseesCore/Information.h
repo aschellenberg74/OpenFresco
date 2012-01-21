@@ -41,7 +41,6 @@ class Vector;
 
 
 #include <OPS_Globals.h>
-#include <Tensor.h>
 class ID;
 class Vector;
 
@@ -50,7 +49,7 @@ class Vector;
 using std::ofstream;
 
 enum InfoType {UnknownType, IntType, DoubleType, 
-	       IdType, VectorType, MatrixType, TensorType};
+	       IdType, VectorType, MatrixType};
 		   
 class Information
 {
@@ -61,7 +60,6 @@ class Information
     Information(const ID &val);
     Information(const Vector &val);
     Information(const Matrix &val);
-    Information(const Tensor &val);
     Information(const ID &val1, const Vector &val2);
     
     virtual ~Information();
@@ -71,7 +69,6 @@ class Information
     virtual int setID(const ID &newID);
     virtual int setVector(const Vector &newVector);
     virtual int setMatrix(const Matrix &newMatrix);
-    virtual int setTensor(const Tensor &newTensor);
     virtual int setString(const char *theString);
     
     virtual void Print(OPS_Stream &s, int flag = 0);
@@ -85,7 +82,6 @@ class Information
     ID		*theID;    // pointer to an ID object, created elsewhere
     Vector 	*theVector;// pointer to a Vector object, created elsewhere
     Matrix	*theMatrix;// pointer to a Matrix object, created elsewhere
-    Tensor      *theTensor;// pointer to a Tensor object, created elsewhere
     char        *theString;// pointer to string
 
   protected:

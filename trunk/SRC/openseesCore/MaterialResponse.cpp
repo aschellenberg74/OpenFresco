@@ -66,12 +66,6 @@ Response(val), theMaterial(mat), responseID(id)
 
 }
 
-MaterialResponse::MaterialResponse(Material *mat, int id, const Tensor &val):
-Response(val), theMaterial(mat), responseID(id)
-{
-
-}
-
 MaterialResponse::~MaterialResponse()
 {
 

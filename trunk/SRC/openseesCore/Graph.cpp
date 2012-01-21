@@ -31,6 +31,8 @@
 //
 // What: "@(#) Graph.C, revA"
 
+#include <stdlib.h>
+
 #include <Graph.h>
 #include <Vertex.h>
 #include <VertexIter.h>

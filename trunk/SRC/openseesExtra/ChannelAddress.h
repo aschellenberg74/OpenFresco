@@ -38,14 +38,6 @@
 
 #define SOCKET_TYPE 1
 
-#ifdef _PARALLEL_PROCESSING
-#define MPI_TYPE 2
-#endif
-
-#ifdef _PARALLEL_INTERPRETERS
-#define MPI_TYPE 2
-#endif
-
 class ChannelAddress
 {
   public:
