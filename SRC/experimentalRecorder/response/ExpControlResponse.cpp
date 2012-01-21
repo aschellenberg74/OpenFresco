@@ -81,14 +81,6 @@ ExpControlResponse::ExpControlResponse(ExperimentalControl *ec,
 }
 
 
-ExpControlResponse::ExpControlResponse(ExperimentalControl *ec,
-    int id, const Tensor &val)
-    : Response(val), theControl(ec), responseID(id)
-{
-
-}
-
-
 ExpControlResponse::~ExpControlResponse()
 {
 

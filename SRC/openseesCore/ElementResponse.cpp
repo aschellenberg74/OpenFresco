@@ -66,13 +66,6 @@ Response(val), theElement(ele), responseID(id)
 
 }
 
-ElementResponse::ElementResponse(Element *ele, int id, const Tensor &val):
-Response(val), theElement(ele), responseID(id)
-{
-
-}
-
-
 ElementResponse::ElementResponse(Element *ele, int id, const Vector &val1, const ID &val2)
  :Response(val1, val2), theElement(ele), responseID(id)
 {

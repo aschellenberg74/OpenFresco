@@ -50,7 +50,6 @@ public:
     ExpSetupResponse(ExperimentalSetup *es, int id, const ID &val);
     ExpSetupResponse(ExperimentalSetup *es, int id, const Vector &val);
     ExpSetupResponse(ExperimentalSetup *es, int id, const Matrix &val);
-    ExpSetupResponse(ExperimentalSetup *es, int id, const Tensor &val);
     ~ExpSetupResponse();
     
     int getResponse();

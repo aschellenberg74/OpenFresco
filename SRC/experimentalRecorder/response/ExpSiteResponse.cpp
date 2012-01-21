@@ -81,14 +81,6 @@ ExpSiteResponse::ExpSiteResponse(ExperimentalSite *es,
 }
 
 
-ExpSiteResponse::ExpSiteResponse(ExperimentalSite *es,
-    int id, const Tensor &val)
-    : Response(val), theSite(es), responseID(id)
-{
-
-}
-
-
 ExpSiteResponse::~ExpSiteResponse()
 {
 

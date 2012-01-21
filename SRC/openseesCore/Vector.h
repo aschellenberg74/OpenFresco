@@ -24,27 +24,21 @@
 
 // Written: fmk 
 // Created: 11/96
-// Revision: A
 //
 // Description: This file contains the class definition for Vector.
 // Vector is a concrete class implementing the vector abstraction.
-//
-// What: "@(#) Vector.h, revA"
 
 #ifndef Vector_h
 #define Vector_h 
 
 #include <OPS_Globals.h>
 
-class ID;
-
 #define VECTOR_VERY_LARGE_VALUE 1.0e200
 
 class Matrix; 
 class Message;
 class SystemOfEqn;
-
-#include <Tensor.h> // cannot use class as Tensor is itself defined in Tensor.h
+class ID;
 
 class Vector
 {
@@ -78,7 +72,6 @@ class Vector
     double &operator[](int x);
     Vector operator()(const ID &rows) const;
     Vector &operator=(const Vector  &V);
-    Vector &operator=(const Tensor  &T);
     
     Vector &operator+=(double fact);
     Vector &operator-=(double fact);

@@ -38,7 +38,6 @@ class Element;
 class ID;
 class Vector;
 class Matrix;
-class Tensor;
 
 class ElementResponse : public Response
 {
@@ -49,7 +48,6 @@ public:
 	ElementResponse(Element *ele, int id, const ID &val);
 	ElementResponse(Element *ele, int id, const Vector &val);
 	ElementResponse(Element *ele, int id, const Matrix &val);
-	ElementResponse(Element *ele, int id, const Tensor &val);
 	ElementResponse(Element *ele, int id, const Vector &val1, const ID &val2);
 
 	~ElementResponse();

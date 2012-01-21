@@ -30,6 +30,8 @@
 //
 // The LoadPattern interface:
 
+#include <string.h>
+#include <stdlib.h>
 
 #include <LoadPattern.h>
 #include <stdlib.h>

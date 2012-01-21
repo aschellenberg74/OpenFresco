@@ -38,7 +38,6 @@ class Material;
 class ID;
 class Vector;
 class Matrix;
-class Tensor;
 
 class MaterialResponse : public Response
 {
@@ -49,7 +48,6 @@ class MaterialResponse : public Response
   MaterialResponse(Material *mat, int id, const ID &val);
   MaterialResponse(Material *mat, int id, const Vector &val);
   MaterialResponse(Material *mat, int id, const Matrix &val);
-  MaterialResponse(Material *mat, int ID, const Tensor &val);
   ~MaterialResponse();
   
   int getResponse(void);

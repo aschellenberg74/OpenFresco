@@ -130,7 +130,6 @@
 #define MAT_TAG_Pinching4					18
 #define MAT_TAG_BarSlip					19
 #define MAT_TAG_Fatigue			20
-#define MAT_TAG_Maxwell			50
 #define MAT_TAG_SAWSMaterial			41
 #define MAT_TAG_Steel03					23
 #define MAT_TAG_ReinforcingSteel					24
@@ -143,6 +142,10 @@
 #define MAT_TAG_InitStrain			47
 #define MAT_TAG_InitStress			48
 #define MAT_TAG_pyUCLA  			49
+#define MAT_TAG_Maxwell			50
+#define MAT_TAG_Cast			51
+#define MAT_TAG_ElasticMultiLinear			46
+
 
 // Terje:
 #define MAT_TAG_SmoothSteel01			21
@@ -265,7 +268,7 @@
 #define ND_TAG_ElasticIsotropicPlateFiber		14
 #define ND_TAG_ElasticIsotropicBeamFiber		15
 #define ND_TAG_ElasticIsotropicBeamFiber2d		18
-#define ND_TAG_ElasticIsotropic3D               16
+#define ND_TAG_ElasticIsotropicThreeDimensional         16
 #define ND_TAG_ElasticCrossAnisotropic3D        17
 #define ND_TAG_J2PlaneStrain                  3005
 #define ND_TAG_J2PlaneStress                  3006
@@ -310,6 +313,10 @@
 #define ND_TAG_BoundingCamClayPlaneStrain       14010
 // Initial state analysis material wrapper - C.McGann
 #define ND_TAG_InitialStateAnalysisWrapper      14011
+// Manzari Dafalias material - P. Arduino
+#define ND_TAG_ManzariDafalias                  14012
+#define ND_TAG_ManzariDafalias3D                14013
+#define ND_TAG_ManzariDafaliasPlaneStrain       14014
 
 #define ND_TAG_ReinforcedConcretePlaneStress  104
 #define ND_TAG_FAReinforcedConcretePlaneStress  105
@@ -421,6 +428,7 @@
 #define ELE_TAG_LargeDispBeamColumn3d	 6002
 #define ELE_TAG_FourNodeQuad	 1010
 #define ELE_TAG_FourNodeQuad3d	 1011
+#define ELE_TAG_Tri31	         1012     //Added by Roozbeh Geraili Mikola
 #define ELE_TAG_BeamWithHinges2d  401
 #define ELE_TAG_BeamWithHinges3d  402
 #define ELE_TAG_EightNodeBrick   7001
@@ -441,6 +449,7 @@
 #define ELE_TAG_BBarBrickUP             7016
 #define ELE_TAG_PlateMITC4      2023
 #define ELE_TAG_ShellMITC4      2024
+#define ELE_TAG_ShellNL         2025 //Tesser
 #define ELE_TAG_Plate1          2022
 #define ELE_TAG_Brick                      3458
 #define ELE_TAG_BbarBrick                  3457
@@ -505,6 +514,10 @@
 #define ELE_TAG_BeamContact2D    15
 #define ELE_TAG_BeamEndContact3D 16
 #define ELE_TAG_SSPquad          18
+#define ELE_TAG_SSPquadUP        19
+#define ELE_TAG_SSPbrick         22
+#define ELE_TAG_SSPbrickUP       23
+#define ELE_TAG_BeamContact2Dp   24
 
 #define ELE_TAG_TPB1D 17
 #define ELE_TAG_TFP_Bearing 20
@@ -652,23 +665,23 @@
 #define INTEGRATOR_TAGS_CentralDifferenceNoDamping      17
 #define INTEGRATOR_TAGS_NewmarkExplicit                 18
 #define INTEGRATOR_TAGS_NewmarkHSIncrReduct             19
-#define INTEGRATOR_TAGS_NewmarkHSFixedNumIter           20
-#define INTEGRATOR_TAGS_HHTExplicit                     21
-#define INTEGRATOR_TAGS_HHTGeneralized                  22
-#define INTEGRATOR_TAGS_HHTGeneralizedExplicit          23
-#define INTEGRATOR_TAGS_HHTHSIncrReduct                 24
-#define INTEGRATOR_TAGS_HHTHSFixedNumIter               25
-#define INTEGRATOR_TAGS_AlphaOS                         26
-#define INTEGRATOR_TAGS_AlphaOSGeneralized              27
-#define INTEGRATOR_TAGS_Collocation                     28
-#define INTEGRATOR_TAGS_CollocationHSIncrReduct         29
-#define INTEGRATOR_TAGS_CollocationHSFixedNumIter       30
-#define INTEGRATOR_TAGS_TRBDF2                          31
-#define INTEGRATOR_TAGS_NewmarkHybridSimulation         32
-#define INTEGRATOR_TAGS_HHTHybridSimulation             33
-#define INTEGRATOR_TAGS_CollocationHybridSimulation     34
+#define INTEGRATOR_TAGS_NewmarkHSIncrLimit              20
+#define INTEGRATOR_TAGS_NewmarkHSFixedNumIter           21
+#define INTEGRATOR_TAGS_HHTExplicit                     22
+#define INTEGRATOR_TAGS_HHTGeneralized                  23
+#define INTEGRATOR_TAGS_HHTGeneralizedExplicit          24
+#define INTEGRATOR_TAGS_HHTHSIncrReduct                 25
+#define INTEGRATOR_TAGS_HHTHSIncrLimit                  26
+#define INTEGRATOR_TAGS_HHTHSFixedNumIter               27
+#define INTEGRATOR_TAGS_AlphaOS                         28
+#define INTEGRATOR_TAGS_AlphaOSGeneralized              29
+#define INTEGRATOR_TAGS_Collocation                     30
+#define INTEGRATOR_TAGS_CollocationHSIncrReduct         31
+#define INTEGRATOR_TAGS_CollocationHSIncrLimit          32
+#define INTEGRATOR_TAGS_CollocationHSFixedNumIter       33
+#define INTEGRATOR_TAGS_TRBDF2                          34
 #define INTEGRATOR_TAGS_GeneralizedAlpha                35
-#define INTEGRATOR_TAGS_DisplacementPath             36
+#define INTEGRATOR_TAGS_DisplacementPath                36
 
 #define LinSOE_TAGS_FullGenLinSOE		1
 #define LinSOE_TAGS_BandGenLinSOE		2
@@ -749,6 +762,7 @@
 #define OPS_STREAM_TAGS_BinaryFileStream        7
 #define OPS_STREAM_TAGS_TCP_Stream              8
 #define OPS_STREAM_TAGS_ChannelStream           9
+#define OPS_STREAM_TAGS_DataTurbineStream      10
 
 
 #define DomDecompALGORITHM_TAGS_DomainDecompAlgo 1

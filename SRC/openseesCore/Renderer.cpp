@@ -23,8 +23,6 @@
 // $Source: /usr/local/cvs/OpenSees/SRC/renderer/Renderer.cpp,v $
                                                                         
                                                                         
-// File: ~/renderer/Renderer.C
-//
 // Written: fmk 
 // Created: 10/98
 // Revision: A
@@ -38,7 +36,7 @@
 #include <Renderer.h>
 #include <ColorMap.h>
 #include <Domain.h>
-
+#include <string.h>
 
 int        Renderer::numRenderers(0);
 char     **Renderer::theTitles =0;

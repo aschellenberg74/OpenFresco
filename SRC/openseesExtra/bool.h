@@ -1,31 +1,28 @@
 /* ****************************************************************** **
-**    OpenFRESCO - Open Framework                                     **
-**                 for Experimental Setup and Control                 **
+**    OpenSees - Open System for Earthquake Engineering Simulation    **
+**          Pacific Earthquake Engineering Research Center            **
 **                                                                    **
 **                                                                    **
-** Copyright (c) 2006, Yoshikazu Takahashi, Kyoto University          **
-** All rights reserved.                                               **
+** (C) Copyright 1999, The Regents of the University of California    **
+** All Rights Reserved.                                               **
 **                                                                    **
-** Licensed under the modified BSD License (the "License");           **
-** you may not use this file except in compliance with the License.   **
-** You may obtain a copy of the License in main directory.            **
-** Unless required by applicable law or agreed to in writing,         **
-** software distributed under the License is distributed on an        **
-** "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,       **
-** either express or implied. See the License for the specific        **
-** language governing permissions and limitations under the License.  **
+** Commercial use of this program without express permission of the   **
+** University of California, Berkeley, is strictly prohibited.  See   **
+** file 'COPYRIGHT'  in main directory for information on usage and   **
+** redistribution,  and for a DISCLAIMER OF ALL WARRANTIES.           **
 **                                                                    **
 ** Developed by:                                                      **
-**   Yoshikazu Takahashi (yos@catfish.dpri.kyoto-u.ac.jp)             **
-**   Andreas Schellenberg (andreas.schellenberg@gmx.net)              **
-**   Gregory L. Fenves (fenves@berkeley.edu)                          **
+**   Frank McKenna (fmckenna@ce.berkeley.edu)                         **
+**   Gregory L. Fenves (fenves@ce.berkeley.edu)                       **
+**   Filip C. Filippou (filippou@ce.berkeley.edu)                     **
 **                                                                    **
 ** ****************************************************************** */
-
+                                                                        
 // $Revision$
 // $Date$
-// $URL$
-
+// $Source: /usr/local/cvs/OpenSees/SRC/bool.h,v $
+                                                                        
+                                                                        
 // Defining TRUE and FALSE is usually a Bad Idea,
 // because you will probably be inconsistent with anyone
 // else who had the same clever idea.

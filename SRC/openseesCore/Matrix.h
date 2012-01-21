@@ -43,9 +43,6 @@ class Vector;
 class ID;
 class Message;
 
-#include <Tensor.h> // cannot use class as Tensor is itself defined in Tensor.h
-
-
 #define MATRIX_VERY_LARGE_VALUE 1.0e213
 
 class Matrix
@@ -73,6 +70,7 @@ class Matrix
     int Invert(Matrix &res) const;
 
     int addMatrix(double factThis, const Matrix &other, double factOther);
+    int addMatrixTranspose(double factThis, const Matrix &other, double factOther);
     int addMatrixProduct(double factThis, const Matrix &A, const Matrix &B, double factOther); // AB
     int addMatrixTransposeProduct(double factThis, const Matrix &A, const Matrix &B, double factOther); // A'B
     int addMatrixTripleProduct(double factThis, const Matrix &A, const Matrix &B, double factOther); // A'BA
@@ -84,7 +82,6 @@ class Matrix
     Matrix operator()(const ID &rows, const ID & cols) const;
     
     Matrix &operator=(const Matrix &M);
-    Matrix &operator=(const Tensor &T);
     
     // matrix operations which will preserve the derived type and
     // which can be implemented efficiently without many constructor calls.
@@ -125,7 +122,9 @@ class Matrix
     
     // methods added by Remo
     int  Assemble(const Matrix &V, int init_row, int init_col, double fact = 1.0);
+	int  Assemble(const Vector &V, int init_row, int init_col, double fact = 1.0);
     int  AssembleTranspose(const Matrix &V, int init_row, int init_col, double fact = 1.0);
+    int  AssembleTranspose(const Vector &V, int init_row, int init_col, double fact = 1.0);
     int  Extract(const Matrix &V, int init_row, int init_col, double fact = 1.0);
 
     friend OPS_Stream &operator<<(OPS_Stream &s, const Matrix &M);

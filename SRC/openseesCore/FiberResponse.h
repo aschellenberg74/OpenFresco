@@ -38,7 +38,6 @@ class Fiber;
 class ID;
 class Vector;
 class Matrix;
-class Tensor;
 
 class FiberResponse : public Response
 {
@@ -49,7 +48,6 @@ public:
 	FiberResponse(Fiber *fib, int id, const ID &val);
 	FiberResponse(Fiber *fib, int id, const Vector &val);
 	FiberResponse(Fiber *fib, int id, const Matrix &val);
-	FiberResponse(Fiber *fib, int id, const Tensor &val);
 	~FiberResponse();
 
 	int getResponse(void);

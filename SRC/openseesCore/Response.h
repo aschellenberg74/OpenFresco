@@ -33,7 +33,6 @@
 class ID;
 class Vector;
 class Matrix;
-class Tensor;
 
 #include <Information.h>
 
@@ -46,7 +45,6 @@ class Response
   Response(const ID &val);
   Response(const Vector &val);
   Response(const Matrix &val);
-  Response(const Tensor &val);
   Response(const Vector &val1, const ID &val2);
 
   virtual ~Response();

@@ -50,7 +50,6 @@ public:
     ExpSiteResponse(ExperimentalSite *es, int id, const ID &val);
     ExpSiteResponse(ExperimentalSite *es, int id, const Vector &val);
     ExpSiteResponse(ExperimentalSite *es, int id, const Matrix &val);
-    ExpSiteResponse(ExperimentalSite *es, int id, const Tensor &val);
     ~ExpSiteResponse();
     
     int getResponse();

@@ -50,7 +50,6 @@ public:
     ExpControlResponse(ExperimentalControl *ec, int id, const ID &val);
     ExpControlResponse(ExperimentalControl *ec, int id, const Vector &val);
     ExpControlResponse(ExperimentalControl *ec, int id, const Matrix &val);
-    ExpControlResponse(ExperimentalControl *ec, int id, const Tensor &val);
     ~ExpControlResponse();
     
     int getResponse();

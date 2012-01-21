@@ -33,6 +33,7 @@
 #include "DatabaseStream.h"
 #include <FE_Datastore.h>
 #include <Vector.h>
+#include <string.h>
 
 DatabaseStream::DatabaseStream(FE_Datastore *database, const char *tName)
   :OPS_Stream(OPS_STREAM_TAGS_DatabaseStream),
