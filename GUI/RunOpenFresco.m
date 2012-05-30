@@ -32,19 +32,19 @@ function errorCode = RunOpenFresco(opfPath,tclFile)
 
 % write the command line for execution
 if ispc
-   command = ['@ "',fullfile(opfPath,'openSees.exe'),'" "',tclFile,'"'];
+    command = ['@ "',fullfile(opfPath,'openSees.exe'),'" "',tclFile,'"'];
 elseif ismac || isunix
-   command = ['"',fullfile(opfPath,'OpenSees'),'" "',tclFile,'"'];
+    command = ['"',fullfile(opfPath,'OpenSees'),'" "',tclFile,'"'];
 end
 
-% run OpenSees in console (this will load OpenFresco.dll) 
+% run OpenSees in console (this will load OpenFresco.dll)
 if ispc
-   errorCode = dos([command,' & exit &']);
+    errorCode = dos([command,' & exit &']);
 elseif ismac || isunix
-   errorCode = system(['xterm -e ',command,' &']);
+    errorCode = system(['xterm -e ',command,' &']);
 end
 
 % print error code to Matlab command prompt
 if (errorCode ~= 0)
-   fprintf(1,'error code = %d\n',errorCode);
+    fprintf(1,'error code = %d\n',errorCode);
 end

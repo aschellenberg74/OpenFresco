@@ -1,5 +1,5 @@
 function GUI_StructuralOutput(varargin)
-%GUI_STRUCTURALOUTPUT to provide the layout of the GUI structural output page
+%GUI_STRUCTURALOUTPUT to define the layout of the structural output page
 % GUI_StructuralOutput(varargin)
 %
 % varargin : variable length input argument list
@@ -28,7 +28,7 @@ function GUI_StructuralOutput(varargin)
 % $Date$
 % $URL$
 
-% Check if window already exists
+% check if window already exists
 if ~isempty(findobj('Tag','StructOutDOF1'))
     if ~isempty(findobj('Tag','StructOutDOF2'))
         figure(findobj('Tag','StructOutDOF2'));
@@ -37,14 +37,16 @@ if ~isempty(findobj('Tag','StructOutDOF1'))
     return
 end
 
-%  Initialization tasks
-handles = guidata(gcbf);
+% initialization tasks
+handles = guidata(findobj('Tag','OpenFrescoExpress'));
+SS = handles.Store.SS;
 
 % find longest motion
 tEnd = 0.0;
 switch handles.GM.loadType
     case 'Ground Motions'
-        for mo=1:length(handles.GM.dt)
+        numMotions = size(handles.Model.b,2);
+        for mo=1:numMotions
             tEndi = handles.GM.scalet{mo}(end);
             if tEndi > tEnd
                 tEnd = tEndi;
@@ -54,34 +56,36 @@ switch handles.GM.loadType
         tEnd = handles.GM.rampTime + handles.GM.vibTime;
 end
 
-%%%%%%%%%%%%%%%%%
-%Create figure 1%
-%%%%%%%%%%%%%%%%%
-
-%Main Figure
-SS = get(0,'screensize');
-f_StructOut1 = figure('Visible','on','Name','Structural Output',...
+% =====================================================================
+% create figure 1
+f_StructOut1 = figure('Name','Structural Output',...
+    'Visible','on',...
     'NumberTitle','off',...
     'MenuBar','none',...
     'Tag','StructOutDOF1',...
     'Color',[0.3 0.5 0.7],...
-    'Position',[SS(3)*0.12,SS(4)*0.05,SS(3)*0.88,SS(4)*0.87]);
+    'Position',[SS(3)*0.12,SS(4)*0.05,SS(3)*0.87,SS(4)*0.87]);
+orient(f_StructOut1,'landscape');
+ModifyPrintSetup(f_StructOut1,'PrintUI',0);
 
-%Toolbar
+% toolbar
 File(1) = uimenu('Position',1,'Label','File');
-uimenu(File(1),'Position',1,'Label','Save',...
-    'Accelerator','S','Callback','filemenufcn(gcbf,''FileSaveAs'')');
-uimenu(File(1),'Position',2,'Label','Print',...
-    'Accelerator','P','Callback','printdlg(gcbf)');
+uimenu(File(1),'Position',1,'Label','Save As FIG','Accelerator','M', ...
+    'Callback','PrintWithHeader(''fig'',''SO1d'',[-0.1,0.25,0.67,0.25])');
+uimenu(File(1),'Position',2,'Label','Save As PDF','Accelerator','S', ...
+    'Callback','PrintWithHeader(''pdf'',''SO1d'',[-0.1,0.25,0.67,0.25])');
+uimenu(File(1),'Position',3,'Label','Copy','Accelerator','C', ...
+    'Callback','PrintWithHeader(''clipboard'',''SO1d'',[-0.1,0.25,0.67,0.25])');
+uimenu(File(1),'Position',4,'Label','Print','Accelerator','P', ...
+    'Callback','PrintWithHeader(''printer'',''SO1d'',[-0.1,0.25,0.67,0.25])');
 uimenu('Position',2,'Label','|');
 StdMenu(1) = uimenu('Position',3,'Label','MATLAB Menu');
 uimenu(StdMenu(1),'Position',1,'Label','Turn on',...
-   'Callback','set(gcf,''MenuBar'',''figure''); set(gcf,''Toolbar'',''figure'');');
+    'Callback','set(gcf,''MenuBar'',''figure''); set(gcf,''Toolbar'',''figure'');');
 uimenu(StdMenu(1),'Position',2,'Label','Turn off',...
-   'Callback','set(gcf,''MenuBar'',''none''); set(gcf,''Toolbar'',''none'');');
-% =========================================================================
+    'Callback','set(gcf,''MenuBar'',''none''); set(gcf,''Toolbar'',''none'');');
 
-%Title
+% title
 st_StructuralOut1_title = uicontrol(f_StructOut1,'Style','text',...
     'String','Structural Output',...
     'FontSize',20,...
@@ -91,7 +95,7 @@ st_StructuralOut1_title = uicontrol(f_StructOut1,'Style','text',...
     'Position',[0.3 0.86 0.4 0.1],...
     'FontName',handles.Store.font);
 
-%DOF 1 Output
+% DOF 1 output
 a_StructuralOutput_dX = axes('Parent',f_StructOut1,...
     'Tag','SO1d',...
     'NextPlot','replacechildren',...
@@ -144,44 +148,49 @@ a_StructuralOutput_fdX = axes('Parent',f_StructOut1,...
     'Tag','SO1fd',...
     'NextPlot','replacechildren',...
     'FontWeight','bold',...
-    'Position',[0.68 0.09 0.3 0.75],'Box','on');
+    'Position',[0.68 0.09 0.29 0.75],'Box','on');
 grid('on');
 xlabel(a_StructuralOutput_fdX,'Disp [L]');
 ylabel(a_StructuralOutput_fdX,'Force [F]');
 if ~strcmp(handles.Model.Type, '1 DOF')
-    set(a_StructuralOutput_fdX,'Position',[0.68 0.52 0.31 0.33]);
+    set(a_StructuralOutput_fdX,'Position',[0.68 0.52 0.29 0.33]);
     a_StructuralOutput_dd = axes('Parent',f_StructOut1,...
         'Tag','SO1dd',...
         'NextPlot','replacechildren',...
         'FontWeight','bold',...
-        'Position',[0.68 0.08 0.31 0.33],'Box','on');
+        'Position',[0.68 0.08 0.29 0.33],'Box','on');
     axis(a_StructuralOutput_dd,'equal');
     grid('on');
     xlabel(a_StructuralOutput_dd,'Disp 1 [L]');
     ylabel(a_StructuralOutput_dd,'Disp 2 [L]');
 end
 
-
-%%%%%%%%%%%%%%%%%
-%Create figure 2%
-%%%%%%%%%%%%%%%%%
-
+% =====================================================================
+% create figure 2
 if ~strcmp(handles.Model.Type, '1 DOF')
+    % main figure
     set(f_StructOut1,'Name','Structural Output DOF 1')
     set(st_StructuralOut1_title,'String','Structural Output: DOF 1');
-    f_StructOut2 = figure('Visible','on','Name','Structural Output DOF 2',...
+    f_StructOut2 = figure('Name','Structural Output DOF 2',...
+        'Visible','on',...
         'NumberTitle','off',...
         'MenuBar','none',...
         'Tag','StructOutDOF2',...
         'Color',[0.3 0.5 0.7],...
-        'Position',[SS(3)*0.12,SS(4)*0.05,SS(3)*0.88,SS(4)*0.87]);
+        'Position',[SS(3)*0.12,SS(4)*0.05,SS(3)*0.87,SS(4)*0.87]);
+    orient(f_StructOut2,'landscape');
+    ModifyPrintSetup(f_StructOut2,'PrintUI',0);
     
-    %Toolbar
+    % toolbar
     File(1) = uimenu('Position',1,'Label','File');
-    uimenu(File(1),'Position',1,'Label','Save',...
-        'Accelerator','S','Callback','filemenufcn(gcbf,''FileSaveAs'')');
-    uimenu(File(1),'Position',2,'Label','Print',...
-        'Accelerator','P','Callback','printdlg(gcbf)');
+    uimenu(File(1),'Position',1,'Label','Save As FIG','Accelerator','M', ...
+        'Callback','PrintWithHeader(''fig'',''SO2d'',[-0.1,0.25,0.67,0.25])');
+    uimenu(File(1),'Position',2,'Label','Save As PDF','Accelerator','S', ...
+        'Callback','PrintWithHeader(''pdf'',''SO2d'',[-0.1,0.25,0.67,0.25])');
+    uimenu(File(1),'Position',3,'Label','Copy','Accelerator','C', ...
+        'Callback','PrintWithHeader(''clipboard'',''SO2d'',[-0.1,0.25,0.67,0.25])');
+    uimenu(File(1),'Position',4,'Label','Print','Accelerator','P', ...
+        'Callback','PrintWithHeader(''printer'',''SO2d'',[-0.1,0.25,0.67,0.25])');
     uimenu('Position',2,'Label','|');
     StdMenu(1) = uimenu('Position',3,'Label','MATLAB Menu');
     uimenu(StdMenu(1),'Position',1,'Label','Turn on', ...
@@ -189,7 +198,7 @@ if ~strcmp(handles.Model.Type, '1 DOF')
     uimenu(StdMenu(1),'Position',2,'Label','Turn off', ...
         'Callback','set(gcf,''MenuBar'',''none''); set(gcf,''Toolbar'',''none'');');
     
-    %Title
+    % title
     uicontrol(f_StructOut2,'Style','text',...
         'String','Structural Output: DOF 2',...
         'FontSize',20,...
@@ -199,7 +208,7 @@ if ~strcmp(handles.Model.Type, '1 DOF')
         'Position',[0.3 0.86 0.4 0.1],...
         'FontName',handles.Store.font);
     
-    %DOF 2 Output
+    % DOF 2 output
     a_StructuralOutput_dY = axes('Parent',f_StructOut2,...
         'Tag','SO2d',...
         'NextPlot','replacechildren',...
@@ -256,7 +265,7 @@ if ~strcmp(handles.Model.Type, '1 DOF')
         'Tag','SO2fd',...
         'NextPlot','replacechildren',...
         'FontWeight','bold',...
-        'Position',[0.68 0.52 0.31 0.33],'Box','on');
+        'Position',[0.68 0.52 0.29 0.33],'Box','on');
     grid('on');
     xlabel(a_StructuralOutput_fdY,'Disp [L]');
     ylabel(a_StructuralOutput_fdY,'Force [F]');
@@ -264,12 +273,13 @@ if ~strcmp(handles.Model.Type, '1 DOF')
         'Tag','SO2ff',...
         'NextPlot','replacechildren',...
         'FontWeight','bold',...
-        'Position',[0.68 0.08 0.31 0.33],'Box','on');
+        'Position',[0.68 0.08 0.29 0.33],'Box','on');
     axis(a_StructuralOutput_ff,'equal');
     grid('on');
     xlabel(a_StructuralOutput_ff,'Force 1 [F]');
     ylabel(a_StructuralOutput_ff,'Force 2 [F]');
     
-    %Bring DOF 1 output to the foreground
+    % bring DOF 1 output to the foreground
     figure(findobj('Tag','StructOutDOF1'));
 end
+% =====================================================================

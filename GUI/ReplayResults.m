@@ -32,7 +32,7 @@ if rem(step,10) ~= 0
     return
 end
 
-% Initialization tasks
+% initialization tasks
 handles = guidata(findobj('Tag','OpenFrescoExpress'));
 t = handles.Response.Time(:,1:step);
 ag = handles.Response.ag(:,step);
@@ -45,17 +45,17 @@ f = handles.Response.f;
 MX = handles.Response.MX;
 TI = handles.Response.TI(:,1:step);
 
-
 switch handles.Model.Type
+    % =====================================================================
     case '1 DOF'
-        %Structural Outputs
+        % structural outputs
         set(handles.Plots.SO1dplot,'Xdata',t,'YData',U(1,:));
         set(handles.Plots.SO1fplot,'Xdata',t,'YData',Pr(1,:));
         set(handles.Plots.SO1aplot,'Xdata',t,'YData',Udotdot(1,:));
         set(handles.Plots.SO1fdplot,'Xdata',U(1,:),'YData',Pr(1,:));
         set(handles.Plots.SO1fddot,'Xdata',U(1,end),'YData',Pr(1,end));
         
-        %Routine for tracing ag plot
+        % routine for tracing ag plot
         switch handles.GM.loadType
             case 'Ground Motions'
                 set(handles.Plots.SO1agdot,'Xdata',t(end),'YData',ag(1));
@@ -67,7 +67,7 @@ switch handles.Model.Type
                 end
         end
         
-        %Error Monitors
+        % error monitors
         set(handles.Plots.EM1eplot,'Xdata',t,'YData',error(1,:));
         set(handles.Plots.EM1ffteplot,'Xdata',f,'YData',MX(1,:));
         set(handles.Plots.EM1MeasCmdplot,'Xdata',U(1,:),'YData',Um(1,:));
@@ -76,9 +76,9 @@ switch handles.Model.Type
         
         % update all the plots
         drawnow;
-        
+    % =====================================================================
     case '2 DOF A'
-        %Structural Outputs
+        % structural outputs
         set(handles.Plots.SO1dplot,'Xdata',t,'YData',U(1,:));
         set(handles.Plots.SO1fplot,'Xdata',t,'YData',Pr(1,:));
         set(handles.Plots.SO1aplot,'Xdata',t,'YData',Udotdot(1,:));
@@ -94,7 +94,7 @@ switch handles.Model.Type
         set(handles.Plots.SO2ffplot,'Xdata',Pr(1,:),'YData',Pr(2,:));
         set(handles.Plots.SO2ffdot,'Xdata',Pr(1,end),'YData',Pr(2,end));
         
-        %Routine for tracing ag plots
+        % routine for tracing ag plots
         switch handles.GM.loadType
             case 'Ground Motions'
                 set(handles.Plots.SO1agdot,'Xdata',t(end),'YData',ag(1));
@@ -111,8 +111,8 @@ switch handles.Model.Type
                 end
         end
         
-
-        %Error Monitors
+        
+        % error Monitors
         set(handles.Plots.EM1eplot,'Xdata',t,'YData',error(1,:));
         set(handles.Plots.EM1ffteplot,'Xdata',f,'YData',MX(1,:));
         set(handles.Plots.EM1MeasCmdplot,'Xdata',U(1,:),'YData',Um(1,:));
@@ -126,9 +126,9 @@ switch handles.Model.Type
         
         % update all the plots
         drawnow;
-        
+    % =====================================================================
     case '2 DOF B'
-        %Structural Outputs
+        % structural outputs
         set(handles.Plots.SO1dplot,'Xdata',t,'YData',U(1,:));
         set(handles.Plots.SO1fplot,'Xdata',t,'YData',Pr(1,:));
         set(handles.Plots.SO1aplot,'Xdata',t,'YData',Udotdot(1,:));
@@ -144,7 +144,7 @@ switch handles.Model.Type
         set(handles.Plots.SO2ffplot,'Xdata',Pr(1,:),'YData',Pr(2,:));
         set(handles.Plots.SO2ffdot,'Xdata',Pr(1,end),'YData',Pr(2,end));
         
-        %Routine for tracing ag plots
+        % routine for tracing ag plots
         switch handles.GM.loadType
             case 'Ground Motions'
                 set(handles.Plots.SO1agdot,'Xdata',t(end),'YData',ag(1));
@@ -161,7 +161,7 @@ switch handles.Model.Type
                 end
         end
         
-        %Error Monitors
+        % error monitors
         set(handles.Plots.EM1eplot,'Xdata',t,'YData',error(1,:));
         set(handles.Plots.EM1ffteplot,'Xdata',f,'YData',MX(1,:));
         set(handles.Plots.EM1MeasCmdplot,'Xdata',U(1,:),'YData',Um(1,:));
@@ -175,4 +175,5 @@ switch handles.Model.Type
         
         % update all the plots
         drawnow;
+    % =====================================================================
 end

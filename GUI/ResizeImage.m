@@ -38,5 +38,5 @@ yi = linspace(1,oldsize(1),newsize(1))';
 
 newimg = zeros(newsize,'uint8');
 for i=1:newsize(3)
-    newimg(:,:,i) = interp2(oldimg(:,:,i),xi,yi,'*cubic');
+    newimg(:,:,i) = interp2(single(oldimg(:,:,i)),xi,yi,'*cubic');
 end

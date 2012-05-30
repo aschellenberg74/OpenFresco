@@ -1,0 +1,39 @@
+
+===========================================================================
+OpenFresco Express v1.0                                25-May-2012 21:09:12
+===========================================================================
+ o File   : AboutErrorMonitors.txt
+ o Purpose: Explanation of error monitor plots in OpenFresco Express
+
+Displacement Error:
+===================
+This plot tracks the error between the measured and command displacements
+over time. A positive error means the measured displacements are greater
+than the corresponding command values.
+
+Fourier Amplitude:
+==================
+Indicates the values of the fourier amplitude of the error for frequencies
+from 0 to 100 Hz. This information can be used to identify the dominant
+frequencies in the error signal.
+
+Measured vs. Command Displacement:
+==================================
+This plot compares the measured and command displacements. A straight line
+at 45 degrees shows perfect tracking. A line at less than 45 degrees means
+the response is undershooting, while a line at more than 45 degrees means
+the response is overshooting. If the plot traces out an ellipse counter-
+clockwise, the response is lagging behind the command values. Similarly,
+a clockwise ellipse indicates a leading response. A counter-clockwise
+ellipse at an angle under 45 degrees, indicating both lag and undershoot,
+is a common response.
+
+Tracking Indicator:
+===================
+The tracking indicator is computed as the area underneath the plot of
+measured vs. command displacement. A positive plot indicates added damping
+in the system, and a negative plot means less damping. Caution should be
+taken when the response is negative, as the system can become unstable.
+Meanwhile, an increasing line shows the response is leading, while a
+decreasing line shows lag. A steeper line in this figure corresponds to a
+larger error.

@@ -36,6 +36,7 @@ function Response = TerminateAnalysis(Model,GroundMotion,LastState,Analysis)
 handles = guidata(findobj('Tag','OpenFrescoExpress'));
 
 switch handles.Store.StopOption
+    % =====================================================================
     case 'Unload'
         % update damping values for free vibration
         zeta = 0.1;
@@ -59,9 +60,13 @@ switch handles.Store.StopOption
         guidata(findobj('Tag','OpenFrescoExpress'), handles);
         
         % execute free vibration analysis
-        Response = Integrator_NewmarkExplicit(Model,GroundMotion,LastState,Analysis);
-        
+        if strcmp(handles.GM.integrator,'NewmarkExplicit')
+            Response = Integrator_NewmarkExplicit(Model,GroundMotion,LastState,Analysis);
+        elseif strcmp(handles.GM.integrator,'AlphaOS')
+            Response = Integrator_AlphaOS(Model,GroundMotion,LastState,Analysis);
+        end
+    % =====================================================================
     case 'Save State'
         Response = LastState;
-        
+    % =====================================================================
 end
