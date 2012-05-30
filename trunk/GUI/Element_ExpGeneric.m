@@ -67,7 +67,7 @@ switch action
             numTrials = 0;
             socketID(tag) = -1;
             while (numTrials<10 && socketID(tag)<0)
-                try
+                try %#ok<TRYNC>
                     socketID(tag) = TCPSocket('openConnection',ipAddr,ipPort);
                     pause(1.0);
                     numTrials = numTrials+1;

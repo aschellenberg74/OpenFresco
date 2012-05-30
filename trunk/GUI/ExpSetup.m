@@ -1,5 +1,5 @@
 function ExpSetup(action,varargin)
-%EXPSETUP to handle user inputs related to the Experimental Setup 
+%EXPSETUP to handle user inputs related to the Experimental Setup
 % ExpSetup(action,varargin)
 %
 % action   : selected action on the Experimental Setup page
@@ -29,15 +29,16 @@ function ExpSetup(action,varargin)
 % $Date$
 % $URL$
 
-% Initialization tasks
+% initialization tasks
 handles = guidata(gcbf);
 
-%Identify Chosen DOF
+% identify chosen DOF
 DOF_selection = handles.Model.Type;
 
 switch action
+    % =====================================================================
     case 'choose DOF'
-        %Prevent user from changing setup
+        % prevent user from changing setup
         TF = strcmp(get(get(handles.ES(2), 'SelectedObject'),'Tag'), DOF_selection);
         if TF ~=1
             msgbox({'Cannot change experimental setup type!','Can only change structure type'},'Error','error');
@@ -50,21 +51,22 @@ switch action
                     set(handles.ES(5),'Value',1);
             end
         end
-
+    % =====================================================================
     case 'extra options'
-        %%%This callback has not been fully checked for functionality yet
-        %nonlinear options for 2 DOF B case
+        % this callback has not been fully checked for functionality yet
+        % nonlinear options for 2 DOF B case
         if strcmp(DOF_selection, '2 DOF B')
             nonlinear = questdlg('Would you like to perform nonlinear analysis?','Nonlinear?','Yes','No','Yes');
             switch nonlinear
                 case 'Yes'
-                    Act_Lengths = inputdlg({['Please input actuator lengths'; 'Actuator 1                   '] 'Actuator 2'},'Actuator Lengths');
-                    if ~isempty(Act_Lengths)
-                        handles.Model.ActLength1 = str2num(Act_Lengths{1});
-                        handles.Model.ActLength2 = str2num(Act_Lengths{2});
-                    else
-                        return
-                    end
+                    msgbox('Sorry! This is not implemented yet!','Warning','warn');
+                    %Act_Lengths = inputdlg({['Please input actuator lengths'; 'Actuator 1                   '] 'Actuator 2'},'Actuator Lengths');
+                    %if ~isempty(Act_Lengths)
+                    %    handles.Model.ActLength1 = str2num(Act_Lengths{1});
+                    %    handles.Model.ActLength2 = str2num(Act_Lengths{2});
+                    %else
+                    %    return
+                    %end
             end
         else
             msgbox({'Cannot change experimental setup type!','Can only change structure type'},'Error','error');
@@ -77,12 +79,11 @@ switch action
                     set(handles.ES(5),'Value',1);
             end
         end
+    % =====================================================================
 end
-            
-    %Based on setup chosen, return setup type to ExpSetup.Type
-    %Example: ExpSetup.Type = 'OneActuator'
 
-%Update handles structure
-guidata(gcbf, handles);
+% based on setup chosen, return setup type to ExpSetup.Type
+% example: ExpSetup.Type = 'OneActuator'
 
-end
+% update handles structure
+guidata(gcbf,handles);

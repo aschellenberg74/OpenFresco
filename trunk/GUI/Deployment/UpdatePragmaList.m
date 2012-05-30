@@ -1,11 +1,8 @@
-function fileList = GetFileList(fileExt,searchDir)
-%GETFILELIST find all the files in the given folder and its subfolders
-% that are on the path and have extension fileExt
-% fileList = GetFileList(fileExt,searchDir)
+function UpdatePragmaList(pathOPF)
+%UPDATEPRAGMALIST to update pragmalist in OpenFrescoExpress.m
+% UpdatePragmaList(pathOPF)
 %
-% fileList  : list of all the files with extension fileExt
-% fileExt   : file extension. Example fileExt = '.m', '.txt', ...
-% searchDir : full path of directory to search
+% pathOPF : path to the OpenFresco GUI directory
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%                          OpenFresco Express                          %%
@@ -31,35 +28,41 @@ function fileList = GetFileList(fileExt,searchDir)
 % $Date$
 % $URL$
 
-p = path;
-semiCol = strfind(p,pathsep);
-semiCol = [0,semiCol];
-j = 0;
-folderList = cell(0,0);
-for i=1:length(semiCol)-1
-   pathName = p(semiCol(i)+1:semiCol(i+1)-1);
-   if ~isempty(strfind(pathName,searchDir))
-      j = j+1;
-      folderList{j,1} = pathName;
-   end   
-end
+% open files
+srcFile = fullfile(pathOPF,'OpenFrescoExpress.m');
+tmpFile = fullfile(pathOPF,'OpenFrescoExpress.tmp');
+FIDr = fopen(srcFile,'r');
+FIDw = fopen(tmpFile,'w');
 
-% find the files with specified extension
-k = 0;
-fileList = cell(0,0);
-for i=1:length(folderList)
-   cd(folderList{i})
-   d = dir;
-   for j=1:length(d)
-      if (d(j).isdir == 0)
-         dotLoc = findstr(d(j).name,'.');
-         if ~isempty(dotLoc)
-            ext = d(j).name(dotLoc(end):end);
-            if isequal(ext,fileExt)
-               k = k+1;
-               fileList{k,1} = d(j).name;
-            end
-         end
-      end
+% copy OpenFrescoExpress.m to OpenFrescoExpress.tmp except for '%#'
+while feof(FIDr)==0
+   txtLine = fgetl(FIDr);
+   if ~isempty(txtLine) && length(txtLine)>2 && isequal(txtLine(1:2),'%#')
+      % do nothing
+   else
+      fprintf(FIDw,'%s\n',txtLine);
    end
 end
+
+% write pragma list to OpenFrescoExpress.tmp
+list = GetFileList('.m',pathOPF);
+k = 1;
+tmp = list{1};
+fprintf(FIDw,'%%#function %s ',tmp(1:end-2));
+for i=2:length(list)
+   tmp = list{i};
+   if (k==4)
+      fprintf(FIDw,'\n%%#function %s ',tmp(1:end-2));
+      k = 1;
+   else
+      fprintf(FIDw,'%s ',tmp(1:end-2));
+      k = k+1;
+   end
+end
+
+% close all files
+fclose('all');
+
+% replace OpenFrescoExpress.m with OpenFrescoExpress.tmp
+copyfile(tmpFile,srcFile,'f');
+delete(tmpFile);

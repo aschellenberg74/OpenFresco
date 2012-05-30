@@ -1,7 +1,7 @@
-function [error, f, MX, TI] = AnimateResponse(Type,t,ag,U,Udotdot,Pr,Um)
+function [error,f,MX,TI] = AnimateResponse(Type,t,ag,U,Udotdot,Pr,Um)
 %ANIMATERESPONSE switches over the model type to choose which plots to
 % populate with the structural response and error monitoring data
-% [error, f, MX, TI] = AnimateResponse(Type,t,ag,U,Udotdot,Pr,Um)
+% [error,f,MX,TI] = AnimateResponse(Type,t,ag,U,Udotdot,Pr,Um)
 %
 % error   : displacement error
 % f       : error frequency vector
@@ -40,19 +40,20 @@ function [error, f, MX, TI] = AnimateResponse(Type,t,ag,U,Udotdot,Pr,Um)
 % $Date$
 % $URL$
 
-% Initialization tasks
+% initialization tasks
 handles = guidata(findobj('Tag','OpenFrescoExpress'));
 
 switch Type
+    % =====================================================================
     case '1 DOF'
-        %Structural Outputs
+        % structural outputs
         set(handles.Plots.SO1dplot,'Xdata',t,'YData',U(1,:));
         set(handles.Plots.SO1fplot,'Xdata',t,'YData',Pr(1,:));
         set(handles.Plots.SO1aplot,'Xdata',t,'YData',Udotdot(1,:));
         set(handles.Plots.SO1fdplot,'Xdata',U(1,:),'YData',Pr(1,:));
         set(handles.Plots.SO1fddot,'Xdata',U(1,end),'YData',Pr(1,end));
         
-        %Routine for tracing ag plot
+        % routine for tracing ag plot
         switch handles.GM.loadType
             case 'Ground Motions'
                 set(handles.Plots.SO1agdot,'Xdata',t(end),'YData',ag(1));
@@ -65,7 +66,7 @@ switch Type
                 end
         end
         
-        %Error Monitors
+        % error monitors
         error = Um-U;
         [f,MX] = GetFFT(error',t(2)-t(1));
         TI(1,:) = 0.5*(cumtrapz(U(1,:),Um(1,:)) - cumtrapz(Um(1,:),U(1,:)));
@@ -75,7 +76,7 @@ switch Type
         set(handles.Plots.EM1MeasCmddot,'Xdata',U(1,end),'YData',Um(1,end));
         set(handles.Plots.EM1trackplot,'Xdata',t,'YData',TI(1,:));
         
-        %Animate Structure
+        % animate structure
         if findobj('Tag','StructAnim')
             set(handles.Plots.StructAnim, ...
                 'Vertices',[0.0 0.0; U(1,end) 10.0], ...
@@ -84,9 +85,9 @@ switch Type
         
         % update all the plots
         drawnow;
-        
+    % =====================================================================
     case '2 DOF A'
-        %Structural Outputs
+        % structural outputs
         set(handles.Plots.SO1dplot,'Xdata',t,'YData',U(1,:));
         set(handles.Plots.SO1fplot,'Xdata',t,'YData',Pr(1,:));
         set(handles.Plots.SO1aplot,'Xdata',t,'YData',Udotdot(1,:));
@@ -102,7 +103,7 @@ switch Type
         set(handles.Plots.SO2ffplot,'Xdata',Pr(1,:),'YData',Pr(2,:));
         set(handles.Plots.SO2ffdot,'Xdata',Pr(1,end),'YData',Pr(2,end));
         
-        %Routine for tracing ag plots
+        % routine for tracing ag plots
         switch handles.GM.loadType
             case 'Ground Motions'
                 set(handles.Plots.SO1agdot,'Xdata',t(end),'YData',ag(1));
@@ -119,7 +120,7 @@ switch Type
                 end
         end
         
-        %Error Monitors
+        % error monitors
         error = Um-U;
         [f,MX] = GetFFT(error',t(2)-t(1));
         TI(1,:) = 0.5*(cumtrapz(U(1,:),Um(1,:)) - cumtrapz(Um(1,:),U(1,:)));
@@ -135,7 +136,7 @@ switch Type
         set(handles.Plots.EM2MeasCmddot,'Xdata',U(2,end),'YData',Um(2,end));
         set(handles.Plots.EM2trackplot,'Xdata',t,'YData',TI(2,:));
         
-        %Animate Structure
+        % animate structure
         if findobj('Tag','StructAnim')
             set(handles.Plots.StructAnim, ...
                 'Vertices',[0.0 0.0; U(1,end) 5.0; U(2,end) 10.0], ...
@@ -144,9 +145,9 @@ switch Type
         
         % update all the plots
         drawnow;
-        
+    % =====================================================================
     case '2 DOF B'
-        %Structural Outputs
+        % structural outputs
         set(handles.Plots.SO1dplot,'Xdata',t,'YData',U(1,:));
         set(handles.Plots.SO1fplot,'Xdata',t,'YData',Pr(1,:));
         set(handles.Plots.SO1aplot,'Xdata',t,'YData',Udotdot(1,:));
@@ -162,7 +163,7 @@ switch Type
         set(handles.Plots.SO2ffplot,'Xdata',Pr(1,:),'YData',Pr(2,:));
         set(handles.Plots.SO2ffdot,'Xdata',Pr(1,end),'YData',Pr(2,end));
         
-        %Routine for tracing ag plots
+        % routine for tracing ag plots
         switch handles.GM.loadType
             case 'Ground Motions'
                 set(handles.Plots.SO1agdot,'Xdata',t(end),'YData',ag(1));
@@ -179,7 +180,7 @@ switch Type
                 end
         end
         
-        %Error Monitors
+        % error monitors
         error = Um-U;
         [f,MX] = GetFFT(error',t(2)-t(1));
         TI(1,:) = 0.5*(cumtrapz(U(1,:),Um(1,:)) - cumtrapz(Um(1,:),U(1,:)));
@@ -195,7 +196,7 @@ switch Type
         set(handles.Plots.EM2MeasCmddot,'Xdata',U(2,end),'YData',Um(2,end));
         set(handles.Plots.EM2trackplot,'Xdata',t,'YData',TI(2,:));
         
-        %Animate Structure
+        % animate structure
         if findobj('Tag','StructAnim')
             set(handles.Plots.StructAnim, ...
                 'Vertices',[0.0 0.0 0.0; U(1,end) U(2,end) 10.0], ...
@@ -204,4 +205,5 @@ switch Type
         
         % update all the plots
         drawnow;
+    % =====================================================================
 end

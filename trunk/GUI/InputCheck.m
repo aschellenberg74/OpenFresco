@@ -30,7 +30,7 @@ function [error,message] = InputCheck(varargin)
 % $Date$
 % $URL$
 
-% Initialization tasks
+% initialization tasks
 handles = guidata(gcbf);
 error = 0;
 message = 'Writing of the .tcl file failed!';
@@ -42,34 +42,33 @@ if isempty(handles.Model.Type)
     return
 else
     switch handles.GM.loadType
+        % =================================================================
         case 'Ground Motions'
-            if handles.GM.ag{1} == 0
+            if length(handles.GM.ag{1}) < 2
                 error = 1;
                 message = sprintf('Writing of the .tcl file failed!\nNo ground motion loaded.');
                 return
             end
-            if strcmp(handles.Model.Type, '2 DOF B')
-                s = size(handles.GM.ag);
-                if s(2) ~= 2
-                    error = 1;
-                    message = sprintf('Writing of the .tcl file failed!\nGround motion data missing.');
-                    return
-                end
+            if strcmp(handles.Model.Type,'2 DOF B') && length(handles.GM.ag{2}) < 2
+                error = 1;
+                message = sprintf('Writing of the .tcl file failed!\nGround motion data missing.');
+                return
             end
+        % =================================================================
         case 'Initial Conditions'
             if isempty(handles.GM.initialDisp) || isempty(handles.GM.rampTime) || isempty(handles.GM.vibTime)
                 error = 1;
                 message = sprintf('Writing of the .tcl file failed!\nIncomplete free vibration parameters.');
                 return
             end
+        % =================================================================
     end
     
     switch handles.Model.Type
-        %%%%%%%%%%%%
-        %1 DOF Case%
-        %%%%%%%%%%%%
+        % =================================================================
         case '1 DOF'
             switch handles.ExpControl.Type
+                % ---------------------------------------------------------
                 case 'Simulation'
                     if isempty(handles.ExpControl.DOF1.SimMaterial)
                         error = 1;
@@ -90,7 +89,7 @@ else
                                     return
                                 end
                             case 'Steel - Bilinear'
-                                if isempty(handles.ExpControl.DOF1.Fy) || isempty(handles.ExpControl.DOF1.E0) || isempty(handles.ExpControl.DOF1.b)
+                                if isempty(handles.ExpControl.DOF1.Fy) || isempty(handles.ExpControl.DOF1.E) || isempty(handles.ExpControl.DOF1.b)
                                     error = 1;
                                     message = sprintf('Writing of the .tcl file failed!\nDOF 1 material is missing inputs.');
                                     return
@@ -109,7 +108,7 @@ else
                         message = sprintf('Writing of the .tcl file failed!\nSimulation control type not specified.');
                         return
                     end
-                    
+                % ---------------------------------------------------------
                 case 'Real'
                     if isempty(handles.ExpControl.RealControl.Controller)
                         error = 1;
@@ -149,13 +148,12 @@ else
                                 end
                         end
                     end
-            end                                    
-
-        %%%%%%%%%%%%%%%
-        %2 DOF A  Case%
-        %%%%%%%%%%%%%%%
+                % ---------------------------------------------------------
+            end
+        % =================================================================
         case '2 DOF A'
             switch handles.ExpControl.Type
+                % ---------------------------------------------------------
                 case 'Simulation'
                     if isempty(handles.Model.M)
                         error = 1;
@@ -181,7 +179,7 @@ else
                                     return
                                 end
                             case 'Steel - Bilinear'
-                                if isempty(handles.ExpControl.DOF1.Fy) || isempty(handles.ExpControl.DOF1.E0) || isempty(handles.ExpControl.DOF1.b)
+                                if isempty(handles.ExpControl.DOF1.Fy) || isempty(handles.ExpControl.DOF1.E) || isempty(handles.ExpControl.DOF1.b)
                                     error = 1;
                                     message = sprintf('Writing of the .tcl file failed!\nDOF 1 material is missing inputs.');
                                     return
@@ -214,7 +212,7 @@ else
                                     return
                                 end
                             case 'Steel - Bilinear'
-                                if isempty(handles.ExpControl.DOF2.Fy) || isempty(handles.ExpControl.DOF2.E0) || isempty(handles.ExpControl.DOF2.b)
+                                if isempty(handles.ExpControl.DOF2.Fy) || isempty(handles.ExpControl.DOF2.E) || isempty(handles.ExpControl.DOF2.b)
                                     error = 1;
                                     message = sprintf('Writing of the .tcl file failed!\nDOF 2 material is missing inputs.');
                                     return
@@ -227,7 +225,7 @@ else
                                 end
                         end
                     end
-                    
+                % ---------------------------------------------------------
                 case 'Real'
                     if isempty(handles.ExpControl.RealControl.Controller)
                         error = 1;
@@ -267,13 +265,12 @@ else
                                 end
                         end
                     end
+                % ---------------------------------------------------------
             end
-
-        %%%%%%%%%%%%%%%
-        %2 DOF B  Case%
-        %%%%%%%%%%%%%%%
+        % =================================================================
         case '2 DOF B'
             switch handles.ExpControl.Type
+                % ---------------------------------------------------------
                 case 'Simulation'
                     if isempty(handles.ExpControl.DOF1.SimMaterial)
                         error = 1;
@@ -294,7 +291,7 @@ else
                                     return
                                 end
                             case 'Steel - Bilinear'
-                                if isempty(handles.ExpControl.DOF1.Fy) || isempty(handles.ExpControl.DOF1.E0) || isempty(handles.ExpControl.DOF1.b)
+                                if isempty(handles.ExpControl.DOF1.Fy) || isempty(handles.ExpControl.DOF1.E) || isempty(handles.ExpControl.DOF1.b)
                                     error = 1;
                                     message = sprintf('Writing of the .tcl file failed!\nDOF 1 material is missing inputs.');
                                     return
@@ -327,7 +324,7 @@ else
                                     return
                                 end
                             case 'Steel - Bilinear'
-                                if isempty(handles.ExpControl.DOF2.Fy) || isempty(handles.ExpControl.DOF2.E0) || isempty(handles.ExpControl.DOF2.b)
+                                if isempty(handles.ExpControl.DOF2.Fy) || isempty(handles.ExpControl.DOF2.E) || isempty(handles.ExpControl.DOF2.b)
                                     error = 1;
                                     message = sprintf('Writing of the .tcl file failed!\nDOF 2 material is missing inputs.');
                                     return
@@ -346,8 +343,7 @@ else
                         message = sprintf('Writing of the .tcl file failed!\nSimulation control type not specified.');
                         return
                     end
-                    
-                    
+                % ---------------------------------------------------------
                 case 'Real'
                     if isempty(handles.ExpControl.RealControl.Controller)
                         error = 1;
@@ -387,6 +383,8 @@ else
                                 end
                         end
                     end
+                % ---------------------------------------------------------
             end
+        % =================================================================
     end
 end

@@ -1,11 +1,10 @@
-function [f,MX] = GetFFT(data,dt)
-%GETFFT to get the scaled FFT and plot it if requested
-% [f,MX] = GetFFT(data,dt)
+function PrintWithHeader(format,axisTag,loc)
+%PRINTWITHHEADER to print a figure with header
+% PrintWithHeader(format,axisTag,loc)
 %
-% f    : frequency vector [Hz]
-% MX   : scaled magnitude vector
-% data : input data (column) vector
-% dt   : sampling time [sec]
+% format  : format to print to 'fig', 'pdf', 'clipboard' or 'printer'
+% axisTag : tag of axis above which to put the header
+% loc     : location in terms of normalized axis size [x1,y1,x2,y2]
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%                          OpenFresco Express                          %%
@@ -31,30 +30,38 @@ function [f,MX] = GetFFT(data,dt)
 % $Date$
 % $URL$
 
-Fs = 1/dt;              % sampling frequency
-Fn = Fs/2;              % Nyquist frequency
-npts = size(data,1);    % number of points
+% get the OpenFresco version
+ver = fgetl(fopen('OPFE_Version.txt'));
 
-% next highest power of 2 greater than or equal to length(x):
-NFFT = 2^nextpow2(npts);
+% get handle to the axis above which to put the header
+hAxis = findobj('Tag',axisTag);
 
-% take fft, padding with zeros, length(FFTX)==NFFT
-FFTX = fft(data,NFFT);
-numUniquePts = ceil((NFFT+1)/2);
+% setup the headers
+xLim = get(hAxis,'XLim');
+yLim = get(hAxis,'YLim');
+hHeaderLeft = text('Parent',hAxis, ...
+    'Position',[xLim(1)+loc(1)*diff(xLim),yLim(2)+loc(2)*diff(yLim),0], ...
+    'String',sprintf('OpenFresco Express v%s',ver), ...
+    'HorizontalAlignment','left', ...
+    'FontName','Helvetica','FontSize',10);
+hHeaderRight = text('Parent',hAxis, ...
+    'Position',[xLim(2)+loc(3)*diff(xLim),yLim(2)+loc(4)*diff(yLim),0], ...
+    'String',datestr(now), ...
+    'HorizontalAlignment','right', ...
+    'FontName','Helvetica','FontSize',10);
 
-% fft is symmetric, throw away second half
-FFTX = FFTX(1:numUniquePts,:);
-% take magnitude of X
-MX = abs(FFTX);
+switch lower(format)
+    case 'fig'
+        filemenufcn(gcbf,'FileSaveAs');
+    case 'pdf'
+        [name,path] = uiputfile('*.pdf','Save As PDF');
+        print(gcbf,fullfile(path,name),'-dpdf');
+    case 'clipboard'
+        print(gcbf,'-dmeta');
+    case 'printer'
+        printdlg(gcbf);
+end
 
-% multiply by 2 to take into account that we threw out second half of FFTX
-MX = MX.*2;
-% account for endpoint uniqueness
-MX(1,:) = MX(1,:)./2;
-% we know NFFT is even
-MX(end,:) = MX(end,:)./2;
-% scale the FFT so that it is not a function of the length of data
-MX = MX./npts;
-
-% frequency vector
-f = 2*Fn/NFFT*(0:numUniquePts-1)';
+% delete the headers
+delete(hHeaderLeft);
+delete(hHeaderRight);

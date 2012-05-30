@@ -8,11 +8,11 @@ handles = guidata(gcbf);
 % get the path
 DIR = handles.Model.DIR;
 
-FID = fopen(fullfile(DIR,'OPFAnalysis.tcl'),'w');
+FID = fopen(fullfile(DIR,'OPFE_Analysis.tcl'),'w');
 
 % Print header
 fprintf(FID,'####################################################\n');
-fprintf(FID,'# File: OPFAnalysis.tcl                            #\n');
+fprintf(FID,'# File: OPFE_Analysis.tcl                          #\n');
 fprintf(FID,'#                                                  #\n');
 fprintf(FID,'# Purpose: Script file for use with OpenFresco GUI #\n');
 fprintf(FID,'#                                                  #\n');

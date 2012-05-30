@@ -32,12 +32,14 @@ clear all; close all; clc;
 pathOPF = pwd;
 pathOPF = pathOPF(1:end-4);
 
+% folders we want to add to path
 folderList = { ...
    fullfile('WIN32','bin') ...
    fullfile('GUI') ...
    fullfile('GUI','Buttons') ...
    }';
 
+% add folders to path and save
 for i=length(folderList):-1:1
    addpath(fullfile(pathOPF,folderList{i}));
 end

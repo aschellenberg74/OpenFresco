@@ -28,8 +28,9 @@ function GUI_AnimateStructure(varargin)
 % $Date$
 % $URL$
 
-% Initialization tasks
+% initialization tasks
 handles = guidata(findobj('Tag','OpenFrescoExpress'));
+SS = handles.Store.SS;
 
 % update the axis limits and the color bar
 if (nargin > 0 && strcmp(varargin{1},'update'))
@@ -37,23 +38,25 @@ if (nargin > 0 && strcmp(varargin{1},'update'))
     if (xlim > 0)
         switch handles.Model.Type
             case {'1 DOF','2 DOF A'}
-                set(gca,'XLim',[-3*xlim,3*xlim],'YLim',[-1,11], ...
+                set(findobj('Tag','AxesStructAnim'), ...
+                    'XLim',[-3*xlim,3*xlim], ...
                     'CLim',[0,xlim]);
             case '2 DOF B'
-                set(gca,'XLim',[-3*xlim,3*xlim],'YLim',[-3*xlim,3*xlim], ...
-                    'ZLim',[-1,11],'CLim',[0,xlim]);
+                set(findobj('Tag','AxesStructAnim'), ...
+                    'XLim',[-3*xlim,3*xlim], ...
+                    'YLim',[-3*xlim,3*xlim], ...
+                    'CLim',[0,xlim]);
         end
     end
 end
 
-% Check if window already exists
+% check if window already exists (needs to be after update block)
 if ~isempty(findobj('Tag','StructAnim'))
     figure(findobj('Tag','StructAnim'));
     return
 end
 
-% Main Figure
-SS = get(0,'screensize');
+% main figure
 f_StructAnim = figure('Visible','on', ...
     'Name','Animate Structure', ...
     'NumberTitle','off', ...
@@ -63,22 +66,27 @@ f_StructAnim = figure('Visible','on', ...
     'Position',[0.3*SS(3),0.25*SS(4),0.5*SS(3),0.5*SS(4)]);
 imagesc(imread(which('BlueGradient.png')));
 set(gca,'Visible','off','Position',[0,0,1,1]);
+orient(f_StructAnim,'landscape');
+ModifyPrintSetup(f_StructAnim,'PrintUI',0);
 
-% Toolbar
+% toolbar
 File(1) = uimenu('Position',1,'Label','File');
-uimenu(File(1),'Position',1,'Label','Save', ...
-    'Accelerator','S','Callback','filemenufcn(gcbf,''FileSaveAs'')');
-uimenu(File(1),'Position',2,'Label','Print', ...
-    'Accelerator','P','Callback','printdlg(gcbf)');
+uimenu(File(1),'Position',1,'Label','Save As FIG','Accelerator','M','Callback', ...
+    'PrintWithHeader(''fig'',''AxesStructAnim'',[-0.05,0.02,0.15,0.02])');
+uimenu(File(1),'Position',2,'Label','Save As PDF','Accelerator','S','Callback', ...
+    'PrintWithHeader(''pdf'',''AxesStructAnim'',[-0.05,0.02,0.15,0.02])');
+uimenu(File(1),'Position',3,'Label','Copy','Accelerator','C','Callback', ...
+    'PrintWithHeader(''clipboard'',''AxesStructAnim'',[-0.05,0.02,0.15,0.02])');
+uimenu(File(1),'Position',4,'Label','Print','Accelerator','P','Callback', ...
+    'PrintWithHeader(''printer'',''AxesStructAnim'',[-0.05,0.02,0.15,0.02])');
 uimenu('Position',2,'Label','|');
 StdMenu(1) = uimenu('Position',3,'Label','MATLAB Menu');
 uimenu(StdMenu(1),'Position',1,'Label','Turn on', ...
    'Callback','set(gcf,''MenuBar'',''figure''); set(gcf,''Toolbar'',''figure'');');
 uimenu(StdMenu(1),'Position',2,'Label','Turn off', ...
    'Callback','set(gcf,''MenuBar'',''none''); set(gcf,''Toolbar'',''none'');');
-% =========================================================================
 
-% Axes
+% axes
 a = axes('Parent',f_StructAnim, ...
     'Visible','off', ...
     'Tag','AxesStructAnim', ...
@@ -88,7 +96,7 @@ colorbar('Position',[0.8935 0.0467 0.036 0.863]);
 set(a,'Position',[0.05 0.05 0.81746 0.9]);
 colormap(hot(128));
 
-% Colorbar Maximum
+% colorbar maximum
 handles.Plots.ColorBarMax = uicontrol(f_StructAnim,'Style','edit',...
     'Units','normalized',...
     'FontSize',10,...
@@ -98,8 +106,9 @@ handles.Plots.ColorBarMax = uicontrol(f_StructAnim,'Style','edit',...
     'Tag','ColorBarMax',...
     'Callback','GUI_AnimateStructure(''update'')');
 
-% Plot Model
+% plot model
 switch handles.Model.Type
+    % =====================================================================
     case '1 DOF'
         xyzNodes(1,:) = [0.0  0.0];  % node 1
         xyzNodes(2,:) = [0.0 10.0];  % node 2
@@ -122,7 +131,7 @@ switch handles.Model.Type
         set(a,'XLim',[-3*xlim,3*xlim],'YLim',[-1,11], ...
             'CLim',[0,xlim]);
         set(handles.Plots.ColorBarMax,'String',num2str(xlim,3));
-        
+    % =====================================================================
     case '2 DOF A'
         xyzNodes(1,:) = [0.0  0.0];  % node 1
         xyzNodes(2,:) = [0.0  5.0];  % node 2
@@ -147,7 +156,7 @@ switch handles.Model.Type
         set(a,'XLim',[-3*xlim,3*xlim],'YLim',[-1,11], ...
             'CLim',[0,xlim]);
         set(handles.Plots.ColorBarMax,'String',num2str(xlim,3));
-        
+    % =====================================================================
     case '2 DOF B'
         xyzNodes(1,:) = [0.0  0.0  0.0];  % node 1
         xyzNodes(2,:) = [0.0  0.0 10.0];  % node 2
@@ -177,7 +186,8 @@ switch handles.Model.Type
             'ZLim',[-1,11],'CLim',[0,xylim]);
         set(handles.Plots.ColorBarMax,'String',num2str(xylim,3));
         view(3);
+    % =====================================================================
 end
 
 % save the handles
-guidata(findobj('Tag','OpenFrescoExpress'), handles);
+guidata(findobj('Tag','OpenFrescoExpress'),handles);

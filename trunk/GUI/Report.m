@@ -28,435 +28,418 @@ function Report(varargin)
 % $Date$
 % $URL$
 
-% Initialization tasks
+% initialization tasks
 handles = guidata(gcbf);
 
-% get the path and open file for writing
-DIR = which('OpenFrescoExpress.m');
-DIR = DIR(1:end-20);
-FID = fopen(fullfile(DIR,'OPFReport.txt'),'w');
+% check the required input data
+[error,message] = InputCheck;
+if error
+    msgbox(message,'Error','error');
+    return
+end
 
-% Print header
-fprintf(FID,'==============================================================\n');
-fprintf(FID,'| File   : OPFReport.txt                                     |\n');
-fprintf(FID,'| Purpose: Summary of inputs for use with OpenFresco Express |\n');
-fprintf(FID,'==============================================================\n\n');
+% get the path and open file for writing
+DIR = which('OPFE_Version.txt');
+DIR = fileparts(DIR);
+FID = fopen(fullfile(DIR,'OPFE_Report.txt'),'w');
+ver = fgetl(fopen('OPFE_Version.txt'));
+
+% print header
+fprintf(FID,'\r\n');
+fprintf(FID,'===========================================================================\r\n');
+fprintf(FID,'OpenFresco Express v%s                                %s\r\n',ver,datestr(now));
+fprintf(FID,'===========================================================================\r\n');
+fprintf(FID,' o File   : OPFE_Report.txt\r\n');
+fprintf(FID,' o Purpose: Summary of inputs for use with OpenFresco Express\r\n\r\n');
 
 switch handles.Model.Type
-    %%%%%%%%%%%%
-    %1 DOF Case%
-    %%%%%%%%%%%%
+    % =====================================================================
     case '1 DOF'
-        fprintf(FID,'Model Properties:\n=================\n');
-        fprintf(FID,'Model Type: 1 DOF Column\n');
-        fprintf(FID,'Mass [m]: %1.4f\n',handles.Model.M);
-        fprintf(FID,'Stiffness [F/L]: %1.4f\n',handles.Model.K);
-        fprintf(FID,'Period [sec]: %1.4f\n',handles.Model.T);
-        fprintf(FID,'Frequency [Hz]: %1.4f\n',1/handles.Model.T);
-        fprintf(FID,'Damping Type: %s\n',handles.Model.DampType);
-        fprintf(FID,'Damping Value: %1.4f\n',handles.Model.Zeta);
-        fprintf(FID,'Mass Proportional Damping Factor: %1.4f\n',handles.Model.alphaM);
-        fprintf(FID,'Stiffness Proportional Damping Factor: %1.4f\n\n',handles.Model.betaK);
+        fprintf(FID,'Model Properties:\r\n=================\r\n');
+        fprintf(FID,' o Type: 1 DOF Column\r\n');
+        fprintf(FID,' o Mass [m]: %1.4f\r\n',handles.Model.M);
+        fprintf(FID,' o Stiffness [F/L]: %1.4f\r\n',handles.Model.K);
+        fprintf(FID,' o Period [sec]: %1.4f\r\n',handles.Model.T);
+        fprintf(FID,' o Frequency [Hz]: %1.4f\r\n',1/handles.Model.T);
+        fprintf(FID,' o Damping Type: %s\r\n',handles.Model.DampType);
+        fprintf(FID,' o Damping Value: %1.4f\r\n',handles.Model.Zeta);
+        fprintf(FID,' o Mass Proportional Damping Factor: %1.4f\r\n',handles.Model.alphaM);
+        fprintf(FID,' o Stiffness Proportional Damping Factor: %1.4f\r\n\r\n',handles.Model.betaK);
         
-        fprintf(FID,'Loading:\n========\n');
+        fprintf(FID,'Loading:\r\n========\r\n');
         switch handles.GM.loadType
             case 'Ground Motions'
-                strLength = length(handles.GM.store.filepath{1});
-                id = strfind(handles.GM.store.filepath,filesep);
-                strStart = id{1}(end);
-                GMName = handles.GM.store.filepath{1}(strStart+1:strLength);
-                fprintf(FID,'Ground Motion: %s\n',GMName);
-                fprintf(FID,'Database Type: %s\n',handles.GM.databaseType);
-                fprintf(FID,'PGA [L/sec^2]: %3.4f\n',handles.GM.Spectra{1}.pga);
-                fprintf(FID,'PGV [L/sec]: %3.4f\n',max(abs(handles.GM.scalevg{1})));
-                fprintf(FID,'PGD [L]: %3.4f\n',max(abs(handles.GM.scaledg{1})));
-                fprintf(FID,'Ground Motion Time Step [sec]: %1.4f\n',handles.GM.dt);
-                fprintf(FID,'Amplitude Scale Factor: %1.4f\n',handles.GM.AmpFact);
-                fprintf(FID,'Time Scale Factor: %1.4f\n\n',handles.GM.TimeFact);
+                [~,gmName,gmExt] = fileparts(handles.GM.store.filepath{1});
+                fprintf(FID,' o Ground Motion: %s\r\n',[gmName,gmExt]);
+                fprintf(FID,' o Database Type: %s\r\n',handles.GM.databaseType{1});
+                fprintf(FID,' o PGA [L/sec^2]: %3.4f\r\n',handles.GM.Spectra{1}.pga);
+                fprintf(FID,' o PGV [L/sec]: %3.4f\r\n',max(abs(handles.GM.scalevg{1})));
+                fprintf(FID,' o PGD [L]: %3.4f\r\n',max(abs(handles.GM.scaledg{1})));
+                fprintf(FID,' o Ground Motion Time Step [sec]: %1.4f\r\n',handles.GM.dt(1));
+                fprintf(FID,' o Ground Motion Time Step Limit [sec]: %1.4f\r\n',handles.Model.Maxdt);
+                fprintf(FID,' o Amplitude Scale Factor: %1.4f\r\n',handles.GM.AmpFact(1));
+                fprintf(FID,' o Time Scale Factor: %1.4f\r\n\r\n',handles.GM.TimeFact(1));
             case 'Initial Conditions'
-                fprintf(FID,'Initial Displacement [L]: %1.4f\n',handles.GM.initialDisp);
-                fprintf(FID,'Ramp Time [sec]: %1.4f\n',handles.GM.rampTime);
-                fprintf(FID,'Vibration Time [sec]: %1.4f\n\n',handles.GM.vibTime);
+                fprintf(FID,' o Initial Displacement [L]: %1.4f\r\n',handles.GM.initialDisp(1));
+                fprintf(FID,' o Ramp Time [sec]: %1.4f\r\n',handles.GM.rampTime);
+                fprintf(FID,' o Vibration Time [sec]: %1.4f\r\n\r\n',handles.GM.vibTime);
         end
         
-        fprintf(FID,'Experimental Setup:\n===================\n');
-        fprintf(FID,'Setup Type: No Transformation\n');
+        fprintf(FID,'Experimental Setup:\r\n===================\r\n');
+        fprintf(FID,' o Setup: No Transformation\r\n');
         if strcmp(handles.ExpControl.Type,'Simulation')
-            fprintf(FID,'Control: %s\n',handles.ExpControl.SimControl.SimType);
+            fprintf(FID,' o Control: %s\r\n',handles.ExpControl.SimControl.SimType);
         else
-            fprintf(FID,'Control: %s\n',handles.ExpControl.RealControl.Controller);
+            fprintf(FID,' o Control: %s\r\n',handles.ExpControl.RealControl.Controller);
         end
-        fprintf(FID,'Direction: Global X\n');
-        fprintf(FID,'Size Trial: 1\n');
-        fprintf(FID,'Size Output: 1\n\n');
+        fprintf(FID,' o Direction: Global X\r\n');
+        fprintf(FID,' o Size Trial: 1\r\n');
+        fprintf(FID,' o Size Output: 1\r\n\r\n');
         
-        fprintf(FID,'Experimental Control:\n=====================\n');
+        fprintf(FID,'Experimental Control:\r\n=====================\r\n');
         switch handles.ExpControl.Type
             case 'Simulation'
-                fprintf(FID,'Control Type: %s\n',handles.ExpControl.Type);
-                fprintf(FID,'Simulation Type: %s\n\n',handles.ExpControl.SimControl.SimType);
+                fprintf(FID,' o Type: %s\r\n',handles.ExpControl.Type);
+                fprintf(FID,' o Controller: %s\r\n',handles.ExpControl.SimControl.SimType);
                 switch handles.ExpControl.DOF1.SimMaterial
                     case 'Elastic'
-                        fprintf(FID,'Material: %s\n',handles.ExpControl.DOF1.SimMaterial);
-                        fprintf(FID,'E [F/L^2]: %1.4f\n\n',handles.ExpControl.DOF1.E);
+                        fprintf(FID,' o Material: %s\r\n',handles.ExpControl.DOF1.SimMaterial);
+                        fprintf(FID,'     E [F/L^2]: %1.4f\r\n\r\n',handles.ExpControl.DOF1.E);
                     case 'Elastic-Perfectly Plastic'
-                        fprintf(FID,'Material: %s\n',handles.ExpControl.DOF1.SimMaterial);
-                        fprintf(FID,'E [F/L^2]: %1.4f\n',handles.ExpControl.DOF1.E);
-                        fprintf(FID,'epsP: %1.4f\n\n',handles.ExpControl.DOF1.epsP);
+                        fprintf(FID,' o Material: %s\r\n',handles.ExpControl.DOF1.SimMaterial);
+                        fprintf(FID,'     E [F/L^2]: %1.4f\r\n',handles.ExpControl.DOF1.E);
+                        fprintf(FID,'     epsP: %1.4f\r\n\r\n',handles.ExpControl.DOF1.epsP);
                     case 'Steel - Bilinear'
-                        fprintf(FID,'Material: %s\n',handles.ExpControl.DOF1.SimMaterial);
-                        fprintf(FID,'Fy [F/L^2]: %1.4f\n',handles.ExpControl.DOF1.Fy);
-                        fprintf(FID,'E0 [F/L^2]: %1.4f\n',handles.ExpControl.DOF1.E0);
-                        fprintf(FID,'b: %1.4f\n\n',handles.ExpControl.DOF1.b);
+                        fprintf(FID,' o Material: %s\r\n',handles.ExpControl.DOF1.SimMaterial);
+                        fprintf(FID,'     Fy [F/L^2]: %1.4f\r\n',handles.ExpControl.DOF1.Fy);
+                        fprintf(FID,'     E [F/L^2]: %1.4f\r\n',handles.ExpControl.DOF1.E);
+                        fprintf(FID,'     b: %1.4f\r\n\r\n',handles.ExpControl.DOF1.b);
                     case 'Steel - Giuffré-Menegotto-Pinto'
-                        fprintf(FID,'Material: %s\n',handles.ExpControl.DOF1.SimMaterial);
-                        fprintf(FID,'Fy [F/L^2]: %1.4f\n',handles.ExpControl.DOF1.Fy);
-                        fprintf(FID,'E [F/L^2]: %1.4f\n',handles.ExpControl.DOF1.E);
-                        fprintf(FID,'b: %1.4f\n',handles.ExpControl.DOF1.b);
-                        fprintf(FID,'R0: %1.4f\n',handles.ExpControl.DOF1.R0);
-                        fprintf(FID,'cR1: %1.4f\n',handles.ExpControl.DOF1.cR1);
-                        fprintf(FID,'cR2: %1.4f\n\n',handles.ExpControl.DOF1.cR2);
-                end                
+                        fprintf(FID,' o Material: %s\r\n',handles.ExpControl.DOF1.SimMaterial);
+                        fprintf(FID,'     Fy [F/L^2]: %1.4f\r\n',handles.ExpControl.DOF1.Fy);
+                        fprintf(FID,'     E [F/L^2]: %1.4f\r\n',handles.ExpControl.DOF1.E);
+                        fprintf(FID,'     b: %1.4f\r\n',handles.ExpControl.DOF1.b);
+                        fprintf(FID,'     R0: %1.4f\r\n',handles.ExpControl.DOF1.R0);
+                        fprintf(FID,'     cR1: %1.4f\r\n',handles.ExpControl.DOF1.cR1);
+                        fprintf(FID,'     cR2: %1.4f\r\n\r\n',handles.ExpControl.DOF1.cR2);
+                end
             case 'Real'
-                fprintf(FID,'Control Type: %s\n',handles.ExpControl.Type);
+                fprintf(FID,' o Type: %s\r\n',handles.ExpControl.Type);
+                fprintf(FID,' o Control: %s\r\n',handles.ExpControl.RealControl.Controller);
                 switch handles.ExpControl.RealControl.Controller
                     case 'LabVIEW'
-                        fprintf(FID,'Controller: %s\n',handles.ExpControl.RealControl.Controller);
-                        fprintf(FID,'IP Address: %s\n',handles.ExpControl.RealControl.ipAddr);
-                        fprintf(FID,'IP Port: %s\n\n',handles.ExpControl.RealControl.ipPort);
-%                         %Define experimental control points
-%                         fprintf(FID,'# Define control points\n# ---------------------\n');
-%                         fprintf(FID,'# expControlPoint tag nodeTag dir resp <-fact f> <-lim l u> ...\n');
-%                         fprintf(FID,'expControlPoint 1 1  ux disp -fact 1.0 -lim -7.5 7.5\n');
-%                         fprintf(FID,'expControlPoint 2 1  ux disp -fact 1.0 -lim -7.5 7.5  ux force -fact 1.0 -lim -12.0 12.0\n\n');
+                        fprintf(FID,' o IP Address: %s\r\n',handles.ExpControl.RealControl.ipAddr);
+                        fprintf(FID,' o IP Port: %s\r\n\r\n',handles.ExpControl.RealControl.ipPort);
+                        % define experimental control points
+                        %fprintf(FID,'# Define control points\r\n# ---------------------\r\n');
+                        %fprintf(FID,'# expControlPoint tag nodeTag dir resp <-fact f> <-lim l u> ...\r\n');
+                        %fprintf(FID,'expControlPoint 1 1  ux disp -fact 1.0 -lim -7.5 7.5\r\n');
+                        %fprintf(FID,'expControlPoint 2 1  ux disp -fact 1.0 -lim -7.5 7.5  ux force -fact 1.0 -lim -12.0 12.0\r\n\r\n');
                     case 'MTSCsi'
-                        fprintf(FID,'Controller: %s\n',handles.ExpControl.RealControl.Controller);
-                        fprintf(FID,'Configuration File: %s\n',strcat(handles.ExpControl.RealControl.ConfigName,handles.ExpControl.RealControl.ConfigType));
-                        fprintf(FID,'Ramp Time [sec]: %1.4f\n\n',handles.ExpControl.RealControl.rampTime);
+                        fprintf(FID,' o Configuration File: %s\r\n',strcat(handles.ExpControl.RealControl.ConfigName,handles.ExpControl.RealControl.ConfigType));
+                        fprintf(FID,' o Ramp Time [sec]: %1.4f\r\n\r\n',handles.ExpControl.RealControl.rampTime);
                     case 'SCRAMNet'
-                        fprintf(FID,'Controller: %s\n',handles.ExpControl.RealControl.Controller);
-                        fprintf(FID,'Memory Offset [bytes]: %1.0f\n',handles.ExpControl.RealControl.memOffset);
-                        fprintf(FID,'Number of Actuator Channels: %1.0f\n\n',handles.ExpControl.RealControl.NumActCh);
+                        fprintf(FID,' o Memory Offset [bytes]: %1.0f\r\n',handles.ExpControl.RealControl.memOffset);
+                        fprintf(FID,' o Number of Actuator Channels: %1.0f\r\n\r\n',handles.ExpControl.RealControl.NumActCh);
                     case 'dSpace'
-                        fprintf(FID,'Controller: %s\n',handles.ExpControl.RealControl.Controller);
-                        fprintf(FID,'Predictor-Corrector Type: %s\n',handles.ExpControl.RealControl.PCtype);
-                        fprintf(FID,'Board Name: %s\n\n',handles.ExpControl.RealControl.boardName);
+                        fprintf(FID,' o Predictor-Corrector Type: %s\r\n',handles.ExpControl.RealControl.PCtype);
+                        fprintf(FID,' o Board Name: %s\r\n\r\n',handles.ExpControl.RealControl.boardName);
                     case 'xPCtarget'
-                        fprintf(FID,'Controller: %s\n',handles.ExpControl.RealControl.Controller);
-                        fprintf(FID,'Predictor-Corrector Type: %s\n',handles.ExpControl.RealControl.PCtype);
-                        fprintf(FID,'IP Address: %s\n',handles.ExpControl.RealControl.ipAddr);
-                        fprintf(FID,'IP Port: %s\n',handles.ExpControl.RealControl.ipPort);
-                        fprintf(FID,'Application Name: %s\n\n',handles.ExpControl.RealControl.appName);
+                        fprintf(FID,' o Predictor-Corrector Type: %s\r\n',handles.ExpControl.RealControl.PCtype);
+                        fprintf(FID,' o IP Address: %s\r\n',handles.ExpControl.RealControl.ipAddr);
+                        fprintf(FID,' o IP Port: %s\r\n',handles.ExpControl.RealControl.ipPort);
+                        fprintf(FID,' o Application Name: %s\r\n\r\n',handles.ExpControl.RealControl.appName);
                 end
         end
         
-        fprintf(FID,'Analysis Properties:\n====================\n');
-        fprintf(FID,'Analysis Time Step [sec]: %1.4f\n',handles.GM.dtAnalysis);
-        fprintf(FID,'Analysis Time Step Limit [sec]: %1.4f\n',handles.Model.Maxdt);
-        
-        
-    %%%%%%%%%%%%%%%
-    %2 DOF A  Case%
-    %%%%%%%%%%%%%%%
+        fprintf(FID,'Analysis Properties:\r\n====================\r\n');
+        fprintf(FID,' o Analysis Time Step [sec]: %1.4f\r\n',handles.GM.dtAnalysis);
+        fprintf(FID,' o Analysis Time Step Limit [sec]: %1.4f\r\n',handles.Model.Maxdt);
+    
+    % =====================================================================
     case '2 DOF A'
-        fprintf(FID,'Model Properties:\n=================\n');
-        fprintf(FID,'Model Type: 2 DOF Shear Building\n');
-        fprintf(FID,'Mass [M]: [%1.4f  %1.4f; %1.4f  %1.4f]\n',handles.Model.M(1,1),handles.Model.M(2,1),handles.Model.M(1,2),handles.Model.M(2,2));
-        fprintf(FID,'Stiffness [F/L]: [%1.4f  %1.4f; %1.4f  %1.4f]\n',handles.Model.K(1,1),handles.Model.K(2,1),handles.Model.K(1,2),handles.Model.K(2,2));
-        fprintf(FID,'Period [sec]: %1.4f  %1.4f\n',handles.Model.T(1,1),handles.Model.T(2,1));
-        fprintf(FID,'Frequency [Hz]: %1.4f %1.4f\n',(1/handles.Model.T(1,1)),(1/handles.Model.T(2,1)));
-        fprintf(FID,'Damping Type: %s\n',handles.Model.DampType);
+        fprintf(FID,'Model Properties:\r\n=================\r\n');
+        fprintf(FID,' o Type: 2 DOF Shear Building\r\n');
+        fprintf(FID,' o Mass [M]: [%1.4f  %1.4f; %1.4f  %1.4f]\r\n',handles.Model.M(1,1),handles.Model.M(2,1),handles.Model.M(1,2),handles.Model.M(2,2));
+        fprintf(FID,' o Stiffness [F/L]: [%1.4f  %1.4f; %1.4f  %1.4f]\r\n',handles.Model.K(1,1),handles.Model.K(2,1),handles.Model.K(1,2),handles.Model.K(2,2));
+        fprintf(FID,' o Period [sec]: %1.4f  %1.4f\r\n',handles.Model.T(1,1),handles.Model.T(2,1));
+        fprintf(FID,' o Frequency [Hz]: %1.4f %1.4f\r\n',(1/handles.Model.T(1,1)),(1/handles.Model.T(2,1)));
+        fprintf(FID,' o Damping Type: %s\r\n',handles.Model.DampType);
         if strcmp(handles.Model.DampType,'Rayleigh')
-            fprintf(FID,'Damping Values: %1.4f  %1.4f\n',handles.Model.Zeta(1,1),handles.Model.Zeta(1,2));
+            fprintf(FID,' o Damping Values: %1.4f  %1.4f\r\n',handles.Model.Zeta(1,1),handles.Model.Zeta(1,2));
         else
-            fprintf(FID,'Damping Value: %1.4f\n',handles.Model.Zeta);
+            fprintf(FID,' o Damping Value: %1.4f\r\n',handles.Model.Zeta);
         end
-        fprintf(FID,'Mass Proportional Damping Factor: %1.4f\n',handles.Model.alphaM);
-        fprintf(FID,'Stiffness Proportional Damping Factor: %1.4f\n\n',handles.Model.betaK);
+        fprintf(FID,' o Mass Proportional Damping Factor: %1.4f\r\n',handles.Model.alphaM);
+        fprintf(FID,' o Stiffness Proportional Damping Factor: %1.4f\r\n\r\n',handles.Model.betaK);
         
-        fprintf(FID,'Loading:\n========\n');
+        fprintf(FID,'Loading:\r\n========\r\n');
         switch handles.GM.loadType
             case 'Ground Motions'
-                strLength = length(handles.GM.store.filepath{1});
-                id = strfind(handles.GM.store.filepath,filesep);
-                strStart = id{1}(end);
-                GMName = handles.GM.store.filepath{1}(strStart+1:strLength);
-                fprintf(FID,'Ground Motion: %s\n',GMName);
-                fprintf(FID,'Database Type: %s\n',handles.GM.databaseType);
-                fprintf(FID,'PGA [L/sec^2]: %3.4f\n',handles.GM.Spectra{1}.pga);
-                fprintf(FID,'PGV [L/sec]: %3.4f\n',max(abs(handles.GM.scalevg{1})));
-                fprintf(FID,'PGD [L]: %3.4f\n',max(abs(handles.GM.scaledg{1})));
-                fprintf(FID,'Ground Motion Time Step Limit [sec]: %1.4f\n',handles.Model.Maxdt);
-                fprintf(FID,'Amplitude Scale Factor: %1.4f\n',handles.GM.AmpFact);
-                fprintf(FID,'Time Scale Factor: %1.4f\n\n',handles.GM.TimeFact);
+                [~,gmName,gmExt] = fileparts(handles.GM.store.filepath{1});
+                fprintf(FID,' o Ground Motion: %s\r\n',[gmName,gmExt]);
+                fprintf(FID,' o Database Type: %s\r\n',handles.GM.databaseType{1});
+                fprintf(FID,' o PGA [L/sec^2]: %3.4f\r\n',handles.GM.Spectra{1}.pga);
+                fprintf(FID,' o PGV [L/sec]: %3.4f\r\n',max(abs(handles.GM.scalevg{1})));
+                fprintf(FID,' o PGD [L]: %3.4f\r\n',max(abs(handles.GM.scaledg{1})));
+                fprintf(FID,' o Ground Motion Time Step [sec]: %1.4f\r\n',handles.GM.dt(1));
+                fprintf(FID,' o Ground Motion Time Step Limit [sec]: %1.4f\r\n',handles.Model.Maxdt);
+                fprintf(FID,' o Amplitude Scale Factor: %1.4f\r\n',handles.GM.AmpFact(1));
+                fprintf(FID,' o Time Scale Factor: %1.4f\r\n\r\n',handles.GM.TimeFact(1));
             case 'Initial Conditions'
-                fprintf(FID,'Initial Displacement [L]: %1.4f %1.4f\n',handles.GM.initialDisp(1), handles.GM.initialDisp(2));
-                fprintf(FID,'Ramp Time [sec]: %1.4f\n',handles.GM.rampTime);
-                fprintf(FID,'Vibration Time [sec]: %1.4f\n\n',handles.GM.vibTime);
+                fprintf(FID,' o Initial Displacement [L]: %1.4f %1.4f\r\n',handles.GM.initialDisp(1), handles.GM.initialDisp(2));
+                fprintf(FID,' o Ramp Time [sec]: %1.4f\r\n',handles.GM.rampTime);
+                fprintf(FID,' o Vibration Time [sec]: %1.4f\r\n\r\n',handles.GM.vibTime);
         end
         
-        fprintf(FID,'Experimental Setup:\n===================\n');
-        fprintf(FID,'Setup Type: No Transformation\n');
+        fprintf(FID,'Experimental Setup:\r\n===================\r\n');
+        fprintf(FID,' o Setup: No Transformation\r\n');
         if strcmp(handles.ExpControl.Type,'Simulation')
-            fprintf(FID,'Control: %s\n',handles.ExpControl.SimControl.SimType);
+            %fprintf(FID,' o Control: %s\r\n',handles.ExpControl.SimControl.SimType);
+            fprintf(FID,' o Control: SimDomain\r\n');
         else
-            fprintf(FID,'Control: %s\n',handles.ExpControl.RealControl.Controller);
+            fprintf(FID,' o Control: %s\r\n',handles.ExpControl.RealControl.Controller);
         end
-        fprintf(FID,'Direction: Global X\n');
-        fprintf(FID,'Size Trial: 2\n');
-        fprintf(FID,'Size Output: 2\n\n');
+        fprintf(FID,' o Direction: Global X\r\n');
+        fprintf(FID,' o Size Trial: 2\r\n');
+        fprintf(FID,' o Size Output: 2\r\n\r\n');
         
-        fprintf(FID,'Experimental Control:\n=====================\n');
+        fprintf(FID,'Experimental Control:\r\n=====================\r\n');
         switch handles.ExpControl.Type
             case 'Simulation'
-                fprintf(FID,'Control Type: %s\n',handles.ExpControl.Type);
-                fprintf(FID,'Simulation Type: %s\n\n',handles.ExpControl.SimControl.SimType);
+                fprintf(FID,' o Type: %s\r\n',handles.ExpControl.Type);
+                %fprintf(FID,' o Control: %s\r\n',handles.ExpControl.SimControl.SimType);
+                fprintf(FID,' o Control: SimDomain\r\n');
                 switch handles.ExpControl.DOF1.SimMaterial
                     case 'Elastic'
-                        fprintf(FID,'DOF 1 Material: %s\n',handles.ExpControl.DOF1.SimMaterial);
-                        fprintf(FID,'E [F/L^2]: %1.4f\n\n',handles.ExpControl.DOF1.E);
+                        fprintf(FID,' o Story 1 Material: %s\r\n',handles.ExpControl.DOF1.SimMaterial);
+                        fprintf(FID,'     E [F/L^2]: %1.4f\r\n',handles.ExpControl.DOF1.E);
                     case 'Elastic-Perfectly Plastic'
-                        fprintf(FID,'DOF 1 Material: %s\n',handles.ExpControl.DOF1.SimMaterial);
-                        fprintf(FID,'E [F/L^2]: %1.4f\n',handles.ExpControl.DOF1.E);
-                        fprintf(FID,'epsP: %1.4f\n\n',handles.ExpControl.DOF1.epsP);
+                        fprintf(FID,' o Story 1 Material: %s\r\n',handles.ExpControl.DOF1.SimMaterial);
+                        fprintf(FID,'     E [F/L^2]: %1.4f\r\n',handles.ExpControl.DOF1.E);
+                        fprintf(FID,'     epsP: %1.4f\r\n',handles.ExpControl.DOF1.epsP);
                     case 'Steel - Bilinear'
-                        fprintf(FID,'DOF 1 Material: %s\n',handles.ExpControl.DOF1.SimMaterial);
-                        fprintf(FID,'Fy [F/L^2]: %1.4f\n',handles.ExpControl.DOF1.Fy);
-                        fprintf(FID,'E0 [F/L^2]: %1.4f\n',handles.ExpControl.DOF1.E0);
-                        fprintf(FID,'b: %1.4f\n\n',handles.ExpControl.DOF1.b);
+                        fprintf(FID,' o Story 1 Material: %s\r\n',handles.ExpControl.DOF1.SimMaterial);
+                        fprintf(FID,'     Fy [F/L^2]: %1.4f\r\n',handles.ExpControl.DOF1.Fy);
+                        fprintf(FID,'     E [F/L^2]: %1.4f\r\n',handles.ExpControl.DOF1.E);
+                        fprintf(FID,'     b: %1.4f\r\n',handles.ExpControl.DOF1.b);
                     case 'Steel - Giuffré-Menegotto-Pinto'
-                        fprintf(FID,'DOF 1 Material: %s\n',handles.ExpControl.DOF1.SimMaterial);
-                        fprintf(FID,'Fy [F/L^2]: %1.4f\n',handles.ExpControl.DOF1.Fy);
-                        fprintf(FID,'E [F/L^2]: %1.4f\n',handles.ExpControl.DOF1.E);
-                        fprintf(FID,'b: %1.4f\n',handles.ExpControl.DOF1.b);
-                        fprintf(FID,'R0: %1.4f\n',handles.ExpControl.DOF1.R0);
-                        fprintf(FID,'cR1: %1.4f\n',handles.ExpControl.DOF1.cR1);
-                        fprintf(FID,'cR2: %1.4f\n\n',handles.ExpControl.DOF1.cR2);
-                end        
+                        fprintf(FID,' o Story 1 Material: %s\r\n',handles.ExpControl.DOF1.SimMaterial);
+                        fprintf(FID,'     Fy [F/L^2]: %1.4f\r\n',handles.ExpControl.DOF1.Fy);
+                        fprintf(FID,'     E [F/L^2]: %1.4f\r\n',handles.ExpControl.DOF1.E);
+                        fprintf(FID,'     b: %1.4f\r\n',handles.ExpControl.DOF1.b);
+                        fprintf(FID,'     R0: %1.4f\r\n',handles.ExpControl.DOF1.R0);
+                        fprintf(FID,'     cR1: %1.4f\r\n',handles.ExpControl.DOF1.cR1);
+                        fprintf(FID,'     cR2: %1.4f\r\n',handles.ExpControl.DOF1.cR2);
+                end
                 switch handles.ExpControl.DOF2.SimMaterial
                     case 'Elastic'
-                        fprintf(FID,'DOF 2 Material: %s\n',handles.ExpControl.DOF2.SimMaterial);
-                        fprintf(FID,'E [F/L^2]: %1.4f\n\n',handles.ExpControl.DOF2.E);
+                        fprintf(FID,' o Story 2 Material: %s\r\n',handles.ExpControl.DOF2.SimMaterial);
+                        fprintf(FID,'     E [F/L^2]: %1.4f\r\n\r\n',handles.ExpControl.DOF2.E);
                     case 'Elastic-Perfectly Plastic'
-                        fprintf(FID,'DOF 2 Material: %s\n',handles.ExpControl.DOF2.SimMaterial);
-                        fprintf(FID,'E [F/L^2]: %1.4f\n',handles.ExpControl.DOF2.E);
-                        fprintf(FID,'epsP: %1.4f\n\n',handles.ExpControl.DOF2.epsP);
+                        fprintf(FID,' o Story 2 Material: %s\r\n',handles.ExpControl.DOF2.SimMaterial);
+                        fprintf(FID,'     E [F/L^2]: %1.4f\r\n',handles.ExpControl.DOF2.E);
+                        fprintf(FID,'     epsP: %1.4f\r\n\r\n',handles.ExpControl.DOF2.epsP);
                     case 'Steel - Bilinear'
-                        fprintf(FID,'DOF 2 Material: %s\n',handles.ExpControl.DOF2.SimMaterial);
-                        fprintf(FID,'Fy [F/L^2]: %1.4f\n',handles.ExpControl.DOF2.Fy);
-                        fprintf(FID,'E0 [F/L^2]: %1.4f\n',handles.ExpControl.DOF2.E0);
-                        fprintf(FID,'b: %1.4f\n\n',handles.ExpControl.DOF2.b);
+                        fprintf(FID,' o Story 2 Material: %s\r\n',handles.ExpControl.DOF2.SimMaterial);
+                        fprintf(FID,'     Fy [F/L^2]: %1.4f\r\n',handles.ExpControl.DOF2.Fy);
+                        fprintf(FID,'     E [F/L^2]: %1.4f\r\n',handles.ExpControl.DOF2.E);
+                        fprintf(FID,'     b: %1.4f\r\n\r\n',handles.ExpControl.DOF2.b);
                     case 'Steel - Giuffré-Menegotto-Pinto'
-                        fprintf(FID,'DOF 2 Material: %s\n',handles.ExpControl.DOF2.SimMaterial);
-                        fprintf(FID,'Fy [F/L^2]: %1.4f\n',handles.ExpControl.DOF2.Fy);
-                        fprintf(FID,'E [F/L^2]: %1.4f\n',handles.ExpControl.DOF2.E);
-                        fprintf(FID,'b: %1.4f\n',handles.ExpControl.DOF2.b);
-                        fprintf(FID,'R0: %1.4f\n',handles.ExpControl.DOF2.R0);
-                        fprintf(FID,'cR1: %1.4f\n',handles.ExpControl.DOF2.cR1);
-                        fprintf(FID,'cR2: %1.4f\n\n',handles.ExpControl.DOF2.cR2);
-                end  
-%                         %Define experimental control points
-%                         fprintf(FID,'# Define control points\n# ---------------------\n');
-%                         fprintf(FID,'# expControlPoint tag nodeTag dir resp <-fact f> <-lim l u> ...\n');
-%                         fprintf(FID,'expControlPoint 1 2  ux disp\n');
-%                         fprintf(FID,'expControlPoint 2 2  ux disp  ux force\n');
-%                         fprintf(FID,'expControlPoint 3 3  ux disp\n');
-%                         fprintf(FID,'expControlPoint 4 3  ux disp  ux force\n\n');
+                        fprintf(FID,' o Story 2 Material: %s\r\n',handles.ExpControl.DOF2.SimMaterial);
+                        fprintf(FID,'     Fy [F/L^2]: %1.4f\r\n',handles.ExpControl.DOF2.Fy);
+                        fprintf(FID,'     E [F/L^2]: %1.4f\r\n',handles.ExpControl.DOF2.E);
+                        fprintf(FID,'     b: %1.4f\r\n',handles.ExpControl.DOF2.b);
+                        fprintf(FID,'     R0: %1.4f\r\n',handles.ExpControl.DOF2.R0);
+                        fprintf(FID,'     cR1: %1.4f\r\n',handles.ExpControl.DOF2.cR1);
+                        fprintf(FID,'     cR2: %1.4f\r\n\r\n',handles.ExpControl.DOF2.cR2);
+                end
+                % define experimental control points
+                %fprintf(FID,'# Define control points\r\n# ---------------------\r\n');
+                %fprintf(FID,'# expControlPoint tag nodeTag dir resp <-fact f> <-lim l u> ...\r\n');
+                %fprintf(FID,'expControlPoint 1 2  ux disp\r\n');
+                %fprintf(FID,'expControlPoint 2 2  ux disp  ux force\r\n');
+                %fprintf(FID,'expControlPoint 3 3  ux disp\r\n');
+                %fprintf(FID,'expControlPoint 4 3  ux disp  ux force\r\n\r\n');
             case 'Real'
-                fprintf(FID,'Control Type: %s\n',handles.ExpControl.Type);
+                fprintf(FID,' o Type: %s\r\n',handles.ExpControl.Type);
+                fprintf(FID,' o Control: %s\r\n',handles.ExpControl.RealControl.Controller);
                 switch handles.ExpControl.RealControl.Controller
                     case 'LabVIEW'
-                        fprintf(FID,'Controller: %s\n',handles.ExpControl.RealControl.Controller);
-                        fprintf(FID,'IP Address: %s\n',handles.ExpControl.RealControl.ipAddr);
-                        fprintf(FID,'IP Port: %s\n\n',handles.ExpControl.RealControl.ipPort);
-%                         %Define experimental control points
-%                         fprintf(FID,'# Define control points\n# ---------------------\n');
-%                         fprintf(FID,'# expControlPoint tag nodeTag dir resp <-fact f> <-lim l u> ...\n');
-%                         fprintf(FID,'expControlPoint 1 1  ux disp -fact 1.0 -lim -7.5 7.5\n');
-%                         fprintf(FID,'expControlPoint 2 1  ux disp -fact 1.0 -lim -7.5 7.5  ux force -fact 1.0 -lim -12.0 12.0\n');
-%                         fprintf(FID,'expControlPoint 3 2  ux disp -fact 1.0 -lim -7.5 7.5\n');
-%                         fprintf(FID,'expControlPoint 4 2  ux disp -fact 1.0 -lim -7.5 7.5  ux force -fact 1.0 -lim -12.0 12.0\n\n');                        
+                        fprintf(FID,' o IP Address: %s\r\n',handles.ExpControl.RealControl.ipAddr);
+                        fprintf(FID,' o IP Port: %s\r\n\r\n',handles.ExpControl.RealControl.ipPort);
+                        % define experimental control points
+                        %fprintf(FID,'# Define control points\r\n# ---------------------\r\n');
+                        %fprintf(FID,'# expControlPoint tag nodeTag dir resp <-fact f> <-lim l u> ...\r\n');
+                        %fprintf(FID,'expControlPoint 1 1  ux disp -fact 1.0 -lim -7.5 7.5\r\n');
+                        %fprintf(FID,'expControlPoint 2 1  ux disp -fact 1.0 -lim -7.5 7.5  ux force -fact 1.0 -lim -12.0 12.0\r\n');
+                        %fprintf(FID,'expControlPoint 3 2  ux disp -fact 1.0 -lim -7.5 7.5\r\n');
+                        %fprintf(FID,'expControlPoint 4 2  ux disp -fact 1.0 -lim -7.5 7.5  ux force -fact 1.0 -lim -12.0 12.0\r\n\r\n');
                     case 'MTSCsi'
-                        fprintf(FID,'Controller: %s\n',handles.ExpControl.RealControl.Controller);
-                        fprintf(FID,'Configuration File: %s\n',strcat(handles.ExpControl.RealControl.ConfigName,handles.ExpControl.RealControl.ConfigType));
-                        fprintf(FID,'Ramp Time [sec]: %1.4f\n\n',handles.ExpControl.RealControl.rampTime);
+                        fprintf(FID,' o Configuration File: %s\r\n',strcat(handles.ExpControl.RealControl.ConfigName,handles.ExpControl.RealControl.ConfigType));
+                        fprintf(FID,' o Ramp Time [sec]: %1.4f\r\n\r\n',handles.ExpControl.RealControl.rampTime);
                     case 'SCRAMNet'
-                        fprintf(FID,'Controller: %s\n',handles.ExpControl.RealControl.Controller);
-                        fprintf(FID,'Memory Offset [bytes]: %1.0f\n',handles.ExpControl.RealControl.memOffset);
-                        fprintf(FID,'Number of Actuator Channels: %1.0f\n\n',handles.ExpControl.RealControl.NumActCh);
+                        fprintf(FID,' o Memory Offset [bytes]: %1.0f\r\n',handles.ExpControl.RealControl.memOffset);
+                        fprintf(FID,' o Number of Actuator Channels: %1.0f\r\n\r\n',handles.ExpControl.RealControl.NumActCh);
                     case 'dSpace'
-                        fprintf(FID,'Controller: %s\n',handles.ExpControl.RealControl.Controller);
-                        fprintf(FID,'Predictor-Corrector Type: %s\n',handles.ExpControl.RealControl.PCtype);
-                        fprintf(FID,'Board Name: %s\n\n',handles.ExpControl.RealControl.boardName);
+                        fprintf(FID,' o Predictor-Corrector Type: %s\r\n',handles.ExpControl.RealControl.PCtype);
+                        fprintf(FID,' o Board Name: %s\r\n\r\n',handles.ExpControl.RealControl.boardName);
                     case 'xPCtarget'
-                        fprintf(FID,'Controller: %s\n',handles.ExpControl.RealControl.Controller);
-                        fprintf(FID,'Predictor-Corrector Type: %s\n',handles.ExpControl.RealControl.PCtype);
-                        fprintf(FID,'IP Address: %s\n',handles.ExpControl.RealControl.ipAddr);
-                        fprintf(FID,'IP Port: %s\n',handles.ExpControl.RealControl.ipPort);
-                        fprintf(FID,'Application Name: %s\n\n',handles.ExpControl.RealControl.appName);
+                        fprintf(FID,' o Predictor-Corrector Type: %s\r\n',handles.ExpControl.RealControl.PCtype);
+                        fprintf(FID,' o IP Address: %s\r\n',handles.ExpControl.RealControl.ipAddr);
+                        fprintf(FID,' o IP Port: %s\r\n',handles.ExpControl.RealControl.ipPort);
+                        fprintf(FID,' o Application Name: %s\r\n\r\n',handles.ExpControl.RealControl.appName);
                 end
         end
         
-        fprintf(FID,'Analysis Properties:\n====================\n');
-        fprintf(FID,'Analysis Time Step [sec]: %1.4f\n',handles.GM.dtAnalysis);
-        fprintf(FID,'Analysis Time Step Limit [sec]: %1.4f\n',handles.Model.Maxdt);
+        fprintf(FID,'Analysis Properties:\r\n====================\r\n');
+        fprintf(FID,' o Analysis Time Step [sec]: %1.4f\r\n',handles.GM.dtAnalysis);
+        fprintf(FID,' o Analysis Time Step Limit [sec]: %1.4f\r\n',handles.Model.Maxdt);
         
-        
-    %%%%%%%%%%%%%%%
-    %2 DOF B  Case%
-    %%%%%%%%%%%%%%%
+    % =====================================================================
     case '2 DOF B'
-        fprintf(FID,'Model Properties:\n=================\n');
-        fprintf(FID,'Model Type: 2 DOF Column\n');
-        fprintf(FID,'Mass [M]: [%1.4f  %1.4f; %1.4f  %1.4f]\n',handles.Model.M(1,1),handles.Model.M(2,1),handles.Model.M(1,2),handles.Model.M(2,2));
-        fprintf(FID,'Stiffness [F/L]: [%1.4f  %1.4f; %1.4f  %1.4f]\n',handles.Model.K(1,1),handles.Model.K(2,1),handles.Model.K(1,2),handles.Model.K(2,2));
-        fprintf(FID,'Period [sec]: %1.4f  %1.4f\n',handles.Model.T(1,1),handles.Model.T(2,1));
-        fprintf(FID,'Frequency [Hz]: %1.4f %1.4f\n',(1/handles.Model.T(1,1)),(1/handles.Model.T(2,1)));
-        fprintf(FID,'Damping Type: %s\n',handles.Model.DampType);
+        fprintf(FID,'Model Properties:\r\n=================\r\n');
+        fprintf(FID,' o Type: 2 DOF Column\r\n');
+        fprintf(FID,' o Mass [M]: [%1.4f  %1.4f; %1.4f  %1.4f]\r\n',handles.Model.M(1,1),handles.Model.M(2,1),handles.Model.M(1,2),handles.Model.M(2,2));
+        fprintf(FID,' o Stiffness [F/L]: [%1.4f  %1.4f; %1.4f  %1.4f]\r\n',handles.Model.K(1,1),handles.Model.K(2,1),handles.Model.K(1,2),handles.Model.K(2,2));
+        fprintf(FID,' o Period [sec]: %1.4f  %1.4f\r\n',handles.Model.T(1,1),handles.Model.T(2,1));
+        fprintf(FID,' o Frequency [Hz]: %1.4f %1.4f\r\n',(1/handles.Model.T(1,1)),(1/handles.Model.T(2,1)));
+        fprintf(FID,' o Damping Type: %s\r\n',handles.Model.DampType);
         if strcmp(handles.Model.DampType,'Rayleigh')
-            fprintf(FID,'Damping Values: %1.4f  %1.4f\n',handles.Model.Zeta(1,1),handles.Model.Zeta(1,2));
+            fprintf(FID,' o Damping Values: %1.4f  %1.4f\r\n',handles.Model.Zeta(1,1),handles.Model.Zeta(1,2));
         else
-            fprintf(FID,'Damping Value: %1.4f\n',handles.Model.Zeta);
+            fprintf(FID,' o Damping Value: %1.4f\r\n',handles.Model.Zeta);
         end
-        fprintf(FID,'Mass Proportional Damping Factor: %1.4f\n',handles.Model.alphaM);
-        fprintf(FID,'Stiffness Proportional Damping Factor: %1.4f\n\n',handles.Model.betaK);
+        fprintf(FID,' o Mass Proportional Damping Factor: %1.4f\r\n',handles.Model.alphaM);
+        fprintf(FID,' o Stiffness Proportional Damping Factor: %1.4f\r\n\r\n',handles.Model.betaK);
         
-        fprintf(FID,'Loading:\n========\n');
+        fprintf(FID,'Loading:\r\n========\r\n');
         switch handles.GM.loadType
             case 'Ground Motions'
-                fprintf(FID,'Direction 1\n');
-                strLength = length(handles.GM.store.filepath{1});
-                id = strfind(handles.GM.store.filepath,filesep);
-                strStart = id{1}(end);
-                GMName = handles.GM.store.filepath{1}(strStart+1:strLength);
-                fprintf(FID,'Ground Motion: %s\n',GMName);
-                fprintf(FID,'Database Type: %s\n',handles.GM.databaseType);
-                fprintf(FID,'PGA [L/sec^2]: %1.4f\n',handles.GM.Spectra{1}.pga);
-                fprintf(FID,'PGV [L/sec]: %1.4f\n',max(abs(handles.GM.scalevg{1})));
-                fprintf(FID,'PGD [L]: %1.4f\n',max(abs(handles.GM.scaledg{1})));
-                fprintf(FID,'Ground Motion Time Step [sec]: %1.4f\n',handles.GM.dt(1));
-                fprintf(FID,'Amplitude Scale Factor: %1.4f\n',handles.GM.AmpFact(1));
-                fprintf(FID,'Time Scale Factor: %1.4f\n\n',handles.GM.TimeFact(1));
+                fprintf(FID,' o Direction 1\r\n');
+                [~,gmName,gmExt] = fileparts(handles.GM.store.filepath{1});
+                fprintf(FID,' o Ground Motion: %s\r\n',[gmName,gmExt]);
+                fprintf(FID,' o Database Type: %s\r\n',handles.GM.databaseType{1});
+                fprintf(FID,' o PGA [L/sec^2]: %1.4f\r\n',handles.GM.Spectra{1}.pga);
+                fprintf(FID,' o PGV [L/sec]: %1.4f\r\n',max(abs(handles.GM.scalevg{1})));
+                fprintf(FID,' o PGD [L]: %1.4f\r\n',max(abs(handles.GM.scaledg{1})));
+                fprintf(FID,' o Ground Motion Time Step [sec]: %1.4f\r\n',handles.GM.dt(1));
+                fprintf(FID,' o Ground Motion Time Step Limit [sec]: %1.4f\r\n',handles.Model.Maxdt);
+                fprintf(FID,' o Amplitude Scale Factor: %1.4f\r\n',handles.GM.AmpFact(1));
+                fprintf(FID,' o Time Scale Factor: %1.4f\r\n\r\n',handles.GM.TimeFact(1));
                 
-                fprintf(FID,'Direction 2\n');
-                strLength = length(handles.GM.store.filepath{2});
-                id = strfind(handles.GM.store.filepath,filesep);
-                strStart = id{1}(end);
-                GMName = handles.GM.store.filepath{2}(strStart+1:strLength);
-                fprintf(FID,'Ground Motion: %s\n',GMName);
-                fprintf(FID,'Database Type: %s\n',handles.GM.databaseType);
-                fprintf(FID,'PGA [L/sec^2]: %1.4f\n',handles.GM.Spectra{2}.pga);
-                fprintf(FID,'PGV [L/sec]: %1.4f\n',max(abs(handles.GM.scalevg{2})));
-                fprintf(FID,'PGD [L]: %1.4f\n',max(abs(handles.GM.scaledg{2})));
-                fprintf(FID,'Ground Motion Time Step [sec]: %1.4f\n',handles.GM.dt(2));
-                fprintf(FID,'Amplitude Scale Factor: %1.4f\n',handles.GM.AmpFact(2));
-                fprintf(FID,'Time Scale Factor: %1.4f\n\n',handles.GM.TimeFact(2));
+                fprintf(FID,' o Direction 2\r\n');
+                [~,gmName,gmExt] = fileparts(handles.GM.store.filepath{2});
+                fprintf(FID,' o Ground Motion: %s\r\n',[gmName,gmExt]);
+                fprintf(FID,' o Database Type: %s\r\n',handles.GM.databaseType{2});
+                fprintf(FID,' o PGA [L/sec^2]: %1.4f\r\n',handles.GM.Spectra{2}.pga);
+                fprintf(FID,' o PGV [L/sec]: %1.4f\r\n',max(abs(handles.GM.scalevg{2})));
+                fprintf(FID,' o PGD [L]: %1.4f\r\n',max(abs(handles.GM.scaledg{2})));
+                fprintf(FID,' o Ground Motion Time Step [sec]: %1.4f\r\n',handles.GM.dt(2));
+                fprintf(FID,' o Ground Motion Time Step Limit [sec]: %1.4f\r\n',handles.Model.Maxdt);
+                fprintf(FID,' o Amplitude Scale Factor: %1.4f\r\n',handles.GM.AmpFact(2));
+                fprintf(FID,' o Time Scale Factor: %1.4f\r\n\r\n',handles.GM.TimeFact(2));
             case 'Initial Conditions'
-                fprintf(FID,'Initial Displacement [L]: %1.4f %1.4f\n',handles.GM.initialDisp(1), handles.GM.initialDisp(2));
-                fprintf(FID,'Ramp Time [sec]: %1.4f\n',handles.GM.rampTime);
-                fprintf(FID,'Vibration Time [sec]: %1.4f\n\n',handles.GM.vibTime);
+                fprintf(FID,' o Initial Displacement [L]: %1.4f %1.4f\r\n',handles.GM.initialDisp(1), handles.GM.initialDisp(2));
+                fprintf(FID,' o Ramp Time [sec]: %1.4f\r\n',handles.GM.rampTime);
+                fprintf(FID,' o Vibration Time [sec]: %1.4f\r\n\r\n',handles.GM.vibTime);
         end
         
-        fprintf(FID,'Experimental Setup:\n===================\n');
-        fprintf(FID,'Setup Type: No Transformation\n');
+        fprintf(FID,'Experimental Setup:\r\n===================\r\n');
+        fprintf(FID,' o Setup: No Transformation\r\n');
         if strcmp(handles.ExpControl.Type,'Simulation')
-            fprintf(FID,'Control: %s\n',handles.ExpControl.SimControl.SimType);
+            fprintf(FID,' o Control: %s\r\n',handles.ExpControl.SimControl.SimType);
         else
-            fprintf(FID,'Control: %s\n',handles.ExpControl.RealControl.Controller);
+            fprintf(FID,' o Control: %s\r\n',handles.ExpControl.RealControl.Controller);
         end
-        fprintf(FID,'Directions: Global X, Global Y\n');
-        fprintf(FID,'Size Trial: 2\n');
-        fprintf(FID,'Size Output: 2\n\n');
+        fprintf(FID,' o Directions: Global X, Global Y\r\n');
+        fprintf(FID,' o Size Trial: 2\r\n');
+        fprintf(FID,' o Size Output: 2\r\n\r\n');
         
-        
-        fprintf(FID,'Experimental Control:\n=====================\n');
+        fprintf(FID,'Experimental Control:\r\n=====================\r\n');
         switch handles.ExpControl.Type
             case 'Simulation'
-                fprintf(FID,'Control Type: %s\n',handles.ExpControl.Type);
-                fprintf(FID,'Simulation Type: %s\n\n',handles.ExpControl.SimControl.SimType);
+                fprintf(FID,' o Type: %s\r\n',handles.ExpControl.Type);
+                fprintf(FID,' o Control Type: %s\r\n',handles.ExpControl.SimControl.SimType);
                 switch handles.ExpControl.DOF1.SimMaterial
                     case 'Elastic'
-                        fprintf(FID,'DOF 1 Material: %s\n',handles.ExpControl.DOF1.SimMaterial);
-                        fprintf(FID,'E [F/L^2]: %1.4f\n\n',handles.ExpControl.DOF1.E);
+                        fprintf(FID,' o DOF 1 Material: %s\r\n',handles.ExpControl.DOF1.SimMaterial);
+                        fprintf(FID,'     E [F/L^2]: %1.4f\r\n',handles.ExpControl.DOF1.E);
                     case 'Elastic-Perfectly Plastic'
-                        fprintf(FID,'DOF 1 Material: %s\n',handles.ExpControl.DOF1.SimMaterial);
-                        fprintf(FID,'E [F/L^2]: %1.4f\n',handles.ExpControl.DOF1.E);
-                        fprintf(FID,'epsP: %1.4f\n\n',handles.ExpControl.DOF1.epsP);
+                        fprintf(FID,' o DOF 1 Material: %s\r\n',handles.ExpControl.DOF1.SimMaterial);
+                        fprintf(FID,'     E [F/L^2]: %1.4f\r\n',handles.ExpControl.DOF1.E);
+                        fprintf(FID,'     epsP: %1.4f\r\n',handles.ExpControl.DOF1.epsP);
                     case 'Steel - Bilinear'
-                        fprintf(FID,'DOF 1 Material: %s\n',handles.ExpControl.DOF1.SimMaterial);
-                        fprintf(FID,'Fy [F/L^2]: %1.4f\n',handles.ExpControl.DOF1.Fy);
-                        fprintf(FID,'E0 [F/L^2]: %1.4f\n',handles.ExpControl.DOF1.E0);
-                        fprintf(FID,'b: %1.4f\n\n',handles.ExpControl.DOF1.b);
+                        fprintf(FID,' o DOF 1 Material: %s\r\n',handles.ExpControl.DOF1.SimMaterial);
+                        fprintf(FID,'     Fy [F/L^2]: %1.4f\r\n',handles.ExpControl.DOF1.Fy);
+                        fprintf(FID,'     E [F/L^2]: %1.4f\r\n',handles.ExpControl.DOF1.E);
+                        fprintf(FID,'     b: %1.4f\r\n',handles.ExpControl.DOF1.b);
                     case 'Steel - Giuffré-Menegotto-Pinto'
-                        fprintf(FID,'DOF 1 Material: %s\n',handles.ExpControl.DOF1.SimMaterial);
-                        fprintf(FID,'Fy [F/L^2]: %1.4f\n',handles.ExpControl.DOF1.Fy);
-                        fprintf(FID,'E [F/L^2]: %1.4f\n',handles.ExpControl.DOF1.E);
-                        fprintf(FID,'b: %1.4f\n',handles.ExpControl.DOF1.b);
-                        fprintf(FID,'R0: %1.4f\n',handles.ExpControl.DOF1.R0);
-                        fprintf(FID,'cR1: %1.4f\n',handles.ExpControl.DOF1.cR1);
-                        fprintf(FID,'cR2: %1.4f\n\n',handles.ExpControl.DOF1.cR2);
-                end        
+                        fprintf(FID,' o DOF 1 Material: %s\r\n',handles.ExpControl.DOF1.SimMaterial);
+                        fprintf(FID,'     Fy [F/L^2]: %1.4f\r\n',handles.ExpControl.DOF1.Fy);
+                        fprintf(FID,'     E [F/L^2]: %1.4f\r\n',handles.ExpControl.DOF1.E);
+                        fprintf(FID,'     b: %1.4f\r\n',handles.ExpControl.DOF1.b);
+                        fprintf(FID,'     R0: %1.4f\r\n',handles.ExpControl.DOF1.R0);
+                        fprintf(FID,'     cR1: %1.4f\r\n',handles.ExpControl.DOF1.cR1);
+                        fprintf(FID,'     cR2: %1.4f\r\n',handles.ExpControl.DOF1.cR2);
+                end
                 switch handles.ExpControl.DOF2.SimMaterial
                     case 'Elastic'
-                        fprintf(FID,'DOF 2 Material: %s\n',handles.ExpControl.DOF2.SimMaterial);
-                        fprintf(FID,'E [F/L^2]: %1.4f\n\n',handles.ExpControl.DOF2.E);
+                        fprintf(FID,' o DOF 2 Material: %s\r\n',handles.ExpControl.DOF2.SimMaterial);
+                        fprintf(FID,'     E [F/L^2]: %1.4f\r\n\r\n',handles.ExpControl.DOF2.E);
                     case 'Elastic-Perfectly Plastic'
-                        fprintf(FID,'DOF 2 Material: %s\n',handles.ExpControl.DOF2.SimMaterial);
-                        fprintf(FID,'E [F/L^2]: %1.4f\n',handles.ExpControl.DOF2.E);
-                        fprintf(FID,'epsP: %1.4f\n\n',handles.ExpControl.DOF2.epsP);
+                        fprintf(FID,' o DOF 2 Material: %s\r\n',handles.ExpControl.DOF2.SimMaterial);
+                        fprintf(FID,'     E [F/L^2]: %1.4f\r\n',handles.ExpControl.DOF2.E);
+                        fprintf(FID,'     epsP: %1.4f\r\n\r\n',handles.ExpControl.DOF2.epsP);
                     case 'Steel - Bilinear'
-                        fprintf(FID,'DOF 2 Material: %s\n',handles.ExpControl.DOF2.SimMaterial);
-                        fprintf(FID,'Fy [F/L^2]: %1.4f\n',handles.ExpControl.DOF2.Fy);
-                        fprintf(FID,'E0 [F/L^2]: %1.4f\n',handles.ExpControl.DOF2.E0);
-                        fprintf(FID,'b: %1.4f\n\n',handles.ExpControl.DOF2.b);
+                        fprintf(FID,' o DOF 2 Material: %s\r\n',handles.ExpControl.DOF2.SimMaterial);
+                        fprintf(FID,'     Fy [F/L^2]: %1.4f\r\n',handles.ExpControl.DOF2.Fy);
+                        fprintf(FID,'     E [F/L^2]: %1.4f\r\n',handles.ExpControl.DOF2.E);
+                        fprintf(FID,'     b: %1.4f\r\n\r\n',handles.ExpControl.DOF2.b);
                     case 'Steel - Giuffré-Menegotto-Pinto'
-                        fprintf(FID,'DOF 2 Material: %s\n',handles.ExpControl.DOF2.SimMaterial);
-                        fprintf(FID,'Fy [F/L^2]: %1.4f\n',handles.ExpControl.DOF2.Fy);
-                        fprintf(FID,'E [F/L^2]: %1.4f\n',handles.ExpControl.DOF2.E);
-                        fprintf(FID,'b: %1.4f\n',handles.ExpControl.DOF2.b);
-                        fprintf(FID,'R0: %1.4f\n',handles.ExpControl.DOF2.R0);
-                        fprintf(FID,'cR1: %1.4f\n',handles.ExpControl.DOF2.cR1);
-                        fprintf(FID,'cR2: %1.4f\n\n',handles.ExpControl.DOF2.cR2);
+                        fprintf(FID,' o DOF 2 Material: %s\r\n',handles.ExpControl.DOF2.SimMaterial);
+                        fprintf(FID,'     Fy [F/L^2]: %1.4f\r\n',handles.ExpControl.DOF2.Fy);
+                        fprintf(FID,'     E [F/L^2]: %1.4f\r\n',handles.ExpControl.DOF2.E);
+                        fprintf(FID,'     b: %1.4f\r\n',handles.ExpControl.DOF2.b);
+                        fprintf(FID,'     R0: %1.4f\r\n',handles.ExpControl.DOF2.R0);
+                        fprintf(FID,'     cR1: %1.4f\r\n',handles.ExpControl.DOF2.cR1);
+                        fprintf(FID,'     cR2: %1.4f\r\n\r\n',handles.ExpControl.DOF2.cR2);
                 end
-
             case 'Real'
-                fprintf(FID,'Control Type: %s\n',handles.ExpControl.Type);
+                fprintf(FID,' o Type: %s\r\n',handles.ExpControl.Type);
+                fprintf(FID,' o Control: %s\r\n',handles.ExpControl.RealControl.Controller);
                 switch handles.ExpControl.RealControl.Controller
                     case 'LabVIEW'
-                        fprintf(FID,'Controller: %s\n',handles.ExpControl.RealControl.Controller);
-                        fprintf(FID,'IP Address: %s\n',handles.ExpControl.RealControl.ipAddr);
-                        fprintf(FID,'IP Port: %s\n\n',handles.ExpControl.RealControl.ipPort); 
-%                         %Define experimental control points
-%                         fprintf(FID,'# Define control points\n# ---------------------\n');
-%                         fprintf(FID,'# expControlPoint tag nodeTag dir resp <-fact f> <-lim l u> ...\n');
-%                         fprintf(FID,'expControlPoint 1 1  ux disp -fact 1.0 -lim -7.5 7.5  uy disp -fact 1.0 -lim -7.5 7.5\n');
-%                         fprintf(FID,'expControlPoint 2 1  ux disp -fact 1.0 -lim -7.5 7.5  uy disp -fact 1.0 -lim -7.5 7.5  ux force -fact 1.0 -lim -12.0 12.0  uy force -fact 1.0 -lim -12.0 12.0\n\n');
+                        fprintf(FID,' o IP Address: %s\r\n',handles.ExpControl.RealControl.ipAddr);
+                        fprintf(FID,' o IP Port: %s\r\n\r\n',handles.ExpControl.RealControl.ipPort);
+                        % define experimental control points
+                        %fprintf(FID,'# Define control points\r\n# ---------------------\r\n');
+                        %fprintf(FID,'# expControlPoint tag nodeTag dir resp <-fact f> <-lim l u> ...\r\n');
+                        %fprintf(FID,'expControlPoint 1 1  ux disp -fact 1.0 -lim -7.5 7.5  uy disp -fact 1.0 -lim -7.5 7.5\r\n');
+                        %fprintf(FID,'expControlPoint 2 1  ux disp -fact 1.0 -lim -7.5 7.5  uy disp -fact 1.0 -lim -7.5 7.5  ux force -fact 1.0 -lim -12.0 12.0  uy force -fact 1.0 -lim -12.0 12.0\r\n\r\n');
                     case 'MTSCsi'
-                        fprintf(FID,'Controller: %s\n',handles.ExpControl.RealControl.Controller);
-                        fprintf(FID,'Configuration File: %s\n',strcat(handles.ExpControl.RealControl.ConfigName,handles.ExpControl.RealControl.ConfigType));
-                        fprintf(FID,'Ramp Time [sec]: %1.4f\n\n',handles.ExpControl.RealControl.rampTime);
+                        fprintf(FID,' o Configuration File: %s\r\n',strcat(handles.ExpControl.RealControl.ConfigName,handles.ExpControl.RealControl.ConfigType));
+                        fprintf(FID,' o Ramp Time [sec]: %1.4f\r\n\r\n',handles.ExpControl.RealControl.rampTime);
                     case 'SCRAMNet'
-                        fprintf(FID,'Controller: %s\n',handles.ExpControl.RealControl.Controller);
-                        fprintf(FID,'Memory Offset [bytes]: %1.0f\n',handles.ExpControl.RealControl.memOffset);
-                        fprintf(FID,'Number of Actuator Channels: %1.0f\n\n',handles.ExpControl.RealControl.NumActCh);
+                        fprintf(FID,' o Memory Offset [bytes]: %1.0f\r\n',handles.ExpControl.RealControl.memOffset);
+                        fprintf(FID,' o Number of Actuator Channels: %1.0f\r\n\r\n',handles.ExpControl.RealControl.NumActCh);
                     case 'dSpace'
-                        fprintf(FID,'Controller: %s\n',handles.ExpControl.RealControl.Controller);
-                        fprintf(FID,'Predictor-Corrector Type: %s\n',handles.ExpControl.RealControl.PCtype);
-                        fprintf(FID,'Board Name: %s\n\n',handles.ExpControl.RealControl.boardName);
+                        fprintf(FID,' o Predictor-Corrector Type: %s\r\n',handles.ExpControl.RealControl.PCtype);
+                        fprintf(FID,' o Board Name: %s\r\n\r\n',handles.ExpControl.RealControl.boardName);
                     case 'xPCtarget'
-                        fprintf(FID,'Controller: %s\n',handles.ExpControl.RealControl.Controller);
-                        fprintf(FID,'Predictor-Corrector Type: %s\n',handles.ExpControl.RealControl.PCtype);
-                        fprintf(FID,'IP Address: %s\n',handles.ExpControl.RealControl.ipAddr);
-                        fprintf(FID,'IP Port: %s\n',handles.ExpControl.RealControl.ipPort);
-                        fprintf(FID,'Application Name: %s\n\n',handles.ExpControl.RealControl.appName);
+                        fprintf(FID,' o Predictor-Corrector Type: %s\r\n',handles.ExpControl.RealControl.PCtype);
+                        fprintf(FID,' o IP Address: %s\r\n',handles.ExpControl.RealControl.ipAddr);
+                        fprintf(FID,' o IP Port: %s\r\n',handles.ExpControl.RealControl.ipPort);
+                        fprintf(FID,' o Application Name: %s\r\n\r\n',handles.ExpControl.RealControl.appName);
                 end
-        end
+        end     
         
-        fprintf(FID,'Analysis Properties:\n====================\n');
-        fprintf(FID,'Analysis Time Step [sec]: %1.4f\n',handles.GM.dtAnalysis);
-        fprintf(FID,'Analysis Time Step Limit [sec]: %1.4f\n',handles.Model.Maxdt);
+        fprintf(FID,'Analysis Properties:\r\n====================\r\n');
+        fprintf(FID,' o Analysis Time Step [sec]: %1.4f\r\n',handles.GM.dtAnalysis);
+        fprintf(FID,' o Analysis Time Step Limit [sec]: %1.4f\r\n',handles.Model.Maxdt);
+    % =====================================================================
 end
 fclose(FID);
-%Update handles structure
-guidata(gcbf, handles);
-end
+
+% update handles structure
+guidata(gcbf,handles);
