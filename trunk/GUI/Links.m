@@ -36,10 +36,12 @@ switch action
     % =====================================================================
     case {'User Tips','Hybrid Simulation'}
         web('http://peer.berkeley.edu/publications/peer_reports/reports_2009/web_PEER9104_Schellenberg_etal.pdf', '-browser');
-        %open('Schellenberg_etal.pdf');
     % =====================================================================
     case 'OpenFresco'
         web('http://openfresco.berkeley.edu/', '-browser');
+    % =====================================================================
+    case 'OpenFrescoExpress'
+        web('http://openfresco.berkeley.edu/users/express/', '-browser');
     % =====================================================================
     case 'Sim Material'
         objTag = get(gcbo, 'Tag');
