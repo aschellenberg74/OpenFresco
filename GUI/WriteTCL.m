@@ -56,7 +56,7 @@ switch handles.Model.Type
     case '1 DOF'
         % start of model generation
         fprintf(FID,'# ------------------------------\n# Start of model generation\n# ------------------------------\n# create ModelBuilder (with two-dimensions and 1 DOF/node)\n');
-        fprintf(FID,'model BasicBuilder -ndm 2 -ndf %g\n\n',handles.Model.ndf);
+        fprintf(FID,'model BasicBuilder -ndm 2 -ndf 1\n\n');
         fprintf(FID,'# Load OpenFresco package\n# -----------------------\n');
         fprintf(FID,'loadPackage OpenFresco\n\n');
         % define geometry
@@ -216,14 +216,14 @@ switch handles.Model.Type
         
         % start the server process
         fprintf(FID,'# ------------------------------\n# Start the server process\n# ------------------------------\n');
-        fprintf(FID,'# startSimAppSiteServer $siteTag $port <-ssl>\nstartSimAppSiteServer 1 8090\n');
+        fprintf(FID,'# startSimAppSiteServer $siteTag $port <-ssl>\nstartSimAppSiteServer 1 8090\nexit\n');
         fprintf(FID,'# ------------------------------\n# End of analysis\n# ------------------------------\n');
         
     % =====================================================================
     case '2 DOF A'
         % start of model generation
         fprintf(FID,'# ------------------------------\n# Start of model generation\n# ------------------------------\n# create ModelBuilder (with two-dimensions and 2 DOF/node)\n');
-        fprintf(FID,'model BasicBuilder -ndm 2 -ndf %g\n\n',handles.Model.ndf);
+        fprintf(FID,'model BasicBuilder -ndm 2 -ndf 2\n\n');
         fprintf(FID,'# Load OpenFresco package\n# -----------------------\n');
         fprintf(FID,'loadPackage OpenFresco\n\n');
         
@@ -416,13 +416,13 @@ switch handles.Model.Type
         
         % start the server process
         fprintf(FID,'# ------------------------------\n# Start the server process\n# ------------------------------\n');
-        fprintf(FID,'# startSimAppSiteServer $siteTag $port <-ssl>\nstartSimAppSiteServer 1 8090\n');
+        fprintf(FID,'# startSimAppSiteServer $siteTag $port <-ssl>\nstartSimAppSiteServer 1 8090\nexit\n');
         fprintf(FID,'# ------------------------------\n# End of analysis\n# ------------------------------\n');
         
     % =====================================================================
     case '2 DOF B'
         % start of model generation
-        fprintf(FID,'# ------------------------------\n# Start of model generation\n# ------------------------------\n# create ModelBuilder (with three-dimensions and 2 DOF/node)\n');
+        fprintf(FID,'# ------------------------------\n# Start of model generation\n# ------------------------------\n# create ModelBuilder (with three-dimensions and 3 DOF/node)\n');
         fprintf(FID,'model BasicBuilder -ndm 3 -ndf 3\n\n');
         fprintf(FID,'# Load OpenFresco package\n# -----------------------\n');
         fprintf(FID,'loadPackage OpenFresco\n\n');
@@ -599,7 +599,7 @@ switch handles.Model.Type
         
         % start the server process
         fprintf(FID,'# ------------------------------\n# Start the server process\n# ------------------------------\n');
-        fprintf(FID,'# startSimAppSiteServer $siteTag $port <-ssl>\nstartSimAppSiteServer 1 8090\n');
+        fprintf(FID,'# startSimAppSiteServer $siteTag $port <-ssl>\nstartSimAppSiteServer 1 8090\nexit\n');
         fprintf(FID,'# ------------------------------\n# End of analysis\n# ------------------------------\n');
     % =====================================================================
 end
