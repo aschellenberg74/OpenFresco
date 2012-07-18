@@ -4,7 +4,7 @@
 # $Date$
 # $URL$
 #
-# Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+# Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 # Created: 07/07
 # Revision: A
 #
@@ -21,6 +21,11 @@
 # ------------------------------
 # create ModelBuilder (with two-dimensions and 2 DOF/node)
 model BasicBuilder -ndm 2 -ndf 3
+
+# Load OpenFresco package
+# -----------------------
+# (make sure all dlls are in the same folder as openSees.exe)
+loadPackage OpenFresco
 
 # Define geometry for model
 # -------------------------
@@ -80,7 +85,7 @@ expSetup ThreeActuators 1 -control 1 54.0 54.0 54.0 36.0 36.0 -phiLocX 90.0
 
 # Define experimental site
 # ------------------------
-# expSite ActorSite $tag -setup $setupTag $ipPort <-ssl>
+# expSite ActorSite $tag -setup $setupTag $ipPort <-ssl> <-udp>
 expSite ActorSite 1 -setup 1 8090
 # ------------------------------
 # End of model generation
@@ -92,6 +97,7 @@ expSite ActorSite 1 -setup 1 8090
 # ------------------------------
 # startLabServer $siteTag
 startLabServer  1
+exit
 # --------------------------------
 # End of analysis
 # --------------------------------

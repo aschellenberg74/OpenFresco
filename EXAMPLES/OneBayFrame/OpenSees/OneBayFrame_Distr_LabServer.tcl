@@ -5,7 +5,7 @@
 # $Date$
 # $URL$
 #
-# Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+# Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 # Created: 11/06
 # Revision: A
 #
@@ -54,7 +54,6 @@ expSite ActorSite 1 -setup 1 8091
 # ------------------------------
 # startLabServer $siteTag
 startLabServer  1
-
 exit
 # --------------------------------
 # End of analysis

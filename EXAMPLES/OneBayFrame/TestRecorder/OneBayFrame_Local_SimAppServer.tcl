@@ -4,7 +4,7 @@
 # $Date$
 # $URL$
 #
-# Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+# Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 # Created: 11/06
 # Revision: A
 #
@@ -113,11 +113,12 @@ expRecorder Control -file ServerControl_daqFrc.out -time -control 1 daqForce
 # ------------------------------
 # Start the server process
 # ------------------------------
-# startSimAppElemServer $eleTag $port <-ssl>
-#startSimAppElemServer 1 8090;  # use with generic client element in FEA
+# startSimAppElemServer $eleTag $port <-ssl> <-udp>
+#startSimAppElemServer 1 8090 -udp;  # use with generic client element in FEA
 
-# startSimAppSiteServer $siteTag $port <-ssl>
-startSimAppSiteServer 1 8090;  # use with experimental element in FEA
+# startSimAppSiteServer $siteTag $port <-ssl> <-udp>
+startSimAppSiteServer 1 8090 -udp;  # use with experimental element in FEA
+exit
 # --------------------------------
 # End of analysis
 # --------------------------------

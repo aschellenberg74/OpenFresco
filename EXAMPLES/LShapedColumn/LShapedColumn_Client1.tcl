@@ -5,7 +5,7 @@
 # $Date$
 # $URL$
 #
-# Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+# Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 # Created: 07/07
 # Revision: A
 #
@@ -43,7 +43,7 @@ fix 1   1  1  1
 
 # Define experimental site
 # ------------------------
-# expSite ShadowSite $tag <-setup $setupTag> $ipAddr $ipPort <-ssl> <-dataSize $size>
+# expSite ShadowSite $tag <-setup $setupTag> $ipAddr $ipPort <-ssl> <-udp> <-dataSize $size>
 expSite ShadowSite 1 "127.0.0.1" 8090
 
 # Define coordinate transformation
@@ -135,14 +135,16 @@ recorder Element -file Elmt_daqDsp.out  -time -ele 1   daqDisp
 # Finally perform the analysis
 # ------------------------------
 # perform an eigenvalue analysis
-set pi 3.14159265358979
+set pi [expr acos(-1.0)]
 set lambda [eigen -fullGenLapack 6]
 puts "\nEigenvalues at start of transient:"
-puts "lambda         omega          period"
+puts "|   lambda   |  omega   |  period | frequency |"
 foreach lambda $lambda {
-   set omega [expr pow($lambda,0.5)]
-   set period [expr 2*$pi/pow($lambda,0.5)]
-   puts "$lambda  $omega  $period"}
+    set omega [expr pow($lambda,0.5)]
+    set period [expr 2.0*$pi/$omega]
+    set frequ [expr 1.0/$period]
+    puts [format "| %5.3e | %8.4f | %7.4f | %9.4f |" $lambda $omega $period $frequ]
+}
 
 # open output file for writing
 set outFileID [open elapsedTime.txt w]
@@ -159,6 +161,7 @@ puts "\nElapsed Time = $tTot \n"
 close $outFileID
 
 wipe
+exit
 # --------------------------------
 # End of analysis
 # --------------------------------

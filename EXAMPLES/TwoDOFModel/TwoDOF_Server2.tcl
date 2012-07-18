@@ -4,7 +4,7 @@
 # $Date$
 # $URL$
 #
-# Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+# Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 # Created: 09/06
 # Revision: A
 #
@@ -49,7 +49,7 @@ expControl SimUniaxialMaterials 1 2
 
 # Define experimental site
 # ------------------------
-# expSite ActorSite $tag -control $ctrlTag $ipPort <-ssl>
+# expSite ActorSite $tag -control $ctrlTag $ipPort <-ssl> <-udp>
 expSite ActorSite 1 -control 1 8090
 # ------------------------------
 # End of model generation
@@ -61,6 +61,7 @@ expSite ActorSite 1 -control 1 8090
 # ------------------------------
 # startLabServer $siteTag
 startLabServer  1
+exit
 # --------------------------------
 # End of analysis
 # --------------------------------

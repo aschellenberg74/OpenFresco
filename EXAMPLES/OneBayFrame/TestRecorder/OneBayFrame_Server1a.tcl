@@ -4,7 +4,7 @@
 # $Date$
 # $URL$
 #
-# Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+# Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 # Created: 11/06
 # Revision: A
 #
@@ -41,7 +41,7 @@ expSetup OneActuator 1 -control 1 1 -sizeTrialOut 1 1
 
 # Define experimental site
 # ------------------------
-# expSite ActorSite $tag -setup $setupTag $ipPort <-ssl>
+# expSite ActorSite $tag -setup $setupTag $ipPort <-ssl> <-udp>
 expSite ActorSite 1 -setup 1 8090
 # ------------------------------
 # End of model generation
@@ -96,6 +96,7 @@ expRecorder Control -file ServerAControl_daqFrc.out -time -control 1 daqForce
 # ------------------------------
 # startLabServer $siteTag
 startLabServer  1
+exit
 # --------------------------------
 # End of analysis
 # --------------------------------

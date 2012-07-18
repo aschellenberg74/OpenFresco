@@ -5,7 +5,7 @@
 # $Date$
 # $URL$
 #
-# Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+# Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 # Created: 07/07
 # Revision: A
 #
@@ -74,7 +74,7 @@ if {$pid == 0}  {
 
     # Define experimental site
     # ------------------------
-    # expSite ShadowSite $tag <-setup $setupTag> $ipAddr $ipPort <-ssl> <-dataSize $size>
+    # expSite ShadowSite $tag <-setup $setupTag> $ipAddr $ipPort <-ssl> <-udp> <-dataSize $size>
     expSite ShadowSite 2 "169.229.203.152" 8091 -ssl
 
     # Define experimental elements
@@ -165,6 +165,7 @@ set tTot [time {
 puts "Elapsed Time = $tTot \n"
 
 wipe
+exit
 # --------------------------------
 # End of analysis
 # --------------------------------
