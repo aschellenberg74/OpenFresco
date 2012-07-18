@@ -62,11 +62,12 @@ expElement twoNodeLink 1 1 3 -dir 2 -site 1 -initStif 5.6 -orient 0 1 0 -1 0 0
 # ------------------------------
 # Start the server process
 # ------------------------------
-# startSimAppSiteServer $siteTag $port
+# startSimAppSiteServer $siteTag $port <-ssl> <-udp>
 startSimAppSiteServer 1 8092
 
-# startSimAppElemServer $eleTag $port
+# startSimAppElemServer $eleTag $port <-ssl> <-udp>
 #startSimAppElemServer 1 8092
+exit
 # --------------------------------
 # End of analysis
 # --------------------------------

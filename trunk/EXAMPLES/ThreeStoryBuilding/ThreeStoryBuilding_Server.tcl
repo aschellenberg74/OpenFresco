@@ -4,7 +4,7 @@
 # $Date$
 # $URL$
 #
-# Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+# Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 # Created: 09/07
 # Revision: A
 #
@@ -20,6 +20,11 @@
 # ------------------------------
 # create ModelBuilder (with two-dimensions and 2 DOF/node)
 model BasicBuilder -ndm 2 -ndf 2
+
+# Load OpenFresco package
+# -----------------------
+# (make sure all dlls are in the same folder as openSees.exe)
+loadPackage OpenFresco
 
 # Define geometry for model
 # -------------------------
@@ -581,7 +586,7 @@ expControl SimDomain  1  -trialCP 1 2 3  -outCP 4 5 6
 
 # Define experimental site
 # ------------------------
-# expSite ActorSite $tag -control $ctrlTag $ipPort <-ssl>
+# expSite ActorSite $tag -control $ctrlTag $ipPort <-ssl> <-udp>
 expSite ActorSite 1 -control 1 8090
 # ------------------------------
 # End of model generation
@@ -593,6 +598,7 @@ expSite ActorSite 1 -control 1 8090
 # ------------------------------
 # startLabServer $siteTag
 startLabServer  1
+exit
 # --------------------------------
 # End of analysis
 # --------------------------------

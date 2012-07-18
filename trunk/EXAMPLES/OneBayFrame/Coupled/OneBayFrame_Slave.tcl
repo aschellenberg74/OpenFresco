@@ -4,7 +4,7 @@
 # $Date$
 # $URL$
 #
-# Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+# Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 # Created: 08/08
 # Revision: A
 #
@@ -135,6 +135,7 @@ recorder Element -file Slave_Elmt_daqDsp.out  -time -ele 1   daqDisp
 # Finally perform the analysis
 # ------------------------------
 analyze 16000 0.02
+exit
 # --------------------------------
 # End of analysis
 # --------------------------------

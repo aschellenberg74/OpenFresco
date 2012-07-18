@@ -4,7 +4,7 @@
 # $Date$
 # $URL$
 #
-# Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+# Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 # Created: 09/06
 # Revision: A
 #
@@ -40,7 +40,7 @@ expSetup OneActuator 1 -control 1 2 -sizeTrialOut 2 2 -ctrlDispFact 0.5 -daqDisp
 
 # Define experimental site
 # ------------------------
-# expSite ActorSite $tag -setup $setupTag $ipPort <-ssl>
+# expSite ActorSite $tag -setup $setupTag $ipPort <-ssl> <-udp>
 expSite ActorSite 1 -setup 1 8090
 # ------------------------------
 # End of model generation
@@ -52,6 +52,7 @@ expSite ActorSite 1 -setup 1 8090
 # ------------------------------
 # startLabServer $siteTag
 startLabServer  1
+exit
 # --------------------------------
 # End of analysis
 # --------------------------------

@@ -4,7 +4,7 @@
 # $Date$
 # $URL$
 #
-# Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+# Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 # Created: 11/06
 # Revision: A
 #
@@ -53,9 +53,9 @@ element truss 2 2 4 5.0 1
 
 # Define experimental elements
 # ----------------------------
-# element genericClient $eleTag -node $Ndi -dof $dofNdi -dof $dofNdj ... -server $ipPort <$ipAddr> <-ssl> <-dataSize $size>
-element genericClient 3 -node 3 4 -dof 1 2 -dof 1 2 -server 8090;  # use with SimAppElemServer
-#expElement truss 3 3 4 -server 8090 -initStif [expr 3000.0*5.0/135.76];  # use with SimAppSiteServer
+# element genericClient $eleTag -node $Ndi -dof $dofNdi -dof $dofNdj ... -server $ipPort <$ipAddr> <-ssl> <-udp> <-dataSize $size>
+element genericClient 3 -node 3 4 -dof 1 2 -dof 1 2 -server 8090 -udp;  # use with SimAppElemServer
+#expElement truss 3 3 4 -server 8090 -udp -initStif [expr 3000.0*5.0/135.76];  # use with SimAppSiteServer
 
 # Define static loads
 # -------------------
@@ -114,6 +114,7 @@ analyze 2
 print node 4
 print ele
 wipe
+exit
 # --------------------------------
 # End of analysis
 # --------------------------------

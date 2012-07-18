@@ -4,7 +4,7 @@
 # $Date$
 # $URL$
 #
-# Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+# Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 # Created: 09/07
 # Revision: A
 #
@@ -613,7 +613,8 @@ recorder Node -file Slave_Node_Acc.out -time -node 79 157 235 -dof 1 2 3 accel
 # ------------------------------
 # Finally perform the analysis
 # ------------------------------
-analyze 100000000
+analyze 25000
+exit
 # --------------------------------
 # End of analysis
 # --------------------------------
