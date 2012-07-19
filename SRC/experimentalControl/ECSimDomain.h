@@ -42,6 +42,7 @@ class Domain;
 class AnalysisModel;
 class ConvergenceTest;
 class EquiSolnAlgo;
+class LineSearch;
 class StaticIntegrator;
 class ConstraintHandler;
 class DOF_Numberer;
@@ -107,6 +108,7 @@ private:
     Domain            *theDomain;
     AnalysisModel     *theModel;
     ConvergenceTest   *theTest;
+    LineSearch        *theLineSearch;
     EquiSolnAlgo      *theAlgorithm;
     StaticIntegrator  *theIntegrator;
     ConstraintHandler *theHandler;

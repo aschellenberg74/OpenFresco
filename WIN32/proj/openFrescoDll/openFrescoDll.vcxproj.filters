@@ -533,6 +533,15 @@
     <ClCompile Include="..\..\..\SRC\openseesCore\VertexIter.cpp">
       <Filter>openseesCore</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\NewtonLineSearch.cpp">
+      <Filter>openseesExtra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\RegulaFalsiLineSearch.cpp">
+      <Filter>openseesExtra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\LineSearch.cpp">
+      <Filter>openseesExtra</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\SRC\utility\ExpControlSP.h">
@@ -1044,6 +1053,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\SRC\openseesCore\VertexIter.h">
       <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\NewtonLineSearch.h">
+      <Filter>openseesExtra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\RegulaFalsiLineSearch.h">
+      <Filter>openseesExtra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\LineSearch.h">
+      <Filter>openseesExtra</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
