@@ -52,6 +52,8 @@
 //#include <CTestNormUnbalance.h>
 //#include <CTestEnergyIncr.h>
 #include <NewtonRaphson.h>
+#include <NewtonLineSearch.h>
+#include <RegulaFalsiLineSearch.h>
 #include <LoadControl.h>
 //#include <DisplacementControl.h>
 
@@ -312,11 +314,13 @@ int ECSimDomain::setup()
     
     theModel = new AnalysisModel();
 
-    theTest = new CTestNormDispIncr(1.0E-12, 100, 0);
-    //theTest = new CTestNormUnbalance(1.0E-12, 100, 0);
-    //theTest = new CTestEnergyIncr(1.0E-12, 100, 0);
+    theTest = new CTestNormDispIncr(1.0E-8, 25, 0);
+    //theTest = new CTestNormUnbalance(1.0E-8, 25, 0);
+    //theTest = new CTestEnergyIncr(1.0E-8, 25, 0);
 
     theAlgorithm = new NewtonRaphson(*theTest);
+    //theLineSearch = new RegulaFalsiLineSearch(0.8, 10, 0.1, 10.0, 1);
+    //theAlgorithm = new NewtonLineSearch(*theTest, theLineSearch);
 
     theIntegrator = new LoadControl(1.0, 1, 1.0, 1.0);
 
