@@ -4,6 +4,11 @@ Instructions for building Abaqus (R) user defined elements
 
 1) add Visual Studio to "Path" environmental system variable:
 =============================================================
+For MS VS2010:
+--------------
+C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\lib
+C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin
+C:\Program Files (x86)\Microsoft Visual Studio 10.0\Common7\IDE
 For MS VS2008:
 --------------
 C:\Program Files\Microsoft Visual Studio 9.0\VC\lib
@@ -17,6 +22,10 @@ C:\Program Files\Microsoft Visual Studio 8\Common7\IDE
 
 2) add Visual Studio to "INCLUDE" environmental system variable:
 ================================================================
+For MS VS2010:
+--------------
+C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\include
+C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Include
 For MS VS2008:
 --------------
 C:\Program Files\Microsoft Visual Studio 9.0\VC\include
@@ -28,6 +37,10 @@ C:\Program Files\Microsoft Visual Studio 8\VC\PlatformSDK\Include
 
 3) add Visual Studio to "LIB" environmental system variable:
 ============================================================
+For MS VS2010:
+--------------
+C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\lib
+C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Lib
 For MS VS2008:
 --------------
 C:\Program Files\Microsoft Visual Studio 9.0\VC\lib
@@ -61,10 +74,10 @@ cl socketf.c /c /O2 /D_CRT_SECURE_NO_DEPRECATE /DF77_NAME_UPPER /DUSE_FORT_STDCA
 8) compile Abaqus user element genericClient_exp.for
 ====================================================
 ifort genericClient_exp.for /c /Gm /recursive /nologo
-rename genericClient_exp.for to genericClient_exp_temp.for
+rename genericClient_exp.obj to genericClient_exp_temp.obj
 or
 ifort genericClient_imp.for /c /Gm /recursive /nologo
-rename genericClient_imp.for to genericClient_imp_temp.for
+rename genericClient_imp.obj to genericClient_imp_temp.obj
 
 9) combine object files and winsocket library into single element object file
 =============================================================================
