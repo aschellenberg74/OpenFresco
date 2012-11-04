@@ -48,12 +48,11 @@ public:
     EEInvertedVBrace2d(int tag, int Nd1, int Nd2, int Nd3,
         ExperimentalSite *site,
         bool iMod = false, bool nlGeom = false,
-        double rho1 = 0.0, double rho2 = 0.0);
+        int addRayleigh = 1, double rho1 = 0.0, double rho2 = 0.0);
     EEInvertedVBrace2d(int tag, int Nd1, int Nd2, int Nd3,
         int port, char *machineInetAddress = 0,
-        int ssl = 0, int udp = 0,
-        int dataSize = OF_Network_dataSize,
-        bool iMod = false, bool nlGeom = false,
+        int ssl = 0, int udp = 0, int dataSize = OF_Network_dataSize,
+        bool iMod = false, bool nlGeom = false, int addRayleigh = 1,
         double rho1 = 0.0, double rho2 = 0.0);
     
     // destructor
@@ -77,6 +76,7 @@ public:
     // public methods to set and to obtain stiffness, 
     // and to obtain mass, damping and residual information    
     int setInitialStiff(const Matrix& stiff);
+    const Matrix &getDamp();
     const Matrix &getMass();
     
     void zeroLoad();
@@ -111,6 +111,7 @@ private:
     
     bool iMod;          // I-Modification flag
     bool nlGeom;        // non-linear geometry flag
+    int addRayleigh;    // flag to add Rayleigh damping
     double rho1, rho2;  // masses per unit length
     double L1, L2;      // undeformed length of trusses
     
@@ -118,11 +119,11 @@ private:
     static Vector theVector;
     static Vector theLoad;
     
-    Channel *theChannel;        // channel
-    double *sData;              // send data array
-    Vector *sendData;           // send vector
-    double *rData;              // receive data array
-    Vector *recvData;           // receive vector
+    Channel *theChannel;    // channel
+    double *sData;          // send data array
+    Vector *sendData;       // send vector
+    double *rData;          // receive data array
+    Vector *recvData;       // receive vector
     
     Vector *db;         // trial displacements in basic system
     Vector *vb;         // trial velocities in basic system

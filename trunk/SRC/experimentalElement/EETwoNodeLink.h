@@ -55,12 +55,14 @@ public:
     EETwoNodeLink(int tag, int dimension, int Nd1, int Nd2,
         const ID &direction, ExperimentalSite *site,
         const Vector y = 0, const Vector x = 0, const Vector Mratio = 0,
-        const Vector shearDistI = 0, bool iMod = false, double mass = 0.0);
+        const Vector shearDistI = 0, bool iMod = false,
+        int addRayleigh = 1, double mass = 0.0);
     EETwoNodeLink(int tag, int dimension, int Nd1, int Nd2,
         const ID &direction, int port, char *machineInetAddress = 0,
         int ssl = 0, int udp = 0, int dataSize = OF_Network_dataSize,
         const Vector y = 0, const Vector x = 0, const Vector Mratio = 0,
-        const Vector shearDistI = 0, bool iMod = false, double mass = 0.0);
+        const Vector shearDistI = 0, bool iMod = false,
+        int addRayleigh = 1, double mass = 0.0);
     
     // destructor
     ~EETwoNodeLink();
@@ -84,6 +86,7 @@ public:
     // and to obtain mass, damping and residual information
     int setInitialStiff(const Matrix& kbInit);
     const Matrix &getTangentStiff();
+    const Matrix &getDamp();
     const Matrix &getMass();
     
     void zeroLoad();
@@ -136,6 +139,7 @@ private:
     Vector Mratio;      // p-delta moment distribution ratios
     Vector shearDistI;  // shear distance from node I as fraction of length
     bool iMod;          // I-Modification flag
+    int addRayleigh;    // flag to add Rayleigh damping
     double mass;        // total mass
     double L;           // element length
     

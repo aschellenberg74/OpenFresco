@@ -70,8 +70,8 @@ int addEEInvertedVBrace(ClientData clientData, Tcl_Interp *interp, int argc,
 		if ((argc-eleArgStart) < 17)  {
 			opserr << "WARNING insufficient arguments\n";
 			printCommand(argc, argv);
-			opserr << "Want: expElement invertedVBrace eleTag iNode jNode kNode -site siteTag -initStif Kij <-iMod> <-nlGeom> <-rho1 rho1> <-rho2 rho2>\n";
-			opserr << "  or: expElement invertedVBrace eleTag iNode jNode kNode -server ipPort <ipAddr> <-ssl> <-dataSize size> -initStif Kij <-iMod> <-nlGeom> <-rho1 rho1> <-rho2 rho2>\n";
+			opserr << "Want: expElement invertedVBrace eleTag iNode jNode kNode -site siteTag -initStif Kij <-iMod> <-nlGeom> <-noRayleigh> <-rho1 rho1> <-rho2 rho2>\n";
+			opserr << "  or: expElement invertedVBrace eleTag iNode jNode kNode -server ipPort <ipAddr> <-ssl> <-dataSize size> -initStif Kij <-iMod> <-nlGeom> <-noRayleigh> <-rho1 rho1> <-rho2 rho2>\n";
 			return TCL_ERROR;
 		}    
 		
@@ -83,6 +83,7 @@ int addEEInvertedVBrace(ClientData clientData, Tcl_Interp *interp, int argc,
         int dataSize = OF_Network_dataSize;
         bool iMod = false;
         bool nlGeom = false;
+        int doRayleigh = 1;
 		double rho1 = 0.0;
 		double rho2 = 0.0;
 		
@@ -167,6 +168,13 @@ int addEEInvertedVBrace(ClientData clientData, Tcl_Interp *interp, int argc,
 			}
 		}
 		for (i = 7+eleArgStart; i < argc; i++)  {
+			if (strcmp(argv[i], "-doRayleigh") == 0)  {
+                doRayleigh = 1;
+            } else if (strcmp(argv[i], "-noRayleigh") == 0)  {
+                doRayleigh = 0;
+            }
+        }
+		for (i = 7+eleArgStart; i < argc; i++)  {
 			if (i+1 < argc && strcmp(argv[i], "-rho1") == 0)  {
 				if (Tcl_GetDouble(interp, argv[i+1], &rho1) != TCL_OK)  {
 					opserr << "WARNING invalid rho1\n";
@@ -184,10 +192,14 @@ int addEEInvertedVBrace(ClientData clientData, Tcl_Interp *interp, int argc,
 		}
 
 		// now create the EEInvertedVBrace and add it to the Domain
-        if (theSite != 0)
-		    theExpElement = new EEInvertedVBrace2d(tag, iNode, jNode, kNode, theSite, iMod, nlGeom, rho1, rho2);
-        else
-		    theExpElement = new EEInvertedVBrace2d(tag, iNode, jNode, kNode, ipPort, ipAddr, ssl, udp, dataSize, iMod, nlGeom, rho1, rho2);
+        if (theSite != 0)  {
+		    theExpElement = new EEInvertedVBrace2d(tag, iNode, jNode, kNode,
+                theSite, iMod, nlGeom, doRayleigh, rho1, rho2);
+        } else  {
+		    theExpElement = new EEInvertedVBrace2d(tag, iNode, jNode, kNode,
+                ipPort, ipAddr, ssl, udp, dataSize, iMod, nlGeom, doRayleigh,
+                rho1, rho2);
+        }
 		
 		if (theExpElement == 0) {
 			opserr << "WARNING ran out of memory creating element\n";

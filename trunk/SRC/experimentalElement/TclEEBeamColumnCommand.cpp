@@ -71,8 +71,8 @@ int addEEBeamColumn(ClientData clientData, Tcl_Interp *interp, int argc,
 		if ((argc-eleArgStart) < 17)  {
 			opserr << "WARNING insufficient arguments\n";
 			printCommand(argc, argv);
-			opserr << "Want: expElement beamColumn eleTag iNode jNode transTag -site siteTag -initStif Kij <-iMod> <-rho rho>\n";
-			opserr << "  or: expElement beamColumn eleTag iNode jNode transTag -server ipPort <ipAddr> <-ssl> <-dataSize size> -initStif Kij <-iMod> <-rho rho>\n";
+			opserr << "Want: expElement beamColumn eleTag iNode jNode transTag -site siteTag -initStif Kij <-iMod> <-noRayleigh> <-rho rho>\n";
+			opserr << "  or: expElement beamColumn eleTag iNode jNode transTag -server ipPort <ipAddr> <-ssl> <-dataSize size> -initStif Kij <-iMod> <-noRayleigh> <-rho rho>\n";
 			return TCL_ERROR;
 		}
 		
@@ -84,6 +84,7 @@ int addEEBeamColumn(ClientData clientData, Tcl_Interp *interp, int argc,
         int ssl = 0, udp = 0;
         int dataSize = OF_Network_dataSize;
         bool iMod = false;
+        int doRayleigh = 1;
 		double rho = 0.0;
 		
 		if (Tcl_GetInt(interp, argv[1+eleArgStart], &tag) != TCL_OK)  {
@@ -168,6 +169,13 @@ int addEEBeamColumn(ClientData clientData, Tcl_Interp *interp, int argc,
 			}
 		}
 		for (i = 7+eleArgStart; i < argc; i++)  {
+			if (strcmp(argv[i], "-doRayleigh") == 0)  {
+                doRayleigh = 1;
+            } else if (strcmp(argv[i], "-noRayleigh") == 0)  {
+                doRayleigh = 0;
+            }
+        }
+		for (i = 7+eleArgStart; i < argc; i++)  {
 			if (i+1 < argc && strcmp(argv[i], "-rho") == 0)  {
 				if (Tcl_GetDouble(interp, argv[i+1], &rho) != TCL_OK)  {
 					opserr << "WARNING invalid rho\n";
@@ -178,10 +186,13 @@ int addEEBeamColumn(ClientData clientData, Tcl_Interp *interp, int argc,
 		}
         
 		// now create the EEBeamColumn
-        if (theSite != 0)
-		    theExpElement = new EEBeamColumn2d(tag, iNode, jNode, *theTrans, theSite, iMod, rho);
-        else
-		    theExpElement = new EEBeamColumn2d(tag, iNode, jNode, *theTrans, ipPort, ipAddr, ssl, udp, dataSize, iMod, rho);
+        if (theSite != 0)  {
+		    theExpElement = new EEBeamColumn2d(tag, iNode, jNode, *theTrans,
+                theSite, iMod, doRayleigh, rho);
+        } else  {
+		    theExpElement = new EEBeamColumn2d(tag, iNode, jNode, *theTrans,
+                ipPort, ipAddr, ssl, udp, dataSize, iMod, doRayleigh, rho);
+        }
 		
 		if (theExpElement == 0) {
 			opserr << "WARNING ran out of memory creating element\n";
@@ -240,8 +251,8 @@ int addEEBeamColumn(ClientData clientData, Tcl_Interp *interp, int argc,
         if ((argc-eleArgStart) < 44)  {
 			opserr << "WARNING insufficient arguments\n";
 			printCommand(argc, argv);
-			opserr << "Want: expElement beamColumn eleTag iNode jNode transTag -site siteTag -initStif Kij <-iMod> <-rho rho>\n";
-			opserr << "  or: expElement beamColumn eleTag iNode jNode transTag -server ipPort <ipAddr> <-ssl> <-dataSize size> -initStif Kij <-iMod> <-rho rho>\n";
+			opserr << "Want: expElement beamColumn eleTag iNode jNode transTag -site siteTag -initStif Kij <-iMod> <-noRayleigh> <-rho rho>\n";
+			opserr << "  or: expElement beamColumn eleTag iNode jNode transTag -server ipPort <ipAddr> <-ssl> <-dataSize size> -initStif Kij <-iMod> <-noRayleigh> <-rho rho>\n";
 			return TCL_ERROR;
 		}
 		
@@ -253,6 +264,7 @@ int addEEBeamColumn(ClientData clientData, Tcl_Interp *interp, int argc,
         int ssl = 0, udp = 0;
         int dataSize = OF_Network_dataSize;
         bool iMod = false;
+        int doRayleigh = 1;
 		double rho = 0.0;
 		
 		if (Tcl_GetInt(interp, argv[1+eleArgStart], &tag) != TCL_OK)  {
@@ -337,6 +349,13 @@ int addEEBeamColumn(ClientData clientData, Tcl_Interp *interp, int argc,
 			}
 		}
 		for (i = 7+eleArgStart; i < argc; i++)  {
+			if (strcmp(argv[i], "-doRayleigh") == 0)  {
+                doRayleigh = 1;
+            } else if (strcmp(argv[i], "-noRayleigh") == 0)  {
+                doRayleigh = 0;
+            }
+        }
+		for (i = 7+eleArgStart; i < argc; i++)  {
 			if (i+1 < argc && strcmp(argv[i], "-rho") == 0)  {
 				if (Tcl_GetDouble(interp, argv[i+1], &rho) != TCL_OK)  {
 					opserr << "WARNING invalid rho\n";
@@ -347,10 +366,13 @@ int addEEBeamColumn(ClientData clientData, Tcl_Interp *interp, int argc,
 		}
 
 		// now create the EEBeamColumn
-        if (theSite != 0)
-		    theExpElement = new EEBeamColumn3d(tag, iNode, jNode, *theTrans, theSite, iMod, rho);
-        else
-		    theExpElement = new EEBeamColumn3d(tag, iNode, jNode, *theTrans, ipPort, ipAddr, ssl, udp, dataSize, iMod, rho);
+        if (theSite != 0)  {
+		    theExpElement = new EEBeamColumn3d(tag, iNode, jNode, *theTrans,
+                theSite, iMod, doRayleigh, rho);
+        } else  {
+		    theExpElement = new EEBeamColumn3d(tag, iNode, jNode, *theTrans,
+                ipPort, ipAddr, ssl, udp, dataSize, iMod, doRayleigh, rho);
+        }
 		
 		if (theExpElement == 0) {
 			opserr << "WARNING ran out of memory creating element\n";

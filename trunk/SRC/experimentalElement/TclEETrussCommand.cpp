@@ -61,8 +61,8 @@ int addEETruss(ClientData clientData, Tcl_Interp *interp,  int argc,
 	if ((argc-eleArgStart) < 8)  {
 		opserr << "WARNING insufficient arguments\n";
 		printCommand(argc, argv);
-		opserr << "Want: expElement truss eleTag iNode jNode -site siteTag -initStif Kij <-iMod> <-rho rho>\n";
-		opserr << "  or: expElement truss eleTag iNode jNode -server ipPort <ipAddr> <-ssl> <-dataSize size> -initStif Kij <-iMod> <-rho rho>\n";
+		opserr << "Want: expElement truss eleTag iNode jNode -site siteTag -initStif Kij <-iMod> <-noRayleigh> <-rho rho>\n";
+		opserr << "  or: expElement truss eleTag iNode jNode -server ipPort <ipAddr> <-ssl> <-dataSize size> -initStif Kij <-iMod> <-noRayleigh> <-rho rho>\n";
 		return TCL_ERROR;
 	}    
 	
@@ -73,6 +73,7 @@ int addEETruss(ClientData clientData, Tcl_Interp *interp,  int argc,
     int ssl = 0, udp = 0;
     int dataSize = OF_Network_dataSize;
     bool iMod = false;
+    int doRayleigh = 1;
 	double rho = 0.0;
 
 	if (Tcl_GetInt(interp, argv[1+eleArgStart], &tag) != TCL_OK)  {
@@ -145,6 +146,13 @@ int addEETruss(ClientData clientData, Tcl_Interp *interp,  int argc,
             iMod = true;
         }
     }
+    for (i = 7+eleArgStart; i < argc; i++)  {
+        if (strcmp(argv[i], "-doRayleigh") == 0)  {
+            doRayleigh = 1;
+        } else if (strcmp(argv[i], "-noRayleigh") == 0)  {
+            doRayleigh = 0;
+        }
+    }
 	for (i = 6+eleArgStart; i < argc; i++)  {
 		if (i+1 < argc && strcmp(argv[i], "-rho") == 0)  {
 			if (Tcl_GetDouble(interp, argv[i+1], &rho) != TCL_OK)  {
@@ -157,16 +165,21 @@ int addEETruss(ClientData clientData, Tcl_Interp *interp,  int argc,
 
 	// now create the EETruss
     if (strcmp(argv[eleArgStart], "truss") == 0)  {
-        if (theSite != 0)
-	        theExpElement = new EETruss(tag, ndm, iNode, jNode, theSite, iMod, rho);
-        else
-	        theExpElement = new EETruss(tag, ndm, iNode, jNode, ipPort, ipAddr, ssl, udp, dataSize, iMod, rho);
-    }
-    else if (strcmp(argv[eleArgStart], "corotTruss") == 0)  {
-        if (theSite != 0)
-	        theExpElement = new EETrussCorot(tag, ndm, iNode, jNode, theSite, iMod, rho);
-        else
-	        theExpElement = new EETrussCorot(tag, ndm, iNode, jNode, ipPort, ipAddr, ssl, udp, dataSize, iMod, rho);
+        if (theSite != 0)  {
+	        theExpElement = new EETruss(tag, ndm, iNode, jNode,
+                theSite, iMod, doRayleigh, rho);
+        } else  {
+	        theExpElement = new EETruss(tag, ndm, iNode, jNode,
+                ipPort, ipAddr, ssl, udp, dataSize, iMod, doRayleigh, rho);
+        }
+    } else if (strcmp(argv[eleArgStart], "corotTruss") == 0)  {
+        if (theSite != 0)  {
+	        theExpElement = new EETrussCorot(tag, ndm, iNode, jNode,
+                theSite, iMod, doRayleigh, rho);
+        } else  {
+	        theExpElement = new EETrussCorot(tag, ndm, iNode, jNode,
+                ipPort, ipAddr, ssl, udp, dataSize, iMod, doRayleigh, rho);
+        }
     }
 	
 	if (theExpElement == 0)  {

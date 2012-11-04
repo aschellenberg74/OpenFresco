@@ -48,12 +48,11 @@ public:
     // constructors
     EEGeneric(int tag, ID nodes, ID *dof,
         ExperimentalSite *site,
-        bool iMod = false, const Matrix *mass = 0);
+        bool iMod = false, int addRayleigh = 1, const Matrix *mass = 0);
     EEGeneric(int tag, ID nodes, ID *dof,
         int port, char *machineInetAddress = 0,
-        int ssl = 0, int udp = 0, 
-        int dataSize = OF_Network_dataSize,
-        bool iMod = false, const Matrix *mass = 0);
+        int ssl = 0, int udp = 0, int dataSize = OF_Network_dataSize,
+        bool iMod = false, int addRayleigh = 1, const Matrix *mass = 0);
     
     // destructor
     ~EEGeneric();
@@ -76,6 +75,7 @@ public:
     // public methods to set and to obtain stiffness, 
     // and to obtain mass, damping and residual information    
     int setInitialStiff(const Matrix& stiff);
+    const Matrix &getDamp();
     const Matrix &getMass();
     
     void zeroLoad();
@@ -114,18 +114,19 @@ private:
     int numDOF;
     int numBasicDOF;
     
-    bool iMod;      // I-Modification flag
-    Matrix *mass;   // mass matrix
+    bool iMod;          // I-Modification flag
+    int addRayleigh;    // flag to add Rayleigh damping
+    Matrix *mass;       // mass matrix
     
     static Matrix theMatrix;
     static Vector theVector;
     static Vector theLoad;
     
-    Channel *theChannel;        // channel
-    double *sData;              // send data array
-    Vector *sendData;           // send vector
-    double *rData;              // receive data array
-    Vector *recvData;           // receive vector
+    Channel *theChannel;    // channel
+    double *sData;          // send data array
+    Vector *sendData;       // send vector
+    double *rData;          // receive data array
+    Vector *recvData;       // receive vector
     
     Vector *db;         // trial displacements in basic system
     Vector *vb;         // trial velocities in basic system

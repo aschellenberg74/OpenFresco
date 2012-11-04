@@ -57,11 +57,11 @@ Vector EEGeneric::theLoad(1);
 // by each object and storing the tags of the end nodes.
 EEGeneric::EEGeneric(int tag, ID nodes, ID *dof,
     ExperimentalSite *site,
-    bool iM, const Matrix *m)
+    bool iM, int addRay, const Matrix *m)
     : ExperimentalElement(tag, ELE_TAG_EEGeneric, site),
     connectedExternalNodes(nodes), basicDOF(1),
     numExternalNodes(0), numDOF(0), numBasicDOF(0),
-    iMod(iM), mass(0),
+    iMod(iM), addRayleigh(addRay), mass(0),
     db(0), vb(0), ab(0), t(0),
     dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
     dbCtrl(1), vbCtrl(1), abCtrl(1),
@@ -148,11 +148,11 @@ EEGeneric::EEGeneric(int tag, ID nodes, ID *dof,
 // by each object and storing the tags of the end nodes.
 EEGeneric::EEGeneric(int tag, ID nodes, ID *dof,
     int port, char *machineInetAddr, int ssl, int udp,
-    int dataSize, bool iM, const Matrix *m)
+    int dataSize, bool iM, int addRay, const Matrix *m)
     : ExperimentalElement(tag, ELE_TAG_EEGeneric),
     connectedExternalNodes(nodes), basicDOF(1),
     numExternalNodes(0), numDOF(0), numBasicDOF(0),
-    iMod(iM), mass(0),
+    iMod(iM), addRayleigh(addRay), mass(0),
     theChannel(0), sData(0), sendData(0), rData(0), recvData(0),
     db(0), vb(0), ab(0), t(0),
     dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
@@ -427,6 +427,7 @@ int EEGeneric::commitState()
 {
     int rValue = 0;
     
+    // commit the site
     if (theSite != 0)  {
         rValue += theSite->commitState();
     }
@@ -434,6 +435,9 @@ int EEGeneric::commitState()
         sData[0] = OF_RemoteTest_commitState;
         rValue += theChannel->sendVector(0, 0, *sendData, 0);
     }
+    
+    // commit the base class
+    rValue += this->Element::commitState();
     
     return rValue;
 }
@@ -493,6 +497,20 @@ int EEGeneric::setInitialStiff(const Matrix &kbinit)
     theInitStiff.Assemble(kbInit,basicDOF,basicDOF);
     
     return 0;
+}
+
+
+const Matrix& EEGeneric::getDamp()
+{
+    // zero the matrix
+    theMatrix.Zero();
+    
+    // call base class to setup Rayleigh damping
+    if (addRayleigh == 1)  {
+        theMatrix = this->Element::getDamp();
+    }
+    
+    return theMatrix;
 }
 
 
@@ -600,13 +618,16 @@ const Vector& EEGeneric::getResistingForce()
 
 const Vector& EEGeneric::getResistingForceIncInertia()
 {	
+    // this already includes damping forces from specimen
     theVector = this->getResistingForce();
     
-    // add the damping forces if rayleigh damping
-    if (alphaM != 0.0 || betaK != 0.0 || betaK0 != 0.0 || betaKc != 0.0)
-        theVector += this->getRayleighDampingForces();
+    // add the damping forces from rayleigh damping
+    if (addRayleigh == 1)  {
+        if (alphaM != 0.0 || betaK != 0.0 || betaK0 != 0.0 || betaKc != 0.0)
+            theVector += this->getRayleighDampingForces();
+    }
     
-    // now include the mass portion
+    // add inertia forces from element mass
     if (mass != 0)  {
         int ndim = 0, i;
         static Vector accel(numDOF);
@@ -747,6 +768,8 @@ void EEGeneric::Print(OPS_Stream &s, int flag)
         s << endln;
         if (theSite != 0)
             s << "  ExperimentalSite: " << theSite->getTag() << endln;
+        s << "  addRayleigh: " << addRayleigh;
+        s << "  mass matrix: " << mass << endln;
         // determine resisting forces in global system
         s << "  resisting force: " << this->getResistingForce() << endln;
     } else if (flag == 1)  {

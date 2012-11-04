@@ -57,11 +57,10 @@ Vector EEInvertedVBrace2d::theLoad(9);
 // by each object and storing the tags of the end nodes.
 EEInvertedVBrace2d::EEInvertedVBrace2d(int tag, int Nd1, int Nd2, int Nd3,
     ExperimentalSite *site,
-    bool iM, bool nlgeom, double r1, double r2)
+    bool iM, bool nlGeomFlag, int addRay, double r1, double r2)
     : ExperimentalElement(tag, ELE_TAG_EEInvertedVBrace2d, site),
-    connectedExternalNodes(3),
-    iMod(iM), nlGeom(nlgeom),
-    rho1(r1), rho2(r2), L1(0.0), L2(0.0),
+    connectedExternalNodes(3), iMod(iM), nlGeom(nlGeomFlag),
+    addRayleigh(addRay), rho1(r1), rho2(r2), L1(0.0), L2(0.0),
     db(0), vb(0), ab(0), t(0),
     dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
     dbCtrl(3), vbCtrl(3), abCtrl(3),
@@ -127,11 +126,10 @@ EEInvertedVBrace2d::EEInvertedVBrace2d(int tag, int Nd1, int Nd2, int Nd3,
 // by each object and storing the tags of the end nodes.
 EEInvertedVBrace2d::EEInvertedVBrace2d(int tag, int Nd1, int Nd2, int Nd3,
     int port, char *machineInetAddr, int ssl, int udp, int dataSize,
-    bool iM, bool nlGeomFlag, double r1, double r2)
+    bool iM, bool nlGeomFlag, int addRay, double r1, double r2)
     : ExperimentalElement(tag, ELE_TAG_EEInvertedVBrace2d),
-    connectedExternalNodes(3),
-    iMod(iM), nlGeom(nlGeomFlag),
-    rho1(r1), rho2(r2), L1(0.0), L2(0.0),
+    connectedExternalNodes(3), iMod(iM), nlGeom(nlGeomFlag),
+    addRayleigh(addRay), rho1(r1), rho2(r2), L1(0.0), L2(0.0),
     theChannel(0), sData(0), sendData(0), rData(0), recvData(0),
     db(0), vb(0), ab(0), t(0),
     dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
@@ -421,6 +419,7 @@ int EEInvertedVBrace2d::commitState()
 {
     int rValue = 0;
     
+    // commit the site
     if (theSite != 0)  {
         rValue += theSite->commitState();
     }
@@ -428,6 +427,9 @@ int EEInvertedVBrace2d::commitState()
         sData[0] = OF_RemoteTest_commitState;
         rValue += theChannel->sendVector(0, 0, *sendData, 0);
     }
+    
+    // commit the base class
+    rValue += this->Element::commitState();
     
     return rValue;
 }
@@ -506,6 +508,20 @@ int EEInvertedVBrace2d::setInitialStiff(const Matrix& kbinit)
     theInitStiff.addMatrixTripleProduct(0.0, T, kbInit, 1.0);
     
     return 0;
+}
+
+
+const Matrix& EEInvertedVBrace2d::getDamp()
+{
+    // zero the matrix
+    theMatrix.Zero();
+    
+    // call base class to setup Rayleigh damping
+    if (addRayleigh == 1)  {
+        theMatrix = this->Element::getDamp();
+    }
+    
+    return theMatrix;
 }
 
 
@@ -670,13 +686,16 @@ const Vector& EEInvertedVBrace2d::getResistingForce()
 
 const Vector& EEInvertedVBrace2d::getResistingForceIncInertia()
 {	
+    // this already includes damping forces from specimen
     theVector = this->getResistingForce();
     
-    // add the damping forces if rayleigh damping
-    if (alphaM != 0.0 || betaK != 0.0 || betaK0 != 0.0 || betaKc != 0.0)
-        theVector += this->getRayleighDampingForces();
+    // add the damping forces from rayleigh damping
+    if (addRayleigh == 1)  {
+        if (alphaM != 0.0 || betaK != 0.0 || betaK0 != 0.0 || betaKc != 0.0)
+            theVector += this->getRayleighDampingForces();
+    }
     
-    // now include the mass portion
+    // add inertia forces from element mass
     if ((L1 != 0.0 && rho1 != 0.0) || (L2 != 0.0 && rho2 != 0.0))  {
         const Vector &accel1 = theNodes[0]->getTrialAccel();
         const Vector &accel2 = theNodes[1]->getTrialAccel();
@@ -812,6 +831,7 @@ void EEInvertedVBrace2d::Print(OPS_Stream &s, int flag)
             << ", kNode: " << connectedExternalNodes(2) << endln;
         if (theSite != 0)
             s << "  ExperimentalSite: " << theSite->getTag() << endln;
+        s << "  addRayleigh: " << addRayleigh << endln;
         s << "  mass per unit length diagonal 1: " << rho1 << endln;
         s << "  mass per unit length diagonal 2: " << rho2 << endln;
         // determine resisting forces in global system

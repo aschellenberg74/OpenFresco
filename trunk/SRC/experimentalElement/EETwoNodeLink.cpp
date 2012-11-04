@@ -64,11 +64,12 @@ Vector EETwoNodeLink::EETwoNodeLinkV12(12);
 EETwoNodeLink::EETwoNodeLink(int tag, int dim, int Nd1, int Nd2, 
     const ID &direction, ExperimentalSite *site,
     const Vector _y, const Vector _x, const Vector Mr,
-    const Vector sdI, bool iM, double m)
+    const Vector sdI, bool iM, int addRay, double m)
     : ExperimentalElement(tag, ELE_TAG_EETwoNodeLink, site),     
     dimension(dim), numDOF(0), connectedExternalNodes(2),
     numDir(direction.Size()), dir(0), trans(3,3), x(_x), y(_y),
-    Mratio(Mr), shearDistI(sdI), iMod(iM), mass(m), L(0.0),
+    Mratio(Mr), shearDistI(sdI), iMod(iM),
+    addRayleigh(addRay), mass(m), L(0.0),
     db(0), vb(0), ab(0), t(0),
     dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
     dbCtrl(direction.Size()), vbCtrl(direction.Size()),
@@ -194,11 +195,12 @@ EETwoNodeLink::EETwoNodeLink(int tag, int dim, int Nd1, int Nd2,
     const ID &direction, int port, char *machineInetAddr,
     int ssl, int udp, int dataSize,
     const Vector _y, const Vector _x, const Vector Mr,
-    const Vector sdI, bool iM, double m)
+    const Vector sdI, bool iM, int addRay, double m)
     : ExperimentalElement(tag, ELE_TAG_EETwoNodeLink),     
     dimension(dim), numDOF(0), connectedExternalNodes(2),
     numDir(direction.Size()), dir(0), trans(3,3), x(_x), y(_y),
-    Mratio(Mr), shearDistI(sdI), iMod(iM), mass(m), L(0.0),
+    Mratio(Mr), shearDistI(sdI), iMod(iM),
+    addRayleigh(addRay), mass(m), L(0.0),
     theChannel(0), sData(0), sendData(0), rData(0), recvData(0),
     db(0), vb(0), ab(0), t(0),
     dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
@@ -572,6 +574,7 @@ int EETwoNodeLink::commitState()
 {
     int rValue = 0;
     
+    // commit the site
     if (theSite != 0)  {
         rValue += theSite->commitState();
     }
@@ -579,6 +582,9 @@ int EETwoNodeLink::commitState()
         sData[0] = OF_RemoteTest_commitState;
         rValue += theChannel->sendVector(0, 0, *sendData, 0);
     }
+    
+    // commit the base class
+    rValue += this->Element::commitState();
     
     return rValue;
 }
@@ -711,6 +717,20 @@ const Matrix& EETwoNodeLink::getTangentStiff()
 }
 
 
+const Matrix& EETwoNodeLink::getDamp()
+{
+    // zero the matrix
+    theMatrix->Zero();
+    
+    // call base class to setup Rayleigh damping
+    if (addRayleigh == 1)  {
+        (*theMatrix) = this->Element::getDamp();
+    }
+    
+    return *theMatrix;
+}
+
+
 const Matrix& EETwoNodeLink::getMass()
 {
     // zero the matrix
@@ -826,13 +846,16 @@ const Vector& EETwoNodeLink::getResistingForce()
 
 const Vector& EETwoNodeLink::getResistingForceIncInertia()
 {	
+    // this already includes damping forces from specimen
     this->getResistingForce();
     
-    // add the damping forces if rayleigh damping
-    if (alphaM != 0.0 || betaK != 0.0 || betaK0 != 0.0 || betaKc != 0.0)
-        (*theVector) += this->getRayleighDampingForces();
+    // add the damping forces from rayleigh damping
+    if (addRayleigh == 1)  {
+        if (alphaM != 0.0 || betaK != 0.0 || betaK0 != 0.0 || betaKc != 0.0)
+            (*theVector) += this->getRayleighDampingForces();
+    }
     
-    // now include the mass portion
+    // add inertia forces from element mass
     if (mass != 0.0)  {
         const Vector &accel1 = theNodes[0]->getTrialAccel();
         const Vector &accel2 = theNodes[1]->getTrialAccel();    
@@ -840,7 +863,7 @@ const Vector& EETwoNodeLink::getResistingForceIncInertia()
         int numDOF2 = numDOF/2;
         double m = 0.5*mass;
         for (int i=0; i<dimension; i++)  {
-            (*theVector)(i) += m * accel1(i);
+            (*theVector)(i)         += m * accel1(i);
             (*theVector)(i+numDOF2) += m * accel2(i);
         }
     }
@@ -957,6 +980,7 @@ void EETwoNodeLink::Print(OPS_Stream &s, int flag)
             << ", jNode: " << connectedExternalNodes(1) << endln;
         if (theSite != 0)
             s << "  ExperimentalSite: " << theSite->getTag() << endln;
+        s << "  addRayleigh: " << addRayleigh;
         s << "  mass: " << mass << endln;
         // determine resisting forces in global system
         s << "  resisting force: " << this->getResistingForce() << endln;

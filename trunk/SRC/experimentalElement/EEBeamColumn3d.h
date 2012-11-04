@@ -49,13 +49,12 @@ public:
     EEBeamColumn3d(int tag, int Nd1, int Nd2,
         CrdTransf &coordTransf,
         ExperimentalSite *site,
-        bool iMod = false, double rho = 0.0);
+        bool iMod = false, int addRayleigh = 1, double rho = 0.0);
     EEBeamColumn3d(int tag, int Nd1, int Nd2,
         CrdTransf &coordTransf,
         int port, char *machineInetAddress = 0,
-        int ssl = 0, int udp = 0,
-        int dataSize = OF_Network_dataSize,
-        bool iMod = false, double rho = 0.0);
+        int ssl = 0, int udp = 0, int dataSize = OF_Network_dataSize,
+        bool iMod = false, int addRayleigh = 1, double rho = 0.0);
     
     // destructor
     ~EEBeamColumn3d();
@@ -79,6 +78,7 @@ public:
     // and to obtain mass, damping and residual information    
     int setInitialStiff(const Matrix& stiff);
     const Matrix &getTangentStiff();
+    const Matrix &getDamp();
     const Matrix &getMass();
     
     void zeroLoad();
@@ -114,19 +114,20 @@ private:
     ID connectedExternalNodes;      // contains the tags of the end nodes
     CrdTransf *theCoordTransf;
     
-    bool iMod;		// I-Modification flag
-    double rho;		// rho: mass per unit length
-    double L;		// undeformed element length
+    bool iMod;		    // I-Modification flag
+    int addRayleigh;    // flag to add Rayleigh damping
+    double rho;		    // rho: mass per unit length
+    double L;		    // undeformed element length
     
     static Matrix theMatrix;
     static Vector theVector;
     static Vector theLoad;
     
-    Channel *theChannel;        // channel
-    double *sData;              // send data array
-    Vector *sendData;           // send vector
-    double *rData;              // receive data array
-    Vector *recvData;           // receive vector
+    Channel *theChannel;    // channel
+    double *sData;          // send data array
+    Vector *sendData;       // send vector
+    double *rData;          // receive data array
+    Vector *recvData;       // receive vector
     
     Vector *db;         // displacements in basic system B
     Vector *vb;         // velocities in basic system B
