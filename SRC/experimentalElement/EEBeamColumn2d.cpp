@@ -60,10 +60,10 @@ Vector EEBeamColumn2d::theLoad(6);
 EEBeamColumn2d::EEBeamColumn2d(int tag, int Nd1, int Nd2,
     CrdTransf &coordTransf,
     ExperimentalSite *site,
-    bool iM, double r)
+    bool iM, int addRay, double r)
     : ExperimentalElement(tag, ELE_TAG_EEBeamColumn2d, site),
     connectedExternalNodes(2), theCoordTransf(0),
-    iMod(iM), rho(r), L(0.0),
+    iMod(iM), addRayleigh(addRay), rho(r), L(0.0),
     db(0), vb(0), ab(0), t(0),
     dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
     dbCtrl(3), vbCtrl(3), abCtrl(3),
@@ -143,10 +143,10 @@ EEBeamColumn2d::EEBeamColumn2d(int tag, int Nd1, int Nd2,
 EEBeamColumn2d::EEBeamColumn2d(int tag, int Nd1, int Nd2,
     CrdTransf &coordTransf,
     int port, char *machineInetAddr, int ssl, int udp,
-    int dataSize, bool iM, double r)
+    int dataSize, bool iM, int addRay, double r)
     : ExperimentalElement(tag, ELE_TAG_EEBeamColumn2d),
     connectedExternalNodes(2), theCoordTransf(0),
-    iMod(iM), rho(r), L(0.0),
+    iMod(iM), addRayleigh(addRay), rho(r), L(0.0),
     theChannel(0), sData(0), sendData(0), rData(0), recvData(0),
     db(0), vb(0), ab(0), t(0),
     dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
@@ -419,6 +419,7 @@ int EEBeamColumn2d::commitState()
 {
     int rValue = 0;
     
+    // commit the site
     if (theSite != 0)  {
         rValue += theSite->commitState();
     }
@@ -426,7 +427,12 @@ int EEBeamColumn2d::commitState()
         sData[0] = OF_RemoteTest_commitState;
         rValue += theChannel->sendVector(0, 0, *sendData, 0);
     }
+
+    // commit the coordinate transformation
     rValue += theCoordTransf->commitState();
+    
+    // commit the base class
+    rValue += this->Element::commitState();
     
     return rValue;
 }
@@ -581,6 +587,20 @@ const Matrix& EEBeamColumn2d::getTangentStiff()
 }
 
 
+const Matrix& EEBeamColumn2d::getDamp()
+{
+    // zero the matrix
+    theMatrix.Zero();
+    
+    // call base class to setup Rayleigh damping
+    if (addRayleigh == 1)  {
+        theMatrix = this->Element::getDamp();
+    }
+    
+    return theMatrix;
+}
+
+
 const Matrix& EEBeamColumn2d::getMass()
 {
     // zero the matrix
@@ -616,19 +636,19 @@ int EEBeamColumn2d::addLoad(ElementalLoad *theEleLoad, double loadFactor)
     const Vector &data = theEleLoad->getData(type, loadFactor);
 
     if (type == LOAD_TAG_Beam2dUniformLoad) {
-        double wt = data(0)*loadFactor;  // Transverse (+ve upward)
-        double wa = data(1)*loadFactor;  // Axial (+ve from node I to J)
+        double wt = data(0)*loadFactor;  // transverse (+ve upward)
+        double wa = data(1)*loadFactor;  // axial (+ve from node I to J)
 
         double V = 0.5*wt*L;
         double M = V*L/6.0; // wt*L*L/12
         double P = wa*L;
 
-        // Reactions in basic system
+        // reactions in basic system
         pA0[0] -= P;
         pA0[1] -= V;
         pA0[2] -= V;
 
-        // Fixed end forces in basic system
+        // fixed end forces in basic system
         qA0[0] -= 0.5*P;
         qA0[1] -= M;
         qA0[2] += M;
@@ -645,7 +665,7 @@ int EEBeamColumn2d::addLoad(ElementalLoad *theEleLoad, double loadFactor)
         double a = aOverL*L;
         double b = L-a;
 
-        // Reactions in basic system
+        // reactions in basic system
         pA0[0] -= N;
         double V1 = P*(1.0-aOverL);
         double V2 = P*aOverL;
@@ -656,7 +676,7 @@ int EEBeamColumn2d::addLoad(ElementalLoad *theEleLoad, double loadFactor)
         double a2 = a*a;
         double b2 = b*b;
 
-        // Fixed end forces in basic system
+        // fixed end forces in basic system
         qA0[0] -= N*aOverL;
         double M1 = -a*b2*P*L2;
         double M2 = a2*b*P*L2;
@@ -706,6 +726,7 @@ int EEBeamColumn2d::addInertiaLoadToUnbalance(const Vector &accel)
 
 const Vector& EEBeamColumn2d::getResistingForce()
 {
+    // make sure the coordinate transformation is updated
     theCoordTransf->update();
     
     // zero the residual
@@ -772,13 +793,16 @@ const Vector& EEBeamColumn2d::getResistingForce()
 
 const Vector& EEBeamColumn2d::getResistingForceIncInertia()
 {	
+    // this already includes damping forces from specimen
     theVector = this->getResistingForce();
     
-    // add the damping forces if rayleigh damping
-    if (alphaM != 0.0 || betaK != 0.0 || betaK0 != 0.0 || betaKc != 0.0)
-        theVector += this->getRayleighDampingForces();
+    // add the damping forces from rayleigh damping
+    if (addRayleigh == 1)  {
+        if (alphaM != 0.0 || betaK != 0.0 || betaK0 != 0.0 || betaKc != 0.0)
+            theVector += this->getRayleighDampingForces();
+    }
     
-    // now include the mass portion
+    // add inertia forces from element mass
     if (L != 0.0 && rho != 0.0)  {
         const Vector &accel1 = theNodes[0]->getTrialAccel();
         const Vector &accel2 = theNodes[1]->getTrialAccel();    
@@ -903,6 +927,7 @@ void EEBeamColumn2d::Print(OPS_Stream &s, int flag)
         s << "  CoordTransf: " << theCoordTransf->getTag() << endln;
         if (theSite != 0)
             s << "  ExperimentalSite: " << theSite->getTag() << endln;
+        s << "  addRayleigh: " << addRayleigh;
         s << "  mass per unit length: " << rho << endln;
         // determine resisting forces in global system
         s << "  resisting force: " << this->getResistingForce() << endln;

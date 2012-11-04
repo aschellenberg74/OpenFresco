@@ -63,8 +63,8 @@ int addEETwoNodeLink(ClientData clientData, Tcl_Interp *interp, int argc,
     if ((argc-eleArgStart) < 10)  {
         opserr << "WARNING insufficient arguments\n";
         printCommand(argc, argv);
-        opserr << "Want: expElement twoNodeLink eleTag iNode jNode -dir dirs -site siteTag -initStif Kij <-orient <x1 x2 x3> y1 y2 y3> <-pDelta Mratios> <-shearDist sDratios> <-iMod> <-mass m>\n";
-        opserr << "  or: expElement twoNodeLink eleTag iNode jNode -dir dirs -server ipPort <ipAddr> <-ssl> <-dataSize size> -initStif Kij <-orient <x1 x2 x3> y1 y2 y3> <-pDelta Mratios> <-shearDist sDratios> <-iMod> <-mass m>\n";
+        opserr << "Want: expElement twoNodeLink eleTag iNode jNode -dir dirs -site siteTag -initStif Kij <-orient <x1 x2 x3> y1 y2 y3> <-pDelta Mratios> <-shearDist sDratios> <-iMod> <-noRayleigh> <-mass m>\n";
+        opserr << "  or: expElement twoNodeLink eleTag iNode jNode -dir dirs -server ipPort <ipAddr> <-ssl> <-dataSize size> -initStif Kij <-orient <x1 x2 x3> y1 y2 y3> <-pDelta Mratios> <-shearDist sDratios> <-iMod> <-noRayleigh> <-mass m>\n";
         return TCL_ERROR;
     }    
     
@@ -76,6 +76,7 @@ int addEETwoNodeLink(ClientData clientData, Tcl_Interp *interp, int argc,
     int dataSize = OF_Network_dataSize;
     Vector Mratio(0), shearDistI(0);
     bool iMod = false;
+    int doRayleigh = 1;
 	double mass = 0.0;
     
     if (Tcl_GetInt(interp, argv[1+eleArgStart], &tag) != TCL_OK)  {
@@ -196,6 +197,8 @@ int addEETwoNodeLink(ClientData clientData, Tcl_Interp *interp, int argc,
                 strcmp(argv[j],"-pDelta") != 0 &&
                 strcmp(argv[j],"-shearDist") != 0 &&
                 strcmp(argv[j],"-iMod") != 0 &&
+                strcmp(argv[j],"-doRayleigh") != 0 &&
+                strcmp(argv[j],"-noRayleigh") != 0 &&
                 strcmp(argv[j],"-mass") != 0)  {
                 numOrient++;
                 j++;
@@ -301,6 +304,13 @@ int addEETwoNodeLink(ClientData clientData, Tcl_Interp *interp, int argc,
             iMod = true;
         }
     }
+    for (i = 7+eleArgStart; i < argc; i++)  {
+        if (strcmp(argv[i], "-doRayleigh") == 0)  {
+            doRayleigh = 1;
+        } else if (strcmp(argv[i], "-noRayleigh") == 0)  {
+            doRayleigh = 0;
+        }
+    }
 	for (i=argi; i<argc; i++)  {
 		if (i+1 < argc && strcmp(argv[i], "-mass") == 0)  {
 			if (Tcl_GetDouble(interp, argv[i+1], &mass) != TCL_OK)  {
@@ -311,10 +321,14 @@ int addEETwoNodeLink(ClientData clientData, Tcl_Interp *interp, int argc,
 		}
 	}
     // now create the EETwoNodeLink
-    if (theSite != 0)
-        theExpElement = new EETwoNodeLink(tag, ndm, iNode, jNode, theDirIDs, theSite, y, x, Mratio, shearDistI, iMod, mass);
-    else
-        theExpElement = new EETwoNodeLink(tag, ndm, iNode, jNode, theDirIDs, ipPort, ipAddr, ssl, udp, dataSize, y, x, Mratio, shearDistI, iMod, mass);
+    if (theSite != 0)  {
+        theExpElement = new EETwoNodeLink(tag, ndm, iNode, jNode, theDirIDs,
+            theSite, y, x, Mratio, shearDistI, iMod, doRayleigh, mass);
+    } else  {
+        theExpElement = new EETwoNodeLink(tag, ndm, iNode, jNode, theDirIDs,
+            ipPort, ipAddr, ssl, udp, dataSize, y, x, Mratio, shearDistI,
+            iMod, doRayleigh, mass);
+    }
     
 	if (theExpElement == 0)  {
 		opserr << "WARNING ran out of memory creating element\n";

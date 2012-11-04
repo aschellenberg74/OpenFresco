@@ -58,8 +58,8 @@ int addEEGeneric(ClientData clientData, Tcl_Interp *interp,  int argc,
 	if ((argc-eleArgStart) < 10)  {
 		opserr << "WARNING insufficient arguments\n";
 		printCommand(argc, argv);
-		opserr << "Want: expElement generic eleTag -node Ndi -dof dofNdi -dof dofNdj ... -site siteTag -initStif Kij <-iMod> <-mass Mij>\n";
-		opserr << "  or: expElement generic eleTag -node Ndi -dof dofNdi -dof dofNdj ... -server ipPort <ipAddr> <-ssl> <-dataSize size> -initStif Kij <-iMod> <-mass Mij>\n";
+		opserr << "Want: expElement generic eleTag -node Ndi -dof dofNdi -dof dofNdj ... -site siteTag -initStif Kij <-iMod> <-noRayleigh> <-mass Mij>\n";
+		opserr << "  or: expElement generic eleTag -node Ndi -dof dofNdi -dof dofNdj ... -server ipPort <ipAddr> <-ssl> <-dataSize size> -initStif Kij <-iMod> <-noRayleigh> <-mass Mij>\n";
 		return TCL_ERROR;
 	}    
 	
@@ -71,6 +71,7 @@ int addEEGeneric(ClientData clientData, Tcl_Interp *interp,  int argc,
     int ssl = 0, udp = 0;
     int dataSize = OF_Network_dataSize;
     bool iMod = false;
+    int doRayleigh = 1;
     Matrix *mass = 0;
 
 	if (Tcl_GetInt(interp, argv[1+eleArgStart], &tag) != TCL_OK)  {
@@ -204,6 +205,13 @@ int addEEGeneric(ClientData clientData, Tcl_Interp *interp,  int argc,
             iMod = true;
         }
     }
+    for (i = 7+eleArgStart; i < argc; i++)  {
+        if (strcmp(argv[i], "-doRayleigh") == 0)  {
+            doRayleigh = 1;
+        } else if (strcmp(argv[i], "-noRayleigh") == 0)  {
+            doRayleigh = 0;
+        }
+    }
 	for (i=argi; i<argc; i++)  {
 		if (strcmp(argv[i], "-mass") == 0)  {
 			if (argc-1 < i+numDOF*numDOF)  {
@@ -227,20 +235,21 @@ int addEEGeneric(ClientData clientData, Tcl_Interp *interp,  int argc,
 	}
     
 	// now create the EEGeneric
-    if (theSite != 0) {
-        if (mass == 0) {
-	        theExpElement = new EEGeneric(tag, nodes, dofs, theSite, iMod);
+    if (theSite != 0)  {
+        if (mass == 0)  {
+	        theExpElement = new EEGeneric(tag, nodes, dofs, theSite,
+                iMod, doRayleigh);
+        } else  {
+            theExpElement = new EEGeneric(tag, nodes, dofs, theSite,
+                iMod, doRayleigh, mass);
         }
-        else {
-            theExpElement = new EEGeneric(tag, nodes, dofs, theSite, iMod, mass);
-        }
-    }
-    else {
-        if (mass == 0) {
-	        theExpElement = new EEGeneric(tag, nodes, dofs, ipPort, ipAddr, ssl, udp, dataSize, iMod);
-        }
-        else {
-            theExpElement = new EEGeneric(tag, nodes, dofs, ipPort, ipAddr, ssl, udp, dataSize, iMod, mass);
+    } else  {
+        if (mass == 0)  {
+	        theExpElement = new EEGeneric(tag, nodes, dofs, ipPort,
+                ipAddr, ssl, udp, dataSize, iMod, doRayleigh);
+        } else  {
+            theExpElement = new EEGeneric(tag, nodes, dofs, ipPort,
+                ipAddr, ssl, udp, dataSize, iMod, doRayleigh, mass);
         }
     }
 	
