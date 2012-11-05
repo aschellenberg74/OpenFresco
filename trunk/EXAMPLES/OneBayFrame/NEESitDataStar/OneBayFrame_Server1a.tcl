@@ -31,8 +31,8 @@ uniaxialMaterial Steel02 1 1.5 2.8 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0
 # Define experimental control
 # ---------------------------
 # expControl SimUniaxialMaterials $tag $matTags
-#expControl SimUniaxialMaterials 1 1
-expControl xPCtarget 1 1 "192.168.2.20" 22222 HybridControllerD3D3_1Act "D:/PredictorCorrector/RTActualTestModels/cmAPI-xPCTarget-STS"
+expControl SimUniaxialMaterials 1 1
+#expControl xPCtarget 1 1 "192.168.2.20" 22222 HybridControllerD3D3_1Act "D:/PredictorCorrector/RTActualTestModels/cmAPI-xPCTarget-STS"
 
 # Define experimental setup
 # -------------------------
@@ -42,7 +42,7 @@ expSetup OneActuator 1 -control 1 1 -sizeTrialOut 1 1
 # Define experimental site
 # ------------------------
 # expSite ActorSite $tag -setup $setupTag $ipPort <-ssl> <-udp>
-expSite ActorSite 1 -setup 1 8090 -ssl
+expSite ActorSite 1 -setup 1 8090
 # ------------------------------
 # End of model generation
 # ------------------------------

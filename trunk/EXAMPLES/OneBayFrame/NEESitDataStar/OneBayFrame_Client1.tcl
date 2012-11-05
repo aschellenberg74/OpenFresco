@@ -20,63 +20,68 @@
 # create ModelBuilder (with two-dimensions and 2 DOF/node)
 model BasicBuilder -ndm 2 -ndf 2
 
+# Load OpenFresco package
+# -----------------------
+# (make sure all dlls are in the same folder as OpenSeesMP.exe)
+loadPackage OpenFresco
+
 set np  [getNP]
 set pid [getPID]
 
 if {$pid == 0}  {
-
+    
     set mass3 0.04
     set mass4 0.02
     # node $tag $xCrd $yCrd $mass
     node  1     0.0   0.00
     node  3     0.0  54.00  -mass $mass3 $mass3
     node  4   100.0  54.00  -mass $mass4 $mass4
-
+    
     # set the boundary conditions
     # fix $tag $DX $DY
     fix 1   1  1
     fix 3   0  1
     fix 4   0  1
-
+    
     # Define materials
     # ----------------
     uniaxialMaterial Elastic 3 [expr 2.0*100.0/1.0]
-
+    
     # Define experimental site
     # ------------------------
     # expSite ShadowSite $tag <-setup $setupTag> $ipAddr $ipPort <-ssl> <-dataSize $size>
-    expSite ShadowSite 1 "169.229.203.152" 8090 -ssl
-
+    expSite ShadowSite 1 "127.0.0.1" 8090
+    
     # Define experimental elements
     # ----------------------------
     # left column
     # expElement twoNodeLink $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-orient <$x1 $x2 $x3> $y1 $y2 $y3> <-pDelta Mratios> <-iMod> <-mass $m>
     expElement twoNodeLink 1 1 3 -dir 2 -site 1 -initStif 2.8
-
+    
     # Define numerical elements
     # -------------------------
     # spring
     # element truss $eleTag $iNode $jNode $A $matTag
     element truss 3 3 4 1.0 3
-
+    
 } else {
-
+    
     set mass3 0.04
     set mass4 0.02
     # node $tag $xCrd $yCrd $mass
     node  2   100.0   0.00
     node  4   100.0  54.00  -mass $mass4 $mass4
-
+    
     # set the boundary conditions
     # fix $tag $DX $DY
     fix 2   1  1
     fix 4   0  1
-
+    
     # Define experimental site
     # ------------------------
     # expSite ShadowSite $tag <-setup $setupTag> $ipAddr $ipPort <-ssl> <-udp> <-dataSize $size>
-    expSite ShadowSite 2 "169.229.203.152" 8091 -ssl
-
+    expSite ShadowSite 2 "127.0.0.1" 8091
+    
     # Define experimental elements
     # ----------------------------
     # right column
@@ -140,13 +145,13 @@ analysis Transient
 # Start of recorder generation
 # ------------------------------
 # create the recorder objects
-#recorder Node -file Node_Dsp$pid.out -time -node 3 4 -dof 1 disp
-#recorder Node -file Node_Vel$pid.out -time -node 3 4 -dof 1 vel
-#recorder Node -file Node_Acc$pid.out -time -node 3 4 -dof 1 accel
+recorder Node -file Node_Dsp$pid.out -time -node 3 4 -dof 1 disp
+recorder Node -file Node_Vel$pid.out -time -node 3 4 -dof 1 vel
+recorder Node -file Node_Acc$pid.out -time -node 3 4 -dof 1 accel
 
-#recorder Element -file Elmt_Frc$pid.out     -time -ele 1 2 3 forces
-#recorder Element -file Elmt_ctrlDsp$pid.out -time -ele 1 2   ctrlDisp
-#recorder Element -file Elmt_daqDsp$pid.out  -time -ele 1 2   daqDisp
+recorder Element -file Elmt_Frc$pid.out     -time -ele 1 2 3 forces
+recorder Element -file Elmt_ctrlDsp$pid.out -time -ele 1 2   ctrlDisp
+recorder Element -file Elmt_daqDsp$pid.out  -time -ele 1 2   daqDisp
 # --------------------------------
 # End of recorder generation
 # --------------------------------

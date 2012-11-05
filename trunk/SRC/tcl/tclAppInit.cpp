@@ -99,7 +99,7 @@ SimulationInformation simulationInfo;
 SimulationInformation *theSimulationInfo = 0;
 StandardStream sserr;
 OPS_Stream *opserrPtr = &sserr;
-double ops_Dt = 0.0;
+//double ops_Dt = 0.0;
 
 #ifndef _WIN32
 extern Domain *ops_TheActiveDomain;
@@ -409,6 +409,78 @@ int specifyModelBuilder(ClientData clientData, Tcl_Interp *interp,
 }
 
 
+// Rayleigh damping command
+int rayleighDamping(ClientData clientData, Tcl_Interp *interp, int argc, TCL_Char **argv)
+{
+    if (argc < 5)  {
+        opserr << "WARNING rayleigh alphaM betaKt betaK0 betaKc - not enough arguments to command\n";
+        return TCL_ERROR;
+    }
+    
+    double alphaM, betaKt, betaK0, betaKc;
+    
+    if (Tcl_GetDouble(interp, argv[1], &alphaM) != TCL_OK)  {
+        opserr << "WARNING rayleigh alphaM betaKt betaK0 betaKc - could not read alphaM \n";
+        return TCL_ERROR;
+    }
+    if (Tcl_GetDouble(interp, argv[2], &betaKt) != TCL_OK)  {
+        opserr << "WARNING rayleigh alphaM betaKt betaK0 betaKc - could not read betaKt \n";
+        return TCL_ERROR;
+    }
+    if (Tcl_GetDouble(interp, argv[3], &betaK0) != TCL_OK)  {
+        opserr << "WARNING rayleigh alphaM betaKt betaK0 betaKc - could not read betaK0 \n";
+        return TCL_ERROR;
+    }
+    if (Tcl_GetDouble(interp, argv[4], &betaKc) != TCL_OK)  {
+        opserr << "WARNING rayleigh alphaM betaKt betaK0 betaKc - could not read betaKc \n";
+        return TCL_ERROR;
+    }
+    
+    theDomain->setRayleighDampingFactors(alphaM, betaKt, betaK0, betaKc);
+    
+    return TCL_OK;
+}
+
+
+// element Rayleigh damping command
+int setElementRayleighDampingFactors(ClientData clientData, Tcl_Interp *interp, int argc, TCL_Char **argv)
+{
+    if (argc < 6)  {
+        opserr << "WARNING setElementRayleighDampingFactors eleTag alphaM betaKt betaK0 betaKc - not enough arguments to command\n";
+        return TCL_ERROR;
+    }
+    
+    int eleTag;
+    double alphaM, betaKt, betaK0, betaKc;
+    
+    if (Tcl_GetInt(interp, argv[1], &eleTag) != TCL_OK)  {
+        opserr << "WARNING setElementRayleighDampingFactors eleTag alphaM betaKt betaK0 betaKc - could not read eleTag \n";
+        return TCL_ERROR;
+    }
+    if (Tcl_GetDouble(interp, argv[2], &alphaM) != TCL_OK)  {
+        opserr << "WARNING setElementRayleighDampingFactors eleTag alphaM betaKt betaK0 betaKc - could not read alphaM \n";
+        return TCL_ERROR;
+    }
+    if (Tcl_GetDouble(interp, argv[3], &betaKt) != TCL_OK)  {
+        opserr << "WARNING setElementRayleighDampingFactors eleTag alphaM betaKt betaK0 betaKc - could not read betaKt \n";
+        return TCL_ERROR;
+    }
+    if (Tcl_GetDouble(interp, argv[4], &betaK0) != TCL_OK)  {
+        opserr << "WARNING setElementRayleighDampingFactors eleTag alphaM betaKt betaK0 betaKc - could not read betaK0 \n";
+        return TCL_ERROR;
+    }
+    if (Tcl_GetDouble(interp, argv[5], &betaKc) != TCL_OK)  {
+        opserr << "WARNING setElementRayleighDampingFactors eleTag alphaM betaKt betaK0 betaKc - could not read betaKc \n";
+        return TCL_ERROR;
+    }
+    
+    Element *theEle = theDomain->getElement(eleTag);
+    theEle->setRayleighDampingFactors(alphaM, betaKt, betaK0, betaKc);
+    
+    return TCL_OK;
+}
+
+
 int getLibraryFunction(const char *libName, const char *funcName,
     void **libHandle, void **funcHandle)
 {
@@ -542,6 +614,12 @@ int Tcl_AppInit(Tcl_Interp *interp)
     Tcl_CreateCommand(interp, "model", specifyModelBuilder,
         (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);
     
+    Tcl_CreateCommand(interp, "rayleigh", rayleighDamping,
+        (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);       
+    
+    Tcl_CreateCommand(interp, "setElementRayleighDampingFactors", setElementRayleighDampingFactors,
+        (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);       
+
     /* OpenSees commands
     Tcl_CreateCommand(interp, "recorder", addRecorder,
 	    (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);*/

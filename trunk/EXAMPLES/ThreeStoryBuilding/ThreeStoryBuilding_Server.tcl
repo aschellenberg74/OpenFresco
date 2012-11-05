@@ -594,6 +594,42 @@ expSite ActorSite 1 -control 1 8090
 
 
 # ------------------------------
+# Start of analysis generation
+# ------------------------------
+# create the system of equations
+system BandGeneral
+# create the DOF numberer
+numberer Plain
+# create the constraint handler
+constraints Penalty 1e12 1e12
+# create the convergence test
+test NormDispIncr 1.0e-12 25
+#test NormUnbalance 1.0e-12 25
+#test EnergyIncr 1.0e-12 25
+# create the integration scheme
+integrator LoadControl 1.0
+# create the solution algorithm
+algorithm Newton
+# create the analysis object 
+analysis Static
+# ------------------------------
+# End of analysis generation
+# ------------------------------
+
+
+# ------------------------------
+# Start of recorder generation
+# ------------------------------
+# create the recorder objects
+expRecorder Site -file Server_Node_Dsp.out -time -site 1 trialDisp
+expRecorder Site -file Server_Node_Vel.out -time -site 1 trialVel
+expRecorder Site -file Server_Node_Acc.out -time -site 1 trialAccel
+# --------------------------------
+# End of recorder generation
+# --------------------------------
+
+
+# ------------------------------
 # Start the server process
 # ------------------------------
 # startLabServer $siteTag

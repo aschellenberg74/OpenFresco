@@ -67,7 +67,7 @@
 //#include <SectionRepres.h>
 
 #include <UniaxialMaterial.h>
-//#include <NDMaterial.h>
+#include <NDMaterial.h>
 
 //#include <ImposedMotionSP.h>
 //#include <ImposedMotionSP1.h>
@@ -112,8 +112,8 @@ int TclCommand_addNode(ClientData clientData, Tcl_Interp *interp, int argc,
 int TclCommand_addUniaxialMaterial(ClientData clientData, Tcl_Interp *interp,
     int argc, TCL_Char **argv);
 
-//int TclCommand_addNDMaterial(ClientData clientData, Tcl_Interp *interp, int argc,   
-//    TCL_Char **argv);
+int TclCommand_addNDMaterial(ClientData clientData, Tcl_Interp *interp, int argc,   
+    TCL_Char **argv);
 
 //int TclCommand_addSection(ClientData clientData, Tcl_Interp *interp, int argc,   
 //    TCL_Char **argv);
@@ -204,7 +204,7 @@ TclModelBuilder::TclModelBuilder(Domain &thedomain,
     : ModelBuilder(thedomain), theInterp(interp), ndm(NDM), ndf(NDF)
 {
     //theUniaxialMaterials = new ArrayOfTaggedObjects(32);
-    //theNDMaterials = new ArrayOfTaggedObjects(32);
+    theNDMaterials = new ArrayOfTaggedObjects(32);
     //theSections = new ArrayOfTaggedObjects(32);
     //theSectionRepresents = new ArrayOfTaggedObjects(32);  
     /*#ifdef OO_HYSTERETIC
@@ -233,8 +233,8 @@ TclModelBuilder::TclModelBuilder(Domain &thedomain,
     Tcl_CreateCommand(interp, "uniaxialMaterial", TclCommand_addUniaxialMaterial,
         (ClientData)NULL, NULL);
 
-    //Tcl_CreateCommand(interp, "nDMaterial", TclCommand_addNDMaterial,
-    //    (ClientData)NULL, NULL);
+    Tcl_CreateCommand(interp, "nDMaterial", TclCommand_addNDMaterial,
+        (ClientData)NULL, NULL);
 
     //Tcl_CreateCommand(interp, "section", TclCommand_addSection,
     //    (ClientData)NULL, NULL);
@@ -261,19 +261,19 @@ TclModelBuilder::TclModelBuilder(Domain &thedomain,
     //    (ClientData)NULL, NULL);
 
     //Tcl_CreateCommand(interp, "imposedMotion", TclCommand_addImposedMotionSP,
-    //    (ClientData)NULL, NULL);  
+    //    (ClientData)NULL, NULL);
 
     //Tcl_CreateCommand(interp, "imposedSupportMotion", TclCommand_addImposedMotionSP,
-    //    (ClientData)NULL, NULL);  
+    //    (ClientData)NULL, NULL);
 
     //Tcl_CreateCommand(interp, "groundMotion", TclCommand_addGroundMotion,
-    //    (ClientData)NULL, NULL);    
+    //    (ClientData)NULL, NULL);
 
     //Tcl_CreateCommand(interp, "equalDOF", TclCommand_addEqualDOF_MP,
     //    (ClientData)NULL, NULL);
 
     //Tcl_CreateCommand(interp, "rigidLink", &TclCommand_RigidLink, 
-    //    (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);                
+    //    (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);
 
     //Tcl_CreateCommand(interp, "rigidDiaphragm", &TclCommand_RigidDiaphragm, 
     //    (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);   
@@ -282,7 +282,7 @@ TclModelBuilder::TclModelBuilder(Domain &thedomain,
     //    (ClientData)NULL, NULL);
 
     Tcl_CreateCommand(interp, "geomTransf", TclCommand_addRemoGeomTransf,
-        (ClientData)NULL, NULL);    
+        (ClientData)NULL, NULL);
 
     /*#ifdef OO_HYSTERETIC
     Tcl_CreateCommand(interp, "stiffnessDegradation",
@@ -324,7 +324,7 @@ TclModelBuilder::~TclModelBuilder()
     OPS_clearAllUniaxialMaterial();
 
     //theUniaxialMaterials->clearAll();
-    //theNDMaterials->clearAll();
+    theNDMaterials->clearAll();
     //theSections->clearAll(); 
     //theSectionRepresents->clearAll();
 
@@ -337,7 +337,7 @@ TclModelBuilder::~TclModelBuilder()
 
     // free up memory allocated in the constructor
     //delete theUniaxialMaterials;
-    //delete theNDMaterials;
+    delete theNDMaterials;
     //delete theSections;
     //delete theSectionRepresents;
 
@@ -352,7 +352,7 @@ TclModelBuilder::~TclModelBuilder()
     theDomain = 0;
     theModelBuilder = 0;
     //theLoadPattern = 0;
-    //theMultiSupportPattern = 0;  
+    //theMultiSupportPattern = 0;
 
     // may possibly invoke Tcl_DeleteCommand() later
     //Tcl_DeleteCommand(theInterp, "parameter");
@@ -361,7 +361,7 @@ TclModelBuilder::~TclModelBuilder()
     Tcl_DeleteCommand(theInterp, "node");
     //Tcl_DeleteCommand(theInterp, "element");
     Tcl_DeleteCommand(theInterp, "uniaxialMaterial");
-    //Tcl_DeleteCommand(theInterp, "nDMaterial");
+    Tcl_DeleteCommand(theInterp, "nDMaterial");
     //Tcl_DeleteCommand(theInterp, "section");
     //Tcl_DeleteCommand(theInterp, "pattern");
     //Tcl_DeleteCommand(theInterp, "timeSeries");
@@ -505,31 +505,31 @@ return result;
 }*/
 
 
-/*int TclModelBuilder::addNDMaterial(NDMaterial &theMaterial)
+int TclModelBuilder::addNDMaterial(NDMaterial &theMaterial)
 {
-bool result = theNDMaterials->addComponent(&theMaterial);
-if (result == true)
-return 0;
-else {
-opserr << "TclModelBuilder::addNDMaterial() - failed to add material: " << theMaterial;
-return -1;
-}
+    bool result = theNDMaterials->addComponent(&theMaterial);
+    if (result == true)
+        return 0;
+    else {
+        opserr << "TclModelBuilder::addNDMaterial() - failed to add material: " << theMaterial;
+        return -1;
+    }
 }
 
 
 NDMaterial* TclModelBuilder::getNDMaterial(int tag)
 {
-TaggedObject *mc = theNDMaterials->getComponentPtr(tag);
-if (mc == 0) 
-return 0;
+    TaggedObject *mc = theNDMaterials->getComponentPtr(tag);
+    if (mc == 0) 
+        return 0;
 
-// otherweise we do a cast and return
-NDMaterial *result = (NDMaterial *)mc;
-return result;
+    // otherweise we do a cast and return
+    NDMaterial *result = (NDMaterial *)mc;
+    return result;
 }
 
 
-int TclModelBuilder::addSection(SectionForceDeformation &theSection)
+/*int TclModelBuilder::addSection(SectionForceDeformation &theSection)
 {
 bool result = theSections->addComponent(&theSection);
 if (result == true)
@@ -950,19 +950,19 @@ int TclCommand_addUniaxialMaterial(ClientData clientData, Tcl_Interp *interp,
 }
 
 
-/*extern int TclModelBuilderNDMaterialCommand (ClientData clienData,
-Tcl_Interp *interp, int argc, TCL_Char **argv,
-TclModelBuilder *theModelBuilder);
+extern int TclModelBuilderNDMaterialCommand (ClientData clienData,
+    Tcl_Interp *interp, int argc, TCL_Char **argv,
+    TclModelBuilder *theModelBuilder);
 
 int TclCommand_addNDMaterial(ClientData clientData, Tcl_Interp *interp, 
-int argc, TCL_Char **argv)
+    int argc, TCL_Char **argv)
 {
-return TclModelBuilderNDMaterialCommand(clientData, interp, 
-argc, argv, theModelBuilder);
+    return TclModelBuilderNDMaterialCommand(clientData, interp, 
+        argc, argv, theModelBuilder);
 }
 
 
-extern int TclModelBuilderSectionCommand (ClientData clienData,
+/*extern int TclModelBuilderSectionCommand (ClientData clienData,
 Tcl_Interp *interp, int argc, TCL_Char **argv,
 TclModelBuilder *theModelBuilder);
 
@@ -1178,12 +1178,12 @@ int argc, TCL_Char **argv)
 {
 // ensure the destructor has not been called - 
 if (theModelBuilder == 0) {
-opserr << "WARNING current builder has been destroyed - eleLoad\n";    
+opserr << "WARNING current builder has been destroyed - eleLoad\n";
 return TCL_ERROR;
 }
 
 if (theTclLoadPattern == 0) {
-opserr << "WARNING no active load pattern - eleLoad\n";    
+opserr << "WARNING no active load pattern - eleLoad\n";
 return TCL_ERROR;
 }
 
@@ -1225,7 +1225,7 @@ return TCL_ERROR;
 }
 count++;
 if (Tcl_GetInt(interp, argv[count], &eleEnd) != TCL_OK) {
-opserr << "WARNING eleLoad -range invalid eleEnd " << argv[count] << "\n";	
+opserr << "WARNING eleLoad -range invalid eleEnd " << argv[count] << "\n";
 return TCL_ERROR;
 }
 count++;
@@ -1260,7 +1260,7 @@ return TCL_ERROR;
 }
 
 for (int i=0; i<theEleTags.Size(); i++) {
-theLoad = new Beam2dUniformLoad(eleLoadTag, wt, wa, theEleTags(i));    
+theLoad = new Beam2dUniformLoad(eleLoadTag, wt, wa, theEleTags(i));
 
 if (theLoad == 0) {
 opserr << "WARNING eleLoad - out of memory creating load of type " << argv[count] ;
@@ -1301,7 +1301,7 @@ return TCL_ERROR;
 }
 
 for (int i=0; i<theEleTags.Size(); i++) {
-theLoad = new Beam3dUniformLoad(eleLoadTag, wy, wz, wx, theEleTags(i));    
+theLoad = new Beam3dUniformLoad(eleLoadTag, wy, wz, wx, theEleTags(i));
 
 if (theLoad == 0) {
 opserr << "WARNING eleLoad - out of memory creating load of type " << argv[count] ;
@@ -1325,7 +1325,7 @@ return 0;
 
 }
 else { 
-opserr << "WARNING eleLoad beamUniform currently only valid only for ndm=2 or 3\n";     
+opserr << "WARNING eleLoad beamUniform currently only valid only for ndm=2 or 3\n";
 return TCL_ERROR;
 }
 
@@ -1336,15 +1336,15 @@ if (ndm == 2) {
 double P, x;
 double N = 0.0;
 if (count >= argc || Tcl_GetDouble(interp, argv[count], &P) != TCL_OK) {
-opserr << "WARNING eleLoad - invalid P for beamPoint\n";		
+opserr << "WARNING eleLoad - invalid P for beamPoint\n";
 return TCL_ERROR;
 } 
 if (count+1 >= argc || Tcl_GetDouble(interp, argv[count+1], &x) != TCL_OK) {
-opserr << "WARNING eleLoad - invalid xDivL for beamPoint\n";	
+opserr << "WARNING eleLoad - invalid xDivL for beamPoint\n";
 return TCL_ERROR;
 } 
 if (count+2 < argc && Tcl_GetDouble(interp, argv[count+2], &N) != TCL_OK) {
-opserr << "WARNING eleLoad - invalid N for beamPoint\n";		
+opserr << "WARNING eleLoad - invalid N for beamPoint\n";
 return TCL_ERROR;
 } 
 
@@ -1356,7 +1356,7 @@ return TCL_ERROR;
 
 
 for (int i=0; i<theEleTags.Size(); i++) {
-theLoad = new Beam2dPointLoad(eleLoadTag, P, x, theEleTags(i), N);    
+theLoad = new Beam2dPointLoad(eleLoadTag, P, x, theEleTags(i), N);
 
 if (theLoad == 0) {
 opserr << "WARNING eleLoad - out of memory creating load of type " << argv[count] ;
@@ -1383,19 +1383,19 @@ else if (ndm == 3) {
 double Py, Pz, x;
 double N = 0.0;
 if (count >= argc || Tcl_GetDouble(interp, argv[count], &Py) != TCL_OK) {
-opserr << "WARNING eleLoad - invalid Py for beamPoint\n";		
+opserr << "WARNING eleLoad - invalid Py for beamPoint\n";
 return TCL_ERROR;
 } 
 if (count+1 >= argc || Tcl_GetDouble(interp, argv[count+1], &Pz) != TCL_OK) {
-opserr << "WARNING eleLoad - invalid Pz  for beamPoint\n";		
+opserr << "WARNING eleLoad - invalid Pz  for beamPoint\n";
 return TCL_ERROR;
 } 
 if (count+2 >= argc || Tcl_GetDouble(interp, argv[count+2], &x) != TCL_OK) {
-opserr << "WARNING eleLoad - invalid xDivL for beamPoint\n";	
+opserr << "WARNING eleLoad - invalid xDivL for beamPoint\n";
 return TCL_ERROR;
 } 
 if (count+3 < argc && Tcl_GetDouble(interp, argv[count+3], &N) != TCL_OK) {
-opserr << "WARNING eleLoad - invalid N for beamPoint\n";		
+opserr << "WARNING eleLoad - invalid N for beamPoint\n";
 return TCL_ERROR;
 } 
 
@@ -1406,7 +1406,7 @@ return TCL_ERROR;
 }
 
 for (int i=0; i<theEleTags.Size(); i++) {
-theLoad = new Beam3dPointLoad(eleLoadTag, Py, Pz, x, theEleTags(i), N);    
+theLoad = new Beam3dPointLoad(eleLoadTag, Py, Pz, x, theEleTags(i), N);
 
 if (theLoad == 0) {
 opserr << "WARNING eleLoad - out of memory creating load of type " << argv[count] ;
@@ -1517,20 +1517,20 @@ double temp1, temp2, temp3, temp4;
 // Four temps given, Temp change at top node 1, bottom node 1, top node 2, bottom node 2.
 if (argc-count == 4){
 if (Tcl_GetDouble(interp, argv[count], &temp1) != TCL_OK) {
-opserr << "WARNING eleLoad - invalid Ttop1 " << argv[count] << " for -beamTemp\n";		
+opserr << "WARNING eleLoad - invalid Ttop1 " << argv[count] << " for -beamTemp\n";
 return TCL_ERROR;
 } 
 
 if (Tcl_GetDouble(interp, argv[count+1],&temp2 ) != TCL_OK) {
-opserr << "WARNING eleLoad - invalid Tbot1 " << argv[count+1] << " for -beamTemp\n";	
+opserr << "WARNING eleLoad - invalid Tbot1 " << argv[count+1] << " for -beamTemp\n";
 return TCL_ERROR;
 } 
 if (Tcl_GetDouble(interp, argv[count+2], &temp3) != TCL_OK) {
-opserr << "WARNING eleLoad - invalid Ttop2 " << argv[count+1] << " for -beamTemp\n";	
+opserr << "WARNING eleLoad - invalid Ttop2 " << argv[count+1] << " for -beamTemp\n";
 return TCL_ERROR;
 } 
 if (Tcl_GetDouble(interp, argv[count+3], &temp4) != TCL_OK) {
-opserr << "WARNING eleLoad - invalid Tbot2 " << argv[count+1] << " for -beamTemp\n";	
+opserr << "WARNING eleLoad - invalid Tbot2 " << argv[count+1] << " for -beamTemp\n";
 return TCL_ERROR;
 } 
 
@@ -1561,12 +1561,12 @@ return 0;
 // Two temps given, temp change at top, temp at bottom of element
 else if (argc-count == 2) {
 if (Tcl_GetDouble(interp, argv[count], &temp1) != TCL_OK) {
-opserr << "WARNING eleLoad - invalid Ttop " << argv[count] << " for -beamTemp\n";		
+opserr << "WARNING eleLoad - invalid Ttop " << argv[count] << " for -beamTemp\n";
 return TCL_ERROR;
 } 
 
 if (Tcl_GetDouble(interp, argv[count+1],&temp2 ) != TCL_OK) {
-opserr << "WARNING eleLoad - invalid Tbot " << argv[count+1] << " for -beamTemp\n";	
+opserr << "WARNING eleLoad - invalid Tbot " << argv[count+1] << " for -beamTemp\n";
 return TCL_ERROR;
 }
 
@@ -1643,7 +1643,7 @@ int argc, TCL_Char **argv)
 {
 // ensure the destructor has not been called
 if (theModelBuilder == 0)  {
-opserr << "WARNING builder has been destroyed - mass.\n";    
+opserr << "WARNING builder has been destroyed - mass.\n";
 return TCL_ERROR;
 }
 
@@ -1690,7 +1690,7 @@ int TclCommand_addHomogeneousBC(ClientData clientData, Tcl_Interp *interp,
 {
     // ensure the destructor has not been called
     if (theModelBuilder == 0)  {
-        opserr << "WARNING builder has been destroyed - BC.\n";    
+        opserr << "WARNING builder has been destroyed - BC.\n";
         return TCL_ERROR;
     }
 
@@ -1747,7 +1747,7 @@ int argc, TCL_Char **argv)
 {
 // ensure the destructor has not been called
 if (theModelBuilder == 0)  {
-opserr << "WARNING builder has been destroyed - sp.\n";    
+opserr << "WARNING builder has been destroyed - sp.\n";
 return TCL_ERROR;
 }
 
@@ -1842,7 +1842,7 @@ TCL_Char **argv)
 {
 // ensure the destructor has not been called - 
 if (theModelBuilder == 0) {
-opserr << "WARNING builder has been destroyed - sp \n";    
+opserr << "WARNING builder has been destroyed - sp \n";
 return TCL_ERROR;
 }
 
@@ -1860,7 +1860,7 @@ int nodeId, dofId, gMotionID;
 
 if (Tcl_GetInt(interp, argv[1], &nodeId) != TCL_OK) {
 opserr << "WARNING invalid nodeId: " << argv[1];
-opserr << " - imposedMotion nodeId dofID gMotionID\n";    
+opserr << " - imposedMotion nodeId dofID gMotionID\n";
 return TCL_ERROR;
 }
 
@@ -1984,7 +1984,7 @@ opserr << "WARNING invalid dofID: " << argv[i]
 << " must be >= 1";
 return TCL_ERROR;
 }
-rcDOF (j) = dofID;    
+rcDOF (j) = dofID;
 Ccr (j,j) = 1.0;
 }
 
@@ -2020,11 +2020,11 @@ return TCL_ERROR;
 int rNode, cNode;
 if (Tcl_GetInt(interp, argv[2], &rNode) != TCL_OK) {
 opserr << "WARNING rigidLink linkType? rNode? cNode? - could not read rNode \n";
-return TCL_ERROR;	        
+return TCL_ERROR;
 }
 if (Tcl_GetInt(interp, argv[3], &cNode) != TCL_OK) {
 opserr << "WARNING rigidLink linkType? rNode? cNode? - could not read CNode \n";
-return TCL_ERROR;	        
+return TCL_ERROR;
 }
 
 // construct a rigid rod or beam depending on 1st arg
@@ -2034,7 +2034,7 @@ RigidRod theLink(*theDomain, rNode, cNode);
 RigidBeam theLink(*theDomain, rNode, cNode);
 } else {
 opserr << "WARNING rigidLink linkType? rNode? cNode? - unrecognised link type (-bar, -beam) \n";
-return TCL_ERROR;	        
+return TCL_ERROR;
 }
 
 return TCL_OK;
@@ -2051,12 +2051,12 @@ return TCL_ERROR;
 int rNode, perpDirn;
 if (Tcl_GetInt(interp, argv[1], &perpDirn) != TCL_OK) {
 opserr << "WARNING rigidLink perpDirn rNode cNodes - could not read perpDirn? \n";
-return TCL_ERROR;	        
+return TCL_ERROR;
 }
 
 if (Tcl_GetInt(interp, argv[2], &rNode) != TCL_OK) {
 opserr << "WARNING rigidLink perpDirn rNode cNodes - could not read rNode \n";
-return TCL_ERROR;	        
+return TCL_ERROR;
 }
 
 // read in the constrained Nodes
@@ -2066,7 +2066,7 @@ for (int i=0; i<numConstrainedNodes; i++) {
 int cNode;
 if (Tcl_GetInt(interp, argv[3+i], &cNode) != TCL_OK) {
 opserr << "WARNING rigidLink perpDirn rNode cNodes - could not read a cNode\n";
-return TCL_ERROR;	        
+return TCL_ERROR;
 }
 constrainedNodes(i) = cNode;
 }
@@ -2153,7 +2153,7 @@ argc, argv, theModelBuilder);
 {
 void *libHandle;
 int (*funcPtr)(ClientData clientData, Tcl_Interp *interp,  int argc, 
-TCL_Char **argv, Domain*, TclModelBuilder*);       
+TCL_Char **argv, Domain*, TclModelBuilder*);
 
 const char *funcName = 0;
 int res = -1;
@@ -2169,7 +2169,7 @@ int result = (*funcPtr)(clientData, interp,
 argc, 
 argv,
 theDomain,
-theModelBuilder);	
+theModelBuilder);
 } else  {
 opserr << "Error: Could not find function: " << argv[1] << endln;
 return -1;

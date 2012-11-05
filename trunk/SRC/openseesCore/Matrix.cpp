@@ -36,6 +36,8 @@
 #include "ID.h"
 
 #include <stdlib.h>
+#include <iostream>
+using std::nothrow;
 
 #define MATRIX_WORK_AREA 400
 #define INT_WORK_AREA 20
@@ -45,6 +47,8 @@
 #define _DLL
 #endif
 #endif
+
+#include <math.h>
 
 int Matrix::sizeDoubleWork = MATRIX_WORK_AREA;
 int Matrix::sizeIntWork = INT_WORK_AREA;
@@ -63,8 +67,8 @@ Matrix::Matrix()
 {
   // allocate work areas if the first
   if (matrixWork == 0) {
-    matrixWork = new double[sizeDoubleWork];
-    intWork = new int[sizeIntWork];
+    matrixWork = new (nothrow) double[sizeDoubleWork];
+    intWork = new (nothrow) int[sizeIntWork];
     if (matrixWork == 0 || intWork == 0) {
       opserr << "WARNING: Matrix::Matrix() - out of memory creating work area's\n";
       exit(-1);
@@ -79,8 +83,8 @@ Matrix::Matrix(int nRows,int nCols)
 
   // allocate work areas if the first matrix
   if (matrixWork == 0) {
-    matrixWork = new double[sizeDoubleWork];
-    intWork = new int[sizeIntWork];
+    matrixWork = new (nothrow) double[sizeDoubleWork];
+    intWork = new (nothrow) int[sizeIntWork];
     if (matrixWork == 0 || intWork == 0) {
       opserr << "WARNING: Matrix::Matrix() - out of memory creating work area's\n";
       exit(-1);
@@ -103,7 +107,7 @@ Matrix::Matrix(int nRows,int nCols)
     data = 0;
 
     if (dataSize > 0) {
-      data = new double[dataSize];
+      data = new (nothrow) double[dataSize];
       //data = (double *)malloc(dataSize*sizeof(double));
       if (data == 0) {
 	opserr << "WARNING:Matrix::Matrix(int,int): Ran out of memory on init ";
@@ -123,8 +127,8 @@ Matrix::Matrix(double *theData, int row, int col)
 {
   // allocate work areas if the first matrix
   if (matrixWork == 0) {
-    matrixWork = new double[sizeDoubleWork];
-    intWork = new int[sizeIntWork];
+    matrixWork = new (nothrow) double[sizeDoubleWork];
+    intWork = new (nothrow) int[sizeIntWork];
     if (matrixWork == 0 || intWork == 0) {
       opserr << "WARNING: Matrix::Matrix() - out of memory creating work area's\n";
       exit(-1);
@@ -152,8 +156,8 @@ Matrix::Matrix(const Matrix &other)
 {
   // allocate work areas if the first matrix
   if (matrixWork == 0) {
-    matrixWork = new double[sizeDoubleWork];
-    intWork = new int[sizeIntWork];
+    matrixWork = new (nothrow) double[sizeDoubleWork];
+    intWork = new (nothrow) int[sizeIntWork];
     if (matrixWork == 0 || intWork == 0) {
       opserr << "WARNING: Matrix::Matrix() - out of memory creating work area's\n";
       exit(-1);
@@ -165,7 +169,7 @@ Matrix::Matrix(const Matrix &other)
     dataSize = other.dataSize;
 
     if (dataSize != 0) {
-      data = new double[dataSize];
+      data = new (nothrow) double[dataSize];
       // data = (double *)malloc(dataSize*sizeof(double));
       if (data == 0) {
 	opserr << "WARNING:Matrix::Matrix(Matrix &): ";
@@ -260,7 +264,7 @@ Matrix::resize(int rows, int cols) {
 
     fromFree = 0;
     // create new space
-    data = new double[newSize];
+    data = new (nothrow) double[newSize];
     // data = (double *)malloc(dataSize*sizeof(double));
     if (data == 0) {
       opserr << "Matrix::resize(" << rows << "," << cols << ") - out of memory\n";
@@ -375,7 +379,7 @@ Matrix::Solve(const Vector &b, Vector &x) const
       if (matrixWork != 0) {
 	delete [] matrixWork;
       }
-      matrixWork = new double[dataSize];
+      matrixWork = new (nothrow) double[dataSize];
       sizeDoubleWork = dataSize;
       
       if (matrixWork == 0) {
@@ -391,7 +395,7 @@ Matrix::Solve(const Vector &b, Vector &x) const
       if (intWork != 0) {
 	delete [] intWork;
       }
-      intWork = new int[n];
+      intWork = new (nothrow) int[n];
       sizeIntWork = n;
       
       if (intWork == 0) {
@@ -472,7 +476,7 @@ Matrix::Solve(const Matrix &b, Matrix &x) const
       if (matrixWork != 0) {
 	delete [] matrixWork;
       }
-      matrixWork = new double[dataSize];
+      matrixWork = new (nothrow) double[dataSize];
       sizeDoubleWork = dataSize;
       
       if (matrixWork == 0) {
@@ -488,7 +492,7 @@ Matrix::Solve(const Matrix &b, Matrix &x) const
       if (intWork != 0) {
 	delete [] intWork;
       }
-      intWork = new int[n];
+      intWork = new (nothrow) int[n];
       sizeIntWork = n;
       
       if (intWork == 0) {
@@ -551,9 +555,10 @@ Matrix::Invert(Matrix &theInverse) const
 {
 
     int n = numRows;
-    int nrhs = theInverse.numCols;
+
 
 #ifdef _G3DEBUG    
+
     if (numRows != numCols) {
       opserr << "Matrix::Solve(B,X) - the matrix of dimensions [" << numRows << "," << numCols << "] is not square\n";
       return -1;
@@ -571,7 +576,7 @@ Matrix::Invert(Matrix &theInverse) const
       if (matrixWork != 0) {
 	delete [] matrixWork;
       }
-      matrixWork = new double[dataSize];
+      matrixWork = new (nothrow) double[dataSize];
       sizeDoubleWork = dataSize;
       
       if (matrixWork == 0) {
@@ -587,7 +592,7 @@ Matrix::Invert(Matrix &theInverse) const
       if (intWork != 0) {
 	delete [] intWork;
       }
-      intWork = new int[n];
+      intWork = new (nothrow) int[n];
       sizeIntWork = n;
       
       if (intWork == 0) {
@@ -604,7 +609,6 @@ Matrix::Invert(Matrix &theInverse) const
       matrixWork[i] = data[i];
 
     int ldA = n;
-    int ldB = n;
     int info;
     double *Wptr = matrixWork;
     double *Aptr = theInverse.data;
@@ -1062,8 +1066,6 @@ Matrix::addMatrixTripleProduct(double thisFact,
     // NOTE: looping as per blas3 dgemm_: j,k,i
     
     int rowsB = B.numRows;
-    int colsB = B.numCols;
-    int colsC = numCols;
     double *ckjPtr  = &(C.data)[0];
     for (int j=0; j<numCols; j++) {
       double *aijPtrA = &matrixWork[j*rowsB];
@@ -1181,7 +1183,7 @@ Matrix::operator=(const Matrix &other)
       
       int theSize = other.numCols*other.numRows;
       
-      data = new double[theSize];
+      data = new (nothrow) double[theSize];
       
       this->dataSize = theSize;
       this->numCols = other.numCols;
@@ -1752,3 +1754,204 @@ Matrix operator*(double a, const Matrix &V)
 
 
 
+int
+Matrix::Eigen3(const Matrix &M)
+{
+  //.... compute eigenvalues and vectors for a 3 x 3 symmetric matrix
+  //
+  //.... INPUTS:
+  //        M(3,3) - matrix with initial values (only upper half used)
+  //
+  //.... OUTPUTS
+  //        v(3,3) - matrix of eigenvectors (by column)
+  //        d(3)   - eigenvalues associated with columns of v
+  //        rot    - number of rotations to diagonalize
+  //
+  //---------------------------------------------------------------eig3==
+
+  //.... Storage done as follows:
+  //
+  //       | v(1,1) v(1,2) v(1,3) |     |  d(1)  a(1)  a(3)  |
+  //       | v(2,1) v(2,2) v(2,3) |  =  |  a(1)  d(2)  a(2)  |
+  //       | v(3,1) v(3,2) v(3,3) |     |  a(3)  a(2)  d(3)  |
+  //
+  //        Transformations performed on d(i) and a(i) and v(i,j) become
+  //        the eigenvectors.  
+  //
+  //---------------------------------------------------------------eig3==
+
+  int     rot, its, i, j , k ;
+  double  g, h, aij, sm, thresh, t, c, s, tau ;
+
+  static Matrix  v(3,3) ;
+  static Vector  d(3) ;
+  static Vector  a(3) ;
+  static Vector  b(3) ; 
+  static Vector  z(3) ;
+
+  static const double tol = 1.0e-08 ;
+
+  // set dataPtr 
+  double *dataPtr = data;
+
+  // set v = M 
+  v = M ;
+  
+  //.... move array into one-d arrays
+  a(0) = v(0,1) ;
+  a(1) = v(1,2) ;
+  a(2) = v(2,0) ;
+
+
+  for ( i = 0; i < 3; i++ ) {
+    d(i) = v(i,i) ;
+    b(i) = v(i,i) ;
+    z(i) = 0.0 ;
+
+    for ( j = 0; j < 3; j++ ) 
+      v(i,j) = 0.0 ;
+
+    v(i,i) = 1.0 ;
+
+  } //end for i
+
+  rot = 0 ;
+  its = 0 ;
+
+  sm = fabs(a(0)) + fabs(a(1)) + fabs(a(2)) ;
+
+  while ( sm > tol ) {
+    //.... set convergence test and threshold
+    if ( its < 3 ) 
+      thresh = 0.011*sm ;
+    else
+      thresh = 0.0 ;
+      
+    //.... perform sweeps for rotations
+    for ( i = 0; i < 3; i++ ) {
+
+      j = (i+1)%3;
+      k = (j+1)%3;
+
+      aij  = a(i) ;
+
+      g    = 100.0 * fabs(aij) ;
+
+      if ( fabs(d(i)) + g != fabs(d(i))  ||
+	   fabs(d(j)) + g != fabs(d(j))     ) {
+
+	if ( fabs(aij) > thresh ) {
+
+	  a(i) = 0.0 ; 
+	  h    = d(j) - d(i) ; 
+
+	  if( fabs(h)+g == fabs(h) )
+	    t = aij / h ;
+	  else {
+	    //t = 2.0 * sign(h/aij) / ( fabs(h/aij) + sqrt(4.0+(h*h/aij/aij)));
+	    double hDIVaij = h/aij;
+	    if (hDIVaij > 0.0) 
+	      t = 2.0 / (  hDIVaij + sqrt(4.0+(hDIVaij * hDIVaij)));
+	    else
+	      t = - 2.0 / (-hDIVaij + sqrt(4.0+(hDIVaij * hDIVaij)));
+	  }
+
+	  //.... set rotation parameters
+
+	  c    = 1.0 / sqrt(1.0 + t*t) ;
+	  s    = t*c ;
+	  tau  = s / (1.0 + c) ;
+
+	  //.... rotate diagonal terms
+
+	  h    = t * aij ;
+	  z(i) = z(i) - h ;
+	  z(j) = z(j) + h ;
+	  d(i) = d(i) - h ;
+	  d(j) = d(j) + h ;
+
+	  //.... rotate off-diagonal terms
+
+	  h    = a(j) ;
+	  g    = a[k] ;
+	  a(j) = h + s*(g - h*tau) ;
+	  a(k) = g - s*(h + g*tau) ;
+
+	  //.... rotate eigenvectors
+
+	  for ( k = 0; k < 3; k++ ) {
+	    g      = v(k,i) ;
+	    h      = v(k,j) ;
+	    v(k,i) = g - s*(h + g*tau) ;
+	    v(k,j) = h + s*(g - h*tau) ;
+	  } // end for k
+
+	  rot = rot + 1 ;
+
+	} // end if fabs > thresh 
+      } //else
+      else 
+	a(i) = 0.0 ;
+
+    }  // end for i
+
+    //.... update the diagonal terms
+    for ( i = 0; i < 3; i++ ) {
+      b(i) = b(i) + z(i) ;
+      d(i) = b(i) ;
+      z(i) = 0.0 ;
+    } // end for i
+
+    its += 1 ;
+
+    sm = fabs(a(0)) + fabs(a(1)) + fabs(a(2)) ;
+
+  } //end while sm
+  static Vector  dd(3) ;
+  if (d(0)>d(1))
+    {
+      if (d(0)>d(2))
+	{
+	  dd(0)=d(0);
+	  if (d(1)>d(2))
+	    {
+	      dd(1)=d(1);
+	      dd(2)=d(2);
+	    }else
+	    {
+	      dd(1)=d(2);
+	      dd(2)=d(1);
+	    }
+	}else
+	{
+	  dd(0)=d(2);
+	  dd(1)=d(0);
+	  dd(2)=d(1);
+	}
+    }else
+    {
+      if (d(1)>d(2))
+	{
+	  dd(0)=d(1);
+	  if (d(0)>d(2))
+	    {
+	      dd(1)=d(0);
+	      dd(2)=d(2);
+	    }else
+	    {
+	      dd(1)=d(2);
+	      dd(2)=d(0);
+	    }
+	}else
+	{
+	  dd(0)=d(2);
+	  dd(1)=d(1);
+	  dd(2)=d(0);
+	}
+    }
+  data[0]=dd(2);
+  data[4]=dd(1);
+  data[8]=dd(0);
+
+  return 0;
+}
