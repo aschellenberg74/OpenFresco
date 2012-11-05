@@ -34,6 +34,7 @@
 //
 
 #include <stdlib.h>
+#include <math.h>
 
 #include "Element.h"
 #include "ElementResponse.h"
@@ -42,6 +43,8 @@
 #include <Matrix.h>
 #include <Node.h>
 #include <Domain.h>
+
+Element  *ops_TheActiveElement = 0;
 
 Matrix **Element::theMatrices; 
 Vector **Element::theVectors1; 
@@ -58,6 +61,7 @@ Element::Element(int tag, int cTag)
   Kc(0), index(-1), nodeIndex(-1)
 {
     // does nothing
+  ops_TheActiveElement = this;
 }
 
 
@@ -344,6 +348,11 @@ Element::addLoad(ElementalLoad *theLoad, double loadFactor) {
   return 0;
 }
 
+int 
+Element::addLoad(ElementalLoad *theLoad, const Vector &loadFactors) {
+  return 0;
+}
+
 /*
 int 
 Element::addInertiaLoadToUnbalance(const Vector &accel)
@@ -583,3 +592,35 @@ Element::addResistingForceToNodalReaction(int flag)
 
   return result;
 }
+
+double Element::getCharacteristicLength(void)
+{
+  int numNodes = this->getNumExternalNodes();
+  Node **theNodes = this->getNodePtrs();
+  double cLength = 0.0;
+  double minSize = 10e14; //Tesser
+
+  for (int i=0; i<numNodes; i++) {
+    Node *nodeI = theNodes[i];
+    Vector iCoords = nodeI->getCrds();
+    int iDOF = nodeI->getNumberDOF();
+    for (int j=i+1; j<numNodes; j++) {
+      Node *nodeJ = theNodes[j];
+      Vector jCoords = nodeJ->getCrds();      
+      int jDOF = nodeI->getNumberDOF();
+      double ijLength = 0;
+      for (int k=0; k<iDOF && k<jDOF; k++) {
+	ijLength += (jCoords(k)-iCoords(k))*(jCoords(k)-iCoords(k)); //Tesser
+      }	
+      ijLength = sqrt(ijLength);
+      if (ijLength > cLength)
+	cLength = ijLength;
+      if (ijLength < minSize) 
+	minSize = ijLength;
+    }
+  }
+  return minSize;
+}
+      
+
+

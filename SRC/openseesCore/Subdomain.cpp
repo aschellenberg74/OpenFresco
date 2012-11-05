@@ -348,7 +348,7 @@ int
 Subdomain::revertToStart(void) 
 {
     this->Domain::revertToLastCommit();
-    
+
     NodeIter &theNodes = this->getNodes();
     Node *nodePtr;
     while ((nodePtr = theNodes()) != 0)
@@ -404,6 +404,18 @@ void Subdomain::Print(OPS_Stream &s, ID *nodeTags, ID *eleTags, int flag)
       }
     }
   }
+
+  /*
+  if (eleTags != 0) {
+    int numEles = eleTags->Size();
+    for (int i=0; i<numEles; i++) {
+      int eleTag = (*eleTags)(i);
+      Element *theEle = this->getElement(eleTag);
+      if (theEle != 0)
+	theEle->Print(s, flag);
+    }
+  }
+  */
 
   this->Domain::Print(s, 0, eleTags, flag);
 }

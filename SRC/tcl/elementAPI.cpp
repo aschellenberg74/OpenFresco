@@ -40,11 +40,11 @@
 #include <Node.h>
 #include <TclModelBuilder.h>
 #include <UniaxialMaterial.h>
+#include <NDMaterial.h>
+#include <CrdTransf.h>
 //#include <WrapperUniaxialMaterial.h>
-//#include <NDMaterial.h>
 //#include <WrapperNDMaterial.h>
 //#include <WrapperElement.h>
-#include <CrdTransf.h>
 
 typedef struct elementFunction {
     char *funcName;
@@ -662,6 +662,13 @@ return theMaterial;
 }*/
 
 
+NDMaterial *Tcl_addWrapperNDMaterial(matObj *theMat, ClientData clientData,
+    Tcl_Interp *interp,  int argc, TCL_Char **argv, TclModelBuilder *builder)
+{
+    return 0;
+}
+
+
 /*NDMaterial *Tcl_addWrapperNDMaterial(matObj *theMat, ClientData clientData,
     Tcl_Interp *interp,  int argc, TCL_Char **argv, TclModelBuilder *builder)
 {
@@ -750,10 +757,10 @@ UniaxialMaterial *OPS_GetUniaxialMaterial(int matTag)
 }
 
 
-/*NDMaterial *OPS_GetNDMaterial(int matTag)
+NDMaterial *OPS_GetNDMaterial(int matTag)
 {
     return theModelBuilder->getNDMaterial(matTag);
-}*/
+}
 
 
 CrdTransf *OPS_GetCrdTransfPtr(int tag)

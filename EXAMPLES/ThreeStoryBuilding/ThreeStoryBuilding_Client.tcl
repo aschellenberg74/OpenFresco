@@ -222,9 +222,9 @@ analysis Transient
 # Start of recorder generation
 # ------------------------------
 # create the recorder objects
-recorder Node -file Node_Dsp.out -time -node 2 3 4 18 19 20 -dof 1 2 3 disp
-recorder Node -file Node_Vel.out -time -node 2 3 4 18 19 20 -dof 1 2 3 vel
-recorder Node -file Node_Acc.out -time -node 2 3 4 18 19 20 -dof 1 2 3 accel
+recorder Node -file Client_Node_Dsp.out -time -node 2 3 4 18 19 20 -dof 1 2 3 disp
+recorder Node -file Client_Node_Vel.out -time -node 2 3 4 18 19 20 -dof 1 2 3 vel
+recorder Node -file Client_Node_Acc.out -time -node 2 3 4 18 19 20 -dof 1 2 3 accel
 # --------------------------------
 # End of recorder generation
 # --------------------------------

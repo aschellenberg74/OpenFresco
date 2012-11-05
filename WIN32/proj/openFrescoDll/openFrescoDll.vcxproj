@@ -128,6 +128,8 @@
     <ClCompile Include="..\..\..\SRC\openseesCore\AnalysisModel.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\ArrayOfTaggedObjects.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\ArrayOfTaggedObjectsIter.cpp" />
+    <ClCompile Include="..\..\..\SRC\openseesCore\BeamFiberMaterial.cpp" />
+    <ClCompile Include="..\..\..\SRC\openseesCore\BeamFiberMaterial2d.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\BinaryFileStream.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\Channel.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\ConstraintHandler.cpp" />
@@ -164,12 +166,17 @@
     <ClCompile Include="..\..\..\SRC\openseesCore\Message.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\MovableObject.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\MP_Constraint.cpp" />
+    <ClCompile Include="..\..\..\SRC\openseesCore\NDMaterial.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\NodalLoad.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\NodalLoadIter.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\Node.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\ObjectBroker.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\OPS_Stream.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\Parameter.cpp" />
+    <ClCompile Include="..\..\..\SRC\openseesCore\PlaneStrainMaterial.cpp" />
+    <ClCompile Include="..\..\..\SRC\openseesCore\PlaneStressMaterial.cpp" />
+    <ClCompile Include="..\..\..\SRC\openseesCore\PlateFiberMaterial.cpp" />
+    <ClCompile Include="..\..\..\SRC\openseesCore\Pressure_Constraint.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\Recorder.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\Renderer.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\Response.cpp" />
@@ -179,6 +186,7 @@
     <ClCompile Include="..\..\..\SRC\openseesCore\SingleDomMP_Iter.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\SingleDomNodIter.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\SingleDomParamIter.cpp" />
+    <ClCompile Include="..\..\..\SRC\openseesCore\SingleDomPC_Iter.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\SingleDomSP_Iter.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\SolutionAlgorithm.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\SP_Constraint.cpp" />
@@ -299,6 +307,8 @@
     <ClInclude Include="..\..\..\SRC\openseesCore\AnalysisModel.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\ArrayOfTaggedObjects.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\ArrayOfTaggedObjectsIter.h" />
+    <ClInclude Include="..\..\..\SRC\openseesCore\BeamFiberMaterial.h" />
+    <ClInclude Include="..\..\..\SRC\openseesCore\BeamFiberMaterial2d.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\BinaryFileStream.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\Channel.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\classTags.h" />
@@ -347,6 +357,7 @@
     <ClInclude Include="..\..\..\SRC\openseesCore\MovableObject.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\MP_Constraint.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\MP_ConstraintIter.h" />
+    <ClInclude Include="..\..\..\SRC\openseesCore\NDMaterial.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\NodalLoad.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\NodalLoadIter.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\Node.h" />
@@ -356,6 +367,11 @@
     <ClInclude Include="..\..\..\SRC\openseesCore\OPS_Stream.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\Parameter.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\ParameterIter.h" />
+    <ClInclude Include="..\..\..\SRC\openseesCore\PlaneStrainMaterial.h" />
+    <ClInclude Include="..\..\..\SRC\openseesCore\PlaneStressMaterial.h" />
+    <ClInclude Include="..\..\..\SRC\openseesCore\PlateFiberMaterial.h" />
+    <ClInclude Include="..\..\..\SRC\openseesCore\Pressure_Constraint.h" />
+    <ClInclude Include="..\..\..\SRC\openseesCore\Pressure_ConstraintIter.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\Recorder.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\Renderer.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\Response.h" />
@@ -365,6 +381,7 @@
     <ClInclude Include="..\..\..\SRC\openseesCore\SingleDomMP_Iter.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\SingleDomNodIter.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\SingleDomParamIter.h" />
+    <ClInclude Include="..\..\..\SRC\openseesCore\SingleDomPC_Iter.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\SingleDomSP_Iter.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\SolutionAlgorithm.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\SP_Constraint.h" />

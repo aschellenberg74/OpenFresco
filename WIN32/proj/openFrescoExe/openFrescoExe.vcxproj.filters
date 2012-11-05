@@ -555,6 +555,30 @@
     <ClCompile Include="..\..\..\SRC\openseesExtra\RegulaFalsiLineSearch.cpp">
       <Filter>openseesExtra</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\Pressure_Constraint.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\SingleDomPC_Iter.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\NDMaterial.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\PlaneStrainMaterial.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\PlaneStressMaterial.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\PlateFiberMaterial.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\BeamFiberMaterial.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\BeamFiberMaterial2d.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\SRC\utility\ExpControlSP.h">
@@ -1084,6 +1108,33 @@
     </ClInclude>
     <ClInclude Include="..\..\..\SRC\openseesExtra\RegulaFalsiLineSearch.h">
       <Filter>openseesExtra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\Pressure_Constraint.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\SingleDomPC_Iter.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\Pressure_ConstraintIter.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\NDMaterial.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\PlaneStrainMaterial.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\PlaneStressMaterial.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\PlateFiberMaterial.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\BeamFiberMaterial.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\BeamFiberMaterial2d.h">
+      <Filter>openseesCore</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
