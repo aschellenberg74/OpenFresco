@@ -4,7 +4,7 @@
 ** $Date$
 ** $URL$
 **
-** Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+** Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 ** Created: 03/09
 ** Revision: A
 **
@@ -35,7 +35,7 @@
 ** -----------------
 *ELSET, ELSET=AllElements
 1, 2, 3, 103, 104, 203, 204
-*USER ELEMENT, TYPE=VU1, NODES=2, COORDINATES=2, I PROPERTIES=1
+*USER ELEMENT, TYPE=VU1, NODES=2, COORDINATES=2, I PROPERTIES=1, VARIABLES=1
 1, 2
 *ELEMENT, TYPE=VU1, ELSET=ColumnLeft
 1, 1, 3
@@ -92,7 +92,6 @@ CARTESIAN
 *BOUNDARY
 1, 1, 1
 1, 2, 2
-1, 6, 6
 2, 1, 1
 2, 2, 2
 2, 6, 6

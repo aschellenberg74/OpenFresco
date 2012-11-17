@@ -1,18 +1,17 @@
-** File: OneBayFrame_Imp.inp (use with OneBayFrame_Local_SimAppServer.tcl)
+** File: OneBayFrame_ImpAna.inp
 **
 ** $Revision$
 ** $Date$
 ** $URL$
 **
-** Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+** Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 ** Created: 03/09
 ** Revision: A
 **
 ** Purpose: this file contains the tcl input to perform
-** a local hybrid simulation of a one bay frame with
-** one experimental element.
-** The genericClient_imp.obj element is utilized within
-** Abaqus/Standard to represent the experimental element.
+** a purely analytical simulation of a one bay frame.
+** This is used to validate the results of the hybrid
+** simulation and coupled simulation analyses.
 **
 **
 *HEADING

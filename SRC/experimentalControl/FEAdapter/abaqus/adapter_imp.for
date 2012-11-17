@@ -95,7 +95,7 @@ c     energy array indices
       dimension rhs(mlvarx,*),amatrx(ndofel,ndofel),
      *     svars(nsvars),energy(8),props(*),coords(mcrd,nnode),
      *     u(ndofel),du(mlvarx,*),v(ndofel),a(ndofel),time(2),
-     *     params(3),jdltyp(mdload,*),adlmag(mdload,*),
+     *     params(*),jdltyp(mdload,*),adlmag(mdload,*),
      *     ddlmag(mdload,*),predef(2,npredf,nnode),lflags(*),
      *     jprops(*)
       

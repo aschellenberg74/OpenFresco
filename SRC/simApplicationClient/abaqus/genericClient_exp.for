@@ -53,7 +53,8 @@
       
 c     operational code keys
       parameter (jMassCalc            = 1,
-     *           jIntForceAndDtStable = 2)
+     *           jIntForceAndDtStable = 2,
+     *           jExternForce         = 3)
       
 c     flag indices
       parameter (iProcedure = 1,
