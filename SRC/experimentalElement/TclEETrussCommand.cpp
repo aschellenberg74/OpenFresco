@@ -23,7 +23,7 @@
 // $Date$
 // $URL$
 
-// Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 09/06
 // Revision: A
 //
@@ -62,7 +62,7 @@ int addEETruss(ClientData clientData, Tcl_Interp *interp,  int argc,
 		opserr << "WARNING insufficient arguments\n";
 		printCommand(argc, argv);
 		opserr << "Want: expElement truss eleTag iNode jNode -site siteTag -initStif Kij <-iMod> <-noRayleigh> <-rho rho>\n";
-		opserr << "  or: expElement truss eleTag iNode jNode -server ipPort <ipAddr> <-ssl> <-dataSize size> -initStif Kij <-iMod> <-noRayleigh> <-rho rho>\n";
+		opserr << "  or: expElement truss eleTag iNode jNode -server ipPort <ipAddr> <-ssl> <-udp> <-dataSize size> -initStif Kij <-iMod> <-noRayleigh> <-rho rho>\n";
 		return TCL_ERROR;
 	}    
 	

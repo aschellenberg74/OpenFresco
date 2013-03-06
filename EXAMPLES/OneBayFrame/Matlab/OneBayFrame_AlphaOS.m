@@ -45,6 +45,7 @@
 
 close all;
 clear all;
+tic;
 
 %%%%%%%%%%%%%%%%%%%% Load Earthquake Data - "El Centro" %%%%%%%%%%%%%%%%%%%
 
@@ -58,7 +59,7 @@ nsteps = length (accel)-1;       % number of steps
 
 %%%%%%%%%%%%%%%%%%%%%%%%% Setup Connection %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-socketID = TCPSocket('openConnection','127.0.0.1',8090);
+socketID = UDPSocket('openConnection','127.0.0.1',8090);
 if (socketID<0)
    errordlg('Unable to setup connection.');
    return;
@@ -68,7 +69,7 @@ end
 dataSize = 2;
 sData = zeros(1,dataSize);
 dataSizes = int32([1 0 0 0 0, 0 0 0 1 0, dataSize]);
-TCPSocket('sendData',socketID,dataSizes,11);
+UDPSocket('sendData',socketID,dataSizes,11);
 
 
 %%%%%%%%%%%%%%%%%%%%%%% Define Parameters/Variables %%%%%%%%%%%%%%%%%%%%%%%
@@ -239,9 +240,9 @@ end
 %%%%%%%%%%%%%%%% Disconnect from Experimental Site %%%%%%%%%%%%%%%%%%%%%%%%
 
 sData(1) = 99;
-TCPSocket('sendData',socketID,sData,dataSize);
-TCPSocket('closeConnection',socketID);
-
+UDPSocket('sendData',socketID,sData,dataSize);
+UDPSocket('closeConnection',socketID);
+toc;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%% Post-Processing %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

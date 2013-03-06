@@ -767,7 +767,7 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
 			opserr << "WARNING invalid number of arguments\n";
 			printCommand(argc,argv);
 			opserr << "Want: expControl GenericTCP tag ipAddr ipPort -ctrlModes (5 mode) -daqModes (5 mode) "
-                << "<-initFile fileName> <-ctrlFilters (5 filterTag)> <-daqFilters (5 filterTag)>\n";
+                << "<-initFile fileName> <-ssl> <-udp> <-ctrlFilters (5 filterTag)> <-daqFilters (5 filterTag)>\n";
 			return TCL_ERROR;
 		}
         
@@ -775,6 +775,7 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
 		int ipPort, mode, i;
         ID ctrlModes(5), daqModes(5);
         char *initFileName = 0;
+        int ssl = 0, udp = 0;
 		
         argi = 2;
 		if (Tcl_GetInt(interp, argv[argi], &tag) != TCL_OK)  {
@@ -827,10 +828,16 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
                 strcpy(initFileName,argv[i+1]);
             }
         }
-		
+        for (i = argi; i < argc; i++)  {
+            if (strcmp(argv[i], "-ssl") == 0)
+                ssl = 1;
+            else if (strcmp(argv[i], "-udp") == 0)
+                udp = 1;
+        }
+        
 		// parsing was successful, allocate the control
 		theControl = new ECGenericTCP(tag, ipAddr, ipPort,
-            ctrlModes, daqModes, initFileName);
+            ctrlModes, daqModes, initFileName, ssl, udp);
     }
 
     // ----------------------------------------------------------------------------	

@@ -19,16 +19,16 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
+// $Revision: 314 $
+// $Date: 2011-05-22 14:17:07 -0700 (Sun, 22 May 2011) $
+// $URL: https://nees.org/tools/openfresco/svn/trunk/SRC/simApplicationClient/matlab/UDPSocket.c $
 
 // Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
-// Created: 10/06
+// Created: 02/13
 // Revision: A
 //
 // Description: This file contains the Matlab gateway function for 
-// the tcp_socket.c.
+// the udp_socket.c.
 
 #include "mex.h"
 #include <string.h>
@@ -54,15 +54,15 @@ void mexFunction(int nlhs, mxArray *plhs[],
 
     // check for proper number of arguments
     if (nrhs<2)
-        mexErrMsgTxt("TCPSocket::mexFunction - WARNING insufficient input arguments \nWant: varargout = TCPSocket(action,varargin);\n");
+        mexErrMsgTxt("UDPSocket::mexFunction - WARNING insufficient input arguments \nWant: varargout = UDPSocket(action,varargin);\n");
     if (nlhs>1)
-        mexErrMsgTxt("TCPSocket::mexFunction - WARNING to many output arguments \nWant: varargout = TCPSocket(action,varargin);\n");
+        mexErrMsgTxt("UDPSocket::mexFunction - WARNING to many output arguments \nWant: varargout = UDPSocket(action,varargin);\n");
 
     // first input must be a row vector string 
     if (mxIsChar(prhs[0]) != 1)
-        mexErrMsgTxt("TCPSocket::mexFunction - WARNING first input parameter, action, must be a string.\n");
+        mexErrMsgTxt("UDPSocket::mexFunction - WARNING first input parameter, action, must be a string.\n");
     if (mxGetM(prhs[0]) != 1)
-        mexErrMsgTxt("TCPSocket::mexFunction - WARNING first input parameter, action, must be a row vector.\n");
+        mexErrMsgTxt("UDPSocket::mexFunction - WARNING first input parameter, action, must be a row vector.\n");
 
     // get the action
     action = mxArrayToString(prhs[0]);
@@ -75,7 +75,7 @@ void mexFunction(int nlhs, mxArray *plhs[],
         
         // check if data has correct size
         if (nleft != (int)(mxGetM(prhs[2])*mxGetN(prhs[2])))
-            mexErrMsgTxt("TCPSocket::mexFunction - WARNING size of data does not agree with specified dataSize.\n");
+            mexErrMsgTxt("UDPSocket::mexFunction - WARNING size of data does not agree with specified dataSize.\n");
         
         if (mxIsDouble(prhs[2]) == 1)  {
             double *data = (double *)mxGetPr(prhs[2]);
@@ -93,7 +93,7 @@ void mexFunction(int nlhs, mxArray *plhs[],
             dataTypeSize = sizeof(char);
         }
         else  {
-            mexErrMsgTxt("TCPSocket::mexFunction - WARNING data type is not supported.\n");
+            mexErrMsgTxt("UDPSocket::mexFunction - WARNING data type is not supported.\n");
         }
         
         senddata(&socketID, &dataTypeSize, gMsg, &nleft, &ierr);
@@ -142,7 +142,7 @@ void mexFunction(int nlhs, mxArray *plhs[],
                 dataTypeSize = sizeof(char);
             }
             else  {
-                mexErrMsgTxt("TCPSocket::mexFunction - WARNING data type is not supported.\n");
+                mexErrMsgTxt("UDPSocket::mexFunction - WARNING data type is not supported.\n");
             }
         }
         
@@ -164,7 +164,7 @@ void mexFunction(int nlhs, mxArray *plhs[],
             mxFree(ipAddr);
         }
         else  {
-            mexErrMsgTxt("TCPSocket::mexFunction - WARNING wrong number of input arguments received.\n");
+            mexErrMsgTxt("UDPSocket::mexFunction - WARNING wrong number of input arguments received.\n");
         }
 
         plhs[0] = mxCreateDoubleScalar(socketID);
@@ -192,6 +192,6 @@ void mexFunction(int nlhs, mxArray *plhs[],
         mxFree(ipAddr);
     }
     else  {
-        mexErrMsgTxt("TCPSocket::mexFunction - WARNING invalid action received.\n");        
+        mexErrMsgTxt("UDPSocket::mexFunction - WARNING invalid action received.\n");        
     }
 }

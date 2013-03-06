@@ -19,15 +19,15 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $Source: $
+// $Revision: 314 $
+// $Date: 2011-05-22 14:17:07 -0700 (Sun, 22 May 2011) $
+// $URL: $
 
 // Written: Frank McKenna & Andreas Schellenberg
 // Created: 10/06
 // Revision: A
 //
-// Description: This file contains the implementation of the socket.
+// Description: This file contains the implementation of the tcp_socket.
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -119,19 +119,18 @@ void CALL_CONV setupconnectionserver(unsigned int *port, int *socketID)
         struct sockaddr_in addr_in;
     } other_Addr;
     
+    SocketConnection *theSocket = theSockets;
     socket_type sockfd;
     socket_type newsockfd;
     socklen_type addrLength;
     unsigned int other_Port;
-    char *other_InetAddr;
-    
+    char *other_InetAddr;    
     int ierr;
-    SocketConnection *theSocket = theSockets;
     
     // initialize sockets
     startupsockets(&ierr);
     if (ierr != 0) {
-        fprintf(stderr,"socket::setupconnectionserver() - could not startup server socket\n");
+        fprintf(stderr,"tcp_socket::setupconnectionserver() - could not startup server socket\n");
         *socketID = -1;
         return;
     }
@@ -152,25 +151,24 @@ void CALL_CONV setupconnectionserver(unsigned int *port, int *socketID)
     
     // open a socket
     if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-        fprintf(stderr,"socket::setupconnectionserver() - could not open server socket\n");
+        fprintf(stderr,"tcp_socket::setupconnectionserver() - could not open server socket\n");
         *socketID = -2;
         return;
     }
     
     // bind local address to it
     if (bind(sockfd, &my_Addr.addr, sizeof(my_Addr.addr)) < 0) {
-        fprintf(stderr,"socket::setupconnectionserver() - could not bind local address\n");
+        fprintf(stderr,"tcp_socket::setupconnectionserver() - could not bind local address\n");
         *socketID = -3;
         return;
     }
     
-    addrLength = sizeof(other_Addr.addr);
-    
     // wait for other process to contact me & setup connection
     listen(sockfd, 1);
+    addrLength = sizeof(other_Addr.addr);
     newsockfd = accept(sockfd, &other_Addr.addr, &addrLength);
     if (newsockfd < 0) {
-        fprintf(stderr,"socket::setupconnectionserver() - could not accept client connection\n");
+        fprintf(stderr,"tcp_socket::setupconnectionserver() - could not accept client connection\n");
         *socketID = -4;
         return;
     }    
@@ -226,14 +224,13 @@ void CALL_CONV setupconnectionclient(unsigned int *other_Port,
         struct sockaddr_in addr_in;
     } other_Addr;
     
-    socket_type sockfd;
-    
-    int ierr;
     SocketConnection *theSocket = theSockets;
+    socket_type sockfd;    
+    int ierr;
     
     // check inputs
     if (other_InetAddr == 0) {
-        fprintf(stderr,"socket::setupconnectionclient() - missing other_InetAddr\n");
+        fprintf(stderr,"tcp_socket::setupconnectionclient() - missing other_InetAddr\n");
         *socketID = -1;
         return;
     }
@@ -241,7 +238,7 @@ void CALL_CONV setupconnectionclient(unsigned int *other_Port,
     // initialize sockets
     startupsockets(&ierr);
     if (ierr != 0) {
-        fprintf(stderr,"socket::setupconnectionclient() - could not startup client socket\n");
+        fprintf(stderr,"tcp_socket::setupconnectionclient() - could not startup client socket\n");
         *socketID = -2;
         return;
     }
@@ -283,21 +280,21 @@ void CALL_CONV setupconnectionclient(unsigned int *other_Port,
     
     // open a socket
     if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-        fprintf(stderr,"socket::setupconnectionclient() - could not open client socket\n");
+        fprintf(stderr,"tcp_socket::setupconnectionclient() - could not open client socket\n");
         *socketID = -3;
         return;
     }
     
     // bind local address to it
     if (bind(sockfd, &my_Addr.addr, sizeof(my_Addr.addr)) < 0) {
-        fprintf(stderr,"socket::setupconnectionclient() - could not bind local address\n");
+        fprintf(stderr,"tcp_socket::setupconnectionclient() - could not bind local address\n");
         *socketID = -4;
         return;
     }
     
     // now try to connect to socket with remote address
-    if (connect(sockfd, &other_Addr.addr, sizeof(other_Addr.addr))< 0) {
-            fprintf(stderr,"socket::setupconnectionclient() - could not connect to server\n");
+    if (connect(sockfd, &other_Addr.addr, sizeof(other_Addr.addr)) < 0) {
+            fprintf(stderr,"tcp_socket::setupconnectionclient() - could not connect to server\n");
             *socketID = -5;
             return;
     }
@@ -329,12 +326,13 @@ void CALL_CONV setupconnectionclient(unsigned int *other_Port,
 void CALL_CONV closeconnection(int *socketID, int *ierr)
 {
     SocketConnection *theSocket = theSockets;
+    *ierr = 0;
     
     // find the socket
     while (theSocket->socketID != *socketID) 
         theSocket = theSocket->next;
     if (theSocket == 0) {
-        fprintf(stderr,"socket::closeconnection() - could not find socket to close\n");
+        fprintf(stderr,"tcp_socket::closeconnection() - could not find socket to close\n");
         *ierr = -1;
         return;
     }
@@ -347,8 +345,6 @@ void CALL_CONV closeconnection(int *socketID, int *ierr)
     
     // cleanup sockets
     cleanupsockets();
-    
-    *ierr = 0;
 }
 
 
@@ -364,30 +360,33 @@ void CALL_CONV closeconnection(int *socketID, int *ierr)
 */
 void CALL_CONV senddata(int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr)
 {
+    SocketConnection *theSocket = theSockets;
+    socket_type sockfd;
     int nwrite, nleft;
     unsigned long nbMode = 0;
     char *gMsg = data;
-    SocketConnection *theSocket = theSockets;
+    *ierr = 0;
     
     // find the socket
     while (theSocket != 0 && theSocket->socketID != *socketID)
         theSocket = theSocket->next;
     if (theSocket == 0) {
-        fprintf(stderr,"socket::senddata() - could not find socket to send data\n");
+        fprintf(stderr,"tcp_socket::senddata() - could not find socket to send data\n");
         *ierr = -1;
         return;
     }
+    sockfd = theSocket->sockfd;
     
     // turn on blocking mode
 #ifdef _WIN32
-    if (ioctlsocket(theSocket->sockfd,FIONBIO,&nbMode) != 0) {
-        fprintf(stderr,"socket::senddata() - could not turn on blocking mode\n");
+    if (ioctlsocket(sockfd, FIONBIO, &nbMode) != 0) {
+        fprintf(stderr,"tcp_socket::senddata() - could not turn on blocking mode\n");
         *ierr = -2;
         return;
     }
 #else
-    if (ioctl(theSocket->sockfd,FIONBIO,&nbMode) != 0) {
-        fprintf(stderr,"socket::senddata() - could not turn on blocking mode\n");
+    if (ioctl(sockfd, FIONBIO, &nbMode) != 0) {
+        fprintf(stderr,"tcp_socket::senddata() - could not turn on blocking mode\n");
         *ierr = -2;
         return;
     }
@@ -399,12 +398,10 @@ void CALL_CONV senddata(int *socketID, int *dataTypeSize, char data[], int *lenD
     nleft = *lenData * *dataTypeSize;
     
     while (nleft > 0) {
-        nwrite = send(theSocket->sockfd, gMsg, nleft, 0);
+        nwrite = send(sockfd, gMsg, nleft, 0);
         nleft -= nwrite;
         gMsg +=  nwrite;
     }
-    
-    *ierr = 0;
 }
 
 
@@ -420,30 +417,33 @@ void CALL_CONV senddata(int *socketID, int *dataTypeSize, char data[], int *lenD
 */
 void CALL_CONV sendnbdata(int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr)
 {
+    SocketConnection *theSocket = theSockets;
+    socket_type sockfd;
     int nwrite, nleft;
     unsigned long nbMode = 1;
     char *gMsg = data;
-    SocketConnection *theSocket = theSockets;
+    *ierr = 0;
     
     // find the socket
     while (theSocket != 0 && theSocket->socketID != *socketID)
         theSocket = theSocket->next;
     if (theSocket == 0) {
-        fprintf(stderr,"socket::sendnbdata() - could not find socket to send data\n");
+        fprintf(stderr,"tcp_socket::sendnbdata() - could not find socket to send data\n");
         *ierr = -1;
         return;
     }
+    sockfd = theSocket->sockfd;
     
     // turn on nonblocking mode
 #ifdef _WIN32
-    if (ioctlsocket(theSocket->sockfd,FIONBIO,&nbMode) != 0) {
-        fprintf(stderr,"socket::sendnbdata() - could not turn on nonblocking mode\n");
+    if (ioctlsocket(sockfd, FIONBIO, &nbMode) != 0) {
+        fprintf(stderr,"tcp_socket::sendnbdata() - could not turn on nonblocking mode\n");
         *ierr = -2;
         return;
     }
 #else
-    if (ioctl(theSocket->sockfd,FIONBIO,&nbMode) != 0) {
-        fprintf(stderr,"socket::sendnbdata() - could not turn on nonblocking mode\n");
+    if (ioctl(sockfd, FIONBIO, &nbMode) != 0) {
+        fprintf(stderr,"tcp_socket::sendnbdata() - could not turn on nonblocking mode\n");
         *ierr = -2;
         return;
     }
@@ -455,7 +455,7 @@ void CALL_CONV sendnbdata(int *socketID, int *dataTypeSize, char data[], int *le
     nleft = *lenData * *dataTypeSize;
     
     while (nleft > 0) {
-        nwrite = send(theSocket->sockfd, gMsg, nleft, 0);
+        nwrite = send(sockfd, gMsg, nleft, 0);
         if (nwrite < 0) {
             *ierr = -3;
             return;
@@ -463,8 +463,6 @@ void CALL_CONV sendnbdata(int *socketID, int *dataTypeSize, char data[], int *le
         nleft -= nwrite;
         gMsg +=  nwrite;
     }
-    
-    *ierr = 0;
 }
 
 
@@ -480,30 +478,33 @@ void CALL_CONV sendnbdata(int *socketID, int *dataTypeSize, char data[], int *le
 */
 void CALL_CONV recvdata(int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr)
 {
+    SocketConnection *theSocket = theSockets;
+    socket_type sockfd;
     int nread, nleft;
     unsigned long nbMode = 0;
     char *gMsg = data;
-    SocketConnection *theSocket = theSockets;
+    *ierr = 0;
     
     // find the socket
     while (theSocket != 0 && theSocket->socketID != *socketID)
         theSocket=theSocket->next;
     if (theSocket == 0) {
-        fprintf(stderr,"socket::recvdata() - could not find socket to receive data\n");
+        fprintf(stderr,"tcp_socket::recvdata() - could not find socket to receive data\n");
         *ierr = -1;
         return;
     }
+    sockfd = theSocket->sockfd;
     
     // turn on blocking mode
 #ifdef _WIN32
-    if (ioctlsocket(theSocket->sockfd,FIONBIO,&nbMode) != 0) {
-        fprintf(stderr,"socket::recvdata() - could not turn on blocking mode\n");
+    if (ioctlsocket(sockfd, FIONBIO, &nbMode) != 0) {
+        fprintf(stderr,"tcp_socket::recvdata() - could not turn on blocking mode\n");
         *ierr = -2;
         return;
     }
 #else
-    if (ioctl(theSocket->sockfd,FIONBIO,&nbMode) != 0) {
-        fprintf(stderr,"socket::recvdata() - could not turn on blocking mode\n");
+    if (ioctl(sockfd, FIONBIO, &nbMode) != 0) {
+        fprintf(stderr,"tcp_socket::recvdata() - could not turn on blocking mode\n");
         *ierr = -2;
         return;
     }
@@ -515,12 +516,10 @@ void CALL_CONV recvdata(int *socketID, int *dataTypeSize, char data[], int *lenD
     nleft = *lenData * *dataTypeSize;
     
     while (nleft > 0) {
-        nread = recv(theSocket->sockfd, gMsg, nleft, 0);
+        nread = recv(sockfd, gMsg, nleft, 0);
         nleft -= nread;
         gMsg +=  nread;
     }
-    
-    *ierr = 0;
 }
 
 
@@ -536,30 +535,33 @@ void CALL_CONV recvdata(int *socketID, int *dataTypeSize, char data[], int *lenD
 */
 void CALL_CONV recvnbdata(int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr)
 {
+    SocketConnection *theSocket = theSockets;
+    socket_type sockfd;
     int nread, nleft;
     unsigned long nbMode = 1;
     char *gMsg = data;
-    SocketConnection *theSocket = theSockets;
+    *ierr = 0;
     
     // find the socket
     while (theSocket != 0 && theSocket->socketID != *socketID)
         theSocket=theSocket->next;
     if (theSocket == 0) {
-        fprintf(stderr,"socket::recvnbdata() - could not find socket to receive data\n");
+        fprintf(stderr,"tcp_socket::recvnbdata() - could not find socket to receive data\n");
         *ierr = -1;
         return;
     }
+    sockfd = theSocket->sockfd;
     
     // turn on nonblocking mode
 #ifdef _WIN32
-    if (ioctlsocket(theSocket->sockfd,FIONBIO,&nbMode) != 0) {
-        fprintf(stderr,"socket::recvnbdata() - could not turn on nonblocking mode\n");
+    if (ioctlsocket(sockfd, FIONBIO, &nbMode) != 0) {
+        fprintf(stderr,"tcp_socket::recvnbdata() - could not turn on nonblocking mode\n");
         *ierr = -2;
         return;
     }
 #else
-    if (ioctl(theSocket->sockfd,FIONBIO,&nbMode) != 0) {
-        fprintf(stderr,"socket::recvnbdata() - could not turn on nonblocking mode\n");
+    if (ioctl(sockfd, FIONBIO, &nbMode) != 0) {
+        fprintf(stderr,"tcp_socket::recvnbdata() - could not turn on nonblocking mode\n");
         *ierr = -2;
         return;
     }
@@ -571,7 +573,7 @@ void CALL_CONV recvnbdata(int *socketID, int *dataTypeSize, char data[], int *le
     nleft = *lenData * *dataTypeSize;
     
     while (nleft > 0) {
-        nread = recv(theSocket->sockfd, gMsg, nleft, 0);
+        nread = recv(sockfd, gMsg, nleft, 0);
         if (nread < 0) {
             *ierr = -3;
             return;
@@ -579,8 +581,6 @@ void CALL_CONV recvnbdata(int *socketID, int *dataTypeSize, char data[], int *le
         nleft -= nread;
         gMsg +=  nread;
     }
-    
-    *ierr = 0;
 }
 
 
@@ -599,7 +599,7 @@ void CALL_CONV getsocketid(unsigned int *port, const char machineInetAddr[], int
     
     // check inputs
     if (machineInetAddr == 0) {
-        fprintf(stderr,"socket::getsocketid() - missing machineInetAddr\n");
+        fprintf(stderr,"tcp_socket::getsocketid() - missing machineInetAddr\n");
         *socketID = -1;
         return;
     }
@@ -614,6 +614,6 @@ void CALL_CONV getsocketid(unsigned int *port, const char machineInetAddr[], int
         }
         theSocket = theSocket->next;
     }
-    fprintf(stderr,"socket::getsocketid() - could not find socket to get socketID\n");
+    fprintf(stderr,"tcp_socket::getsocketid() - could not find socket to get socketID\n");
     *socketID = -2;
 }

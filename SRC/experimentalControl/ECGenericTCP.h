@@ -26,7 +26,7 @@
 #ifndef ECGenericTCP_h
 #define ECGenericTCP_h
 
-// Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 08/11
 // Revision: A
 //
@@ -43,7 +43,8 @@ class ECGenericTCP : public ExperimentalControl
 public:
     // constructors
     ECGenericTCP(int tag, char *ipAddress, int ipPort,
-        ID ctrlModes, ID daqModes, char *initFileName = 0);
+        ID ctrlModes, ID daqModes, char *initFileName = 0,
+        int ssl = 0, int udp = 0);
     ECGenericTCP(const ECGenericTCP &ec);
     
     // destructor

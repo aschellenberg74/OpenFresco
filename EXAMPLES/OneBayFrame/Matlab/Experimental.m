@@ -53,16 +53,16 @@ sData = zeros(1,dataSize);
 % send trial response to experimental site
 sData(1) = 3;
 sData(2) = u;
-TCPSocket('sendData',socketID,sData,dataSize);
+UDPSocket('sendData',socketID,sData,dataSize);
 
 % get measured resisting forces
 sData(1) = 10;
-TCPSocket('sendData',socketID,sData,dataSize);
-rData = TCPSocket('recvData',socketID,dataSize);
+UDPSocket('sendData',socketID,sData,dataSize);
+rData = UDPSocket('recvData',socketID,dataSize);
 
 % commit state
 sData(1) = 5;
-TCPSocket('sendData',socketID,sData,dataSize);
+UDPSocket('sendData',socketID,sData,dataSize);
 
 % Set resisting force
 ElementPost.p_r = rData(1);

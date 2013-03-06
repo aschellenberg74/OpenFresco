@@ -1,13 +1,13 @@
 include ../../Makefile.def
 
-OBJS       = ExperimentalElement.o \
-	     EETwoNodeLink.o \
-	     EETruss.o \
-	     EETrussCorot.o \
-	     EEGeneric.o \
-	     EEBeamColumn2d.o \
-	     EEBeamColumn3d.o \
-             EEInvertedVBrace2d.o
+OBJS  = ExperimentalElement.o \
+        EETwoNodeLink.o \
+        EETruss.o \
+        EETrussCorot.o \
+        EEGeneric.o \
+        EEBeamColumn2d.o \
+        EEBeamColumn3d.o \
+        EEInvertedVBrace2d.o
 
 all:         $(OBJS)
 

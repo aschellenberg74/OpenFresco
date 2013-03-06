@@ -103,7 +103,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\..\SRC\simApplicationClient\c\genericClient.c" />
-    <ClCompile Include="..\..\..\SRC\simApplicationClient\c\socket.c" />
+    <ClCompile Include="..\..\..\SRC\simApplicationClient\c\udp_socket.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

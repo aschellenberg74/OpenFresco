@@ -1,9 +1,9 @@
 include ../../Makefile.def
 
-OBJS = ExperimentalSite.o \
-	     LocalExpSite.o \
-	     ShadowExpSite.o \
-	     ActorExpSite.o
+OBJS  = ExperimentalSite.o \
+        LocalExpSite.o \
+        ShadowExpSite.o \
+        ActorExpSite.o
 
 all:         $(OBJS)
 
