@@ -1,5 +1,5 @@
-%TCPSOCKET to communicate between two processes through a TCP/IP socket
-% varargout = TCPSocket(action,varargin)
+%UDPSOCKET to communicate between two processes through a UDP socket
+% varargout = UDPSocket(action,varargin)
 % 
 % varargout : variable output argument list
 %  varargout = socketID  for action 'openConnection'
@@ -36,27 +36,27 @@
 %
 % Client Example:
 %  1) setting up a connection to server
-%       socketID = TCPSocket('openConnection','127.0.0.1',8090);
+%       socketID = UDPSocket('openConnection','127.0.0.1',8090);
 %  2) setting the data sizes for the experimental site
 %       dataSize = 2;
 %       sData = zeros(1,dataSize);
 %       dataSizes = int32([1 0 0 0 0, 0 0 0 1 0, dataSize]);
-%       TCPSocket('sendData',socketID,dataSizes,11);
+%       UDPSocket('sendData',socketID,dataSizes,11);
 %  3) sending trial response to experimental site
 %       sData(1) = 3;
 %       sData(2) = db;
-%       TCPSocket('sendData',socketID,sData,dataSize);
+%       UDPSocket('sendData',socketID,sData,dataSize);
 %  4) getting measured resisting forces from experimental site
 %       sData(1) = 10;
-%       TCPSocket('sendData',socketID,sData,dataSize);
-%       rData = TCPSocket('recvData',socketID,dataSize);
+%       UDPSocket('sendData',socketID,sData,dataSize);
+%       rData = UDPSocket('recvData',socketID,dataSize);
 %  5) disconnecting from experimental site
 %       sData(1) = 99;
-%       TCPSocket('sendData',socketID,sData,dataSize);
-%       TCPSocket('closeConnection',socketID);
+%       UDPSocket('sendData',socketID,sData,dataSize);
+%       UDPSocket('closeConnection',socketID);
 %
 %
-%   See also UDPSOCKET, GENERICCLIENT2D, EETRUSS, EEFRAME2D, EEFRAME3D, EETWONODELINK2D
+%   See also TCPSOCKET, GENERICCLIENT2D, EETRUSS, EEFRAME2D, EEFRAME3D, EETWONODELINK2D
 
 %/* ****************************************************************** **
 %**    OpenFRESCO - Open Framework                                     **
@@ -79,10 +79,10 @@
 %**                                                                    **
 %** ****************************************************************** */
 
-% $Revision$
-% $Date$
-% $URL$
+% $Revision: 314 $
+% $Date: 2011-05-22 14:17:07 -0700 (Sun, 22 May 2011) $
+% $URL: https://nees.org/tools/openfresco/svn/trunk/SRC/simApplicationClient/matlab/UDPSocket.m $
 
 % Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
-% Created: 10/06
+% Created: 02/13
 % Revision: A

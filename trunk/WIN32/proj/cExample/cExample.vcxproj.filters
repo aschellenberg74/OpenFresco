@@ -21,7 +21,7 @@
     <ClCompile Include="..\..\..\SRC\simApplicationClient\c\genericClient.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\SRC\simApplicationClient\c\socket.c">
+    <ClCompile Include="..\..\..\SRC\simApplicationClient\c\udp_socket.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

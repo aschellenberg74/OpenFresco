@@ -23,7 +23,7 @@
 // $Date$
 // $URL$
 
-// Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 10/06
 // Revision: A
 //
@@ -59,7 +59,7 @@ int addEEGeneric(ClientData clientData, Tcl_Interp *interp,  int argc,
 		opserr << "WARNING insufficient arguments\n";
 		printCommand(argc, argv);
 		opserr << "Want: expElement generic eleTag -node Ndi -dof dofNdi -dof dofNdj ... -site siteTag -initStif Kij <-iMod> <-noRayleigh> <-mass Mij>\n";
-		opserr << "  or: expElement generic eleTag -node Ndi -dof dofNdi -dof dofNdj ... -server ipPort <ipAddr> <-ssl> <-dataSize size> -initStif Kij <-iMod> <-noRayleigh> <-mass Mij>\n";
+		opserr << "  or: expElement generic eleTag -node Ndi -dof dofNdi -dof dofNdj ... -server ipPort <ipAddr> <-ssl> <-udp> <-dataSize size> -initStif Kij <-iMod> <-noRayleigh> <-mass Mij>\n";
 		return TCL_ERROR;
 	}    
 	

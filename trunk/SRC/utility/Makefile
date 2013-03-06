@@ -1,8 +1,7 @@
 include ../../Makefile.def
 
-OBJS       = ExperimentalCP.o \
-	     ExpControlSP.o
-#	     TclModelBuilderExpSiteCommand.o
+OBJS  = ExperimentalCP.o \
+        ExpControlSP.o
 
 all:         $(OBJS)
 

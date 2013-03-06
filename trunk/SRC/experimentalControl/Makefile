@@ -1,14 +1,12 @@
 include ../../Makefile.def
 
-OBJS       = ExperimentalControl.o \
-	     ECSimulation.o \
-	     ECSimUniaxialMaterials.o \
-	     ECSimDomain.o \
-	     ECSimFEAdapter.o \
-	     ECSimSimulink.o
-#	     ECSCRAMNet.o \
-#	     ECNIEseries.o nidaqex.o \
-#	     EquipmentSpec.o
+OBJS  = ExperimentalControl.o \
+        ECSimulation.o \
+        ECSimUniaxialMaterials.o \
+        ECSimDomain.o \
+        ECSimFEAdapter.o \
+        ECSimSimulink.o \
+        ECGenericTCP.o
 
 all:         $(OBJS)
 
@@ -30,8 +28,6 @@ test:  test.o
 		-lg2c -ldl -lpng \
 	$(MACHINE_NUMERICAL_LIBS) $(MACHINE_SPECIFIC_LIBS) \
 	-o test
-
-
 
 # Miscellaneous
 tidy:	

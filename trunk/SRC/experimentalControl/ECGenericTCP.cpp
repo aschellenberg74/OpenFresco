@@ -23,7 +23,7 @@
 // $Date$
 // $URL$
 
-// Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 08/11
 // Revision: A
 //
@@ -40,12 +40,14 @@ using std::ios;
 #include <Message.h>
 #include <Channel.h>
 #include <TCP_Socket.h>
+#include <TCP_SocketSSL.h>
+#include <UDP_Socket.h>
 
 
 ECGenericTCP::ECGenericTCP(int tag,    
     char *ipaddress, int ipport,
     ID ctrlmodes, ID daqmodes,
-    char *initfilename)
+    char *initfilename, int ssl, int udp)
     : ExperimentalControl(tag),
     ipAddress(ipaddress), ipPort(ipport),
     dataSize(OF_Network_dataSize), theChannel(0),
@@ -62,7 +64,18 @@ ECGenericTCP::ECGenericTCP(int tag,
     }
 
     // setup the connection
-    theChannel = new TCP_Socket(ipPort, ipAddress);
+    if (ssl)
+        theChannel = new TCP_SocketSSL(ipPort, ipAddress);
+    else if (udp)
+        theChannel = new UDP_Socket(ipPort, ipAddress);
+    else
+        theChannel = new TCP_Socket(ipPort, ipAddress);
+
+     if (!theChannel)  {
+        opserr << "ECGenericTCP::ECGenericTCP() - "
+            << "failed to create channel.\n";
+        exit(OF_ReturnType_failed);
+    }
     if (theChannel->setUpConnection() != 0)  {
         opserr << "ECGenericTCP::ECGenericTCP() - "
             << "failed to setup TCP connection to generic controller.\n";

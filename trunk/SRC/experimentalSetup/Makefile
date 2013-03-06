@@ -1,15 +1,15 @@
 include ../../Makefile.def
 
-OBJS = ExperimentalSetup.o \
-	     ESNoTransformation.o \
-	     ESAggregator.o \
-	     ESOneActuator.o \
-	     ESTwoActuators2d.o \
-	     ESThreeActuators2d.o \
-	     ESThreeActuatorsJntOff2d.o \
-	     ESInvertedVBrace2d.o \
-	     ESInvertedVBraceJntOff2d.o \
-	     ESFourActuators3d.o
+OBJS  = ExperimentalSetup.o \
+        ESNoTransformation.o \
+        ESAggregator.o \
+        ESOneActuator.o \
+        ESTwoActuators2d.o \
+        ESThreeActuators2d.o \
+        ESThreeActuatorsJntOff2d.o \
+        ESInvertedVBrace2d.o \
+        ESInvertedVBraceJntOff2d.o \
+        ESFourActuators3d.o
 
 all:         $(OBJS)
 
@@ -34,8 +34,6 @@ test:  test.o
 		-lg2c -ldl -lpng \
 	$(MACHINE_NUMERICAL_LIBS) $(MACHINE_SPECIFIC_LIBS) \
 	-o test
-
-
 
 # Miscellaneous
 tidy:	
