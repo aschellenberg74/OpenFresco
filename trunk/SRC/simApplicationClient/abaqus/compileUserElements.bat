@@ -13,9 +13,9 @@ call "%pathVC%\vcvarsall.bat" amd64
 call "%pathIF%\ifortvars.bat" intel64
 
 echo.
-echo Compiling socket.c:
-echo ===================
-call cl.exe "%pathSRC%\simApplicationClient\c\socket.c" /c /O2 /D_CRT_SECURE_NO_DEPRECATE /DF77_NAME_UPPER /DUSE_FORT_STDCALL /DMIXED_STRING_LEN
+echo Compiling tcp_socket.c:
+echo =======================
+call cl.exe "%pathSRC%\simApplicationClient\c\tcp_socket.c" /c /O2 /D_CRT_SECURE_NO_DEPRECATE /DF77_NAME_UPPER /DUSE_FORT_STDCALL /DMIXED_STRING_LEN
 
 echo.
 echo Compiling socketf.c:
@@ -32,7 +32,7 @@ echo done compiling genericClient_exp.for
 echo.
 echo Combining files into single element object file:
 echo ================================================
-call lib /out:genericClient_exp.obj expUserElmt.obj socket.obj socketf.obj
+call lib /out:genericClient_exp.obj expUserElmt.obj tcp_socket.obj socketf.obj
 del expUserElmt.obj
 
 echo.
@@ -45,9 +45,9 @@ echo done compiling genericClient_imp.for
 echo.
 echo Combining files into single element object file:
 echo ================================================
-call lib /out:genericClient_imp.obj impUserElmt.obj socket.obj socketf.obj
+call lib /out:genericClient_imp.obj impUserElmt.obj tcp_socket.obj socketf.obj
 del impUserElmt.obj
-del socket.obj
+del tcp_socket.obj
 del socketf.obj
 
 goto :eof
