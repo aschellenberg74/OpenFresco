@@ -216,7 +216,7 @@ switch handles.Model.Type
         
         % start the server process
         fprintf(FID,'# ------------------------------\n# Start the server process\n# ------------------------------\n');
-        fprintf(FID,'# startSimAppSiteServer $siteTag $port <-ssl>\nstartSimAppSiteServer 1 8090\nexit\n');
+        fprintf(FID,'# startSimAppSiteServer $siteTag $port <-ssl>\nstartSimAppSiteServer 1 7777\nexit\n');
         fprintf(FID,'# ------------------------------\n# End of analysis\n# ------------------------------\n');
         
     % =====================================================================
@@ -416,7 +416,7 @@ switch handles.Model.Type
         
         % start the server process
         fprintf(FID,'# ------------------------------\n# Start the server process\n# ------------------------------\n');
-        fprintf(FID,'# startSimAppSiteServer $siteTag $port <-ssl>\nstartSimAppSiteServer 1 8090\nexit\n');
+        fprintf(FID,'# startSimAppSiteServer $siteTag $port <-ssl>\nstartSimAppSiteServer 1 7777\nexit\n');
         fprintf(FID,'# ------------------------------\n# End of analysis\n# ------------------------------\n');
         
     % =====================================================================
@@ -599,7 +599,7 @@ switch handles.Model.Type
         
         % start the server process
         fprintf(FID,'# ------------------------------\n# Start the server process\n# ------------------------------\n');
-        fprintf(FID,'# startSimAppSiteServer $siteTag $port <-ssl>\nstartSimAppSiteServer 1 8090\nexit\n');
+        fprintf(FID,'# startSimAppSiteServer $siteTag $port <-ssl>\nstartSimAppSiteServer 1 7777\nexit\n');
         fprintf(FID,'# ------------------------------\n# End of analysis\n# ------------------------------\n');
     % =====================================================================
 end
