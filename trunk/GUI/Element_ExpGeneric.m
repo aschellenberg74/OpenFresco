@@ -1,6 +1,6 @@
-function varargout = Element_ExpGeneric(action,ElmData,disp)
+function varargout = Element_ExpGeneric(action,ElmData,disp,vel)
 %ELEMENT_EXPGENERIC to define an experimental generic element
-% varargout = Element_ExpGeneric(action,ElmData,disp)
+% varargout = Element_ExpGeneric(action,ElmData,disp,vel)
 %
 % varargout : variable length output argument list
 % action    : switch with following possible values
@@ -14,6 +14,7 @@ function varargout = Element_ExpGeneric(action,ElmData,disp)
 %              'disconnect'         disconnect from experimental site
 % ElmData   : data structure with element information
 % disp      : trial displacement
+% vel       : trial velocity
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%                          OpenFresco Express                          %%
@@ -42,7 +43,8 @@ function varargout = Element_ExpGeneric(action,ElmData,disp)
 % socket identifier
 persistent socketID;
 % state variables
-persistent dispT;
+persistent dispT velT;
+persistent rData getDaq;
 
 % extract element properties
 tag    = ElmData.tag;            % unique element tag
@@ -85,52 +87,83 @@ switch action
             end
             
             % set the data size for the experimental site
-            dataSizes = int32([ndf 0 0 0 0, ndf 0 0 ndf 0, dataSize]);
+            dataSizes = int32([ndf ndf ndf 0 0, ndf ndf 0 ndf 0, dataSize]);
             TCPSocket('sendData',socketID(tag),dataSizes,11);
             
             dispT(:,tag) = zeros(ndf,1);
+            velT(:,tag) = zeros(ndf,1);
             
             % send trial response to experimental site
             sData(1) = 3;
             sData(2:ndf+1) = dispT(:,tag)';
+            sData(ndf+2:2*ndf+1) = velT(:,tag)';
             TCPSocket('sendData',socketID(tag),sData,dataSize);
         end
         
-        % get measured resisting forces
-        sData(1) = 10;
+        % get measured response
+        sData(1) = 6;
         TCPSocket('sendData',socketID(tag),sData,dataSize);
         rData = TCPSocket('recvData',socketID(tag),dataSize);
-        forceM = rData(ndf+1:2*ndf)';
+        getDaq = 0;
         
-        varargout = {forceM};
+        varargout = {rData(1:ndf)',rData(ndf+1:2*ndf)',rData(2*ndf+1:3*ndf)'};
     % ======================================================================
-    case 'setTrialDisp'
+    case 'setTrialResp'
         dispT(:,tag) = disp;
+        velT(:,tag) = vel;
         
         % send trial response to experimental site
         sData(1) = 3;
         sData(2:ndf+1) = dispT(:,tag)';
+        sData(ndf+2:2*ndf+1) = velT(:,tag)';
         TCPSocket('sendData',socketID(tag),sData,dataSize);
+        getDaq = 1;
         
         varargout = {0};
     % ======================================================================
+    case 'getDaqResp'
+        % get measured response
+        if getDaq
+            sData(1) = 6;
+            TCPSocket('sendData',socketID(tag),sData,dataSize);
+            rData = TCPSocket('recvData',socketID(tag),dataSize);
+            getDaq = 0;
+        end
+        
+        varargout = {rData(1:ndf)',rData(ndf+1:2*ndf)',rData(2*ndf+1:3*ndf)'};
+    % ======================================================================
     case 'getDisp'
         % get measured displacements
-        sData(1) = 7;
-        TCPSocket('sendData',socketID(tag),sData,dataSize);
-        rData = TCPSocket('recvData',socketID(tag),dataSize);
-        dispM = rData(1:ndf)';
+        if getDaq
+            sData(1) = 6;
+            TCPSocket('sendData',socketID(tag),sData,dataSize);
+            rData = TCPSocket('recvData',socketID(tag),dataSize);
+            getDaq = 0;
+        end
         
-        varargout = {dispM};
+        varargout = {rData(1:ndf)'};
+    % ======================================================================
+    case 'getVel'
+        % get measured velocities
+        if getDaq
+            sData(1) = 6;
+            TCPSocket('sendData',socketID(tag),sData,dataSize);
+            rData = TCPSocket('recvData',socketID(tag),dataSize);
+            getDaq = 0;
+        end
+        
+        varargout = {rData(ndf+1:2*ndf)'};
     % ======================================================================
     case 'getResistingForce'
         % get measured resisting forces
-        sData(1) = 10;
-        TCPSocket('sendData',socketID(tag),sData,dataSize);
-        rData = TCPSocket('recvData',socketID(tag),dataSize);
-        forceM = rData(ndf+1:2*ndf)';
+        if getDaq
+            sData(1) = 6;
+            TCPSocket('sendData',socketID(tag),sData,dataSize);
+            rData = TCPSocket('recvData',socketID(tag),dataSize);
+            getDaq = 0;
+        end
         
-        varargout = {forceM};
+        varargout = {rData(2*ndf+1:3*ndf)'};
     % ======================================================================
     case 'getTangentStiff'
         varargout = {kInit};

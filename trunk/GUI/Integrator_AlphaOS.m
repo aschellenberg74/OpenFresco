@@ -166,8 +166,8 @@ c2 = gamma/(beta*deltaT);
 c3 = 1.0/(beta*deltaT*deltaT);
 a1 = (0.5 - beta)*deltaT*deltaT;
 a2 = deltaT*(1.0 - gamma);
-% animation downsampling factor (to animate at 10 Hz)
-downSampFact = round(0.1/deltaT);
+% animation downsampling factor (to animate at 2.5 Hz)
+downSampFact = round(0.4/deltaT);
 
 % calculations for each time step, i
 tic;
@@ -214,7 +214,7 @@ for i=iStart:iEnd-1
     % set trial response in elements
     for el=1:numElem
         id = Element{el}.id;
-        feval(Element{el}.type,'setTrialDisp',Element{el},Up(id,i+1));
+        feval(Element{el}.type,'setTrialResp',Element{el},Up(id,i+1),Udot(id,i+1));
     end
     
     % get resisting forces from elements
