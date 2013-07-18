@@ -32,6 +32,7 @@ function GUI_Template(varargin)
 % Create GUI Template 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %#ok<*NASGU>
+%#ok<*ST2NM>
 % check if window already exists
 if ~isempty(findobj('Tag','OpenFrescoExpress'))
     figure(findobj('Tag','OpenFrescoExpress'));
@@ -64,16 +65,18 @@ if exist('imresize','file')
     % Sidebar
     sideButWidth  = 0.8*SS(3)*0.1*0.84;
     sideButHeight = 0.8*SS(4)*0.5*0.16;
-    Analysis0     = imresize(imread(which('Analysis0.png')), [(sideButHeight) (sideButWidth)]);
-    Analysis1     = imresize(imread(which('Analysis1.png')), [(sideButHeight) (sideButWidth)]);
-    ExpControl0   = imresize(imread(which('ExpControl0.png')), [(sideButHeight) (sideButWidth)]);
-    ExpControl1   = imresize(imread(which('ExpControl1.png')), [(sideButHeight) (sideButWidth)]);
-    ExpSetup0     = imresize(imread(which('ExpSetup0.png')), [(sideButHeight) (sideButWidth)]);
-    ExpSetup1     = imresize(imread(which('ExpSetup1.png')), [(sideButHeight) (sideButWidth)]);
-    Loading0      = imresize(imread(which('Loading0.png')), [(sideButHeight) (sideButWidth)]);
-    Loading1      = imresize(imread(which('Loading1.png')), [(sideButHeight) (sideButWidth)]);
     Structure0    = imresize(imread(which('Structure0.png')), [(sideButHeight) (sideButWidth)]);
     Structure1    = imresize(imread(which('Structure1.png')), [(sideButHeight) (sideButWidth)]);
+    Loading0      = imresize(imread(which('Loading0.png')), [(sideButHeight) (sideButWidth)]);
+    Loading1      = imresize(imread(which('Loading1.png')), [(sideButHeight) (sideButWidth)]);
+    ExpSite0      = imresize(imread(which('ExpSite0.png')), [(sideButHeight) (sideButWidth)]);
+    ExpSite1      = imresize(imread(which('ExpSite1.png')), [(sideButHeight) (sideButWidth)]);
+    ExpSetup0     = imresize(imread(which('ExpSetup0.png')), [(sideButHeight) (sideButWidth)]);
+    ExpSetup1     = imresize(imread(which('ExpSetup1.png')), [(sideButHeight) (sideButWidth)]);
+    ExpControl0   = imresize(imread(which('ExpControl0.png')), [(sideButHeight) (sideButWidth)]);
+    ExpControl1   = imresize(imread(which('ExpControl1.png')), [(sideButHeight) (sideButWidth)]);
+    Analysis0     = imresize(imread(which('Analysis0.png')), [(sideButHeight) (sideButWidth)]);
+    Analysis1     = imresize(imread(which('Analysis1.png')), [(sideButHeight) (sideButWidth)]);
     
     % Structure Page
     structureWidth  = 0.8*SS(3)*0.81*0.318;
@@ -92,6 +95,14 @@ if exist('imresize','file')
     GM1 = imresize(imread(which('GroundMotions1.png')), [loadingHeight loadingWidth]);
     IC0 = imresize(imread(which('InitialConditions0.png')), [loadingHeight loadingWidth]);
     IC1 = imresize(imread(which('InitialConditions1.png')), [loadingHeight loadingWidth]);
+    
+    % Experimental Site Page
+    siteWidth  = 0.8*SS(3)*0.81*0.1;
+    siteHeight = 0.8*SS(4)*0.9*0.08;
+    Locl0 = imresize(imread(which('Local0.png')), [siteHeight siteWidth]);
+    Locl1 = imresize(imread(which('Local1.png')), [siteHeight siteWidth]);
+    Dist0 = imresize(imread(which('Distributed0.png')), [siteHeight siteWidth]);
+    Dist1 = imresize(imread(which('Distributed1.png')), [siteHeight siteWidth]);
     
     % Experimental Setup Page
     setupWidth  = 0.8*SS(3)*0.81*0.5;
@@ -142,16 +153,18 @@ else
     % Sidebar
     sideButWidth  = 0.8*SS(3)*0.1*0.84;
     sideButHeight = 0.8*SS(4)*0.5*0.16;
-    Analysis0     = ResizeImage(imread(which('Analysis0.png')), [(sideButHeight) (sideButWidth)]);
-    Analysis1     = ResizeImage(imread(which('Analysis1.png')), [(sideButHeight) (sideButWidth)]);
-    ExpControl0   = ResizeImage(imread(which('ExpControl0.png')), [(sideButHeight) (sideButWidth)]);
-    ExpControl1   = ResizeImage(imread(which('ExpControl1.png')), [(sideButHeight) (sideButWidth)]);
-    ExpSetup0     = ResizeImage(imread(which('ExpSetup0.png')), [(sideButHeight) (sideButWidth)]);
-    ExpSetup1     = ResizeImage(imread(which('ExpSetup1.png')), [(sideButHeight) (sideButWidth)]);
-    Loading0      = ResizeImage(imread(which('Loading0.png')), [(sideButHeight) (sideButWidth)]);
-    Loading1      = ResizeImage(imread(which('Loading1.png')), [(sideButHeight) (sideButWidth)]);
     Structure0    = ResizeImage(imread(which('Structure0.png')), [(sideButHeight) (sideButWidth)]);
     Structure1    = ResizeImage(imread(which('Structure1.png')), [(sideButHeight) (sideButWidth)]);
+    Loading0      = ResizeImage(imread(which('Loading0.png')), [(sideButHeight) (sideButWidth)]);
+    Loading1      = ResizeImage(imread(which('Loading1.png')), [(sideButHeight) (sideButWidth)]);
+    ExpSite0      = ResizeImage(imread(which('ExpSite0.png')), [(sideButHeight) (sideButWidth)]);
+    ExpSite1      = ResizeImage(imread(which('ExpSite1.png')), [(sideButHeight) (sideButWidth)]);
+    ExpSetup0     = ResizeImage(imread(which('ExpSetup0.png')), [(sideButHeight) (sideButWidth)]);
+    ExpSetup1     = ResizeImage(imread(which('ExpSetup1.png')), [(sideButHeight) (sideButWidth)]);
+    ExpControl0   = ResizeImage(imread(which('ExpControl0.png')), [(sideButHeight) (sideButWidth)]);
+    ExpControl1   = ResizeImage(imread(which('ExpControl1.png')), [(sideButHeight) (sideButWidth)]);
+    Analysis0     = ResizeImage(imread(which('Analysis0.png')), [(sideButHeight) (sideButWidth)]);
+    Analysis1     = ResizeImage(imread(which('Analysis1.png')), [(sideButHeight) (sideButWidth)]);
     
     % Structure Page
     structureWidth  = 0.8*SS(3)*0.81*0.318;
@@ -170,6 +183,14 @@ else
     GM1 = ResizeImage(imread(which('GroundMotions1.png')), [loadingHeight loadingWidth]);
     IC0 = ResizeImage(imread(which('InitialConditions0.png')), [loadingHeight loadingWidth]);
     IC1 = ResizeImage(imread(which('InitialConditions1.png')), [loadingHeight loadingWidth]);
+    
+    % Experimental Site Page
+    siteWidth  = 0.8*SS(3)*0.81*0.1;
+    siteHeight = 0.8*SS(4)*0.9*0.08;
+    Locl0 = ResizeImage(imread(which('Local0.png')), [siteHeight siteWidth]);
+    Locl1 = ResizeImage(imread(which('Local1.png')), [siteHeight siteWidth]);
+    Dist0 = ResizeImage(imread(which('Distributed0.png')), [siteHeight siteWidth]);
+    Dist1 = ResizeImage(imread(which('Distributed1.png')), [siteHeight siteWidth]);
     
     % Experimental Setup Page
     setupWidth  = 0.8*SS(3)*0.81*0.5;
@@ -254,36 +275,42 @@ Menu(9) = uimenu(Menu(5),'Position',4,'Label','OpenFresco', ...
 % create sidebar tabs
 Sidebar(1) = uibuttongroup('Parent',f,...
     'BackgroundColor',panel_color,...
-    'Position',[0.03 .45 .1 .5]);
+    'Position',[0.03 0.35 0.10 0.60]);
 Sidebar(7) = uicontrol(Sidebar(1),'Style','togglebutton',...
     'Tag','Structure',...
     'Units','normalized',...
     'FontName',font,...
-    'Position',[0.08 0.8 0.84 0.16],...
+    'Position',[0.08 0.8317 0.84 0.1283],...
     'CData',Structure0);
 Sidebar(8) = uicontrol(Sidebar(1),'Style','togglebutton',...
     'Tag','Loading',...
     'Units','normalized',...
     'FontName',font,...
-    'Position',[0.08 0.61 0.84 0.16],...
+    'Position',[0.08 0.6733 0.84 0.1283],...
     'CData',Loading0);
+Sidebar(13) = uicontrol(Sidebar(1),'Style','togglebutton',...
+    'Tag','Experimental Site',...
+    'Units','normalized',...
+    'FontName',font,...
+    'Position',[0.08 0.5150 0.84 0.1283],...
+    'CData',ExpSite0);
 Sidebar(9) = uicontrol(Sidebar(1),'Style','togglebutton',...
     'Tag','Experimental Setup',...
     'Units','normalized',...
     'FontName',font,...
-    'Position',[0.08 0.42 0.84 0.16],...
+    'Position',[0.08 0.3567 0.84 0.1283],...
     'CData',ExpSetup0);
 Sidebar(10) = uicontrol(Sidebar(1),'Style','togglebutton',...
     'Tag','Experimental Control',...
     'Units','normalized',...
     'FontName',font,...
-    'Position',[0.08 0.23 0.84 0.16],...
+    'Position',[0.08 0.1983 0.84 0.1283],...
     'CData',ExpControl0);
 Sidebar(11) = uicontrol(Sidebar(1),'Style','togglebutton',...
     'Tag','Analysis',...
     'Units','normalized',...
     'FontName',font,...
-    'Position',[0.08 0.04 0.84 0.16],...
+    'Position',[0.08 0.04 0.84 0.1283],...
     'CData',Analysis0);
 set(Sidebar(1),'SelectionChangeFcn',@template_toggle_Callback);
 set(Sidebar(1),'SelectedObject',[]);
@@ -297,11 +324,11 @@ Sidebar(2) = uicontrol('Parent',f,...
     'FontWeight','bold',...
     'BackgroundColor',panel_color,...
     'Callback','Links(''User Tips'')',...
-    'Position',[0.03 0.36 0.1 0.04]);
+    'Position',[0.03 0.28 0.1 0.04]);
 
 % add PEER logo
 Sidebar(12) = axes('Parent',f,...
-    'Position',[-0.01 0.121 0.18 0.181],...
+    'Position',[-0.01 0.069 0.18 0.181],...
     'XTick',[],'YTick',[]);
 image(PEER);
 axis equal; axis off;
@@ -1077,6 +1104,172 @@ VibHelp = uicontrol(GM(22),'Style','pushbutton',...
     'Position',[0.90 0.11 0.049 0.132],...
     'CData',Question1,...
     'Callback',@helpCallback);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Create Experimental Site Page
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% title
+ExpSite(1) = uicontrol(ph_Main,'Style','text',...
+    'String','Experimental Site',...
+    'FontSize',18,...
+    'ForegroundColor',[1 1 1],...
+    'BackgroundColor',panel_color,...
+    'Units','normalized',...
+    'Position',[0.3 0.945 0.4 0.05],...
+    'FontName',font,...
+    'Visible','off');
+
+% tab buttons
+ExpSite(2) = uicontrol(ph_Main,'Style','togglebutton',...
+    'Tag','Local Site',...
+    'Units','normalized',...
+    'Value',1,...
+    'Position',[0.15 0.82 0.1 0.08],...
+    'Visible','off',...
+    'Callback','ExpSite(''tab toggle'')',...
+    'CData',Locl1);
+ExpSite(3) = uicontrol(ph_Main,'Style','togglebutton',...
+    'Tag','Distributed Site',...
+    'Units','normalized',...
+    'Position',[0.25 0.82 0.1 0.08],...
+    'Visible','off',...
+    'Callback','ExpSite(''tab toggle'')',...
+    'CData',Dist0);
+
+%==================
+% Local Site Panel
+%==================
+ExpSite(4) = uipanel('Parent',ph_Main,...
+    'Visible','off',...
+    'BackgroundColor',panelDefault,...
+    'Position',[0.15 0.1 0.7 0.72]);
+ExpSite(5) = uipanel('Parent',ExpSite(4),...
+    'Visible','off',...
+    'BackgroundColor',panelDefault,...
+    'Position',[0.05 0.65 0.9 0.15]);
+uicontrol(ExpSite(5),'Style','text',...
+    'Units','normalized',...
+    'FontSize',10,...
+    'String','The "Local Experimental Site" does not require any parameters.',...
+    'BackgroundColor',panelDefault,...
+    'Position',[0 0.175 1.0 0.45]);
+
+%========================
+% Distributed Site Panel
+%========================
+ExpSite(6) = uipanel('Parent',ph_Main,...
+    'Visible','off',...
+    'BackgroundColor',panelDefault,...
+    'Position',[0.15 0.1 0.7 0.72]);
+ExpSite(7) = uipanel('Parent',ExpSite(6),...
+    'Visible','off',...
+    'BackgroundColor',panelDefault,...
+    'Position',[0.05 0.65 0.9 0.15]);
+uicontrol(ExpSite(7),'Style','text',...
+    'Units','normalized',...
+    'FontSize',10,...
+    'String','Define Site',...
+    'BackgroundColor',panelDefault,...
+    'Position',[0 0.175 0.25 0.45]);
+ExpSite(8) = uicontrol(ExpSite(7),'Style','popupmenu',...
+    'String',{'Site Types...','Shadow Site','Actor Site'},...
+    'Value',1,...
+    'FontSize',10,...
+    'Units','normalized',...
+    'BackgroundColor',[1 1 1],...
+    'Position',[0.31 0.3 0.4 0.4],...
+    'Callback','ExpSite(''Distributed Site'')');
+
+% Shadow Site Panels
+ExpSite(9) = uipanel('Parent',ExpSite(6),...
+    'Visible','off',...
+    'Tag','ShadowSite',...
+    'BackgroundColor',panelDefault,...
+    'Position',[0.05 0.25 0.9 0.4]);
+uicontrol(ExpSite(9),'Style','text',...
+    'Units','normalized',...
+    'FontSize',10,...
+    'String','Actor IP Address',...
+    'BackgroundColor',panelDefault,...
+    'Position',[0 0.74 0.25 0.15]);
+ExpSite(10) = uicontrol(ExpSite(9),'Style','edit',...
+    'Units','normalized',...
+    'FontSize',10,...
+    'BackgroundColor',[1 1 1],...
+    'Position',[0.31 0.77 0.4 0.15],...
+    'Callback','ExpSite(''ipAddr'')');
+uicontrol(ExpSite(9),'Style','text',...
+    'Units','normalized',...
+    'FontSize',10,...
+    'String','Actor IP Port',...
+    'BackgroundColor',panelDefault,...
+    'Position',[0 0.51 0.25 0.15]);
+ExpSite(11) = uicontrol(ExpSite(9),'Style','edit',...
+    'Units','normalized',...
+    'FontSize',10,...
+    'String','8090',...
+    'BackgroundColor',[1 1 1],...
+    'Position',[0.31 0.54 0.4 0.15],...
+    'Callback','ExpSite(''ipPort'')');
+uicontrol(ExpSite(9),'Style','text',...
+    'Units','normalized',...
+    'FontSize',10,...
+    'String','Protocol Type',...
+    'BackgroundColor',panelDefault,...
+    'Position',[0 0.29 0.25 0.15]);
+ExpSite(12) = uicontrol(ExpSite(9),'Style','popupmenu',...
+    'Units','normalized',...
+    'FontSize',10,...
+    'BackgroundColor',[1 1 1],...
+    'String',{'TCP','UDP','SSL'},...
+    'Position',[0.31 0.31 0.4 0.15],...
+    'Callback','ExpSite(''protocol'')');
+uicontrol(ExpSite(9),'Style','text',...
+    'Units','normalized',...
+    'FontSize',10,...
+    'String','Data Size',...
+    'BackgroundColor',panelDefault,...
+    'Position',[0 0.05 0.25 0.15]);
+ExpSite(13) = uicontrol(ExpSite(9),'Style','edit',...
+    'Units','normalized',...
+    'FontSize',10,...
+    'String','256',...
+    'BackgroundColor',[1 1 1],...
+    'Position',[0.31 0.08 0.4 0.15],...
+    'Callback','ExpSite(''dataSize'')');
+
+% Actor Site Panels
+ExpSite(14) = uipanel('Parent',ExpSite(6),...
+    'Visible','off',...
+    'Tag','ActorSite',...
+    'BackgroundColor',panelDefault,...
+    'Position',[0.05 0.43 0.9 0.22]);
+uicontrol(ExpSite(14),'Style','text',...
+    'Units','normalized',...
+    'FontSize',10,...
+    'String','Actor IP Port',...
+    'BackgroundColor',panelDefault,...
+    'Position',[0 0.51 0.25 0.28]);
+ExpSite(15) = uicontrol(ExpSite(14),'Style','edit',...
+    'Units','normalized',...
+    'FontSize',10,...
+    'String','8090',...
+    'BackgroundColor',[1 1 1],...
+    'Position',[0.31 0.57 0.4 0.28],...
+    'Callback','ExpSite(''ipPort'')');
+uicontrol(ExpSite(14),'Style','text',...
+    'Units','normalized',...
+    'FontSize',10,...
+    'String','Protocol Type',...
+    'BackgroundColor',panelDefault,...
+    'Position',[0 0.105 0.25 0.28]);
+ExpSite(16) = uicontrol(ExpSite(14),'Style','popupmenu',...
+    'Units','normalized',...
+    'FontSize',10,...
+    'BackgroundColor',[1 1 1],...
+    'String',{'TCP','UDP','SSL'},...
+    'Position',[0.31 0.145 0.4 0.28],...
+    'Callback','ExpSite(''protocol'')');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Create Experimental Setup Page
@@ -2260,6 +2453,7 @@ handles.Menu = Menu;
 handles.Sidebar = Sidebar;
 handles.Structure = Struct;
 handles.GroundMotions = GM;
+handles.ESI = ExpSite;
 handles.ES = ExpSetup;
 handles.EC = ExpControl;
 handles.Analysis = Analysis;
@@ -2270,16 +2464,18 @@ handles.Store.font = font;
 handles.Store.BackgroundPanel = BackgroundPanel;
 handles.Store.sideButWidth = sideButWidth;
 handles.Store.sideButHeight = sideButHeight;
-handles.Store.Analysis0 = Analysis0;
-handles.Store.Analysis1 = Analysis1;
-handles.Store.ExpControl0 = ExpControl0;
-handles.Store.ExpControl1 = ExpControl1;
-handles.Store.ExpSetup0 = ExpSetup0;
-handles.Store.ExpSetup1 = ExpSetup1;
-handles.Store.Loading0 = Loading0;
-handles.Store.Loading1 = Loading1;
 handles.Store.Structure0 = Structure0;
 handles.Store.Structure1 = Structure1;
+handles.Store.Loading0 = Loading0;
+handles.Store.Loading1 = Loading1;
+handles.Store.ExpSite0 = ExpSite0;
+handles.Store.ExpSite1 = ExpSite1;
+handles.Store.ExpSetup0 = ExpSetup0;
+handles.Store.ExpSetup1 = ExpSetup1;
+handles.Store.ExpControl0 = ExpControl0;
+handles.Store.ExpControl1 = ExpControl1;
+handles.Store.Analysis0 = Analysis0;
+handles.Store.Analysis1 = Analysis1;
 
 handles.Store.structureWidth = structureWidth;
 handles.Store.structureHeight = structureHeight;
@@ -2296,6 +2492,13 @@ handles.Store.GM0 = GM0;
 handles.Store.GM1 = GM1;
 handles.Store.IC0 = IC0;
 handles.Store.IC1 = IC1;
+
+handles.Store.siteWidth  = siteWidth;
+handles.Store.siteHeight = siteHeight;
+handles.Store.Locl0 = Locl0;
+handles.Store.Locl1 = Locl1;
+handles.Store.Dist0 = Dist0;
+handles.Store.Dist1 = Dist1;
 
 handles.Store.ECWidth  = ECWidth;
 handles.Store.ECHeight = ECHeight;
@@ -2359,7 +2562,7 @@ handles.Model.Element{1}.tag = 1;
 handles.Model.Element{1}.type = 'Element_ExpGeneric';
 handles.Model.Element{1}.kInit = handles.Model.K;
 handles.Model.Element{1}.ipAddr = '127.0.0.1';
-handles.Model.Element{1}.ipPort = 8090;
+handles.Model.Element{1}.ipPort = 7777;
 handles.Model.Element{1}.id = 1;
 
 % initialize ground motion data
@@ -2379,7 +2582,16 @@ handles.GM.vibTime = [];
 handles.GM.dtAnalysis = [];
 handles.GM.integrator = 'NewmarkExplicit';
 
-% initialize experimental controls
+% initialize experimental site data
+handles.ExpSite.Type = 'Local';
+handles.ExpSite.ipAddr = [];
+handles.ExpSite.ipPort = 8090;
+handles.ExpSite.protocol = 'TCP';
+handles.ExpSite.dataSize = 256;
+handles.ExpSite.store.LoclActive = 5;
+handles.ExpSite.store.DistActive = (7:8);
+
+% initialize experimental control data
 handles.ExpControl.Type = 'Simulation';
 handles.ExpControl.DOF1.SimMaterial = [];
 handles.ExpControl.DOF2.SimMaterial = [];
@@ -2421,7 +2633,7 @@ handles.ExpControl.store.NodeOptions = get(handles.EC(57),'String');
 handles.ExpControl.store.DirOptions = get(handles.EC(60),'String');
 handles.ExpControl.store.RespOptions = get(handles.EC(61),'String');
 
-% create preset control points
+% initialize preset control point data
 handles.ExpControl.CP = {};
 handles.ExpControl.CP.Name{1} = 'Control Point 1';
 handles.ExpControl.CP.NumResp{1} = 1;
@@ -2468,6 +2680,7 @@ set(get(handles.GroundMotions(9), 'Children'), 'Visible', 'off');
 set(get(handles.GroundMotions(15), 'Children'), 'Visible', 'off');
 set(get(handles.GroundMotions(16), 'Children'), 'Visible', 'off');
 set(get(handles.GroundMotions(17), 'Children'), 'Visible', 'off');
+set(handles.ESI,'Visible','off');
 set(handles.ES,'Visible','off');
 set(handles.EC,'Visible','off');
 set(handles.Analysis,'Visible','off');
@@ -2497,6 +2710,7 @@ switch Page_selection;
         end
         set(handles.Sidebar(7),'CData',handles.Store.Structure1);
         set(handles.Sidebar(8),'CData',handles.Store.Loading0);
+        set(handles.Sidebar(13),'CData',handles.Store.ExpSite0);
         set(handles.Sidebar(9),'CData',handles.Store.ExpSetup0);
         set(handles.Sidebar(10),'CData',handles.Store.ExpControl0);
         set(handles.Sidebar(11),'CData',handles.Store.Analysis0);
@@ -2511,6 +2725,7 @@ switch Page_selection;
         set(get(handles.GroundMotions(15), 'Children'), 'Visible', 'off');
         set(get(handles.GroundMotions(16), 'Children'), 'Visible', 'off');
         set(get(handles.GroundMotions(17), 'Children'), 'Visible', 'off');
+        set(handles.ESI,'Visible','off');
         set(handles.ES,'Visible','off');
         set(handles.EC,'Visible','off');
         set(handles.Analysis,'Visible','off');
@@ -2540,6 +2755,7 @@ switch Page_selection;
             set(handles.Sidebar(7), 'Value', 1)
             set(handles.Sidebar(7),'CData',handles.Store.Structure1);
             set(handles.Sidebar(8),'CData',handles.Store.Loading0);
+            set(handles.Sidebar(13),'CData',handles.Store.ExpSite0);
             set(handles.Sidebar(9),'CData',handles.Store.ExpSetup0);
             set(handles.Sidebar(10),'CData',handles.Store.ExpControl0);
             set(handles.Sidebar(11),'CData',handles.Store.Analysis0);
@@ -2556,6 +2772,7 @@ switch Page_selection;
             set(get(handles.GroundMotions(17), 'Children'), 'Visible', 'off');
             % turn off all other pages
             set(handles.GroundMotions,'Visible','off');
+            set(handles.ESI,'Visible','off');
             set(handles.ES,'Visible','off');
             set(handles.EC,'Visible','off');
             set(handles.Analysis,'Visible','off');
@@ -2564,10 +2781,12 @@ switch Page_selection;
         
         set(handles.Sidebar(7),'CData',handles.Store.Structure0);
         set(handles.Sidebar(8),'CData',handles.Store.Loading1);
+        set(handles.Sidebar(13),'CData',handles.Store.ExpSite0);
         set(handles.Sidebar(9),'CData',handles.Store.ExpSetup0);
         set(handles.Sidebar(10),'CData',handles.Store.ExpControl0);
         set(handles.Sidebar(11),'CData',handles.Store.Analysis0);
         set(handles.Structure,'Visible','off');
+        set(handles.ESI,'Visible','off');
         set(handles.ES,'Visible','off');
         set(handles.EC,'Visible','off');
         set(handles.Analysis,'Visible','off');
@@ -2584,6 +2803,7 @@ switch Page_selection;
             set(handles.Sidebar(7), 'Value', 1)
             set(handles.Sidebar(7),'CData',handles.Store.Structure1);
             set(handles.Sidebar(8),'CData',handles.Store.Loading0);
+            set(handles.Sidebar(13),'CData',handles.Store.ExpSite0);
             set(handles.Sidebar(9),'CData',handles.Store.ExpSetup0);
             set(handles.Sidebar(10),'CData',handles.Store.ExpControl0);
             set(handles.Sidebar(11),'CData',handles.Store.Analysis0);
@@ -2648,6 +2868,58 @@ switch Page_selection;
             end
         end
     % =====================================================================
+    case 'Experimental Site'
+        if handles.Model.StopFlag == 1
+            msgbox(sprintf('Experiment has ended!\nChoose run new test to make changes.'),'Error','error');
+            set(handles.Sidebar(10),'Value',0);
+            set(handles.Sidebar(11),'Value',1);
+            return
+        end
+        set(handles.Sidebar(7),'CData',handles.Store.Structure0);
+        set(handles.Sidebar(8),'CData',handles.Store.Loading0);
+        set(handles.Sidebar(13),'CData',handles.Store.ExpSite1);
+        set(handles.Sidebar(9),'CData',handles.Store.ExpSetup0);
+        set(handles.Sidebar(10),'CData',handles.Store.ExpControl0);
+        set(handles.Sidebar(11),'CData',handles.Store.Analysis0);
+        set(handles.Structure,'Visible','off');
+        set(handles.GroundMotions,'Visible','off');
+        set(get(handles.GroundMotions(7), 'Children'), 'Visible', 'off');
+        set(get(handles.GroundMotions(8), 'Children'), 'Visible', 'off');
+        set(get(handles.GroundMotions(9), 'Children'), 'Visible', 'off');
+        set(get(handles.GroundMotions(15), 'Children'), 'Visible', 'off');
+        set(get(handles.GroundMotions(16), 'Children'), 'Visible', 'off');
+        set(get(handles.GroundMotions(17), 'Children'), 'Visible', 'off');
+        set(handles.ES,'Visible','off');
+        set(handles.EC,'Visible','off');
+        set(handles.Analysis,'Visible','off');
+        
+        if get(handles.ESI(2),'Value') == 1
+            set(handles.ESI(1:5),'Visible','on');
+            set(handles.ESI(2),'CData',handles.Store.Locl1);
+            set(handles.ESI(3),'Value',0,'CData',handles.Store.Dist0);
+            set(handles.ESI([6 9 14]),'Visible','off');
+            set(handles.ESI(handles.ExpSite.store.LoclActive),'Visible','on');
+        elseif get(handles.ESI(3),'Value') == 1
+            set(handles.ESI([1:3 6:8]),'Visible','on');
+            set(handles.ESI(2),'Value',0,'CData',handles.Store.Locl0);
+            set(handles.ESI(3),'CData',handles.Store.Dist1);
+            set(handles.ESI(4),'Visible','off');
+            set(handles.ESI(handles.ExpSite.store.DistActive),'Visible','on');
+        else
+            switch handles.ExpSite.Type
+                case 'Local'
+                    set(handles.ESI(2),'Value',1);
+                    set(handles.ESI(1:5),'Visible','on');
+                    set(handles.ESI([6 9 14]),'Visible','off');
+                    set(handles.ESI(handles.ExpSite.store.LoclActive),'Visible','on');
+                case {'Shadow','Actor'}
+                    set(handles.ESI(3),'Value',1);
+                    set(handles.ESI([1:3 6:8]),'Visible','on');
+                    set(handles.ESI(4),'Visible','off');
+                    set(handles.ESI(handles.ExpSite.store.DistActive),'Visible','on');
+            end
+        end
+    % =====================================================================
     case 'Experimental Setup'
         if handles.Model.StopFlag == 1
             msgbox(sprintf('Experiment has ended!\nChoose run new test to make changes.'),'Error','error');
@@ -2657,6 +2929,7 @@ switch Page_selection;
         end
         set(handles.Sidebar(7),'CData',handles.Store.Structure0);
         set(handles.Sidebar(8),'CData',handles.Store.Loading0);
+        set(handles.Sidebar(13),'CData',handles.Store.ExpSite0);
         set(handles.Sidebar(9),'CData',handles.Store.ExpSetup1);
         set(handles.Sidebar(10),'CData',handles.Store.ExpControl0);
         set(handles.Sidebar(11),'CData',handles.Store.Analysis0);
@@ -2668,6 +2941,7 @@ switch Page_selection;
         set(get(handles.GroundMotions(15), 'Children'), 'Visible', 'off');
         set(get(handles.GroundMotions(16), 'Children'), 'Visible', 'off');
         set(get(handles.GroundMotions(17), 'Children'), 'Visible', 'off');
+        set(handles.ESI,'Visible','off');
         set(handles.ES,'Visible','on');
         set(handles.EC,'Visible','off');
         set(handles.Analysis,'Visible','off');
@@ -2697,6 +2971,7 @@ switch Page_selection;
         end
         set(handles.Sidebar(7),'CData',handles.Store.Structure0);
         set(handles.Sidebar(8),'CData',handles.Store.Loading0);
+        set(handles.Sidebar(13),'CData',handles.Store.ExpSite0);
         set(handles.Sidebar(9),'CData',handles.Store.ExpSetup0);
         set(handles.Sidebar(10),'CData',handles.Store.ExpControl1);
         set(handles.Sidebar(11),'CData',handles.Store.Analysis0);
@@ -2708,6 +2983,7 @@ switch Page_selection;
         set(get(handles.GroundMotions(15), 'Children'), 'Visible', 'off');
         set(get(handles.GroundMotions(16), 'Children'), 'Visible', 'off');
         set(get(handles.GroundMotions(17), 'Children'), 'Visible', 'off');
+        set(handles.ESI,'Visible','off');
         set(handles.ES,'Visible','off');
         set(handles.Analysis,'Visible','off');
         if get(handles.EC(2),'Value') == 1
@@ -2753,6 +3029,7 @@ switch Page_selection;
     case 'Analysis'
         set(handles.Sidebar(7),'CData',handles.Store.Structure0);
         set(handles.Sidebar(8),'CData',handles.Store.Loading0);
+        set(handles.Sidebar(13),'CData',handles.Store.ExpSite0);
         set(handles.Sidebar(9),'CData',handles.Store.ExpSetup0);
         set(handles.Sidebar(10),'CData',handles.Store.ExpControl0);
         set(handles.Sidebar(11),'CData',handles.Store.Analysis1);
@@ -2764,6 +3041,7 @@ switch Page_selection;
         set(get(handles.GroundMotions(15), 'Children'), 'Visible', 'off');
         set(get(handles.GroundMotions(16), 'Children'), 'Visible', 'off');
         set(get(handles.GroundMotions(17), 'Children'), 'Visible', 'off');
+        set(handles.ESI,'Visible','off');
         set(handles.ES,'Visible','off');
         set(handles.EC,'Visible','off');
         set(handles.Analysis,'Visible','on');

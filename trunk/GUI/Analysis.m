@@ -38,15 +38,309 @@ analysis_option = get(gcbo,'Tag');
 switch action
     % =====================================================================
     case 'choose option'
-        % check if the analysis has already been stopped
-        if handles.Model.StopFlag == 1
-            % provide replay options
-            if strcmp(analysis_option,'Start')
-                replay = questdlg(sprintf('The experiment has ended.\nWould you like to replay\nthe results?'), ...
-                    'Replay', ...
-                    'Yes','No','Yes');
-                switch replay
-                    case 'Yes'
+        
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        if ~strcmp(handles.ExpSite.Type,'Actor')  % Local or Shadow Site
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        
+            % check if the analysis has NOT been previously stopped
+            if (handles.Model.StopFlag == 0)
+                switch analysis_option
+                    % ---------------------------------------------------------
+                    case 'Start'
+                        DIR = which('OPFE_Version.txt');
+                        DIR = fileparts(DIR);
+                        % return if TCL does not exist
+                        if ~exist(fullfile(DIR,'OPFE_Analysis.tcl'),'file')
+                            msgbox(sprintf('No .tcl file found!\nPlease write .tcl first.'),'Error','error')
+                            set(handles.Analysis(7),'Value',0);
+                            return
+                        end
+                        % initialize GUI display
+                        set(handles.Analysis(7),'CData',handles.Store.Start1a);
+                        handles.Store.AnalysisOption = analysis_option;
+                        guidata(findobj('Tag','OpenFrescoExpress'),handles);
+                        disp('Starting...');
+                        % start new analysis
+                        if handles.Model.firstStart
+                            handles.Model.firstStart = 0;
+                            guidata(findobj('Tag','OpenFrescoExpress'),handles);
+                            GUI_ErrorMonitors;
+                            GUI_StructuralOutput;
+                            if handles.Store.Animate
+                                GUI_AnimateStructure;
+                            end
+                            GUI_AnalysisControls;
+                            handles = guidata(findobj('Tag','OpenFrescoExpress'));
+                            set(handles.Sidebar(4),'CData',handles.Store.Start1b);
+                            
+                            % initialize plots
+                            switch handles.Model.Type
+                                case '1 DOF'
+                                    handles.Plots.SO1dplot  = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','SO1d'));
+                                    handles.Plots.SO1fplot  = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','SO1f'));
+                                    handles.Plots.SO1aplot  = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','SO1a'));
+                                    handles.Plots.SO1fdplot = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','SO1fd'));
+                                    handles.Plots.SO1fddot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','SO1fd'));
+                                    switch handles.GM.loadType
+                                        case 'Ground Motions'
+                                            handles.Plots.SO1agplot = line(handles.GM.scalet{1},handles.GM.scaleag{1},'LineWidth',1.0,'Parent',findobj('Tag','SO1ag'));
+                                            handles.Plots.SO1agdot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','SO1ag'));
+                                        case 'Initial Conditions'
+                                            handles.Plots.SO1agdot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','SO1ag'));
+                                    end
+                                    handles.Plots.EM1eplot       = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','EM1e'));
+                                    handles.Plots.EM1ffteplot    = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','EM1ffte'));
+                                    handles.Plots.EM1MeasCmdplot = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','EM1MeasCmd'));
+                                    handles.Plots.EM1MeasCmddot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','EM1MeasCmd'));
+                                    handles.Plots.EM1trackplot   = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','EM1track'));
+                                    
+                                case '2 DOF A'
+                                    handles.Plots.SO1dplot  = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','SO1d'));
+                                    handles.Plots.SO1fplot  = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','SO1f'));
+                                    handles.Plots.SO1aplot  = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','SO1a'));
+                                    handles.Plots.SO1fdplot = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','SO1fd'));
+                                    handles.Plots.SO1fddot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','SO1fd'));
+                                    switch handles.GM.loadType
+                                        case 'Ground Motions'
+                                            handles.Plots.SO1agplot = line(handles.GM.scalet{1},handles.GM.scaleag{1},'LineWidth',1.0,'Parent',findobj('Tag','SO1ag'));
+                                            handles.Plots.SO1agdot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','SO1ag'));
+                                            handles.Plots.SO2agplot = line(handles.GM.scalet{1},handles.GM.scaleag{1},'LineWidth',1.0,'Parent',findobj('Tag','SO2ag'));
+                                            handles.Plots.SO2agdot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','SO2ag'));
+                                        case 'Initial Conditions'
+                                            handles.Plots.SO1agdot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','SO1ag'));
+                                            handles.Plots.SO2agdot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','SO2ag'));
+                                    end
+                                    handles.Plots.SO1ddplot = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','SO1dd'));
+                                    handles.Plots.SO1dddot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','SO1dd'));
+                                    handles.Plots.SO2dplot  = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','SO2d'));
+                                    handles.Plots.SO2fplot  = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','SO2f'));
+                                    handles.Plots.SO2aplot  = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','SO2a'));
+                                    handles.Plots.SO2fdplot = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','SO2fd'));
+                                    handles.Plots.SO2fddot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','SO2fd'));
+                                    handles.Plots.SO2ffplot = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','SO2ff'));
+                                    handles.Plots.SO2ffdot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','SO2ff'));
+                                    
+                                    handles.Plots.EM1eplot       = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','EM1e'));
+                                    handles.Plots.EM1ffteplot    = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','EM1ffte'));
+                                    handles.Plots.EM1MeasCmdplot = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','EM1MeasCmd'));
+                                    handles.Plots.EM1MeasCmddot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','EM1MeasCmd'));
+                                    handles.Plots.EM1trackplot   = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','EM1track'));
+                                    handles.Plots.EM2eplot       = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','EM2e'));
+                                    handles.Plots.EM2ffteplot    = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','EM2ffte'));
+                                    handles.Plots.EM2MeasCmdplot = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','EM2MeasCmd'));
+                                    handles.Plots.EM2MeasCmddot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','EM2MeasCmd'));
+                                    handles.Plots.EM2trackplot   = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','EM2track'));
+                                    
+                                case '2 DOF B'
+                                    handles.Plots.SO1dplot  = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','SO1d'));
+                                    handles.Plots.SO1fplot  = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','SO1f'));
+                                    handles.Plots.SO1aplot  = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','SO1a'));
+                                    handles.Plots.SO1fdplot = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','SO1fd'));
+                                    handles.Plots.SO1fddot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','SO1fd'));
+                                    switch handles.GM.loadType
+                                        case 'Ground Motions'
+                                            handles.Plots.SO1agplot = line(handles.GM.scalet{1},handles.GM.scaleag{1},'LineWidth',1.0,'Parent',findobj('Tag','SO1ag'));
+                                            handles.Plots.SO1agdot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','SO1ag'));
+                                            handles.Plots.SO2agplot = line(handles.GM.scalet{2},handles.GM.scaleag{2},'LineWidth',1.0,'Parent',findobj('Tag','SO2ag'));
+                                            handles.Plots.SO2agdot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','SO2ag'));
+                                        case 'Initial Conditions'
+                                            handles.Plots.SO1agdot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','SO1ag'));
+                                            handles.Plots.SO2agdot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','SO2ag'));
+                                    end
+                                    handles.Plots.SO1ddplot = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','SO1dd'));
+                                    handles.Plots.SO1dddot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','SO1dd'));
+                                    handles.Plots.SO2dplot  = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','SO2d'));
+                                    handles.Plots.SO2fplot  = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','SO2f'));
+                                    handles.Plots.SO2aplot  = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','SO2a'));
+                                    handles.Plots.SO2fdplot = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','SO2fd'));
+                                    handles.Plots.SO2fddot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','SO2fd'));
+                                    handles.Plots.SO2ffplot = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','SO2ff'));
+                                    handles.Plots.SO2ffdot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','SO2ff'));
+                                    
+                                    handles.Plots.EM1eplot       = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','EM1e'));
+                                    handles.Plots.EM1ffteplot    = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','EM1ffte'));
+                                    handles.Plots.EM1MeasCmdplot = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','EM1MeasCmd'));
+                                    handles.Plots.EM1MeasCmddot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','EM1MeasCmd'));
+                                    handles.Plots.EM1trackplot   = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','EM1track'));
+                                    handles.Plots.EM2eplot       = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','EM2e'));
+                                    handles.Plots.EM2ffteplot    = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','EM2ffte'));
+                                    handles.Plots.EM2MeasCmdplot = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','EM2MeasCmd'));
+                                    handles.Plots.EM2MeasCmddot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','EM2MeasCmd'));
+                                    handles.Plots.EM2trackplot   = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','EM2track'));
+                            end
+                            set(findobj('Tag','StartControl'),'Value',1)
+                            set(handles.Analysis(7),'Value',1);
+                            guidata(findobj('Tag','OpenFrescoExpress'),handles);
+                            DIR = which('OPFE_Version.txt');
+                            DIR = fileparts(DIR);
+                            % load path to OpenSees.exe and OpenFresco.dll
+                            if ~exist('OPS-OPF-Path.txt','file')
+                                fprintf(1,'Using GUI-internal OpenSees/OpenFresco at:\n');
+                                pathOPF = which('Pnpscr.dll');
+                                pathOPF = pathOPF(1:end-11);
+                                fprintf(1,'%s\n',pathOPF);
+                            else
+                                fprintf(1,'Using user-specified OpenSees/OpenFresco at:\n');
+                                s = which('OPS-OPF-Path.txt');
+                                if isempty(s)
+                                    s = fullfile(pwd,'OPS-OPF-Path.txt');
+                                end
+                                FID = fopen(s,'r');
+                                pathOPF = fgetl(FID);
+                                fclose(FID);
+                                fprintf(1,'%s\n',pathOPF);
+                            end
+                            % now run OpenSees/OpenFresco in console
+                            RunOpenFresco(pathOPF,fullfile(DIR,'OPFE_Analysis.tcl'),1);
+                            clear functions;
+                            if strcmp(handles.GM.integrator,'NewmarkExplicit')
+                                handles.Response = Integrator_NewmarkExplicit(handles.Model,handles.GM,[],handles.Analysis);
+                            elseif strcmp(handles.GM.integrator,'AlphaOS')
+                                handles.Response = Integrator_AlphaOS(handles.Model,handles.GM,[],handles.Analysis);
+                            end
+                            % set analysis to "stopped"
+                            set(findobj('Tag','StopControl'),'Value',1);
+                            set(handles.Analysis(9),'Value',1);
+                            set(handles.Analysis(7),'CData',handles.Store.Start0a);
+                            set(handles.Analysis(8),'CData',handles.Store.Pause0a);
+                            set(handles.Analysis(9),'CData',handles.Store.Stop1a);
+                            set(handles.Sidebar(4),'CData',handles.Store.Start0b);
+                            set(handles.Sidebar(5),'CData',handles.Store.Pause0b);
+                            set(handles.Sidebar(6),'CData',handles.Store.Stop1b);
+                            handles.Model.StopFlag = 1;
+                            handles.Store.AnalysisOption = 'Stop';
+                            % save results
+                            saveResults = questdlg(sprintf('Analysis complete!\nWould you like to save the test results?'),'Save?','Yes','No','Yes');
+                            if strcmp(saveResults,'Yes')
+                                Response = handles.Response; %#ok<NASGU>
+                                uisave('Response');
+                            end
+                        else  % resume paused analysis
+                            set(findobj('Tag','Start'),'Value',1);
+                            set(handles.Analysis(7),'Value',1);
+                            set(handles.Analysis(7),'CData',handles.Store.Start1a);
+                            set(handles.Analysis(8),'CData',handles.Store.Pause0a);
+                            set(handles.Analysis(9),'CData',handles.Store.Stop0a);
+                            set(handles.Sidebar(4),'CData',handles.Store.Start1b);
+                            set(handles.Sidebar(5),'CData',handles.Store.Pause0b);
+                            set(handles.Sidebar(6),'CData',handles.Store.Stop0b);
+                            figure(findobj('Tag','ErrMon'));
+                            if ~isempty(findobj('Tag','StructOutDOF2'));
+                                figure(findobj('Tag','StructOutDOF2'));
+                            end
+                            figure(findobj('Tag','StructOutDOF1'));
+                            figure(findobj('Tag','AnalysisControls'));
+                        end
+                    % ---------------------------------------------------------
+                    case 'Pause'
+                        % return if test not yet started
+                        if handles.Model.firstStart
+                            msgbox('Test not yet started!','Error','error');
+                            return
+                        end
+                        
+                        handles.Store.AnalysisOption = analysis_option;
+                        disp('Paused...');
+                        set(findobj('Tag','Pause'),'Value',1);
+                        set(handles.Analysis(8),'Value',1);
+                        set(handles.Analysis(7),'CData',handles.Store.Start0a);
+                        set(handles.Analysis(8),'CData',handles.Store.Pause1a);
+                        set(handles.Analysis(9),'CData',handles.Store.Stop0a);
+                        set(handles.Sidebar(4),'CData',handles.Store.Start0b);
+                        set(handles.Sidebar(5),'CData',handles.Store.Pause1b);
+                        set(handles.Sidebar(6),'CData',handles.Store.Stop0b);
+                        % bring figures to front
+                        figure(findobj('Tag','ErrMon'));
+                        if ~isempty(findobj('Tag','StructOutDOF2'))
+                            figure(findobj('Tag','StructOutDOF2'));
+                        end
+                        figure(findobj('Tag','StructOutDOF1'));
+                    % ---------------------------------------------------------
+                    case 'Stop'
+                        % return if test not yet started
+                        if handles.Model.firstStart
+                            msgbox('Test not yet started!','Error','error');
+                            return
+                        end
+                        
+                        set(findobj('Tag','Stop'),'Value',1);
+                        set(handles.Analysis(9),'Value',1);
+                        set(handles.Analysis(7),'CData',handles.Store.Start0a);
+                        set(handles.Analysis(8),'CData',handles.Store.Pause0a);
+                        set(handles.Analysis(9),'CData',handles.Store.Stop1a);
+                        set(handles.Sidebar(4),'CData',handles.Store.Start0b);
+                        set(handles.Sidebar(5),'CData',handles.Store.Pause0b);
+                        set(handles.Sidebar(6),'CData',handles.Store.Stop1b);
+                        % bring figures to front
+                        figure(findobj('Tag','ErrMon'));
+                        if ~isempty(findobj('Tag','StructOutDOF2'))
+                            figure(findobj('Tag','StructOutDOF2'));
+                        end
+                        figure(findobj('Tag','StructOutDOF1'));
+                        % determine stopping method
+                        stop_option = questdlg('How would you like to proceed?', ...
+                            'Stop Test', ...
+                            'Unload', 'Save State', 'Cancel', 'Unload');
+                        handles.Store.StopOption = stop_option;
+                        set(findobj('Tag','Stop'),'Value',1);
+                        set(handles.Analysis(9),'Value',1);
+                        switch stop_option
+                            case 'Unload'
+                                handles.Store.AnalysisOption = analysis_option;
+                                disp('Unloading...');
+                                handles.Model.StopFlag = 1;
+                            case 'Save State'
+                                handles.Store.AnalysisOption = analysis_option;
+                                disp('Saving...');
+                                handles.Model.StopFlag = 1;
+                            case 'Cancel'
+                                handles.Model.StopFlag = 0;
+                                id = find(strcmp(handles.Store.AnalysisOption, get(handles.Analysis(7:8),'Tag')) == 1);
+                                set(handles.Analysis(id+6),'Value',1);
+                                if id == 1
+                                    set(findobj('Tag','Start'),'Value',1);
+                                    set(handles.Analysis(7),'CData',handles.Store.Start1a);
+                                    set(handles.Analysis(8),'CData',handles.Store.Pause0a);
+                                    set(handles.Analysis(9),'CData',handles.Store.Stop0a);
+                                    set(handles.Sidebar(4),'CData',handles.Store.Start1b,'Value',1);
+                                    set(handles.Sidebar(5),'CData',handles.Store.Pause0b);
+                                    set(handles.Sidebar(6),'CData',handles.Store.Stop0b);
+                                elseif id == 2
+                                    set(findobj('Tag','Pause'),'Value',1)
+                                    set(handles.Analysis(7),'CData',handles.Store.Start0a);
+                                    set(handles.Analysis(8),'CData',handles.Store.Pause1a);
+                                    set(handles.Analysis(9),'CData',handles.Store.Stop0a);
+                                    set(handles.Sidebar(4),'CData',handles.Store.Start0b);
+                                    set(handles.Sidebar(5),'CData',handles.Store.Pause1b,'Value',1);
+                                    set(handles.Sidebar(6),'CData',handles.Store.Stop0b);
+                                else
+                                    set(findobj('Tag','Stop'),'Value',1)
+                                    set(handles.Analysis(7),'CData',handles.Store.Start0a);
+                                    set(handles.Analysis(8),'CData',handles.Store.Pause0a);
+                                    set(handles.Analysis(9),'CData',handles.Store.Stop1a);
+                                    set(handles.Sidebar(4),'CData',handles.Store.Start0b);
+                                    set(handles.Sidebar(5),'CData',handles.Store.Pause0b);
+                                    set(handles.Sidebar(6),'CData',handles.Store.Stop1b,'Value',1);
+                                end
+                                % bring figures to front
+                                figure(findobj('Tag','ErrMon'));
+                                if ~isempty(findobj('Tag','StructOutDOF2'))
+                                    figure(findobj('Tag','StructOutDOF2'));
+                                end
+                                figure(findobj('Tag','StructOutDOF1'));
+                        end
+                    % ---------------------------------------------------------
+                end
+                guidata(findobj('Tag','OpenFrescoExpress'),handles);
+                
+            else  % if the analysis has already been stopped
+                % provide replay options
+                if strcmp(analysis_option,'Start')
+                    replay = questdlg(sprintf('The experiment has ended.\nWould you like to replay\nthe results?'), ...
+                        'Replay', ...
+                        'Yes','No','Yes');
+                    if strcmpi(replay,'Yes')
                         disp('Replaying...');
                         handles.Model.StopFlag = 0;
                         startCall1 = get(handles.Analysis(7),'Callback');
@@ -65,7 +359,7 @@ switch action
                         set(handles.Sidebar(6),'CData',handles.Store.Stop0b,'Callback','');
                         
                         % update handles structure
-                        guidata(findobj('Tag','OpenFrescoExpress'), handles);
+                        guidata(findobj('Tag','OpenFrescoExpress'),handles);
                         
                         figure(findobj('Tag','ErrMon'));
                         if ~isempty(findobj('Tag','StructOutDOF2'))
@@ -88,8 +382,8 @@ switch action
                         set(handles.Sidebar(6),'CData',handles.Store.Stop1b,'Value',1,'Callback',stopCall2);
                         handles.Model.StopFlag = 1;
                         % update handles structure
-                        guidata(findobj('Tag','OpenFrescoExpress'), handles);
-                    case 'No'
+                        guidata(findobj('Tag','OpenFrescoExpress'),handles);
+                    else
                         msgbox(sprintf('Experiment has ended.\nChoose "Run New Test" to start a new test.'),'Error','error');
                         set(handles.Sidebar(6),'Value',1);
                         set(handles.Analysis(9),'Value',1);
@@ -99,242 +393,10 @@ switch action
                         set(handles.Sidebar(4),'CData',handles.Store.Start0b);
                         set(handles.Sidebar(5),'CData',handles.Store.Pause0b);
                         set(handles.Sidebar(6),'CData',handles.Store.Stop1b);
-                end
-            else
-                msgbox(sprintf('Experiment has ended.\nChoose "Run New Test" to start a new test.'),'Error','error');
-                set(handles.Sidebar(6),'Value',1);
-                set(handles.Analysis(9),'Value',1);
-                set(handles.Analysis(7),'CData',handles.Store.Start0a);
-                set(handles.Analysis(8),'CData',handles.Store.Pause0a);
-                set(handles.Analysis(9),'CData',handles.Store.Stop1a);
-                set(handles.Sidebar(4),'CData',handles.Store.Start0b);
-                set(handles.Sidebar(5),'CData',handles.Store.Pause0b);
-                set(handles.Sidebar(6),'CData',handles.Store.Stop1b);
-            end
-            
-        else
-            % if the analysis has NOT been previously stopped
-            switch analysis_option
-                % ---------------------------------------------------------
-                case 'Start'
-                    DIR = which('OPFE_Version.txt');
-                    DIR = fileparts(DIR);
-                    % return if TCL does not exist
-                    if ~exist(fullfile(DIR,'OPFE_Analysis.tcl'),'file')
-                        msgbox(sprintf('No .tcl file found!\nPlease write .tcl first.'),'Error','error')
-                        set(handles.Analysis(7),'Value',0);
-                        return
                     end
-                    % initialize GUI display
-                    set(handles.Analysis(7),'CData',handles.Store.Start1a);
-                    handles.Store.AnalysisOption = analysis_option;
-                    guidata(findobj('Tag','OpenFrescoExpress'), handles);
-                    disp('Starting...');
-                    % start new analysis
-                    if handles.Model.firstStart
-                        handles.Model.firstStart = 0;
-                        guidata(findobj('Tag','OpenFrescoExpress'), handles);
-                        GUI_ErrorMonitors;
-                        GUI_StructuralOutput;
-                        if handles.Store.Animate
-                            GUI_AnimateStructure;
-                        end
-                        GUI_AnalysisControls;
-                        handles = guidata(findobj('Tag','OpenFrescoExpress'));
-                        set(handles.Sidebar(4),'CData',handles.Store.Start1b);
-                        
-                        % initialize plots
-                        switch handles.Model.Type
-                            case '1 DOF'
-                                handles.Plots.SO1dplot  = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','SO1d'));
-                                handles.Plots.SO1fplot  = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','SO1f'));
-                                handles.Plots.SO1aplot  = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','SO1a'));
-                                handles.Plots.SO1fdplot = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','SO1fd'));
-                                handles.Plots.SO1fddot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','SO1fd'));
-                                switch handles.GM.loadType
-                                    case 'Ground Motions'
-                                        handles.Plots.SO1agplot = line(handles.GM.scalet{1},handles.GM.scaleag{1},'LineWidth',1.0,'Parent',findobj('Tag','SO1ag'));
-                                        handles.Plots.SO1agdot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','SO1ag'));
-                                    case 'Initial Conditions'
-                                        handles.Plots.SO1agdot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','SO1ag'));
-                                end
-                                handles.Plots.EM1eplot       = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','EM1e'));
-                                handles.Plots.EM1ffteplot    = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','EM1ffte'));
-                                handles.Plots.EM1MeasCmdplot = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','EM1MeasCmd'));
-                                handles.Plots.EM1MeasCmddot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','EM1MeasCmd'));
-                                handles.Plots.EM1trackplot   = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','EM1track'));
-                                
-                            case '2 DOF A'
-                                handles.Plots.SO1dplot  = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','SO1d'));
-                                handles.Plots.SO1fplot  = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','SO1f'));
-                                handles.Plots.SO1aplot  = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','SO1a'));
-                                handles.Plots.SO1fdplot = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','SO1fd'));
-                                handles.Plots.SO1fddot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','SO1fd'));
-                                switch handles.GM.loadType
-                                    case 'Ground Motions'
-                                        handles.Plots.SO1agplot = line(handles.GM.scalet{1},handles.GM.scaleag{1},'LineWidth',1.0,'Parent',findobj('Tag','SO1ag'));
-                                        handles.Plots.SO1agdot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','SO1ag'));
-                                        handles.Plots.SO2agplot = line(handles.GM.scalet{1},handles.GM.scaleag{1},'LineWidth',1.0,'Parent',findobj('Tag','SO2ag'));
-                                        handles.Plots.SO2agdot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','SO2ag'));
-                                    case 'Initial Conditions'
-                                        handles.Plots.SO1agdot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','SO1ag'));
-                                        handles.Plots.SO2agdot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','SO2ag'));
-                                end
-                                handles.Plots.SO1ddplot = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','SO1dd'));
-                                handles.Plots.SO1dddot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','SO1dd'));
-                                handles.Plots.SO2dplot  = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','SO2d'));
-                                handles.Plots.SO2fplot  = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','SO2f'));
-                                handles.Plots.SO2aplot  = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','SO2a'));
-                                handles.Plots.SO2fdplot = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','SO2fd'));
-                                handles.Plots.SO2fddot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','SO2fd'));
-                                handles.Plots.SO2ffplot = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','SO2ff'));
-                                handles.Plots.SO2ffdot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','SO2ff'));
-                                
-                                handles.Plots.EM1eplot       = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','EM1e'));
-                                handles.Plots.EM1ffteplot    = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','EM1ffte'));
-                                handles.Plots.EM1MeasCmdplot = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','EM1MeasCmd'));
-                                handles.Plots.EM1MeasCmddot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','EM1MeasCmd'));
-                                handles.Plots.EM1trackplot   = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','EM1track'));
-                                handles.Plots.EM2eplot       = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','EM2e'));
-                                handles.Plots.EM2ffteplot    = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','EM2ffte'));
-                                handles.Plots.EM2MeasCmdplot = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','EM2MeasCmd'));
-                                handles.Plots.EM2MeasCmddot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','EM2MeasCmd'));
-                                handles.Plots.EM2trackplot   = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','EM2track'));
-                                
-                            case '2 DOF B'
-                                handles.Plots.SO1dplot  = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','SO1d'));
-                                handles.Plots.SO1fplot  = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','SO1f'));
-                                handles.Plots.SO1aplot  = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','SO1a'));
-                                handles.Plots.SO1fdplot = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','SO1fd'));
-                                handles.Plots.SO1fddot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','SO1fd'));
-                                switch handles.GM.loadType
-                                    case 'Ground Motions'
-                                        handles.Plots.SO1agplot = line(handles.GM.scalet{1},handles.GM.scaleag{1},'LineWidth',1.0,'Parent',findobj('Tag','SO1ag'));
-                                        handles.Plots.SO1agdot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','SO1ag'));
-                                        handles.Plots.SO2agplot = line(handles.GM.scalet{2},handles.GM.scaleag{2},'LineWidth',1.0,'Parent',findobj('Tag','SO2ag'));
-                                        handles.Plots.SO2agdot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','SO2ag'));
-                                    case 'Initial Conditions'
-                                        handles.Plots.SO1agdot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','SO1ag'));
-                                        handles.Plots.SO2agdot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','SO2ag'));
-                                end
-                                handles.Plots.SO1ddplot = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','SO1dd'));
-                                handles.Plots.SO1dddot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','SO1dd'));
-                                handles.Plots.SO2dplot  = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','SO2d'));
-                                handles.Plots.SO2fplot  = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','SO2f'));
-                                handles.Plots.SO2aplot  = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','SO2a'));
-                                handles.Plots.SO2fdplot = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','SO2fd'));
-                                handles.Plots.SO2fddot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','SO2fd'));
-                                handles.Plots.SO2ffplot = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','SO2ff'));
-                                handles.Plots.SO2ffdot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','SO2ff'));
-                                
-                                handles.Plots.EM1eplot       = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','EM1e'));
-                                handles.Plots.EM1ffteplot    = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','EM1ffte'));
-                                handles.Plots.EM1MeasCmdplot = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','EM1MeasCmd'));
-                                handles.Plots.EM1MeasCmddot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','EM1MeasCmd'));
-                                handles.Plots.EM1trackplot   = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','EM1track'));
-                                handles.Plots.EM2eplot       = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','EM2e'));
-                                handles.Plots.EM2ffteplot    = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','EM2ffte'));
-                                handles.Plots.EM2MeasCmdplot = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','EM2MeasCmd'));
-                                handles.Plots.EM2MeasCmddot  = line(0,0,'Color','red','Marker','o','LineWidth',1.0,'Parent',findobj('Tag','EM2MeasCmd'));
-                                handles.Plots.EM2trackplot   = line(0,0,'LineWidth',1.0,'Parent',findobj('Tag','EM2track'));
-                        end
-                        set(findobj('Tag','StartControl'),'Value',1)
-                        set(handles.Analysis(7),'Value',1);
-                        guidata(findobj('Tag','OpenFrescoExpress'), handles);
-                        DIR = which('OPFE_Version.txt');
-                        DIR = fileparts(DIR);
-                        % load path to OpenSees.exe and OpenFresco.dll
-                        if ~exist('OPS-OPF-Path.txt','file')
-                            fprintf(1,'Using GUI-internal OpenSees/OpenFresco at:\n');
-                            pathOPF = which('Pnpscr.dll');
-                            pathOPF = pathOPF(1:end-11);
-                            fprintf(1,'%s\n',pathOPF);
-                        else
-                            fprintf(1,'Using user-specified OpenSees/OpenFresco at:\n');
-                            s = which('OPS-OPF-Path.txt');
-                            if isempty(s)
-                                s = fullfile(pwd,'OPS-OPF-Path.txt');
-                            end
-                            FID = fopen(s,'r');
-                            pathOPF = fgetl(FID);
-                            fclose(FID);
-                            fprintf(1,'%s\n',pathOPF);
-                        end
-                        % now run OpenSees/OpenFresco
-                        RunOpenFresco(pathOPF,fullfile(DIR,'OPFE_Analysis.tcl'));
-                        clear functions;
-                        if strcmp(handles.GM.integrator,'NewmarkExplicit')
-                            handles.Response = Integrator_NewmarkExplicit(handles.Model,handles.GM,[],handles.Analysis);
-                        elseif strcmp(handles.GM.integrator,'AlphaOS')
-                            handles.Response = Integrator_AlphaOS(handles.Model,handles.GM,[],handles.Analysis);
-                        end
-                        % set analysis to "stopped"
-                        set(findobj('Tag','StopControl'),'Value',1);
-                        set(handles.Analysis(9),'Value',1);
-                        set(handles.Analysis(7),'CData',handles.Store.Start0a);
-                        set(handles.Analysis(8),'CData',handles.Store.Pause0a);
-                        set(handles.Analysis(9),'CData',handles.Store.Stop1a);
-                        set(handles.Sidebar(4),'CData',handles.Store.Start0b);
-                        set(handles.Sidebar(5),'CData',handles.Store.Pause0b);
-                        set(handles.Sidebar(6),'CData',handles.Store.Stop1b);
-                        handles.Model.StopFlag = 1;
-                        handles.Store.AnalysisOption = 'Stop';
-                        % save results
-                        saveResults = questdlg(sprintf('Analysis complete!\nWould you like to save the test results?'),'Save?','Yes','No','Yes');
-                        if strcmp(saveResults,'Yes')
-                            Response = handles.Response; %#ok<NASGU>
-                            uisave('Response');
-                        end
-                    % resume paused analysis
-                    else
-                        set(findobj('Tag','Start'),'Value',1);
-                        set(handles.Analysis(7),'Value',1);
-                        set(handles.Analysis(7),'CData',handles.Store.Start1a);
-                        set(handles.Analysis(8),'CData',handles.Store.Pause0a);
-                        set(handles.Analysis(9),'CData',handles.Store.Stop0a);
-                        set(handles.Sidebar(4),'CData',handles.Store.Start1b);
-                        set(handles.Sidebar(5),'CData',handles.Store.Pause0b);
-                        set(handles.Sidebar(6),'CData',handles.Store.Stop0b);
-                        figure(findobj('Tag','ErrMon'));
-                        if ~isempty(findobj('Tag','StructOutDOF2'));
-                            figure(findobj('Tag','StructOutDOF2'));
-                        end
-                        figure(findobj('Tag','StructOutDOF1'));
-                        figure(findobj('Tag','AnalysisControls'));
-                    end
-                % ---------------------------------------------------------
-                case 'Pause'
-                    % return if test not yet started
-                    if handles.Model.firstStart
-                        msgbox('Test not yet started!','Error','error');
-                        return
-                    end
-                    
-                    handles.Store.AnalysisOption = analysis_option;
-                    disp('Paused...');
-                    set(findobj('Tag','Pause'),'Value',1);
-                    set(handles.Analysis(8),'Value',1);
-                    set(handles.Analysis(7),'CData',handles.Store.Start0a);
-                    set(handles.Analysis(8),'CData',handles.Store.Pause1a);
-                    set(handles.Analysis(9),'CData',handles.Store.Stop0a);
-                    set(handles.Sidebar(4),'CData',handles.Store.Start0b);
-                    set(handles.Sidebar(5),'CData',handles.Store.Pause1b);
-                    set(handles.Sidebar(6),'CData',handles.Store.Stop0b);
-                    % bring figures to front
-                    figure(findobj('Tag','ErrMon'));
-                    if ~isempty(findobj('Tag','StructOutDOF2'))
-                        figure(findobj('Tag','StructOutDOF2'));
-                    end
-                    figure(findobj('Tag','StructOutDOF1'));
-                % ---------------------------------------------------------
-                case 'Stop'
-                    % return if test not yet started
-                    if handles.Model.firstStart
-                        msgbox('Test not yet started!','Error','error');
-                        return
-                    end
-                    
-                    set(findobj('Tag','Stop'),'Value',1);
+                else
+                    msgbox(sprintf('Experiment has ended.\nChoose "Run New Test" to start a new test.'),'Error','error');
+                    set(handles.Sidebar(6),'Value',1);
                     set(handles.Analysis(9),'Value',1);
                     set(handles.Analysis(7),'CData',handles.Store.Start0a);
                     set(handles.Analysis(8),'CData',handles.Store.Pause0a);
@@ -342,69 +404,123 @@ switch action
                     set(handles.Sidebar(4),'CData',handles.Store.Start0b);
                     set(handles.Sidebar(5),'CData',handles.Store.Pause0b);
                     set(handles.Sidebar(6),'CData',handles.Store.Stop1b);
-                    % bring figures to front
-                    figure(findobj('Tag','ErrMon'));
-                    if ~isempty(findobj('Tag','StructOutDOF2'))
-                        figure(findobj('Tag','StructOutDOF2'));
-                    end
-                    figure(findobj('Tag','StructOutDOF1'));
-                    % determine stopping method
-                    stop_option = questdlg('How would you like to proceed?', ...
-                        'Stop Test', ...
-                        'Unload', 'Save State', 'Cancel', 'Unload');
-                    handles.Store.StopOption = stop_option;
-                    set(findobj('Tag','Stop'),'Value',1);
-                    set(handles.Analysis(9),'Value',1);
-                    switch stop_option
-                        case 'Unload'
-                            handles.Store.AnalysisOption = analysis_option;
-                            disp('Unloading...');
-                            handles.Model.StopFlag = 1;
-                        case 'Save State'
-                            handles.Store.AnalysisOption = analysis_option;
-                            disp('Saving...');
-                            handles.Model.StopFlag = 1;
-                        case 'Cancel'
-                            handles.Model.StopFlag = 0;
-                            id = find(strcmp(handles.Store.AnalysisOption, get(handles.Analysis(7:8),'Tag')) == 1);
-                            set(handles.Analysis(id+6),'Value',1);
-                            if id == 1
-                                set(findobj('Tag','Start'),'Value',1);
-                                set(handles.Analysis(7),'CData',handles.Store.Start1a);
-                                set(handles.Analysis(8),'CData',handles.Store.Pause0a);
-                                set(handles.Analysis(9),'CData',handles.Store.Stop0a);
-                                set(handles.Sidebar(4),'CData',handles.Store.Start1b,'Value',1);
-                                set(handles.Sidebar(5),'CData',handles.Store.Pause0b);
-                                set(handles.Sidebar(6),'CData',handles.Store.Stop0b);
-                            elseif id == 2
-                                set(findobj('Tag','Pause'),'Value',1)
-                                set(handles.Analysis(7),'CData',handles.Store.Start0a);
-                                set(handles.Analysis(8),'CData',handles.Store.Pause1a);
-                                set(handles.Analysis(9),'CData',handles.Store.Stop0a);
-                                set(handles.Sidebar(4),'CData',handles.Store.Start0b);
-                                set(handles.Sidebar(5),'CData',handles.Store.Pause1b,'Value',1);
-                                set(handles.Sidebar(6),'CData',handles.Store.Stop0b);
-                            else
-                                set(findobj('Tag','Stop'),'Value',1)
-                                set(handles.Analysis(7),'CData',handles.Store.Start0a);
-                                set(handles.Analysis(8),'CData',handles.Store.Pause0a);
-                                set(handles.Analysis(9),'CData',handles.Store.Stop1a);
-                                set(handles.Sidebar(4),'CData',handles.Store.Start0b);
-                                set(handles.Sidebar(5),'CData',handles.Store.Pause0b);
-                                set(handles.Sidebar(6),'CData',handles.Store.Stop1b,'Value',1);
-                            end
-                            % bring figures to front
-                            figure(findobj('Tag','ErrMon'));
-                            if ~isempty(findobj('Tag','StructOutDOF2'))
-                                figure(findobj('Tag','StructOutDOF2'));
-                            end
-                            figure(findobj('Tag','StructOutDOF1'));
-                    end
-                % ---------------------------------------------------------
+                end
             end
-            guidata(findobj('Tag','OpenFrescoExpress'), handles);
+            
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        else  % Actor Site
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            
+            % check if the analysis has NOT been previously stopped
+            if (handles.Model.StopFlag == 0)
+                switch analysis_option
+                    % ---------------------------------------------------------
+                    case 'Start'
+                        DIR = which('OPFE_Version.txt');
+                        DIR = fileparts(DIR);
+                        % return if TCL does not exist
+                        if ~exist(fullfile(DIR,'OPFE_Analysis.tcl'),'file')
+                            msgbox(sprintf('No .tcl file found!\nPlease write .tcl first.'),'Error','error')
+                            set(handles.Analysis(7),'Value',0);
+                            return
+                        end
+                        % initialize GUI display
+                        set(handles.Analysis(7),'CData',handles.Store.Start1a);
+                        handles.Store.AnalysisOption = analysis_option;
+                        guidata(findobj('Tag','OpenFrescoExpress'),handles);
+                        disp('Starting...');
+                        if handles.Model.firstStart
+                            handles.Model.firstStart = 0;
+                            set(handles.Analysis(7),'Value',1);
+                            guidata(findobj('Tag','OpenFrescoExpress'),handles);
+                            DIR = which('OPFE_Version.txt');
+                            DIR = fileparts(DIR);
+                            % load path to OpenSees.exe and OpenFresco.dll
+                            if ~exist('OPS-OPF-Path.txt','file')
+                                fprintf(1,'Using GUI-internal OpenSees/OpenFresco at:\n');
+                                pathOPF = which('Pnpscr.dll');
+                                pathOPF = pathOPF(1:end-11);
+                                fprintf(1,'%s\n',pathOPF);
+                            else
+                                fprintf(1,'Using user-specified OpenSees/OpenFresco at:\n');
+                                s = which('OPS-OPF-Path.txt');
+                                if isempty(s)
+                                    s = fullfile(pwd,'OPS-OPF-Path.txt');
+                                end
+                                FID = fopen(s,'r');
+                                pathOPF = fgetl(FID);
+                                fclose(FID);
+                                fprintf(1,'%s\n',pathOPF);
+                            end
+                            % disable pause, run new test, and quit buttons
+                            set(handles.Analysis([8,10,11]),'Enable','off');
+                            % now run OpenSees/OpenFresco in console
+                            RunOpenFresco(pathOPF,fullfile(DIR,'OPFE_Analysis.tcl'),1);
+                            clear functions;
+                            hWarn = msgbox(['Make sure OpenSees/OpenFresco has successfully executed ', ...
+                                'and the console window has automatically been closed by the client ', ...
+                                'before clicking STOP on the Analysis page!'],'Console Warning','warn');
+                            set(hWarn,'Tag','ConsoleMsg','Units','normalized');
+                            pos = get(hWarn,'Position');
+                            set(hWarn,'Position',[0.5-0.5*pos(3)+0.22*pos(3),0.5-0.5*pos(4)-1.0*pos(4),pos(3),pos(4)]);
+                            waitfor(handles.Analysis(9),'Value',1);
+                            % set analysis to "stopped"
+                            set(findobj('Tag','StopControl'),'Value',1);
+                            set(handles.Analysis(9),'Value',1);
+                            set(handles.Analysis(7),'CData',handles.Store.Start0a);
+                            set(handles.Analysis(8),'CData',handles.Store.Pause0a,'Enable','on');
+                            set(handles.Analysis(9),'CData',handles.Store.Stop1a);
+                            set(handles.Analysis([10,11]),'Enable','on');
+                            handles.Model.StopFlag = 1;
+                            handles.Store.AnalysisOption = 'Stop';
+                            close(findobj('Tag','ConsoleMsg'));
+                        end
+                    % ---------------------------------------------------------
+                    case 'Pause'
+                        % return if test not yet started
+                        if handles.Model.firstStart
+                            msgbox('Test not yet started!','Error','error');
+                            return
+                        end
+                        
+                        handles.Store.AnalysisOption = analysis_option;
+                        disp('Paused...');
+                        set(findobj('Tag','Pause'),'Value',1);
+                        set(handles.Analysis(8),'Value',1);
+                        set(handles.Analysis(7),'CData',handles.Store.Start0a);
+                        set(handles.Analysis(8),'CData',handles.Store.Pause1a);
+                        set(handles.Analysis(9),'CData',handles.Store.Stop0a);
+                    % ---------------------------------------------------------
+                    case 'Stop'
+                        % return if test not yet started
+                        if handles.Model.firstStart
+                            msgbox('Test not yet started!','Error','error');
+                            return
+                        end
+                        
+                        set(findobj('Tag','Stop'),'Value',1);
+                        set(handles.Analysis(9),'Value',1);
+                        set(handles.Analysis(7),'CData',handles.Store.Start0a);
+                        set(handles.Analysis(8),'CData',handles.Store.Pause0a);
+                        set(handles.Analysis(9),'CData',handles.Store.Stop1a);
+                        set(findobj('Tag','Stop'),'Value',1);
+                        set(handles.Analysis(9),'Value',1);
+                        handles.Store.AnalysisOption = analysis_option;
+                        handles.Model.StopFlag = 1;
+                    % ---------------------------------------------------------
+                end
+                guidata(findobj('Tag','OpenFrescoExpress'),handles);
+                
+            else  % if the analysis has already been stopped
+                msgbox(sprintf('Experiment has ended.\nChoose "Run New Test" to start a new test.'),'Error','error');
+                set(handles.Sidebar(6),'Value',1);
+                set(handles.Analysis(9),'Value',1);
+                set(handles.Analysis(7),'CData',handles.Store.Start0a);
+                set(handles.Analysis(8),'CData',handles.Store.Pause0a);
+                set(handles.Analysis(9),'CData',handles.Store.Stop1a);
+            end
         end
-    % =====================================================================        
+    % =====================================================================
     case 'generate report'
         % display report summarizing inputs
         Report;
@@ -448,6 +564,7 @@ switch action
         set(handles.Sidebar(1),'SelectedObject',tabs(5));
         set(handles.Sidebar(7),'CData',handles.Store.Structure1);
         set(handles.Sidebar(8),'CData',handles.Store.Loading0);
+        set(handles.Sidebar(13),'CData',handles.Store.ExpSite0);
         set(handles.Sidebar(9),'CData',handles.Store.ExpSetup0);
         set(handles.Sidebar(10),'CData',handles.Store.ExpControl0);
         set(handles.Sidebar(11),'CData',handles.Store.Analysis0);
@@ -462,6 +579,7 @@ switch action
         set(get(handles.GroundMotions(15), 'Children'), 'Visible', 'off');
         set(get(handles.GroundMotions(16), 'Children'), 'Visible', 'off');
         set(get(handles.GroundMotions(17), 'Children'), 'Visible', 'off');
+        set(handles.ESI,'Visible','off');
         set(handles.ES,'Visible','off');
         set(handles.EC,'Visible','off');
         set(handles.Analysis,'Visible','off');
@@ -470,10 +588,10 @@ switch action
         set(handles.Analysis(8),'CData',handles.Store.Pause0a);
         set(handles.Analysis(9),'CData',handles.Store.Stop0a);
         % update handles structure
-        guidata(findobj('Tag','OpenFrescoExpress'), handles);
+        guidata(findobj('Tag','OpenFrescoExpress'),handles);
     % =====================================================================
     case 'dtAnalysis'
-        input_val = str2num(get(gcbo,'String'));
+        input_val = str2num(get(gcbo,'String')); %#ok<ST2NM>
         if input_val > handles.Model.Maxdt
             msgbox(['Time step too large! Must be less than ' num2str(handles.Model.Maxdt)],'Error','error');
             set(handles.Analysis(3),'String',handles.GM.dtAnalysis);
@@ -481,7 +599,7 @@ switch action
             handles.GM.dtAnalysis = input_val;
         end
         % update handles structure
-        guidata(findobj('Tag','OpenFrescoExpress'), handles);
+        guidata(findobj('Tag','OpenFrescoExpress'),handles);
     % =====================================================================
     case 'animate'
         answer = get(gcbo,'String');
@@ -491,6 +609,6 @@ switch action
             handles.Store.Animate = 0;
         end
         % update handles structure
-        guidata(findobj('Tag','OpenFrescoExpress'), handles);
+        guidata(findobj('Tag','OpenFrescoExpress'),handles);
     % =====================================================================
 end

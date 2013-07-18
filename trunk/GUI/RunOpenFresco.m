@@ -1,10 +1,11 @@
-function errorCode = RunOpenFresco(opfPath,tclFile)
+function errorCode = RunOpenFresco(opfPath,tclFile,console)
 %RUNOPENFRESCO to run OpenFresco and source the provided tcl file
-% errorCode = RunOpenFresco(opfPath,tclFile)
+% errorCode = RunOpenFresco(opfPath,tclFile,console)
 %
 % errorCode : error code returned by dos or system command
 % opfPath   : path to OpenFresco.exe executable file
 % tclFile   : tcl file (including path) to be sourced
+% console   : flag to run iconically or in console
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%                          OpenFresco Express                          %%
@@ -37,11 +38,20 @@ elseif ismac || isunix
     command = ['"',fullfile(opfPath,'OpenSees'),'" "',tclFile,'"'];
 end
 
-% run OpenSees in console (this will load OpenFresco.dll)
-if ispc
-    errorCode = dos([command,' & exit &']);
-elseif ismac || isunix
-    errorCode = system(['xterm -e ',command,' &']);
+if (console == 1)
+    % run OpenSees in console (this will load OpenFresco.dll)
+    if ispc
+        errorCode = dos([command,' & exit &']);
+    elseif ismac || isunix
+        errorCode = system(['xterm -e ',command,' &']);
+    end
+else
+    % run OpenSees iconically (this will load OpenFresco.dll)
+    if ispc
+        errorCode = dos(command,'-echo');
+    elseif ismac || isunix
+        errorCode = system(['xterm -e ',command]);
+    end    
 end
 
 % print error code to Matlab command prompt
