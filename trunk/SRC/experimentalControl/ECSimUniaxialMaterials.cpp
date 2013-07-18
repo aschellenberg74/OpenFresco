@@ -193,7 +193,12 @@ int ECSimUniaxialMaterials::setSize(ID sizeT, ID sizeO)
         sizeO(OF_Resp_Disp) != numMats ||
         sizeO(OF_Resp_Vel) != numMats ||
         sizeO(OF_Resp_Force) != numMats) {
-        opserr << "ECSimUniaxialMaterials::setSize() - wrong sizeTrial/Out\n"; 
+        opserr << "ECSimUniaxialMaterials::setSize() - wrong sizeTrial/Out\n";
+        opserr << "sizeT(Disp) = " << sizeT(OF_Resp_Disp) << " != " << numMats << endln;
+        opserr << "sizeT(Vel) = " << sizeT(OF_Resp_Vel) << " != " << numMats << endln;
+        opserr << "sizeO(Disp) = " << sizeO(OF_Resp_Disp) << " != " << numMats << endln;
+        opserr << "sizeO(Vel) = " << sizeO(OF_Resp_Vel) << " != " << numMats << endln;
+        opserr << "sizeO(Force) = " << sizeO(OF_Resp_Force) << " != " << numMats << endln;
         opserr << "see User Manual.\n";
         exit(OF_ReturnType_failed);
     }

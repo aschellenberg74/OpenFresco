@@ -45,7 +45,7 @@ int TclStartSimAppElemServer(ClientData clientData, Tcl_Interp *interp,
 { 
     if (argc < 3)  {
         opserr << "WARNING insufficient arguments\n"
-            << "Want: startSimAppElemServer eleTag ipPort <-ssl>\n";
+            << "Want: startSimAppElemServer eleTag ipPort <-udp> <-ssl>\n";
         return TCL_ERROR;
     }
     

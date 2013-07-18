@@ -45,7 +45,7 @@ int TclStartSimAppSiteServer(ClientData clientData,
 { 
     if (argc < 3)  {
         opserr << "WARNING insufficient arguments\n"
-            << "Want: startSimAppSiteServer siteTag ipPort <-ssl>\n";
+            << "Want: startSimAppSiteServer siteTag ipPort <-udp> <-ssl>\n";
         return TCL_ERROR;
     }
     
