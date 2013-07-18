@@ -64,6 +64,7 @@ switch handles.Model.Type
         %fprintf(FID,'node  1     0.0   0.0\nnode  2     0.0   1.0  -mass  %+1.6E  0.0\n',handles.Model.M);
         %fprintf(FID,'fix   1      1     1\nfix   2      0     1\n\n');
         
+        if ~strcmp(handles.ExpSite.Type,'Shadow')
         switch handles.ExpControl.Type
             % -------------------------------------------------------------
             case 'Simulation'
@@ -189,14 +190,31 @@ switch handles.Model.Type
                 end
             % -------------------------------------------------------------
         end
+        end
         
         % define experimental setup
-        fprintf(FID,'# Define experimental setup\n# -------------------------\n');
-        fprintf(FID,'expSetup NoTransformation 1 -control 1 -dir 1 -sizeTrialOut 1 1\n\n');
+        switch handles.ExpSite.Type
+            case 'Local'
+                fprintf(FID,'# Define experimental setup\n# -------------------------\n');
+                fprintf(FID,'expSetup NoTransformation 1 -control 1 -dir 1 -sizeTrialOut 1 1\n\n');
+            case 'Shadow'
+                fprintf(FID,'# Define experimental setup\n# -------------------------\n');
+                fprintf(FID,'expSetup NoTransformation 1 -dir 1 -sizeTrialOut 1 1\n\n');
+        end
         
         % define experimental site
         fprintf(FID,'# Define experimental site\n# ------------------------\n');
-        fprintf(FID,'expSite LocalSite 1 1\n\n');
+        switch handles.ExpSite.Type
+            case 'Local'
+                fprintf(FID,'# expSite LocalSite $tag $setupTag\n');
+                fprintf(FID,'expSite LocalSite 1 1\n\n');
+            case 'Shadow'
+                fprintf(FID,'# expSite ShadowSite $tag <-setup $setupTag> $ipAddr $ipPort <-ssl> <-udp> <-dataSize $size>\n');
+                fprintf(FID,'expSite ShadowSite 1 -setup 1 "%s" %d -%s -dataSize %d\n\n',handles.ExpSite.ipAddr,handles.ExpSite.ipPort,lower(handles.ExpSite.protocol),handles.ExpSite.dataSize);
+            case 'Actor'
+                fprintf(FID,'# expSite ActorSite $tag –control $ctrlTag $ipPort <–ssl> <-udp>\n');
+                fprintf(FID,'expSite ActorSite 1 -control 1 %d -%s\n\n',handles.ExpSite.ipPort,lower(handles.ExpSite.protocol));
+        end
         
         % define experimental element
         %fprintf(FID,'# Define experimental element\n# ---------------------------\n');
@@ -216,7 +234,14 @@ switch handles.Model.Type
         
         % start the server process
         fprintf(FID,'# ------------------------------\n# Start the server process\n# ------------------------------\n');
-        fprintf(FID,'# startSimAppSiteServer $siteTag $port <-ssl>\nstartSimAppSiteServer 1 7777\nexit\n');
+        switch handles.ExpSite.Type
+            case {'Local','Shadow'}
+                fprintf(FID,'# startSimAppSiteServer $siteTag $port <-udp> <-ssl>\n');
+                fprintf(FID,'startSimAppSiteServer 1 7777 -udp\nexit\n');
+            case 'Actor'
+                fprintf(FID,'# startLabServer $siteTag\n');
+                fprintf(FID,'startLabServer 1\nexit\n');
+        end
         fprintf(FID,'# ------------------------------\n# End of analysis\n# ------------------------------\n');
         
     % =====================================================================
@@ -227,6 +252,7 @@ switch handles.Model.Type
         fprintf(FID,'# Load OpenFresco package\n# -----------------------\n');
         fprintf(FID,'loadPackage OpenFresco\n\n');
         
+        if ~strcmp(handles.ExpSite.Type,'Shadow')
         switch handles.ExpControl.Type
             % -------------------------------------------------------------
             case 'Simulation'
@@ -386,14 +412,31 @@ switch handles.Model.Type
                 end
             % -------------------------------------------------------------
         end
+        end
         
         % define experimental setup
-        fprintf(FID,'# Define experimental setup\n# -------------------------\n');
-        fprintf(FID,'expSetup NoTransformation 1 -control 1 -dir 1 2 -sizeTrialOut 2 2\n\n');
+        switch handles.ExpSite.Type
+            case 'Local'
+                fprintf(FID,'# Define experimental setup\n# -------------------------\n');
+                fprintf(FID,'expSetup NoTransformation 1 -control 1 -dir 1 2 -sizeTrialOut 2 2\n\n');
+            case 'Shadow'
+                fprintf(FID,'# Define experimental setup\n# -------------------------\n');
+                fprintf(FID,'expSetup NoTransformation 1 -dir 1 2 -sizeTrialOut 2 2\n\n');
+        end
         
         % define experimental site
         fprintf(FID,'# Define experimental site\n# ------------------------\n');
-        fprintf(FID,'expSite LocalSite 1 1\n\n');
+        switch handles.ExpSite.Type
+            case 'Local'
+                fprintf(FID,'# expSite LocalSite $tag $setupTag\n');
+                fprintf(FID,'expSite LocalSite 1 1\n\n');
+            case 'Shadow'
+                fprintf(FID,'# expSite ShadowSite $tag <-setup $setupTag> $ipAddr $ipPort <-ssl> <-udp> <-dataSize $size>\n');
+                fprintf(FID,'expSite ShadowSite 1 -setup 1 "%s" %d -%s -dataSize %d\n\n',handles.ExpSite.ipAddr,handles.ExpSite.ipPort,lower(handles.ExpSite.protocol),handles.ExpSite.dataSize);
+            case 'Actor'
+                fprintf(FID,'# expSite ActorSite $tag –control $ctrlTag $ipPort <–ssl> <-udp>\n');
+                fprintf(FID,'expSite ActorSite 1 -control 1 %d -%s\n\n',handles.ExpSite.ipPort,lower(handles.ExpSite.protocol));
+        end
         
         % define experimental element
         %fprintf(FID,'# Define experimental element\n# ---------------------------\n');
@@ -416,7 +459,14 @@ switch handles.Model.Type
         
         % start the server process
         fprintf(FID,'# ------------------------------\n# Start the server process\n# ------------------------------\n');
-        fprintf(FID,'# startSimAppSiteServer $siteTag $port <-ssl>\nstartSimAppSiteServer 1 7777\nexit\n');
+        switch handles.ExpSite.Type
+            case {'Local','Shadow'}
+                fprintf(FID,'# startSimAppSiteServer $siteTag $port <-udp> <-ssl>\n');
+                fprintf(FID,'startSimAppSiteServer 1 7777 -udp\nexit\n');
+            case 'Actor'
+                fprintf(FID,'# startLabServer $siteTag\n');
+                fprintf(FID,'startLabServer 1\nexit\n');
+        end
         fprintf(FID,'# ------------------------------\n# End of analysis\n# ------------------------------\n');
         
     % =====================================================================
@@ -431,6 +481,7 @@ switch handles.Model.Type
         %fprintf(FID,'node  1     0.0   0.0   0.0\nnode  2     0.0   0.0   1.0  -mass  %+1.6E  %+1.6E   0.0\n',handles.Model.M(1,1),handles.Model.M(2,2));
         %fprintf(FID,'fix   1      1     1     1\nfix   2      0     0     1\n\n');
         
+        if ~strcmp(handles.ExpSite.Type,'Shadow')
         switch handles.ExpControl.Type
             % -------------------------------------------------------------
             case 'Simulation'
@@ -569,14 +620,31 @@ switch handles.Model.Type
                 end
             % -------------------------------------------------------------
         end
+        end
         
         % define experimental setup
-        fprintf(FID,'# Define experimental setup\n# -------------------------\n');
-        fprintf(FID,'expSetup NoTransformation 1 -control 1 -dir 1 2 -sizeTrialOut 2 2\n\n');
+        switch handles.ExpSite.Type
+            case 'Local'
+                fprintf(FID,'# Define experimental setup\n# -------------------------\n');
+                fprintf(FID,'expSetup NoTransformation 1 -control 1 -dir 1 2 -sizeTrialOut 2 2\n\n');
+            case 'Shadow'
+                fprintf(FID,'# Define experimental setup\n# -------------------------\n');
+                fprintf(FID,'expSetup NoTransformation 1 -dir 1 2 -sizeTrialOut 2 2\n\n');
+        end
         
         % define experimental site
         fprintf(FID,'# Define experimental site\n# ------------------------\n');
-        fprintf(FID,'expSite LocalSite 1 1\n\n');
+        switch handles.ExpSite.Type
+            case 'Local'
+                fprintf(FID,'# expSite LocalSite $tag $setupTag\n');
+                fprintf(FID,'expSite LocalSite 1 1\n\n');
+            case 'Shadow'
+                fprintf(FID,'# expSite ShadowSite $tag <-setup $setupTag> $ipAddr $ipPort <-ssl> <-udp> <-dataSize $size>\n');
+                fprintf(FID,'expSite ShadowSite 1 -setup 1 "%s" %d -%s -dataSize %d\n\n',handles.ExpSite.ipAddr,handles.ExpSite.ipPort,lower(handles.ExpSite.protocol),handles.ExpSite.dataSize);
+            case 'Actor'
+                fprintf(FID,'# expSite ActorSite $tag –control $ctrlTag $ipPort <–ssl> <-udp>\n');
+                fprintf(FID,'expSite ActorSite 1 -control 1 %d -%s\n\n',handles.ExpSite.ipPort,lower(handles.ExpSite.protocol));
+        end
         
         % define experimental element
         %fprintf(FID,'# Define experimental element\n# ---------------------------\n');
@@ -599,8 +667,16 @@ switch handles.Model.Type
         
         % start the server process
         fprintf(FID,'# ------------------------------\n# Start the server process\n# ------------------------------\n');
-        fprintf(FID,'# startSimAppSiteServer $siteTag $port <-ssl>\nstartSimAppSiteServer 1 7777\nexit\n');
+        switch handles.ExpSite.Type
+            case {'Local','Shadow'}
+                fprintf(FID,'# startSimAppSiteServer $siteTag $port <-udp> <-ssl>\n');
+                fprintf(FID,'startSimAppSiteServer 1 7777 -udp\nexit\n');
+            case 'Actor'
+                fprintf(FID,'# startLabServer $siteTag\n');
+                fprintf(FID,'startLabServer 1\nexit\n');
+        end
         fprintf(FID,'# ------------------------------\n# End of analysis\n# ------------------------------\n');
+        
     % =====================================================================
 end
 

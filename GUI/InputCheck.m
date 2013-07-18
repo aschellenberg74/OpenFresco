@@ -64,6 +64,38 @@ else
         % =================================================================
     end
     
+    switch handles.ExpSite.Type
+        % =================================================================
+        case 'Distributed'
+            error = 1;
+            message = sprintf('Writing of the .tcl file failed!\nDistributed site type not specified.');
+            return
+        % =================================================================
+        case 'Shadow'
+            if isempty(handles.ExpSite.ipAddr) || isempty(handles.ExpSite.ipPort) || isempty(handles.ExpSite.protocol) || isempty(handles.ExpSite.dataSize)
+                error = 1;
+                message = sprintf('Writing of the .tcl file failed!\nShadow Site inputs are incomplete.');
+                return
+            end
+            % check if IP address has valid format
+            octets = textscan(handles.ExpSite.ipAddr,'%s %s %s %s','delimiter','.');
+            for i=1:4
+                if (length(octets{i}) ~= 1) || (str2double(octets{i}{1}) < 0) || (str2double(octets{i}{1}) > 255)
+                    error = 1;
+                    message = sprintf('Writing of the .tcl file failed!\nShadow Site has invalid IP Address specified.');
+                    return
+                end
+            end
+        % =================================================================
+        case 'Actor'
+            if isempty(handles.ExpSite.ipPort) || isempty(handles.ExpSite.protocol)
+                error = 1;
+                message = sprintf('Writing of the .tcl file failed!\nActor Site inputs are incomplete.');
+                return
+            end
+        % =================================================================
+    end
+    
     switch handles.Model.Type
         % =================================================================
         case '1 DOF'

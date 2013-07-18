@@ -56,7 +56,7 @@ switch action
         % this callback has not been fully checked for functionality yet
         % nonlinear options for 2 DOF B case
         if strcmp(DOF_selection, '2 DOF B')
-            nonlinear = questdlg('Would you like to perform nonlinear analysis?','Nonlinear?','Yes','No','Yes');
+            nonlinear = questdlg('Would you like to account for large displacement effects?','Nonlinear Geometry?','Yes','No','Yes');
             switch nonlinear
                 case 'Yes'
                     msgbox('Sorry! This is not implemented yet!','Warning','warn');

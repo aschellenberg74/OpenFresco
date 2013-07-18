@@ -85,6 +85,27 @@ switch handles.Model.Type
                 fprintf(FID,' o Vibration Time [sec]: %1.4f\r\n\r\n',handles.GM.vibTime);
         end
         
+        fprintf(FID,'Experimental Site:\r\n==================\r\n');
+        fprintf(FID,' o Site: %s\r\n',handles.ExpSite.Type);
+        switch handles.ExpSite.Type
+            case 'Local'
+                fprintf(FID,' o Setup: No Transformation\r\n\r\n');
+            case 'Shadow'
+                fprintf(FID,' o Setup: No Transformation\r\n');
+                fprintf(FID,' o IP Address: %s\r\n',handles.ExpSite.ipAddr);
+                fprintf(FID,' o IP Port: %d\r\n',handles.ExpSite.ipPort);
+                fprintf(FID,' o Protocol: %s\r\n',handles.ExpSite.protocol);
+                fprintf(FID,' o Data Size: %d\r\n\r\n',handles.ExpSite.dataSize);
+            case 'Actor'
+                if strcmp(handles.ExpControl.Type,'Simulation')
+                    fprintf(FID,' o Control: %s\r\n',handles.ExpControl.SimControl.SimType);
+                else
+                    fprintf(FID,' o Control: %s\r\n',handles.ExpControl.RealControl.Controller);
+                end
+                fprintf(FID,' o IP Port: %d\r\n',handles.ExpSite.ipPort);
+                fprintf(FID,' o Protocol: %s\r\n\r\n',handles.ExpSite.protocol);
+        end
+        
         fprintf(FID,'Experimental Setup:\r\n===================\r\n');
         fprintf(FID,' o Setup: No Transformation\r\n');
         if strcmp(handles.ExpControl.Type,'Simulation')
@@ -190,6 +211,27 @@ switch handles.Model.Type
                 fprintf(FID,' o Initial Displacement [L]: %1.4f %1.4f\r\n',handles.GM.initialDisp(1), handles.GM.initialDisp(2));
                 fprintf(FID,' o Ramp Time [sec]: %1.4f\r\n',handles.GM.rampTime);
                 fprintf(FID,' o Vibration Time [sec]: %1.4f\r\n\r\n',handles.GM.vibTime);
+        end
+        
+        fprintf(FID,'Experimental Site:\r\n==================\r\n');
+        fprintf(FID,' o Site: %s\r\n',handles.ExpSite.Type);
+        switch handles.ExpSite.Type
+            case 'Local'
+                fprintf(FID,' o Setup: No Transformation\r\n\r\n');
+            case 'Shadow'
+                fprintf(FID,' o Setup: No Transformation\r\n');
+                fprintf(FID,' o IP Address: %s\r\n',handles.ExpSite.ipAddr);
+                fprintf(FID,' o IP Port: %d\r\n',handles.ExpSite.ipPort);
+                fprintf(FID,' o Protocol: %s\r\n',handles.ExpSite.protocol);
+                fprintf(FID,' o Data Size: %d\r\n\r\n',handles.ExpSite.dataSize);
+            case 'Actor'
+                if strcmp(handles.ExpControl.Type,'Simulation')
+                    fprintf(FID,' o Control: SimDomain\r\n');
+                else
+                    fprintf(FID,' o Control: %s\r\n',handles.ExpControl.RealControl.Controller);
+                end
+                fprintf(FID,' o IP Port: %d\r\n',handles.ExpSite.ipPort);
+                fprintf(FID,' o Protocol: %s\r\n\r\n',handles.ExpSite.protocol);
         end
         
         fprintf(FID,'Experimental Setup:\r\n===================\r\n');
@@ -343,6 +385,27 @@ switch handles.Model.Type
                 fprintf(FID,' o Initial Displacement [L]: %1.4f %1.4f\r\n',handles.GM.initialDisp(1), handles.GM.initialDisp(2));
                 fprintf(FID,' o Ramp Time [sec]: %1.4f\r\n',handles.GM.rampTime);
                 fprintf(FID,' o Vibration Time [sec]: %1.4f\r\n\r\n',handles.GM.vibTime);
+        end
+        
+        fprintf(FID,'Experimental Site:\r\n==================\r\n');
+        fprintf(FID,' o Site: %s\r\n',handles.ExpSite.Type);
+        switch handles.ExpSite.Type
+            case 'Local'
+                fprintf(FID,' o Setup: No Transformation\r\n\r\n');
+            case 'Shadow'
+                fprintf(FID,' o Setup: No Transformation\r\n');
+                fprintf(FID,' o IP Address: %s\r\n',handles.ExpSite.ipAddr);
+                fprintf(FID,' o IP Port: %d\r\n',handles.ExpSite.ipPort);
+                fprintf(FID,' o Protocol: %s\r\n',handles.ExpSite.protocol);
+                fprintf(FID,' o Data Size: %d\r\n\r\n',handles.ExpSite.dataSize);
+            case 'Actor'
+                if strcmp(handles.ExpControl.Type,'Simulation')
+                    fprintf(FID,' o Control: %s\r\n',handles.ExpControl.SimControl.SimType);
+                else
+                    fprintf(FID,' o Control: %s\r\n',handles.ExpControl.RealControl.Controller);
+                end
+                fprintf(FID,' o IP Port: %d\r\n',handles.ExpSite.ipPort);
+                fprintf(FID,' o Protocol: %s\r\n\r\n',handles.ExpSite.protocol);
         end
         
         fprintf(FID,'Experimental Setup:\r\n===================\r\n');

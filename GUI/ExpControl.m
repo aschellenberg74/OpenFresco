@@ -29,6 +29,8 @@ function ExpControl(action,varargin)
 % $Date$
 % $URL$
 
+%#ok<*ST2NM>
+
 % initialization tasks
 handles = guidata(gcbf);
 
