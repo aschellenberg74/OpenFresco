@@ -169,6 +169,8 @@ int ShadowExpSite::setSize(ID sizeT, ID sizeO)
     // call the base class method
     this->ExperimentalSite::setSize(sizeT, sizeO);
     
+    int usrDataSize = dataSize;
+
     if (theSetup != 0)  {
         theSetup->checkSize(sizeT, sizeO);
         int nCtrl = 0, nDaq = 0;
@@ -186,6 +188,12 @@ int ShadowExpSite::setSize(ID sizeT, ID sizeO)
         }
         if (dataSize < 1+nInput) dataSize = 1+nInput;
         if (dataSize < nOutput)  dataSize = nOutput;
+    }
+    
+    // warning message if user-provided dataSize was too small
+    if (dataSize > usrDataSize)  {
+        opserr << "\nWARNING ShadowExpSite::setSize() - "
+            << "dataSize increased to " << dataSize << ".\n";
     }
     
     // send experimental setup to ActorExpSite

@@ -181,7 +181,7 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp,
 		if (5 > argc && argc > 9)  {
 			opserr << "WARNING invalid number of arguments\n";
 			printCommand(argc,argv);
-			opserr << "Want: expSite ShadowSite tag <-setup setupTag> ipAddr ipPort <-ssl> <-dataSize size>\n";
+			opserr << "Want: expSite ShadowSite tag <-setup setupTag> ipAddr ipPort <-udp> <-ssl> <-dataSize size>\n";
 			return TCL_ERROR;
 		}
 		
@@ -299,8 +299,8 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp,
 		if (6 > argc || argc > 8)  {
 			opserr << "WARNING invalid number of arguments\n";
 			printCommand(argc,argv);
-			opserr << "Want: expSite ActorSite tag -setup setupTag ipPort <-ssl>\n"
-                << "  or: expSite ActorSite tag -control ctrlTag ipPort <-ssl>\n";
+			opserr << "Want: expSite ActorSite tag -setup setupTag ipPort <-udp> <-ssl>\n"
+                << "  or: expSite ActorSite tag -control ctrlTag ipPort <-udp> <-ssl>\n";
 			return TCL_ERROR;
 		}    
 		
