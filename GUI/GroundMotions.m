@@ -144,7 +144,7 @@ switch action
                         handles.GM.AmpFact(1) = 1.0;
                     else
                         set(handles.GroundMotions(28),'Style','text','BackgroundColor',[0.941176 0.941176 0.941176]);
-                        handles.GM.AmpFact(1) = 386.1;
+                        handles.GM.AmpFact(1) = 32.174*12;
                     end
                     set(handles.GroundMotions(4),'String',handles.GM.AmpFact(1));
                     
@@ -185,7 +185,7 @@ switch action
                         handles.GM.AmpFact(2) = 1.0;
                     else
                         set(handles.GroundMotions(29),'Style','text','BackgroundColor',[0.941176 0.941176 0.941176]);
-                        handles.GM.AmpFact(2) = 386.1;
+                        handles.GM.AmpFact(2) = 32.174*12;
                     end
                     set(handles.GroundMotions(12),'String',handles.GM.AmpFact(2));
                     

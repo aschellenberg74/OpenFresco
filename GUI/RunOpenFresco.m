@@ -32,25 +32,26 @@ function errorCode = RunOpenFresco(opfPath,tclFile,console)
 % $URL$
 
 % write the command line for execution
+changeDirCmd = ['cd "',opfPath,'"'];
 if ispc
-    command = ['@ "',fullfile(opfPath,'openSees.exe'),'" "',tclFile,'"'];
+    openSeesCmd = ['openSees.exe "',tclFile,'"'];
 elseif ismac || isunix
-    command = ['"',fullfile(opfPath,'OpenSees'),'" "',tclFile,'"'];
+    openSeesCmd = ['"',fullfile(opfPath,'OpenSees'),'" "',tclFile,'"'];
 end
 
 if (console == 1)
     % run OpenSees in console (this will load OpenFresco.dll)
     if ispc
-        errorCode = dos([command,' & exit &']);
+        errorCode = dos(['@ ',changeDirCmd,' & ',openSeesCmd,' & exit &']);
     elseif ismac || isunix
-        errorCode = system(['xterm -e ',command,' &']);
+        errorCode = system(['xterm -e ',changeDirCmd,' & ',openSeesCmd,' &']);
     end
 else
     % run OpenSees iconically (this will load OpenFresco.dll)
     if ispc
-        errorCode = dos(command,'-echo');
+        errorCode = dos([changeDirCmd,' ',openSeesCmd],'-echo');
     elseif ismac || isunix
-        errorCode = system(['xterm -e ',command]);
+        errorCode = system(['xterm -e ',changeDirCmd,' & ',openSeesCmd,' &']);
     end    
 end
 

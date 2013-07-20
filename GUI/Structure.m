@@ -1081,7 +1081,7 @@ switch action
             plot(handles.GroundMotions(8), handles.GM.Spectra{1}.T, handles.GM.Spectra{1}.psdAcc);
             plot(handles.GroundMotions(9), handles.GM.Spectra{1}.T, handles.GM.Spectra{1}.dsp);
         end
-        if ~isempty(handles.GM.Spectra{2})
+        if length(handles.GM.Spectra)==2 && ~isempty(handles.GM.Spectra{2})
             handles.GM.Spectra{2} = ResponseSpectraElastic(handles.GM.scaleag{2},handles.GM.scaledt(2),1.0,handles.Model.Zeta,0.01,4.99,300);
             plot(handles.GroundMotions(15), handles.GM.scalet{2}, handles.GM.scaleag{2});
             plot(handles.GroundMotions(16), handles.GM.Spectra{2}.T, handles.GM.Spectra{2}.psdAcc);

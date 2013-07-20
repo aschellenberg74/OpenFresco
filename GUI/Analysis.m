@@ -192,12 +192,14 @@ switch action
                                 fprintf(1,'%s\n',pathOPF);
                             end
                             % now run OpenSees/OpenFresco in console
-                            RunOpenFresco(pathOPF,fullfile(DIR,'OPFE_Analysis.tcl'),1);
-                            clear functions;
-                            if strcmp(handles.GM.integrator,'NewmarkExplicit')
-                                handles.Response = Integrator_NewmarkExplicit(handles.Model,handles.GM,[],handles.Analysis);
-                            elseif strcmp(handles.GM.integrator,'AlphaOS')
-                                handles.Response = Integrator_AlphaOS(handles.Model,handles.GM,[],handles.Analysis);
+                            errorCode = RunOpenFresco(pathOPF,fullfile(DIR,'OPFE_Analysis.tcl'),1);
+                            if (errorCode == 0)
+                                clear functions;
+                                if strcmp(handles.GM.integrator,'NewmarkExplicit')
+                                    handles.Response = Integrator_NewmarkExplicit(handles.Model,handles.GM,[],handles.Analysis);
+                                elseif strcmp(handles.GM.integrator,'AlphaOS')
+                                    handles.Response = Integrator_AlphaOS(handles.Model,handles.GM,[],handles.Analysis);
+                                end
                             end
                             % set analysis to "stopped"
                             set(findobj('Tag','StopControl'),'Value',1);
@@ -211,10 +213,12 @@ switch action
                             handles.Model.StopFlag = 1;
                             handles.Store.AnalysisOption = 'Stop';
                             % save results
-                            saveResults = questdlg(sprintf('Analysis complete!\nWould you like to save the test results?'),'Save?','Yes','No','Yes');
-                            if strcmp(saveResults,'Yes')
-                                Response = handles.Response; %#ok<NASGU>
-                                uisave('Response');
+                            if (errorCode == 0)
+                                saveResults = questdlg(sprintf('Analysis complete!\nWould you like to save the test results?'),'Save?','Yes','No','Yes');
+                                if strcmp(saveResults,'Yes')
+                                    Response = handles.Response; %#ok<NASGU>
+                                    uisave('Response');
+                                end
                             end
                         else  % resume paused analysis
                             set(findobj('Tag','Start'),'Value',1);
@@ -455,15 +459,16 @@ switch action
                             % disable pause, run new test, and quit buttons
                             set(handles.Analysis([8,10,11]),'Enable','off');
                             % now run OpenSees/OpenFresco in console
-                            RunOpenFresco(pathOPF,fullfile(DIR,'OPFE_Analysis.tcl'),1);
-                            clear functions;
-                            hWarn = msgbox(['Make sure OpenSees/OpenFresco has successfully executed ', ...
-                                'and the console window has automatically been closed by the client ', ...
-                                'before clicking STOP on the Analysis page!'],'Console Warning','warn');
-                            set(hWarn,'Tag','ConsoleMsg','Units','normalized');
-                            pos = get(hWarn,'Position');
-                            set(hWarn,'Position',[0.5-0.5*pos(3)+0.22*pos(3),0.5-0.5*pos(4)-1.0*pos(4),pos(3),pos(4)]);
-                            waitfor(handles.Analysis(9),'Value',1);
+                            errorCode = RunOpenFresco(pathOPF,fullfile(DIR,'OPFE_Analysis.tcl'),1);
+                            if (errorCode == 0)
+                                hWarn = msgbox(['Make sure OpenSees/OpenFresco has successfully executed ', ...
+                                    'and the console window has automatically been closed by the client ', ...
+                                    'before clicking STOP on the Analysis page!'],'Console Warning','warn');
+                                set(hWarn,'Tag','ConsoleMsg','Units','normalized');
+                                pos = get(hWarn,'Position');
+                                set(hWarn,'Position',[0.5-0.5*pos(3)+0.22*pos(3),0.5-0.5*pos(4)-1.0*pos(4),pos(3),pos(4)]);
+                                waitfor(handles.Analysis(9),'Value',1);
+                            end
                             % set analysis to "stopped"
                             set(findobj('Tag','StopControl'),'Value',1);
                             set(handles.Analysis(9),'Value',1);
@@ -560,8 +565,7 @@ switch action
         end
         
         % return user to structure page
-        tabs = get(handles.Sidebar(1),'Children');
-        set(handles.Sidebar(1),'SelectedObject',tabs(5));
+        set(handles.Sidebar(1),'SelectedObject',handles.Sidebar(7));
         set(handles.Sidebar(7),'CData',handles.Store.Structure1);
         set(handles.Sidebar(8),'CData',handles.Store.Loading0);
         set(handles.Sidebar(13),'CData',handles.Store.ExpSite0);
