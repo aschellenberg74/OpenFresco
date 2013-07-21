@@ -237,7 +237,7 @@ switch handles.Model.Type
         switch handles.ExpSite.Type
             case {'Local','Shadow'}
                 fprintf(FID,'# startSimAppSiteServer $siteTag $port <-udp> <-ssl>\n');
-                fprintf(FID,'startSimAppSiteServer 1 7777 -udp\nexit\n');
+                fprintf(FID,'startSimAppSiteServer 1 7777\nexit\n');
             case 'Actor'
                 fprintf(FID,'# startLabServer $siteTag\n');
                 fprintf(FID,'startLabServer 1\nexit\n');
@@ -462,7 +462,7 @@ switch handles.Model.Type
         switch handles.ExpSite.Type
             case {'Local','Shadow'}
                 fprintf(FID,'# startSimAppSiteServer $siteTag $port <-udp> <-ssl>\n');
-                fprintf(FID,'startSimAppSiteServer 1 7777 -udp\nexit\n');
+                fprintf(FID,'startSimAppSiteServer 1 7777\nexit\n');
             case 'Actor'
                 fprintf(FID,'# startLabServer $siteTag\n');
                 fprintf(FID,'startLabServer 1\nexit\n');
@@ -670,7 +670,7 @@ switch handles.Model.Type
         switch handles.ExpSite.Type
             case {'Local','Shadow'}
                 fprintf(FID,'# startSimAppSiteServer $siteTag $port <-udp> <-ssl>\n');
-                fprintf(FID,'startSimAppSiteServer 1 7777 -udp\nexit\n');
+                fprintf(FID,'startSimAppSiteServer 1 7777\nexit\n');
             case 'Actor'
                 fprintf(FID,'# startLabServer $siteTag\n');
                 fprintf(FID,'startLabServer 1\nexit\n');
