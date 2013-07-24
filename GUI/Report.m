@@ -135,7 +135,7 @@ switch handles.Model.Type
                         fprintf(FID,'     Fy [F/L^2]: %1.4f\r\n',handles.ExpControl.DOF1.Fy);
                         fprintf(FID,'     E [F/L^2]: %1.4f\r\n',handles.ExpControl.DOF1.E);
                         fprintf(FID,'     b: %1.4f\r\n\r\n',handles.ExpControl.DOF1.b);
-                    case 'Steel - Giuffré-Menegotto-Pinto'
+                    case 'Steel - Giuffre-Menegotto-Pinto'
                         fprintf(FID,' o Material: %s\r\n',handles.ExpControl.DOF1.SimMaterial);
                         fprintf(FID,'     Fy [F/L^2]: %1.4f\r\n',handles.ExpControl.DOF1.Fy);
                         fprintf(FID,'     E [F/L^2]: %1.4f\r\n',handles.ExpControl.DOF1.E);
@@ -265,7 +265,7 @@ switch handles.Model.Type
                         fprintf(FID,'     Fy [F/L^2]: %1.4f\r\n',handles.ExpControl.DOF1.Fy);
                         fprintf(FID,'     E [F/L^2]: %1.4f\r\n',handles.ExpControl.DOF1.E);
                         fprintf(FID,'     b: %1.4f\r\n',handles.ExpControl.DOF1.b);
-                    case 'Steel - Giuffré-Menegotto-Pinto'
+                    case 'Steel - Giuffre-Menegotto-Pinto'
                         fprintf(FID,' o Story 1 Material: %s\r\n',handles.ExpControl.DOF1.SimMaterial);
                         fprintf(FID,'     Fy [F/L^2]: %1.4f\r\n',handles.ExpControl.DOF1.Fy);
                         fprintf(FID,'     E [F/L^2]: %1.4f\r\n',handles.ExpControl.DOF1.E);
@@ -287,7 +287,7 @@ switch handles.Model.Type
                         fprintf(FID,'     Fy [F/L^2]: %1.4f\r\n',handles.ExpControl.DOF2.Fy);
                         fprintf(FID,'     E [F/L^2]: %1.4f\r\n',handles.ExpControl.DOF2.E);
                         fprintf(FID,'     b: %1.4f\r\n\r\n',handles.ExpControl.DOF2.b);
-                    case 'Steel - Giuffré-Menegotto-Pinto'
+                    case 'Steel - Giuffre-Menegotto-Pinto'
                         fprintf(FID,' o Story 2 Material: %s\r\n',handles.ExpControl.DOF2.SimMaterial);
                         fprintf(FID,'     Fy [F/L^2]: %1.4f\r\n',handles.ExpControl.DOF2.Fy);
                         fprintf(FID,'     E [F/L^2]: %1.4f\r\n',handles.ExpControl.DOF2.E);
@@ -437,7 +437,7 @@ switch handles.Model.Type
                         fprintf(FID,'     Fy [F/L^2]: %1.4f\r\n',handles.ExpControl.DOF1.Fy);
                         fprintf(FID,'     E [F/L^2]: %1.4f\r\n',handles.ExpControl.DOF1.E);
                         fprintf(FID,'     b: %1.4f\r\n',handles.ExpControl.DOF1.b);
-                    case 'Steel - Giuffré-Menegotto-Pinto'
+                    case 'Steel - Giuffre-Menegotto-Pinto'
                         fprintf(FID,' o DOF 1 Material: %s\r\n',handles.ExpControl.DOF1.SimMaterial);
                         fprintf(FID,'     Fy [F/L^2]: %1.4f\r\n',handles.ExpControl.DOF1.Fy);
                         fprintf(FID,'     E [F/L^2]: %1.4f\r\n',handles.ExpControl.DOF1.E);
@@ -459,7 +459,7 @@ switch handles.Model.Type
                         fprintf(FID,'     Fy [F/L^2]: %1.4f\r\n',handles.ExpControl.DOF2.Fy);
                         fprintf(FID,'     E [F/L^2]: %1.4f\r\n',handles.ExpControl.DOF2.E);
                         fprintf(FID,'     b: %1.4f\r\n\r\n',handles.ExpControl.DOF2.b);
-                    case 'Steel - Giuffré-Menegotto-Pinto'
+                    case 'Steel - Giuffre-Menegotto-Pinto'
                         fprintf(FID,' o DOF 2 Material: %s\r\n',handles.ExpControl.DOF2.SimMaterial);
                         fprintf(FID,'     Fy [F/L^2]: %1.4f\r\n',handles.ExpControl.DOF2.Fy);
                         fprintf(FID,'     E [F/L^2]: %1.4f\r\n',handles.ExpControl.DOF2.E);

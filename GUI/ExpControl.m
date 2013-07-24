@@ -254,7 +254,7 @@ switch action
                     set(handles.EC(handles.ExpControl.store.SimActive),'Visible','on');
                     switch handles.ExpControl.CtrlDOF
                         case 'DOF 1'
-                            handles.ExpControl.DOF1.SimMaterial = 'Steel - Giuffré-Menegotto-Pinto';
+                            handles.ExpControl.DOF1.SimMaterial = 'Steel - Giuffre-Menegotto-Pinto';
                             handles.ExpControl.DOF1.cR1 = 0.925;
                             handles.ExpControl.DOF1.cR2 = 0.15;
                             set(handles.EC(21),'String',handles.ExpControl.DOF1.Fy);
@@ -262,7 +262,7 @@ switch action
                             set(handles.EC(23),'String',handles.ExpControl.DOF1.b);
                             set(handles.EC(24),'String',handles.ExpControl.DOF1.R0);
                         case 'DOF 2'
-                            handles.ExpControl.DOF2.SimMaterial = 'Steel - Giuffré-Menegotto-Pinto';
+                            handles.ExpControl.DOF2.SimMaterial = 'Steel - Giuffre-Menegotto-Pinto';
                             handles.ExpControl.DOF2.cR1 = 0.925;
                             handles.ExpControl.DOF2.cR2 = 0.15;
                             set(handles.EC(21),'String',handles.ExpControl.DOF2.Fy);

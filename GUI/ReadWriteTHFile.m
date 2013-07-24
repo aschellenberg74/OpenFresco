@@ -34,6 +34,8 @@ function varargout = ReadWriteTHFile(action,fileIN,fileOUT)
 % $Date$
 % $URL$
 
+%#ok<*ST2NM>
+
 switch action
     % =====================================================================
     case 'readDT'

@@ -77,7 +77,7 @@ switch handles.Model.Type
                         fprintf(FID,'uniaxialMaterial ElasticPP 1 %+1.6E %+1.6E\n\n',handles.ExpControl.DOF1.E,handles.ExpControl.DOF1.epsP);
                     case 'Steel - Bilinear'
                         fprintf(FID,'uniaxialMaterial Steel01 1 %+1.6E %+1.6E %+1.6E\n\n',handles.ExpControl.DOF1.Fy,handles.ExpControl.DOF1.E,handles.ExpControl.DOF1.b);
-                    case 'Steel - Giuffré-Menegotto-Pinto'
+                    case 'Steel - Giuffre-Menegotto-Pinto'
                         fprintf(FID,'uniaxialMaterial Steel02 1 %+1.6E %+1.6E %+1.6E %+1.6E %+1.6E %+1.6E\n\n',handles.ExpControl.DOF1.Fy,handles.ExpControl.DOF1.E,handles.ExpControl.DOF1.b,handles.ExpControl.DOF1.R0, handles.ExpControl.DOF1.cR1, handles.ExpControl.DOF1.cR2);
                 end
                 % define experimental control
@@ -272,7 +272,7 @@ switch handles.Model.Type
                         fprintf(FID,'uniaxialMaterial ElasticPP 1 %+1.6E %+1.6E\n',handles.ExpControl.DOF1.E,handles.ExpControl.DOF1.epsP);
                     case 'Steel - Bilinear'
                         fprintf(FID,'uniaxialMaterial Steel01 1 %+1.6E %+1.6E %+1.6E\n',handles.ExpControl.DOF1.Fy,handles.ExpControl.DOF1.E,handles.ExpControl.DOF1.b);
-                    case 'Steel - Giuffré-Menegotto-Pinto'
+                    case 'Steel - Giuffre-Menegotto-Pinto'
                         fprintf(FID,'uniaxialMaterial Steel02 1 %+1.6E %+1.6E %+1.6E %+1.6E %+1.6E %+1.6E\n',handles.ExpControl.DOF1.Fy,handles.ExpControl.DOF1.E,handles.ExpControl.DOF1.b,handles.ExpControl.DOF1.R0, handles.ExpControl.DOF1.cR1, handles.ExpControl.DOF1.cR2);
                 end
                 switch handles.ExpControl.DOF2.SimMaterial
@@ -282,7 +282,7 @@ switch handles.Model.Type
                         fprintf(FID,'uniaxialMaterial ElasticPP 2 %+1.6E %+1.6E\n\n',handles.ExpControl.DOF2.E,handles.ExpControl.DOF2.epsP);
                     case 'Steel - Bilinear'
                         fprintf(FID,'uniaxialMaterial Steel01 2 %+1.6E %+1.6E %+1.6E\n\n',handles.ExpControl.DOF2.Fy,handles.ExpControl.DOF2.E,handles.ExpControl.DOF2.b);
-                    case 'Steel - Giuffré-Menegotto-Pinto'
+                    case 'Steel - Giuffre-Menegotto-Pinto'
                         fprintf(FID,'uniaxialMaterial Steel02 2 %+1.6E %+1.6E %+1.6E %+1.6E %+1.6E %+1.6E\n\n',handles.ExpControl.DOF2.Fy,handles.ExpControl.DOF2.E,handles.ExpControl.DOF2.b,handles.ExpControl.DOF2.R0, handles.ExpControl.DOF2.cR1, handles.ExpControl.DOF2.cR2);
                 end
                 
@@ -494,7 +494,7 @@ switch handles.Model.Type
                         fprintf(FID,'uniaxialMaterial ElasticPP 1 %+1.6E %+1.6E\n',handles.ExpControl.DOF1.E,handles.ExpControl.DOF1.epsP);
                     case 'Steel - Bilinear'
                         fprintf(FID,'uniaxialMaterial Steel01 1 %+1.6E %+1.6E %+1.6E\n',handles.ExpControl.DOF1.Fy,handles.ExpControl.DOF1.E,handles.ExpControl.DOF1.b);
-                    case 'Steel - Giuffré-Menegotto-Pinto'
+                    case 'Steel - Giuffre-Menegotto-Pinto'
                         fprintf(FID,'uniaxialMaterial Steel02 1 %+1.6E %+1.6E %+1.6E %+1.6E %+1.6E %+1.6E\n',handles.ExpControl.DOF1.Fy,handles.ExpControl.DOF1.E,handles.ExpControl.DOF1.b,handles.ExpControl.DOF1.R0, handles.ExpControl.DOF1.cR1, handles.ExpControl.DOF1.cR2);
                 end
                 switch handles.ExpControl.DOF2.SimMaterial
@@ -504,7 +504,7 @@ switch handles.Model.Type
                         fprintf(FID,'uniaxialMaterial ElasticPP 2 %+1.6E %+1.6E\n\n',handles.ExpControl.DOF2.E,handles.ExpControl.DOF2.epsP);
                     case 'Steel - Bilinear'
                         fprintf(FID,'uniaxialMaterial Steel01 2 %+1.6E %+1.6E %+1.6E\n\n',handles.ExpControl.DOF2.Fy,handles.ExpControl.DOF2.E,handles.ExpControl.DOF2.b);
-                    case 'Steel - Giuffré-Menegotto-Pinto'
+                    case 'Steel - Giuffre-Menegotto-Pinto'
                         fprintf(FID,'uniaxialMaterial Steel02 2 %+1.6E %+1.6E %+1.6E %+1.6E %+1.6E %+1.6E\n\n',handles.ExpControl.DOF2.Fy,handles.ExpControl.DOF2.E,handles.ExpControl.DOF2.b,handles.ExpControl.DOF2.R0, handles.ExpControl.DOF2.cR1, handles.ExpControl.DOF2.cR2);
                 end
                 
