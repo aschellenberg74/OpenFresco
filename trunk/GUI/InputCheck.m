@@ -126,7 +126,7 @@ else
                                     message = sprintf('Writing of the .tcl file failed!\nDOF 1 material is missing inputs.');
                                     return
                                 end
-                            case 'Steel - Giuffré-Menegotto-Pinto'
+                            case 'Steel - Giuffre-Menegotto-Pinto'
                                 if isempty(handles.ExpControl.DOF1.Fy) || isempty(handles.ExpControl.DOF1.E) || isempty(handles.ExpControl.DOF1.b) || isempty(handles.ExpControl.DOF1.R0) || isempty(handles.ExpControl.DOF1.cR1) || isempty(handles.ExpControl.DOF1.cR2)
                                     error = 1;
                                     message = sprintf('Writing of the .tcl file failed!\nDOF 1 material is missing inputs.');
@@ -216,7 +216,7 @@ else
                                     message = sprintf('Writing of the .tcl file failed!\nDOF 1 material is missing inputs.');
                                     return
                                 end
-                            case 'Steel - Giuffré-Menegotto-Pinto'
+                            case 'Steel - Giuffre-Menegotto-Pinto'
                                 if isempty(handles.ExpControl.DOF1.Fy) || isempty(handles.ExpControl.DOF1.E) || isempty(handles.ExpControl.DOF1.b) || isempty(handles.ExpControl.DOF1.R0) || isempty(handles.ExpControl.DOF1.cR1) || isempty(handles.ExpControl.DOF1.cR2)
                                     error = 1;
                                     message = sprintf('Writing of the .tcl file failed!\nDOF 1 material is missing inputs.');
@@ -249,7 +249,7 @@ else
                                     message = sprintf('Writing of the .tcl file failed!\nDOF 2 material is missing inputs.');
                                     return
                                 end
-                            case 'Steel - Giuffré-Menegotto-Pinto'
+                            case 'Steel - Giuffre-Menegotto-Pinto'
                                 if isempty(handles.ExpControl.DOF2.Fy) || isempty(handles.ExpControl.DOF2.E) || isempty(handles.ExpControl.DOF2.b) || isempty(handles.ExpControl.DOF2.R0) || isempty(handles.ExpControl.DOF2.cR1) || isempty(handles.ExpControl.DOF2.cR2)
                                     error = 1;
                                     message = sprintf('Writing of the .tcl file failed!\nDOF 2 material is missing inputs.');
@@ -328,7 +328,7 @@ else
                                     message = sprintf('Writing of the .tcl file failed!\nDOF 1 material is missing inputs.');
                                     return
                                 end
-                            case 'Steel - Giuffré-Menegotto-Pinto'
+                            case 'Steel - Giuffre-Menegotto-Pinto'
                                 if isempty(handles.ExpControl.DOF1.Fy) || isempty(handles.ExpControl.DOF1.E) || isempty(handles.ExpControl.DOF1.b) || isempty(handles.ExpControl.DOF1.R0) || isempty(handles.ExpControl.DOF1.cR1) || isempty(handles.ExpControl.DOF1.cR2)
                                     error = 1;
                                     message = sprintf('Writing of the .tcl file failed!\nDOF 1 material is missing inputs.');
@@ -361,7 +361,7 @@ else
                                     message = sprintf('Writing of the .tcl file failed!\nDOF 2 material is missing inputs.');
                                     return
                                 end
-                            case 'Steel - Giuffré-Menegotto-Pinto'
+                            case 'Steel - Giuffre-Menegotto-Pinto'
                                 if isempty(handles.ExpControl.DOF2.Fy) || isempty(handles.ExpControl.DOF2.E) || isempty(handles.ExpControl.DOF2.b) || isempty(handles.ExpControl.DOF2.R0) || isempty(handles.ExpControl.DOF2.cR1) || isempty(handles.ExpControl.DOF2.cR2)
                                     error = 1;
                                     message = sprintf('Writing of the .tcl file failed!\nDOF 2 material is missing inputs.');

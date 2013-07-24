@@ -34,7 +34,7 @@ SS = handles.Store.SS;
 
 % update the axis limits and the color bar
 if (nargin > 0 && strcmp(varargin{1},'update'))
-    xlim = str2num(get(handles.Plots.ColorBarMax,'String'));
+    xlim = str2num(get(handles.Plots.ColorBarMax,'String')); %#ok<ST2NM>
     if (xlim > 0)
         switch handles.Model.Type
             case {'1 DOF','2 DOF A'}
