@@ -203,6 +203,7 @@
     <ClCompile Include="..\..\..\SRC\openseesCore\VertexIter.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\win32Functions.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\DummyStream.cpp" />
+    <ClCompile Include="..\..\..\SRC\openseesExtra\LimitCurve.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\LineSearch.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\NewtonLineSearch.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\RegulaFalsiLineSearch.cpp" />
@@ -401,6 +402,7 @@
     <ClInclude Include="..\..\..\SRC\openseesCore\VertexIter.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\bool.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\DummyStream.h" />
+    <ClInclude Include="..\..\..\SRC\openseesExtra\LimitCurve.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\LineSearch.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\NewtonLineSearch.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\packages.h" />

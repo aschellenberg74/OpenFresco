@@ -579,6 +579,9 @@
     <ClCompile Include="..\..\..\SRC\openseesCore\BeamFiberMaterial2d.cpp">
       <Filter>openseesCore</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\LimitCurve.cpp">
+      <Filter>openseesExtra</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\SRC\utility\ExpControlSP.h">
@@ -1135,6 +1138,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\SRC\openseesCore\BeamFiberMaterial2d.h">
       <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\LimitCurve.h">
+      <Filter>openseesExtra</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

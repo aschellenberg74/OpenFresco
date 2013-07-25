@@ -201,6 +201,7 @@
     <ClCompile Include="..\..\..\SRC\openseesExtra\DOF_Numberer.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\DummyStream.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\EquiSolnAlgo.cpp" />
+    <ClCompile Include="..\..\..\SRC\openseesExtra\LimitCurve.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\LinearSeries.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\LineSearch.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\LoadControl.cpp" />
@@ -409,6 +410,7 @@
     <ClInclude Include="..\..\..\SRC\openseesExtra\EquiSolnAlgo.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\GraphNumberer.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\GroundMotion.h" />
+    <ClInclude Include="..\..\..\SRC\openseesExtra\LimitCurve.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\LinearSeries.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\LineSearch.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\LoadControl.h" />
