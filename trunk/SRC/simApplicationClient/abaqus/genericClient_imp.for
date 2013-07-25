@@ -131,6 +131,7 @@ c     extract socketID
 c     (jtype = user-defined integer value n in element type Un)
       if (jtype .le. numSockIDs) then
          socketID = socketIDs(jtype)
+         write(*,*) 'INFO - socketID = ',socketID,'.'
       else
          write(*,*) 'ERROR - Only ',numSockIDs,' genericClient_imp ',
      *              'elements supported: consider increasing ',
