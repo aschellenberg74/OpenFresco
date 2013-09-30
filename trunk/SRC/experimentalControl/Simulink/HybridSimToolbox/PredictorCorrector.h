@@ -67,11 +67,11 @@ int predictDVA(double *dsp, double x);
 int correctDVA(double *dsp, double x);
 
 // global variables
-int i, nAct;
-double dtCon, xi;
+extern int i, nAct;
+extern double dtCon, xi;
 
-double *dsp1, *dsp2, *dsp3, *dsp4, *dsp5, *dsp6, *dspXi;
-double *vel1, *vel2;
-double *acc1;
+extern double *dsp1, *dsp2, *dsp3, *dsp4, *dsp5, *dsp6, *dspXi;
+extern double *vel1, *vel2;
+extern double *acc1;
 
 #endif
