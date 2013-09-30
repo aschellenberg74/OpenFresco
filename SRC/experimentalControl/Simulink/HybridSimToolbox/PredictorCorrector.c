@@ -11,6 +11,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+// global variables
+int i, nAct;
+double dtCon, xi;
+
+double *dsp1, *dsp2, *dsp3, *dsp4, *dsp5, *dsp6, *dspXi;
+double *vel1, *vel2;
+double *acc1;
+
 //=============================================================================
 int initData(int n, double dtcon)
 {
