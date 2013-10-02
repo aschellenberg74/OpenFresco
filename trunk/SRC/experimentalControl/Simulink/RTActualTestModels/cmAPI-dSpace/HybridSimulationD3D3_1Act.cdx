@@ -4,45 +4,52 @@ CapturePrio=1
 AnimationTimerValue=50
 AutomaticAnimationTimerCalibration=0
 TimerCalibrationSetting=1000
+EnableMixedDataGroups=0
+
+[BusNavigator]
+FileCount=0
 
 [Instrumentation]
 FileCount=2
-File1=daq.lay
+File1=HybridSimulationD3D3_1Act.cdc
 FileInWorkingRoot1=true
-FileDate1=20071018181055
-FileVisibleToUser1=true
-FileAutoOpen1=true
+FileDate1=20131001231915
+FileSize1=29696
+FileCRC1=b368a011
+FileVisibleToUser1=false
+FileAutoOpen1=false
 FileConsistencyCheck1=true
-InternalFlags1=00000000
+InternalFlags1=10000000
 FileInstanceCount1=1
 FileExplicitDependCount1=0
-File2=HybridSimulationPoly3_1Act.cdc
+File2=daq_1act.lay
 FileInWorkingRoot2=true
-FileDate2=20071018181055
-FileSize2=9216
-FileCRC2=0e51c769
-FileVisibleToUser2=false
-FileAutoOpen2=false
+FileDate2=20131001231915
+FileVisibleToUser2=true
+FileAutoOpen2=true
 FileConsistencyCheck2=true
-InternalFlags2=10000000
+InternalFlags2=00000000
 FileInstanceCount2=1
 FileExplicitDependCount2=0
-Version=5
+Version=6
 
 [AppServerManager]
 FileCount=0
 Version=1
-DataGroup1=PPC - hybridcontrollerpoly3_1act - Service #0
-DataGroup2=PPC - hybridcontrollerpoly3_1act - HostService
+DataGroup1=PPC - hybridcontrollerd3d3_1act - Service #0
+DataGroup2=PPC - hybridcontrollerd3d3_1act - HostService
 NumberOfDataGroups=2
+
+[FailureSim]
+FileCount=0
 
 [HierarchyBrowser]
 FileCount=1
-File1=hybridcontrollerpoly3_1act.sdf
+File1=hybridcontrollerd3d3_1act.sdf
 FileInWorkingRoot1=true
-FileDate1=20071018173514
-FileSize1=192
-FileCRC1=c1f97a17
+FileDate1=20131001231632
+FileSize1=256
+FileCRC1=d0b0ec46
 FileVisibleToUser1=true
 FileAutoOpen1=true
 FileConsistencyCheck1=true
@@ -51,6 +58,9 @@ FileInstanceCount1=1
 FileExplicitDependCount1=0
 Version=3
 Sections=1
+
+[Stimulus Editor]
+FileCount=0
 
 [CommonTexteditor]
 FileCount=0
@@ -68,9 +78,9 @@ FileCount=0
 
 [Experiment]
 FileCount=1
-File1=HybridSimulationPoly3_1Act.cdd
+File1=HybridSimulationD3D3_1Act.cdd
 FileInWorkingRoot1=true
-FileDate1=20071015224609
+FileDate1=20130929224612
 FileSize1=0
 FileCRC1=00000000
 FileVisibleToUser1=false
@@ -80,14 +90,14 @@ InternalFlags1=00000000
 FileInstanceCount1=1
 FileExplicitDependCount1=0
 Version=1
-Name=HybridSimulationPoly3_1Act
+Name=HybridSimulationD3D3_1Act
 Author=Andreas Schellenberg
 ExperimentVersionMajor=1
 ExperimentVersionMinor=0
 EnableEvents=true
 
 [Experiment.View]
-File1=daq.lay
+File1=daq_1act.lay
 File1Pos=1,0,874,541,-1,-1,3
 FileCount=1
 Workbook=false
@@ -95,45 +105,33 @@ Fullscreen=false
 Sequence=0;
 
 [Instrumentation.Openfiles]
-Openfile1=daq.lay
+Openfile1=daq_1act.lay
 Count=1
 
-[AppServerManager.PPC - hybridcontrollerpoly3_1act - Service #0]
+[AppServerManager.PPC - hybridcontrollerd3d3_1act - Service #0]
 ServerProgID=SingleShotPPC.AppServer
-VariableFile=hybridcontrollerpoly3_1act.sdf
+VariableFile=hybridcontrollerd3d3_1act.sdf
 TargetName=ds1104
 ConnectionType=-1
 TaskNumber=0
 
-[AppServerManager.PPC - hybridcontrollerpoly3_1act - HostService]
+[AppServerManager.PPC - hybridcontrollerd3d3_1act - HostService]
 ServerProgID=TimeTracePPC.AppServer
-VariableFile=hybridcontrollerpoly3_1act.sdf
+VariableFile=hybridcontrollerd3d3_1act.sdf
 TargetName=ds1104
 ConnectionType=-1
 TaskNumber=1
-MeasureListSize=8
-MeasureSignal1="Labels"/"commDsp"
+MeasureListSize=1
+MeasureSignal1="Labels"/"counter"
 MeasureSignalState1=1
-MeasureSignal2="Labels"/"state"
-MeasureSignalState2=1
-MeasureSignal3="Labels"/"measDsp"
-MeasureSignalState3=1
-MeasureSignal4="Tunable Parameters"/"targDsp"
-MeasureSignalState4=1
-MeasureSignal5="Tunable Parameters"/"newTarget"
-MeasureSignalState5=1
-MeasureSignal6="Labels"/"switchPC"
-MeasureSignalState6=1
-MeasureSignal7="Labels"/"atTarget"
-MeasureSignalState7=1
-MeasureSignal8="Labels"/"measFrc"
-MeasureSignalState8=1
 TimeBase=0.001
 Length=100
 Delay=0
 Downsampling=1
-AutoRepeat=1
+AutoRepeat=0
 AutoStart=True
+Synchronization=False
+FlexRay=False
 TriggerType=-1
 TriggerLevel=0
 TriggerEdge=Neg
@@ -141,9 +139,13 @@ TriggerState=Off
 TriggerSignal=
 StartPlotAtZero=False
 UseTimestamping=True
+AcquisitionMode=0
+AutomaticStorage=False
+StoreFile=default.mat
+KeepGraphicsOutput=True
 
 [HierarchyBrowser.File1]
-File=hybridcontrollerpoly3_1act.sdf
+File=hybridcontrollerd3d3_1act.sdf
 BoardName=ds1104
 BoardType=1104
 ConnectionType=-1
@@ -159,10 +161,10 @@ Row=0
 Col=0
 Height=10
 Width=1.000000
-Left=1285
-Top=106
-Right=1295
-Bottom=791
+Left=1605
+Top=102
+Right=1615
+Bottom=666
 Docked=1
 Visible=false
 
