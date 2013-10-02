@@ -1,15 +1,15 @@
 %INITIALIZESIMULATION to initialize the parameters needed to build the Simulink model
 %
-% implemented by Andreas Schellenberg (andreas.schellenberg@gmx.net) 11/2004
+% implemented by Andreas Schellenberg (andreas.schellenberg@gmail.com) 11/2004
 
 clear;
 close all;
 clc;
 
 % set time steps
-HybridCtrlParameters.dtInt = 0.005;          % integration time step (sec)
-HybridCtrlParameters.dtSim = 0.25;           % simulation time step (sec)
-HybridCtrlParameters.dtCon = 1/1024;         % controller time step (sec)
+HybridCtrlParameters.dtInt = 0.02;           % integration time step (sec)
+HybridCtrlParameters.dtSim = 0.04;           % simulation time step (sec)
+HybridCtrlParameters.dtCon = 1/1000;         % controller time step (sec)
 HybridCtrlParameters.delay = 0.0;            % delay due to undershoot (sec)
 
 % calculate max number of substeps
