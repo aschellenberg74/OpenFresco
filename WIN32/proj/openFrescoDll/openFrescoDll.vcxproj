@@ -65,7 +65,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions> /FORCE:MULTIPLE /FIXED:NO %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>libeay32MTd.lib;ssleay32MTd.lib;ws2_32.lib;MtsCsiCom.lib;CLib32.lib;pnpscrd.lib;tcl85.lib;tk85.lib;lapack.lib;blas.lib;ifconsol.lib;libifcoremt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libeay32MTd.lib;ssleay32MTd.lib;ws2_32.lib;MtsCsiCom.lib;CLIB32.lib;pnpscrd.lib;tcl85.lib;tk85.lib;lapack.lib;blas.lib;ifconsol.lib;libifcoremt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)OpenFresco.dll</OutputFile>
       <AdditionalLibraryDirectories>..\..\..\src\experimentalControl\dSpace;..\..\..\src\experimentalControl\MTSCsi;..\..\..\src\experimentalControl\NIEseries;..\..\..\src\experimentalControl\SCRAMNet;..\..\..\win32\lib;..\..\..\win32\lib\debug;c:\Program Files\Tcl\lib;c:\Program Files\OpenSSL\lib\VC;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
@@ -105,7 +105,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions> /FORCE:MULTIPLE /FIXED:NO %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>libeay32MT.lib;ssleay32MT.lib;ws2_32.lib;MtsCsiCom.lib;CLib32.lib;pnpscr.lib;tcl85.lib;tk85.lib;lapack.lib;blas.lib;ifconsol.lib;libifcoremt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libeay32MT.lib;ssleay32MT.lib;ws2_32.lib;MtsCsiCom.lib;CLIB32.lib;pnpscr.lib;tcl85.lib;tk85.lib;lapack.lib;blas.lib;ifconsol.lib;libifcoremt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)OpenFresco.dll</OutputFile>
       <AdditionalLibraryDirectories>..\..\..\src\experimentalControl\dSpace;..\..\..\src\experimentalControl\MTSCsi;..\..\..\src\experimentalControl\NIEseries;..\..\..\src\experimentalControl\SCRAMNet;..\..\..\win32\lib;..\..\..\win32\lib\release;c:\Program Files\Tcl\lib;c:\Program Files\OpenSSL\lib\VC;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>libc.lib;libcmtd.lib;msvcrt.lib;libcd.lib;msvcrtd.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
