@@ -7,8 +7,10 @@ function data = plotOutputXPCtarget(fileName,actID,tStart)
 % actID    : id of actuator to plot (optional)
 % tStart   : time to start plotting (optional)
 %
-% Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+% Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 % Created: 04/05
+
+%#ok<*TRYNC>
 
 if (nargin<2)
    actID = 1;
@@ -164,10 +166,10 @@ try
 end
 hold('on');
 try
-   plot(flag(id:end,end),flag(id:end,2),'-r');
+   plot(flag(id:end,end),flag(id:end,2),'--r');
 end
 try
-   plot(flag(id:end,end),flag(id:end,3),'-g');
+   plot(flag(id:end,end),flag(id:end,3),'-.g');
 end
 grid('on');
 xlabel('Time [sec]');

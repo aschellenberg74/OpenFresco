@@ -58,6 +58,7 @@ uniaxialMaterial Elastic 3 [expr 2.0*100.0/1.0]
 expControl SimUniaxialMaterials 1 1
 #expControl xPCtarget 1 1 "192.168.2.20" 22222 HybridControllerD3D3_1Act "D:/PredictorCorrector/RTActualTestModels/cmAPI-xPCTarget-STS"
 #expControl SCRAMNet 1 381020 8
+#expControl dSpace 1 1 DS1104
 expControl SimUniaxialMaterials 2 2
 
 # Define experimental setup

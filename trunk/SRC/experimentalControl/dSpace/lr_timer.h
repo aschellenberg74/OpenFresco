@@ -8,7 +8,7 @@
 * 1993 - 1996 by dSPACE GmbH, Paderborn                                        *
 ************************************************************************/
 
-/* $RCSfile$ $Revision$ $Date$ */
+/* $RCSfile: lr_timer.h $ $Revision: 1.1 $ $Date: 1996/03/06 15:03:10MEZ $ */
 
 #ifndef _LR_TIMER
 #define _LR_TIMER

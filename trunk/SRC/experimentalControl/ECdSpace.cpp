@@ -36,7 +36,7 @@ ECdSpace::ECdSpace(int tag, int pctype, char *boardname)
     : ExperimentalControl(tag),
     pcType(pctype), boardName(boardname),
     ctrlDisp(0), ctrlVel(0), ctrlAccel(0), daqDisp(0), daqForce(0)
-{	    
+{
     // the host application OpenFresco needs to access the dSpace board
     // OpenSees is therefore registred with the DSP device driver
     error = DS_register_host_app("OpenFresco");
@@ -48,7 +48,7 @@ ECdSpace::ECdSpace(int tag, int pctype, char *boardname)
     
     // before accessing the processor board, the board index of the
     // board is obtained from the DSP device driver
-    error = DS_board_index(boardName, &board_index);	
+    error = DS_board_index(boardName, &board_index);
     if (error != DS_NO_ERROR)  {
         opserr << "ECdSpace::ECdSpace() - a board named " << boardName
             << " is not registered with the DSP device driver.\n";
@@ -58,7 +58,7 @@ ECdSpace::ECdSpace(int tag, int pctype, char *boardname)
     
     // in order to get more information about the selected board the CLIB
     // function DS_board_spec() is called
-    error = DS_board_spec(board_index, &board_spec);	
+    error = DS_board_spec(board_index, &board_spec);
     if (error != DS_NO_ERROR)  {
         opserr << "ECdSpace::ECdSpace() - "
             << "DS_board_spec: error = " << error << endln;
@@ -115,14 +115,14 @@ ECdSpace::ECdSpace(int tag, int pctype, char *boardname)
         opserr << "* The rtp application has been loaded and is stopped *\n";
         opserr << "******************************************************\n";
         opserr << endln;
-    }	
+    }
 }
 
 
 ECdSpace::ECdSpace(const ECdSpace &ec)
     : ExperimentalControl(ec),
     ctrlDisp(0), ctrlVel(0), ctrlAccel(0), daqDisp(0), daqForce(0)
-{	
+{
     boardState = ec.boardState;
     simState = ec.simState;
     pcType = ec.pcType;
@@ -151,7 +151,7 @@ ECdSpace::~ECdSpace()
     // delete memory of string
     if (boardName != 0)
         delete [] boardName;
-
+    
     // stop the rtp application
     simState = 0;
     error = DS_write_32(board_index, simStateId, 1, (UInt32 *)&simState);
@@ -216,7 +216,7 @@ int ECdSpace::setup()
             daqForce[i] = 0.0;
     }
     
-    // get addresses of the controlled variables on the DSP board		  
+    // get addresses of the controlled variables on the DSP board
     error = DS_get_var_addr(board_index, "newTarget", &newTargetId);
     if (error != DS_NO_ERROR)  {
         opserr << "ECdSpace::setup() - DS_get_var_addr - "
@@ -304,8 +304,8 @@ int ECdSpace::setup()
         exit(OF_ReturnType_failed);
     }
     this->sleep(1000);
-	
-	do  {
+    
+    do  {
         rValue += this->control();
         rValue += this->acquire();
         
@@ -378,7 +378,7 @@ int ECdSpace::setTrialResponse(const Vector* disp,
     const Vector* accel,
     const Vector* force,
     const Vector* time)
-{	
+{
     int i, rValue = 0;
     if (disp != 0)  {
         for (i=0; i<(*sizeCtrl)(OF_Resp_Disp); i++)  {
@@ -437,7 +437,7 @@ int ECdSpace::getDaqResponse(Vector* disp,
 
 
 int ECdSpace::commitState()
-{	
+{
     return OF_ReturnType_completed;
 }
 
@@ -537,7 +537,7 @@ Response* ECdSpace::setResponse(const char **argv, int argc,
 int ECdSpace::getResponse(int responseID, Information &info)
 {
     Vector resp(0);
-
+    
     switch (responseID)  {
     case 1:  // ctrl displacements
         resp.setData(ctrlDisp,(*sizeCtrl)(OF_Resp_Disp));
@@ -621,7 +621,7 @@ int ECdSpace::control()
         }
     }
     
-	// set newTarget flag
+    // set newTarget flag
     newTarget = 1;
     error = DS_write_32(board_index, newTargetId, 1, (UInt32 *)&newTarget);
     if (error != DS_NO_ERROR)  {
@@ -631,9 +631,9 @@ int ECdSpace::control()
         exit(OF_ReturnType_failed);
     }
     
-	// wait until switchPC flag has changed as well
+    // wait until switchPC flag has changed as well
     switchPC = 0;
-    while (switchPC != 1) {
+    while (switchPC != 1)  {
         error = DS_read_32(board_index, switchPCId, 1, (UInt32 *)&switchPC);
         if (error != DS_NO_ERROR)  {
             opserr << "ECdSpace::control() - "
@@ -643,7 +643,7 @@ int ECdSpace::control()
         }
     }
     
-	// reset newTarget flag
+    // reset newTarget flag
     newTarget = 0;
     error = DS_write_32(board_index, newTargetId, 1, (UInt32 *)&newTarget);
     if (error != DS_NO_ERROR)  {
@@ -653,9 +653,9 @@ int ECdSpace::control()
         exit(OF_ReturnType_failed);
     }
     
-	// wait until switchPC flag has changed as well
+    // wait until switchPC flag has changed as well
     switchPC = 1;
-    while (switchPC != 0) {
+    while (switchPC != 0)  {
         error = DS_read_32(board_index, switchPCId, 1, (UInt32 *)&switchPC);
         if (error != DS_NO_ERROR)  {
             opserr << "ECdSpace::control() - "

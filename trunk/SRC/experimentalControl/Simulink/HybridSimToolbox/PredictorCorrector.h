@@ -26,6 +26,9 @@ int setNewAcc(double *acc, double dtInt);
 // methods to get data and parameters
 double getNumSubSteps(double vAct, int actID, double vActMax, int Nmin);
 
+// method for hold in ramp-and-hold procedure
+int predictP0(double *dsp, double x);
+
 // methods using linear Lagrange polynomials
 int predictP1(double *dsp, double x);
 int correctP1(double *dsp, double x);
@@ -38,7 +41,7 @@ int correctP2(double *dsp, double x);
 int predictP3(double *dsp, double x);
 int correctP3(double *dsp, double x);
 
-// method for hold in ramp-and-hold procedure
+// method for hold in ramp-and-hold procedure (same as predictP0)
 int predictD0(double *dsp, double x);
 
 // methods using linear Lagrange polynomials and current disp
