@@ -231,7 +231,7 @@ StaticAnalysis::analyze(int numSteps)
 
 
 int 
-StaticAnalysis::eigen(int numMode, bool generalized)
+StaticAnalysis::eigen(int numMode, bool generalized, bool findSmallest)
 {
 
     if (theAnalysisModel == 0 || theEigenSOE == 0) {
@@ -242,7 +242,8 @@ StaticAnalysis::eigen(int numMode, bool generalized)
     int result = 0;
     Domain *the_Domain = this->getDomainPtr();
 
-    result = theAnalysisModel->eigenAnalysis(numMode, generalized);
+    // for parallel processing, want all analysis doing an eigenvalue analysis
+    result = theAnalysisModel->eigenAnalysis(numMode, generalized, findSmallest);
 
     int stamp = the_Domain->hasDomainChanged();
 
@@ -316,7 +317,7 @@ StaticAnalysis::eigen(int numMode, bool generalized)
     // solve for the eigen values & vectors
     //
 
-    if (theEigenSOE->solve(numMode, generalized) < 0) {
+    if (theEigenSOE->solve(numMode, generalized, findSmallest) < 0) {
 	opserr << "WARNING StaticAnalysis::eigen() - EigenSOE failed in solve()\n";
 	return -4;
     }
@@ -556,6 +557,9 @@ StaticAnalysis::setLinearSOE(LinearSOE &theNewSOE)
     theAlgorithm->setLinks(*theAnalysisModel, *theIntegrator, *theSOE, theTest);
     theSOE->setLinks(*theAnalysisModel);
 
+    if (theEigenSOE != 0) 
+      theEigenSOE->setLinearSOE(*theSOE);
+
     // cause domainChanged to be invoked on next analyze
     /*
     if (domainStamp != 0) {
@@ -571,23 +575,28 @@ StaticAnalysis::setLinearSOE(LinearSOE &theNewSOE)
 int 
 StaticAnalysis::setEigenSOE(EigenSOE &theNewSOE)
 {
-    // invoke the destructor on the old one
-    if (theEigenSOE != 0)
-	delete theEigenSOE;
+  // invoke the destructor on the old one if not the same!
+  if (theEigenSOE != 0) {
+    if (theEigenSOE->getClassTag() != theNewSOE.getClassTag()) {
+      delete theEigenSOE;
+      theEigenSOE = 0;
+    }
+  }
 
-    // set the links needed by the other objects in the aggregation
+  if (theEigenSOE == 0) {
     theEigenSOE = &theNewSOE;
     theEigenSOE->setLinks(*theAnalysisModel);
-
-    // cause domainChanged to be invoked on next analyze
-	domainStamp = 0;
+    theEigenSOE->setLinearSOE(*theSOE);
     /*
-	if (domainStamp != 0) {
+    if (domainStamp != 0) {
       Graph &theGraph = theAnalysisModel->getDOFGraph();
-      int result = theEigenSOE->setSize(theGraph);
+      theEigenSOE->setSize(theGraph);
     }
-	*/
-    return 0;
+    */
+    domainStamp = 0;
+  }
+  
+  return 0;
 }
 
 
