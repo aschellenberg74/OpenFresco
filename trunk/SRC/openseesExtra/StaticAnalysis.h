@@ -71,7 +71,7 @@ class StaticAnalysis: public Analysis
     void clearAll(void);	    
     
     int analyze(int numSteps);
-    int eigen(int numMode, bool generlzed = true);
+    int eigen(int numMode, bool generlzed = true, bool findSmallest = true);
     int initialize(void);
     int domainChanged(void);
 
@@ -103,7 +103,6 @@ class StaticAnalysis: public Analysis
     EigenSOE 		*theEigenSOE;
     StaticIntegrator    *theIntegrator;
     ConvergenceTest     *theTest;
-
     int domainStamp;
 
     // AddingSensitivity:BEGIN ///////////////////////////////
