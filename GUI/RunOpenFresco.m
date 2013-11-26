@@ -42,7 +42,8 @@ end
 if (console == 1)
     % run OpenSees in console (this will load OpenFresco.dll)
     if ispc
-        errorCode = dos(['@ ',changeDirCmd,' & ',openSeesCmd,' & exit &']);
+        %errorCode = dos(['@ ',changeDirCmd,' & ',openSeesCmd,' & exit &']);
+        errorCode = dos(['@ ',changeDirCmd,' & ',openSeesCmd,' &']);
     elseif ismac || isunix
         errorCode = system(['xterm -e ',changeDirCmd,' & ',openSeesCmd,' &']);
     end
