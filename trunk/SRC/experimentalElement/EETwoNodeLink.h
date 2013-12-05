@@ -70,7 +70,7 @@ public:
     // method to get class type
     const char *getClassType() const {return "EETwoNodeLink";};
     
-    // public methods to obtain information about dof & connectivity    
+    // public methods to obtain information about dof & connectivity
     int getNumExternalNodes() const;
     const ID &getExternalNodes();
     Node **getNodePtrs();
@@ -106,8 +106,8 @@ public:
     // public methods for element output
     int sendSelf(int commitTag, Channel &theChannel);
     int recvSelf(int commitTag, Channel &theChannel, FEM_ObjectBroker &theBroker);
-    int displaySelf(Renderer &theViewer, int displayMode, float fact);    
-    void Print(OPS_Stream &s, int flag = 0);    
+    int displaySelf(Renderer &theViewer, int displayMode, float fact);
+    void Print(OPS_Stream &s, int flag = 0);
     
     // public methods for element recorder
     Response *setResponse(const char **argv, int argc, OPS_Stream &s);
@@ -125,8 +125,8 @@ private:
     void applyIMod();
     
     // private attributes - a copy for each object of the class
-    int dimension;					// 1, 2, or 3 dimensions
-    int numDOF;						// number of dof for EETwoNodeLink
+    int dimension;                  // 1, 2, or 3 dimensions
+    int numDOF;                     // number of dof for EETwoNodeLink
     ID connectedExternalNodes;      // contains the tags of the end nodes
     Node *theNodes[2];
     
@@ -165,8 +165,8 @@ private:
     Vector abCtrl;      // ctrl accelerations in basic system
     
     Vector dl;          // displacements in local system
-	Matrix Tgl;         // transformation matrix from global to local system
-	Matrix Tlb;         // transformation matrix from local to basic system
+    Matrix Tgl;         // transformation matrix from global to local system
+    Matrix Tlb;         // transformation matrix from local to basic system
     
     Vector dbPast;      // past displacements in basic system
     double tPast;       // past time
@@ -176,7 +176,7 @@ private:
     Vector *theVector;  // pointer to objects vector (a class wide Vector)
     Vector *theLoad;    // pointer to the load vector
     
-    // static data - single copy for all objects of the class	
+    // static data - single copy for all objects of the class
     static Matrix EETwoNodeLinkM2;   // class wide matrix for 2*2
     static Matrix EETwoNodeLinkM4;   // class wide matrix for 4*4
     static Matrix EETwoNodeLinkM6;   // class wide matrix for 6*6

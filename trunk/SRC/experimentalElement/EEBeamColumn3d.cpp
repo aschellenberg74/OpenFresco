@@ -52,7 +52,6 @@
 // initialize the class wide variables
 Matrix EEBeamColumn3d::theMatrix(12,12);
 Vector EEBeamColumn3d::theVector(12);
-Vector EEBeamColumn3d::theLoad(12);
 
 
 // responsible for allocating the necessary space needed
@@ -63,7 +62,7 @@ EEBeamColumn3d::EEBeamColumn3d(int tag, int Nd1, int Nd2,
     bool iM, int addRay, double r)
     : ExperimentalElement(tag, ELE_TAG_EEBeamColumn3d, site),
     connectedExternalNodes(2), theCoordTransf(0),
-    iMod(iM), addRayleigh(addRay), rho(r), L(0.0),
+    iMod(iM), addRayleigh(addRay), rho(r), L(0.0), theLoad(12),
     db(0), vb(0), ab(0), t(0),
     dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
     dbCtrl(6), vbCtrl(6), abCtrl(6),
@@ -107,14 +106,14 @@ EEBeamColumn3d::EEBeamColumn3d(int tag, int Nd1, int Nd2,
     vb = new Vector(6);
     ab = new Vector(6);
     t  = new Vector(1);
-
+    
     // allocate memory for daq response vectors
     dbDaq = new Vector(6);
     vbDaq = new Vector(6);
     abDaq = new Vector(6);
     qDaq  = new Vector(6);
     tDaq  = new Vector(1);
-
+    
     // set the initial stiffness matrix size
     theInitStiff.resize(12,12);
     
@@ -146,7 +145,7 @@ EEBeamColumn3d::EEBeamColumn3d(int tag, int Nd1, int Nd2,
     int dataSize, bool iM, int addRay, double r)
     : ExperimentalElement(tag, ELE_TAG_EEBeamColumn3d),
     connectedExternalNodes(2), theCoordTransf(0),
-    iMod(iM), addRayleigh(addRay), rho(r), L(0.0),
+    iMod(iM), addRayleigh(addRay), rho(r), L(0.0), theLoad(12),
     theChannel(0), sData(0), sendData(0), rData(0), recvData(0),
     db(0), vb(0), ab(0), t(0),
     dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
@@ -206,7 +205,7 @@ EEBeamColumn3d::EEBeamColumn3d(int tag, int Nd1, int Nd2,
     sizeCtrl = new ID(intData, OF_Resp_All);
     sizeDaq = new ID(&intData[OF_Resp_All], OF_Resp_All);
     idData.Zero();
-
+    
     (*sizeCtrl)[OF_Resp_Disp]  = 6;
     (*sizeCtrl)[OF_Resp_Vel]   = 6;
     (*sizeCtrl)[OF_Resp_Accel] = 6;
@@ -217,10 +216,10 @@ EEBeamColumn3d::EEBeamColumn3d(int tag, int Nd1, int Nd2,
     (*sizeDaq)[OF_Resp_Accel]  = 6;
     (*sizeDaq)[OF_Resp_Force]  = 6;
     (*sizeDaq)[OF_Resp_Time]   = 1;
-
+    
     if (dataSize < 25) dataSize = 25;
     intData[2*OF_Resp_All] = dataSize;
-
+    
     theChannel->sendID(0, 0, idData, 0);
     
     // allocate memory for the send vectors
@@ -235,7 +234,7 @@ EEBeamColumn3d::EEBeamColumn3d(int tag, int Nd1, int Nd2,
     id += 6;
     t = new Vector(&sData[id], 1);
     sendData->Zero();
-
+    
     // allocate memory for the receive vectors
     id = 0;
     rData = new double [dataSize];
@@ -250,7 +249,7 @@ EEBeamColumn3d::EEBeamColumn3d(int tag, int Nd1, int Nd2,
     id += 6;
     tDaq = new Vector(&rData[id], 1);
     recvData->Zero();
-
+    
     // set the initial stiffness matrix size
     theInitStiff.resize(12,12);
     
@@ -281,7 +280,7 @@ EEBeamColumn3d::~EEBeamColumn3d()
     // that the object still holds a pointer to
     if (theCoordTransf != 0)
         delete theCoordTransf;
-
+    
     if (db != 0)
         delete db;
     if (vb != 0)
@@ -290,7 +289,7 @@ EEBeamColumn3d::~EEBeamColumn3d()
         delete ab;
     if (t != 0)
         delete t;
-
+    
     if (dbDaq != 0)
         delete dbDaq;
     if (vbDaq != 0)
@@ -301,7 +300,7 @@ EEBeamColumn3d::~EEBeamColumn3d()
         delete qDaq;
     if (tDaq != 0)
         delete tDaq;
-
+    
     if (theSite == 0)  {
         sData[0] = OF_RemoteTest_DIE;
         theChannel->sendVector(0, 0, *sendData, 0);
@@ -326,25 +325,25 @@ int EEBeamColumn3d::getNumExternalNodes() const
 }
 
 
-const ID& EEBeamColumn3d::getExternalNodes() 
+const ID& EEBeamColumn3d::getExternalNodes()
 {
     return connectedExternalNodes;
 }
 
 
-Node** EEBeamColumn3d::getNodePtrs() 
+Node** EEBeamColumn3d::getNodePtrs()
 {
     return theNodes;
 }
 
 
-int EEBeamColumn3d::getNumDOF() 
+int EEBeamColumn3d::getNumDOF()
 {
     return 12;
 }
 
 
-int EEBeamColumn3d::getNumBasicDOF() 
+int EEBeamColumn3d::getNumBasicDOF()
 {
     return 6;
 }
@@ -381,9 +380,9 @@ void EEBeamColumn3d::setDomain(Domain *theDomain)
         return;
     }
     
-    // now determine the number of dof and the dimension    
+    // now determine the number of dof and the dimension
     int dofNd1 = theNodes[0]->getNumberDOF();
-    int dofNd2 = theNodes[1]->getNumberDOF();	
+    int dofNd2 = theNodes[1]->getNumberDOF();
     
     // if differing dof at the ends - print a warning message
     if (dofNd1 != 6)  {
@@ -429,7 +428,7 @@ int EEBeamColumn3d::commitState()
         sData[0] = OF_RemoteTest_commitState;
         rValue += theChannel->sendVector(0, 0, *sendData, 0);
     }
-
+    
     // commit the coordinate transformation
     rValue += theCoordTransf->commitState();
     
@@ -443,7 +442,7 @@ int EEBeamColumn3d::commitState()
 int EEBeamColumn3d::update()
 {
     int rValue = 0;
-
+    
     // get current time
     Domain *theDomain = this->getDomain();
     (*t)(0) = theDomain->getCurrentTime();
@@ -526,6 +525,7 @@ int EEBeamColumn3d::setInitialStiff(const Matrix& kbinit)
     
     // transform stiffness from basic sys B to basic sys A
     static Matrix kbAInit(6,6);
+    kbAInit.Zero();
     kbAInit(0,0) = kbInit(0,0);
     kbAInit(1,1) = L*L*kbInit(1,1) + L*(kbInit(1,2)+kbInit(2,1)) + kbInit(2,2);
     kbAInit(1,2) = -L*kbInit(1,2) - kbInit(2,2);
@@ -605,6 +605,7 @@ const Matrix& EEBeamColumn3d::getTangentStiff()
     
     // transform stiffness from basic sys B to basic sys A
     static Matrix kbAInit(6,6);
+    kbAInit.Zero();
     kbAInit(0,0) = kbInit(0,0);
     kbAInit(1,1) = L*L*kbInit(1,1) + L*(kbInit(1,2)+kbInit(2,1)) + kbInit(2,2);
     kbAInit(1,2) = -L*kbInit(1,2) - kbInit(2,2);
@@ -666,28 +667,28 @@ void EEBeamColumn3d::zeroLoad()
 
 
 int EEBeamColumn3d::addLoad(ElementalLoad *theEleLoad, double loadFactor)
-{  
+{
     int type;
     const Vector &data = theEleLoad->getData(type, loadFactor);
-
+    
     if (type == LOAD_TAG_Beam3dUniformLoad) {
         double wy = data(0)*loadFactor;  // transverse
         double wz = data(1)*loadFactor;  // transverse
         double wx = data(2)*loadFactor;  // axial (+ve from node I to J)
-
+        
         double Vy = 0.5*wy*L;
         double Mz = Vy*L/6.0; // wy*L*L/12
         double Vz = 0.5*wz*L;
         double My = Vz*L/6.0; // wz*L*L/12
         double P  = wx*L;
-
+        
         // reactions in basic system
         pA0[0] -= P;
         pA0[1] -= Vy;
         pA0[2] -= Vy;
         pA0[3] -= Vz;
         pA0[4] -= Vz;
-
+        
         // fixed end forces in basic system
         qA0[0] -= 0.5*P;
         qA0[1] -= Mz;
@@ -695,19 +696,19 @@ int EEBeamColumn3d::addLoad(ElementalLoad *theEleLoad, double loadFactor)
         qA0[3] += My;
         qA0[4] -= My;
     }
-
+    
     else if (type == LOAD_TAG_Beam3dPointLoad) {
         double Py = data(0)*loadFactor;
         double Pz = data(1)*loadFactor;
         double N  = data(2)*loadFactor;
         double aOverL = data(3);
-
+        
         if (aOverL < 0.0 || aOverL > 1.0)
             return 0;
-
+        
         double a = aOverL*L;
         double b = L-a;
-
+        
         // reactions in basic system
         pA0[0] -= N;
         double V1, V2;
@@ -719,11 +720,11 @@ int EEBeamColumn3d::addLoad(ElementalLoad *theEleLoad, double loadFactor)
         V2 = Pz*aOverL;
         pA0[3] -= V1;
         pA0[4] -= V2;
-
+        
         double L2 = 1.0/(L*L);
         double a2 = a*a;
         double b2 = b*b;
-
+        
         // fixed end forces in basic system
         qA0[0] -= N*aOverL;
         double M1, M2;
@@ -752,7 +753,7 @@ int EEBeamColumn3d::addInertiaLoadToUnbalance(const Vector &accel)
     // check for quick return
     if (L == 0.0 || rho == 0.0)  {
         return 0;
-    }    
+    }
     
     // get R * accel from the nodes
     const Vector &Raccel1 = theNodes[0]->getRV(accel);
@@ -770,7 +771,7 @@ int EEBeamColumn3d::addInertiaLoadToUnbalance(const Vector &accel)
     theLoad(0) -= m * Raccel1(0);
     theLoad(1) -= m * Raccel1(1);
     theLoad(2) -= m * Raccel1(2);
-    theLoad(6) -= m * Raccel2(0);    
+    theLoad(6) -= m * Raccel2(0);
     theLoad(7) -= m * Raccel2(1);
     theLoad(8) -= m * Raccel2(2);
     
@@ -849,26 +850,26 @@ const Vector& EEBeamColumn3d::getResistingForce()
 
 
 const Vector& EEBeamColumn3d::getResistingForceIncInertia()
-{	
+{
     // this already includes damping forces from specimen
     theVector = this->getResistingForce();
     
     // add the damping forces from rayleigh damping
     if (addRayleigh == 1)  {
         if (alphaM != 0.0 || betaK != 0.0 || betaK0 != 0.0 || betaKc != 0.0)
-            theVector += this->getRayleighDampingForces();
+            theVector.addVector(1.0, this->getRayleighDampingForces(), 1.0);
     }
     
     // add inertia forces from element mass
     if (L != 0.0 && rho != 0.0)  {
         const Vector &accel1 = theNodes[0]->getTrialAccel();
-        const Vector &accel2 = theNodes[1]->getTrialAccel();    
+        const Vector &accel2 = theNodes[1]->getTrialAccel();
         
         double m = 0.5*rho*L;
         theVector(0) += m * accel1(0);
         theVector(1) += m * accel1(1);
         theVector(2) += m * accel1(2);
-        theVector(6) += m * accel2(0);    
+        theVector(6) += m * accel2(0);
         theVector(7) += m * accel2(1);
         theVector(8) += m * accel2(2);
     }
@@ -878,7 +879,7 @@ const Vector& EEBeamColumn3d::getResistingForceIncInertia()
 
 
 const Vector& EEBeamColumn3d::getTime()
-{	
+{
     if (theSite != 0)  {
         (*tDaq) = theSite->getTime();
     }
@@ -887,13 +888,13 @@ const Vector& EEBeamColumn3d::getTime()
         theChannel->sendVector(0, 0, *sendData, 0);
         theChannel->recvVector(0, 0, *recvData, 0);
     }
-
+    
     return *tDaq;
 }
 
 
 const Vector& EEBeamColumn3d::getBasicDisp()
-{	
+{
     if (theSite != 0)  {
         (*dbDaq) = theSite->getDisp();
     }
@@ -902,13 +903,13 @@ const Vector& EEBeamColumn3d::getBasicDisp()
         theChannel->sendVector(0, 0, *sendData, 0);
         theChannel->recvVector(0, 0, *recvData, 0);
     }
-
+    
     return *dbDaq;
 }
 
 
 const Vector& EEBeamColumn3d::getBasicVel()
-{	
+{
     if (theSite != 0)  {
         (*vbDaq) = theSite->getVel();
     }
@@ -917,13 +918,13 @@ const Vector& EEBeamColumn3d::getBasicVel()
         theChannel->sendVector(0, 0, *sendData, 0);
         theChannel->recvVector(0, 0, *recvData, 0);
     }
-
+    
     return *vbDaq;
 }
 
 
 const Vector& EEBeamColumn3d::getBasicAccel()
-{	
+{
     if (theSite != 0)  {
         (*abDaq) = theSite->getAccel();
     }
@@ -932,7 +933,7 @@ const Vector& EEBeamColumn3d::getBasicAccel()
         theChannel->sendVector(0, 0, *sendData, 0);
         theChannel->recvVector(0, 0, *recvData, 0);
     }
-
+    
     return *abDaq;
 }
 
@@ -1025,7 +1026,7 @@ Response* EEBeamColumn3d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","Mx_2");
         output.tag("ResponseType","My_2");
         output.tag("ResponseType","Mz_2");
-
+        
         theResponse = new ElementResponse(this, 1, theVector);
     }
     
@@ -1045,7 +1046,7 @@ Response* EEBeamColumn3d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","T_2");
         output.tag("ResponseType","My_2");
         output.tag("ResponseType","Mz_2");
-
+        
         theResponse = new ElementResponse(this, 2, theVector);
     }
     
@@ -1061,7 +1062,7 @@ Response* EEBeamColumn3d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","q4");
         output.tag("ResponseType","q5");
         output.tag("ResponseType","q6");
-
+        
         theResponse = new ElementResponse(this, 3, Vector(6));
     }
     
@@ -1082,7 +1083,7 @@ Response* EEBeamColumn3d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","db4");
         output.tag("ResponseType","db5");
         output.tag("ResponseType","db6");
-
+        
         theResponse = new ElementResponse(this, 4, Vector(6));
     }
     
@@ -1097,7 +1098,7 @@ Response* EEBeamColumn3d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","vb4");
         output.tag("ResponseType","vb5");
         output.tag("ResponseType","vb6");
-
+        
         theResponse = new ElementResponse(this, 5, Vector(6));
     }
     
@@ -1112,7 +1113,7 @@ Response* EEBeamColumn3d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","ab4");
         output.tag("ResponseType","ab5");
         output.tag("ResponseType","ab6");
-
+        
         theResponse = new ElementResponse(this, 6, Vector(6));
     }
     
@@ -1127,7 +1128,7 @@ Response* EEBeamColumn3d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","dbDaq4");
         output.tag("ResponseType","dbDaq5");
         output.tag("ResponseType","dbDaq6");
-
+        
         theResponse = new ElementResponse(this, 7, Vector(6));
     }
     
@@ -1142,7 +1143,7 @@ Response* EEBeamColumn3d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","vbDaq4");
         output.tag("ResponseType","vbDaq5");
         output.tag("ResponseType","vbDaq6");
-
+        
         theResponse = new ElementResponse(this, 8, Vector(6));
     }
     
@@ -1157,7 +1158,7 @@ Response* EEBeamColumn3d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","abDaq4");
         output.tag("ResponseType","abDaq5");
         output.tag("ResponseType","abDaq6");
-
+        
         theResponse = new ElementResponse(this, 9, Vector(6));
     }
     
@@ -1170,7 +1171,7 @@ Response* EEBeamColumn3d::setResponse(const char **argv, int argc,
 int EEBeamColumn3d::getResponse(int responseID, Information &eleInfo)
 {
     double L = theCoordTransf->getInitialLength();
-    Vector qA(6);
+    static Vector qA(6);
     
     switch (responseID)  {
     case 1:  // global forces
@@ -1186,7 +1187,6 @@ int EEBeamColumn3d::getResponse(int responseID, Information &eleInfo)
         qA(5) = (*qDaq)[5];
         
         /* transform forces from basic sys B to basic sys A (nonlinear)
-        static Vector qA(6);
         qA(0) = 
         qA(1) = 
         qA(2) = 
@@ -1243,7 +1243,7 @@ int EEBeamColumn3d::getResponse(int responseID, Information &eleInfo)
 
 
 void EEBeamColumn3d::applyIMod()
-{    
+{
     // get daq displacements
     if (theSite != 0)  {
         (*dbDaq) = theSite->getDisp();
@@ -1253,7 +1253,7 @@ void EEBeamColumn3d::applyIMod()
         theChannel->sendVector(0, 0, *sendData, 0);
         theChannel->recvVector(0, 0, *recvData, 0);
     }
-
+    
     // correct for displacement control errors using I-Modification
     if ((*dbDaq)[0] != 0.0)  {
         (*qDaq)[0] -= kbInit(0,0)*((*dbDaq)[0] - (*db)[0]);

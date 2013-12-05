@@ -50,7 +50,6 @@
 // initialize the class wide variables
 Matrix EEInvertedVBrace2d::theMatrix(9,9);
 Vector EEInvertedVBrace2d::theVector(9);
-Vector EEInvertedVBrace2d::theLoad(9);
 
 
 // responsible for allocating the necessary space needed
@@ -60,7 +59,7 @@ EEInvertedVBrace2d::EEInvertedVBrace2d(int tag, int Nd1, int Nd2, int Nd3,
     bool iM, bool nlGeomFlag, int addRay, double r1, double r2)
     : ExperimentalElement(tag, ELE_TAG_EEInvertedVBrace2d, site),
     connectedExternalNodes(3), iMod(iM), nlGeom(nlGeomFlag),
-    addRayleigh(addRay), rho1(r1), rho2(r2), L1(0.0), L2(0.0),
+    addRayleigh(addRay), rho1(r1), rho2(r2), L1(0.0), L2(0.0), theLoad(9),
     db(0), vb(0), ab(0), t(0),
     dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
     dbCtrl(3), vbCtrl(3), abCtrl(3),
@@ -103,14 +102,14 @@ EEInvertedVBrace2d::EEInvertedVBrace2d(int tag, int Nd1, int Nd2, int Nd3,
     vb = new Vector(3);
     ab = new Vector(3);
     t  = new Vector(1);
-
+    
     // allocate memory for daq response vectors
     dbDaq = new Vector(3);
     vbDaq = new Vector(3);
     abDaq = new Vector(3);
     qDaq  = new Vector(6);
     tDaq  = new Vector(1);
-
+    
     // set the initial stiffness matrix size
     theInitStiff.resize(9,9);
     
@@ -129,7 +128,7 @@ EEInvertedVBrace2d::EEInvertedVBrace2d(int tag, int Nd1, int Nd2, int Nd3,
     bool iM, bool nlGeomFlag, int addRay, double r1, double r2)
     : ExperimentalElement(tag, ELE_TAG_EEInvertedVBrace2d),
     connectedExternalNodes(3), iMod(iM), nlGeom(nlGeomFlag),
-    addRayleigh(addRay), rho1(r1), rho2(r2), L1(0.0), L2(0.0),
+    addRayleigh(addRay), rho1(r1), rho2(r2), L1(0.0), L2(0.0), theLoad(9),
     theChannel(0), sData(0), sendData(0), rData(0), recvData(0),
     db(0), vb(0), ab(0), t(0),
     dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
@@ -202,7 +201,7 @@ EEInvertedVBrace2d::EEInvertedVBrace2d(int tag, int Nd1, int Nd2, int Nd3,
     
     if (dataSize < 16) dataSize = 16;
     intData[2*OF_Resp_All] = dataSize;
-
+    
     theChannel->sendID(0, 0, idData, 0);
     
     // allocate memory for the send vectors
@@ -217,7 +216,7 @@ EEInvertedVBrace2d::EEInvertedVBrace2d(int tag, int Nd1, int Nd2, int Nd3,
     id += 3;
     t = new Vector(&sData[id], 1);
     sendData->Zero();
-
+    
     // allocate memory for the receive vectors
     id = 0;
     rData = new double [dataSize];
@@ -232,7 +231,7 @@ EEInvertedVBrace2d::EEInvertedVBrace2d(int tag, int Nd1, int Nd2, int Nd3,
     id += 6;
     tDaq = new Vector(&rData[id], 1);
     recvData->Zero();
-
+    
     // set the initial stiffness matrix size
     theInitStiff.resize(9,9);
     
@@ -257,7 +256,7 @@ EEInvertedVBrace2d::~EEInvertedVBrace2d()
         delete ab;
     if (t != 0)
         delete t;
-
+    
     if (dbDaq != 0)
         delete dbDaq;
     if (vbDaq != 0)
@@ -268,7 +267,7 @@ EEInvertedVBrace2d::~EEInvertedVBrace2d()
         delete qDaq;
     if (tDaq != 0)
         delete tDaq;
-
+    
     if (theSite == 0)  {
         sData[0] = OF_RemoteTest_DIE;
         theChannel->sendVector(0, 0, *sendData, 0);
@@ -293,25 +292,25 @@ int EEInvertedVBrace2d::getNumExternalNodes() const
 }
 
 
-const ID& EEInvertedVBrace2d::getExternalNodes() 
+const ID& EEInvertedVBrace2d::getExternalNodes()
 {
     return connectedExternalNodes;
 }
 
 
-Node** EEInvertedVBrace2d::getNodePtrs() 
+Node** EEInvertedVBrace2d::getNodePtrs()
 {
     return theNodes;
 }
 
 
-int EEInvertedVBrace2d::getNumDOF() 
+int EEInvertedVBrace2d::getNumDOF()
 {
     return 9;
 }
 
 
-int EEInvertedVBrace2d::getNumBasicDOF() 
+int EEInvertedVBrace2d::getNumBasicDOF()
 {
     return 3;
 }
@@ -354,10 +353,10 @@ void EEInvertedVBrace2d::setDomain(Domain *theDomain)
         return;
     }
     
-    // now determine the number of dof and the dimension    
+    // now determine the number of dof and the dimension
     int dofNd1 = theNodes[0]->getNumberDOF();
-    int dofNd2 = theNodes[1]->getNumberDOF();	
-    int dofNd3 = theNodes[2]->getNumberDOF();	
+    int dofNd2 = theNodes[1]->getNumberDOF();
+    int dofNd3 = theNodes[2]->getNumberDOF();
     
     // if differing dof at the ends - print a warning message
     if (dofNd1 != 3)  {
@@ -386,9 +385,9 @@ void EEInvertedVBrace2d::setDomain(Domain *theDomain)
     const Vector &end3Crd = theNodes[2]->getCrds();
     
     dx1[0] = end3Crd(0)-end1Crd(0);
-    dx1[1] = end3Crd(1)-end1Crd(1);	
+    dx1[1] = end3Crd(1)-end1Crd(1);
     dx2[0] = end3Crd(0)-end2Crd(0);
-    dx2[1] = end3Crd(1)-end2Crd(1);	
+    dx2[1] = end3Crd(1)-end2Crd(1);
     
     L1 = sqrt(dx1[0]*dx1[0] + dx1[1]*dx1[1]);
     L2 = sqrt(dx2[0]*dx2[0] + dx2[1]*dx2[1]);
@@ -412,7 +411,7 @@ void EEInvertedVBrace2d::setDomain(Domain *theDomain)
     T(1,0) =  dx1[0]*dx2[0]/D;  T(1,1) = -dx2[0]*dx1[1]/D;
     T(1,3) = -dx1[0]*dx2[0]/D;  T(1,4) = -dx1[0]*dx2[1]/D;  T(1,7) = 1;
     //T(2,8) = 1;  // include this to apply rotation at node 3
-}   	 
+}
 
 
 int EEInvertedVBrace2d::commitState()
@@ -438,7 +437,7 @@ int EEInvertedVBrace2d::commitState()
 int EEInvertedVBrace2d::update()
 {
     int rValue = 0;
-
+    
     // get current time
     Domain *theDomain = this->getDomain();
     (*t)(0) = theDomain->getCurrentTime();
@@ -466,10 +465,10 @@ int EEInvertedVBrace2d::update()
         }
         
         // transform displacements from the global to the basic system
-        (*db) = T*dg;
-        (*vb) = T*vg;
-        (*ab) = T*ag;
-                
+        db->addMatrixVector(0.0, T, dg, 1.0);
+        vb->addMatrixVector(0.0, T, vg, 1.0);
+        ab->addMatrixVector(0.0, T, ag, 1.0);
+        
         if ((*db) != dbPast || (*t)(0) != tPast)  {
             // save the displacements and the time
             dbPast = (*db);
@@ -502,7 +501,7 @@ int EEInvertedVBrace2d::setInitialStiff(const Matrix& kbinit)
         return -1;
     }
     kbInit = kbinit;
-        
+    
     // transform stiffness matrix from the basic to the global system
     theInitStiff.Zero();
     theInitStiff.addMatrixTripleProduct(0.0, T, kbInit, 1.0);
@@ -535,7 +534,7 @@ const Matrix& EEInvertedVBrace2d::getMass()
         double m1 = 0.5*rho1*L1;
         double m2 = 0.5*rho2*L2;
         theMatrix(0,0) = m1;
-        theMatrix(1,1) = m1;	
+        theMatrix(1,1) = m1;
         theMatrix(3,3) = m2;
         theMatrix(4,4) = m2;
         theMatrix(6,6) = m1+m2;
@@ -553,7 +552,7 @@ void EEInvertedVBrace2d::zeroLoad()
 
 
 int EEInvertedVBrace2d::addLoad(ElementalLoad *theLoad, double loadFactor)
-{  
+{
     opserr <<"EEInvertedVBrace2d::addLoad() - "
         << "load type unknown for element: "
         << this->getTag() << endln;
@@ -567,7 +566,7 @@ int EEInvertedVBrace2d::addInertiaLoadToUnbalance(const Vector &accel)
     // check for quick return
     if ((L1 == 0.0 || rho1 == 0) && (L2 == 0 || rho2 == 0.0))  {
         return 0;
-    }    
+    }
     
     // get R * accel from the nodes
     const Vector &Raccel1 = theNodes[0]->getRV(accel);
@@ -586,10 +585,10 @@ int EEInvertedVBrace2d::addInertiaLoadToUnbalance(const Vector &accel)
     double m2 = 0.5*rho2*L2;
     theLoad(0) -= m1 * Raccel1(0);
     theLoad(1) -= m1 * Raccel1(1);
-    theLoad(3) -= m2 * Raccel2(0);    
-    theLoad(4) -= m2 * Raccel2(1);    
-    theLoad(6) -= (m1+m2) * Raccel3(0);    
-    theLoad(7) -= (m1+m2) * Raccel3(1);    
+    theLoad(3) -= m2 * Raccel2(0);
+    theLoad(4) -= m2 * Raccel2(1);
+    theLoad(6) -= (m1+m2) * Raccel3(0);
+    theLoad(7) -= (m1+m2) * Raccel3(1);
     
     return 0;
 }
@@ -609,9 +608,9 @@ const Vector& EEInvertedVBrace2d::getResistingForce()
     
     // calculate the new direction cosines
     dx1[0] = (end3Crd(0) + end3Dsp(0)) - (end1Crd(0) + end1Dsp(0));
-    dx1[1] = (end3Crd(1) + end3Dsp(1)) - (end1Crd(1) + end1Dsp(1));	
+    dx1[1] = (end3Crd(1) + end3Dsp(1)) - (end1Crd(1) + end1Dsp(1));
     dx2[0] = (end3Crd(0) + end3Dsp(0)) - (end2Crd(0) + end2Dsp(0));
-    dx2[1] = (end3Crd(1) + end3Dsp(1)) - (end2Crd(1) + end2Dsp(1));	
+    dx2[1] = (end3Crd(1) + end3Dsp(1)) - (end2Crd(1) + end2Dsp(1));
     
     // zero the residual
     theVector.Zero();
@@ -637,15 +636,15 @@ const Vector& EEInvertedVBrace2d::getResistingForce()
             theChannel->sendVector(0, 0, *sendData, 0);
             theChannel->recvVector(0, 0, *recvData, 0);
         }
-
+        
         // correct for displacement control errors using I-Modification
-        static Vector qb;
-        qb = kbInit*((*dbDaq) - (*db));
+        static Vector qb(3);
+        qb.addMatrixVector(0.0, kbInit, (*dbDaq) - (*db), 1.0);
         
         //double ratioX1 = (q(0)+q(3)!=0) ? q(0)/(q(0) + q(3)) : 0.5;
         //double ratioX2 = (q(0)+q(3)!=0) ? q(3)/(q(0) + q(3)) : 0.5;
         //double ratioY1 = (q(1)+q(4)!=0) ? q(1)/(q(1) + q(4)) : 0.5;
-        //double ratioY2 = (q(1)+q(4)!=0) ? q(4)/(q(1) + q(4)) : 0.5;        
+        //double ratioY2 = (q(1)+q(4)!=0) ? q(4)/(q(1) + q(4)) : 0.5;
         //q(0) += qb(0)*ratioX1;
         //q(1) += qb(1)*ratioY1;
         //q(3) += qb(0)*ratioX2;
@@ -661,7 +660,7 @@ const Vector& EEInvertedVBrace2d::getResistingForce()
     dbCtrl = (*db);
     vbCtrl = (*vb);
     abCtrl = (*ab);
-
+    
     // determine resisting forces in global system and account for load-cell
     // cross-talk by averaging between shear and axial loads
     theVector(0) = 0.5*((*qDaq)(0) + dx1[0]/dx1[1]*(*qDaq)(1));
@@ -685,14 +684,14 @@ const Vector& EEInvertedVBrace2d::getResistingForce()
 
 
 const Vector& EEInvertedVBrace2d::getResistingForceIncInertia()
-{	
+{
     // this already includes damping forces from specimen
     theVector = this->getResistingForce();
     
     // add the damping forces from rayleigh damping
     if (addRayleigh == 1)  {
         if (alphaM != 0.0 || betaK != 0.0 || betaK0 != 0.0 || betaKc != 0.0)
-            theVector += this->getRayleighDampingForces();
+            theVector.addVector(1.0, this->getRayleighDampingForces(), 1.0);
     }
     
     // add inertia forces from element mass
@@ -705,9 +704,9 @@ const Vector& EEInvertedVBrace2d::getResistingForceIncInertia()
         double m2 = 0.5*rho2*L2;
         theVector(0) += m1 * accel1(0);
         theVector(1) += m1 * accel1(1);
-        theVector(3) += m2 * accel2(0);    
+        theVector(3) += m2 * accel2(0);
         theVector(4) += m2 * accel2(1);
-        theVector(6) += (m1+m2) * accel3(0);    
+        theVector(6) += (m1+m2) * accel3(0);
         theVector(7) += (m1+m2) * accel3(1);
     }
     
@@ -716,7 +715,7 @@ const Vector& EEInvertedVBrace2d::getResistingForceIncInertia()
 
 
 const Vector& EEInvertedVBrace2d::getTime()
-{	
+{
     if (theSite != 0)  {
         (*tDaq) = theSite->getTime();
     }
@@ -725,13 +724,13 @@ const Vector& EEInvertedVBrace2d::getTime()
         theChannel->sendVector(0, 0, *sendData, 0);
         theChannel->recvVector(0, 0, *recvData, 0);
     }
-
+    
     return *tDaq;
 }
 
 
 const Vector& EEInvertedVBrace2d::getBasicDisp()
-{	
+{
     if (theSite != 0)  {
         (*dbDaq) = theSite->getDisp();
     }
@@ -740,13 +739,13 @@ const Vector& EEInvertedVBrace2d::getBasicDisp()
         theChannel->sendVector(0, 0, *sendData, 0);
         theChannel->recvVector(0, 0, *recvData, 0);
     }
-
+    
     return *dbDaq;
 }
 
 
 const Vector& EEInvertedVBrace2d::getBasicVel()
-{	
+{
     if (theSite != 0)  {
         (*vbDaq) = theSite->getVel();
     }
@@ -755,13 +754,13 @@ const Vector& EEInvertedVBrace2d::getBasicVel()
         theChannel->sendVector(0, 0, *sendData, 0);
         theChannel->recvVector(0, 0, *recvData, 0);
     }
-
+    
     return *vbDaq;
 }
 
 
 const Vector& EEInvertedVBrace2d::getBasicAccel()
-{	
+{
     if (theSite != 0)  {
         (*abDaq) = theSite->getAccel();
     }
@@ -770,7 +769,7 @@ const Vector& EEInvertedVBrace2d::getBasicAccel()
         theChannel->sendVector(0, 0, *sendData, 0);
         theChannel->recvVector(0, 0, *recvData, 0);
     }
-
+    
     return *abDaq;
 }
 
@@ -801,8 +800,8 @@ int EEInvertedVBrace2d::displaySelf(Renderer &theViewer,
     // now  determine the end points of the brace based on
     // the display factor (a measure of the distorted image)
     const Vector &end1Crd = theNodes[0]->getCrds();
-    const Vector &end2Crd = theNodes[1]->getCrds();	
-    const Vector &end3Crd = theNodes[2]->getCrds();	
+    const Vector &end2Crd = theNodes[1]->getCrds();
+    const Vector &end3Crd = theNodes[2]->getCrds();
     
     const Vector &end1Disp = theNodes[0]->getDisp();
     const Vector &end2Disp = theNodes[1]->getDisp();
@@ -812,8 +811,8 @@ int EEInvertedVBrace2d::displaySelf(Renderer &theViewer,
     
     for (int i=0; i<2; i++)  {
         coords(0,i) = end1Crd(i) + end1Disp(i)*fact;
-        coords(1,i) = end2Crd(i) + end2Disp(i)*fact;    
-        coords(2,i) = end3Crd(i) + end3Disp(i)*fact;    
+        coords(1,i) = end2Crd(i) + end2Disp(i)*fact;
+        coords(2,i) = end3Crd(i) + end3Disp(i)*fact;
     }
     
     return theViewer.drawPolygon (coords, values);
@@ -868,7 +867,7 @@ Response* EEInvertedVBrace2d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","Px_3");
         output.tag("ResponseType","Py_3");
         output.tag("ResponseType","Mz_3");
-
+        
         theResponse = new ElementResponse(this, 1, theVector);
     }
     
@@ -885,7 +884,7 @@ Response* EEInvertedVBrace2d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","px_3");
         output.tag("ResponseType","py_3");
         output.tag("ResponseType","mz_3");
-
+        
         theResponse = new ElementResponse(this, 2, theVector);
     }
     
@@ -901,7 +900,7 @@ Response* EEInvertedVBrace2d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","q4");
         output.tag("ResponseType","q5");
         output.tag("ResponseType","q6");
-
+        
         theResponse = new ElementResponse(this, 3, Vector(6));
     }
     
@@ -919,7 +918,7 @@ Response* EEInvertedVBrace2d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","db1");
         output.tag("ResponseType","db2");
         output.tag("ResponseType","db3");
-
+        
         theResponse = new ElementResponse(this, 4, Vector(3));
     }
     
@@ -931,7 +930,7 @@ Response* EEInvertedVBrace2d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","vb1");
         output.tag("ResponseType","vb2");
         output.tag("ResponseType","vb3");
-
+        
         theResponse = new ElementResponse(this, 5, Vector(3));
     }
     
@@ -943,7 +942,7 @@ Response* EEInvertedVBrace2d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","ab1");
         output.tag("ResponseType","ab2");
         output.tag("ResponseType","ab3");
-
+        
         theResponse = new ElementResponse(this, 6, Vector(3));
     }
     
@@ -955,7 +954,7 @@ Response* EEInvertedVBrace2d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","dbDaq1");
         output.tag("ResponseType","dbDaq2");
         output.tag("ResponseType","dbDaq3");
-
+        
         theResponse = new ElementResponse(this, 7, Vector(3));
     }
     
@@ -967,7 +966,7 @@ Response* EEInvertedVBrace2d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","vbDaq1");
         output.tag("ResponseType","vbDaq2");
         output.tag("ResponseType","vbDaq3");
-
+        
         theResponse = new ElementResponse(this, 8, Vector(3));
     }
     
@@ -979,7 +978,7 @@ Response* EEInvertedVBrace2d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","abDaq1");
         output.tag("ResponseType","abDaq2");
         output.tag("ResponseType","abDaq3");
-
+        
         theResponse = new ElementResponse(this, 9, Vector(3));
     }
     

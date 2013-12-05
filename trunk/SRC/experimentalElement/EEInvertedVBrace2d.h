@@ -61,7 +61,7 @@ public:
     // method to get class type
     const char *getClassType() const {return "EEInvertedVBrace2d";};
     
-    // public methods to obtain information about dof & connectivity    
+    // public methods to obtain information about dof & connectivity
     int getNumExternalNodes() const;
     const ID &getExternalNodes();
     Node **getNodePtrs();
@@ -69,12 +69,12 @@ public:
     int getNumBasicDOF();
     void setDomain(Domain *theDomain);
     
-    // public methods to set the state of the element    
+    // public methods to set the state of the element
     int commitState();
     int update();
     
-    // public methods to set and to obtain stiffness, 
-    // and to obtain mass, damping and residual information    
+    // public methods to set and to obtain stiffness,
+    // and to obtain mass, damping and residual information
     int setInitialStiff(const Matrix& stiff);
     const Matrix &getDamp();
     const Matrix &getMass();
@@ -96,8 +96,8 @@ public:
     // public methods for element output
     int sendSelf(int commitTag, Channel &theChannel);
     int recvSelf(int commitTag, Channel &theChannel, FEM_ObjectBroker &theBroker);
-    int displaySelf(Renderer &theViewer, int displayMode, float fact);    
-    void Print(OPS_Stream &s, int flag = 0);    
+    int displaySelf(Renderer &theViewer, int displayMode, float fact);
+    void Print(OPS_Stream &s, int flag = 0);
     
     // public methods for element recorder
     Response *setResponse(const char **argv, int argc, OPS_Stream &s);
@@ -115,9 +115,9 @@ private:
     double rho1, rho2;  // masses per unit length
     double L1, L2;      // undeformed length of trusses
     
-    static Matrix theMatrix;
-    static Vector theVector;
-    static Vector theLoad;
+    static Matrix theMatrix;  // a class wide Matrix
+    static Vector theVector;  // a class wide Vector
+    Vector theLoad;
     
     Channel *theChannel;    // channel
     double *sData;          // send data array

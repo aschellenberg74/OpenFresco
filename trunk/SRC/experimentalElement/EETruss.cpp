@@ -80,7 +80,7 @@ EETruss::EETruss(int tag, int dim, int Nd1, int Nd2,
     }
     
     connectedExternalNodes(0) = Nd1;
-    connectedExternalNodes(1) = Nd2;        
+    connectedExternalNodes(1) = Nd2;
     
     // set node pointers to NULL
     theNodes[0] = 0;
@@ -152,7 +152,7 @@ EETruss::EETruss(int tag, int dim, int Nd1, int Nd2,
     }
     
     connectedExternalNodes(0) = Nd1;
-    connectedExternalNodes(1) = Nd2;        
+    connectedExternalNodes(1) = Nd2;
     
     // set node pointers to NULL
     theNodes[0] = 0;
@@ -305,25 +305,25 @@ int EETruss::getNumExternalNodes() const
 }
 
 
-const ID& EETruss::getExternalNodes() 
+const ID& EETruss::getExternalNodes()
 {
     return connectedExternalNodes;
 }
 
 
-Node** EETruss::getNodePtrs() 
+Node** EETruss::getNodePtrs()
 {
     return theNodes;
 }
 
 
-int EETruss::getNumDOF() 
+int EETruss::getNumDOF()
 {
     return numDOF;
 }
 
 
-int EETruss::getNumBasicDOF() 
+int EETruss::getNumBasicDOF()
 {
     return 1;
 }
@@ -349,7 +349,7 @@ void EETruss::setDomain(Domain *theDomain)
     int Nd1 = connectedExternalNodes(0);
     int Nd2 = connectedExternalNodes(1);
     theNodes[0] = theDomain->getNode(Nd1);
-    theNodes[1] = theDomain->getNode(Nd2);	
+    theNodes[1] = theDomain->getNode(Nd2);
     
     // if can't find both - send a warning message
     if (!theNodes[0] || !theNodes[1])  {
@@ -367,7 +367,7 @@ void EETruss::setDomain(Domain *theDomain)
     
     // now determine the number of dof and the dimension    
     int dofNd1 = theNodes[0]->getNumberDOF();
-    int dofNd2 = theNodes[1]->getNumberDOF();	
+    int dofNd2 = theNodes[1]->getNumberDOF();
     
     // if differing dof at the ends - print a warning message
     if (dofNd1 != dofNd2)  {
@@ -382,7 +382,7 @@ void EETruss::setDomain(Domain *theDomain)
     
     // now set the number of dof for element and set matrix and vector pointer
     if (numDIM == 1 && dofNd1 == 1)  {
-        numDOF = 2;    
+        numDOF = 2;
         theMatrix = &EETrussM2;
         theVector = &EETrussV2;
     }
@@ -392,19 +392,19 @@ void EETruss::setDomain(Domain *theDomain)
         theVector = &EETrussV4;	
     }
     else if (numDIM == 2 && dofNd1 == 3)  {
-        numDOF = 6;	
+        numDOF = 6;
         theMatrix = &EETrussM6;
-        theVector = &EETrussV6;		
+        theVector = &EETrussV6;
     }
     else if (numDIM == 3 && dofNd1 == 3)  {
-        numDOF = 6;	
+        numDOF = 6;
         theMatrix = &EETrussM6;
-        theVector = &EETrussV6;			
+        theVector = &EETrussV6;
     }
     else if (numDIM == 3 && dofNd1 == 6)  {
-        numDOF = 12;	    
+        numDOF = 12;
         theMatrix = &EETrussM12;
-        theVector = &EETrussV12;			
+        theVector = &EETrussV12;
     }
     else  {
         opserr <<"EETruss::setDomain() - can not handle "
@@ -433,7 +433,7 @@ void EETruss::setDomain(Domain *theDomain)
     // now determine the length, cosines and fill in the transformation
     // NOTE t = -t(every one else uses for residual calc)
     const Vector &end1Crd = theNodes[0]->getCrds();
-    const Vector &end2Crd = theNodes[1]->getCrds();	
+    const Vector &end2Crd = theNodes[1]->getCrds();
     
     // initalize the cosines
     cosX[0] = cosX[1] = cosX[2] = 0.0;
@@ -449,10 +449,10 @@ void EETruss::setDomain(Domain *theDomain)
     }
     
     // set global orientations
-	cosX[0] /= L;
-	cosX[1] /= L;
-	cosX[2] /= L;
-}   	 
+    cosX[0] /= L;
+    cosX[1] /= L;
+    cosX[2] /= L;
+}
 
 
 int EETruss::commitState()
@@ -485,11 +485,11 @@ int EETruss::update()
     
     // determine dsp, vel and acc in basic system
     const Vector &dsp1 = theNodes[0]->getTrialDisp();
-    const Vector &dsp2 = theNodes[1]->getTrialDisp();	
+    const Vector &dsp2 = theNodes[1]->getTrialDisp();
     const Vector &vel1 = theNodes[0]->getTrialVel();
-    const Vector &vel2 = theNodes[1]->getTrialVel();	
+    const Vector &vel2 = theNodes[1]->getTrialVel();
     const Vector &acc1 = theNodes[0]->getTrialAccel();
-    const Vector &acc2 = theNodes[1]->getTrialAccel();	
+    const Vector &acc2 = theNodes[1]->getTrialAccel();
     
     (*db)(0) = (*vb)(0) = (*ab)(0) = 0.0;
     for (int i=0; i<numDIM; i++)  {
@@ -559,7 +559,7 @@ const Matrix& EETruss::getDamp()
 
 
 const Matrix& EETruss::getMass()
-{   
+{
     // zero the matrix
     theMatrix->Zero();
     
@@ -602,7 +602,7 @@ int EETruss::addInertiaLoadToUnbalance(const Vector &accel)
     
     // get R * accel from the nodes
     const Vector &Raccel1 = theNodes[0]->getRV(accel);
-    const Vector &Raccel2 = theNodes[1]->getRV(accel);    
+    const Vector &Raccel2 = theNodes[1]->getRV(accel);
     
     int nodalDOF = numDOF/2;
     
@@ -616,7 +616,7 @@ int EETruss::addInertiaLoadToUnbalance(const Vector &accel)
     double m = 0.5*rho*L;
     for (int i=0; i<numDIM; i++) {
         double val1 = Raccel1(i);
-        double val2 = Raccel2(i);	
+        double val2 = Raccel2(i);
         
         // perform - fact * M*(R * accel) // remember M a diagonal matrix
         val1 *= -m;
@@ -624,14 +624,14 @@ int EETruss::addInertiaLoadToUnbalance(const Vector &accel)
         
         (*theLoad)(i) += val1;
         (*theLoad)(i+nodalDOF) += val2;
-    }	
+    }
     
     return 0;
 }
 
 
 const Vector& EETruss::getResistingForce()
-{	
+{
     // zero the residual
     theVector->Zero();
     
@@ -658,7 +658,7 @@ const Vector& EETruss::getResistingForce()
         }
         
         // correct for displacement control errors using I-Modification
-        (*qDaq) -= kbInit*((*dbDaq) - (*db));
+        qDaq->addMatrixVector(1.0, kbInit, (*dbDaq) - (*db), -1.0);
     }
     
     // save corresponding ctrl displacements for recorder
@@ -674,27 +674,27 @@ const Vector& EETruss::getResistingForce()
     }
     
     // subtract external load
-    (*theVector) -= *theLoad;
+    theVector->addVector(1.0, *theLoad, -1.0);
     
     return *theVector;
 }
 
 
 const Vector& EETruss::getResistingForceIncInertia()
-{	
+{
     // this already includes damping forces from specimen
     this->getResistingForce();
     
     // add the damping forces from rayleigh damping
     if (addRayleigh == 1)  {
         if (alphaM != 0.0 || betaK != 0.0 || betaK0 != 0.0 || betaKc != 0.0)
-            (*theVector) += this->getRayleighDampingForces();
+            theVector->addVector(1.0, this->getRayleighDampingForces(), 1.0);
     }
     
     // add inertia forces from element mass
     if (L != 0.0 && rho != 0.0)  {
         const Vector &accel1 = theNodes[0]->getTrialAccel();
-        const Vector &accel2 = theNodes[1]->getTrialAccel();	
+        const Vector &accel2 = theNodes[1]->getTrialAccel();
         
         int numDOF2 = numDOF/2;
         double m = 0.5*rho*L;
@@ -709,7 +709,7 @@ const Vector& EETruss::getResistingForceIncInertia()
 
 
 const Vector& EETruss::getTime()
-{	
+{
     if (theSite != 0)  {
         (*tDaq) = theSite->getTime();
     }
@@ -724,7 +724,7 @@ const Vector& EETruss::getTime()
 
 
 const Vector& EETruss::getBasicDisp()
-{	
+{
     if (theSite != 0)  {
         (*dbDaq) = theSite->getDisp();
     }
@@ -739,7 +739,7 @@ const Vector& EETruss::getBasicDisp()
 
 
 const Vector& EETruss::getBasicVel()
-{	
+{
     if (theSite != 0)  {
         (*vbDaq) = theSite->getVel();
     }
@@ -754,7 +754,7 @@ const Vector& EETruss::getBasicVel()
 
 
 const Vector& EETruss::getBasicAccel()
-{	
+{
     if (theSite != 0)  {
         (*abDaq) = theSite->getAccel();
     }
@@ -799,7 +799,7 @@ int EETruss::displaySelf(Renderer &theViewer,
     
     for (int i=0; i<numDIM; i++)  {
         v1(i) = end1Crd(i) + end1Disp(i)*fact;
-        v2(i) = end2Crd(i) + end2Disp(i)*fact;    
+        v2(i) = end2Crd(i) + end2Disp(i)*fact;
     }
     
     return theViewer.drawLine (v1, v2, 1.0, 1.0);
@@ -807,7 +807,7 @@ int EETruss::displaySelf(Renderer &theViewer,
 
 
 void EETruss::Print(OPS_Stream &s, int flag)
-{    
+{
     if (flag == 0)  {
         // print everything
         s << "Element: " << this->getTag() << endln;
@@ -870,7 +870,7 @@ Response* EETruss::setResponse(const char **argv, int argc,
         strcmp(argv[0],"daqForces") == 0)
     {
         output.tag("ResponseType","q1");
-
+        
         theResponse = new ElementResponse(this, 3, Vector(1));
     }
     
@@ -886,7 +886,7 @@ Response* EETruss::setResponse(const char **argv, int argc,
         strcmp(argv[0],"ctrlDisplacements") == 0)
     {
         output.tag("ResponseType","db1");
-
+        
         theResponse = new ElementResponse(this, 4, Vector(1));
     }
     
@@ -896,7 +896,7 @@ Response* EETruss::setResponse(const char **argv, int argc,
         strcmp(argv[0],"ctrlVelocities") == 0)
     {
         output.tag("ResponseType","vb1");
-
+        
         theResponse = new ElementResponse(this, 5, Vector(1));
     }
     
@@ -906,7 +906,7 @@ Response* EETruss::setResponse(const char **argv, int argc,
         strcmp(argv[0],"ctrlAccelerations") == 0)
     {
         output.tag("ResponseType","ab1");
-
+        
         theResponse = new ElementResponse(this, 6, Vector(1));
     }    
     
@@ -916,7 +916,7 @@ Response* EETruss::setResponse(const char **argv, int argc,
         strcmp(argv[0],"daqDisplacements") == 0)
     {
         output.tag("ResponseType","dbDaq1");
-
+        
         theResponse = new ElementResponse(this, 7, Vector(1));
     }
     
@@ -926,7 +926,7 @@ Response* EETruss::setResponse(const char **argv, int argc,
         strcmp(argv[0],"daqVelocities") == 0)
     {
         output.tag("ResponseType","vbDaq1");
-
+        
         theResponse = new ElementResponse(this, 8, Vector(1));
     }
     
@@ -936,7 +936,7 @@ Response* EETruss::setResponse(const char **argv, int argc,
         strcmp(argv[0],"daqAccelerations") == 0)
     {
         output.tag("ResponseType","abDaq1");
-
+        
         theResponse = new ElementResponse(this, 9, Vector(1));
     }
     
