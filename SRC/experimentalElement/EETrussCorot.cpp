@@ -60,7 +60,7 @@ Vector EETrussCorot::EETrussCorotV12(12);
 
 // responsible for allocating the necessary space needed
 // by each object and storing the tags of the end nodes.
-EETrussCorot::EETrussCorot(int tag, int dim, int Nd1, int Nd2, 
+EETrussCorot::EETrussCorot(int tag, int dim, int Nd1, int Nd2,
     ExperimentalSite *site,
     bool iM, int addRay, double r)
     : ExperimentalElement(tag, ELE_TAG_EETrussCorot, site),
@@ -81,7 +81,7 @@ EETrussCorot::EETrussCorot(int tag, int dim, int Nd1, int Nd2,
     }
     
     connectedExternalNodes(0) = Nd1;
-    connectedExternalNodes(1) = Nd2;        
+    connectedExternalNodes(1) = Nd2;
     
     // set node pointers to NULL
     theNodes[0] = 0;
@@ -127,7 +127,7 @@ EETrussCorot::EETrussCorot(int tag, int dim, int Nd1, int Nd2,
 
 // responsible for allocating the necessary space needed
 // by each object and storing the tags of the end nodes.
-EETrussCorot::EETrussCorot(int tag, int dim, int Nd1, int Nd2, 
+EETrussCorot::EETrussCorot(int tag, int dim, int Nd1, int Nd2,
     int port, char *machineInetAddr, int ssl, int udp,
     int dataSize, bool iM, int addRay, double r)
     : ExperimentalElement(tag, ELE_TAG_EETrussCorot),
@@ -149,7 +149,7 @@ EETrussCorot::EETrussCorot(int tag, int dim, int Nd1, int Nd2,
     }
     
     connectedExternalNodes(0) = Nd1;
-    connectedExternalNodes(1) = Nd2;        
+    connectedExternalNodes(1) = Nd2;
     
     // set node pointers to NULL
     theNodes[0] = 0;
@@ -297,25 +297,25 @@ int EETrussCorot::getNumExternalNodes() const
 }
 
 
-const ID& EETrussCorot::getExternalNodes() 
+const ID& EETrussCorot::getExternalNodes()
 {
     return connectedExternalNodes;
 }
 
 
-Node** EETrussCorot::getNodePtrs() 
+Node** EETrussCorot::getNodePtrs()
 {
     return theNodes;
 }
 
 
-int EETrussCorot::getNumDOF() 
+int EETrussCorot::getNumDOF()
 {
     return numDOF;
 }
 
 
-int EETrussCorot::getNumBasicDOF() 
+int EETrussCorot::getNumBasicDOF()
 {
     return 1;
 }
@@ -336,13 +336,13 @@ void EETrussCorot::setDomain(Domain *theDomain)
     // set default values for error conditions
     numDOF = 2;
     theMatrix = &EETrussCorotM2;
-    theVector = &EETrussCorotV2;	
+    theVector = &EETrussCorotV2;
     
     // first set the node pointers
     int Nd1 = connectedExternalNodes(0);
     int Nd2 = connectedExternalNodes(1);
     theNodes[0] = theDomain->getNode(Nd1);
-    theNodes[1] = theDomain->getNode(Nd2);	
+    theNodes[1] = theDomain->getNode(Nd2);
     
     // if can't find both - send a warning message
     if (!theNodes[0] || !theNodes[1])  {
@@ -358,9 +358,9 @@ void EETrussCorot::setDomain(Domain *theDomain)
         return;
     }
     
-    // now determine the number of dof and the dimension    
+    // now determine the number of dof and the dimension
     int dofNd1 = theNodes[0]->getNumberDOF();
-    int dofNd2 = theNodes[1]->getNumberDOF();	
+    int dofNd2 = theNodes[1]->getNumberDOF();
     
     // if differing dof at the ends - print a warning message
     if (dofNd1 != dofNd2)  {
@@ -375,29 +375,29 @@ void EETrussCorot::setDomain(Domain *theDomain)
     
     // now set the number of dof for element and set matrix and vector pointer
     if (numDIM == 1 && dofNd1 == 1)  {
-        numDOF = 2;    
+        numDOF = 2;
         theMatrix = &EETrussCorotM2;
         theVector = &EETrussCorotV2;
     }
     else if (numDIM == 2 && dofNd1 == 2)  {
         numDOF = 4;
         theMatrix = &EETrussCorotM4;
-        theVector = &EETrussCorotV4;	
+        theVector = &EETrussCorotV4;
     }
     else if (numDIM == 2 && dofNd1 == 3)  {
-        numDOF = 6;	
+        numDOF = 6;
         theMatrix = &EETrussCorotM6;
-        theVector = &EETrussCorotV6;		
+        theVector = &EETrussCorotV6;
     }
     else if (numDIM == 3 && dofNd1 == 3)  {
-        numDOF = 6;	
+        numDOF = 6;
         theMatrix = &EETrussCorotM6;
-        theVector = &EETrussCorotV6;			
+        theVector = &EETrussCorotV6;
     }
     else if (numDIM == 3 && dofNd1 == 6)  {
-        numDOF = 12;	    
+        numDOF = 12;
         theMatrix = &EETrussCorotM12;
-        theVector = &EETrussCorotV12;			
+        theVector = &EETrussCorotV12;
     }
     else  {
         opserr <<"EETrussCorot::setDomain() - can not handle "
@@ -426,7 +426,7 @@ void EETrussCorot::setDomain(Domain *theDomain)
     // now determine the length, cosines and fill in the transformation
     // NOTE t = -t(every one else uses for residual calc)
     const Vector &end1Crd = theNodes[0]->getCrds();
-    const Vector &end2Crd = theNodes[1]->getCrds();	
+    const Vector &end2Crd = theNodes[1]->getCrds();
     
     // initalize the cosines
     double cosX[3];
@@ -444,9 +444,9 @@ void EETrussCorot::setDomain(Domain *theDomain)
     Ln = L;
     
     // set global orientations
-	cosX[0] /= L;
-	cosX[1] /= L;
-	cosX[2] /= L;
+    cosX[0] /= L;
+    cosX[1] /= L;
+    cosX[2] /= L;
     
     // initialize rotation matrix
     R(0,0) = cosX[0];
@@ -517,11 +517,11 @@ int EETrussCorot::update()
     
     // determine dsp, vel and acc in basic system
     const Vector &dsp1 = theNodes[0]->getTrialDisp();
-    const Vector &dsp2 = theNodes[1]->getTrialDisp();	
+    const Vector &dsp2 = theNodes[1]->getTrialDisp();
     const Vector &vel1 = theNodes[0]->getTrialVel();
-    const Vector &vel2 = theNodes[1]->getTrialVel();	
+    const Vector &vel2 = theNodes[1]->getTrialVel();
     const Vector &acc1 = theNodes[0]->getTrialAccel();
-    const Vector &acc2 = theNodes[1]->getTrialAccel();	
+    const Vector &acc2 = theNodes[1]->getTrialAccel();
     
     // initial offsets
     d21[0] = L; d21[1] = d21[2] = 0.0;
@@ -615,9 +615,9 @@ const Matrix& EETrussCorot::getTangentStiff()
         opserr << "\nWARNING EETrussCorot::getTangentStiff() - "
             << "Element: " << this->getTag() << endln
             << "TangentStiff cannot be calculated." << endln
-            << "Return InitialStiff including GeometricStiff instead." 
+            << "Return InitialStiff including GeometricStiff instead."
             << endln;
-        opserr << "Subsequent getTangentStiff warnings will be suppressed." 
+        opserr << "Subsequent getTangentStiff warnings will be suppressed."
             << endln;
         
         firstWarning = false;
@@ -646,7 +646,7 @@ const Matrix& EETrussCorot::getTangentStiff()
         }
         
         // correct for displacement control errors using I-Modification
-        (*qDaq) -= kbInit*((*dbDaq) - (*db));
+        qDaq->addMatrixVector(1.0, kbInit, (*dbDaq) - (*db), -1.0);
     }
     
     // transform the stiffness from the basic to the local system
@@ -700,7 +700,7 @@ const Matrix& EETrussCorot::getDamp()
 
 
 const Matrix& EETrussCorot::getMass()
-{   
+{
     // zero the matrix
     theMatrix->Zero();
     
@@ -725,7 +725,7 @@ void EETrussCorot::zeroLoad()
 
 
 int EETrussCorot::addLoad(ElementalLoad *theLoad, double loadFactor)
-{  
+{
     opserr <<"EETrussCorot::addLoad() - "
         << "load type unknown for element: "
         << this->getTag() << endln;
@@ -743,7 +743,7 @@ int EETrussCorot::addInertiaLoadToUnbalance(const Vector &accel)
     
     // get R * accel from the nodes
     const Vector &Raccel1 = theNodes[0]->getRV(accel);
-    const Vector &Raccel2 = theNodes[1]->getRV(accel);    
+    const Vector &Raccel2 = theNodes[1]->getRV(accel);
     
     int nodalDOF = numDOF/2;
     
@@ -757,7 +757,7 @@ int EETrussCorot::addInertiaLoadToUnbalance(const Vector &accel)
     double m = 0.5*rho*L;
     for (int i=0; i<numDIM; i++) {
         double val1 = Raccel1(i);
-        double val2 = Raccel2(i);	
+        double val2 = Raccel2(i);
         
         // perform - fact * M*(R * accel) // remember M a diagonal matrix
         val1 *= -m;
@@ -765,14 +765,14 @@ int EETrussCorot::addInertiaLoadToUnbalance(const Vector &accel)
         
         (*theLoad)(i) += val1;
         (*theLoad)(i+nodalDOF) += val2;
-    }	
+    }
     
     return 0;
 }
 
 
 const Vector& EETrussCorot::getResistingForce()
-{	
+{
     // zero the residual
     theVector->Zero();
     
@@ -799,24 +799,24 @@ const Vector& EETrussCorot::getResistingForce()
         }
         
         // correct for displacement control errors using I-Modification
-        (*qDaq) -= kbInit*((*dbDaq) - (*db));
+        qDaq->addMatrixVector(1.0, kbInit, (*dbDaq) - (*db), -1.0);
     }
     
     // save corresponding ctrl displacements for recorder
     dbCtrl = (*db);
     vbCtrl = (*vb);
     abCtrl = (*ab);
-
+    
     // transform the forces from the basic to the local system
     static Vector ql(3);
-	ql(0) = d21[0]/Ln*(*qDaq)(0);
-	ql(1) = d21[1]/Ln*(*qDaq)(0);
-	ql(2) = d21[2]/Ln*(*qDaq)(0);
-
+    ql(0) = d21[0]/Ln*(*qDaq)(0);
+    ql(1) = d21[1]/Ln*(*qDaq)(0);
+    ql(2) = d21[2]/Ln*(*qDaq)(0);
+    
     // transform the forces from the local to the global system
     static Vector qg(3);
     qg.addMatrixTransposeVector(0.0, R, ql, 1.0);
-
+    
     // copy forces into appropriate places
     int numDOF2 = numDOF/2;
     for (int i=0; i<numDIM; i++)  {
@@ -825,27 +825,27 @@ const Vector& EETrussCorot::getResistingForce()
     }
     
     // subtract external load
-    (*theVector) -= *theLoad;
+    theVector->addVector(1.0, *theLoad, -1.0);
     
     return *theVector;
 }
 
 
 const Vector& EETrussCorot::getResistingForceIncInertia()
-{	
+{
     // this already includes damping forces from specimen
     this->getResistingForce();
     
     // add the damping forces from rayleigh damping
     if (addRayleigh == 1)  {
         if (alphaM != 0.0 || betaK != 0.0 || betaK0 != 0.0 || betaKc != 0.0)
-            (*theVector) += this->getRayleighDampingForces();
+            theVector->addVector(1.0, this->getRayleighDampingForces(), 1.0);
     }
     
     // add inertia forces from element mass
     if (L != 0.0 && rho != 0.0)  {
         const Vector &accel1 = theNodes[0]->getTrialAccel();
-        const Vector &accel2 = theNodes[1]->getTrialAccel();	
+        const Vector &accel2 = theNodes[1]->getTrialAccel();
         
         int numDOF2 = numDOF/2;
         double m = 0.5*rho*L;
@@ -860,7 +860,7 @@ const Vector& EETrussCorot::getResistingForceIncInertia()
 
 
 const Vector& EETrussCorot::getTime()
-{	
+{
     if (theSite != 0)  {
         (*tDaq) = theSite->getTime();
     }
@@ -875,7 +875,7 @@ const Vector& EETrussCorot::getTime()
 
 
 const Vector& EETrussCorot::getBasicDisp()
-{	
+{
     if (theSite != 0)  {
         (*dbDaq) = theSite->getDisp();
     }
@@ -890,7 +890,7 @@ const Vector& EETrussCorot::getBasicDisp()
 
 
 const Vector& EETrussCorot::getBasicVel()
-{	
+{
     if (theSite != 0)  {
         (*vbDaq) = theSite->getVel();
     }
@@ -905,7 +905,7 @@ const Vector& EETrussCorot::getBasicVel()
 
 
 const Vector& EETrussCorot::getBasicAccel()
-{	
+{
     if (theSite != 0)  {
         (*abDaq) = theSite->getAccel();
     }
@@ -940,7 +940,7 @@ int EETrussCorot::displaySelf(Renderer &theViewer,
     // first determine the end points of the element based on
     // the display factor (a measure of the distorted image)
     const Vector &end1Crd = theNodes[0]->getCrds();
-    const Vector &end2Crd = theNodes[1]->getCrds();	
+    const Vector &end2Crd = theNodes[1]->getCrds();
     
     const Vector &end1Disp = theNodes[0]->getDisp();
     const Vector &end2Disp = theNodes[1]->getDisp();
@@ -950,7 +950,7 @@ int EETrussCorot::displaySelf(Renderer &theViewer,
     
     for (int i=0; i<numDIM; i++)  {
         v1(i) = end1Crd(i) + end1Disp(i)*fact;
-        v2(i) = end2Crd(i) + end2Disp(i)*fact;    
+        v2(i) = end2Crd(i) + end2Disp(i)*fact;
     }
     
     return theViewer.drawLine (v1, v2, 1.0, 1.0);
@@ -958,7 +958,7 @@ int EETrussCorot::displaySelf(Renderer &theViewer,
 
 
 void EETrussCorot::Print(OPS_Stream &s, int flag)
-{    
+{
     if (flag == 0)  {
         // print everything
         s << "Element: " << this->getTag() << endln;
@@ -1021,7 +1021,7 @@ Response* EETrussCorot::setResponse(const char **argv, int argc,
         strcmp(argv[0],"daqForces") == 0)
     {
         output.tag("ResponseType","q1");
-
+        
         theResponse = new ElementResponse(this, 3, Vector(1));
     }
     
@@ -1037,7 +1037,7 @@ Response* EETrussCorot::setResponse(const char **argv, int argc,
         strcmp(argv[0],"ctrlDisplacements") == 0)
     {
         output.tag("ResponseType","db1");
-
+        
         theResponse = new ElementResponse(this, 4, Vector(1));
     }
     
@@ -1047,7 +1047,7 @@ Response* EETrussCorot::setResponse(const char **argv, int argc,
         strcmp(argv[0],"ctrlVelocities") == 0)
     {
         output.tag("ResponseType","vb1");
-
+        
         theResponse = new ElementResponse(this, 5, Vector(1));
     }
     
@@ -1057,7 +1057,7 @@ Response* EETrussCorot::setResponse(const char **argv, int argc,
         strcmp(argv[0],"ctrlAccelerations") == 0)
     {
         output.tag("ResponseType","ab1");
-
+        
         theResponse = new ElementResponse(this, 6, Vector(1));
     }    
     
@@ -1067,7 +1067,7 @@ Response* EETrussCorot::setResponse(const char **argv, int argc,
         strcmp(argv[0],"daqDisplacements") == 0)
     {
         output.tag("ResponseType","dbDaq1");
-
+        
         theResponse = new ElementResponse(this, 7, Vector(1));
     }
     
@@ -1077,7 +1077,7 @@ Response* EETrussCorot::setResponse(const char **argv, int argc,
         strcmp(argv[0],"daqVelocities") == 0)
     {
         output.tag("ResponseType","vbDaq1");
-
+        
         theResponse = new ElementResponse(this, 8, Vector(1));
     }
     
@@ -1087,7 +1087,7 @@ Response* EETrussCorot::setResponse(const char **argv, int argc,
         strcmp(argv[0],"daqAccelerations") == 0)
     {
         output.tag("ResponseType","abDaq1");
-
+        
         theResponse = new ElementResponse(this, 9, Vector(1));
     }
     

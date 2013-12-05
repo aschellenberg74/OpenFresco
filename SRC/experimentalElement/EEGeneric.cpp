@@ -47,12 +47,6 @@
 #include <string.h>
 
 
-// initialize the class wide variables
-Matrix EEGeneric::theMatrix(1,1);
-Vector EEGeneric::theVector(1);
-Vector EEGeneric::theLoad(1);
-
-
 // responsible for allocating the necessary space needed
 // by each object and storing the tags of the end nodes.
 EEGeneric::EEGeneric(int tag, ID nodes, ID *dof,
@@ -62,11 +56,12 @@ EEGeneric::EEGeneric(int tag, ID nodes, ID *dof,
     connectedExternalNodes(nodes), basicDOF(1),
     numExternalNodes(0), numDOF(0), numBasicDOF(0),
     iMod(iM), addRayleigh(addRay), mass(0),
+    theMatrix(1,1), theVector(1), theLoad(1),
     db(0), vb(0), ab(0), t(0),
     dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
     dbCtrl(1), vbCtrl(1), abCtrl(1),
     dbPast(1), kbInit(1,1), tPast(0.0)
-{    
+{
     // initialize nodes
     numExternalNodes = connectedExternalNodes.Size();
     theNodes = new Node* [numExternalNodes];
@@ -75,12 +70,12 @@ EEGeneric::EEGeneric(int tag, ID nodes, ID *dof,
             << "- failed to create node array\n";
         exit(-1);
     }
-
+    
     // set node pointers to NULL
     int i;
     for (i=0; i<numExternalNodes; i++)
         theNodes[i] = 0;
-
+    
     // initialize dof
     theDOF = new ID [numExternalNodes];
     if (!theDOF)  {
@@ -120,14 +115,14 @@ EEGeneric::EEGeneric(int tag, ID nodes, ID *dof,
     vb = new Vector(numBasicDOF);
     ab = new Vector(numBasicDOF);
     t  = new Vector(1);
-
+    
     // allocate memory for daq response vectors
     dbDaq = new Vector(numBasicDOF);
     vbDaq = new Vector(numBasicDOF);
     abDaq = new Vector(numBasicDOF);
     qDaq  = new Vector(numBasicDOF);
     tDaq  = new Vector(1);
-
+    
     // set the vector and matrix sizes and zero them
     basicDOF.resize(numBasicDOF);
     basicDOF.Zero();
@@ -153,12 +148,13 @@ EEGeneric::EEGeneric(int tag, ID nodes, ID *dof,
     connectedExternalNodes(nodes), basicDOF(1),
     numExternalNodes(0), numDOF(0), numBasicDOF(0),
     iMod(iM), addRayleigh(addRay), mass(0),
+    theMatrix(1,1), theVector(1), theLoad(1),
     theChannel(0), sData(0), sendData(0), rData(0), recvData(0),
     db(0), vb(0), ab(0), t(0),
     dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
     dbCtrl(1), vbCtrl(1), abCtrl(1),
     dbPast(1), kbInit(1,1), tPast(0.0)
-{    
+{
     // initialize nodes
     numExternalNodes = connectedExternalNodes.Size();
     theNodes = new Node* [numExternalNodes];
@@ -167,12 +163,12 @@ EEGeneric::EEGeneric(int tag, ID nodes, ID *dof,
             << "- failed to create node array\n";
         exit(-1);
     }
-
+    
     // set node pointers to NULL
     int i;
     for (i=0; i<numExternalNodes; i++)
         theNodes[i] = 0;
-
+    
     // initialize dof
     theDOF = new ID [numExternalNodes];
     if (!theDOF)  {
@@ -227,7 +223,7 @@ EEGeneric::EEGeneric(int tag, ID nodes, ID *dof,
     sizeCtrl = new ID(intData, OF_Resp_All);
     sizeDaq = new ID(&intData[OF_Resp_All], OF_Resp_All);
     idData.Zero();
-        
+    
     (*sizeCtrl)[OF_Resp_Disp]  = numBasicDOF;
     (*sizeCtrl)[OF_Resp_Vel]   = numBasicDOF;
     (*sizeCtrl)[OF_Resp_Accel] = numBasicDOF;
@@ -255,7 +251,7 @@ EEGeneric::EEGeneric(int tag, ID nodes, ID *dof,
     id += numBasicDOF;
     t = new Vector(&sData[id], 1);
     sendData->Zero();
-
+    
     // allocate memory for the receive vectors
     id = 0;
     rData = new double [dataSize];
@@ -270,7 +266,7 @@ EEGeneric::EEGeneric(int tag, ID nodes, ID *dof,
     id += numBasicDOF;
     tDaq = new Vector(&rData[id], 1);
     recvData->Zero();
-
+    
     // set the vector and matrix sizes and zero them
     basicDOF.resize(numBasicDOF);
     basicDOF.Zero();
@@ -298,7 +294,7 @@ EEGeneric::~EEGeneric()
         delete [] theDOF;
     if (mass != 0)
         delete mass;
-
+    
     if (db != 0)
         delete db;
     if (vb != 0)
@@ -307,7 +303,7 @@ EEGeneric::~EEGeneric()
         delete ab;
     if (t != 0)
         delete t;
-
+    
     if (dbDaq != 0)
         delete dbDaq;
     if (vbDaq != 0)
@@ -318,7 +314,7 @@ EEGeneric::~EEGeneric()
         delete qDaq;
     if (tDaq != 0)
         delete tDaq;
-
+    
     if (theSite == 0)  {
         sData[0] = OF_RemoteTest_DIE;
         theChannel->sendVector(0, 0, *sendData, 0);
@@ -343,25 +339,25 @@ int EEGeneric::getNumExternalNodes() const
 }
 
 
-const ID& EEGeneric::getExternalNodes() 
+const ID& EEGeneric::getExternalNodes()
 {
     return connectedExternalNodes;
 }
 
 
-Node** EEGeneric::getNodePtrs() 
+Node** EEGeneric::getNodePtrs()
 {
     return theNodes;
 }
 
 
-int EEGeneric::getNumDOF() 
+int EEGeneric::getNumDOF()
 {
     return numDOF;
 }
 
 
-int EEGeneric::getNumBasicDOF() 
+int EEGeneric::getNumBasicDOF()
 {
     return numBasicDOF;
 }
@@ -397,7 +393,7 @@ void EEGeneric::setDomain(Domain *theDomain)
     for (i=0; i<numExternalNodes; i++)  {
         numDOF += theNodes[i]->getNumberDOF();
     }
-
+    
     // set the basicDOF ID
     int j, k = 0, ndf = 0;
     for (i=0; i<numExternalNodes; i++)  {
@@ -407,7 +403,7 @@ void EEGeneric::setDomain(Domain *theDomain)
         }
         ndf += theNodes[i]->getNumberDOF();
     }
-
+    
     // set the matrix and vector sizes and zero them
     theInitStiff.resize(numDOF,numDOF);
     theInitStiff.Zero();
@@ -420,7 +416,7 @@ void EEGeneric::setDomain(Domain *theDomain)
     
     // call the base class method
     this->DomainComponent::setDomain(theDomain);
-}   	 
+}
 
 
 int EEGeneric::commitState()
@@ -446,15 +442,15 @@ int EEGeneric::commitState()
 int EEGeneric::update()
 {
     int rValue = 0;
-
+    
     // get current time
     Domain *theDomain = this->getDomain();
     (*t)(0) = theDomain->getCurrentTime();
-
+    
     // assemble response vectors
     int ndim = 0, i;
     db->Zero(); vb->Zero(); ab->Zero();
-
+    
     for (i=0; i<numExternalNodes; i++)  {
         Vector disp = theNodes[i]->getTrialDisp();
         Vector vel = theNodes[i]->getTrialVel();
@@ -464,7 +460,7 @@ int EEGeneric::update()
         ab->Assemble(accel(theDOF[i]), ndim);
         ndim += theDOF[i].Size();
     }
- 
+    
     if ((*db) != dbPast || (*t)(0) != tPast)  {
         // save the displacements and the time
         dbPast = (*db);
@@ -494,7 +490,7 @@ int EEGeneric::setInitialStiff(const Matrix &kbinit)
     kbInit = kbinit;
     
     theInitStiff.Zero();
-    theInitStiff.Assemble(kbInit,basicDOF,basicDOF);
+    theInitStiff.Assemble(kbInit, basicDOF, basicDOF);
     
     return 0;
 }
@@ -518,13 +514,13 @@ const Matrix& EEGeneric::getMass()
 {
     // zero the matrix
     theMatrix.Zero();
-
+    
     // assemble mass matrix
     if (mass != 0)  {
-        theMatrix.Assemble(*mass,basicDOF,basicDOF);
+        theMatrix.Assemble(*mass, basicDOF, basicDOF);
     }
     
-    return theMatrix; 
+    return theMatrix;
 }
 
 
@@ -535,7 +531,7 @@ void EEGeneric::zeroLoad()
 
 
 int EEGeneric::addLoad(ElementalLoad *theLoad, double loadFactor)
-{  
+{
     opserr <<"EEGeneric::addLoad() - "
         << "load type unknown for element: "
         << this->getTag() << endln;
@@ -545,16 +541,15 @@ int EEGeneric::addLoad(ElementalLoad *theLoad, double loadFactor)
 
 
 int EEGeneric::addInertiaLoadToUnbalance(const Vector &accel)
-{    
+{
     // check for quick return
     if (mass == 0)  {
         return 0;
     }
-
+    
     int ndim = 0, i;
-    static Vector Raccel(numDOF);
-    Raccel.Zero();
-
+    Vector Raccel(numDOF);
+    
     // get mass matrix
     Matrix M = this->getMass();
     // assemble Raccel vector
@@ -564,7 +559,7 @@ int EEGeneric::addInertiaLoadToUnbalance(const Vector &accel)
     }
     
     // want to add ( - fact * M R * accel ) to unbalance
-    theLoad -= M * Raccel;
+    theLoad.addMatrixVector(1.0, M, Raccel, -1.0);
     
     return 0;
 }
@@ -596,43 +591,42 @@ const Vector& EEGeneric::getResistingForce()
             theChannel->sendVector(0, 0, *sendData, 0);
             theChannel->recvVector(0, 0, *recvData, 0);
         }
-
+        
         // correct for displacement control errors using I-Modification
-        (*qDaq) -= kbInit*((*dbDaq) - (*db));
+        qDaq->addMatrixVector(1.0, kbInit, (*dbDaq) - (*db), -1.0);
     }
    
     // save corresponding ctrl displacements for recorder
     dbCtrl = (*db);
     vbCtrl = (*vb);
     abCtrl = (*ab);
-
+    
     // determine resisting forces in global system
-    theVector.Assemble(*qDaq,basicDOF);
+    theVector.Assemble(*qDaq, basicDOF);
     
     // subtract external load
     theVector.addVector(1.0, theLoad, -1.0);
-
+    
     return theVector;
 }
 
 
 const Vector& EEGeneric::getResistingForceIncInertia()
-{	
+{
     // this already includes damping forces from specimen
     theVector = this->getResistingForce();
     
     // add the damping forces from rayleigh damping
     if (addRayleigh == 1)  {
         if (alphaM != 0.0 || betaK != 0.0 || betaK0 != 0.0 || betaKc != 0.0)
-            theVector += this->getRayleighDampingForces();
+            theVector.addVector(1.0, this->getRayleighDampingForces(), 1.0);
     }
     
     // add inertia forces from element mass
     if (mass != 0)  {
         int ndim = 0, i;
-        static Vector accel(numDOF);
-        accel.Zero();
-
+        Vector accel(numDOF);
+        
         // get mass matrix
         Matrix M = this->getMass();
         // assemble accel vector
@@ -641,7 +635,7 @@ const Vector& EEGeneric::getResistingForceIncInertia()
             ndim += theNodes[i]->getNumberDOF();
         }
         
-        theVector += M * accel;
+        theVector.addMatrixVector(1.0, M, accel, 1.0);
     }
     
     return theVector;
@@ -649,7 +643,7 @@ const Vector& EEGeneric::getResistingForceIncInertia()
 
 
 const Vector& EEGeneric::getTime()
-{	
+{
     if (theSite != 0)  {
         (*tDaq) = theSite->getTime();
     }
@@ -658,13 +652,13 @@ const Vector& EEGeneric::getTime()
         theChannel->sendVector(0, 0, *sendData, 0);
         theChannel->recvVector(0, 0, *recvData, 0);
     }
-
+    
     return *tDaq;
 }
 
 
 const Vector& EEGeneric::getBasicDisp()
-{	
+{
     if (theSite != 0)  {
         (*dbDaq) = theSite->getDisp();
     }
@@ -673,13 +667,13 @@ const Vector& EEGeneric::getBasicDisp()
         theChannel->sendVector(0, 0, *sendData, 0);
         theChannel->recvVector(0, 0, *recvData, 0);
     }
-
+    
     return *dbDaq;
 }
 
 
 const Vector& EEGeneric::getBasicVel()
-{	
+{
     if (theSite != 0)  {
         (*vbDaq) = theSite->getVel();
     }
@@ -688,13 +682,13 @@ const Vector& EEGeneric::getBasicVel()
         theChannel->sendVector(0, 0, *sendData, 0);
         theChannel->recvVector(0, 0, *recvData, 0);
     }
-
+    
     return *vbDaq;
 }
 
 
 const Vector& EEGeneric::getBasicAccel()
-{	
+{
     if (theSite != 0)  {
         (*abDaq) = theSite->getAccel();
     }
@@ -703,7 +697,7 @@ const Vector& EEGeneric::getBasicAccel()
         theChannel->sendVector(0, 0, *sendData, 0);
         theChannel->recvVector(0, 0, *recvData, 0);
     }
-
+    
     return *abDaq;
 }
 
@@ -729,26 +723,54 @@ int EEGeneric::displaySelf(Renderer &theViewer,
     int rValue = 0, i, j;
     
     if (numExternalNodes > 1)  {
-        // first determine the end points of the beam based on
-        // the display factor (a measure of the distorted image)
-        for (i=0; i<numExternalNodes-1; i++)  {
-            const Vector &end1Crd = theNodes[i]->getCrds();
-            const Vector &end2Crd = theNodes[i+1]->getCrds();
-            
-            const Vector &end1Disp = theNodes[i]->getDisp();
-            const Vector &end2Disp = theNodes[i+1]->getDisp();
-            
-            int end1NumCrds = end1Crd.Size();
-            int end2NumCrds = end2Crd.Size();
-            
-            Vector v1(3), v2(3);
-            
-            for (j=0; j<end1NumCrds; j++)
-                v1(j) = end1Crd(j) + end1Disp(j)*fact;
-            for (j=0; j<end2NumCrds; j++)
-                v2(j) = end2Crd(j) + end2Disp(j)*fact;
-            
-            rValue += theViewer.drawLine (v1, v2, 1.0, 1.0);
+        if (displayMode >= 0)  {
+            for (i=0; i<numExternalNodes-1; i++)  {
+                const Vector &end1Crd = theNodes[i]->getCrds();
+                const Vector &end2Crd = theNodes[i+1]->getCrds();
+                
+                const Vector &end1Disp = theNodes[i]->getDisp();
+                const Vector &end2Disp = theNodes[i+1]->getDisp();
+                
+                int end1NumCrds = end1Crd.Size();
+                int end2NumCrds = end2Crd.Size();
+                
+                static Vector v1(3), v2(3);
+                
+                for (j=0; j<end1NumCrds; j++)
+                    v1(j) = end1Crd(j) + end1Disp(j)*fact;
+                for (j=0; j<end2NumCrds; j++)
+                    v2(j) = end2Crd(j) + end2Disp(j)*fact;
+                
+                rValue += theViewer.drawLine(v1, v2, 1.0, 1.0);
+            }
+        } else  {
+            int mode = displayMode * -1;
+            for (i=0; i<numExternalNodes-1; i++)  {
+                const Vector &end1Crd = theNodes[i]->getCrds();
+                const Vector &end2Crd = theNodes[i+1]->getCrds();
+                
+                const Matrix &eigen1 = theNodes[i]->getEigenvectors();
+                const Matrix &eigen2 = theNodes[i+1]->getEigenvectors();
+                
+                int end1NumCrds = end1Crd.Size();
+                int end2NumCrds = end2Crd.Size();
+                
+                static Vector v1(3), v2(3);
+                
+                if (eigen1.noCols() >= mode)  {
+                    for (j=0; j<end1NumCrds; j++)
+                        v1(j) = end1Crd(j) + eigen1(j,mode-1)*fact;
+                    for (j=0; j<end2NumCrds; j++)
+                        v2(j) = end2Crd(j) + eigen2(j,mode-1)*fact;
+                } else  {
+                    for (j=0; j<end1NumCrds; j++)
+                        v1(j) = end1Crd(j);
+                    for (j=0; j<end2NumCrds; j++)
+                        v2(j) = end2Crd(j);
+                }
+                
+                rValue += theViewer.drawLine(v1, v2, 1.0, 1.0);
+            }
         }
     }
     
@@ -915,7 +937,7 @@ Response* EEGeneric::setResponse(const char **argv, int argc,
 
 
 int EEGeneric::getResponse(int responseID, Information &eleInfo)
-{    
+{
     switch (responseID)  {
     case 1:  // global forces
         return eleInfo.setVector(this->getResistingForce());

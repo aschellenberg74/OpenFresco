@@ -50,9 +50,9 @@ public:
         ExperimentalSite *site,
         bool iMod = false, int addRayleigh = 1, double rho = 0.0);
     EETruss(int tag, int dimension, int Nd1, int Nd2, 
-	    int port, char *machineInetAddress = 0,
+        int port, char *machineInetAddress = 0,
         int ssl = 0, int udp = 0, int dataSize = OF_Network_dataSize,
-	    bool iMod = false, int addRayleigh = 1, double rho = 0.0);
+        bool iMod = false, int addRayleigh = 1, double rho = 0.0);
     
     // destructor
     ~EETruss();
@@ -60,20 +60,20 @@ public:
     // method to get class type
     const char *getClassType() const {return "EETruss";};
     
-    // public methods to obtain information about dof & connectivity    
+    // public methods to obtain information about dof & connectivity
     int getNumExternalNodes() const;
     const ID &getExternalNodes();
-    Node **getNodePtrs();	
+    Node **getNodePtrs();
     int getNumDOF();
     int getNumBasicDOF();
     void setDomain(Domain *theDomain);
     
-    // public methods to set the state of the element    
+    // public methods to set the state of the element
     int commitState();
     int update();
     
-    // public methods to set and to obtain stiffness, 
-    // and to obtain mass, damping and residual information    
+    // public methods to set and to obtain stiffness,
+    // and to obtain mass, damping and residual information
     int setInitialStiff(const Matrix& kbInit);
     const Matrix &getDamp();
     const Matrix &getMass();
@@ -95,8 +95,8 @@ public:
     // public methods for element output
     int sendSelf(int commitTag, Channel &theChannel);
     int recvSelf(int commitTag, Channel &theChannel, FEM_ObjectBroker &theBroker);
-    int displaySelf(Renderer &theViewer, int displayMode, float fact);    
-    void Print(OPS_Stream &s, int flag = 0);    
+    int displaySelf(Renderer &theViewer, int displayMode, float fact);
+    void Print(OPS_Stream &s, int flag = 0);
     
     // public methods for element recorder
     Response *setResponse(const char **argv, int argc, OPS_Stream &s);
@@ -106,14 +106,14 @@ protected:
     
 private:
     // private attributes - a copy for each object of the class
-    int numDIM;					    // truss in 1d, 2d or 3d domain
-    int numDOF;						// number of dof for truss
-    ID  connectedExternalNodes;		// contains the tags of the end nodes
+    int numDIM;                     // truss in 1d, 2d or 3d domain
+    int numDOF;                     // number of dof for truss
+    ID  connectedExternalNodes;     // contains the tags of the end nodes
     
-    bool iMod;		    // I-Modification flag
+    bool iMod;          // I-Modification flag
     int addRayleigh;    // flag to add Rayleigh damping
-    double rho;		    // rho: mass per unit length
-    double L;		    // undeformed element length
+    double rho;         // rho: mass per unit length
+    double L;           // undeformed element length
     double cosX[3];     // direction cosines for transformation
     
     Matrix *theMatrix;  // pointer to objects matrix (a class wide Matrix)
@@ -147,7 +147,7 @@ private:
     
     Node *theNodes[2];  // array of node pointers
     
-    // static data - single copy for all objects of the class	
+    // static data - single copy for all objects of the class
     static Matrix EETrussM2;   // class wide matrix for 2*2
     static Matrix EETrussM4;   // class wide matrix for 4*4
     static Matrix EETrussM6;   // class wide matrix for 6*6
