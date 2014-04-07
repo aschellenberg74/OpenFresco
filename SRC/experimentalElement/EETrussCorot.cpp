@@ -23,7 +23,7 @@
 // $Date$
 // $URL$
 
-// Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 09/06
 // Revision: A
 //
@@ -608,7 +608,7 @@ int EETrussCorot::setInitialStiff(const Matrix& kbinit)
 
 const Matrix& EETrussCorot::getTangentStiff()
 {
-    // zero the matrix
+    // zero the global matrix
     theMatrix->Zero();
     
     if (firstWarning == true)  {
@@ -687,7 +687,7 @@ const Matrix& EETrussCorot::getTangentStiff()
 
 const Matrix& EETrussCorot::getDamp()
 {
-    // zero the matrix
+    // zero the global matrix
     theMatrix->Zero();
     
     // call base class to setup Rayleigh damping
@@ -701,7 +701,7 @@ const Matrix& EETrussCorot::getDamp()
 
 const Matrix& EETrussCorot::getMass()
 {
-    // zero the matrix
+    // zero the global matrix
     theMatrix->Zero();
     
     // form mass matrix
@@ -773,7 +773,7 @@ int EETrussCorot::addInertiaLoadToUnbalance(const Vector &accel)
 
 const Vector& EETrussCorot::getResistingForce()
 {
-    // zero the residual
+    // zero the global residual
     theVector->Zero();
     
     // get daq resisting forces
@@ -834,7 +834,7 @@ const Vector& EETrussCorot::getResistingForce()
 const Vector& EETrussCorot::getResistingForceIncInertia()
 {
     // this already includes damping forces from specimen
-    this->getResistingForce();
+    *theVector = this->getResistingForce();
     
     // add the damping forces from rayleigh damping
     if (addRayleigh == 1)  {

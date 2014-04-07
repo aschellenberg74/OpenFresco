@@ -44,7 +44,7 @@ class ECSCRAMNetGT : public ExperimentalControl
 {
 public:
     // constructors
-    ECSCRAMNetGT(int tag, int memOffset, int numActCh);
+    ECSCRAMNetGT(int tag, int memOffset, int numDOF);
     ECSCRAMNetGT(const ECSCRAMNetGT &ec);
     
     // destructor
@@ -57,7 +57,7 @@ public:
     virtual int setup();
     virtual int setSize(ID sizeT, ID sizeO);
     
-    virtual int setTrialResponse(const Vector* disp, 
+    virtual int setTrialResponse(const Vector* disp,
         const Vector* vel,
         const Vector* accel,
         const Vector* force,
@@ -78,7 +78,7 @@ public:
     virtual int getResponse(int responseID, Information &info);
     
     // public methods for output
-    void Print(OPS_Stream &s, int flag = 0);    
+    void Print(OPS_Stream &s, int flag = 0);
     
 protected:
     // protected methods to set and to get response
@@ -88,22 +88,21 @@ protected:
 private:
     void sleep(const clock_t wait);
     
-    scgtHandle gtHandle;
-    scgtInterrupt interrupt;
-
-    scgtDeviceInfo *deviceInfo;
+    scgtHandle gtHandle;            // handle to a SCRAMNet GT device
+    scgtInterrupt interrupt;        // SCRAMNet GT interrupt structure
+    scgtDeviceInfo deviceInfo;      // SCRAMNet GT device info structure
     
-    const int memOffset;
-    const int numActCh;
-
-    const int *memPtrBASE;
-	float *memPtrOPF;
-
-    unsigned int *newTarget, *switchPC, *atTarget;
+    const int memOffset;            // memory offset in bytes from SCRAMNet base address
+    const int numDOF;               // number of degrees-of-freedom in control system
+    
+    const int *memPtrBASE;          // pointer to SCRAMNet base memory address
+    float *memPtrOPF;               // pointer to OpenFresco base memory address
+    
+    int *newTarget, *switchPC, *atTarget;
     float *ctrlDisp, *ctrlVel, *ctrlAccel, *ctrlForce, *ctrlTime;
     float *daqDisp, *daqVel, *daqAccel, *daqForce, *daqTime;
-
-    unsigned int flag;
+    
+    int flag;                       // flag to check states of Simulink model
 };
 
 #endif

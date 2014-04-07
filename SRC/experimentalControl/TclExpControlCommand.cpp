@@ -41,16 +41,20 @@
 #include <ECSimDomain.h>
 #include <ECSimFEAdapter.h>
 #include <ECSimSimulink.h>
-#ifdef _WIN32
+#include <ECGenericTCP.h>
+
+#ifndef _WIN64
+#include <ECMtsCsi.h>
+//#include <ECNIEseries.h>
+#endif
+
+#if defined _WIN32 || defined _WIN64
+#include <ECdSpace.h>
 #include <ECxPCtarget.h>
 //#include <ECxPCtargetForce.h>
-#include <ECdSpace.h>
-#include <ECMtsCsi.h>
 #include <ECLabVIEW.h>
-//#include <ECNIEseries.h>
 #include <ECSCRAMNet.h>
-//#include <ECSCRAMNetGT.h>
-#include <ECGenericTCP.h>
+#include <ECSCRAMNetGT.h>
 #endif
 
 extern ExperimentalCP *getExperimentalCP(int tag);
@@ -142,7 +146,7 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
         argi = 2;
         if (Tcl_GetInt(interp, argv[argi], &tag) != TCL_OK)  {
             opserr << "WARNING invalid expControl SimUniaxialMaterials tag\n";
-            return TCL_ERROR;		
+            return TCL_ERROR;
         }
         argi++;
         // now read the number of materials
@@ -381,7 +385,7 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
         argi++;
         
         // parsing was successful, allocate the control
-        theControl = new ECSimFEAdapter(tag, ipAddr, ipPort);	
+        theControl = new ECSimFEAdapter(tag, ipAddr, ipPort);
     }
     
     // ----------------------------------------------------------------------------	
@@ -414,106 +418,89 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
         argi++;
         
         // parsing was successful, allocate the control
-        theControl = new ECSimSimulink(tag, ipAddr, ipPort);	
+        theControl = new ECSimSimulink(tag, ipAddr, ipPort);
     }
-    
-#ifdef _WIN32
+
     // ----------------------------------------------------------------------------	
-    else if (strcmp(argv[1],"xPCtarget") == 0)  {
-        if (argc < 7)  {
+    else if (strcmp(argv[1],"GenericTCP") == 0)  {
+        if (argc < 17)  {
             opserr << "WARNING invalid number of arguments\n";
             printCommand(argc,argv);
-            opserr << "Want: expControl xPCtarget tag type ipAddr ipPort appName <appPath> "
-                << "<-ctrlFilters (5 filterTag)> <-daqFilters (5 filterTag)>\n";
+            opserr << "Want: expControl GenericTCP tag ipAddr ipPort -ctrlModes (5 mode) -daqModes (5 mode) "
+                << "<-initFile fileName> <-ssl> <-udp> <-ctrlFilters (5 filterTag)> <-daqFilters (5 filterTag)>\n";
             return TCL_ERROR;
         }
         
-        int type, i, timeOut = 10;
-        char *ipAddr, *ipPort, *appName, *appPath = 0;
+        char *ipAddr;
+        int ipPort, mode, i;
+        ID ctrlModes(5), daqModes(5);
+        char *initFileName = 0;
+        int ssl = 0, udp = 0;
         
         argi = 2;
         if (Tcl_GetInt(interp, argv[argi], &tag) != TCL_OK)  {
-            opserr << "WARNING invalid expControl xPCtarget tag\n";
-            return TCL_ERROR;
-        }
-        argi++;
-        if (Tcl_GetInt(interp, argv[argi], &type) != TCL_OK)  {
-            opserr << "WARNING invalid type\n";
-            opserr << "expControl xPCtarget " << tag << endln;
+            opserr << "WARNING invalid expControl GenericTCP tag\n";
             return TCL_ERROR;
         }
         argi++;
         ipAddr = new char [strlen(argv[argi])+1];
         strcpy(ipAddr,argv[argi]);
         argi++;
-        ipPort = new char [strlen(argv[argi])+1];
-        strcpy(ipPort,argv[argi]);
+        if (Tcl_GetInt(interp, argv[argi], &ipPort) != TCL_OK)  {
+            opserr << "WARNING invalid ipPort\n";
+            opserr << "expControl GenericTCP " << tag << endln;
+            return TCL_ERROR;
+        }
         argi++;
-        appName = new char [strlen(argv[argi])+1];
-        strcpy(appName,argv[argi]);
+        if (strcmp(argv[argi],"-ctrlModes") != 0)  {
+            opserr << "WARNING expecting -ctrlModes (5 mode)\n";
+            opserr << "expControl GenericTCP " << tag << endln;
+            return TCL_ERROR;
+        }
         argi++;
-        if (argc > 7 &&
-            strcmp(argv[argi],"-ctrlFilters") != 0 &&
-            strcmp(argv[argi],"-daqFilters") != 0 &&
-            strcmp(argv[argi],"-timeOut") != 0)  {
-                appPath = new char [strlen(argv[argi])+1];
-                strcpy(appPath,argv[argi]);
-                argi++;
+        for (i=0; i<5; i++)  {
+            if (Tcl_GetInt(interp, argv[argi], &mode) != TCL_OK)  {
+                opserr << "WARNING invalid mode\n";
+                opserr << "expControl GenericTCP " << tag << endln;
+                return TCL_ERROR;
+            }
+            ctrlModes(i) = mode;
+            argi++;
+        }
+        if (strcmp(argv[argi],"-daqModes") != 0)  {
+            opserr << "WARNING expecting -daqModes (5 mode)\n";
+            opserr << "expControl GenericTCP " << tag << endln;
+            return TCL_ERROR;
+        }
+        argi++;
+        for (i=0; i<5; i++)  {
+            if (Tcl_GetInt(interp, argv[argi], &mode) != TCL_OK)  {
+                opserr << "WARNING invalid mode\n";
+                opserr << "expControl GenericTCP " << tag << endln;
+                return TCL_ERROR;
+            }
+            daqModes(i) = mode;
+            argi++;
         }
         for (i = argi; i < argc; i++)  {
-            if (i+1 < argc && strcmp(argv[i], "-timeOut") == 0)  {
-                if (Tcl_GetInt(interp, argv[i+1], &timeOut) != TCL_OK)  {
-                    opserr << "WARNING invalid timeOut value\n";
-                    opserr << "expControl xPCtarget " << tag << endln;
-                    return TCL_ERROR;	
-                }
+            if (strcmp(argv[i], "-initFile") == 0)  {
+                initFileName = new char [strlen(argv[i+1])+1];
+                strcpy(initFileName,argv[i+1]);
             }
+        }
+        for (i = argi; i < argc; i++)  {
+            if (strcmp(argv[i], "-ssl") == 0)
+                ssl = 1;
+            else if (strcmp(argv[i], "-udp") == 0)
+                udp = 1;
         }
         
         // parsing was successful, allocate the control
-        theControl = new ECxPCtarget(tag, type, ipAddr, ipPort,
-            appName, appPath, timeOut);
+        theControl = new ECGenericTCP(tag, ipAddr, ipPort,
+            ctrlModes, daqModes, initFileName, ssl, udp);
     }
     
-    // ----------------------------------------------------------------------------	
-    /*else if (strcmp(argv[1],"xPCtargetForce") == 0)  {
-    if (argc < 7)  {
-    opserr << "WARNING invalid number of arguments\n";
-    printCommand(argc,argv);
-    opserr << "Want: expControl xPCtargetForce tag ipAddr ipPort appName <appPath> "
-    << "<-ctrlFilters (5 filterTag)> <-daqFilters (5 filterTag)>\n";
-    return TCL_ERROR;
-    }
-    
-    char *ipAddr, *ipPort, *appName, *appPath = 0;
-    
-    argi = 2;
-    if (Tcl_GetInt(interp, argv[argi], &tag) != TCL_OK)  {
-    opserr << "WARNING invalid expControl xPCtargetForce tag\n";
-    return TCL_ERROR;
-    }
-    argi++;
-    ipAddr = new char [strlen(argv[argi])+1];
-    strcpy(ipAddr,argv[argi]);
-    argi++;
-    ipPort = new char [strlen(argv[argi])+1];
-    strcpy(ipPort,argv[argi]);
-    argi++;
-    appName = new char [strlen(argv[argi])+1];
-    strcpy(appName,argv[argi]);
-    argi++;
-    if (argc > 7 &&
-    strcmp(argv[argi],"-ctrlFilters") != 0 &&
-    strcmp(argv[argi],"-daqFilters") != 0)  {
-    appPath = new char [strlen(argv[argi])+1];
-    strcpy(appPath,argv[argi]);
-    argi++;
-    }
-    
-    // parsing was successful, allocate the control
-    theControl = new ECxPCtargetForce(tag, ipAddr, ipPort, appName, appPath);
-    }*/
-    
+#ifndef _WIN64
     // ----------------------------------------------------------------------------	
     else if (strcmp(argv[1],"dSpace") == 0)  {
         if (argc < 5)  {
@@ -575,14 +562,141 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
                 if (Tcl_GetDouble(interp, argv[argi], &rampTime) != TCL_OK)  {
                     opserr << "WARNING invalid rampTime\n";
                     opserr << "expControl MTSCsi " << tag << endln;
-                    return TCL_ERROR;	
+                    return TCL_ERROR;
                 }
                 argi++;
         }
         // parsing was successful, allocate the control
         theControl = new ECMtsCsi(tag, cfgFile, rampTime);
     }
+
+    // ----------------------------------------------------------------------------	
+    /*    else if (strcmp(argv[1],"NIEseries") == 0)  {
+    if (argc < 4)  {
+    opserr << "WARNING invalid number of arguments\n";
+    printCommand(argc,argv);
+    opserr << "Want: expControl NIEseries tag device ";
+    << "<-ctrlFilters (5 filterTag)> <-daqFilters (5 filterTag)>\n";
+    return TCL_ERROR;
+    }
     
+    int device;
+    
+    argi = 2;
+    if (Tcl_GetInt(interp, argv[argi], &tag) != TCL_OK)  {
+    opserr << "WARNING invalid expControl NIEseries tag\n";
+    return TCL_ERROR;
+    }
+    argi++;
+    if (Tcl_GetInt(interp, argv[argi], &device) != TCL_OK)  {
+    opserr << "WARNING invalid device\n";
+    opserr << "expControl NIEseries " << tag << endln;
+    return TCL_ERROR;
+    }
+    argi++;
+    
+    // parsing was successful, allocate the control
+    theControl = new ECNIEseries(tag, device);
+    }*/
+#endif
+
+#if defined _WIN32 || defined _WIN64
+    // ----------------------------------------------------------------------------	
+    else if (strcmp(argv[1],"xPCtarget") == 0)  {
+        if (argc < 7)  {
+            opserr << "WARNING invalid number of arguments\n";
+            printCommand(argc,argv);
+            opserr << "Want: expControl xPCtarget tag type ipAddr ipPort appName <appPath> "
+                << "<-ctrlFilters (5 filterTag)> <-daqFilters (5 filterTag)>\n";
+            return TCL_ERROR;
+        }
+        
+        int type, i, timeOut = 10;
+        char *ipAddr, *ipPort, *appName, *appPath = 0;
+        
+        argi = 2;
+        if (Tcl_GetInt(interp, argv[argi], &tag) != TCL_OK)  {
+            opserr << "WARNING invalid expControl xPCtarget tag\n";
+            return TCL_ERROR;
+        }
+        argi++;
+        if (Tcl_GetInt(interp, argv[argi], &type) != TCL_OK)  {
+            opserr << "WARNING invalid type\n";
+            opserr << "expControl xPCtarget " << tag << endln;
+            return TCL_ERROR;
+        }
+        argi++;
+        ipAddr = new char [strlen(argv[argi])+1];
+        strcpy(ipAddr,argv[argi]);
+        argi++;
+        ipPort = new char [strlen(argv[argi])+1];
+        strcpy(ipPort,argv[argi]);
+        argi++;
+        appName = new char [strlen(argv[argi])+1];
+        strcpy(appName,argv[argi]);
+        argi++;
+        if (argc > 7 &&
+            strcmp(argv[argi],"-ctrlFilters") != 0 &&
+            strcmp(argv[argi],"-daqFilters") != 0 &&
+            strcmp(argv[argi],"-timeOut") != 0)  {
+                appPath = new char [strlen(argv[argi])+1];
+                strcpy(appPath,argv[argi]);
+                argi++;
+        }
+        for (i = argi; i < argc; i++)  {
+            if (i+1 < argc && strcmp(argv[i], "-timeOut") == 0)  {
+                if (Tcl_GetInt(interp, argv[i+1], &timeOut) != TCL_OK)  {
+                    opserr << "WARNING invalid timeOut value\n";
+                    opserr << "expControl xPCtarget " << tag << endln;
+                    return TCL_ERROR;
+                }
+            }
+        }
+        
+        // parsing was successful, allocate the control
+        theControl = new ECxPCtarget(tag, type, ipAddr, ipPort,
+            appName, appPath, timeOut);
+    }
+    
+    // ----------------------------------------------------------------------------	
+    /*else if (strcmp(argv[1],"xPCtargetForce") == 0)  {
+    if (argc < 7)  {
+    opserr << "WARNING invalid number of arguments\n";
+    printCommand(argc,argv);
+    opserr << "Want: expControl xPCtargetForce tag ipAddr ipPort appName <appPath> "
+    << "<-ctrlFilters (5 filterTag)> <-daqFilters (5 filterTag)>\n";
+    return TCL_ERROR;
+    }
+    
+    char *ipAddr, *ipPort, *appName, *appPath = 0;
+    
+    argi = 2;
+    if (Tcl_GetInt(interp, argv[argi], &tag) != TCL_OK)  {
+    opserr << "WARNING invalid expControl xPCtargetForce tag\n";
+    return TCL_ERROR;
+    }
+    argi++;
+    ipAddr = new char [strlen(argv[argi])+1];
+    strcpy(ipAddr,argv[argi]);
+    argi++;
+    ipPort = new char [strlen(argv[argi])+1];
+    strcpy(ipPort,argv[argi]);
+    argi++;
+    appName = new char [strlen(argv[argi])+1];
+    strcpy(appName,argv[argi]);
+    argi++;
+    if (argc > 7 &&
+    strcmp(argv[argi],"-ctrlFilters") != 0 &&
+    strcmp(argv[argi],"-daqFilters") != 0)  {
+    appPath = new char [strlen(argv[argi])+1];
+    strcpy(appPath,argv[argi]);
+    argi++;
+    }
+    
+    // parsing was successful, allocate the control
+    theControl = new ECxPCtargetForce(tag, ipAddr, ipPort, appName, appPath);
+    }*/
+
     // ----------------------------------------------------------------------------	
     else if (strcmp(argv[1],"LabVIEW") == 0)  {
         if (argc < 8)  {
@@ -700,35 +814,6 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
     }
     
     // ----------------------------------------------------------------------------	
-    /*    else if (strcmp(argv[1],"NIEseries") == 0)  {
-    if (argc < 4)  {
-    opserr << "WARNING invalid number of arguments\n";
-    printCommand(argc,argv);
-    opserr << "Want: expControl NIEseries tag device ";
-    << "<-ctrlFilters (5 filterTag)> <-daqFilters (5 filterTag)>\n";
-    return TCL_ERROR;
-    }
-    
-    int device;
-    
-    argi = 2;
-    if (Tcl_GetInt(interp, argv[argi], &tag) != TCL_OK)  {
-    opserr << "WARNING invalid expControl NIEseries tag\n";
-    return TCL_ERROR;
-    }
-    argi++;
-    if (Tcl_GetInt(interp, argv[argi], &device) != TCL_OK)  {
-    opserr << "WARNING invalid device\n";
-    opserr << "expControl NIEseries " << tag << endln;
-    return TCL_ERROR;
-    }
-    argi++;
-    
-    // parsing was successful, allocate the control
-    theControl = new ECNIEseries(tag, device);
-    }*/
-    
-    // ----------------------------------------------------------------------------	
     else if (strcmp(argv[1],"SCRAMNet") == 0)  {
         if (argc < 5)  {
             opserr << "WARNING invalid number of arguments\n";
@@ -763,7 +848,7 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
         theControl = new ECSCRAMNet(tag, memOffset, numActCh);
     }
     
-    /* ----------------------------------------------------------------------------	
+    // ----------------------------------------------------------------------------	
     else if (strcmp(argv[1],"SCRAMNetGT") == 0)  {
     if (argc < 5)  {
     opserr << "WARNING invalid number of arguments\n";
@@ -771,7 +856,7 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
     opserr << "Want: expControl SCRAMNetGT tag memOffset numActCh "
     << "<-ctrlFilters (5 filterTag)> <-daqFilters (5 filterTag)>\n";
     return TCL_ERROR;
-    }    
+    }
     
     int memOffset, numActCh;
     
@@ -796,87 +881,8 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
     
     // parsing was successful, allocate the control
     theControl = new ECSCRAMNetGT(tag, memOffset, numActCh);
-    }*/
-#endif
-    
-    // ----------------------------------------------------------------------------	
-    else if (strcmp(argv[1],"GenericTCP") == 0)  {
-        if (argc < 17)  {
-            opserr << "WARNING invalid number of arguments\n";
-            printCommand(argc,argv);
-            opserr << "Want: expControl GenericTCP tag ipAddr ipPort -ctrlModes (5 mode) -daqModes (5 mode) "
-                << "<-initFile fileName> <-ssl> <-udp> <-ctrlFilters (5 filterTag)> <-daqFilters (5 filterTag)>\n";
-            return TCL_ERROR;
-        }
-        
-        char *ipAddr;
-        int ipPort, mode, i;
-        ID ctrlModes(5), daqModes(5);
-        char *initFileName = 0;
-        int ssl = 0, udp = 0;
-        
-        argi = 2;
-        if (Tcl_GetInt(interp, argv[argi], &tag) != TCL_OK)  {
-            opserr << "WARNING invalid expControl GenericTCP tag\n";
-            return TCL_ERROR;
-        }
-        argi++;
-        ipAddr = new char [strlen(argv[argi])+1];
-        strcpy(ipAddr,argv[argi]);
-        argi++;
-        if (Tcl_GetInt(interp, argv[argi], &ipPort) != TCL_OK)  {
-            opserr << "WARNING invalid ipPort\n";
-            opserr << "expControl GenericTCP " << tag << endln;
-            return TCL_ERROR;
-        }
-        argi++;
-        if (strcmp(argv[argi],"-ctrlModes") != 0)  {
-            opserr << "WARNING expecting -ctrlModes (5 mode)\n";
-            opserr << "expControl GenericTCP " << tag << endln;
-            return TCL_ERROR;
-        }
-        argi++;
-        for (i=0; i<5; i++)  {
-            if (Tcl_GetInt(interp, argv[argi], &mode) != TCL_OK)  {
-                opserr << "WARNING invalid mode\n";
-                opserr << "expControl GenericTCP " << tag << endln;
-                return TCL_ERROR;
-            }
-            ctrlModes(i) = mode;
-            argi++;
-        }
-        if (strcmp(argv[argi],"-daqModes") != 0)  {
-            opserr << "WARNING expecting -daqModes (5 mode)\n";
-            opserr << "expControl GenericTCP " << tag << endln;
-            return TCL_ERROR;
-        }
-        argi++;
-        for (i=0; i<5; i++)  {
-            if (Tcl_GetInt(interp, argv[argi], &mode) != TCL_OK)  {
-                opserr << "WARNING invalid mode\n";
-                opserr << "expControl GenericTCP " << tag << endln;
-                return TCL_ERROR;
-            }
-            daqModes(i) = mode;
-            argi++;
-        }
-        for (i = argi; i < argc; i++)  {
-            if (strcmp(argv[i], "-initFile") == 0)  {
-                initFileName = new char [strlen(argv[i+1])+1];
-                strcpy(initFileName,argv[i+1]);
-            }
-        }
-        for (i = argi; i < argc; i++)  {
-            if (strcmp(argv[i], "-ssl") == 0)
-                ssl = 1;
-            else if (strcmp(argv[i], "-udp") == 0)
-                udp = 1;
-        }
-        
-        // parsing was successful, allocate the control
-        theControl = new ECGenericTCP(tag, ipAddr, ipPort,
-            ctrlModes, daqModes, initFileName, ssl, udp);
     }
+#endif
     
     // ----------------------------------------------------------------------------	
     else  {

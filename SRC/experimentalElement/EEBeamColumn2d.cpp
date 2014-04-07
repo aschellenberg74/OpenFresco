@@ -23,7 +23,7 @@
 // $Date$
 // $URL$
 
-// Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 09/06
 // Revision: A
 //
@@ -239,13 +239,13 @@ EEBeamColumn2d::EEBeamColumn2d(int tag, int Nd1, int Nd2,
     id = 0;
     rData = new double [dataSize];
     recvData = new Vector(rData, dataSize);
-    dbDaq = new Vector(&rData[id], 1);
+    dbDaq = new Vector(&rData[id], 3);
     id += 3;
-    vbDaq = new Vector(&rData[id], 1);
+    vbDaq = new Vector(&rData[id], 3);
     id += 3;
-    abDaq = new Vector(&rData[id], 1);
+    abDaq = new Vector(&rData[id], 3);
     id += 3;
-    qDaq = new Vector(&rData[id], 1);
+    qDaq = new Vector(&rData[id], 3);
     id += 3;
     tDaq = new Vector(&rData[id], 1);
     recvData->Zero();
@@ -590,7 +590,7 @@ const Matrix& EEBeamColumn2d::getTangentStiff()
 
 const Matrix& EEBeamColumn2d::getDamp()
 {
-    // zero the matrix
+    // zero the global matrix
     theMatrix.Zero();
     
     // call base class to setup Rayleigh damping
@@ -604,7 +604,7 @@ const Matrix& EEBeamColumn2d::getDamp()
 
 const Matrix& EEBeamColumn2d::getMass()
 {
-    // zero the matrix
+    // zero the global matrix
     theMatrix.Zero();
     
     // form mass matrix
@@ -730,7 +730,7 @@ const Vector& EEBeamColumn2d::getResistingForce()
     // make sure the coordinate transformation is updated
     theCoordTransf->update();
     
-    // zero the residual
+    // zero the global residual
     theVector.Zero();
     
     // get daq resisting forces
@@ -985,9 +985,9 @@ Response* EEBeamColumn2d::setResponse(const char **argv, int argc,
         strcmp(argv[0],"daqForce") == 0 ||
         strcmp(argv[0],"daqForces") == 0)
     {
-        output.tag("ResponseType","q1");
-        output.tag("ResponseType","q2");
-        output.tag("ResponseType","q3");
+        output.tag("ResponseType","qb1");
+        output.tag("ResponseType","qb2");
+        output.tag("ResponseType","qb3");
         
         theResponse = new ElementResponse(this, 3, Vector(3));
     }

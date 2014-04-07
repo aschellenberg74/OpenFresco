@@ -23,7 +23,7 @@
 // $Date$
 // $URL$
 
-// Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 07/07
 // Revision: A
 //
@@ -266,7 +266,7 @@ int ECSimDomain::setup()
     
     // define load pattern
     theSeries  = new LinearSeries(1,1.0);
-    thePattern = new LoadPattern(1);
+    thePattern = new LoadPattern(1,1.0);
     thePattern->setTimeSeries(theSeries);
     theDomain->addLoadPattern(thePattern);
     

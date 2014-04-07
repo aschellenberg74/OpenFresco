@@ -23,7 +23,7 @@
 // $Date$
 // $URL$
 
-// Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 09/06
 // Revision: A
 //
@@ -221,13 +221,13 @@ EEInvertedVBrace2d::EEInvertedVBrace2d(int tag, int Nd1, int Nd2, int Nd3,
     id = 0;
     rData = new double [dataSize];
     recvData = new Vector(rData, dataSize);
-    dbDaq = new Vector(&rData[id], 1);
+    dbDaq = new Vector(&rData[id], 3);
     id += 3;
-    vbDaq = new Vector(&rData[id], 1);
+    vbDaq = new Vector(&rData[id], 3);
     id += 3;
-    abDaq = new Vector(&rData[id], 1);
+    abDaq = new Vector(&rData[id], 3);
     id += 3;
-    qDaq = new Vector(&rData[id], 1);
+    qDaq = new Vector(&rData[id], 6);
     id += 6;
     tDaq = new Vector(&rData[id], 1);
     recvData->Zero();
@@ -512,7 +512,7 @@ int EEInvertedVBrace2d::setInitialStiff(const Matrix& kbinit)
 
 const Matrix& EEInvertedVBrace2d::getDamp()
 {
-    // zero the matrix
+    // zero the global matrix
     theMatrix.Zero();
     
     // call base class to setup Rayleigh damping
@@ -526,7 +526,7 @@ const Matrix& EEInvertedVBrace2d::getDamp()
 
 const Matrix& EEInvertedVBrace2d::getMass()
 {
-    // zero the matrix
+    // zero the global matrix
     theMatrix.Zero();
     
     // form mass matrix
@@ -612,7 +612,7 @@ const Vector& EEInvertedVBrace2d::getResistingForce()
     dx2[0] = (end3Crd(0) + end3Dsp(0)) - (end2Crd(0) + end2Dsp(0));
     dx2[1] = (end3Crd(1) + end3Dsp(1)) - (end2Crd(1) + end2Dsp(1));
     
-    // zero the residual
+    // zero the global residual
     theVector.Zero();
     
     // determine resisting forces in basic system

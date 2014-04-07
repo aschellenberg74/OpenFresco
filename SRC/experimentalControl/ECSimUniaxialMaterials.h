@@ -26,7 +26,7 @@
 #ifndef ECSimUniaxialMaterials_h
 #define ECSimUniaxialMaterials_h
 
-// Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 10/07
 // Revision: A
 //
@@ -43,7 +43,7 @@ class ECSimUniaxialMaterials : public ECSimulation
 {
 public:
     // constructors
-    ECSimUniaxialMaterials(int tag, int numMat,
+    ECSimUniaxialMaterials(int tag, int numMats,
         UniaxialMaterial **theSpecimen);
     ECSimUniaxialMaterials(const ECSimUniaxialMaterials& ec);
     

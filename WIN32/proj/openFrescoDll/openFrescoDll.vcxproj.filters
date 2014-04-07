@@ -65,9 +65,6 @@
     <ClCompile Include="..\..\..\SRC\experimentalControl\ECMtsCsi.cpp">
       <Filter>experimentalControl</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\SRC\experimentalControl\ECNIEseries.cpp">
-      <Filter>experimentalControl</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\SRC\experimentalControl\ECSCRAMNet.cpp">
       <Filter>experimentalControl</Filter>
     </ClCompile>
@@ -568,6 +565,18 @@
     </ClCompile>
     <ClCompile Include="..\..\..\SRC\openseesExtra\LimitCurve.cpp">
       <Filter>openseesExtra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalControl\ECSCRAMNetGT.cpp">
+      <Filter>experimentalControl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalElement\EEBearing2d.cpp">
+      <Filter>experimentalElement</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalElement\TclEEBearingCommand.cpp">
+      <Filter>experimentalElement</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalElement\EEBearing3d.cpp">
+      <Filter>experimentalElement</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1120,12 +1129,18 @@
     <ClInclude Include="..\..\..\SRC\openseesExtra\LimitCurve.h">
       <Filter>openseesExtra</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalControl\ECSCRAMNetGT.h">
+      <Filter>experimentalControl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalElement\EEBearing2d.h">
+      <Filter>experimentalElement</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalElement\EEBearing3d.h">
+      <Filter>experimentalElement</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuildStep Include="..\..\..\SRC\experimentalControl\ECMtsCsi.h">
-      <Filter>experimentalControl</Filter>
-    </CustomBuildStep>
-    <CustomBuildStep Include="..\..\..\SRC\experimentalControl\ECNIEseries.h">
       <Filter>experimentalControl</Filter>
     </CustomBuildStep>
     <CustomBuildStep Include="..\..\..\SRC\experimentalControl\ECSCRAMNet.h">

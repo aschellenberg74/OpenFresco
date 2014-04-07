@@ -23,7 +23,7 @@
 // $Date$
 // $URL$
 
-// Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 09/06
 // Revision: A
 //
@@ -368,13 +368,13 @@ EETwoNodeLink::EETwoNodeLink(int tag, int dim, int Nd1, int Nd2,
     id = 0;
     rData = new double [dataSize];
     recvData = new Vector(rData, dataSize);
-    dbDaq = new Vector(&rData[id], 1);
+    dbDaq = new Vector(&rData[id], numDir);
     id += numDir;
-    vbDaq = new Vector(&rData[id], 1);
+    vbDaq = new Vector(&rData[id], numDir);
     id += numDir;
-    abDaq = new Vector(&rData[id], 1);
+    abDaq = new Vector(&rData[id], numDir);
     id += numDir;
-    qDaq = new Vector(&rData[id], 1);
+    qDaq = new Vector(&rData[id], numDir);
     id += numDir;
     tDaq = new Vector(&rData[id], 1);
     recvData->Zero();
@@ -665,7 +665,7 @@ int EETwoNodeLink::setInitialStiff(const Matrix& kbinit)
     }
     kbInit = kbinit;
     
-    // zero the matrix
+    // zero the global matrix
     theInitStiff.Zero();
     
     // transform from basic to local system
@@ -693,7 +693,7 @@ const Matrix& EETwoNodeLink::getTangentStiff()
         firstWarning = false;
     }
     
-    // zero the matrix
+    // zero the global matrix
     theMatrix->Zero();
     
     // get daq resisting forces
@@ -733,7 +733,7 @@ const Matrix& EETwoNodeLink::getTangentStiff()
 
 const Matrix& EETwoNodeLink::getDamp()
 {
-    // zero the matrix
+    // zero the global matrix
     theMatrix->Zero();
     
     // call base class to setup Rayleigh damping
@@ -747,7 +747,7 @@ const Matrix& EETwoNodeLink::getDamp()
 
 const Matrix& EETwoNodeLink::getMass()
 {
-    // zero the matrix
+    // zero the global matrix
     theMatrix->Zero();
     
     // form mass matrix
@@ -812,7 +812,7 @@ int EETwoNodeLink::addInertiaLoadToUnbalance(const Vector &accel)
 
 const Vector& EETwoNodeLink::getResistingForce()
 {
-    // zero the residual
+    // zero the global residual
     theVector->Zero();
     
     // get daq resisting forces
@@ -861,7 +861,7 @@ const Vector& EETwoNodeLink::getResistingForce()
 const Vector& EETwoNodeLink::getResistingForceIncInertia()
 {
     // this already includes damping forces from specimen
-    this->getResistingForce();
+    *theVector = this->getResistingForce();
     
     // add the damping forces from rayleigh damping
     if (addRayleigh == 1)  {
@@ -1048,7 +1048,7 @@ Response* EETwoNodeLink::setResponse(const char **argv, int argc,
         strcmp(argv[0],"daqForces") == 0)
     {
         for (int i=0; i<numDir; i++)  {
-            sprintf(outputData,"q%d",i+1);
+            sprintf(outputData,"qb%d",i+1);
             output.tag("ResponseType",outputData);
         }
         theResponse = new ElementResponse(this, 3, Vector(numDir));
