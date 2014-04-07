@@ -18,35 +18,36 @@ if (nargin<2)
 elseif (nargin<3)
     id = 1000;
 else
-    id = tStart*1000;
+    id = max(tStart*1000,1);
 end
 
 % load the file and extract data
 load(fileName);
 data = eval(fileName);
 
+time = data.X.Data';
+npts = length(time);
+dt = data.Capture.SamplingPeriod;
+
 i = ~cellfun(@isempty,strfind({data.Y.Name},'targDsp'));
-targDsp = data.Y(i).Data';
+targDsp = reshape([data.Y(i).Data],npts,[]);
 i = ~cellfun(@isempty,strfind({data.Y.Name},'commDsp'));
-commDsp = data.Y(i).Data';
+commDsp = reshape([data.Y(i).Data],npts,[]);
 i = ~cellfun(@isempty,strfind({data.Y.Name},'measDsp'));
-measDsp = data.Y(i).Data';
+measDsp = reshape([data.Y(i).Data],npts,[]);
 i = ~cellfun(@isempty,strfind({data.Y.Name},'measFrc'));
-measFrc = data.Y(i).Data';
+measFrc = reshape([data.Y(i).Data],npts,[]);
 
 i = ~cellfun(@isempty,strfind({data.Y.Name},'state'));
-state = data.Y(i).Data';
+state = reshape([data.Y(i).Data],npts,[]);
 i = ~cellfun(@isempty,strfind({data.Y.Name},'counter'));
-counter = data.Y(i).Data';
+counter = reshape([data.Y(i).Data],npts,[]);
 i = ~cellfun(@isempty,strfind({data.Y.Name},'newTarget'));
-newTarget = data.Y(i).Data';
+newTarget = reshape([data.Y(i).Data],npts,[]);
 i = ~cellfun(@isempty,strfind({data.Y.Name},'switchPC'));
-switchPC = data.Y(i).Data';
+switchPC = reshape([data.Y(i).Data],npts,[]);
 i = ~cellfun(@isempty,strfind({data.Y.Name},'atTarget'));
-atTarget = data.Y(i).Data';
-
-time = data.X.Data';
-dt = data.Capture.SamplingPeriod;
+atTarget = reshape([data.Y(i).Data],npts,[]);
 
 % get screen size
 SS = get(0,'screensize');

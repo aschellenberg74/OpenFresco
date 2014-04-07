@@ -1,17 +1,20 @@
 include ../../Makefile.def
 
 OBJS  = ExperimentalElement.o \
-        EETwoNodeLink.o \
-        EETruss.o \
-        EETrussCorot.o \
-        EEGeneric.o \
         EEBeamColumn2d.o \
         EEBeamColumn3d.o \
-        EEInvertedVBrace2d.o
+        EEBearing2d.o \
+        EEBearing3d.o \
+        EEGeneric.o \
+        EEInvertedVBrace2d.o \
+        EETruss.o \
+        EETrussCorot.o \
+        EETwoNodeLink.o
 
 all:         $(OBJS)
 
 tcl: 	TclEEBeamColumnCommand.o \
+    TclEEBearingCommand.o \
 	TclEEGenericCommand.o \
 	TclEEInvertedVBraceCommand.o \
 	TclEETrussCommand.o \

@@ -23,7 +23,7 @@
 // $Date$
 // $URL$
 
-// Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 09/06
 // Revision: A
 //
@@ -189,12 +189,12 @@ int ECdSpace::setup()
         for (int i=0; i<(*sizeCtrl)(OF_Resp_Disp); i++)
             ctrlDisp[i] = 0.0;
     }
-    if ((*sizeCtrl)(OF_Resp_Disp) != 0)  {
+    if ((*sizeCtrl)(OF_Resp_Vel) != 0)  {
         ctrlVel = new double [(*sizeCtrl)(OF_Resp_Vel)];
         for (int i=0; i<(*sizeCtrl)(OF_Resp_Vel); i++)
             ctrlVel[i] = 0.0;
     }
-    if ((*sizeCtrl)(OF_Resp_Disp) != 0)  {
+    if ((*sizeCtrl)(OF_Resp_Accel) != 0)  {
         ctrlAccel = new double [(*sizeCtrl)(OF_Resp_Accel)];
         for (int i=0; i<(*sizeCtrl)(OF_Resp_Accel); i++)
             ctrlAccel[i] = 0.0;

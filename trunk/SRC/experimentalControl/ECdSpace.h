@@ -26,7 +26,7 @@
 #ifndef ECdSpace_h
 #define ECdSpace_h
 
-// Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 09/06
 // Revision: A
 //

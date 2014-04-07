@@ -32,9 +32,9 @@
 #include "ECSCRAMNetGT.h"
 
 
-ECSCRAMNetGT::ECSCRAMNetGT(int tag, int memoffset, int numactch)
+ECSCRAMNetGT::ECSCRAMNetGT(int tag, int memoffset, int numdof)
     : ExperimentalControl(tag),
-    memOffset(memoffset), numActCh(numactch),
+    memOffset(memoffset), numDOF(numdof),
     memPtrBASE(0), memPtrOPF(0),
     newTarget(0), switchPC(0), atTarget(0),
     ctrlDisp(0), ctrlVel(0), ctrlAccel(0), ctrlForce(0), ctrlTime(0),
@@ -42,7 +42,7 @@ ECSCRAMNetGT::ECSCRAMNetGT(int tag, int memoffset, int numactch)
 {
     // initialize a handle to a specific SCRAMNet GT device/unit
     int unit = 0;
-	int rValue = scgtOpen(unit, &gtHandle);
+    int rValue = scgtOpen(unit, &gtHandle);
     if (rValue != SCGT_SUCCESS)  {
         opserr << "ECSCRAMNetGT::ECSCRAMNetGT() - scgtOpen():"
             << " could not open driver to device/unit #"
@@ -50,18 +50,41 @@ ECSCRAMNetGT::ECSCRAMNetGT(int tag, int memoffset, int numactch)
         exit(rValue);
     }
     
-    rValue = scgtGetDeviceInfo(&gtHandle, deviceInfo);
+    // get the pointer to the base memory address
+    memPtrBASE = (int*) scgtMapMem(&gtHandle);
+    if (memPtrBASE == NULL)  {
+        opserr << "ECSCRAMNetGT::ECSCRAMNetGT() - scgtMapMem():"
+            << " could not map memory into address space.\n";
+        exit(OF_ReturnType_failed);
+    }
+    
+    // get device information to check amount of mapped memory
+    rValue = scgtGetDeviceInfo(&gtHandle, &deviceInfo);
     if (rValue != SCGT_SUCCESS)  {
         opserr << "ECSCRAMNetGT::ECSCRAMNetGT() - scgtGetDeviceInfo():"
             << " could not retrive device information.\n";
         exit(rValue);
     }
-
-    int nodeID = 1;
+    if (int(deviceInfo.mappedMemSize/4) < (3 + 10*numDOF))  {
+        opserr << "ECSCRAMNetGT::ECSCRAMNetGT() - "
+            << " mapped memory size too small for required data.\n";
+        exit(OF_ReturnType_failed);
+    }
+    
+    // set OpenFresco nodeID (469D = node1, xPCtarget = node2)
+    int nodeID = 3;
     rValue = scgtSetState(&gtHandle, SCGT_NODE_ID, nodeID);
     if (rValue != SCGT_SUCCESS)  {
         opserr << "ECSCRAMNetGT::ECSCRAMNetGT() - scgtSetState():"
-            << " could not change nodeID.\n";
+            << " could not change nodeID to 3.\n";
+        exit(rValue);
+    }
+    
+    // set to write me last
+    rValue = scgtSetState(&gtHandle, SCGT_WRITE_ME_LAST, 0);
+    if (rValue != SCGT_SUCCESS)  {
+        opserr << "ECSCRAMNetGT::ECSCRAMNetGT() - scgtSetState():"
+            << " could not change to write me last.\n";
         exit(rValue);
     }
     
@@ -70,64 +93,79 @@ ECSCRAMNetGT::ECSCRAMNetGT(int tag, int memoffset, int numactch)
     // | no swap 32-bit | 00 | Q(31:24) | Q(23:16) | Q(15:8)  | Q(7:0)   |
     // | 16 bit         | 01 | Q(15:8)  | Q(7:0)   | Q(31:24) | Q(23:16) |
     // | 8 bit          | 10 | Q(7:0)   | Q(15:8)  | Q(23:16) | Q(31:24) |
-    if (sp_stm_mm(Long_mode) != TRUE)  {
-        opserr << "ECSCRAMNetGT::ECSCRAMNetGT() - sp_stm_mm():"
-            << " could not set Longword memory access mode.\n";
+    rValue = scgtSetState(&gtHandle, SCGT_WORD_SWAP_ENABLE, 0);
+    if (rValue != SCGT_SUCCESS)  {
+        opserr << "ECSCRAMNetGT::ECSCRAMNetGT() - scgtSetState():"
+            << " could not disable word swap.\n";
+        exit(rValue);
     }
-
-    // set CSR0 bits so node can receive and transmit data
-    unsigned short csrValue = 0x8003;
-    scr_csr_write(SCR_CSR0,csrValue);
-
-    // get the pointer to the base memory address
-    memPtrBASE = (int*) scgtMapMem(&gtHandle);
-
+    rValue = scgtSetState(&gtHandle, SCGT_BYTE_SWAP_ENABLE, 0);
+    if (rValue != SCGT_SUCCESS)  {
+        opserr << "ECSCRAMNetGT::ECSCRAMNetGT() - scgtSetState():"
+            << " could not disable byte swap.\n";
+        exit(rValue);
+    }
+    
+    // set state so node can receive and transmit data
+    rValue = scgtSetState(&gtHandle, SCGT_RECEIVE_ENABLE, 1);
+    if (rValue != SCGT_SUCCESS)  {
+        opserr << "ECSCRAMNetGT::ECSCRAMNetGT() - scgtSetState():"
+            << " could not change node to receive data.\n";
+        exit(rValue);
+    }
+    rValue = scgtSetState(&gtHandle, SCGT_TRANSMIT_ENABLE, 1);
+    if (rValue != SCGT_SUCCESS)  {
+        opserr << "ECSCRAMNetGT::ECSCRAMNetGT() - scgtSetState():"
+            << " could not change node to transmit data.\n";
+        exit(rValue);
+    }
+    
     // get address for OpenFresco memory on SCRAMNet board
-	// memOffset is given in bytes, so divide by 4
+    // memOffset is given in bytes, so divide by 4
     memPtrOPF = (float*) (memPtrBASE + (memOffset/4));
     float *memPtr = memPtrOPF;
-
+    
     // setup pointers to state flags
-    newTarget = (unsigned int*) memPtr;  memPtr++;
-    switchPC  = (unsigned int*) memPtr;  memPtr++;
-    atTarget  = (unsigned int*) memPtr;  memPtr++;
-
+    newTarget = (int*) memPtr;  memPtr++;
+    switchPC  = (int*) memPtr;  memPtr++;
+    atTarget  = (int*) memPtr;  memPtr++;
+    
     // setup pointers to control memory locations
-    ctrlDisp  = memPtr;  memPtr += numActCh;
-    ctrlVel   = memPtr;  memPtr += numActCh;
-    ctrlAccel = memPtr;  memPtr += numActCh;
-    ctrlForce = memPtr;  memPtr += numActCh;
-    ctrlTime  = memPtr;  memPtr += numActCh;
-
-	// setup pointers to daq memory locations
-    daqDisp  = memPtr;  memPtr += numActCh;
-    daqVel   = memPtr;  memPtr += numActCh;
-    daqAccel = memPtr;  memPtr += numActCh;
-    daqForce = memPtr;  memPtr += numActCh;
-    daqTime  = memPtr;  memPtr += numActCh;
-
+    ctrlDisp  = memPtr;  memPtr += numDOF;
+    ctrlVel   = memPtr;  memPtr += numDOF;
+    ctrlAccel = memPtr;  memPtr += numDOF;
+    ctrlForce = memPtr;  memPtr += numDOF;
+    ctrlTime  = memPtr;  memPtr += numDOF;
+    
+    // setup pointers to daq memory locations
+    daqDisp  = memPtr;  memPtr += numDOF;
+    daqVel   = memPtr;  memPtr += numDOF;
+    daqAccel = memPtr;  memPtr += numDOF;
+    daqForce = memPtr;  memPtr += numDOF;
+    daqTime  = memPtr;
+    
     // initialize everything to zero
-	newTarget[0] = 0;
+    newTarget[0] = 0;
     switchPC[0]  = 0;
     atTarget[0]  = 0;
-    for (int i=0; i<numActCh; i++)  {
+    for (int i=0; i<numDOF; i++)  {
         ctrlDisp[i]  = 0.0;  daqDisp[i]  = 0.0;
         ctrlVel[i]   = 0.0;  daqVel[i]   = 0.0;
         ctrlAccel[i] = 0.0;  daqAccel[i] = 0.0;
         ctrlForce[i] = 0.0;  daqForce[i] = 0.0;
         ctrlTime[i]  = 0.0;  daqTime[i]  = 0.0;
     }
-
-    opserr << "************************************************\n";
-    opserr << "* The SCRANNet csr and memory have been mapped *\n";
-    opserr << "************************************************\n";
-    opserr << endln;    
+    
+    opserr << "******************************************\n";
+    opserr << "* The SCRANNet GT memory has been mapped *\n";
+    opserr << "******************************************\n";
+    opserr << endln;
 }
 
 
 ECSCRAMNetGT::ECSCRAMNetGT(const ECSCRAMNetGT &ec)
     : ExperimentalControl(ec),
-    memOffset(ec.memOffset), numActCh(ec.numActCh),
+    memOffset(ec.memOffset), numDOF(ec.numDOF),
     memPtrBASE(0), memPtrOPF(0),
     newTarget(0), switchPC(0), atTarget(0),
     ctrlDisp(0), ctrlVel(0), ctrlAccel(0), ctrlForce(0), ctrlTime(0),
@@ -138,13 +176,13 @@ ECSCRAMNetGT::ECSCRAMNetGT(const ECSCRAMNetGT &ec)
     newTarget  = ec.newTarget;
     switchPC   = ec.switchPC;
     atTarget   = ec.atTarget;
-
+    
     ctrlDisp  = ec.ctrlDisp;
     ctrlVel   = ec.ctrlVel;
     ctrlAccel = ec.ctrlAccel;
     ctrlForce = ec.ctrlForce;
     ctrlTime  = ec.ctrlTime;
-
+    
     daqDisp  = ec.daqDisp;
     daqVel   = ec.daqVel;
     daqAccel = ec.daqAccel;
@@ -155,34 +193,24 @@ ECSCRAMNetGT::ECSCRAMNetGT(const ECSCRAMNetGT &ec)
 
 ECSCRAMNetGT::~ECSCRAMNetGT()
 {
-    // unmap the SCRAMNet control status registers (CSRs)
-    int rValue = scr_reg_mm(UNMAP);
-    if (rValue != 0)  {
-        opserr << "ECSCRAMNetGT::~ECSCRAMNetGT() - scr_reg_mm(UNMAP):"
-            << " could not unmap CSRs.\n";
-        exit(rValue);
-    }
-
+    // stop predictor-corrector
+    newTarget[0] = -1;
+    
     // unmap the SCRAMNet physical memory
-    rValue = scr_mem_mm(UNMAP);
-    if (rValue != 0)  {
-        opserr << "ECSCRAMNetGT::~ECSCRAMNetGT() - scr_mem_mm(UNMAP):"
-            << " could not unmap memory.\n";
-        exit(rValue);
-    }
+    scgtUnmapMem(&gtHandle);
     
     // close the handle to the SCRAMNet GT device/unit
-    rValue = scgtClose(&gtHandle);
-    if (rValue != 0)  {
+    int rValue = scgtClose(&gtHandle);
+    if (rValue != SCGT_SUCCESS)  {
         opserr << "ECSCRAMNetGT::~ECSCRAMNetGT() - scgtClose():"
             << " could not close driver.\n";
         exit(rValue);
     }
-
+    
     opserr << endln;
-    opserr << "**************************************************\n";
-    opserr << "* The SCRANNet csr and memory have been unmapped *\n";
-    opserr << "**************************************************\n";
+    opserr << "********************************************\n";
+    opserr << "* The SCRANNet GT memory has been unmapped *\n";
+    opserr << "********************************************\n";
     opserr << endln;
 }
 
@@ -203,8 +231,8 @@ int ECSCRAMNetGT::setup()
     int c = getchar();
     if (c == 'c')  {
         getchar();
-        scr_reg_mm(UNMAP);
-        scr_mem_mm(UNMAP);
+        scgtUnmapMem(&gtHandle);
+        scgtClose(&gtHandle);
         exit(OF_ReturnType_failed);
     }
     
@@ -233,14 +261,14 @@ int ECSCRAMNetGT::setup()
         c = getchar();
         if (c == 'c')  {
             getchar();
-            scr_reg_mm(UNMAP);
-            scr_mem_mm(UNMAP);
+            scgtUnmapMem(&gtHandle);
+            scgtClose(&gtHandle);
             exit(OF_ReturnType_failed);
         } else if (c == 'r')  {
             getchar();
         }
     } while (c == 'r');
-        
+    
     opserr << "*****************\n";
     opserr << "* Running...... *\n";
     opserr << "*****************\n";
@@ -256,19 +284,19 @@ int ECSCRAMNetGT::setSize(ID sizeT, ID sizeO)
     // for ECSCRAMNetGT object
     
     // ECSCRAMNetGT objects can only use 
-    // trial response vectors with size <= numActCh and
-    // output response vectors with size <= numActCh
+    // trial response vectors with size <= numDOF and
+    // output response vectors with size <= numDOF
     // check these are available in sizeT/sizeO.
-    if (sizeT(OF_Resp_Disp) > numActCh || sizeT(OF_Resp_Vel) > numActCh ||
-        sizeT(OF_Resp_Accel) > numActCh || sizeT(OF_Resp_Force) > numActCh ||
-        sizeT(OF_Resp_Time) > numActCh ||
-        sizeO(OF_Resp_Disp) > numActCh || sizeO(OF_Resp_Vel) > numActCh ||
-        sizeO(OF_Resp_Accel) > numActCh || sizeO(OF_Resp_Force) > numActCh ||
-        sizeO(OF_Resp_Time) > numActCh)  {
+    if (sizeT(OF_Resp_Disp) > numDOF || sizeT(OF_Resp_Vel) > numDOF ||
+        sizeT(OF_Resp_Accel) > numDOF || sizeT(OF_Resp_Force) > numDOF ||
+        sizeT(OF_Resp_Time) > numDOF ||
+        sizeO(OF_Resp_Disp) > numDOF || sizeO(OF_Resp_Vel) > numDOF ||
+        sizeO(OF_Resp_Accel) > numDOF || sizeO(OF_Resp_Force) > numDOF ||
+        sizeO(OF_Resp_Time) > numDOF)  {
         opserr << "ECSCRAMNetGT::setSize() - wrong sizeTrial/Out\n"; 
         opserr << "see User Manual.\n";
-        scr_reg_mm(UNMAP);
-        scr_mem_mm(UNMAP);
+        scgtUnmapMem(&gtHandle);
+        scgtClose(&gtHandle);
         exit(OF_ReturnType_failed);
     }
     
@@ -378,7 +406,7 @@ int ECSCRAMNetGT::getDaqResponse(Vector* disp,
 
 
 int ECSCRAMNetGT::commitState()
-{	
+{
     return OF_ReturnType_completed;
 }
 
@@ -599,7 +627,7 @@ void ECSCRAMNetGT::Print(OPS_Stream &s, int flag)
     s << "* ExperimentalControl: " << this->getTag() << endln; 
     s << "*   type: ECSCRAMNetGT\n";
     s << "*   memOffset: " << memOffset << endln;
-    s << "*   numActCh: " << numActCh << endln;
+    s << "*   numDOF: " << numDOF << endln;
     s << "*   ctrlFilters:";
     for (int i=0; i<OF_Resp_All; i++)  {
         if (theCtrlFilters[i] != 0)
@@ -621,13 +649,13 @@ void ECSCRAMNetGT::Print(OPS_Stream &s, int flag)
 
 
 int ECSCRAMNetGT::control()
-{    
+{
     // set newTarget flag
     newTarget[0] = 1;
-
+    
     // wait until switchPC flag has changed as well
     flag = 0;
-	while (flag != 1)  {
+    while (flag != 1)  {
         // read switchPC flag
         flag = switchPC[0];
     }
@@ -635,9 +663,9 @@ int ECSCRAMNetGT::control()
     // reset newTarget flag
     newTarget[0] = 0;
     
-	// wait until switchPC flag has changed as well
+    // wait until switchPC flag has changed as well
     flag = 1;
-	while (flag != 0)  {
+    while (flag != 0)  {
         // read switchPC flag
         flag = switchPC[0];
     }
