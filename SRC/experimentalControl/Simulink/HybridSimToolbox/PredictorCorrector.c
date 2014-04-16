@@ -288,11 +288,51 @@ int predictD1(double *dsp, double x)
 }
 
 //=============================================================================
+int predictV1(double *vel, double x)
+{
+    for (i=0; i<nAct; i++)  {
+        vel[i] = (dspXi[i] - dsp2[i])/(xi);
+    }
+    
+    return 0;
+}
+
+//=============================================================================
+int predictA1(double *acc, double x)
+{
+    for (i=0; i<nAct; i++)  {
+        acc[i] = 0.0;
+    }
+    
+    return 0;
+}
+
+//=============================================================================
 int correctD1(double *dsp, double x)
 {
     for (i=0; i<nAct; i++)  {
         dsp[i] = dsp1[i]*(x-xi)/(1.0-xi)
             + dspXi[i]*(1.0-x)/(1.0-xi);
+    }
+    
+    return 0;
+}
+
+//=============================================================================
+int correctV1(double *vel, double x)
+{
+    for (i=0; i<nAct; i++)  {
+        vel[i] = (dsp1[i] - dspXi[i])/(1.0-xi);
+    }
+    
+    return 0;
+}
+
+//=============================================================================
+int correctA1(double *acc, double x)
+{
+    for (i=0; i<nAct; i++)  {
+        acc[i] = 0.0;
     }
     
     return 0;
@@ -311,12 +351,60 @@ int predictD2(double *dsp, double x)
 }
 
 //=============================================================================
+int predictV2(double *vel, double x)
+{
+    for (i=0; i<nAct; i++)  {
+        vel[i] = dspXi[i]*(3.0+2.0*x)/(xi)/(1.0+xi)
+            - dsp2[i]*(3.0+2.0*x-xi)/(xi)
+            + dsp3[i]*(2.0+2.0*x-xi)/(1.0+xi);
+    }
+    
+    return 0;
+}
+
+//=============================================================================
+int predictA2(double *acc, double x)
+{
+    for (i=0; i<nAct; i++)  {
+        acc[i] = dspXi[i]*(2.0)/(xi)/(1.0+xi)
+            - dsp2[i]*(2.0)/(xi)
+            + dsp3[i]*(2.0)/(1.0+xi);
+    }
+    
+    return 0;
+}
+
+//=============================================================================
 int correctD2(double *dsp, double x)
 {
     for (i=0; i<nAct; i++)  {
         dsp[i] = dsp1[i]*(x-xi)*(1.0+x)/(2.0)/(1.0-xi)
             + dspXi[i]*(1.0-x)*(1.0+x)/(1.0-xi)/(1.0+xi)
             - dsp3[i]*(1.0-x)*(x-xi)/(2.0)/(1.0+xi);
+    }
+    
+    return 0;
+}
+
+//=============================================================================
+int correctV2(double *vel, double x)
+{
+    for (i=0; i<nAct; i++)  {
+        vel[i] = dsp1[i]*(1.0+2.0*x-xi)/(2.0)/(1.0-xi)
+            - dspXi[i]*(2.0*x)/(1.0-xi)/(1.0+xi)
+            - dsp3[i]*(1.0-2.0*x+xi)/(2.0)/(1.0+xi);
+    }
+    
+    return 0;
+}
+
+//=============================================================================
+int correctA2(double *acc, double x)
+{
+    for (i=0; i<nAct; i++)  {
+        acc[i] = dsp1[i]/(1.0-xi)
+            - dspXi[i]*(2.0)/(1.0-xi)/(1.0+xi)
+            + dsp3[i]/(1.0+xi);
     }
     
     return 0;
@@ -336,6 +424,32 @@ int predictD3(double *dsp, double x)
 }
 
 //=============================================================================
+int predictV3(double *vel, double x)
+{
+    for (i=0; i<nAct; i++)  {
+        vel[i] = dspXi[i]*(11.0+12.0*x+3.0*x*x)/(xi)/(1.0+xi)/(2.0+xi)
+            - dsp2[i]*(11.0+12.0*x+3.0*x*x-5.0*xi-2.0*x*xi)/(2.0*xi)
+            + dsp3[i]*(7.0+10.0*x+3.0*x*x-4.0*xi-2.0*x*xi)/(1.0+xi)
+            - dsp4[i]*(5.0+8.0*x+3.0*x*x-3.0*xi-2.0*x*xi)/(2.0)/(2.0+xi);
+    }
+    
+    return 0;
+}
+
+//=============================================================================
+int predictA3(double *acc, double x)
+{
+    for (i=0; i<nAct; i++)  {
+        acc[i] = dspXi[i]*(6.0)*(2.0+x)/(xi)/(1.0+xi)/(2.0+xi)
+            - dsp2[i]*(6.0+3.0*x-xi)/(xi)
+            + dsp3[i]*(2.0)*(5.0+3.0*x-xi)/(1.0+xi)
+            - dsp4[i]*(4.0+3.0*x-xi)/(2.0+xi);
+    }
+    
+    return 0;
+}
+
+//=============================================================================
 int correctD3(double *dsp, double x)
 {
     for (i=0; i<nAct; i++)  {
@@ -343,6 +457,33 @@ int correctD3(double *dsp, double x)
             + dspXi[i]*(1.0-x)*(1.0+x)*(2.0+x)/(1.0-xi)/(1.0+xi)/(2.0+xi)
             - dsp3[i]*(1.0-x)*(x-xi)*(2.0+x)/(2.0)/(1.0+xi)
             + dsp4[i]*(1.0-x)*(x-xi)*(1.0+x)/(3.0)/(2.0+xi);
+    }
+    
+    return 0;
+}
+
+//=============================================================================
+int correctV3(double *vel, double x)
+{
+    for (i=0; i<nAct; i++)  {
+        vel[i] = dsp1[i]*(2.0+6.0*x+3.0*x*x-3.0*xi-2.0*x*xi)/(6.0)/(1-xi)
+            + dspXi[i]*(1.0-4.0*x-3.0*x*x)/(1.0-xi)/(1.0+xi)/(2.0+xi)
+            - dsp3[i]*(2.0-2.0*x-3.0*x*x+xi+2.0*x*xi)/(2.0)/(1.0+xi)
+            + dsp4[i]*(1.0-3.0*x*x+2.0*x*xi)/(3.0)/(2.0+xi);
+    }
+    
+    return 0;
+}
+
+
+//=============================================================================
+int correctA3(double *acc, double x)
+{
+    for (i=0; i<nAct; i++)  {
+        acc[i] = dsp1[i]*(3.0+3.0*x-xi)/(3.0)/(1-xi)
+            - dspXi[i]*(2.0)*(2.0+3.0*x)/(1.0-xi)/(1.0+xi)/(2.0+xi)
+            + dsp3[i]*(1.0+3.0*x-xi)/(1.0+xi)
+            - dsp4[i]*(2.0)*(3.0*x-xi)/(3.0)/(2.0+xi);
     }
     
     return 0;

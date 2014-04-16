@@ -47,17 +47,29 @@ int predictD0(double *dsp, double x);
 // methods using linear Lagrange polynomials and current disp
 // when switching between prediction and correction
 int predictD1(double *dsp, double x);
+int predictV1(double *vel, double x);
+int predictA1(double *acc, double x);
 int correctD1(double *dsp, double x);
+int correctV1(double *vel, double x);
+int correctA1(double *acc, double x);
 
 // methods using quadratic Lagrange polynomials and current disp
 // when switching between prediction and correction
 int predictD2(double *dsp, double x);
+int predictV2(double *vel, double x);
+int predictA2(double *acc, double x);
 int correctD2(double *dsp, double x);
+int correctV2(double *vel, double x);
+int correctA2(double *acc, double x);
 
 // methods using cubic Lagrange polynomials and current disp
 // when switching between prediction and correction
 int predictD3(double *dsp, double x);
+int predictV3(double *vel, double x);
+int predictA3(double *acc, double x);
 int correctD3(double *dsp, double x);
+int correctV3(double *vel, double x);
+int correctA3(double *acc, double x);
 
 // methods using cubic Hermite polynomials and current disp
 // when switching between prediction and correction
