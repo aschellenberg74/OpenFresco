@@ -1,6 +1,6 @@
 // File: PredictorCorrector.c
 // 
-// Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 11/04
 // Revision: A
 //
@@ -12,42 +12,44 @@
 #include <stdio.h>
 
 // global variables
-int i, nAct;
-double dtCon, xi;
+int i, nDOF;
+double dtCon, dtSim, dtInt, xi;
 
 double *dsp1, *dsp2, *dsp3, *dsp4, *dsp5, *dsp6, *dspXi;
 double *vel1, *vel2;
 double *acc1;
 
 //=============================================================================
-int initData(int n, double dtcon)
+int initData(int ndof, double dtcon, double dtsim, double dtint)
 {
-    nAct = n;        // initialize number of actuators
-    dtCon = dtcon;   // initialize controller time step
+    nDOF = ndof;     // initialize number of DOF
+    dtCon = dtcon;   // initialize controller time step size
+    dtSim = dtsim;   // initialize simulation time step size
+    dtInt = dtint;   // initialize integration time step size
     xi = 0;
     
-    dsp1  = calloc(nAct, sizeof(double));
-    dsp2  = calloc(nAct, sizeof(double));
-    dsp3  = calloc(nAct, sizeof(double));
-    dsp4  = calloc(nAct, sizeof(double));
-    dsp5  = calloc(nAct, sizeof(double));
-    dsp6  = calloc(nAct, sizeof(double));
-    dspXi = calloc(nAct, sizeof(double));
+    dsp1  = calloc(nDOF, sizeof(double));
+    dsp2  = calloc(nDOF, sizeof(double));
+    dsp3  = calloc(nDOF, sizeof(double));
+    dsp4  = calloc(nDOF, sizeof(double));
+    dsp5  = calloc(nDOF, sizeof(double));
+    dsp6  = calloc(nDOF, sizeof(double));
+    dspXi = calloc(nDOF, sizeof(double));
     
     if (!dsp1 || !dsp2 || !dsp3 || !dsp4  || !dsp5 || !dsp6 || !dspXi)  {
         printf("PredictorCorrector::initData - failed to create dsp vectors\n");
         return -1;
     }
     
-    vel1 = calloc(nAct, sizeof(double));
-    vel2 = calloc(nAct, sizeof(double));
+    vel1 = calloc(nDOF, sizeof(double));
+    vel2 = calloc(nDOF, sizeof(double));
     
     if (!vel1 || !vel2)  {
         printf("PredictorCorrector::initData - failed to create vel vectors\n");
         return -1;
     }
     
-    acc1 = calloc(nAct, sizeof(double));
+    acc1 = calloc(nDOF, sizeof(double));
     
     if (!acc1)  {
         printf("PredictorCorrector::initData - failed to create accData vectors\n");
@@ -64,7 +66,7 @@ int zeroData()
 {
     xi = 0;
     
-    for (i=0; i<nAct; i++)  {
+    for (i=0; i<nDOF; i++)  {
         dsp1[i] = 0;  dsp2[i] = 0;  dsp3[i] = 0;
         dsp4[i] = 0;  dsp5[i] = 0;  dsp6[i] = 0; dspXi[i] = 0;
         vel1[i] = 0;  vel2[i] = 0;
@@ -77,7 +79,7 @@ int zeroData()
 //=============================================================================
 int zeroDsp(double *dsp)
 {
-    for (i=0; i<nAct; i++)  {
+    for (i=0; i<nDOF; i++)  {
         dsp[i] = 0;
     }
     
@@ -89,7 +91,7 @@ int setCurDsp(double *dsp, double x)
 {
     xi = x;
     
-    for (i=0; i<nAct; i++)  {
+    for (i=0; i<nDOF; i++)  {
         dspXi[i] = dsp[i];
     }
     
@@ -99,7 +101,7 @@ int setCurDsp(double *dsp, double x)
 //=============================================================================
 int setNewDsp(double *dsp)
 {
-    for (i=0; i<nAct; i++)  {
+    for (i=0; i<nDOF; i++)  {
         // update displacements
         dsp6[i] = dsp5[i];
         dsp5[i] = dsp4[i];
@@ -144,9 +146,9 @@ int setNewDsp(double *dsp)
 }
 
 //=============================================================================
-int setNewVel(double *vel, double dtInt)
+int setNewVel(double *vel)
 {
-    for (i=0; i<nAct; i++)  {
+    for (i=0; i<nDOF; i++)  {
         vel2[i] = vel1[i];
         vel1[i] = dtInt*vel[i];
     }
@@ -155,9 +157,9 @@ int setNewVel(double *vel, double dtInt)
 }
 
 //=============================================================================
-int setNewAcc(double *acc, double dtInt)
+int setNewAcc(double *acc)
 {
-    for (i=0; i<nAct; i++)  {
+    for (i=0; i<nDOF; i++)  {
         acc1[i] = dtInt*dtInt*acc[i];
     }
     
@@ -165,16 +167,16 @@ int setNewAcc(double *acc, double dtInt)
 }
 
 //=============================================================================
-double getNumSubSteps(double vAct, int actID, double vActMax, int Nmin)
+double getNumSubSteps(double vDOF, int dofID, double vDOFmax, int Nmin)
 {
     double Nmaster, Nslave;
     
-    actID--;  // change to zero indexing
-    Nmaster = ceil(fabs(dsp1[actID] - dsp2[actID])/(vAct*dtCon));
+    dofID--;  // change to zero indexing
+    Nmaster = ceil(fabs(dsp1[dofID] - dsp2[dofID])/(vDOF*dtCon));
     
-    // none of the slaved actuators should exceed vActMax
-    for (i=0; i<nAct; i++)  {
-        Nslave  = ceil(fabs(dsp1[i] - dsp2[i])/(vActMax*dtCon));
+    // none of the slaved actuators should exceed vDOFmax
+    for (i=0; i<nDOF; i++)  {
+        Nslave  = ceil(fabs(dsp1[i] - dsp2[i])/(vDOFmax*dtCon));
         Nmaster = (Nmaster>Nslave) ? Nmaster : Nslave;
     }
     
@@ -187,7 +189,7 @@ double getNumSubSteps(double vAct, int actID, double vActMax, int Nmin)
 //=============================================================================
 int predictP0(double *dsp, double x)
 {
-    for (i=0; i<nAct; i++)  {
+    for (i=0; i<nDOF; i++)  {
         dsp[i] = dsp1[i];
     }
     
@@ -197,7 +199,7 @@ int predictP0(double *dsp, double x)
 //=============================================================================
 int predictP1(double *dsp, double x)
 {
-    for (i=0; i<nAct; i++)  {
+    for (i=0; i<nDOF; i++)  {
         dsp[i] = dsp1[i]*(1.0+x)
             - dsp2[i]*(x);
     }
@@ -208,7 +210,7 @@ int predictP1(double *dsp, double x)
 //=============================================================================
 int correctP1(double *dsp, double x)
 {
-    for (i=0; i<nAct; i++)  {
+    for (i=0; i<nDOF; i++)  {
         dsp[i] = dsp1[i]*(x)
             + dsp2[i]*(1.0-x);
     }
@@ -219,7 +221,7 @@ int correctP1(double *dsp, double x)
 //=============================================================================
 int predictP2(double *dsp, double x)
 {
-    for (i=0; i<nAct; i++)  {
+    for (i=0; i<nDOF; i++)  {
         dsp[i] = dsp1[i]*(1.0+x)*(2.0+x)/(2.0)
             - dsp2[i]*(x)*(2.0+x)
             + dsp3[i]*(x)*(1.0+x)/(2.0);
@@ -231,7 +233,7 @@ int predictP2(double *dsp, double x)
 //=============================================================================
 int correctP2(double *dsp, double x)
 {
-    for (i=0; i<nAct; i++)  {
+    for (i=0; i<nDOF; i++)  {
         dsp[i] = dsp1[i]*(x)*(1.0+x)/(2.0)
             + dsp2[i]*(1.0-x)*(1.0+x)
             - dsp3[i]*(1.0-x)*(x)/(2.0);
@@ -243,7 +245,7 @@ int correctP2(double *dsp, double x)
 //=============================================================================
 int predictP3(double *dsp, double x)
 {
-    for (i=0; i<nAct; i++)  {
+    for (i=0; i<nDOF; i++)  {
         dsp[i] = dsp1[i]*(1.0+x)*(2.0+x)*(3.0+x)/(6.0)
             - dsp2[i]*(x)*(2.0+x)*(3.0+x)/(2.0)
             + dsp3[i]*(x)*(1.0+x)*(3.0+x)/(2.0)
@@ -256,7 +258,7 @@ int predictP3(double *dsp, double x)
 //=============================================================================
 int correctP3(double *dsp, double x)
 {
-    for (i=0; i<nAct; i++)  {
+    for (i=0; i<nDOF; i++)  {
         dsp[i] = dsp1[i]*(x)*(1.0+x)*(2.0+x)/(6.0)
             + dsp2[i]*(1.0-x)*(1.0+x)*(2.0+x)/(2.0)
             - dsp3[i]*(1.0-x)*(x)*(2.0+x)/(2.0)
@@ -269,7 +271,7 @@ int correctP3(double *dsp, double x)
 //=============================================================================
 int predictD0(double *dsp, double x)
 {
-    for (i=0; i<nAct; i++)  {
+    for (i=0; i<nDOF; i++)  {
         dsp[i] = dsp1[i];
     }
     
@@ -279,7 +281,7 @@ int predictD0(double *dsp, double x)
 //=============================================================================
 int predictD1(double *dsp, double x)
 {
-    for (i=0; i<nAct; i++)  {
+    for (i=0; i<nDOF; i++)  {
         dsp[i] = dspXi[i]*(1.0+x)/(xi)
             - dsp2[i]*(1.0+x-xi)/(xi);
     }
@@ -290,8 +292,9 @@ int predictD1(double *dsp, double x)
 //=============================================================================
 int predictV1(double *vel, double x)
 {
-    for (i=0; i<nAct; i++)  {
+    for (i=0; i<nDOF; i++)  {
         vel[i] = (dspXi[i] - dsp2[i])/(xi);
+        vel[i] /= dtSim;
     }
     
     return 0;
@@ -300,7 +303,7 @@ int predictV1(double *vel, double x)
 //=============================================================================
 int predictA1(double *acc, double x)
 {
-    for (i=0; i<nAct; i++)  {
+    for (i=0; i<nDOF; i++)  {
         acc[i] = 0.0;
     }
     
@@ -310,7 +313,7 @@ int predictA1(double *acc, double x)
 //=============================================================================
 int correctD1(double *dsp, double x)
 {
-    for (i=0; i<nAct; i++)  {
+    for (i=0; i<nDOF; i++)  {
         dsp[i] = dsp1[i]*(x-xi)/(1.0-xi)
             + dspXi[i]*(1.0-x)/(1.0-xi);
     }
@@ -321,8 +324,9 @@ int correctD1(double *dsp, double x)
 //=============================================================================
 int correctV1(double *vel, double x)
 {
-    for (i=0; i<nAct; i++)  {
+    for (i=0; i<nDOF; i++)  {
         vel[i] = (dsp1[i] - dspXi[i])/(1.0-xi);
+        vel[i] /= dtSim;
     }
     
     return 0;
@@ -331,7 +335,7 @@ int correctV1(double *vel, double x)
 //=============================================================================
 int correctA1(double *acc, double x)
 {
-    for (i=0; i<nAct; i++)  {
+    for (i=0; i<nDOF; i++)  {
         acc[i] = 0.0;
     }
     
@@ -341,7 +345,7 @@ int correctA1(double *acc, double x)
 //=============================================================================
 int predictD2(double *dsp, double x)
 {
-    for (i=0; i<nAct; i++)  {
+    for (i=0; i<nDOF; i++)  {
         dsp[i] = dspXi[i]*(1.0+x)*(2.0+x)/(xi)/(1.0+xi)
             - dsp2[i]*(1.0+x-xi)*(2.0+x)/(xi)
             + dsp3[i]*(1.0+x-xi)*(1.0+x)/(1.0+xi);
@@ -353,10 +357,11 @@ int predictD2(double *dsp, double x)
 //=============================================================================
 int predictV2(double *vel, double x)
 {
-    for (i=0; i<nAct; i++)  {
+    for (i=0; i<nDOF; i++)  {
         vel[i] = dspXi[i]*(3.0+2.0*x)/(xi)/(1.0+xi)
             - dsp2[i]*(3.0+2.0*x-xi)/(xi)
             + dsp3[i]*(2.0+2.0*x-xi)/(1.0+xi);
+        vel[i] /= dtSim;
     }
     
     return 0;
@@ -365,10 +370,11 @@ int predictV2(double *vel, double x)
 //=============================================================================
 int predictA2(double *acc, double x)
 {
-    for (i=0; i<nAct; i++)  {
+    for (i=0; i<nDOF; i++)  {
         acc[i] = dspXi[i]*(2.0)/(xi)/(1.0+xi)
             - dsp2[i]*(2.0)/(xi)
             + dsp3[i]*(2.0)/(1.0+xi);
+        acc[i] /= (dtSim*dtSim);
     }
     
     return 0;
@@ -377,7 +383,7 @@ int predictA2(double *acc, double x)
 //=============================================================================
 int correctD2(double *dsp, double x)
 {
-    for (i=0; i<nAct; i++)  {
+    for (i=0; i<nDOF; i++)  {
         dsp[i] = dsp1[i]*(x-xi)*(1.0+x)/(2.0)/(1.0-xi)
             + dspXi[i]*(1.0-x)*(1.0+x)/(1.0-xi)/(1.0+xi)
             - dsp3[i]*(1.0-x)*(x-xi)/(2.0)/(1.0+xi);
@@ -389,10 +395,11 @@ int correctD2(double *dsp, double x)
 //=============================================================================
 int correctV2(double *vel, double x)
 {
-    for (i=0; i<nAct; i++)  {
+    for (i=0; i<nDOF; i++)  {
         vel[i] = dsp1[i]*(1.0+2.0*x-xi)/(2.0)/(1.0-xi)
             - dspXi[i]*(2.0*x)/(1.0-xi)/(1.0+xi)
             - dsp3[i]*(1.0-2.0*x+xi)/(2.0)/(1.0+xi);
+        vel[i] /= dtSim;
     }
     
     return 0;
@@ -401,10 +408,11 @@ int correctV2(double *vel, double x)
 //=============================================================================
 int correctA2(double *acc, double x)
 {
-    for (i=0; i<nAct; i++)  {
+    for (i=0; i<nDOF; i++)  {
         acc[i] = dsp1[i]/(1.0-xi)
             - dspXi[i]*(2.0)/(1.0-xi)/(1.0+xi)
             + dsp3[i]/(1.0+xi);
+        acc[i] /= (dtSim*dtSim);
     }
     
     return 0;
@@ -413,7 +421,7 @@ int correctA2(double *acc, double x)
 //=============================================================================
 int predictD3(double *dsp, double x)
 {
-    for (i=0; i<nAct; i++)  {
+    for (i=0; i<nDOF; i++)  {
         dsp[i] = dspXi[i]*(1.0+x)*(2.0+x)*(3.0+x)/(xi)/(1.0+xi)/(2.0+xi)
             - dsp2[i]*(1.0+x-xi)*(2.0+x)*(3.0+x)/(2.0*xi)
             + dsp3[i]*(1.0+x-xi)*(1.0+x)*(3.0+x)/(1.0+xi)
@@ -426,11 +434,12 @@ int predictD3(double *dsp, double x)
 //=============================================================================
 int predictV3(double *vel, double x)
 {
-    for (i=0; i<nAct; i++)  {
+    for (i=0; i<nDOF; i++)  {
         vel[i] = dspXi[i]*(11.0+12.0*x+3.0*x*x)/(xi)/(1.0+xi)/(2.0+xi)
             - dsp2[i]*(11.0+12.0*x+3.0*x*x-5.0*xi-2.0*x*xi)/(2.0*xi)
             + dsp3[i]*(7.0+10.0*x+3.0*x*x-4.0*xi-2.0*x*xi)/(1.0+xi)
             - dsp4[i]*(5.0+8.0*x+3.0*x*x-3.0*xi-2.0*x*xi)/(2.0)/(2.0+xi);
+        vel[i] /= dtSim;
     }
     
     return 0;
@@ -439,11 +448,12 @@ int predictV3(double *vel, double x)
 //=============================================================================
 int predictA3(double *acc, double x)
 {
-    for (i=0; i<nAct; i++)  {
+    for (i=0; i<nDOF; i++)  {
         acc[i] = dspXi[i]*(6.0)*(2.0+x)/(xi)/(1.0+xi)/(2.0+xi)
             - dsp2[i]*(6.0+3.0*x-xi)/(xi)
             + dsp3[i]*(2.0)*(5.0+3.0*x-xi)/(1.0+xi)
             - dsp4[i]*(4.0+3.0*x-xi)/(2.0+xi);
+        acc[i] /= (dtSim*dtSim);
     }
     
     return 0;
@@ -452,7 +462,7 @@ int predictA3(double *acc, double x)
 //=============================================================================
 int correctD3(double *dsp, double x)
 {
-    for (i=0; i<nAct; i++)  {
+    for (i=0; i<nDOF; i++)  {
         dsp[i] = dsp1[i]*(x-xi)*(1.0+x)*(2.0+x)/(6.0)/(1-xi)
             + dspXi[i]*(1.0-x)*(1.0+x)*(2.0+x)/(1.0-xi)/(1.0+xi)/(2.0+xi)
             - dsp3[i]*(1.0-x)*(x-xi)*(2.0+x)/(2.0)/(1.0+xi)
@@ -465,11 +475,12 @@ int correctD3(double *dsp, double x)
 //=============================================================================
 int correctV3(double *vel, double x)
 {
-    for (i=0; i<nAct; i++)  {
+    for (i=0; i<nDOF; i++)  {
         vel[i] = dsp1[i]*(2.0+6.0*x+3.0*x*x-3.0*xi-2.0*x*xi)/(6.0)/(1-xi)
             + dspXi[i]*(1.0-4.0*x-3.0*x*x)/(1.0-xi)/(1.0+xi)/(2.0+xi)
             - dsp3[i]*(2.0-2.0*x-3.0*x*x+xi+2.0*x*xi)/(2.0)/(1.0+xi)
             + dsp4[i]*(1.0-3.0*x*x+2.0*x*xi)/(3.0)/(2.0+xi);
+        vel[i] /= dtSim;
     }
     
     return 0;
@@ -479,11 +490,12 @@ int correctV3(double *vel, double x)
 //=============================================================================
 int correctA3(double *acc, double x)
 {
-    for (i=0; i<nAct; i++)  {
+    for (i=0; i<nDOF; i++)  {
         acc[i] = dsp1[i]*(3.0+3.0*x-xi)/(3.0)/(1-xi)
             - dspXi[i]*(2.0)*(2.0+3.0*x)/(1.0-xi)/(1.0+xi)/(2.0+xi)
             + dsp3[i]*(1.0+3.0*x-xi)/(1.0+xi)
             - dsp4[i]*(2.0)*(3.0*x-xi)/(3.0)/(2.0+xi);
+        acc[i] /= (dtSim*dtSim);
     }
     
     return 0;
@@ -492,7 +504,7 @@ int correctA3(double *acc, double x)
 //=============================================================================
 int predictDV(double *dsp, double x)
 {
-    for (i=0; i<nAct; i++)  {
+    for (i=0; i<nDOF; i++)  {
         dsp[i] = dsp1[i]*(1.0+x)*(1.0+x)*(1.0-2.0*x)
             + vel1[i]*(x)*(1.0+x)*(1.0+x) 
             + dsp2[i]*(x)*(x)*(3.0+2.0*x)
@@ -505,7 +517,7 @@ int predictDV(double *dsp, double x)
 //=============================================================================
 int correctDV(double *dsp, double x)
 {
-    for (i=0; i<nAct; i++)  {
+    for (i=0; i<nDOF; i++)  {
         dsp[i] = dsp1[i]*(x-xi)*(2.0-x-xi)/(1.0-xi)/(1.0-xi)
             - vel1[i]*(1.0-x)*(x-xi)/(1.0-xi)
             + dspXi[i]*(1.0-x)*(1.0-x)/(1.0-xi)/(1.0-xi);
@@ -517,7 +529,7 @@ int correctDV(double *dsp, double x)
 //=============================================================================
 int predictDVA(double *dsp, double x)
 {
-    for (i=0; i<nAct; i++)  {
+    for (i=0; i<nDOF; i++)  {
         dsp[i] = dsp1[i]
             + vel1[i]*(x)
             + acc1[i]*(x)*(x)/(2.0);
@@ -529,7 +541,7 @@ int predictDVA(double *dsp, double x)
 //=============================================================================
 int correctDVA(double *dsp, double x)
 {
-    for (i=0; i<nAct; i++)  {
+    for (i=0; i<nDOF; i++)  {
         dsp[i] = dsp1[i]*(x-xi)*(3.0-3.0*x+x*x-3.0*xi+x*xi+xi*xi)/(1.0-xi)/(1.0-xi)/(1.0-xi)
             - vel1[i]*(1.0-x)*(x-xi)*(2.0-x-xi)/(1.0-xi)/(1.0-xi)
             + acc1[i]*(1.0-x)*(1.0-x)*(x-xi)/(2.0)/(1.0-xi)

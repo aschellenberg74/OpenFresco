@@ -330,6 +330,8 @@ int ECdSpace::setup()
         c = getchar();
         if (c == 'c')  {
             getchar();
+            simState = 0;
+            DS_write_32(board_index, simStateId, 1, (UInt32 *)&simState);
             DS_unregister_host_app();
             exit(OF_ReturnType_failed);
         } else if (c == 'r')  {
