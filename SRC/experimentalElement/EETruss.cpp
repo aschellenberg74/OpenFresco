@@ -70,7 +70,7 @@ EETruss::EETruss(int tag, int dim, int Nd1, int Nd2,
     db(0), vb(0), ab(0), t(0),
     dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
     dbCtrl(1), vbCtrl(1), abCtrl(1),
-    dbPast(1), kbInit(1,1), tPast(0.0)
+    dbLast(1), tLast(0.0), kbInit(1,1)
 {
     // ensure the connectedExternalNode ID is of correct size & set values
     if (connectedExternalNodes.Size() != 2)  {
@@ -125,7 +125,7 @@ EETruss::EETruss(int tag, int dim, int Nd1, int Nd2,
     dbCtrl.Zero();
     vbCtrl.Zero();
     abCtrl.Zero();
-    dbPast.Zero();
+    dbLast.Zero();
 }
 
 
@@ -142,7 +142,7 @@ EETruss::EETruss(int tag, int dim, int Nd1, int Nd2,
     db(0), vb(0), ab(0), t(0),
     dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
     dbCtrl(1), vbCtrl(1), abCtrl(1),
-    dbPast(1), kbInit(1,1), tPast(0.0)
+    dbLast(1), tLast(0.0), kbInit(1,1)
 {
     // ensure the connectedExternalNode ID is of correct size & set values
     if (connectedExternalNodes.Size() != 2)  {
@@ -249,7 +249,7 @@ EETruss::EETruss(int tag, int dim, int Nd1, int Nd2,
     dbCtrl.Zero();
     vbCtrl.Zero();
     abCtrl.Zero();
-    dbPast.Zero();
+    dbLast.Zero();
 }
 
 
@@ -461,7 +461,7 @@ int EETruss::commitState()
     
     // commit the site
     if (theSite != 0)  {
-        rValue += theSite->commitState();
+        rValue += theSite->commitState(t);
     }
     else  {
         sData[0] = OF_RemoteTest_commitState;
@@ -498,10 +498,11 @@ int EETruss::update()
         (*ab)(0) += (acc2(i)-acc1(i))*cosX[i];
     }
     
-    if ((*db) != dbPast || (*t)(0) != tPast)  {
-        // save the displacements and the time
-        dbPast = (*db);
-        tPast = (*t)(0);
+    Vector dbDelta = (*db) - dbLast;
+    // do not check time for right now because of transformation constraint
+    // handler calling update at beginning of new step when applying load
+    // if (dbDelta.pNorm(2) > DBL_EPSILON || (*t)(0) > tLast)  {
+    if (dbDelta.pNorm(2) > DBL_EPSILON)  {
         // set the trial response at the site
         if (theSite != 0)  {
             theSite->setTrialResponse(db, vb, ab, (Vector*)0, t);
@@ -511,6 +512,10 @@ int EETruss::update()
             rValue += theChannel->sendVector(0, 0, *sendData, 0);
         }
     }
+    
+    // save the last displacements and time
+    dbLast = (*db);
+    tLast = (*t)(0);
     
     return rValue;
 }

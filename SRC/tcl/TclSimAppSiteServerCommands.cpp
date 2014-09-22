@@ -23,49 +23,48 @@
 // $Date$
 // $URL$
 
-// Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 04/11
 // Revision: A
 //
-// Description: This file contains the function invoked when the user
-// invokes the startSimAppElemServer command in the interpreter. 
+// Description: This file contains the functions invoked when the user
+// invokes the different SimAppSiteServer commands in the interpreter. 
 
 #include <tcl.h>
-#include <Domain.h>
-#include <Node.h>
 #include <TCP_Socket.h>
 #include <TCP_SocketSSL.h>
 #include <UDP_Socket.h>
 
-#include <ExperimentalElement.h>
+#include <ExperimentalSite.h>
+
+extern ExperimentalSite *getExperimentalSite(int tag);
 
 
-int TclStartSimAppElemServer(ClientData clientData, Tcl_Interp *interp,
-    int argc, TCL_Char **argv, Domain *theDomain)
+int TclStartSimAppSiteServer(ClientData clientData,
+    Tcl_Interp *interp, int argc, TCL_Char **argv)
 { 
     if (argc < 3)  {
         opserr << "WARNING insufficient arguments\n"
-            << "Want: startSimAppElemServer eleTag ipPort <-udp> <-ssl>\n";
+            << "Want: startSimAppSiteServer siteTag ipPort <-udp> <-ssl>\n";
         return TCL_ERROR;
     }
     
-    int eleTag, ipPort;
+    int siteTag, ipPort;
     int ssl = 0, udp = 0;
     Channel *theChannel = 0;
     
-    if (Tcl_GetInt(interp, argv[1], &eleTag) != TCL_OK)  {
-        opserr << "WARNING invalid startSimAppElemServer eleTag\n";
+    if (Tcl_GetInt(interp, argv[1], &siteTag) != TCL_OK)  {
+        opserr << "WARNING invalid startSimAppSiteServer siteTag\n";
         return TCL_ERROR;
     }
-    ExperimentalElement *theExperimentalElement =
-        dynamic_cast <ExperimentalElement*> (theDomain->getElement(eleTag));
-    if (theExperimentalElement == 0)  {
-        opserr << "WARNING experimental element not found\n";
-        opserr << "startSimAppElemServer expElement: " << eleTag << endln;
+    ExperimentalSite *theExperimentalSite = getExperimentalSite(siteTag);
+    if (theExperimentalSite == 0)  {
+        opserr << "WARNING experimental site not found\n";
+        opserr << "startSimAppSiteServer expSite: " << siteTag << endln;
         return TCL_ERROR;
     }
     if (Tcl_GetInt(interp, argv[2], &ipPort) != TCL_OK)  {
-        opserr << "WARNING invalid startSimAppElemServer ipPort\n";
+        opserr << "WARNING invalid startSimAppSiteServer ipPort\n";
         return TCL_ERROR;
     }
     if (argc == 4)  {
@@ -111,7 +110,7 @@ int TclStartSimAppElemServer(ClientData clientData, Tcl_Interp *interp,
         return TCL_ERROR;
     }
     
-    // get the data size for the experimental element
+    // get the data size for the experimental site
     int intData[2*OF_Resp_All+1];
     ID idData(intData, 2*OF_Resp_All+1);
     ID sizeCtrl(intData, OF_Resp_All);
@@ -120,35 +119,7 @@ int TclStartSimAppElemServer(ClientData clientData, Tcl_Interp *interp,
     idData.Zero();
     
     theChannel->recvID(0, 0, idData, 0);
-    
-    // check data size of experimental element
-    int i, ndf = 0;
-    const ID eleNodes = theExperimentalElement->getExternalNodes();
-    int numNodes = eleNodes.Size();
-    Node **theNodes = theExperimentalElement->getNodePtrs();
-    
-    for (i=0; i<numNodes; i++) {
-        ndf += theNodes[i]->getNumberDOF();
-    }
-    
-    if ((sizeCtrl(OF_Resp_Disp) != 0 && sizeCtrl(OF_Resp_Disp) != ndf) ||
-        (sizeCtrl(OF_Resp_Vel) != 0 && sizeCtrl(OF_Resp_Vel) != ndf) ||
-        (sizeCtrl(OF_Resp_Accel) != 0 && sizeCtrl(OF_Resp_Accel) != ndf) ||
-        (sizeCtrl(OF_Resp_Force) != 0 && sizeCtrl(OF_Resp_Force) != ndf) ||
-        (sizeCtrl(OF_Resp_Time) != 0 && sizeCtrl(OF_Resp_Time) != 1)) {
-        opserr << "WARNING incorrect number of control degrees of freedom (ndf)\n";
-        opserr << "want: " << ndf << " but got: " << sizeCtrl << endln;
-        return TCL_ERROR;
-    }
-    if ((sizeDaq(OF_Resp_Disp) != 0 && sizeDaq(OF_Resp_Disp) != ndf) ||
-        (sizeDaq(OF_Resp_Vel) != 0 && sizeDaq(OF_Resp_Vel) != ndf) ||
-        (sizeDaq(OF_Resp_Accel) != 0 && sizeDaq(OF_Resp_Accel) != ndf) ||
-        (sizeDaq(OF_Resp_Force) != 0 && sizeDaq(OF_Resp_Force) != ndf) ||
-        (sizeDaq(OF_Resp_Time) != 0 && sizeDaq(OF_Resp_Time) != 1)) {
-        opserr << "WARNING incorrect number of daq degrees of freedom (ndf)\n";
-        opserr << "want: " << ndf << " but got: " << sizeDaq << endln;
-        return TCL_ERROR;
-    }
+    theExperimentalSite->setSize(sizeCtrl, sizeDaq);
     
     // initialize the receive and send vectors
     Vector *rDisp  = 0, *sDisp  = 0;
@@ -206,13 +177,10 @@ int TclStartSimAppElemServer(ClientData clientData, Tcl_Interp *interp,
         id += sizeDaq(OF_Resp_Time);
     }
     sendData->Zero();
-    Matrix *sMatrix = new Matrix(sData, ndf, ndf);
-    sMatrix->Zero();
     
     // start server loop
-    opserr << "\nSimAppElemServer with ExpElement " << eleTag
+    opserr << "\nSimAppSiteServer with ExpSite " << siteTag
         << " now running...\n";
-    Vector nodeData(1);
     bool exitYet = false;
     while (!exitYet) {
         theChannel->recvVector(0, 0, *recvData, 0);
@@ -221,97 +189,53 @@ int TclStartSimAppElemServer(ClientData clientData, Tcl_Interp *interp,
         //opserr << "\nLOOP action: " << *recvData << endln;
         switch(action) {
         case OF_RemoteTest_open:
-            opserr << "\nConnected to GenericClient Element\n";
+            opserr << "\nConnected to Experimental Element\n";
             break;
         case OF_RemoteTest_setup:
-            opserr << "WARNING SimAppElemServer action setup "
+            opserr << "WARNING SimAppSiteServer action setup "
                 << "received which does nothing, continuing execution\n";
             break;
         case OF_RemoteTest_setTrialResponse:
-            id = 0;
-            for (i=0; i<numNodes; i++) {
-                ndf = theNodes[i]->getNumberDOF();
-                nodeData.resize(ndf);
-                if (rDisp != 0) {
-                    nodeData.Extract(*rDisp,id);
-                    theNodes[i]->setTrialDisp(nodeData);
-                }
-                if (rVel != 0) {
-                    nodeData.Extract(*rVel,id);
-                    theNodes[i]->setTrialVel(nodeData);
-                }
-                if (rAccel != 0) {
-                    nodeData.Extract(*rAccel,id);
-                    theNodes[i]->setTrialAccel(nodeData);
-                }
-                id += ndf;
-            }
-            if (rTime != 0)
-                theDomain->setCurrentTime((*rTime)(0));
-            theDomain->update();
+            theExperimentalSite->setTrialResponse(rDisp, rVel, rAccel, rForce, rTime);
             break;
         case OF_RemoteTest_commitState:
-            theDomain->commit();
+            theExperimentalSite->commitState(rTime);
             break;
         case OF_RemoteTest_getDaqResponse:
-            if (sDisp != 0)
-                (*sDisp) = theExperimentalElement->getDisp();
-            if (sVel != 0)
-                (*sVel) = theExperimentalElement->getVel();
-            if (sAccel != 0)
-                (*sAccel) = theExperimentalElement->getAccel();
-            if (sForce != 0)
-                (*sForce) = theExperimentalElement->getResistingForce();
-            if (sTime != 0)
-                (*sTime) = theExperimentalElement->getTime();
+            theExperimentalSite->getDaqResponse(sDisp, sVel, sAccel, sForce, sTime);
             theChannel->sendVector(0, 0, *sendData, 0);
             break;
         case OF_RemoteTest_getDisp:
-            (*sDisp) = theExperimentalElement->getDisp();
+            (*sDisp) = theExperimentalSite->getDisp();
             theChannel->sendVector(0, 0, *sendData, 0);
             break;
         case OF_RemoteTest_getVel:
-            (*sVel) = theExperimentalElement->getVel();
+            (*sVel) = theExperimentalSite->getVel();
             theChannel->sendVector(0, 0, *sendData, 0);
             break;
         case OF_RemoteTest_getAccel:
-            (*sAccel) = theExperimentalElement->getAccel();
+            (*sAccel) = theExperimentalSite->getAccel();
             theChannel->sendVector(0, 0, *sendData, 0);
             break;
         case OF_RemoteTest_getForce:
-            (*sForce) = theExperimentalElement->getResistingForce();
+            (*sForce) = theExperimentalSite->getForce();
             theChannel->sendVector(0, 0, *sendData, 0);
             break;
         case OF_RemoteTest_getTime:
-            (*sTime) = theExperimentalElement->getTime();
-            theChannel->sendVector(0, 0, *sendData, 0);
-            break;
-        case OF_RemoteTest_getInitialStiff:
-            (*sMatrix) = theExperimentalElement->getInitialStiff();
-            theChannel->sendVector(0, 0, *sendData, 0);
-            break;
-        case OF_RemoteTest_getTangentStiff:
-            (*sMatrix) = theExperimentalElement->getTangentStiff();
-            theChannel->sendVector(0, 0, *sendData, 0);
-            break;
-        case OF_RemoteTest_getDamp:
-            (*sMatrix) = theExperimentalElement->getDamp();
-            theChannel->sendVector(0, 0, *sendData, 0);
-            break;
-        case OF_RemoteTest_getMass:
-            (*sMatrix) = theExperimentalElement->getMass();
+            (*sTime) = theExperimentalSite->getTime();
             theChannel->sendVector(0, 0, *sendData, 0);
             break;
         case OF_RemoteTest_DIE:
             exitYet = true;
+            delete theExperimentalSite;
             break;
         default:
-            opserr << "WARNING SimAppElemServer invalid action "
+            opserr << "WARNING SimAppSiteServer invalid action "
                 << action << " received\n";
             break;
         }
     }
-    opserr << "\nSimAppElemServer with ExpElement " << eleTag
+    opserr << "\nSimAppSiteServer with ExpSite " << siteTag
         << " shutdown\n\n";
     
     // delete allocated memory
@@ -341,7 +265,6 @@ int TclStartSimAppElemServer(ClientData clientData, Tcl_Interp *interp,
         delete sForce;
     if (sTime != 0)
         delete sTime;
-    delete sMatrix;
     delete sendData;
     delete [] sData;
     

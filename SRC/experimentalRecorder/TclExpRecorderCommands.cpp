@@ -23,7 +23,7 @@
 // $Date$
 // $URL$
 
-// Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 08/08
 // Revision: A
 //
@@ -86,6 +86,8 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         outputMode eMode = STANDARD_STREAM; 
         double deltaT = 0.0;
         int precision = 6;
+        bool doScientific = false;
+        bool closeOnWrite = false;
         const char *inetAddr = 0;
         int inetPort;
         int i, j, argi = 2;
@@ -174,6 +176,16 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
                 argi++;
             }
             
+            else if (strcmp(argv[argi],"-scientific") == 0)  {
+                doScientific = true;
+                argi++;
+            }
+            
+            else if (strcmp(argv[argi],"-closeOnWrite") == 0)  {
+                closeOnWrite = true;
+                argi++;
+            }
+            
             else if (strcmp(argv[argi],"-file") == 0)  {
                 fileName = argv[argi+1];
                 const char *pwd = OPS_GetInterpPWD();
@@ -244,9 +256,9 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         
         // construct the theOutputStream
         if (eMode == DATA_STREAM && fileName != 0)  {
-            theOutputStream = new DataFileStream(fileName);
+            theOutputStream = new DataFileStream(fileName, OVERWRITE, 2, 0, closeOnWrite, precision, doScientific);
         } else if (eMode == DATA_STREAM_CSV && fileName != 0)  {
-	        theOutputStream = new DataFileStream(fileName,OVERWRITE,2,1);
+	        theOutputStream = new DataFileStream(fileName, OVERWRITE, 2, 1, closeOnWrite, precision, doScientific);
         } else if (eMode == XML_STREAM && fileName != 0)  {
             theOutputStream = new XmlFileStream(fileName);
         } else if (eMode == BINARY_STREAM && fileName != 0)  {
@@ -254,7 +266,7 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         } else if (eMode == TCP_STREAM && inetAddr != 0)  {
 	        theOutputStream = new TCP_Stream(inetPort, inetAddr);
         } else if (eMode == DATABASE_STREAM && tableName != 0)  {
-            theOutputStream = new DatabaseStream(OPS_GetFEDatastore(),tableName);
+            theOutputStream = new DatabaseStream(OPS_GetFEDatastore(), tableName);
         } else
             theOutputStream = new StandardStream();
         
@@ -294,6 +306,8 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         outputMode eMode = STANDARD_STREAM; 
         double deltaT = 0.0;
         int precision = 6;
+        bool doScientific = false;
+        bool closeOnWrite = false;
         const char *inetAddr = 0;
         int inetPort;
         int i, j, argi = 2;
@@ -382,6 +396,16 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
                 argi++;
             }
             
+            else if (strcmp(argv[argi],"-scientific") == 0)  {
+                doScientific = true;
+                argi++;
+            }
+            
+            else if (strcmp(argv[argi],"-closeOnWrite") == 0)  {
+                closeOnWrite = true;
+                argi++;
+            }
+            
             else if (strcmp(argv[argi],"-file") == 0)  {
                 fileName = argv[argi+1];
                 const char *pwd = OPS_GetInterpPWD();
@@ -452,9 +476,9 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         
         // construct the theOutputStream
         if (eMode == DATA_STREAM && fileName != 0)  {
-            theOutputStream = new DataFileStream(fileName);
+            theOutputStream = new DataFileStream(fileName, OVERWRITE, 2, 0, closeOnWrite, precision, doScientific);
         } else if (eMode == DATA_STREAM_CSV && fileName != 0)  {
-	        theOutputStream = new DataFileStream(fileName,OVERWRITE,2,1);
+	        theOutputStream = new DataFileStream(fileName, OVERWRITE, 2, 1, closeOnWrite, precision, doScientific);
         } else if (eMode == XML_STREAM && fileName != 0)  {
             theOutputStream = new XmlFileStream(fileName);
         } else if (eMode == BINARY_STREAM && fileName != 0)  {
@@ -462,7 +486,7 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         } else if (eMode == TCP_STREAM && inetAddr != 0)  {
 	        theOutputStream = new TCP_Stream(inetPort, inetAddr);
         } else if (eMode == DATABASE_STREAM && tableName != 0)  {
-            theOutputStream = new DatabaseStream(OPS_GetFEDatastore(),tableName);
+            theOutputStream = new DatabaseStream(OPS_GetFEDatastore(), tableName);
         } else
             theOutputStream = new StandardStream();
         
@@ -502,6 +526,8 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         outputMode eMode = STANDARD_STREAM; 
         double deltaT = 0.0;
         int precision = 6;
+        bool doScientific = false;
+        bool closeOnWrite = false;
         const char *inetAddr = 0;
         int inetPort;
         int i, j, argi = 2;
@@ -590,6 +616,16 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
                 argi++;
             }
             
+            else if (strcmp(argv[argi],"-scientific") == 0)  {
+                doScientific = true;
+                argi++;
+            }
+            
+            else if (strcmp(argv[argi],"-closeOnWrite") == 0)  {
+                closeOnWrite = true;
+                argi++;
+            }
+            
             else if (strcmp(argv[argi],"-file") == 0)  {
                 fileName = argv[argi+1];
                 const char *pwd = OPS_GetInterpPWD();
@@ -660,9 +696,9 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         
         // construct theOutputStream
         if (eMode == DATA_STREAM && fileName != 0)  {
-            theOutputStream = new DataFileStream(fileName);
+            theOutputStream = new DataFileStream(fileName, OVERWRITE, 2, 0, closeOnWrite, precision, doScientific);
         } else if (eMode == DATA_STREAM_CSV && fileName != 0)  {
-	        theOutputStream = new DataFileStream(fileName,OVERWRITE,2,1);
+	        theOutputStream = new DataFileStream(fileName, OVERWRITE, 2, 1, closeOnWrite, precision, doScientific);
         } else if (eMode == XML_STREAM && fileName != 0)  {
             theOutputStream = new XmlFileStream(fileName);
         } else if (eMode == BINARY_STREAM && fileName != 0)  {
@@ -670,7 +706,7 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         } else if (eMode == TCP_STREAM && inetAddr != 0)  {
 	        theOutputStream = new TCP_Stream(inetPort, inetAddr);
         } else if (eMode == DATABASE_STREAM && tableName != 0)  {
-            theOutputStream = new DatabaseStream(OPS_GetFEDatastore(),tableName);
+            theOutputStream = new DatabaseStream(OPS_GetFEDatastore(), tableName);
         } else
             theOutputStream = new StandardStream();
         
@@ -710,6 +746,8 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         outputMode eMode = STANDARD_STREAM; 
         double deltaT = 0.0;
         int precision = 6;
+        bool doScientific = false;
+        bool closeOnWrite = false;
         const char *inetAddr = 0;
         int inetPort;
         int i, j, argi = 2;
@@ -798,6 +836,16 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
                 argi++;
             }
             
+            else if (strcmp(argv[argi],"-scientific") == 0)  {
+                doScientific = true;
+                argi++;
+            }
+            
+            else if (strcmp(argv[argi],"-closeOnWrite") == 0)  {
+                closeOnWrite = true;
+                argi++;
+            }
+            
             else if (strcmp(argv[argi],"-file") == 0)  {
                 fileName = argv[argi+1];
                 const char *pwd = OPS_GetInterpPWD();
@@ -868,9 +916,9 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         
         // construct the theOutputStream
         if (eMode == DATA_STREAM && fileName != 0)  {
-            theOutputStream = new DataFileStream(fileName);
+            theOutputStream = new DataFileStream(fileName, OVERWRITE, 2, 0, closeOnWrite, precision, doScientific);
         } else if (eMode == DATA_STREAM_CSV && fileName != 0)  {
-	        theOutputStream = new DataFileStream(fileName,OVERWRITE,2,1);
+	        theOutputStream = new DataFileStream(fileName, OVERWRITE, 2, 1, closeOnWrite, precision, doScientific);
         } else if (eMode == XML_STREAM && fileName != 0)  {
             theOutputStream = new XmlFileStream(fileName);
         } else if (eMode == BINARY_STREAM && fileName != 0)  {
@@ -878,7 +926,7 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         } else if (eMode == TCP_STREAM && inetAddr != 0)  {
 	        theOutputStream = new TCP_Stream(inetPort, inetAddr);
         } else if (eMode == DATABASE_STREAM && tableName != 0)  {
-            theOutputStream = new DatabaseStream(OPS_GetFEDatastore(),tableName);
+            theOutputStream = new DatabaseStream(OPS_GetFEDatastore(), tableName);
         } else
             theOutputStream = new StandardStream();
         

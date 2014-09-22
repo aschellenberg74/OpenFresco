@@ -63,8 +63,9 @@ public:
     // method to get class type
     const char *getClassType() const {return "ActorExpSite";};
     
-    // server loop
+    // server loops
     int run();
+    int runTill(int exitWhen = OF_RemoteTest_DIE);
     
     // public methods to set and to get response
     virtual int setup();
@@ -79,7 +80,7 @@ public:
     virtual int checkDaqResponse();
     virtual int setSendDaqResponse();
     
-    virtual int commitState();
+    virtual int commitState(Vector *time = 0);
     
     virtual ExperimentalSite *getCopy();
     

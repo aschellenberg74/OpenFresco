@@ -96,7 +96,7 @@ public:
     virtual const Vector& getForce();
     virtual const Vector& getTime();
     
-    virtual int commitState();
+    virtual int commitState(Vector *time = 0);
     
     virtual ExperimentalSite *getCopy() = 0;
     

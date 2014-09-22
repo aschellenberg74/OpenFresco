@@ -101,13 +101,21 @@ ActorExpSite::~ActorExpSite()
 
 int ActorExpSite::run()
 {
+    this->runTill(OF_RemoteTest_DIE);
+
+    return OF_ReturnType_completed;
+}
+
+
+int ActorExpSite::runTill(int exitWhen)
+{
     bool exitYet = false;
     int ndim;
     while (exitYet == false)  {
         this->recvVector(recvV);
         int action = (int)recvV(0);
         
-        switch(action)  {
+        switch (action)  {
         case OF_RemoteTest_open:
             opserr << "\nConnected to ShadowExpSite "
                 << recvV(1) << endln;
@@ -121,10 +129,14 @@ int ActorExpSite::run()
                     << " != ShadowExpSite Version " << recvV(2) << endln;
                 exit(OF_ReturnType_failed);
             }
+            if (exitWhen == action)
+                exitYet = true;
             break;
         case OF_RemoteTest_setup:
             dataSize = (int)recvV(1);
             this->setup();
+            if (exitWhen == action)
+                exitYet = true;
             break;
         case OF_RemoteTest_setTrialResponse:
             ndim = 1;
@@ -148,14 +160,28 @@ int ActorExpSite::run()
                 tTime->Extract(recvV, ndim);
             }            
             this->setTrialResponse(tDisp, tVel, tAccel, tForce, tTime);
+            if (exitWhen == action)
+                exitYet = true;
             break;
         case OF_RemoteTest_commitState:
+            if (tTime != 0)  {
+                ndim = 1
+                    + getTrialSize(OF_Resp_Disp)
+                    + getTrialSize(OF_Resp_Vel)
+                    + getTrialSize(OF_Resp_Accel)
+                    + getTrialSize(OF_Resp_Force);
+                tTime->Extract(recvV, ndim);
+            }
             this->commitState();
+            if (exitWhen == action)
+                exitYet = true;
             break;
         case OF_RemoteTest_getDaqResponse:
             this->checkDaqResponse();
             this->setSendDaqResponse();
             this->sendVector(sendV);
+            if (exitWhen == action)
+                exitYet = true;
             break;
         case OF_RemoteTest_DIE:
             opserr << "\nDisconnected from ShadowExpSite "
@@ -163,7 +189,8 @@ int ActorExpSite::run()
             sendV(0) = OF_ReturnType_received;
             sendV(1) = this->getTag();
             this->sendVector(sendV);
-            exitYet = true;
+            if (exitWhen == action)
+                exitYet = true;
             break;
         default:
             opserr << "ActorExpSite::run() - invalid action "
@@ -338,10 +365,14 @@ int ActorExpSite::setSendDaqResponse()
 }
 
 
-int ActorExpSite::commitState()
+int ActorExpSite::commitState(Vector* time)
 {
     int rValue = 0;
-
+    
+    // update the trial time vector
+    if (time != 0 && tTime != 0)
+        *tTime = *time;
+    
     // first commit the control
     if (theControl != 0)  {
         rValue += theControl->commitState();
@@ -351,7 +382,7 @@ int ActorExpSite::commitState()
             exit(OF_ReturnType_failed);
         }
     }
-
+    
     // then commit base class
     rValue += this->ExperimentalSite::commitState();
     

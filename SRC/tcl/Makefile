@@ -2,9 +2,9 @@ include ../../Makefile.def
 
 OBJS  = tclMain.o \
         tclAppInit.o \
-        TclStartLabServer.o \
-        TclStartSimAppElemServer.o \
-        TclStartSimAppSiteServer.o \
+        TclLabServerCommands.o \
+        TclSimAppElemServerCommands.o \
+        TclSimAppSiteServerCommands.o \
 DYLIBOBJS  = OpenFrescoPackage.o
 
 EXPERIMENTALTEST_OBJS = $(OPENFRESCO)/utility/ExperimentalCP.o \
@@ -17,6 +17,7 @@ EXPERIMENTALTEST_OBJS = $(OPENFRESCO)/utility/ExperimentalCP.o \
 	   $(OPENFRESCO)/experimentalElement/EEInvertedVBrace2d.o \
 	   $(OPENFRESCO)/experimentalElement/EETwoNodeLink.o \
 	   $(OPENFRESCO)/experimentalElement/EEGeneric.o \
+       $(OPENFRESCO)/experimentalElement/EEBearing.o \
 	   $(OPENFRESCO)/experimentalSite/ExperimentalSite.o \
 	   $(OPENFRESCO)/experimentalSite/LocalExpSite.o \
 	   $(OPENFRESCO)/experimentalSite/ShadowExpSite.o \
@@ -163,6 +164,7 @@ EXPERIMENTALTEST_OBJS = $(OPENFRESCO)/utility/ExperimentalCP.o \
 OPENFRESCO_TCLFILES = \
 	$(OPENFRESCO)/utility/TclExpCPCommand.o \
 	$(OPENFRESCO)/experimentalElement/TclEEBeamColumnCommand.o \
+    $(OPENFRESCO)/experimentalElement/TclEEBearingCommand.o \
 	$(OPENFRESCO)/experimentalElement/TclEEGenericCommand.o \
 	$(OPENFRESCO)/experimentalElement/TclEEInvertedVBraceCommand.o \
 	$(OPENFRESCO)/experimentalElement/TclEETrussCommand.o \

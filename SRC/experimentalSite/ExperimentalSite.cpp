@@ -281,9 +281,13 @@ const Vector& ExperimentalSite::getTime()
 }
 
 
-int ExperimentalSite::commitState()
+int ExperimentalSite::commitState(Vector* time)
 {
     int rValue = 0;
+    
+    // update the trial time vector
+    if (time != 0 && tTime != 0)
+        *tTime = *time;
     
     // first commit the setup
     if (theSetup != 0)  {
