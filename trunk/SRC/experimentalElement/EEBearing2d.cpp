@@ -66,7 +66,7 @@ EEBearing2d::EEBearing2d(int tag, int Nd1, int Nd2,
     db(0), vb(0), ab(0), qb(0), t(0),
     dbDaq(0), vbDaq(0), abDaq(0), qbDaq(0), tDaq(0),
     dbCtrl(3), vbCtrl(3), abCtrl(3),
-    dl(6), Tgl(6,6), Tlb(3,6), dbPast(3), tPast(0.0), kbInit(3,3),
+    dl(6), Tgl(6,6), Tlb(3,6), dbLast(3), tLast(0.0), kbInit(3,3),
     theLoad(6), firstWarning(true), onP0(true)
 {
     // ensure the connectedExternalNode ID is of correct size & set values
@@ -152,7 +152,7 @@ EEBearing2d::EEBearing2d(int tag, int Nd1, int Nd2,
     dbCtrl.Zero();
     vbCtrl.Zero();
     abCtrl.Zero();
-    dbPast.Zero();
+    dbLast.Zero();
 }
 
 
@@ -170,7 +170,7 @@ EEBearing2d::EEBearing2d(int tag, int Nd1, int Nd2,
     db(0), vb(0), ab(0), qb(0), t(0),
     dbDaq(0), vbDaq(0), abDaq(0), qbDaq(0), tDaq(0),
     dbCtrl(3), vbCtrl(3), abCtrl(3),
-    dl(6), Tgl(6,6), Tlb(3,6), dbPast(3), tPast(0.0), kbInit(3,3),
+    dl(6), Tgl(6,6), Tlb(3,6), dbLast(3), tLast(0.0), kbInit(3,3),
     theLoad(6), firstWarning(true), onP0(true)
 {
     // ensure the connectedExternalNode ID is of correct size & set values
@@ -309,7 +309,7 @@ EEBearing2d::EEBearing2d(int tag, int Nd1, int Nd2,
     dbCtrl.Zero();
     vbCtrl.Zero();
     abCtrl.Zero();
-    dbPast.Zero();
+    dbLast.Zero();
 }
 
 
@@ -455,7 +455,7 @@ int EEBearing2d::commitState()
     
     // commit the site
     if (theSite != 0)  {
-        rValue += theSite->commitState();
+        rValue += theSite->commitState(t);
     }
     else  {
         sData[0] = OF_RemoteTest_commitState;
@@ -511,10 +511,11 @@ int EEBearing2d::update()
         (*qb)(0) = theMaterials[0]->getStress();
     
     // 2) set shear deformations in basic y-direction
-    if ((*db) != dbPast || (*t)(0) != tPast)  {
-        // save the displacements and the time
-        dbPast = (*db);
-        tPast = (*t)(0);
+    Vector dbDelta = (*db) - dbLast;
+    // do not check time for right now because of transformation constraint
+    // handler calling update at beginning of new step when applying load
+    // if (dbDelta.pNorm(2) > DBL_EPSILON || (*t)(0) > tLast)  {
+    if (dbDelta.pNorm(2) > DBL_EPSILON)  {
         // set the trial response at the site
         if (theSite != 0)  {
             theSite->setTrialResponse(db, vb, ab, qb, t);
@@ -527,6 +528,10 @@ int EEBearing2d::update()
     
     // 3) set rotations about basic z-direction
     theMaterials[1]->setTrialStrain((*db)(2), (*vb)(2));
+    
+    // save the last displacements and time
+    dbLast = (*db);
+    tLast = (*t)(0);
     
     return rValue;
 }

@@ -383,10 +383,21 @@ int ShadowExpSite::checkDaqResponse()
 }
 
 
-int ShadowExpSite::commitState()
+int ShadowExpSite::commitState(Vector* time)
 {
     int rValue = 0;
-
+    
+    // update the trial time vector
+    if (time != 0 && tTime != 0)  {
+        *tTime = *time;
+        int ndim = 1
+            + getTrialSize(OF_Resp_Disp)
+            + getTrialSize(OF_Resp_Vel)
+            + getTrialSize(OF_Resp_Accel)
+            + getTrialSize(OF_Resp_Force);
+        sendV.Assemble(*tTime, ndim);
+    }
+    
     // first commit the ActorExpSite
     sendV(0) = OF_RemoteTest_commitState;
     this->sendVector(sendV);

@@ -160,8 +160,8 @@ private:
     Matrix Tgl;         // transformation matrix from global to local system
     Matrix Tlb;         // transformation matrix from local to basic system
     
-    Vector dbPast;      // past displacements in basic system
-    double tPast;       // past time
+    Vector dbLast;      // displacements in basic system at last update
+    double tLast;       // time at last update
     Matrix kbInit;      // stiffness matrix in basic system
     
     static Matrix theMatrix;    // a class wide Matrix

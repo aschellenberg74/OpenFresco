@@ -63,7 +63,7 @@ EEInvertedVBrace2d::EEInvertedVBrace2d(int tag, int Nd1, int Nd2, int Nd3,
     db(0), vb(0), ab(0), t(0),
     dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
     dbCtrl(3), vbCtrl(3), abCtrl(3),
-    dbPast(3), kbInit(3,3), tPast(0.0), T(3,9)
+    dbLast(3), tLast(0.0), kbInit(3,3), T(3,9)
 {
     // ensure the connectedExternalNode ID is of correct size & set values
     if (connectedExternalNodes.Size() != 3)  {
@@ -117,7 +117,7 @@ EEInvertedVBrace2d::EEInvertedVBrace2d(int tag, int Nd1, int Nd2, int Nd3,
     dbCtrl.Zero();
     vbCtrl.Zero();
     abCtrl.Zero();
-    dbPast.Zero();
+    dbLast.Zero();
 }
 
 
@@ -133,7 +133,7 @@ EEInvertedVBrace2d::EEInvertedVBrace2d(int tag, int Nd1, int Nd2, int Nd3,
     db(0), vb(0), ab(0), t(0),
     dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
     dbCtrl(3), vbCtrl(3), abCtrl(3),
-    dbPast(3), kbInit(3,3), tPast(0.0), T(3,9)
+    dbLast(3), tLast(0.0), kbInit(3,3), T(3,9)
 {
     // ensure the connectedExternalNode ID is of correct size & set values
     if (connectedExternalNodes.Size() != 3)  {
@@ -239,7 +239,7 @@ EEInvertedVBrace2d::EEInvertedVBrace2d(int tag, int Nd1, int Nd2, int Nd3,
     dbCtrl.Zero();
     vbCtrl.Zero();
     abCtrl.Zero();
-    dbPast.Zero();
+    dbLast.Zero();
 }
 
 
@@ -420,7 +420,7 @@ int EEInvertedVBrace2d::commitState()
     
     // commit the site
     if (theSite != 0)  {
-        rValue += theSite->commitState();
+        rValue += theSite->commitState(t);
     }
     else  {
         sData[0] = OF_RemoteTest_commitState;
@@ -469,10 +469,11 @@ int EEInvertedVBrace2d::update()
         vb->addMatrixVector(0.0, T, vg, 1.0);
         ab->addMatrixVector(0.0, T, ag, 1.0);
         
-        if ((*db) != dbPast || (*t)(0) != tPast)  {
-            // save the displacements and the time
-            dbPast = (*db);
-            tPast = (*t)(0);
+        Vector dbDelta = (*db) - dbLast;
+        // do not check time for right now because of transformation constraint
+        // handler calling update at beginning of new step when applying load
+        // if (dbDelta.pNorm(2) > DBL_EPSILON || (*t)(0) > tLast)  {
+        if (dbDelta.pNorm(2) > DBL_EPSILON)  {
             // set the trial response at the site
             if (theSite != 0)  {
                 theSite->setTrialResponse(db, vb, ab, (Vector*)0, t);
@@ -487,6 +488,10 @@ int EEInvertedVBrace2d::update()
     } else  {
         // not implemented yet
     }
+    
+    // save the last displacements and time
+    dbLast = (*db);
+    tLast = (*t)(0);
     
     return rValue;
 }

@@ -26,7 +26,7 @@
 #ifndef EETwoNodeLink_h
 #define EETwoNodeLink_h
 
-// Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 09/06
 // Revision: A
 //
@@ -168,8 +168,8 @@ private:
     Matrix Tgl;         // transformation matrix from global to local system
     Matrix Tlb;         // transformation matrix from local to basic system
     
-    Vector dbPast;      // past displacements in basic system
-    double tPast;       // past time
+    Vector dbLast;      // displacements in basic system at last update
+    double tLast;       // time at last update
     Matrix kbInit;      // stiffness matrix in basic system
     
     Matrix *theMatrix;  // pointer to objects matrix (a class wide Matrix)

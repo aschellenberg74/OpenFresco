@@ -26,7 +26,7 @@
 #ifndef EEGeneric_h
 #define EEGeneric_h
 
-// Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 10/06
 // Revision: A
 //
@@ -128,24 +128,24 @@ private:
     double *rData;              // receive data array
     Vector *recvData;           // receive vector
     
-    Vector *db;                 // trial displacements in basic system
-    Vector *vb;                 // trial velocities in basic system
-    Vector *ab;                 // trial accelerations in basic system
-    Vector *t;                  // trial time
+    Vector *db;         // trial displacements in basic system
+    Vector *vb;         // trial velocities in basic system
+    Vector *ab;         // trial accelerations in basic system
+    Vector *t;          // trial time
     
-    Vector *dbDaq;              // daq displacements in basic system
-    Vector *vbDaq;              // daq velocities in basic system
-    Vector *abDaq;              // daq accelerations in basic system
-    Vector *qDaq;               // daq forces in basic system
-    Vector *tDaq;               // daq time
+    Vector *dbDaq;      // daq displacements in basic system
+    Vector *vbDaq;      // daq velocities in basic system
+    Vector *abDaq;      // daq accelerations in basic system
+    Vector *qDaq;       // daq forces in basic system
+    Vector *tDaq;       // daq time
     
-    Vector dbCtrl;              // ctrl displacements in basic system
-    Vector vbCtrl;              // ctrl velocities in basic system
-    Vector abCtrl;              // ctrl accelerations in basic system
+    Vector dbCtrl;      // ctrl displacements in basic system
+    Vector vbCtrl;      // ctrl velocities in basic system
+    Vector abCtrl;      // ctrl accelerations in basic system
     
-    Vector dbPast;              // past displacements in basic system
-    Matrix kbInit;              // stiffness matrix in basic system
-    double tPast;               // past time
+    Vector dbLast;      // displacements in basic system at last update
+    double tLast;       // time at last update
+    Matrix kbInit;      // stiffness matrix in basic system
     
     Node **theNodes;
 };

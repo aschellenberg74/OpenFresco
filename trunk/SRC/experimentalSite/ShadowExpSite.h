@@ -74,7 +74,7 @@ public:
     
     virtual int checkDaqResponse();
     
-    virtual int commitState();
+    virtual int commitState(Vector *time = 0);
     
     virtual ExperimentalSite *getCopy();
     

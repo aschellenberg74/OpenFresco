@@ -26,7 +26,7 @@
 #ifndef EETrussCorot_h
 #define EETrussCorot_h
 
-// Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 09/06
 // Revision: A
 //
@@ -147,9 +147,9 @@ private:
     Vector vbCtrl;      // ctrl velocities in basic system
     Vector abCtrl;      // ctrl accelerations in basic system
     
-    Vector dbPast;      // past displacements in basic system
+    Vector dbLast;      // displacements in basic system at last update
+    double tLast;       // time at last update
     Matrix kbInit;      // stiffness matrix in basic system
-    double tPast;       // past time
     
     Node *theNodes[2];  // array of node pointers
     

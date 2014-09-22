@@ -26,7 +26,7 @@
 #ifndef EEBeamColumn2d_h
 #define EEBeamColumn2d_h
 
-// Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 09/06
 // Revision: A
 //
@@ -144,9 +144,9 @@ private:
     Vector vbCtrl;      // ctrl velocities in basic system B
     Vector abCtrl;      // ctrl accelerations in basic system B
     
-    Vector dbPast;      // past displacements in basic system B
+    Vector dbLast;      // displacements in basic system B at last update
+    double tLast;       // time at last update
     Matrix kbInit;      // stiffness matrix in basic system B
-    double tPast;       // past time
     double qA0[3];      // fixed end forces in basic system A
     double pA0[3];      // reactions in basic system A
     
