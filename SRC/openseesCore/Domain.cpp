@@ -1573,8 +1573,10 @@ Domain::getElementResponse(int eleTag, const char **argv, int argc)
     }
 
     Information &eleInfo = theResponse->getInformation();
-    const Vector *data = &(eleInfo.getData());
-    return data;
+    //const Vector *data = &(eleInfo.getData());
+    responseData = eleInfo.getData();
+    delete theResponse;
+    return &responseData;
   }
 }
 
@@ -3315,6 +3317,10 @@ Domain::setMass(const Matrix &mass, int nodeTag)
 int
 Domain::calculateNodalReactions(int flag)
 {
+
+  // apply load again! (for case ele load removed and record before an analysis)
+  this->applyLoad(committedTime);
+
   Node *theNode;
   Element *theElement;
   NodeIter &theNodes = this->getNodes();

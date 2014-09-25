@@ -228,10 +228,10 @@
     <ClCompile Include="..\..\..\SRC\openseesExtra\UDP_Socket.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\XmlFileStream.cpp" />
     <ClCompile Include="..\..\..\SRC\tcl\elementAPI.cpp" />
+    <ClCompile Include="..\..\..\SRC\tcl\TclLabServerCommands.cpp" />
     <ClCompile Include="..\..\..\SRC\tcl\TclModelBuilder.cpp" />
-    <ClCompile Include="..\..\..\SRC\tcl\TclStartLabServer.cpp" />
-    <ClCompile Include="..\..\..\SRC\tcl\TclStartSimAppElemServer.cpp" />
-    <ClCompile Include="..\..\..\SRC\tcl\TclStartSimAppSiteServer.cpp" />
+    <ClCompile Include="..\..\..\SRC\tcl\TclSimAppElemServerCommands.cpp" />
+    <ClCompile Include="..\..\..\SRC\tcl\TclSimAppSiteServerCommands.cpp" />
     <ClCompile Include="..\..\..\SRC\utility\ExpControlSP.cpp" />
     <ClCompile Include="..\..\..\SRC\utility\ExperimentalCP.cpp" />
     <ClCompile Include="..\..\..\SRC\utility\TclExpCPCommand.cpp" />
