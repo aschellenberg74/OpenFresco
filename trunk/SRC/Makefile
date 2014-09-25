@@ -11,6 +11,7 @@ EXPERIMENTALTEST_OBJS = $(OPENFRESCO)/utility/ExperimentalCP.o \
 	   $(OPENFRESCO)/experimentalElement/EEInvertedVBrace2d.o \
 	   $(OPENFRESCO)/experimentalElement/EETwoNodeLink.o \
 	   $(OPENFRESCO)/experimentalElement/EEGeneric.o \
+       $(OPENFRESCO)/experimentalElement/EEBearing.o \
 	   $(OPENFRESCO)/experimentalSite/ExperimentalSite.o \
 	   $(OPENFRESCO)/experimentalSite/LocalExpSite.o \
 	   $(OPENFRESCO)/experimentalSite/ShadowExpSite.o \

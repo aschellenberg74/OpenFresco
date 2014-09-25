@@ -231,15 +231,6 @@
     <ClCompile Include="..\..\..\SRC\experimentalRecorder\response\ExpSiteResponse.cpp">
       <Filter>experimentalRecorder\response</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\SRC\tcl\TclStartSimAppSiteServer.cpp">
-      <Filter>tcl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\SRC\tcl\TclStartLabServer.cpp">
-      <Filter>tcl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\SRC\tcl\TclStartSimAppElemServer.cpp">
-      <Filter>tcl</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\SRC\tcl\TclModelBuilder.cpp">
       <Filter>tcl</Filter>
     </ClCompile>
@@ -590,6 +581,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\SRC\experimentalElement\EEBearing3d.cpp">
       <Filter>experimentalElement</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\tcl\TclLabServerCommands.cpp">
+      <Filter>tcl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\tcl\TclSimAppElemServerCommands.cpp">
+      <Filter>tcl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\tcl\TclSimAppSiteServerCommands.cpp">
+      <Filter>tcl</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
