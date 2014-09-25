@@ -23,7 +23,7 @@
 // $Date$
 // $URL$
 
-// Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 02/07
 // Revision: A
 //
@@ -31,83 +31,88 @@
 
 #include "ExperimentalCP.h"
 
+#include <Node.h>
+
 #include <stdlib.h>
 
 
-ExperimentalCP::ExperimentalCP(int tag, int NDM, int NDF,
-    int nodetag, const ID &dir, const ID &resp, const Vector &fact)
-    : TaggedObject(tag), ndm(NDM), ndf(NDF), nodeTag(nodetag),
-    direction(dir), uniqueDir(dir), response(resp),
-    factor(dir.Size()), lowerLim(0), upperLim(0),
-    numDirection(dir.Size()), numUniqueDir(dir.Size()),
-    sizeRespType(5), dirRespType(5)
+ExperimentalCP::ExperimentalCP(int tag, const ID &dof,
+    const ID &rsptype, const Vector &fact)
+    : TaggedObject(tag),
+    numSignals(dof.Size()), numDOF(dof.Size()),
+    DOF(dof), rspType(rsptype), factor(dof.Size()),
+    lowerLim(0), upperLim(0), isRelative(dof.Size()),
+    uniqueDOF(dof), sizeRspType(5), dofRspType(5),
+    nodeTag(0), nodeNDM(0), nodeNDF(0)
 {
     // initialize factors
     if (fact.Size() > 0)  {
-        if (resp.Size() != numDirection || 
-            fact.Size() != numDirection)  {
+        if (rspType.Size() != numSignals || 
+            fact.Size() != numSignals)  {
             opserr << "ExperimentalCP::ExperimentalCP() - "
-                << "direction, response and factor need to "
-                << "have same size\n";
+                << "DOF, rspType and factor arrays need to "
+                << "have the same size.\n";
             exit(OF_ReturnType_failed);
         }
         factor = fact;
     } else  {
-        if (resp.Size() != numDirection)  {
+        if (rspType.Size() != numSignals)  {
             opserr << "ExperimentalCP::ExperimentalCP() - "
-                << "direction and response need to "
-                << "have same size\n";
+                << "DOF and rspType arrays need to "
+                << "have the same size.\n";
             exit(OF_ReturnType_failed);
         }
-        for (int i=0; i<numDirection; i++)
+        for (int i=0; i<numSignals; i++)
             factor(i) = 1.0;
     }
-
-    // find unique directions and number thereof
-    numUniqueDir = uniqueDir.unique();
-    if (numUniqueDir > ndf)  {
+    
+    // find unique DOFs and number thereof
+    numDOF = uniqueDOF.unique();
+    /*if (numUniqueDir > ndf)  {
         opserr << "ExperimentalCP::ExperimentalCP() - "
             << "more unique directions specified than "
             << "available degrees of freedom\n";
         exit(OF_ReturnType_failed);
-    }
-
+    }*/
+    
     // set sizes of response types
-    sizeRespType.Zero();
-    for (int i=0; i<numDirection; i++)  {
-        if (response(i) < 0 || response(i) > 4)  {
+    sizeRspType.Zero();
+    for (int i=0; i<numSignals; i++)  {
+        if (rspType(i) < 0 || 4 < rspType(i))  {
             opserr << "ExperimentalCP::ExperimentalCP() - "
-                << "wrong response type received\n";
+                << "wrong response type received.\n";
             exit(OF_ReturnType_failed);
         }
-        sizeRespType(response(i)) += 1;
+        sizeRspType(rspType(i)) += 1;
     }
-
-    // zero the dirRespType vector
-    dirRespType.Zero();
+    
+    // zero the dofRspType vector and the isRelative ID
+    dofRspType.Zero();
+    isRelative.Zero();
 }
 
 
 ExperimentalCP::ExperimentalCP(const ExperimentalCP& ecp)
-    : TaggedObject(ecp),
-    sizeRespType(5), dirRespType(5)
-{
-    ndm       = ecp.ndm;
-    ndf       = ecp.ndf;
-    nodeTag   = ecp.nodeTag;
+    : TaggedObject(ecp)
+{    
+    numSignals = ecp.numSignals;
+    numDOF     = ecp.numDOF;
     
-    numDirection = ecp.numDirection;
-    numUniqueDir = ecp.numUniqueDir;
-    direction = ecp.direction;
-    uniqueDir = ecp.uniqueDir;
-    response  = ecp.response;
-    factor    = ecp.factor;
+    DOF        = ecp.DOF;
+    rspType    = ecp.rspType;
+    factor     = ecp.factor;
+    lowerLim   = ecp.lowerLim;
+    upperLim   = ecp.upperLim;
+    isRelative = ecp.isRelative;
     
-    sizeRespType = ecp.sizeRespType;
-    dirRespType  = ecp.dirRespType;
+    uniqueDOF   = ecp.uniqueDOF;
+    sizeRspType = ecp.sizeRspType;
+    dofRspType  = ecp.dofRspType;
     
-    lowerLim = ecp.lowerLim;
-    upperLim = ecp.upperLim;
+    nodeTag  = ecp.nodeTag;
+    nodeNDM  = ecp.nodeNDM;
+    nodeNDF  = ecp.nodeNDF;
+    nodeCrds = ecp.nodeCrds;
 }
 
 
@@ -125,77 +130,59 @@ ExperimentalCP* ExperimentalCP::getCopy()
 }
 
 
-int ExperimentalCP::setNDM(int NDM)
+int ExperimentalCP::setData(const ID &dof,
+    const ID &rsptype, const Vector &fact)
 {
-    ndm = NDM;
-
-    return 0;
-}
-
-
-int ExperimentalCP::setNDF(int NDF)
-{
-    ndf = NDF;
-
-    return 0;
-}
-
-
-int ExperimentalCP::setData(int nodetag, const ID &dir,
-    const ID &resp, const Vector &fact)
-{
-    nodeTag = nodetag;
-
     // save the number of directions
-    numDirection = dir.Size();
-    direction = dir;
-    uniqueDir = dir;
-    response = resp;
-
+    numSignals = dof.Size();
+    numDOF = dof.Size();
+    DOF = dof;
+    rspType = rsptype;
+    
     // initialize factors
     if (fact.Size() > 0)  {
-        if (resp.Size() != numDirection || 
-            fact.Size() != numDirection)  {
+        if (rspType.Size() != numSignals || 
+            fact.Size() != numSignals)  {
             opserr << "ExperimentalCP::setData() - "
-                << "direction, response and factor need to "
-                << "have same size\n";
+                << "DOF, rspType and factor arrays need to "
+                << "have the same size.\n";
             return OF_ReturnType_failed;
         }
         factor = fact;
     } else  {
-        if (resp.Size() != numDirection)  {
+        if (rspType.Size() != numSignals)  {
             opserr << "ExperimentalCP::setData() - "
-                << "direction and response need to "
-                << "have same size\n";
+                << "DOF and rspType arrays need to "
+                << "have the same size.\n";
             return OF_ReturnType_failed;
         }
-        for (int i=0; i<numDirection; i++)
+        for (int i=0; i<numSignals; i++)
             factor(i) = 1.0;
     }
     
-    // find unique directions and number thereof
-    numUniqueDir = uniqueDir.unique();
-    if (numUniqueDir > ndf)  {
+    // find unique DOFs and number thereof
+    numDOF = uniqueDOF.unique();
+    /*if (numUniqueDir > ndf)  {
         opserr << "ExperimentalCP::ExperimentalCP() - "
             << "more directions specified than available "
             << "degrees of freedom\n";
         exit(OF_ReturnType_failed);
-    }
-
+    }*/
+    
     // set sizes of response types
-    sizeRespType.Zero();
-    for (int i=0; i<numDirection; i++)  {
-        if (response(i) < 0 || response(i) > 4)  {
-            opserr << "ExperimentalCP::ExperimentalCP() - "
-                << "wrong response type received\n";
+    sizeRspType.Zero();
+    for (int i=0; i<numSignals; i++)  {
+        if (rspType(i) < 0 || 4 < rspType(i))  {
+            opserr << "ExperimentalCP::setData() - "
+                << "wrong response type received.\n";
             return OF_ReturnType_failed;
         }
-        sizeRespType(response(i)) += 1;
+        sizeRspType(rspType(i)) += 1;
     }
-
-    // zero the dirRespType vector
-    dirRespType.Zero();
-
+    
+    // zero the dofRspType vector
+    dofRspType.Zero();
+    
     return 0;
 }
 
@@ -203,91 +190,160 @@ int ExperimentalCP::setData(int nodetag, const ID &dir,
 int ExperimentalCP::setLimits(const Vector &lowerlim,
     const Vector &upperlim)
 {
-    if (lowerlim.Size() != numDirection || 
-        upperlim.Size() != numDirection)  {
+    if (lowerlim.Size() != numSignals || 
+        upperlim.Size() != numSignals)  {
             opserr << "ExperimentalCP::setLimits() - "
                 << "lower and upper limits need to be of "
-                << "size: " << numDirection << endln;
+                << "size: " << numSignals << endln;
             return OF_ReturnType_failed;
     }
-
+    
     lowerLim = lowerlim;
     upperLim = upperlim;
-
+    
     return 0;
 }
 
 
-int ExperimentalCP::getNDM()
+int ExperimentalCP::setSigRefType(const ID &isrelative)
 {
-    return ndm;
+    if (isrelative.Size() != numSignals)  {
+            opserr << "ExperimentalCP::setSigRefType() - "
+                << "signal reference type ID needs to be of "
+                << "size: " << numSignals << endln;
+            return OF_ReturnType_failed;
+    }
+    
+    isRelative = isrelative;
+    
+    return 0;
 }
 
 
-int ExperimentalCP::getNDF()
+int ExperimentalCP::setNode(Node *node)
 {
-    return ndf;
+    // check node input
+    if (node == 0)  {
+        opserr << "ExperimentalCP::setNode() - "
+            << "null node pointer passed.\n";
+        exit(OF_ReturnType_failed);
+    }
+    
+    // save nodal data
+    theNode = node;
+    nodeTag = theNode->getTag();
+    nodeNDF = theNode->getNumberDOF();
+    nodeCrds = theNode->getCrds();
+    nodeNDM = nodeCrds.Size();
+    
+    return 0;
+}
+
+
+int ExperimentalCP::getNumSignal()
+{
+    return numSignals;
+}
+
+
+int ExperimentalCP::getNumDOF()
+{
+    return numDOF;
+}
+
+
+const ID& ExperimentalCP::getSizeRspType()
+{
+    return sizeRspType;
+}
+
+
+const ID& ExperimentalCP::getDOFRspType(int dir)
+{
+    /*if (dir < 0 || dir > ndf)  {
+        opserr << "ExperimentalCP::getDOFRspType() - "
+            << "direction out of bounds, "
+            << "direction " << dir << " does not exist\n";
+        exit(OF_ReturnType_failed);
+    }*/
+    
+    dofRspType.Zero();
+    for (int i=0; i<numSignals; i++)  {
+        if (DOF(i) == dir)
+            dofRspType(rspType(i)) = 1;
+    }
+    
+    return dofRspType;
 }
 
 
 int ExperimentalCP::getNodeTag()
 {
+    if (nodeTag == 0)  {
+        opserr << "ExperimentalCP::getNodeTag() - "
+            << "this control point has no node "
+            << "assigned.\n";
+        exit(OF_ReturnType_failed);
+    }
+    
     return nodeTag;
 }
 
 
-int ExperimentalCP::getNumDirection()
+int ExperimentalCP::getNodeNDM()
 {
-    return numDirection;
-}
-
-
-int ExperimentalCP::getNumUniqueDir()
-{
-    return numUniqueDir;
-}
-
-
-const ID& ExperimentalCP::getSizeRespType()
-{
-    return sizeRespType;
-}
-
-
-const ID& ExperimentalCP::getDirRespType(int dir)
-{
-    if (dir<0 || dir>ndf)  {
-        opserr << "ExperimentalCP::getDirRespType() - "
-            << "direction out of bounds, "
-            << "direction " << dir << " does not exist\n";
+    if (nodeTag == 0)  {
+        opserr << "ExperimentalCP::getNodeNDM() - "
+            << "this control point has no node "
+            << "assigned.\n";
         exit(OF_ReturnType_failed);
     }
+    
+    return nodeNDM;
+}
 
-    dirRespType.Zero();
-    for (int i=0; i<numDirection; i++)  {
-        if (direction(i) == dir)
-            dirRespType(response(i)) = 1;
+
+int ExperimentalCP::getNodeNDF()
+{
+    if (nodeTag == 0)  {
+        opserr << "ExperimentalCP::getNodeNDF() - "
+            << "this control point has no node "
+            << "assigned.\n";
+        exit(OF_ReturnType_failed);
     }
-
-    return dirRespType;
+    
+    return nodeNDF;
 }
 
 
-const ID& ExperimentalCP::getDirection()
+const Vector& ExperimentalCP::getNodeCrds()
 {
-    return direction;
+    if (nodeTag == 0)  {
+        opserr << "ExperimentalCP::getNodeCrds() - "
+            << "this control point has no node "
+            << "assigned.\n";
+        exit(OF_ReturnType_failed);
+    }
+    
+    return nodeCrds;
 }
 
 
-const ID& ExperimentalCP::getUniqueDir()
+const ID& ExperimentalCP::getDOF()
 {
-    return uniqueDir;
+    return DOF;
 }
 
 
-const ID& ExperimentalCP::getResponseType()
+const ID& ExperimentalCP::getUniqueDOF()
 {
-    return response;
+    return uniqueDOF;
+}
+
+
+const ID& ExperimentalCP::getRspType()
+{
+    return rspType;
 }
 
 
@@ -302,7 +358,7 @@ const Vector& ExperimentalCP::getLowerLimit()
     if (lowerLim == 0)  {
         opserr << "ExperimentalCP::getLowerLimit() - "
             << "this control point has no lower "
-            << "limits assigned\n";
+            << "limits assigned.\n";
         exit(OF_ReturnType_failed);
     }
     
@@ -315,7 +371,7 @@ const Vector& ExperimentalCP::getUpperLimit()
     if (upperLim == 0)  {
         opserr << "ExperimentalCP::getUpperLimit() - "
             << "this control point has no upper "
-            << "limits assigned\n";
+            << "limits assigned.\n";
         exit(OF_ReturnType_failed);
     }
     
@@ -323,97 +379,121 @@ const Vector& ExperimentalCP::getUpperLimit()
 }
 
 
-int ExperimentalCP::getDirection(int dirID)
+const ID& ExperimentalCP::getSigRefType()
 {
-    if (dirID<0 || dirID>=numDirection)  {
-        opserr << "ExperimentalCP::getDir() - "
-            << "direction ID out of bounds, "
-            << "component " << dirID << " does not exist\n";
-        exit(OF_ReturnType_failed);
-    }
-
-    return direction(dirID);
+    return isRelative;
 }
 
 
-int ExperimentalCP::getResponseType(int dirID)
+int ExperimentalCP::getDOF(int signalID)
 {
-    if (dirID<0 || dirID>=numDirection)  {
-        opserr << "ExperimentalCP::getResponseType() - "
-            << "direction ID out of bounds, "
-            << "component " << dirID << " does not exist\n";
+    if (signalID < 0 || numSignals <= signalID)  {
+        opserr << "ExperimentalCP::getDOF() - "
+            << "signal ID out of bounds, "
+            << "component " << signalID << " does not exist.\n";
         exit(OF_ReturnType_failed);
     }
-
-    return response(dirID);
+    
+    return DOF(signalID);
 }
 
 
-double ExperimentalCP::getFactor(int dirID)
+int ExperimentalCP::getRspType(int signalID)
 {
-    if (dirID<0 || dirID>=numDirection)  {
+    if (signalID < 0 || numSignals <= signalID)  {
+        opserr << "ExperimentalCP::getRspType() - "
+            << "signal ID out of bounds, "
+            << "component " << signalID << " does not exist.\n";
+        exit(OF_ReturnType_failed);
+    }
+    
+    return rspType(signalID);
+}
+
+
+double ExperimentalCP::getFactor(int signalID)
+{
+    if (signalID < 0 || numSignals <= signalID)  {
         opserr << "ExperimentalCP::getFactor() - "
-            << "direction ID out of bounds, "
-            << "component " << dirID << " does not exist\n";
+            << "signal ID out of bounds, "
+            << "component " << signalID << " does not exist.\n";
         exit(OF_ReturnType_failed);
     }
-
-    return factor(dirID);
+    
+    return factor(signalID);
 }
 
 
-double ExperimentalCP::getLowerLimit(int dirID)
+double ExperimentalCP::getLowerLimit(int signalID)
 {
     if (lowerLim == 0)  {
         opserr << "ExperimentalCP::getLowerLimit() - "
             << "this control point has no lower "
-            << "limits assigned\n";
+            << "limits assigned.\n";
         exit(OF_ReturnType_failed);
     }
-
-    if (dirID<0 || dirID>=numDirection)  {
-        opserr << "ExperimentalCP::getFactor() - "
-            << "direction ID out of bounds, "
-            << "component " << dirID << " does not exist\n";
+    
+    if (signalID < 0 || numSignals <= signalID)  {
+        opserr << "ExperimentalCP::getLowerLimit() - "
+            << "signal ID out of bounds, "
+            << "component " << signalID << " does not exist.\n";
         exit(OF_ReturnType_failed);
     }
-
-    return lowerLim(dirID);
+    
+    return lowerLim(signalID);
 }
 
 
-double ExperimentalCP::getUpperLimit(int dirID)
+double ExperimentalCP::getUpperLimit(int signalID)
 {
     if (upperLim == 0)  {
         opserr << "ExperimentalCP::getUpperLimit() - "
             << "this control point has no upper "
-            << "limits assigned\n";
+            << "limits assigned.\n";
         exit(OF_ReturnType_failed);
     }
-
-    if (dirID<0 || dirID>=numDirection)  {
-        opserr << "ExperimentalCP::getFactor() - "
-            << "direction ID out of bounds, "
-            << "component " << dirID << " does not exist\n";
+    
+    if (signalID < 0 || numSignals <= signalID)  {
+        opserr << "ExperimentalCP::getUpperLimit() - "
+            << "signal ID out of bounds, "
+            << "component " << signalID << " does not exist.\n";
         exit(OF_ReturnType_failed);
     }
+    
+    return upperLim(signalID);
+}
 
-    return upperLim(dirID);
+
+int ExperimentalCP::getSigRefType(int signalID)
+{
+    if (signalID < 0 || numSignals <= signalID)  {
+        opserr << "ExperimentalCP::getSigRefType() - "
+            << "signal ID out of bounds, "
+            << "component " << signalID << " does not exist.\n";
+        exit(OF_ReturnType_failed);
+    }
+    
+    return isRelative(signalID);
 }
 
 
 void ExperimentalCP::Print(OPS_Stream &s, int flag)
 {
     s << "ExperimentalCP: " << this->getTag() << endln;
-    s << "  ndm: " << ndm << ", ndf: " << ndf << endln;
-    s << "  node tag: " << nodeTag << endln;
-    s << "  dir: " << direction;
-    s << "  resp: " << response;
-    s << "  fact: " << factor;
+    s << "  numSignal: " << numSignals << ", numDOF: " << numDOF << endln; 
+    s << "  DOF     : " << DOF << endln;
+    s << "  rspType : " << rspType << endln;
+    s << "  factor  : " << factor << endln;
     if (lowerLim != 0)
-        s << "  lowerLim: " << lowerLim;
+        s << "  lowerLim: " << lowerLim << endln;
     if (upperLim != 0)
-        s << "  upperLim: " << upperLim;
+        s << "  upperLim: " << upperLim << endln;
+    s << "  isRelative  : " << isRelative << endln;
+    if (nodeTag != 0)  {
+        s << "  nodeTag: " << nodeTag << endln;
+        s << "    ndm: " << nodeNDM << ", ndf: " << nodeNDF << endln;
+        s << "    crds: " << nodeCrds << endln;
+    }
     s << endln;
 }
 
@@ -422,7 +502,7 @@ int ExperimentalCP::hasLimits()
 {
     if (lowerLim != 0 && upperLim != 0)
         return 1;
-
+    
     return 0;
 }
 
@@ -431,8 +511,8 @@ int ExperimentalCP::operator == (ExperimentalCP& ecp)
 {
     // factor value IS NOT checked!
     if (nodeTag == ecp.nodeTag 
-        && direction == ecp.direction
-        && response == ecp.response) {
+        && DOF == ecp.DOF
+        && rspType == ecp.rspType) {
         return 1;
     } else {
         return 0;
@@ -444,8 +524,8 @@ int ExperimentalCP::operator != (ExperimentalCP& ecp)
 {
     // factor value IS NOT checked!
     if (nodeTag != ecp.nodeTag 
-        || direction != ecp.direction
-        || response != ecp.response) {
+        || DOF != ecp.DOF
+        || rspType != ecp.rspType) {
         return 1;
     } else {
         return 0;

@@ -33,6 +33,8 @@
 #include <string.h>
 #include <tcl.h>
 #include <ArrayOfTaggedObjects.h>
+#include <Domain.h>
+#include <Node.h>
 #include <elementAPI.h>
 
 #include <ExperimentalCP.h>
@@ -98,16 +100,17 @@ int TclExpCPCommand(ClientData clientData, Tcl_Interp *interp,
         theExperimentalCPs = new ArrayOfTaggedObjects(32);
     
     // make sure there is a minimum number of arguments
-    if (argc < 5)  {
+    if (argc < 4)  {
         opserr << "WARNING invalid number of arguments\n";
         printCommand(argc,argv);
-        opserr << "Want: expControlPoint tag nodeTag dir resp <-fact f> <-lim l u> ...\n";
+        opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType <-fact f> <-lim l u> <-isRel> ...\n";
         return TCL_ERROR;
     }
     
-    int ndm = OPS_GetNDM();
-    int ndf = OPS_GetNDF();
-    int tag, nodeTag, numDir = 0, numLim = 0, argi = 1, i;
+    int tag, i, argi = 1;
+    int nodeTag = 0, ndf = 0, ndm = 0;
+    Node *theNode = 0;
+    int numSignals = 0, numLim = 0, numRefType = 0;
     double f, lim;
     ExperimentalCP *theCP = 0;
     
@@ -116,194 +119,245 @@ int TclExpCPCommand(ClientData clientData, Tcl_Interp *interp,
         return TCL_ERROR;
     }
     argi++;
-    if (Tcl_GetInt(interp, argv[argi], &nodeTag) != TCL_OK)  {
-        opserr << "WARNING invalid nodeTag\n";
-        opserr << "control point: " << tag << endln;
-        return TCL_ERROR;
-    }
-    argi++;
-    // count number of directions
-    i = argi;
-    while (i<argc)  {
-        if (strcmp(argv[i],"-fact") == 0)  {
-            i += 2;
+    if (strcmp(argv[argi],"-node") == 0)  {
+        argi++;
+        if (Tcl_GetInt(interp, argv[argi], &nodeTag) != TCL_OK)  {
+            opserr << "WARNING invalid nodeTag for control point: " << tag << endln;
+            printCommand(argc,argv);
+            opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType <-fact f> <-lim l u> <-isRel> ...\n";
+            return TCL_ERROR;
         }
-        else if (strcmp(argv[i],"-lim") == 0)  {
+        theNode = theDomain->getNode(nodeTag);
+        ndf = theNode->getNumberDOF();
+        ndm = OPS_GetNDM();
+        argi++;
+    }
+    // count number of signals
+    i = argi;
+    while (i < argc)  {
+        if (strcmp(argv[i],"-fact") == 0 || strcmp(argv[i],"-factor") == 0)
+            i += 2;
+        else if (strcmp(argv[i],"-isRel") == 0 || strcmp(argv[i],"-isRelative") == 0)
+            i++;
+        else if (strcmp(argv[i],"-lim") == 0 || strcmp(argv[i],"-limit") == 0)  {
             i += 3;
             numLim++;
         }
         else  {
             i += 2;
-            numDir++;
+            numSignals++;
         }
     }
-    if (numDir == 0)  {
-        opserr << "WARNING invalid number of arguments\n";
+    if (numSignals == 0)  {
+        opserr << "WARNING invalid number of arguments for control point: " << tag << endln;
         printCommand(argc,argv);
-        opserr << "Want: expControlPoint tag nodeTag dir resp <-fact f> <-lim l u> ...\n";
+        opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType <-fact f> <-lim l u> <-isRel> ...\n";
         return TCL_ERROR;
     }
-    if (numLim > 0 && numLim != numDir)  {
-        opserr << "WARNING invalid number of limits\n";
+    if (numLim > 0 && numLim != numSignals)  {
+        opserr << "WARNING invalid number of limits for control point: " << tag << endln;
         printCommand(argc,argv);
-        opserr << "Want: expControlPoint tag nodeTag dir resp <-fact f> <-lim l u> ...\n";
+        opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType <-fact f> <-lim l u> <-isRel> ...\n";
         return TCL_ERROR;
     }
-    ID dir(numDir);
-    ID resp(numDir);
-    Vector fact(numDir);
-    Vector lowerLim(numLim);
-    Vector upperLim(numLim);
-    for (i=0; i<numDir; i++)  {
-        if (ndm == 1 && ndf == 1)  {
+    ID dof(numSignals);
+    ID rspType(numSignals);
+    Vector factor(numSignals);
+    Vector lowerLim(numSignals);
+    Vector upperLim(numSignals);
+    ID isRelative(numSignals);
+    for (i=0; i<numSignals; i++)  {
+        if (ndf == 0)  {
+            int dofID = 0;
+            if (sscanf(argv[argi],"%d",&dofID) != 1)  {
+                if (sscanf(argv[argi],"%*[dfouDFOU]%d",&dofID) != 1)  {
+                    opserr << "WARNING invalid dof for control point: " << tag << endln;
+                    printCommand(argc,argv);
+                    opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType <-fact f> <-lim l u> <-isRel> ...\n";
+                    return TCL_ERROR;
+                }
+            }
+            dof(i) = dofID - 1;
+        }
+        else if (ndm == 1 && ndf == 1)  {
             if (strcmp(argv[argi],"1") == 0 || 
+                strcmp(argv[argi],"dof1") == 0 || strcmp(argv[argi],"DOF1") == 0 ||
                 strcmp(argv[argi],"u1") == 0 || strcmp(argv[argi],"U1") == 0 ||
                 strcmp(argv[argi],"ux") == 0 || strcmp(argv[argi],"UX") == 0)
-                dir(i) = 0;
+                dof(i) = 0;
             else  {
-                opserr << "WARNING invalid dir\n";
-                opserr << "control point: " << tag << endln;
+                opserr << "WARNING invalid dof for control point: " << tag << endln;
+                printCommand(argc,argv);
+                opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType <-fact f> <-lim l u> <-isRel> ...\n";
                 return TCL_ERROR;
             }
         }
         else if (ndm == 2 && ndf == 2)  {
             if (strcmp(argv[argi],"1") == 0 ||
+                strcmp(argv[argi],"dof1") == 0 || strcmp(argv[argi],"DOF1") == 0 ||
                 strcmp(argv[argi],"u1") == 0 || strcmp(argv[argi],"U1") == 0 ||
                 strcmp(argv[argi],"ux") == 0 || strcmp(argv[argi],"UX") == 0)
-                dir(i) = 0;
+                dof(i) = 0;
             else if (strcmp(argv[argi],"2") == 0 ||
+                strcmp(argv[argi],"dof2") == 0 || strcmp(argv[argi],"DOF2") == 0 ||
                 strcmp(argv[argi],"u2") == 0 || strcmp(argv[argi],"U2") == 0 ||
                 strcmp(argv[argi],"uy") == 0 || strcmp(argv[argi],"UY") == 0)
-                dir(i) = 1;
+                dof(i) = 1;
             else  {
-                opserr << "WARNING invalid dir\n";
-                opserr << "control point: " << tag << endln;
+                opserr << "WARNING invalid dof for control point: " << tag << endln;
+                printCommand(argc,argv);
+                opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType <-fact f> <-lim l u> <-isRel> ...\n";
                 return TCL_ERROR;
             }
         }
         else if (ndm == 2 && ndf == 3)  {
             if (strcmp(argv[argi],"1") == 0 ||
+                strcmp(argv[argi],"dof1") == 0 || strcmp(argv[argi],"DOF1") == 0 ||
                 strcmp(argv[argi],"u1") == 0 || strcmp(argv[argi],"U1") == 0 ||
                 strcmp(argv[argi],"ux") == 0 || strcmp(argv[argi],"UX") == 0)
-                dir(i) = 0;
+                dof(i) = 0;
             else if (strcmp(argv[argi],"2") == 0 ||
+                strcmp(argv[argi],"dof2") == 0 || strcmp(argv[argi],"DOF2") == 0 ||
                 strcmp(argv[argi],"u2") == 0 || strcmp(argv[argi],"U2") == 0 ||
                 strcmp(argv[argi],"uy") == 0 || strcmp(argv[argi],"UY") == 0)
-                dir(i) = 1;
+                dof(i) = 1;
             else if (strcmp(argv[argi],"3") == 0 ||
+                strcmp(argv[argi],"dof3") == 0 || strcmp(argv[argi],"DOF3") == 0 ||
                 strcmp(argv[argi],"r3") == 0 || strcmp(argv[argi],"R3") == 0 ||
                 strcmp(argv[argi],"rz") == 0 || strcmp(argv[argi],"RZ") == 0)
-                dir(i) = 2;
+                dof(i) = 2;
             else  {
-                opserr << "WARNING invalid dir\n";
-                opserr << "control point: " << tag << endln;
+                opserr << "WARNING invalid dof for control point: " << tag << endln;
+                printCommand(argc,argv);
+                opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType <-fact f> <-lim l u> <-isRel> ...\n";
                 return TCL_ERROR;
             }
         }
         else if (ndm == 3 && ndf == 3)  {
             if (strcmp(argv[argi],"1") == 0 ||
+                strcmp(argv[argi],"dof1") == 0 || strcmp(argv[argi],"DOF1") == 0 ||
                 strcmp(argv[argi],"u1") == 0 || strcmp(argv[argi],"U1") == 0 ||
                 strcmp(argv[argi],"ux") == 0 || strcmp(argv[argi],"UX") == 0)
-                dir(i) = 0;
+                dof(i) = 0;
             else if (strcmp(argv[argi],"2") == 0 ||
+                strcmp(argv[argi],"dof2") == 0 || strcmp(argv[argi],"DOF2") == 0 ||
                 strcmp(argv[argi],"u2") == 0 || strcmp(argv[argi],"U2") == 0 ||
                 strcmp(argv[argi],"uy") == 0 || strcmp(argv[argi],"UY") == 0)
-                dir(i) = 1;
+                dof(i) = 1;
             else if (strcmp(argv[argi],"3") == 0 ||
+                strcmp(argv[argi],"dof3") == 0 || strcmp(argv[argi],"DOF3") == 0 ||
                 strcmp(argv[argi],"u3") == 0 || strcmp(argv[argi],"U3") == 0 ||
                 strcmp(argv[argi],"uz") == 0 || strcmp(argv[argi],"UZ") == 0)
-                dir(i) = 2;
+                dof(i) = 2;
             else  {
-                opserr << "WARNING invalid dir\n";
-                opserr << "control point: " << tag << endln;
+                opserr << "WARNING invalid dof for control point: " << tag << endln;
+                printCommand(argc,argv);
+                opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType <-fact f> <-lim l u> <-isRel> ...\n";
                 return TCL_ERROR;
             }
         }
         else if (ndm == 3 && ndf == 6)  {
             if (strcmp(argv[argi],"1") == 0 ||
+                strcmp(argv[argi],"dof1") == 0 || strcmp(argv[argi],"DOF1") == 0 ||
                 strcmp(argv[argi],"u1") == 0 || strcmp(argv[argi],"U1") == 0 ||
                 strcmp(argv[argi],"ux") == 0 || strcmp(argv[argi],"UX") == 0)
-                dir(i) = 0;
+                dof(i) = 0;
             else if (strcmp(argv[argi],"2") == 0 ||
+                strcmp(argv[argi],"dof2") == 0 || strcmp(argv[argi],"DOF2") == 0 ||
                 strcmp(argv[argi],"u2") == 0 || strcmp(argv[argi],"U2") == 0 ||
                 strcmp(argv[argi],"uy") == 0 || strcmp(argv[argi],"UY") == 0)
-                dir(i) = 1;
+                dof(i) = 1;
             else if (strcmp(argv[argi],"3") == 0 ||
+                strcmp(argv[argi],"dof3") == 0 || strcmp(argv[argi],"DOF3") == 0 ||
                 strcmp(argv[argi],"u3") == 0 || strcmp(argv[argi],"U3") == 0 ||
                 strcmp(argv[argi],"uz") == 0 || strcmp(argv[argi],"UZ") == 0)
-                dir(i) = 2;
+                dof(i) = 2;
             else if (strcmp(argv[argi],"4") == 0 ||
+                strcmp(argv[argi],"dof4") == 0 || strcmp(argv[argi],"DOF4") == 0 ||
                 strcmp(argv[argi],"r1") == 0 || strcmp(argv[argi],"R1") == 0 ||
                 strcmp(argv[argi],"rx") == 0 || strcmp(argv[argi],"RX") == 0)
-                dir(i) = 3;
+                dof(i) = 3;
             else if (strcmp(argv[argi],"5") == 0 ||
+                strcmp(argv[argi],"dof5") == 0 || strcmp(argv[argi],"DOF5") == 0 ||
                 strcmp(argv[argi],"r2") == 0 || strcmp(argv[argi],"R2") == 0 ||
                 strcmp(argv[argi],"ry") == 0 || strcmp(argv[argi],"RY") == 0)
-                dir(i) = 4;
+                dof(i) = 4;
             else if (strcmp(argv[argi],"6") == 0 ||
+                strcmp(argv[argi],"dof6") == 0 || strcmp(argv[argi],"DOF6") == 0 ||
                 strcmp(argv[argi],"r3") == 0 || strcmp(argv[argi],"R3") == 0 ||
                 strcmp(argv[argi],"rz") == 0 || strcmp(argv[argi],"RZ") == 0)
-                dir(i) = 5;
+                dof(i) = 5;
             else  {
-                opserr << "WARNING invalid dir\n";
-                opserr << "control point: " << tag << endln;
-                return TCL_ERROR;
+                opserr << "WARNING invalid dof for control point: " << tag << endln;
+                printCommand(argc,argv);
+                opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType <-fact f> <-lim l u> <-isRel> ...\n";
+               return TCL_ERROR;
             }
         }
         argi++;
-        if (strcmp(argv[argi],"1") == 0 || strcmp(argv[argi],"disp") == 0 
-            || strcmp(argv[argi],"displacement") == 0)
-            resp(i) = OF_Resp_Disp;
-        else if (strcmp(argv[argi],"2") == 0 || strcmp(argv[argi],"vel") == 0 
-            || strcmp(argv[argi],"velocity") == 0)
-            resp(i) = OF_Resp_Vel;
-        else if (strcmp(argv[argi],"3") == 0 || strcmp(argv[argi],"accel") == 0 
-            || strcmp(argv[argi],"acceleration") == 0)
-            resp(i) = OF_Resp_Accel;
-        else if (strcmp(argv[argi],"4") == 0 || strcmp(argv[argi],"force") == 0)
-            resp(i) = OF_Resp_Force;
-        else if (strcmp(argv[argi],"5") == 0 || strcmp(argv[argi],"time") == 0)
-            resp(i) = OF_Resp_Time;
+        if (strcmp(argv[argi],"1") == 0 || strcmp(argv[argi],"dsp") == 0 ||
+            strcmp(argv[argi],"disp") == 0 || strcmp(argv[argi],"displacement") == 0)
+            rspType(i) = OF_Resp_Disp;
+        else if (strcmp(argv[argi],"2") == 0 || strcmp(argv[argi],"vel") == 0 ||
+            strcmp(argv[argi],"velocity") == 0)
+            rspType(i) = OF_Resp_Vel;
+        else if (strcmp(argv[argi],"3") == 0 || strcmp(argv[argi],"acc") == 0 ||
+            strcmp(argv[argi],"accel") == 0 || strcmp(argv[argi],"acceleration") == 0)
+            rspType(i) = OF_Resp_Accel;
+        else if (strcmp(argv[argi],"4") == 0 || strcmp(argv[argi],"frc") == 0 ||
+            strcmp(argv[argi],"force") == 0)
+            rspType(i) = OF_Resp_Force;
+        else if (strcmp(argv[argi],"5") == 0 ||  strcmp(argv[argi],"t") == 0 ||
+            strcmp(argv[argi],"tme") == 0 || strcmp(argv[argi],"time") == 0)
+            rspType(i) = OF_Resp_Time;
         else  {
-            opserr << "WARNING invalid resp\n";
-            opserr << "control point: " << tag << endln;
+            opserr << "WARNING invalid rspType for control point: " << tag << endln;
+            printCommand(argc,argv);
+            opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType <-fact f> <-lim l u> <-isRel> ...\n";
             return TCL_ERROR;
         }
         argi++;
-        if (argi<argc && strcmp(argv[argi],"-fact") == 0)  {
+        if (argi<argc && (strcmp(argv[argi],"-fact") == 0 || strcmp(argv[argi],"-factor") == 0))  {
             argi++;
             if (Tcl_GetDouble(interp, argv[argi], &f) != TCL_OK)  {
-                opserr << "WARNING invalid factor\n";
-                opserr << "control point: " << tag << endln;
+                opserr << "WARNING invalid factor for control point: " << tag << endln;
+                printCommand(argc,argv);
+                opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType <-fact f> <-lim l u> <-isRel> ...\n";
                 return TCL_ERROR;
             }
-            fact(i) = f;
+            factor(i) = f;
             argi++;
+        } else  {
+            factor(i) = 1.0;
         }
-        else  {
-            fact(i) = 1.0;
-        }
-        if (argi<argc && strcmp(argv[argi],"-lim") == 0)  {
+        if (argi<argc && (strcmp(argv[argi],"-lim") == 0 || strcmp(argv[argi],"-limit") == 0))  {
             argi++;
             if (Tcl_GetDouble(interp, argv[argi], &lim) != TCL_OK)  {
-                opserr << "WARNING invalid lower limit\n";
-                opserr << "control point: " << tag << endln;
+                opserr << "WARNING invalid lower limit for control point: " << tag << endln;
+                printCommand(argc,argv);
+                opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType <-fact f> <-lim l u> <-isRel> ...\n";
                 return TCL_ERROR;
             }
             lowerLim(i) = lim;
             argi++;
             if (Tcl_GetDouble(interp, argv[argi], &lim) != TCL_OK)  {
-                opserr << "WARNING invalid upper limit\n";
-                opserr << "control point: " << tag << endln;
+                opserr << "WARNING invalid upper limit for control point: " << tag << endln;
+                printCommand(argc,argv);
+                opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType <-fact f> <-lim l u> <-isRel> ...\n";
                 return TCL_ERROR;
             }
             upperLim(i) = lim;
             argi++;
         }
+        if (argi<argc && (strcmp(argv[argi],"-isRel") == 0 || strcmp(argv[argi],"-isRelative") == 0))  {
+            isRelative(i) = 1;
+            numRefType++;
+            argi++;
+        }
     }
     
     // parsing was successful, allocate the control point
-    theCP = new ExperimentalCP(tag, ndm, ndf, nodeTag, dir, resp, fact);
+    theCP = new ExperimentalCP(tag, dof, rspType, factor);
     
     if (theCP == 0)  {
         opserr << "WARNING could not create experimental control point " << argv[1] << endln;
@@ -311,9 +365,16 @@ int TclExpCPCommand(ClientData clientData, Tcl_Interp *interp,
     }
     
     // add limits if available
-    if (numLim > 0)  {
+    if (numLim > 0)
         theCP->setLimits(lowerLim, upperLim);
-    }
+    
+    // add signal reference types if available
+    if (numRefType > 0)
+        theCP->setSigRefType(isRelative);
+    
+    // add node if available
+    if (theNode != 0)
+        theCP->setNode(theNode);
     
     // now add the control point to the modelBuilder
     if (addExperimentalCP(*theCP) < 0)  {
