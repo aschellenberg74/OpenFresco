@@ -26,26 +26,29 @@
 #ifndef ExperimentalCP_h
 #define ExperimentalCP_h
 
-// Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 02/07
 // Revision: A
 //
 // Description: This file contains the class definition for 
 // ExperimentalCP. This object possess control point data, i.e.
-// control node tag, direction, and response.
+// DOF-IDs and response types for each DOF. Optionally the
+// control point object can store scaling factors, response
+// limits, signal reference types and be associated with a node.
 
 #include <FrescoGlobals.h>
 
 #include <DomainComponent.h>
 #include <ID.h>
 
+class Node;
+
 class ExperimentalCP : public TaggedObject
 {
 public:
     // constructors
-    ExperimentalCP(int tag, int ndm, int ndf,
-        int nodeTag, const ID &direction,
-        const ID &response, const Vector &factor = 0);
+    ExperimentalCP(int tag, const ID &DOF,
+        const ID &rspType, const Vector &factor = 0);
     ExperimentalCP(const ExperimentalCP &ecp);
     
     // destructor
@@ -55,35 +58,41 @@ public:
     virtual void Print(OPS_Stream &s, int flag);
     
     // methods to set control point data
-    int setNDM(int ndm);
-    int setNDF(int ndf);
-    int setData(int nodeTag, const ID &direction,
-        const ID &response, const Vector &factor = 0);
+    int setData(const ID &DOF,
+        const ID &rspType, const Vector &factor = 0);
     int setLimits(const Vector &lowerLimit,
         const Vector &upperLimit);
+    int setSigRefType(const ID &isRelative);
+    int setNode(Node *theNode);
     
     // methods to get derived control point data
-    int getNDM();
-    int getNDF();
+    int getNumSignal();
+    int getNumDOF();
+    const ID &getSizeRspType();
+    const ID &getDOFRspType(int dof);
+    
+    // methods to get optional nodal data
     int getNodeTag();
-    int getNumDirection();
-    int getNumUniqueDir();
-    const ID &getSizeRespType();
-    const ID &getDirRespType(int dir);
-
+    int getNodeNDM();
+    int getNodeNDF();
+    const Vector &getNodeCrds();
+    
     // methods to get basic control point data
-    const ID &getDirection();
-    const ID &getUniqueDir();
-    const ID &getResponseType();
+    const ID &getDOF();
+    const ID &getRspType();
     const Vector &getFactor();
     const Vector &getLowerLimit();
     const Vector &getUpperLimit();
-
-    int getDirection(int dirID);
-    int getResponseType(int dirID);
-    double getFactor(int dirID);
-    double getLowerLimit(int dirID);
-    double getUpperLimit(int dirID);
+    const ID &getSigRefType();
+    
+    const ID &getUniqueDOF();  // DO I STILL NEED THIS ???
+    
+    int getDOF(int signalID);
+    int getRspType(int signalID);
+    double getFactor(int signalID);
+    double getLowerLimit(int signalID);
+    double getUpperLimit(int signalID);
+    int getSigRefType(int signalID);
     
     // methods to query information
     int hasLimits();
@@ -91,20 +100,25 @@ public:
     int operator != (ExperimentalCP &ecp);
     
 protected:
-    int ndm;            // number of dimensions
-    int ndf;            // number of degrees of freedom
-    int nodeTag;        // control node tag
-    ID direction;       // numDirection directions
-    ID uniqueDir;       // numUniqueDir unique directions
-    ID response;        // numDirection response types
-    Vector factor;      // numDirection factors
-    Vector lowerLim;    // lower limits
-    Vector upperLim;    // upper limits
-
-    int numDirection;   // number of directions
-    int numUniqueDir;   // number of unique directions
-    ID sizeRespType;    // sizes of response types
-    ID dirRespType;     // response types for each unique direction
+    int numSignals;     // number of signals assigned to CP
+    int numDOF;         // number of unique DOF assigned to CP
+    
+    ID DOF;             // DOF IDs (size = numSignals) 
+    ID rspType;         // response types (size = numSignals)
+    Vector factor;      // scaling factors (size = numSignals)
+    Vector lowerLim;    // lower limits (size = numSignals)
+    Vector upperLim;    // upper limits (size = numSignals)
+    ID isRelative;      // absolute or relative (size = numSignals)
+    
+    ID uniqueDOF;       // unique DOFs
+    ID sizeRspType;     // sizes of response types
+    ID dofRspType;      // response types for each unique direction
+    
+    int nodeTag;        // node tag with which CP is associated
+    Node *theNode;      // pointer to node with which CP is associated
+    int nodeNDM;        // number of dimensions
+    int nodeNDF;        // number of degrees of freedom
+    Vector nodeCrds;    // vector of nodal coordinates
 };
 
 #endif
