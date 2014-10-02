@@ -43,17 +43,17 @@ f = 2*Fn/NFFT*(0:NumUniquePts-1)';
 % plot the results
 if (nargin==3)
     subplot(2,1,1)
-    plot(t,data,'-','LineWidth',1.0);
+    plot(t,data,'-','LineWidth',1.5);
     hold('on');
     grid('on');
-    xlabel('Time [sec]');
-    ylabel('P(time)');
-    title([figTitle,': Time domain']);
+    xlabel('Time [sec]','FontWeight','bold');
+    ylabel('P(time)','FontWeight','bold');
+    title([figTitle,': Time domain'],'FontWeight','bold');
     subplot(2,1,2)
-    plot(f,MX,'-','LineWidth',1.0);
+    plot(f,MX,'-','LineWidth',1.5);
     hold('on');
     grid('on');
-    xlabel('Frequency [Hz]');
-    ylabel('P(freq)');
-    title([figTitle,': Frequency domain']);
+    xlabel('Frequency [Hz]','FontWeight','bold');
+    ylabel('P(freq)','FontWeight','bold');
+    title([figTitle,': Frequency domain'],'FontWeight','bold');
 end
