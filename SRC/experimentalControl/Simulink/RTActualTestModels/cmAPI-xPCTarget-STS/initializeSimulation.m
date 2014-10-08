@@ -1,7 +1,7 @@
 %INITIALIZESIMULATION to initialize the parameters needed to build the Simulink model
 %
 % created by MTS
-% modified by Andreas Schellenberg (andreas.schellenberg@gmx.net) 11/2004
+% modified by Andreas Schellenberg (andreas.schellenberg@gmail.com) 11/2004
 
 clear;
 close all;
@@ -9,11 +9,15 @@ clc;
 
 %%%%%%%%%% HYBRID CONTROLLER PARAMETERS %%%%%%%%%%
 
+% set number of degrees-of-freedom
+nDOF = 2;
+
 % set time steps
-HybridCtrlParameters.dtInt = 0.005;          % integration time step (sec)
-HybridCtrlParameters.dtSim = 0.25;           % simulation time step (sec)
+HybridCtrlParameters.dtInt = 0.01;           % integration time step (sec)
+HybridCtrlParameters.dtSim = 0.05;           % simulation time step (sec)
 HybridCtrlParameters.dtCon = 1/1024;         % controller time step (sec)
-HybridCtrlParameters.delay = 0.0;            % delay due to undershoot (sec)
+HybridCtrlParameters.delay(1) = 0/1000;      % delay compensation DOF 1 (sec)
+HybridCtrlParameters.delay(2) = 0/1000;      % delay compensation DOF 2 (sec)
 
 % calculate max number of substeps
 HybridCtrlParameters.N = round(HybridCtrlParameters.dtSim/HybridCtrlParameters.dtCon);
@@ -24,7 +28,7 @@ HybridCtrlParameters.dtSim = HybridCtrlParameters.N*HybridCtrlParameters.dtCon;
 HybridCtrlParameters.iDelay = round(HybridCtrlParameters.delay./HybridCtrlParameters.dtCon);
 
 % check that finite state machine does not deadlock
-delayRatio = HybridCtrlParameters.iDelay/HybridCtrlParameters.N;
+delayRatio = max(HybridCtrlParameters.iDelay)/HybridCtrlParameters.N;
 if (delayRatio>0.6 && delayRatio<0.8)
     warndlg(['The delay compensation exceeds 60% of the simulation time step.', ...
         'Please consider increasing the simulation time step in order to avoid oscillations.'], ...
