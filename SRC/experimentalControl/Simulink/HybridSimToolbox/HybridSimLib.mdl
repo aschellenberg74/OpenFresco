@@ -16,9 +16,9 @@ Library {
   ModifiedByFormat	  "%<Auto>"
   LastModifiedBy	  "Andreas"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Tue Apr 15 10:14:41 2014"
-  RTWModifiedTimeStamp	  319457646
-  ModelVersionFormat	  "1.%<AutoIncrement:115>"
+  LastModifiedDate	  "Tue Oct 07 23:54:44 2014"
+  RTWModifiedTimeStamp	  334626821
+  ModelVersionFormat	  "1.%<AutoIncrement:120>"
   ConfigurationManager	  "None"
   SampleTimeColors	  off
   SampleTimeAnnotations	  off
@@ -697,6 +697,28 @@ Library {
       CoefficientInTFapproximation "inf"
     }
     Block {
+      BlockType		      DiscreteFir
+      CoefSource	      "Dialog parameters"
+      FilterStructure	      "Direct form"
+      Coefficients	      "[0.5 0.5]"
+      InputProcessing	      "Elements as channels (sample based)"
+      InitialStates	      "0"
+      SampleTime	      "-1"
+      CoefMin		      "[]"
+      CoefMax		      "[]"
+      OutMin		      "[]"
+      OutMax		      "[]"
+      TapSumDataTypeStr	      "Inherit: Same as input"
+      CoefDataTypeStr	      "Inherit: Same word length as input"
+      ProductDataTypeStr      "Inherit: Inherit via internal rule"
+      AccumDataTypeStr	      "Inherit: Inherit via internal rule"
+      StateDataTypeStr	      "Inherit: Same as accumulator"
+      OutDataTypeStr	      "Inherit: Same as accumulator"
+      LockScale		      off
+      RndMeth		      "Floor"
+      SaturateOnIntegerOverflow	off
+    }
+    Block {
       BlockType		      DiscreteIntegrator
       IntegratorMethod	      "Integration: Forward Euler"
       gainval		      "1.0"
@@ -981,7 +1003,7 @@ Library {
     ShowPageBoundaries	    off
     ZoomFactor		    "100"
     ReportName		    "simulink-default.rpt"
-    SIDHighWatermark	    "391"
+    SIDHighWatermark	    "397"
     Block {
       BlockType		      SubSystem
       Name		      "Filtering"
@@ -1012,19 +1034,16 @@ Library {
 	ShowPageBoundaries	off
 	ZoomFactor		"100"
 	Block {
-	  BlockType		  SubSystem
-	  Name			  "Subsystem1"
-	  SID			  "379"
+	  BlockType		  DiscreteFir
+	  Name			  "MovingAverage Filter"
+	  SID			  "397"
 	  Ports			  [1, 1]
-	  Position		  [30, 54, 115, 86]
+	  Position		  [30, 53, 115, 87]
+	  ZOrder		  -5
 	  ShowName		  off
-	  MinAlgLoopOccurrences	  off
-	  PropExecContextOutsideSubsystem off
-	  RTWSystemCode		  "Auto"
-	  FunctionWithSeparateData off
-	  Opaque		  off
-	  RequestExecContextInheritance	off
-	  MaskHideContents	  off
+	  Coefficients		  "1/numSample*ones(1,numSample)"
+	  MaskType		  "Moving Average Filter"
+	  MaskDescription	  "Moving average filter by using discrete FIR filter.\nSet numSample = 1 for no filtering."
 	  MaskPromptString	  "Number of Samples: numSample"
 	  MaskStyleString	  "edit"
 	  MaskVariables		  "numSample=@1;"
@@ -1038,310 +1057,19 @@ Library {
 	  MaskIconRotate	  "none"
 	  MaskPortRotate	  "default"
 	  MaskIconUnits		  "autoscale"
-	  MaskValueString	  "100"
-	  System {
-	    Name		    "Subsystem1"
-	    Location		    [96, 332, 559, 644]
-	    Open		    off
-	    ModelBrowserVisibility  off
-	    ModelBrowserWidth	    200
-	    ScreenColor		    "white"
-	    PaperOrientation	    "landscape"
-	    PaperPositionMode	    "auto"
-	    PaperType		    "usletter"
-	    PaperUnits		    "inches"
-	    TiledPaperMargins	    [0.500000, 0.500000, 0.500000, 0.500000]
-	    TiledPageScale	    1
-	    ShowPageBoundaries	    off
-	    ZoomFactor		    "100"
-	    Block {
-	      BlockType		      Inport
-	      Name		      "In1"
-	      SID		      "380"
-	      Position		      [20, 148, 50, 162]
-	      IconDisplay	      "Port number"
-	    }
-	    Block {
-	      BlockType		      Demux
-	      Name		      "Demux"
-	      SID		      "381"
-	      Ports		      [1, 6]
-	      Position		      [90, 23, 95, 282]
-	      BackgroundColor	      "black"
-	      ShowName		      off
-	      Outputs		      "6"
-	      DisplayOption	      "bar"
-	    }
-	    Block {
-	      BlockType		      Mux
-	      Name		      "Mux"
-	      SID		      "382"
-	      Ports		      [6, 1]
-	      Position		      [355, 23, 360, 282]
-	      ShowName		      off
-	      Inputs		      "6"
-	      DisplayOption	      "bar"
-	    }
-	    Block {
-	      BlockType		      Reference
-	      Name		      "Weighted\nMoving Average"
-	      SID		      "383"
-	      Ports		      [1, 1]
-	      Position		      [165, 23, 290, 57]
-	      ShowName		      off
-	      LibraryVersion	      "1.13"
-	      SourceBlock	      "simulink_need_slupdate/Weighted\nMoving Average"
-	      SourceType	      "Weighted Moving Average"
-	      mgainval		      "1/numSample*ones(1,numSample)"
-	      vinit		      "0.0"
-	      samptime		      "-1"
-	      OutDataTypeStr	      "Inherit: Inherit via internal rule"
-	      OutputDataTypeScalingMode	"Inherit via internal rule"
-	      OutDataType	      "sfix(16)"
-	      OutScaling	      "2^-10"
-	      LockScale		      off
-	      RndMeth		      "Floor"
-	      DoSatur		      off
-	      GainDataTypeStr	      "Inherit: Inherit via internal rule"
-	      GainDataTypeScalingMode "Inherit via internal rule"
-	      GainDataType	      "sfix( 16 )"
-	      MatRadixGroup	      "Best Precision: Matrix-wise"
-	      GainScaling	      "2^-10"
-	    }
-	    Block {
-	      BlockType		      Reference
-	      Name		      "Weighted\nMoving Average1"
-	      SID		      "384"
-	      Ports		      [1, 1]
-	      Position		      [165, 68, 290, 102]
-	      ShowName		      off
-	      LibraryVersion	      "1.13"
-	      SourceBlock	      "simulink_need_slupdate/Weighted\nMoving Average"
-	      SourceType	      "Weighted Moving Average"
-	      mgainval		      "1/numSample*ones(1,numSample)"
-	      vinit		      "0.0"
-	      samptime		      "-1"
-	      OutDataTypeStr	      "Inherit: Inherit via internal rule"
-	      OutputDataTypeScalingMode	"Inherit via internal rule"
-	      OutDataType	      "sfix(16)"
-	      OutScaling	      "2^-10"
-	      LockScale		      off
-	      RndMeth		      "Floor"
-	      DoSatur		      off
-	      GainDataTypeStr	      "Inherit: Inherit via internal rule"
-	      GainDataTypeScalingMode "Inherit via internal rule"
-	      GainDataType	      "sfix( 16 )"
-	      MatRadixGroup	      "Best Precision: Matrix-wise"
-	      GainScaling	      "2^-10"
-	    }
-	    Block {
-	      BlockType		      Reference
-	      Name		      "Weighted\nMoving Average2"
-	      SID		      "385"
-	      Ports		      [1, 1]
-	      Position		      [165, 113, 290, 147]
-	      ShowName		      off
-	      LibraryVersion	      "1.13"
-	      SourceBlock	      "simulink_need_slupdate/Weighted\nMoving Average"
-	      SourceType	      "Weighted Moving Average"
-	      mgainval		      "1/numSample*ones(1,numSample)"
-	      vinit		      "0.0"
-	      samptime		      "-1"
-	      OutDataTypeStr	      "Inherit: Inherit via internal rule"
-	      OutputDataTypeScalingMode	"Inherit via internal rule"
-	      OutDataType	      "sfix(16)"
-	      OutScaling	      "2^-10"
-	      LockScale		      off
-	      RndMeth		      "Floor"
-	      DoSatur		      off
-	      GainDataTypeStr	      "Inherit: Inherit via internal rule"
-	      GainDataTypeScalingMode "Inherit via internal rule"
-	      GainDataType	      "sfix( 16 )"
-	      MatRadixGroup	      "Best Precision: Matrix-wise"
-	      GainScaling	      "2^-10"
-	    }
-	    Block {
-	      BlockType		      Reference
-	      Name		      "Weighted\nMoving Average3"
-	      SID		      "386"
-	      Ports		      [1, 1]
-	      Position		      [165, 158, 290, 192]
-	      ShowName		      off
-	      LibraryVersion	      "1.13"
-	      SourceBlock	      "simulink_need_slupdate/Weighted\nMoving Average"
-	      SourceType	      "Weighted Moving Average"
-	      mgainval		      "1/numSample*ones(1,numSample)"
-	      vinit		      "0.0"
-	      samptime		      "-1"
-	      OutDataTypeStr	      "Inherit: Inherit via internal rule"
-	      OutputDataTypeScalingMode	"Inherit via internal rule"
-	      OutDataType	      "sfix(16)"
-	      OutScaling	      "2^-10"
-	      LockScale		      off
-	      RndMeth		      "Floor"
-	      DoSatur		      off
-	      GainDataTypeStr	      "Inherit: Inherit via internal rule"
-	      GainDataTypeScalingMode "Inherit via internal rule"
-	      GainDataType	      "sfix( 16 )"
-	      MatRadixGroup	      "Best Precision: Matrix-wise"
-	      GainScaling	      "2^-10"
-	    }
-	    Block {
-	      BlockType		      Reference
-	      Name		      "Weighted\nMoving Average4"
-	      SID		      "387"
-	      Ports		      [1, 1]
-	      Position		      [165, 203, 290, 237]
-	      ShowName		      off
-	      LibraryVersion	      "1.13"
-	      SourceBlock	      "simulink_need_slupdate/Weighted\nMoving Average"
-	      SourceType	      "Weighted Moving Average"
-	      mgainval		      "1/numSample*ones(1,numSample)"
-	      vinit		      "0.0"
-	      samptime		      "-1"
-	      OutDataTypeStr	      "Inherit: Inherit via internal rule"
-	      OutputDataTypeScalingMode	"Inherit via internal rule"
-	      OutDataType	      "sfix(16)"
-	      OutScaling	      "2^-10"
-	      LockScale		      off
-	      RndMeth		      "Floor"
-	      DoSatur		      off
-	      GainDataTypeStr	      "Inherit: Inherit via internal rule"
-	      GainDataTypeScalingMode "Inherit via internal rule"
-	      GainDataType	      "sfix( 16 )"
-	      MatRadixGroup	      "Best Precision: Matrix-wise"
-	      GainScaling	      "2^-10"
-	    }
-	    Block {
-	      BlockType		      Reference
-	      Name		      "Weighted\nMoving Average5"
-	      SID		      "388"
-	      Ports		      [1, 1]
-	      Position		      [165, 248, 290, 282]
-	      ShowName		      off
-	      LibraryVersion	      "1.13"
-	      SourceBlock	      "simulink_need_slupdate/Weighted\nMoving Average"
-	      SourceType	      "Weighted Moving Average"
-	      mgainval		      "1/numSample*ones(1,numSample)"
-	      vinit		      "0.0"
-	      samptime		      "-1"
-	      OutDataTypeStr	      "Inherit: Inherit via internal rule"
-	      OutputDataTypeScalingMode	"Inherit via internal rule"
-	      OutDataType	      "sfix(16)"
-	      OutScaling	      "2^-10"
-	      LockScale		      off
-	      RndMeth		      "Floor"
-	      DoSatur		      off
-	      GainDataTypeStr	      "Inherit: Inherit via internal rule"
-	      GainDataTypeScalingMode "Inherit via internal rule"
-	      GainDataType	      "sfix( 16 )"
-	      MatRadixGroup	      "Best Precision: Matrix-wise"
-	      GainScaling	      "2^-10"
-	    }
-	    Block {
-	      BlockType		      Outport
-	      Name		      "Out1"
-	      SID		      "389"
-	      Position		      [405, 148, 435, 162]
-	      IconDisplay	      "Port number"
-	    }
-	    Line {
-	      SrcBlock		      "Weighted\nMoving Average"
-	      SrcPort		      1
-	      DstBlock		      "Mux"
-	      DstPort		      1
-	    }
-	    Line {
-	      SrcBlock		      "Weighted\nMoving Average1"
-	      SrcPort		      1
-	      DstBlock		      "Mux"
-	      DstPort		      2
-	    }
-	    Line {
-	      SrcBlock		      "Weighted\nMoving Average2"
-	      SrcPort		      1
-	      DstBlock		      "Mux"
-	      DstPort		      3
-	    }
-	    Line {
-	      SrcBlock		      "Weighted\nMoving Average3"
-	      SrcPort		      1
-	      DstBlock		      "Mux"
-	      DstPort		      4
-	    }
-	    Line {
-	      SrcBlock		      "Weighted\nMoving Average4"
-	      SrcPort		      1
-	      DstBlock		      "Mux"
-	      DstPort		      5
-	    }
-	    Line {
-	      SrcBlock		      "Weighted\nMoving Average5"
-	      SrcPort		      1
-	      DstBlock		      "Mux"
-	      DstPort		      6
-	    }
-	    Line {
-	      SrcBlock		      "Mux"
-	      SrcPort		      1
-	      DstBlock		      "Out1"
-	      DstPort		      1
-	    }
-	    Line {
-	      SrcBlock		      "Demux"
-	      SrcPort		      1
-	      DstBlock		      "Weighted\nMoving Average"
-	      DstPort		      1
-	    }
-	    Line {
-	      SrcBlock		      "Demux"
-	      SrcPort		      2
-	      DstBlock		      "Weighted\nMoving Average1"
-	      DstPort		      1
-	    }
-	    Line {
-	      SrcBlock		      "Demux"
-	      SrcPort		      3
-	      DstBlock		      "Weighted\nMoving Average2"
-	      DstPort		      1
-	    }
-	    Line {
-	      SrcBlock		      "Demux"
-	      SrcPort		      4
-	      DstBlock		      "Weighted\nMoving Average3"
-	      DstPort		      1
-	    }
-	    Line {
-	      SrcBlock		      "Demux"
-	      SrcPort		      5
-	      DstBlock		      "Weighted\nMoving Average4"
-	      DstPort		      1
-	    }
-	    Line {
-	      SrcBlock		      "Demux"
-	      SrcPort		      6
-	      DstBlock		      "Weighted\nMoving Average5"
-	      DstPort		      1
-	    }
-	    Line {
-	      SrcBlock		      "In1"
-	      SrcPort		      1
-	      DstBlock		      "Demux"
-	      DstPort		      1
-	    }
-	  }
+	  MaskValueString	  "5"
 	}
 	Block {
 	  BlockType		  S-Function
 	  Name			  "median filter"
 	  SID			  "390"
 	  Ports			  [1, 1]
-	  Position		  [160, 53, 220, 87]
+	  Position		  [155, 53, 240, 87]
 	  ShowName		  off
-	  FunctionName		  "median"
+	  FunctionName		  "medianFilter"
 	  Parameters		  "width"
 	  EnableBusSupport	  off
-	  MaskType		  "Median filter"
+	  MaskType		  "Moving Median Filter"
 	  MaskPromptString	  "Glitch width (samples)"
 	  MaskStyleString	  "edit"
 	  MaskVariables		  "width=@1;"
@@ -1349,6 +1077,7 @@ Library {
 	  MaskEnableString	  "on"
 	  MaskVisibilityString	  "on"
 	  MaskToolTipString	  "on"
+	  MaskDisplay		  "fprintf('MovingMedian\\nFilter')"
 	  MaskIconFrame		  on
 	  MaskIconOpaque	  on
 	  MaskIconRotate	  "none"
@@ -2492,26 +2221,20 @@ Library {
 	      Position		      [51, 70, 89, 105]
 	      BlockRotation	      270
 	      BlockMirror	      on
+	      LibraryVersion	      "1.260"
 	      SourceBlock	      "simulink/Discrete/Difference"
 	      SourceType	      "Difference"
-	      ShowPortLabels	      "FromPortIcon"
-	      SystemSampleTime	      "-1"
-	      FunctionWithSeparateData "off"
-	      RTWMemSecFuncInitTerm   "Inherit from model"
-	      RTWMemSecFuncExecute    "Inherit from model"
-	      RTWMemSecDataConstants  "Inherit from model"
-	      RTWMemSecDataInternal   "Inherit from model"
-	      RTWMemSecDataParameters "Inherit from model"
 	      ICPrevInput	      "0.0"
+	      InputProcessing	      "Inherited"
 	      OutMin		      "[]"
 	      OutMax		      "[]"
 	      OutDataTypeStr	      "Inherit: Inherit via internal rule"
 	      OutputDataTypeScalingMode	"Inherit via internal rule"
 	      OutDataType	      "sfix(16)"
 	      OutScaling	      "2^-10"
-	      LockScale		      "off"
+	      LockScale		      off
 	      RndMeth		      "Floor"
-	      DoSatur		      "off"
+	      DoSatur		      off
 	    }
 	    Block {
 	      BlockType		      DiscreteIntegrator
@@ -3918,20 +3641,13 @@ Library {
 		    SID			    "163"
 		    Ports		    [0, 1]
 		    Position		    [25, 40, 55, 70]
+		    LibraryVersion	    "1.260"
 		    SourceBlock		    "simulink/Sources/Ramp"
 		    SourceType		    "Ramp"
-		    ShowPortLabels	    "FromPortIcon"
-		    SystemSampleTime	    "-1"
-		    FunctionWithSeparateData "off"
-		    RTWMemSecFuncInitTerm   "Inherit from model"
-		    RTWMemSecFuncExecute    "Inherit from model"
-		    RTWMemSecDataConstants  "Inherit from model"
-		    RTWMemSecDataInternal   "Inherit from model"
-		    RTWMemSecDataParameters "Inherit from model"
 		    slope		    "1/dt"
 		    start		    "0"
 		    X0			    "0"
-		    VectorParams1D	    "on"
+		    VectorParams1D	    on
 		    }
 		    Block {
 		    BlockType		    Sum
@@ -4232,20 +3948,13 @@ Library {
 		    SID			    "181"
 		    Ports		    [0, 1]
 		    Position		    [25, 40, 55, 70]
+		    LibraryVersion	    "1.260"
 		    SourceBlock		    "simulink/Sources/Ramp"
 		    SourceType		    "Ramp"
-		    ShowPortLabels	    "FromPortIcon"
-		    SystemSampleTime	    "-1"
-		    FunctionWithSeparateData "off"
-		    RTWMemSecFuncInitTerm   "Inherit from model"
-		    RTWMemSecFuncExecute    "Inherit from model"
-		    RTWMemSecDataConstants  "Inherit from model"
-		    RTWMemSecDataInternal   "Inherit from model"
-		    RTWMemSecDataParameters "Inherit from model"
 		    slope		    "1/dt"
 		    start		    "0"
 		    X0			    "0"
-		    VectorParams1D	    "on"
+		    VectorParams1D	    on
 		    }
 		    Block {
 		    BlockType		    Sum
@@ -4584,17 +4293,12 @@ Library {
 		    SID			    "189"
 		    Ports		    [1, 1]
 		    Position		    [170, 200, 230, 250]
+		    LibraryVersion	    "1.260"
 		    SourceBlock		    "simulink/Logic and Bit\nOperations/Detect Fall\nNonpositive"
 		    SourceType		    "Detect Fall Nonpositive"
-		    ShowPortLabels	    "FromPortIcon"
-		    SystemSampleTime	    "-1"
-		    FunctionWithSeparateData "off"
-		    RTWMemSecFuncInitTerm   "Inherit from model"
-		    RTWMemSecFuncExecute    "Inherit from model"
-		    RTWMemSecDataConstants  "Inherit from model"
-		    RTWMemSecDataInternal   "Inherit from model"
-		    RTWMemSecDataParameters "Inherit from model"
 		    vinit		    "0"
+		    InputProcessing	    "Inherited"
+		    OutDataTypeStr	    "uint8"
 		    }
 		    Block {
 		    BlockType		    Reference
@@ -4602,17 +4306,12 @@ Library {
 		    SID			    "190"
 		    Ports		    [1, 1]
 		    Position		    [170, 85, 230, 135]
+		    LibraryVersion	    "1.260"
 		    SourceBlock		    "simulink/Logic and Bit\nOperations/Detect Rise\nPositive"
 		    SourceType		    "Detect Rise Positive"
-		    ShowPortLabels	    "FromPortIcon"
-		    SystemSampleTime	    "-1"
-		    FunctionWithSeparateData "off"
-		    RTWMemSecFuncInitTerm   "Inherit from model"
-		    RTWMemSecFuncExecute    "Inherit from model"
-		    RTWMemSecDataConstants  "Inherit from model"
-		    RTWMemSecDataInternal   "Inherit from model"
-		    RTWMemSecDataParameters "Inherit from model"
 		    vinit		    "0"
+		    InputProcessing	    "Inherited"
+		    OutDataTypeStr	    "uint8"
 		    }
 		    Block {
 		    BlockType		    SubSystem
@@ -5637,20 +5336,13 @@ Library {
 		    SID			    "251"
 		    Ports		    [0, 1]
 		    Position		    [25, 40, 55, 70]
+		    LibraryVersion	    "1.260"
 		    SourceBlock		    "simulink/Sources/Ramp"
 		    SourceType		    "Ramp"
-		    ShowPortLabels	    "FromPortIcon"
-		    SystemSampleTime	    "-1"
-		    FunctionWithSeparateData "off"
-		    RTWMemSecFuncInitTerm   "Inherit from model"
-		    RTWMemSecFuncExecute    "Inherit from model"
-		    RTWMemSecDataConstants  "Inherit from model"
-		    RTWMemSecDataInternal   "Inherit from model"
-		    RTWMemSecDataParameters "Inherit from model"
 		    slope		    "1/dt"
 		    start		    "0"
 		    X0			    "0"
-		    VectorParams1D	    "on"
+		    VectorParams1D	    on
 		    }
 		    Block {
 		    BlockType		    Sum
@@ -5951,20 +5643,13 @@ Library {
 		    SID			    "269"
 		    Ports		    [0, 1]
 		    Position		    [25, 40, 55, 70]
+		    LibraryVersion	    "1.260"
 		    SourceBlock		    "simulink/Sources/Ramp"
 		    SourceType		    "Ramp"
-		    ShowPortLabels	    "FromPortIcon"
-		    SystemSampleTime	    "-1"
-		    FunctionWithSeparateData "off"
-		    RTWMemSecFuncInitTerm   "Inherit from model"
-		    RTWMemSecFuncExecute    "Inherit from model"
-		    RTWMemSecDataConstants  "Inherit from model"
-		    RTWMemSecDataInternal   "Inherit from model"
-		    RTWMemSecDataParameters "Inherit from model"
 		    slope		    "1/dt"
 		    start		    "0"
 		    X0			    "0"
-		    VectorParams1D	    "on"
+		    VectorParams1D	    on
 		    }
 		    Block {
 		    BlockType		    Sum
@@ -6248,22 +5933,15 @@ Library {
 		  Ports			  [1]
 		  Position		  [460, 144, 540, 176]
 		  ShowName		  off
+		  LibraryVersion	  "1.1717"
 		  SourceBlock		  "xpclib/Misc./Scope (xPC) "
 		  SourceType		  "xpcscopeblock"
-		  ShowPortLabels	  "FromPortIcon"
-		  SystemSampleTime	  "-1"
-		  FunctionWithSeparateData "off"
-		  RTWMemSecFuncInitTerm	  "Inherit from model"
-		  RTWMemSecFuncExecute	  "Inherit from model"
-		  RTWMemSecDataConstants  "Inherit from model"
-		  RTWMemSecDataInternal	  "Inherit from model"
-		  RTWMemSecDataParameters "Inherit from model"
 		  scopeno		  "4"
 		  scopetype		  "File"
-		  autostart		  "on"
+		  autostart		  on
 		  viewmode		  "Graphical redraw"
 		  formatstr		  "'%15.6f'"
-		  grid			  "on"
+		  grid			  on
 		  ylimits		  "[0,3]"
 		  nosamples		  "4096"
 		  noprepostsamples	  "0"
@@ -6277,7 +5955,9 @@ Library {
 		  filename		  "state.dat"
 		  mode			  "Lazy"
 		  writesize		  "512"
-		  autorestart		  "on"
+		  autorestart		  on
+		  dynamicfilemode	  off
+		  maxwritefilesize	  "512*1024^2"
 		}
 		Block {
 		  BlockType		  Reference
@@ -6286,22 +5966,15 @@ Library {
 		  Ports			  [1]
 		  Position		  [665, 59, 745, 91]
 		  ShowName		  off
+		  LibraryVersion	  "1.1717"
 		  SourceBlock		  "xpclib/Misc./Scope (xPC) "
 		  SourceType		  "xpcscopeblock"
-		  ShowPortLabels	  "FromPortIcon"
-		  SystemSampleTime	  "-1"
-		  FunctionWithSeparateData "off"
-		  RTWMemSecFuncInitTerm	  "Inherit from model"
-		  RTWMemSecFuncExecute	  "Inherit from model"
-		  RTWMemSecDataConstants  "Inherit from model"
-		  RTWMemSecDataInternal	  "Inherit from model"
-		  RTWMemSecDataParameters "Inherit from model"
 		  scopeno		  "1"
 		  scopetype		  "File"
-		  autostart		  "on"
+		  autostart		  on
 		  viewmode		  "Numerical"
 		  formatstr		  "'%15.6f'"
-		  grid			  "on"
+		  grid			  on
 		  ylimits		  "[-4,4]"
 		  nosamples		  "4096"
 		  noprepostsamples	  "0"
@@ -6315,7 +5988,9 @@ Library {
 		  filename		  "targDsp.dat"
 		  mode			  "Lazy"
 		  writesize		  "512"
-		  autorestart		  "on"
+		  autorestart		  on
+		  dynamicfilemode	  off
+		  maxwritefilesize	  "512*1024^2"
 		}
 		Block {
 		  BlockType		  Reference
@@ -6324,22 +5999,15 @@ Library {
 		  Ports			  [1]
 		  Position		  [460, 189, 540, 221]
 		  ShowName		  off
+		  LibraryVersion	  "1.1717"
 		  SourceBlock		  "xpclib/Misc./Scope (xPC) "
 		  SourceType		  "xpcscopeblock"
-		  ShowPortLabels	  "FromPortIcon"
-		  SystemSampleTime	  "-1"
-		  FunctionWithSeparateData "off"
-		  RTWMemSecFuncInitTerm	  "Inherit from model"
-		  RTWMemSecFuncExecute	  "Inherit from model"
-		  RTWMemSecDataConstants  "Inherit from model"
-		  RTWMemSecDataInternal	  "Inherit from model"
-		  RTWMemSecDataParameters "Inherit from model"
 		  scopeno		  "5"
 		  scopetype		  "File"
-		  autostart		  "on"
+		  autostart		  on
 		  viewmode		  "Numerical"
 		  formatstr		  "'%15.6f'"
-		  grid			  "on"
+		  grid			  on
 		  ylimits		  "[0,3]"
 		  nosamples		  "4096"
 		  noprepostsamples	  "0"
@@ -6353,7 +6021,9 @@ Library {
 		  filename		  "count.dat"
 		  mode			  "Lazy"
 		  writesize		  "512"
-		  autorestart		  "on"
+		  autorestart		  on
+		  dynamicfilemode	  off
+		  maxwritefilesize	  "512*1024^2"
 		}
 		Block {
 		  BlockType		  Reference
@@ -6362,22 +6032,15 @@ Library {
 		  Ports			  [1]
 		  Position		  [665, 149, 745, 181]
 		  ShowName		  off
+		  LibraryVersion	  "1.1717"
 		  SourceBlock		  "xpclib/Misc./Scope (xPC) "
 		  SourceType		  "xpcscopeblock"
-		  ShowPortLabels	  "FromPortIcon"
-		  SystemSampleTime	  "-1"
-		  FunctionWithSeparateData "off"
-		  RTWMemSecFuncInitTerm	  "Inherit from model"
-		  RTWMemSecFuncExecute	  "Inherit from model"
-		  RTWMemSecDataConstants  "Inherit from model"
-		  RTWMemSecDataInternal	  "Inherit from model"
-		  RTWMemSecDataParameters "Inherit from model"
 		  scopeno		  "2"
 		  scopetype		  "File"
-		  autostart		  "on"
+		  autostart		  on
 		  viewmode		  "Numerical"
 		  formatstr		  "'%15.6f'"
-		  grid			  "on"
+		  grid			  on
 		  ylimits		  "[-4,4]"
 		  nosamples		  "4096"
 		  noprepostsamples	  "0"
@@ -6391,7 +6054,9 @@ Library {
 		  filename		  "commDsp.dat"
 		  mode			  "Lazy"
 		  writesize		  "512"
-		  autorestart		  "on"
+		  autorestart		  on
+		  dynamicfilemode	  off
+		  maxwritefilesize	  "512*1024^2"
 		}
 		Block {
 		  BlockType		  Reference
@@ -6400,22 +6065,15 @@ Library {
 		  Ports			  [1]
 		  Position		  [665, 204, 745, 236]
 		  ShowName		  off
+		  LibraryVersion	  "1.1717"
 		  SourceBlock		  "xpclib/Misc./Scope (xPC) "
 		  SourceType		  "xpcscopeblock"
-		  ShowPortLabels	  "FromPortIcon"
-		  SystemSampleTime	  "-1"
-		  FunctionWithSeparateData "off"
-		  RTWMemSecFuncInitTerm	  "Inherit from model"
-		  RTWMemSecFuncExecute	  "Inherit from model"
-		  RTWMemSecDataConstants  "Inherit from model"
-		  RTWMemSecDataInternal	  "Inherit from model"
-		  RTWMemSecDataParameters "Inherit from model"
 		  scopeno		  "3"
 		  scopetype		  "File"
-		  autostart		  "on"
+		  autostart		  on
 		  viewmode		  "Numerical"
 		  formatstr		  "'%15.6f'"
-		  grid			  "on"
+		  grid			  on
 		  ylimits		  "[-4,4]"
 		  nosamples		  "4096"
 		  noprepostsamples	  "0"
@@ -6429,7 +6087,9 @@ Library {
 		  filename		  "measDsp.dat"
 		  mode			  "Lazy"
 		  writesize		  "512"
-		  autorestart		  "on"
+		  autorestart		  on
+		  dynamicfilemode	  off
+		  maxwritefilesize	  "512*1024^2"
 		}
 		Block {
 		  BlockType		  Reference
@@ -6438,22 +6098,15 @@ Library {
 		  Ports			  [1]
 		  Position		  [665, 379, 745, 411]
 		  ShowName		  off
+		  LibraryVersion	  "1.1717"
 		  SourceBlock		  "xpclib/Misc./Scope (xPC) "
 		  SourceType		  "xpcscopeblock"
-		  ShowPortLabels	  "FromPortIcon"
-		  SystemSampleTime	  "-1"
-		  FunctionWithSeparateData "off"
-		  RTWMemSecFuncInitTerm	  "Inherit from model"
-		  RTWMemSecFuncExecute	  "Inherit from model"
-		  RTWMemSecDataConstants  "Inherit from model"
-		  RTWMemSecDataInternal	  "Inherit from model"
-		  RTWMemSecDataParameters "Inherit from model"
 		  scopeno		  "6"
 		  scopetype		  "File"
-		  autostart		  "on"
+		  autostart		  on
 		  viewmode		  "Numerical"
 		  formatstr		  "'%15.6f'"
-		  grid			  "on"
+		  grid			  on
 		  ylimits		  "[0,3]"
 		  nosamples		  "4096"
 		  noprepostsamples	  "0"
@@ -6467,7 +6120,9 @@ Library {
 		  filename		  "measFrc.dat"
 		  mode			  "Lazy"
 		  writesize		  "512"
-		  autorestart		  "on"
+		  autorestart		  on
+		  dynamicfilemode	  off
+		  maxwritefilesize	  "512*1024^2"
 		}
 		Block {
 		  BlockType		  SubSystem
@@ -6511,17 +6166,12 @@ Library {
 		    SID			    "283"
 		    Ports		    [1, 1]
 		    Position		    [170, 200, 230, 250]
+		    LibraryVersion	    "1.260"
 		    SourceBlock		    "simulink/Logic and Bit\nOperations/Detect Fall\nNonpositive"
 		    SourceType		    "Detect Fall Nonpositive"
-		    ShowPortLabels	    "FromPortIcon"
-		    SystemSampleTime	    "-1"
-		    FunctionWithSeparateData "off"
-		    RTWMemSecFuncInitTerm   "Inherit from model"
-		    RTWMemSecFuncExecute    "Inherit from model"
-		    RTWMemSecDataConstants  "Inherit from model"
-		    RTWMemSecDataInternal   "Inherit from model"
-		    RTWMemSecDataParameters "Inherit from model"
 		    vinit		    "0"
+		    InputProcessing	    "Inherited"
+		    OutDataTypeStr	    "uint8"
 		    }
 		    Block {
 		    BlockType		    Reference
@@ -6529,17 +6179,12 @@ Library {
 		    SID			    "284"
 		    Ports		    [1, 1]
 		    Position		    [170, 85, 230, 135]
+		    LibraryVersion	    "1.260"
 		    SourceBlock		    "simulink/Logic and Bit\nOperations/Detect Rise\nPositive"
 		    SourceType		    "Detect Rise Positive"
-		    ShowPortLabels	    "FromPortIcon"
-		    SystemSampleTime	    "-1"
-		    FunctionWithSeparateData "off"
-		    RTWMemSecFuncInitTerm   "Inherit from model"
-		    RTWMemSecFuncExecute    "Inherit from model"
-		    RTWMemSecDataConstants  "Inherit from model"
-		    RTWMemSecDataInternal   "Inherit from model"
-		    RTWMemSecDataParameters "Inherit from model"
 		    vinit		    "0"
+		    InputProcessing	    "Inherited"
+		    OutDataTypeStr	    "uint8"
 		    }
 		    Block {
 		    BlockType		    From
@@ -6738,22 +6383,15 @@ Library {
 		    Ports		    [1]
 		    Position		    [240, 339, 320, 371]
 		    ShowName		    off
+		    LibraryVersion	    "1.1717"
 		    SourceBlock		    "xpclib/Misc./Scope (xPC) "
 		    SourceType		    "xpcscopeblock"
-		    ShowPortLabels	    "FromPortIcon"
-		    SystemSampleTime	    "-1"
-		    FunctionWithSeparateData "off"
-		    RTWMemSecFuncInitTerm   "Inherit from model"
-		    RTWMemSecFuncExecute    "Inherit from model"
-		    RTWMemSecDataConstants  "Inherit from model"
-		    RTWMemSecDataInternal   "Inherit from model"
-		    RTWMemSecDataParameters "Inherit from model"
 		    scopeno		    "7"
 		    scopetype		    "File"
-		    autostart		    "on"
+		    autostart		    on
 		    viewmode		    "Numerical"
 		    formatstr		    "'%15.6f'"
-		    grid		    "on"
+		    grid		    on
 		    ylimits		    "[0,3]"
 		    nosamples		    "4096"
 		    noprepostsamples	    "0"
@@ -6767,7 +6405,9 @@ Library {
 		    filename		    "flag.dat"
 		    mode		    "Lazy"
 		    writesize		    "512"
-		    autorestart		    "on"
+		    autorestart		    on
+		    dynamicfilemode	    off
+		    maxwritefilesize	    "512*1024^2"
 		    }
 		    Block {
 		    BlockType		    DataTypeConversion
@@ -7523,7 +7163,8 @@ Library {
 	  RequestExecContextInheritance	off
 	  MaskHideContents	  off
 	  MaskType		  "Signal Offset"
-	  MaskDescription	  "Offset signal by average of signal over initial number of samples"
+	  MaskDescription	  "Offset signal by average of signal over initial number of samples.\nSet nOffset = 0 for no signa"
+	  "l offset."
 	  MaskPromptString	  "Number of Signals: nS|Number of samples to initialize offset: nOffset|Sample time: dt"
 	  MaskStyleString	  "edit,edit,edit"
 	  MaskVariables		  "nS=@1;nOffset=@2;dt=@3;"
@@ -7538,7 +7179,7 @@ Library {
 	  MaskIconRotate	  "none"
 	  MaskPortRotate	  "default"
 	  MaskIconUnits		  "autoscale"
-	  MaskValueString	  "||"
+	  MaskValueString	  "[]|[]|[]"
 	  System {
 	    Name		    "Offset"
 	    Location		    [725, 381, 1251, 667]
@@ -7709,20 +7350,13 @@ Library {
 	      SID		      "348"
 	      Ports		      [0, 1]
 	      Position		      [25, 40, 55, 70]
+	      LibraryVersion	      "1.260"
 	      SourceBlock	      "simulink/Sources/Ramp"
 	      SourceType	      "Ramp"
-	      ShowPortLabels	      "FromPortIcon"
-	      SystemSampleTime	      "-1"
-	      FunctionWithSeparateData "off"
-	      RTWMemSecFuncInitTerm   "Inherit from model"
-	      RTWMemSecFuncExecute    "Inherit from model"
-	      RTWMemSecDataConstants  "Inherit from model"
-	      RTWMemSecDataInternal   "Inherit from model"
-	      RTWMemSecDataParameters "Inherit from model"
 	      slope		      "1/dt"
 	      start		      "0"
 	      X0		      "0"
-	      VectorParams1D	      "on"
+	      VectorParams1D	      on
 	    }
 	    Block {
 	      BlockType		      Sum
