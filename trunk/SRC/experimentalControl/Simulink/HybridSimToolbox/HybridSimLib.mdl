@@ -16,9 +16,9 @@ Library {
   ModifiedByFormat	  "%<Auto>"
   LastModifiedBy	  "Andreas"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Tue Oct 07 23:54:44 2014"
-  RTWModifiedTimeStamp	  334626821
-  ModelVersionFormat	  "1.%<AutoIncrement:120>"
+  LastModifiedDate	  "Wed Oct 08 09:25:37 2014"
+  RTWModifiedTimeStamp	  334661086
+  ModelVersionFormat	  "1.%<AutoIncrement:122>"
   ConfigurationManager	  "None"
   SampleTimeColors	  off
   SampleTimeAnnotations	  off
@@ -7163,8 +7163,8 @@ Library {
 	  RequestExecContextInheritance	off
 	  MaskHideContents	  off
 	  MaskType		  "Signal Offset"
-	  MaskDescription	  "Offset signal by average of signal over initial number of samples.\nSet nOffset = 0 for no signa"
-	  "l offset."
+	  MaskDescription	  "Offset signal by average of signal over initial number of samples.\nSet nOffset = -1 for no sign"
+	  "al offset."
 	  MaskPromptString	  "Number of Signals: nS|Number of samples to initialize offset: nOffset|Sample time: dt"
 	  MaskStyleString	  "edit,edit,edit"
 	  MaskVariables		  "nS=@1;nOffset=@2;dt=@3;"
