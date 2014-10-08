@@ -11,20 +11,20 @@ FileCount=0
 
 [Instrumentation]
 FileCount=2
-File1=daq_nact.lay
+File1=daq_2dof.lay
 FileInWorkingRoot1=true
-FileDate1=20131001230237
+FileDate1=20141008095124
 FileVisibleToUser1=true
 FileAutoOpen1=true
 FileConsistencyCheck1=true
 InternalFlags1=00000000
 FileInstanceCount1=1
 FileExplicitDependCount1=0
-File2=HybridSimulationD3D3_nAct.cdc
+File2=HybridControllerD3D3_2DOF.cdc
 FileInWorkingRoot2=true
-FileDate2=20131001230237
-FileSize2=29696
-FileCRC2=4f09b516
+FileDate2=20141008095124
+FileSize2=38898
+FileCRC2=e515177a
 FileVisibleToUser2=false
 FileAutoOpen2=false
 FileConsistencyCheck2=true
@@ -36,15 +36,27 @@ Version=6
 [AppServerManager]
 FileCount=0
 Version=1
-NumberOfDataGroups=0
+DataGroup1=PPC - hybridcontrollerd3d3 - HostService
+NumberOfDataGroups=1
 
 [FailureSim]
 FileCount=0
 
 [HierarchyBrowser]
-FileCount=0
+FileCount=1
+File1=hybridcontrollerd3d3.sdf
+FileInWorkingRoot1=true
+FileDate1=20141008094347
+FileSize1=251
+FileCRC1=fb2d6973
+FileVisibleToUser1=true
+FileAutoOpen1=true
+FileConsistencyCheck1=true
+InternalFlags1=00000000
+FileInstanceCount1=1
+FileExplicitDependCount1=0
 Version=3
-Sections=0
+Sections=1
 
 [Stimulus Editor]
 FileCount=0
@@ -65,9 +77,9 @@ FileCount=0
 
 [Experiment]
 FileCount=1
-File1=HybridSimulationD3D3_nAct.cdd
+File1=HybridControllerD3D3_2DOF.cdd
 FileInWorkingRoot1=true
-FileDate1=20131001230212
+FileDate1=20141008094224
 FileSize1=0
 FileCRC1=00000000
 FileVisibleToUser1=false
@@ -77,22 +89,73 @@ InternalFlags1=00000000
 FileInstanceCount1=1
 FileExplicitDependCount1=0
 Version=1
-Name=HybridSimulationD3D3_nAct
+Name=HybridControllerD3D3_2DOF
 Author=Andreas Schellenberg
 ExperimentVersionMajor=1
 ExperimentVersionMinor=0
 EnableEvents=true
 
 [Experiment.View]
-File1=daq_nact.lay
+File1=daq_2dof.lay
 File1Pos=1,0,874,541,-1,-1,3
 FileCount=1
 Workbook=false
 Fullscreen=false
 Sequence=0;
 
+[AppServerManager.PPC - hybridcontrollerd3d3 - HostService]
+ServerProgID=TimeTracePPC.AppServer
+VariableFile=hybridcontrollerd3d3.sdf
+TargetName=ds1104
+ConnectionType=-1
+TaskNumber=1
+MeasureListSize=0
+TimeBase=0.001
+Length=100
+Delay=0
+Downsampling=1
+AutoRepeat=1
+AutoStart=True
+Synchronization=False
+FlexRay=False
+TriggerType=-1
+TriggerLevel=0
+TriggerEdge=Neg
+TriggerState=Off
+TriggerSignal=
+StartPlotAtZero=False
+UseTimestamping=True
+AcquisitionMode=0
+AutomaticStorage=False
+StoreFile=default.mat
+KeepGraphicsOutput=True
+
+[HierarchyBrowser.File1]
+File=hybridcontrollerd3d3.sdf
+BoardName=ds1104
+BoardType=1104
+ConnectionType=-1
+ParFiles=
+PEActive=false
+ActivePEFile=
+ActiveStatusSet=
+DisplayMode=true
+
+[HierarchyBrowser.CSW1]
+DockBarID=59421
+Row=0
+Col=0
+Height=10
+Width=1.000000
+Left=1605
+Top=102
+Right=1615
+Bottom=705
+Docked=1
+Visible=false
+
 [Instrumentation.Openfiles]
-Openfile1=daq_nact.lay
+Openfile1=daq_2dof.lay
 Count=1
 
 [PythonInterpreter.OpenFiles]
