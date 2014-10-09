@@ -1,6 +1,10 @@
 %INITIALIZESIMULATION to initialize the parameters needed to build the Simulink model
 %
 % implemented by Andreas Schellenberg (andreas.schellenberg@gmail.com) 11/2004
+%
+% $Revision$
+% $Date$
+% $URL$
 
 clear;
 close all;
