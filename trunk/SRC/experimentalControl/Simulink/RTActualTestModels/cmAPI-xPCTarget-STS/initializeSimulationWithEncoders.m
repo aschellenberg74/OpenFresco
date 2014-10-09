@@ -62,8 +62,9 @@ nDucU   = 8;                                  % number of user ducs
 nEncU   = 2;                                  % number of user encoders
 nDinp   = 4;                                  % no. of digital inputs written to scramnet
 nDout   = 4;                                  % no. of digital outputs driven by scramnet
-nUDPOut = 1+7*nAct+nAdcU+nDucU+nEncU+nDinp;   % no. of outputs from simulink bridge
-nUDPInp = 1+6*nAct+nAdcU+nDucU+nEncU+nDinp;   % no. of inputs to simulink bridge
+nEncCmd = 2;                                  % number of encoders commands
+nUDPOut = 1+7*nAct+nAdcU+nDucU+nEncU+nDinp+nEncCmd;  % no. of outputs from simulink bridge
+nUDPInp = 1+6*nAct+nAdcU+nDucU+nEncU+nDinp+nEncCmd;  % no. of inputs to simulink bridge
 
 %%%%%%%%%% SAMPLE PERIOD %%%%%%%%%%
 
@@ -165,15 +166,23 @@ partition(21).Size = num2str(nDucU);
 % user ENCs
 partition(22).Type = 'single';
 partition(22).Size = num2str(nEncU);
-irqPartition       = 22;
 
 % digital inputs from controller
 partition(23).Type = 'uint32';
 partition(23).Size = num2str(nDinp);
 
+% nEncCmd outputs to scramnet
+partition(24).Type = 'single';
+partition(24).Size = num2str(nEncCmd);
+
+% nEncCmd inputs from scramnet
+partition(25).Type = 'single';
+partition(25).Size = num2str(nEncCmd);
+irqPartition       = 25;
+
 % blank space
-partition(24).Type = 'uint32';
-partition(24).Size = '866';
+partition(26).Type = 'uint32';
+partition(26).Size = '862';
 
 %%%%%%%%%% END MTS (STS) %%%%%%%%%%
 
