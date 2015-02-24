@@ -48,11 +48,13 @@ public:
     // constructors
     EEGeneric(int tag, ID nodes, ID *dof,
         ExperimentalSite *site,
-        bool iMod = false, int addRayleigh = 1, const Matrix *mass = 0);
+        bool iMod = false, int addRayleigh = 1, const Matrix *mass = 0,
+        int checkTime = 0);
     EEGeneric(int tag, ID nodes, ID *dof,
         int port, char *machineInetAddress = 0,
         int ssl = 0, int udp = 0, int dataSize = OF_Network_dataSize,
-        bool iMod = false, int addRayleigh = 1, const Matrix *mass = 0);
+        bool iMod = false, int addRayleigh = 1, const Matrix *mass = 0,
+        int checkTime = 0);
     
     // destructor
     ~EEGeneric();
@@ -117,6 +119,7 @@ private:
     bool iMod;                  // I-Modification flag
     int addRayleigh;            // flag to add Rayleigh damping
     Matrix *mass;               // mass matrix
+    int checkTime;              // flag to check time when setting trial
     
     Matrix theMatrix;           // objects matrix
     Vector theVector;           // objects vector
