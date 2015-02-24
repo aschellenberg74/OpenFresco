@@ -44,7 +44,7 @@ using std::ios;
 #include <UDP_Socket.h>
 
 
-ECGenericTCP::ECGenericTCP(int tag,    
+ECGenericTCP::ECGenericTCP(int tag,
     char *ipaddress, int ipport,
     ID ctrlmodes, ID daqmodes,
     char *initfilename, int ssl, int udp)
@@ -62,7 +62,7 @@ ECGenericTCP::ECGenericTCP(int tag,
             << "ctrlMode and/or daqMode IDs have wrong size.\n";
         exit(OF_ReturnType_failed);
     }
-
+    
     // setup the connection
     if (ssl)
         theChannel = new TCP_SocketSSL(ipPort, ipAddress);
@@ -70,8 +70,8 @@ ECGenericTCP::ECGenericTCP(int tag,
         theChannel = new UDP_Socket(ipPort, ipAddress);
     else
         theChannel = new TCP_Socket(ipPort, ipAddress);
-
-     if (!theChannel)  {
+    
+    if (!theChannel)  {
         opserr << "ECGenericTCP::ECGenericTCP() - "
             << "failed to create channel.\n";
         exit(OF_ReturnType_failed);
@@ -115,12 +115,12 @@ ECGenericTCP::ECGenericTCP(const ECGenericTCP &ec)
     ctrlModes = ec.ctrlModes;
     daqModes = ec.daqModes;
     initFileName = ec.initFileName;
-
+    
     // allocate memory for the send vectors
     sData = new double [dataSize];
     sendData = new Vector(sData, dataSize);
     sendData->Zero();
-
+    
     // allocate memory for the receive vectors
     rData = new double [dataSize];
     recvData = new Vector(rData, dataSize);
@@ -133,7 +133,7 @@ ECGenericTCP::~ECGenericTCP()
     // send termination to generic controller
     sData[0] = OF_RemoteTest_DIE;
     theChannel->sendVector(0, 0, *sendData, 0);
-
+    
     // delete memory of ctrl vectors
     if (ctrlDisp != 0)
         delete ctrlDisp;
@@ -157,7 +157,7 @@ ECGenericTCP::~ECGenericTCP()
         delete daqForce;
     if (daqTime != 0)
         delete daqTime;
-
+    
     // delete memory of strings
     if (ipAddress != 0)
         delete [] ipAddress;
@@ -175,7 +175,7 @@ ECGenericTCP::~ECGenericTCP()
         delete [] rData;
     if (theChannel != 0)
         delete theChannel;
-
+    
     opserr << endln;
     opserr << "**************************************************************\n";
     opserr << "* The connection with the generic controller has been closed *\n";
@@ -187,7 +187,7 @@ ECGenericTCP::~ECGenericTCP()
 int ECGenericTCP::setup()
 {
     int rValue = 0;
-
+    
     if (ctrlDisp != 0)
         delete ctrlDisp;
     if (ctrlVel != 0)
@@ -262,17 +262,17 @@ int ECGenericTCP::setup()
     }
     idData(2*OF_Resp_All) = dataSize;
     theChannel->sendID(0, 0, idData, 0);
-
+    
     // read the parameter initialization file and send information
     if (initFileName != 0)  {
-
+        
         // determine the number of lines in the parameter file
         ifstream initFile;
         const int maxLineLength = 16384;
         char mData[maxLineLength+1];
         char *line = &mData[1];
         Message *msgData = new Message(mData, maxLineLength+1);
-
+        
         // open the parameter initialization file
         initFile.open(initFileName, ios::in);
         if (initFile.bad() || !initFile.is_open())  {
@@ -290,10 +290,10 @@ int ECGenericTCP::setup()
         initFile.close();
         delete msgData;
     }
-
+    
     // print experimental control information
     this->Print(opserr);
-
+    
     opserr << "****************************************************************\n";
     opserr << "* Make sure that offset values of controller are set to ZERO   *\n";
     opserr << "*                                                              *\n";
@@ -309,7 +309,7 @@ int ECGenericTCP::setup()
         exit(OF_ReturnType_failed);
     }
     
-	do  {
+    do  {
         rValue += this->control();
         rValue += this->acquire();
         
@@ -362,7 +362,7 @@ int ECGenericTCP::setSize(ID sizeT, ID sizeO)
     // check that they are available in sizeT/sizeO.
     if (ctrlModes(OF_Resp_Disp))  { 
         if (sizeT(OF_Resp_Disp) == 0)  {
-            opserr << "ECGenericTCP::setSize() - disp not available for control\n"; 
+            opserr << "ECGenericTCP::setSize() - disp not available for control\n";
             opserr << "see User Manual.\n";
             delete theChannel;
             exit(OF_ReturnType_failed);
@@ -373,7 +373,7 @@ int ECGenericTCP::setSize(ID sizeT, ID sizeO)
     }
     if (ctrlModes(OF_Resp_Vel))  { 
         if (sizeT(OF_Resp_Vel) == 0)  {
-            opserr << "ECGenericTCP::setSize() - vel not available for control\n"; 
+            opserr << "ECGenericTCP::setSize() - vel not available for control\n";
             opserr << "see User Manual.\n";
             delete theChannel;
             exit(OF_ReturnType_failed);
@@ -384,7 +384,7 @@ int ECGenericTCP::setSize(ID sizeT, ID sizeO)
     }
     if (ctrlModes(OF_Resp_Accel))  { 
         if (sizeT(OF_Resp_Accel) == 0)  {
-            opserr << "ECGenericTCP::setSize() - accel not available for control\n"; 
+            opserr << "ECGenericTCP::setSize() - accel not available for control\n";
             opserr << "see User Manual.\n";
             delete theChannel;
             exit(OF_ReturnType_failed);
@@ -395,7 +395,7 @@ int ECGenericTCP::setSize(ID sizeT, ID sizeO)
     }
     if (ctrlModes(OF_Resp_Force))  { 
         if (sizeT(OF_Resp_Force) == 0)  {
-            opserr << "ECGenericTCP::setSize() - force not available for control\n"; 
+            opserr << "ECGenericTCP::setSize() - force not available for control\n";
             opserr << "see User Manual.\n";
             delete theChannel;
             exit(OF_ReturnType_failed);
@@ -406,7 +406,7 @@ int ECGenericTCP::setSize(ID sizeT, ID sizeO)
     }
     if (ctrlModes(OF_Resp_Time))  { 
         if (sizeT(OF_Resp_Time) == 0)  {
-            opserr << "ECGenericTCP::setSize() - time not available for control\n"; 
+            opserr << "ECGenericTCP::setSize() - time not available for control\n";
             opserr << "see User Manual.\n";
             delete theChannel;
             exit(OF_ReturnType_failed);
@@ -415,10 +415,10 @@ int ECGenericTCP::setSize(ID sizeT, ID sizeO)
     } else  {
         (*sizeCtrl)(OF_Resp_Time) = 0;
     }
-
+    
     if (daqModes(OF_Resp_Disp))  { 
         if (sizeO(OF_Resp_Disp) == 0)  {
-            opserr << "ECGenericTCP::setSize() - disp not accepted from daq\n"; 
+            opserr << "ECGenericTCP::setSize() - disp not accepted from daq\n";
             opserr << "see User Manual.\n";
             delete theChannel;
             exit(OF_ReturnType_failed);
@@ -429,7 +429,7 @@ int ECGenericTCP::setSize(ID sizeT, ID sizeO)
     }
     if (daqModes(OF_Resp_Vel))  { 
         if (sizeO(OF_Resp_Vel) == 0)  {
-            opserr << "ECGenericTCP::setSize() - vel not accepted from daq\n"; 
+            opserr << "ECGenericTCP::setSize() - vel not accepted from daq\n";
             opserr << "see User Manual.\n";
             delete theChannel;
             exit(OF_ReturnType_failed);
@@ -440,7 +440,7 @@ int ECGenericTCP::setSize(ID sizeT, ID sizeO)
     }
     if (daqModes(OF_Resp_Accel))  { 
         if (sizeO(OF_Resp_Accel) == 0)  {
-            opserr << "ECGenericTCP::setSize() - accel not accepted from daq\n"; 
+            opserr << "ECGenericTCP::setSize() - accel not accepted from daq\n";
             opserr << "see User Manual.\n";
             delete theChannel;
             exit(OF_ReturnType_failed);
@@ -451,7 +451,7 @@ int ECGenericTCP::setSize(ID sizeT, ID sizeO)
     }
     if (daqModes(OF_Resp_Force))  { 
         if (sizeO(OF_Resp_Force) == 0)  {
-            opserr << "ECGenericTCP::setSize() - force not accepted from daq\n"; 
+            opserr << "ECGenericTCP::setSize() - force not accepted from daq\n";
             opserr << "see User Manual.\n";
             delete theChannel;
             exit(OF_ReturnType_failed);
@@ -462,7 +462,7 @@ int ECGenericTCP::setSize(ID sizeT, ID sizeO)
     }
     if (daqModes(OF_Resp_Time))  { 
         if (sizeO(OF_Resp_Time) == 0)  {
-            opserr << "ECGenericTCP::setSize() - time not accepted from daq\n"; 
+            opserr << "ECGenericTCP::setSize() - time not accepted from daq\n";
             opserr << "see User Manual.\n";
             delete theChannel;
             exit(OF_ReturnType_failed);
@@ -518,7 +518,7 @@ int ECGenericTCP::setTrialResponse(const Vector* disp,
                 (*ctrlTime)(i) = theCtrlFilters[OF_Resp_Time]->filtering((*ctrlTime)(i));
         }
     }
-
+    
     rValue = this->control();
     
     return rValue;
@@ -575,7 +575,7 @@ int ECGenericTCP::getDaqResponse(Vector* disp,
 
 
 int ECGenericTCP::commitState()
-{	
+{
     return OF_ReturnType_completed;
 }
 
@@ -814,12 +814,4 @@ int ECGenericTCP::acquire()
     theChannel->recvVector(0, 0, *recvData, 0);
 
     return OF_ReturnType_completed;
-}
-
-
-void ECGenericTCP::sleep(const clock_t wait)
-{
-    clock_t goal;
-    goal = wait + clock();
-    while (goal>clock());
 }

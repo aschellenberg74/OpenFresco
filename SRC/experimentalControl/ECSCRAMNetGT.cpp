@@ -685,11 +685,3 @@ int ECSCRAMNetGT::acquire()
     
     return OF_ReturnType_completed;
 }
-
-
-void ECSCRAMNetGT::sleep(const clock_t wait)
-{
-    clock_t goal;
-    goal = wait + clock();
-    while (goal>clock());
-}

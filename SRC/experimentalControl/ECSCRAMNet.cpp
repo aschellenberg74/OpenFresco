@@ -663,11 +663,3 @@ int ECSCRAMNet::acquire()
     
     return OF_ReturnType_completed;
 }
-
-
-void ECSCRAMNet::sleep(const clock_t wait)
-{
-    clock_t goal;
-    goal = wait + clock();
-    while (goal>clock());
-}
