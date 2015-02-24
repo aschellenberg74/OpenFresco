@@ -75,15 +75,13 @@ public:
     
     // public methods for output
     void Print(OPS_Stream &s, int flag = 0);
-    
+
 protected:
     // protected methods to set and to get response
     virtual int control();
     virtual int acquire();
-    
+
 private:
-    void sleep(const clock_t wait);
-    
     const int memOffset;            // memory offset in bytes from SCRAMNet base address
     const int numDOF;               // number of degrees-of-freedom in control system
     
