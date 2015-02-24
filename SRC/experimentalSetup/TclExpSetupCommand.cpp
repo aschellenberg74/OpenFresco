@@ -1105,6 +1105,20 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp,
                     opserr << "expSetup: " << tag << endln;
                     return TCL_ERROR;
             }
+            int numFact = 0;
+            while (i+1+numFact < argc &&
+                strncmp(argv[i+1+numFact],"-trial",6) != 0 &&
+                strncmp(argv[i+1+numFact],"-out",4) != 0 &&
+                strncmp(argv[i+1+numFact],"-ctrl",5) != 0 &&
+                strncmp(argv[i+1+numFact],"-daq",4) != 0)  {
+                numFact++;
+            }
+            if (numFact != size)  {
+                opserr << "WARNING wrong number of trialDispFact: want ";
+                opserr << size << " but got " << numFact << endln;
+                opserr << "expSetup: " << tag << endln;
+                return TCL_ERROR;
+            }
             Vector factor(size);
             double f;
             for (int j=0; j<size; j++)  {
@@ -1126,6 +1140,20 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp,
                 opserr << "WARNING trialVelSize <= 0\n";
                     opserr << "expSetup: " << tag << endln;
                     return TCL_ERROR;
+            }
+            int numFact = 0;
+            while (i+1+numFact < argc &&
+                strncmp(argv[i+1+numFact],"-trial",6) != 0 &&
+                strncmp(argv[i+1+numFact],"-out",4) != 0 &&
+                strncmp(argv[i+1+numFact],"-ctrl",5) != 0 &&
+                strncmp(argv[i+1+numFact],"-daq",4) != 0)  {
+                numFact++;
+            }
+            if (numFact != size)  {
+                opserr << "WARNING wrong number of trialVelFact: want ";
+                opserr << size << " but got " << numFact << endln;
+                opserr << "expSetup: " << tag << endln;
+                return TCL_ERROR;
             }
             Vector factor(size);
             double f;
@@ -1150,6 +1178,20 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp,
                     opserr << "expSetup: " << tag << endln;
                     return TCL_ERROR;
             }
+            int numFact = 0;
+            while (i+1+numFact < argc &&
+                strncmp(argv[i+1+numFact],"-trial",6) != 0 &&
+                strncmp(argv[i+1+numFact],"-out",4) != 0 &&
+                strncmp(argv[i+1+numFact],"-ctrl",5) != 0 &&
+                strncmp(argv[i+1+numFact],"-daq",4) != 0)  {
+                numFact++;
+            }
+            if (numFact != size)  {
+                opserr << "WARNING wrong number of trialAccelFact: want ";
+                opserr << size << " but got " << numFact << endln;
+                opserr << "expSetup: " << tag << endln;
+                return TCL_ERROR;
+            }
             Vector factor(size);
             double f;
             for (int j=0; j<size; j++)  {
@@ -1173,6 +1215,20 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp,
                     opserr << "expSetup: " << tag << endln;
                     return TCL_ERROR;
             }
+            int numFact = 0;
+            while (i+1+numFact < argc &&
+                strncmp(argv[i+1+numFact],"-trial",6) != 0 &&
+                strncmp(argv[i+1+numFact],"-out",4) != 0 &&
+                strncmp(argv[i+1+numFact],"-ctrl",5) != 0 &&
+                strncmp(argv[i+1+numFact],"-daq",4) != 0)  {
+                numFact++;
+            }
+            if (numFact != size)  {
+                opserr << "WARNING wrong number of trialForceFact: want ";
+                opserr << size << " but got " << numFact << endln;
+                opserr << "expSetup: " << tag << endln;
+                return TCL_ERROR;
+            }
             Vector factor(size);
             double f;
             for (int j=0; j<size; j++)  {
@@ -1193,6 +1249,20 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp,
                 opserr << "WARNING trialTimeSize <= 0\n";
                     opserr << "expSetup: " << tag << endln;
                     return TCL_ERROR;
+            }
+            int numFact = 0;
+            while (i+1+numFact < argc &&
+                strncmp(argv[i+1+numFact],"-trial",6) != 0 &&
+                strncmp(argv[i+1+numFact],"-out",4) != 0 &&
+                strncmp(argv[i+1+numFact],"-ctrl",5) != 0 &&
+                strncmp(argv[i+1+numFact],"-daq",4) != 0)  {
+                numFact++;
+            }
+            if (numFact != size)  {
+                opserr << "WARNING wrong number of trialTimeFact: want ";
+                opserr << size << " but got " << numFact << endln;
+                opserr << "expSetup: " << tag << endln;
+                return TCL_ERROR;
             }
             Vector factor(size);
             double f;
@@ -1217,6 +1287,20 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp,
                     opserr << "expSetup: " << tag << endln;
                     return TCL_ERROR;
             }
+            int numFact = 0;
+            while (i+1+numFact < argc &&
+                strncmp(argv[i+1+numFact],"-trial",6) != 0 &&
+                strncmp(argv[i+1+numFact],"-out",4) != 0 &&
+                strncmp(argv[i+1+numFact],"-ctrl",5) != 0 &&
+                strncmp(argv[i+1+numFact],"-daq",4) != 0)  {
+                numFact++;
+            }
+            if (numFact != size)  {
+                opserr << "WARNING wrong number of outDispFact: want ";
+                opserr << size << " but got " << numFact << endln;
+                opserr << "expSetup: " << tag << endln;
+                return TCL_ERROR;
+            }
             Vector factor(size);
             double f;
             for (int j=0; j<size; j++)  {
@@ -1238,6 +1322,20 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp,
                 opserr << "WARNING outVelSize <= 0\n";
                     opserr << "expSetup: " << tag << endln;
                     return TCL_ERROR;
+            }
+            int numFact = 0;
+            while (i+1+numFact < argc &&
+                strncmp(argv[i+1+numFact],"-trial",6) != 0 &&
+                strncmp(argv[i+1+numFact],"-out",4) != 0 &&
+                strncmp(argv[i+1+numFact],"-ctrl",5) != 0 &&
+                strncmp(argv[i+1+numFact],"-daq",4) != 0)  {
+                numFact++;
+            }
+            if (numFact != size)  {
+                opserr << "WARNING wrong number of outVelFact: want ";
+                opserr << size << " but got " << numFact << endln;
+                opserr << "expSetup: " << tag << endln;
+                return TCL_ERROR;
             }
             Vector factor(size);
             double f;
@@ -1262,6 +1360,20 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp,
                     opserr << "expSetup: " << tag << endln;
                     return TCL_ERROR;
             }
+            int numFact = 0;
+            while (i+1+numFact < argc &&
+                strncmp(argv[i+1+numFact],"-trial",6) != 0 &&
+                strncmp(argv[i+1+numFact],"-out",4) != 0 &&
+                strncmp(argv[i+1+numFact],"-ctrl",5) != 0 &&
+                strncmp(argv[i+1+numFact],"-daq",4) != 0)  {
+                numFact++;
+            }
+            if (numFact != size)  {
+                opserr << "WARNING wrong number of outAccelFact: want ";
+                opserr << size << " but got " << numFact << endln;
+                opserr << "expSetup: " << tag << endln;
+                return TCL_ERROR;
+            }
             Vector factor(size);
             double f;
             for (int j=0; j<size; j++)  {
@@ -1285,6 +1397,20 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp,
                     opserr << "expSetup: " << tag << endln;
                     return TCL_ERROR;
             }
+            int numFact = 0;
+            while (i+1+numFact < argc &&
+                strncmp(argv[i+1+numFact],"-trial",6) != 0 &&
+                strncmp(argv[i+1+numFact],"-out",4) != 0 &&
+                strncmp(argv[i+1+numFact],"-ctrl",5) != 0 &&
+                strncmp(argv[i+1+numFact],"-daq",4) != 0)  {
+                numFact++;
+            }
+            if (numFact != size)  {
+                opserr << "WARNING wrong number of outForceFact: want ";
+                opserr << size << " but got " << numFact << endln;
+                opserr << "expSetup: " << tag << endln;
+                return TCL_ERROR;
+            }
             Vector factor(size);
             double f;
             for (int j=0; j<size; j++)  {
@@ -1305,6 +1431,20 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp,
                 opserr << "WARNING outTimeSize <= 0\n";
                     opserr << "expSetup: " << tag << endln;
                     return TCL_ERROR;
+            }
+            int numFact = 0;
+            while (i+1+numFact < argc &&
+                strncmp(argv[i+1+numFact],"-trial",6) != 0 &&
+                strncmp(argv[i+1+numFact],"-out",4) != 0 &&
+                strncmp(argv[i+1+numFact],"-ctrl",5) != 0 &&
+                strncmp(argv[i+1+numFact],"-daq",4) != 0)  {
+                numFact++;
+            }
+            if (numFact != size)  {
+                opserr << "WARNING wrong number of outTimeFact: want ";
+                opserr << size << " but got " << numFact << endln;
+                opserr << "expSetup: " << tag << endln;
+                return TCL_ERROR;
             }
             Vector factor(size);
             double f;
@@ -1329,6 +1469,20 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp,
                     opserr << "expSetup: " << tag << endln;
                     return TCL_ERROR;
             }
+            int numFact = 0;
+            while (i+1+numFact < argc &&
+                strncmp(argv[i+1+numFact],"-trial",6) != 0 &&
+                strncmp(argv[i+1+numFact],"-out",4) != 0 &&
+                strncmp(argv[i+1+numFact],"-ctrl",5) != 0 &&
+                strncmp(argv[i+1+numFact],"-daq",4) != 0)  {
+                numFact++;
+            }
+            if (numFact != size)  {
+                opserr << "WARNING wrong number of ctrlDispFact: want ";
+                opserr << size << " but got " << numFact << endln;
+                opserr << "expSetup: " << tag << endln;
+                return TCL_ERROR;
+            }
             Vector factor(size);
             double f;
             for (int j=0; j<size; j++)  {
@@ -1350,6 +1504,20 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp,
                 opserr << "WARNING ctrlVelSize <= 0\n";
                     opserr << "expSetup: " << tag << endln;
                     return TCL_ERROR;
+            }
+            int numFact = 0;
+            while (i+1+numFact < argc &&
+                strncmp(argv[i+1+numFact],"-trial",6) != 0 &&
+                strncmp(argv[i+1+numFact],"-out",4) != 0 &&
+                strncmp(argv[i+1+numFact],"-ctrl",5) != 0 &&
+                strncmp(argv[i+1+numFact],"-daq",4) != 0)  {
+                numFact++;
+            }
+            if (numFact != size)  {
+                opserr << "WARNING wrong number of ctrlVelFact: want ";
+                opserr << size << " but got " << numFact << endln;
+                opserr << "expSetup: " << tag << endln;
+                return TCL_ERROR;
             }
             Vector factor(size);
             double f;
@@ -1374,6 +1542,20 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp,
                     opserr << "expSetup: " << tag << endln;
                     return TCL_ERROR;
             }
+            int numFact = 0;
+            while (i+1+numFact < argc &&
+                strncmp(argv[i+1+numFact],"-trial",6) != 0 &&
+                strncmp(argv[i+1+numFact],"-out",4) != 0 &&
+                strncmp(argv[i+1+numFact],"-ctrl",5) != 0 &&
+                strncmp(argv[i+1+numFact],"-daq",4) != 0)  {
+                numFact++;
+            }
+            if (numFact != size)  {
+                opserr << "WARNING wrong number of ctrlAccelFact: want ";
+                opserr << size << " but got " << numFact << endln;
+                opserr << "expSetup: " << tag << endln;
+                return TCL_ERROR;
+            }
             Vector factor(size);
             double f;
             for (int j=0; j<size; j++)  {
@@ -1397,6 +1579,20 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp,
                     opserr << "expSetup: " << tag << endln;
                     return TCL_ERROR;
             }
+            int numFact = 0;
+            while (i+1+numFact < argc &&
+                strncmp(argv[i+1+numFact],"-trial",6) != 0 &&
+                strncmp(argv[i+1+numFact],"-out",4) != 0 &&
+                strncmp(argv[i+1+numFact],"-ctrl",5) != 0 &&
+                strncmp(argv[i+1+numFact],"-daq",4) != 0)  {
+                numFact++;
+            }
+            if (numFact != size)  {
+                opserr << "WARNING wrong number of ctrlForceFact: want ";
+                opserr << size << " but got " << numFact << endln;
+                opserr << "expSetup: " << tag << endln;
+                return TCL_ERROR;
+            }
             Vector factor(size);
             double f;
             for (int j=0; j<size; j++)  {
@@ -1417,6 +1613,20 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp,
                 opserr << "WARNING ctrlTimeSize <= 0\n";
                     opserr << "expSetup: " << tag << endln;
                     return TCL_ERROR;
+            }
+            int numFact = 0;
+            while (i+1+numFact < argc &&
+                strncmp(argv[i+1+numFact],"-trial",6) != 0 &&
+                strncmp(argv[i+1+numFact],"-out",4) != 0 &&
+                strncmp(argv[i+1+numFact],"-ctrl",5) != 0 &&
+                strncmp(argv[i+1+numFact],"-daq",4) != 0)  {
+                numFact++;
+            }
+            if (numFact != size)  {
+                opserr << "WARNING wrong number of ctrlTimeFact: want ";
+                opserr << size << " but got " << numFact << endln;
+                opserr << "expSetup: " << tag << endln;
+                return TCL_ERROR;
             }
             Vector factor(size);
             double f;
@@ -1441,6 +1651,20 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp,
                     opserr << "expSetup: " << tag << endln;
                     return TCL_ERROR;
             }
+            int numFact = 0;
+            while (i+1+numFact < argc &&
+                strncmp(argv[i+1+numFact],"-trial",6) != 0 &&
+                strncmp(argv[i+1+numFact],"-out",4) != 0 &&
+                strncmp(argv[i+1+numFact],"-ctrl",5) != 0 &&
+                strncmp(argv[i+1+numFact],"-daq",4) != 0)  {
+                numFact++;
+            }
+            if (numFact != size)  {
+                opserr << "WARNING wrong number of daqDispFact: want ";
+                opserr << size << " but got " << numFact << endln;
+                opserr << "expSetup: " << tag << endln;
+                return TCL_ERROR;
+            }
             Vector factor(size);
             double f;
             for (int j=0; j<size; j++)  {
@@ -1462,6 +1686,20 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp,
                 opserr << "WARNING daqVelSize <= 0\n";
                     opserr << "expSetup: " << tag << endln;
                     return TCL_ERROR;
+            }
+            int numFact = 0;
+            while (i+1+numFact < argc &&
+                strncmp(argv[i+1+numFact],"-trial",6) != 0 &&
+                strncmp(argv[i+1+numFact],"-out",4) != 0 &&
+                strncmp(argv[i+1+numFact],"-ctrl",5) != 0 &&
+                strncmp(argv[i+1+numFact],"-daq",4) != 0)  {
+                numFact++;
+            }
+            if (numFact != size)  {
+                opserr << "WARNING wrong number of daqVelFact: want ";
+                opserr << size << " but got " << numFact << endln;
+                opserr << "expSetup: " << tag << endln;
+                return TCL_ERROR;
             }
             Vector factor(size);
             double f;
@@ -1486,6 +1724,20 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp,
                     opserr << "expSetup: " << tag << endln;
                     return TCL_ERROR;
             }
+            int numFact = 0;
+            while (i+1+numFact < argc &&
+                strncmp(argv[i+1+numFact],"-trial",6) != 0 &&
+                strncmp(argv[i+1+numFact],"-out",4) != 0 &&
+                strncmp(argv[i+1+numFact],"-ctrl",5) != 0 &&
+                strncmp(argv[i+1+numFact],"-daq",4) != 0)  {
+                numFact++;
+            }
+            if (numFact != size)  {
+                opserr << "WARNING wrong number of daqAccelFact: want ";
+                opserr << size << " but got " << numFact << endln;
+                opserr << "expSetup: " << tag << endln;
+                return TCL_ERROR;
+            }
             Vector factor(size);
             double f;
             for (int j=0; j<size; j++)  {
@@ -1509,6 +1761,20 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp,
                     opserr << "expSetup: " << tag << endln;
                     return TCL_ERROR;
             }
+            int numFact = 0;
+            while (i+1+numFact < argc &&
+                strncmp(argv[i+1+numFact],"-trial",6) != 0 &&
+                strncmp(argv[i+1+numFact],"-out",4) != 0 &&
+                strncmp(argv[i+1+numFact],"-ctrl",5) != 0 &&
+                strncmp(argv[i+1+numFact],"-daq",4) != 0)  {
+                numFact++;
+            }
+            if (numFact != size)  {
+                opserr << "WARNING wrong number of daqForceFact: want ";
+                opserr << size << " but got " << numFact << endln;
+                opserr << "expSetup: " << tag << endln;
+                return TCL_ERROR;
+            }
             Vector factor(size);
             double f;
             for (int j=0; j<size; j++)  {
@@ -1529,6 +1795,20 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp,
                 opserr << "WARNING daqTimeSize <= 0\n";
                     opserr << "expSetup: " << tag << endln;
                     return TCL_ERROR;
+            }
+            int numFact = 0;
+            while (i+1+numFact < argc &&
+                strncmp(argv[i+1+numFact],"-trial",6) != 0 &&
+                strncmp(argv[i+1+numFact],"-out",4) != 0 &&
+                strncmp(argv[i+1+numFact],"-ctrl",5) != 0 &&
+                strncmp(argv[i+1+numFact],"-daq",4) != 0)  {
+                numFact++;
+            }
+            if (numFact != size)  {
+                opserr << "WARNING wrong number of daqTimeFact: want ";
+                opserr << size << " but got " << numFact << endln;
+                opserr << "expSetup: " << tag << endln;
+                return TCL_ERROR;
             }
             Vector factor(size);
             double f;
