@@ -48,7 +48,7 @@ ExperimentalControl::ExperimentalControl(int tag)
             << "fail to create ID.\n";
         exit(OF_ReturnType_failed);
     }
-
+    
     // allocate memory for the signal filters
     theCtrlFilters = new ExperimentalSignalFilter* [OF_Resp_All];
     if (theCtrlFilters == 0)  {
@@ -62,7 +62,7 @@ ExperimentalControl::ExperimentalControl(int tag)
             << "failed to allocate pointers for daq filters.\n";
         exit(OF_ReturnType_failed);
     }
-
+    
     // initialize signal filter pointers to zero
     for (int i=0; i<OF_Resp_All; i++)  {
         theCtrlFilters[i] = 0;
@@ -104,7 +104,7 @@ ExperimentalControl::ExperimentalControl(const ExperimentalControl& ec)
             theCtrlFilters[i] = ec.theCtrlFilters[i]->getCopy();
         else
             theCtrlFilters[i] = 0;
-
+        
         if (ec.theDaqFilters[i] != 0) 
             theDaqFilters[i] = ec.theDaqFilters[i]->getCopy();
         else
@@ -213,4 +213,12 @@ const ID& ExperimentalControl::getSizeCtrl()
 const ID& ExperimentalControl::getSizeDaq()
 {
     return *sizeDaq;
+}
+
+
+void ExperimentalControl::sleep(const clock_t wait)
+{
+    clock_t goal;
+    goal = wait + clock();
+    while (goal>clock());
 }
