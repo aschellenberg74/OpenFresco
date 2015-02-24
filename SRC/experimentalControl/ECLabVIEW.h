@@ -61,7 +61,7 @@ public:
     virtual int setup();
     virtual int setSize(ID sizeT, ID sizeO);
     
-    virtual int setTrialResponse(const Vector* disp, 
+    virtual int setTrialResponse(const Vector* disp,
         const Vector* vel,
         const Vector* accel,
         const Vector* force,
@@ -82,29 +82,27 @@ public:
     virtual int getResponse(int responseID, Information &info);
     
     // public methods for output
-    void Print(OPS_Stream &s, int flag = 0);    
-    
+    void Print(OPS_Stream &s, int flag = 0);
+
 protected:
     // protected methods to set and to get response
     virtual int control();
     virtual int acquire();
-    
+
 private:
-    void sleep(const clock_t wait);
-    
     int numTrialCPs;            // number of trial control points
     ExperimentalCP **trialCPs;  // trial control points
     int numOutCPs;              // number of output control points
     ExperimentalCP **outCPs;    // output control points
     char *ipAddress;            // ip address
     int ipPort;                 // ip port
-
+    
     TCP_Socket *theSocket;      // tcp/ip socket
     char *sData;                // send data array
     Message *sendData;          // send vector
     char *rData;                // receive data array
     Message *recvData;          // receive vector
-
+    
     Vector *ctrlDisp, *ctrlForce;
     Vector *daqDisp, *daqForce;
     
@@ -112,7 +110,7 @@ private:
     struct tm *ptm;
     char OPFTransactionID[30];
     char errMsg[80];
-
+    
     FILE *logFile;
 };
 
