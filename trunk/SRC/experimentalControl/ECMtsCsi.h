@@ -24,7 +24,7 @@
 #ifndef ECMtsCsi_h
 #define ECMtsCsi_h
 
-// Written: MTS Systems Corporation
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 01/07
 // Revision: A
 //
@@ -36,11 +36,15 @@
 
 #include <MtsCsi.h>
 
+class ExperimentalCP;
+
 class ECMtsCsi : public ExperimentalControl
 {
 public:
     // constructors
-    ECMtsCsi(int tag, char *cfgFile, double rampTime);
+    ECMtsCsi(int tag, char *cfgFile, double rampTime,
+        int nTrialCPs, ExperimentalCP **trialCPs,
+        int nOutCPs, ExperimentalCP **outCPs);
     ECMtsCsi(const ECMtsCsi& ec);
     
     // destructor
@@ -53,7 +57,7 @@ public:
     virtual int setup();
     virtual int setSize(ID sizeT, ID sizeO);
     
-    virtual int setTrialResponse(const Vector* disp, 
+    virtual int setTrialResponse(const Vector* disp,
         const Vector* vel,
         const Vector* accel,
         const Vector* force,
@@ -65,34 +69,37 @@ public:
         Vector* time);
     
     virtual int commitState();
-
+    
     virtual ExperimentalControl *getCopy();
-
+    
     // public methods for experimental control recorder
     virtual Response *setResponse(const char **argv, int argc,
         OPS_Stream &output);
     virtual int getResponse(int responseID, Information &info);
     
     // public methods for output
-	void Print(OPS_Stream &s, int flag = 0);
-    
+    void Print(OPS_Stream &s, int flag = 0);
+
 protected:
     // protected methods to set and to get response
     virtual int control();
     virtual int acquire();
 
 private:
-	Mts::ICsiController* CsiController;
-	
-    char *cfgFile;
-	double rampTime;
-    int	rampId;
-	
-    Vector *ctrlDisp, *ctrlForce;
-    double *daqResp;
-    Vector *daqDisp, *daqForce;
-
-    int respSize;
+    Mts::ICsiController* CsiController;
+    
+    char *cfgFile;              // CSI controller configuration file
+    double rampTime;            // time to ramp signals to new targets
+    int numTrialCPs;            // number of trial control points
+    ExperimentalCP **trialCPs;  // trial control points
+    int numOutCPs;              // number of output control points
+    ExperimentalCP **outCPs;    // output control points
+    
+    int numCtrlSignals, numDaqSignals;     // number of signals
+    double *ctrlSignal, *daqSignal;        // signal arrays
+    Vector ctrlSigOffset, daqSigOffset;    // signal offsets (i.e. setpoints)
+    
+    int rampId;  // set this to -1 to get current feedback
 };
 
 #endif

@@ -141,7 +141,7 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
             return TCL_ERROR;
         }
         
-        int matTag, numMats = 0;
+        int i, matTag, numMats = 0;
         
         argi = 2;
         if (Tcl_GetInt(interp, argv[argi], &tag) != TCL_OK)  {
@@ -167,7 +167,7 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
             opserr << "expControl SimUniaxialMaterials " << tag << endln;
             return TCL_ERROR;
         }
-        for (int i=0; i<numMats; i++)  {
+        for (i=0; i<numMats; i++)  {
             theSpecimen[i] = 0;
             if (Tcl_GetInt(interp, argv[argi], &matTag) != TCL_OK)  {
                 opserr << "WARNING invalid matTag\n";
@@ -192,65 +192,65 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
             delete [] theSpecimen;
     }
     
-    // ----------------------------------------------------------------------------	
-    /*else if (strcmp(argv[1],"SimUniaxialMaterialsForce") == 0)  {
-    if (argc < 4)  {
-    opserr << "WARNING invalid number of arguments\n";
-    printCommand(argc,argv);
-    opserr << "Want: expControl SimUniaxialMaterialsForce tag matTags "
-    << "<-ctrlFilters (5 filterTag)> <-daqFilters (5 filterTag)>\n";
-    return TCL_ERROR;
-    }
-    
-    int matTag, numMats = 0;
-    
-    argi = 2;
-    if (Tcl_GetInt(interp, argv[argi], &tag) != TCL_OK)  {
-    opserr << "WARNING invalid expControl SimUniaxialMaterialsForce tag\n";
-    return TCL_ERROR;
-    }
-    argi++;
-    // now read the number of materials
-    while (argi+numMats < argc &&
-    strcmp(argv[argi+numMats],"-ctrlFilters") != 0 &&
-    strcmp(argv[argi+numMats],"-daqFilters") != 0)  {
-    numMats++;
-    }
-    if (numMats == 0)  {
-    opserr << "WARNING no uniaxial materials specified\n";
-    opserr << "expControl SimUniaxialMaterialsForce " << tag << endln;
-    return TCL_ERROR;
-    }
-    // create the array to hold the uniaxial materials
-    UniaxialMaterial **theSpecimen = new UniaxialMaterial* [numMats];
-    if (theSpecimen == 0)  {
-    opserr << "WARNING out of memory\n";
-    opserr << "expControl SimUniaxialMaterialsForce " << tag << endln;
-    return TCL_ERROR;
-    }
-    for (int i=0; i<numMats; i++)  {
-    theSpecimen[i] = 0;
-    if (Tcl_GetInt(interp, argv[argi], &matTag) != TCL_OK)  {
-    opserr << "WARNING invalid matTag\n";
-    opserr << "expControl SimUniaxialMaterialsForce " << tag << endln;
-    return TCL_ERROR;
-    }
-    theSpecimen[i] = OPS_GetUniaxialMaterial(matTag);
-    if (theSpecimen[i] == 0)  {
-    opserr << "WARNING uniaxial material not found\n";
-    opserr << "uniaxialMaterial " << matTag << endln;
-    opserr << "expControl SimUniaxialMaterialsForce " << tag << endln;
-    return TCL_ERROR;
-    }
-    argi++;
-    }
-    
-    // parsing was successful, allocate the control
-    theControl = new ECSimUniaxialMaterialsForce(tag, numMats, theSpecimen);
-    
-    // cleanup dynamic memory
-    if (theSpecimen != 0)
-    delete [] theSpecimen;
+    /* ----------------------------------------------------------------------------	
+    else if (strcmp(argv[1],"SimUniaxialMaterialsForce") == 0)  {
+        if (argc < 4)  {
+            opserr << "WARNING invalid number of arguments\n";
+            printCommand(argc,argv);
+            opserr << "Want: expControl SimUniaxialMaterialsForce tag matTags "
+                << "<-ctrlFilters (5 filterTag)> <-daqFilters (5 filterTag)>\n";
+            return TCL_ERROR;
+        }
+        
+        int i, matTag, numMats = 0;
+        
+        argi = 2;
+        if (Tcl_GetInt(interp, argv[argi], &tag) != TCL_OK)  {
+            opserr << "WARNING invalid expControl SimUniaxialMaterialsForce tag\n";
+            return TCL_ERROR;
+        }
+        argi++;
+        // now read the number of materials
+        while (argi+numMats < argc &&
+            strcmp(argv[argi+numMats],"-ctrlFilters") != 0 &&
+            strcmp(argv[argi+numMats],"-daqFilters") != 0)  {
+                numMats++;
+        }
+        if (numMats == 0)  {
+            opserr << "WARNING no uniaxial materials specified\n";
+            opserr << "expControl SimUniaxialMaterialsForce " << tag << endln;
+            return TCL_ERROR;
+        }
+        // create the array to hold the uniaxial materials
+        UniaxialMaterial **theSpecimen = new UniaxialMaterial* [numMats];
+        if (theSpecimen == 0)  {
+            opserr << "WARNING out of memory\n";
+            opserr << "expControl SimUniaxialMaterialsForce " << tag << endln;
+            return TCL_ERROR;
+        }
+        for (i=0; i<numMats; i++)  {
+            theSpecimen[i] = 0;
+            if (Tcl_GetInt(interp, argv[argi], &matTag) != TCL_OK)  {
+                opserr << "WARNING invalid matTag\n";
+                opserr << "expControl SimUniaxialMaterialsForce " << tag << endln;
+                return TCL_ERROR;
+            }
+            theSpecimen[i] = OPS_GetUniaxialMaterial(matTag);
+            if (theSpecimen[i] == 0)  {
+                opserr << "WARNING uniaxial material not found\n";
+                opserr << "uniaxialMaterial " << matTag << endln;
+                opserr << "expControl SimUniaxialMaterialsForce " << tag << endln;
+                return TCL_ERROR;
+            }
+            argi++;
+        }
+        
+        // parsing was successful, allocate the control
+        theControl = new ECSimUniaxialMaterialsForce(tag, numMats, theSpecimen);
+        
+        // cleanup dynamic memory
+        if (theSpecimen != 0)
+            delete [] theSpecimen;
     }*/
     
     // ----------------------------------------------------------------------------	
@@ -263,7 +263,7 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
             return TCL_ERROR;
         }
         
-        int cpTag, i;
+        int i, cpTag;
         int numTrialCPs = 0, numOutCPs = 0;
         
         argi = 2;
@@ -432,7 +432,7 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
         }
         
         char *ipAddr;
-        int ipPort, mode, i;
+        int i, ipPort, mode;
         ID ctrlModes(5), daqModes(5);
         char *initFileName = 0;
         int ssl = 0, udp = 0;
@@ -482,13 +482,13 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
             daqModes(i) = mode;
             argi++;
         }
-        for (i = argi; i < argc; i++)  {
+        for (i=argi; i<argc; i++)  {
             if (strcmp(argv[i], "-initFile") == 0)  {
                 initFileName = new char [strlen(argv[i+1])+1];
                 strcpy(initFileName,argv[i+1]);
             }
         }
-        for (i = argi; i < argc; i++)  {
+        for (i=argi; i<argc; i++)  {
             if (strcmp(argv[i], "-ssl") == 0)
                 ssl = 1;
             else if (strcmp(argv[i], "-udp") == 0)
@@ -503,16 +503,17 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
 #ifndef _WIN64
     // ----------------------------------------------------------------------------	
     else if (strcmp(argv[1],"dSpace") == 0)  {
-        if (argc < 5)  {
+        if (argc < 8)  {
             opserr << "WARNING invalid number of arguments\n";
             printCommand(argc,argv);
-            opserr << "Want: expControl dSpace tag type boardName "
+            opserr << "Want: expControl dSpace tag boardName -trialCP cpTags -outCP cpTags "
                 << "<-ctrlFilters (5 filterTag)> <-daqFilters (5 filterTag)>\n";
             return TCL_ERROR;
         }
         
-        int type;
         char *boardName;
+        int i, cpTag;
+        int numTrialCPs = 0, numOutCPs = 0;
         
         argi = 2;
         if (Tcl_GetInt(interp, argv[argi], &tag) != TCL_OK)  {
@@ -520,32 +521,106 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
             return TCL_ERROR;
         }
         argi++;
-        if (Tcl_GetInt(interp, argv[argi], &type) != TCL_OK)  {
-            opserr << "WARNING invalid type\n";
+        boardName = new char [strlen(argv[argi])+1];
+        strcpy(boardName,argv[argi]);
+        argi++;
+        if (strcmp(argv[argi],"-trialCP") != 0)  {
+            opserr << "WARNING expecting -trialCP cpTags\n";
             opserr << "expControl dSpace " << tag << endln;
             return TCL_ERROR;
         }
         argi++;
-        boardName = new char [strlen(argv[argi])+1];
-        strcpy(boardName,argv[argi]);
+        while (argi+numTrialCPs < argc &&
+            strcmp(argv[argi+numTrialCPs],"-outCP") != 0)  {
+                numTrialCPs++;
+        }
+        if (numTrialCPs == 0)  {
+            opserr << "WARNING no trialCPTags specified\n";
+            opserr << "expControl dSpace " << tag << endln;
+            return TCL_ERROR;
+        }
+        // create the array to hold the trial control points
+        ExperimentalCP **trialCPs = new ExperimentalCP* [numTrialCPs];
+        if (trialCPs == 0)  {
+            opserr << "WARNING out of memory\n";
+            opserr << "expControl dSpace " << tag << endln;
+            return TCL_ERROR;
+        }
+        for (i=0; i<numTrialCPs; i++)  {
+            trialCPs[i] = 0;
+            if (Tcl_GetInt(interp, argv[argi], &cpTag) != TCL_OK)  {
+                opserr << "WARNING invalid cpTag\n";
+                opserr << "expControl dSpace " << tag << endln;
+                return TCL_ERROR;
+            }
+            trialCPs[i] = getExperimentalCP(cpTag);
+            if (trialCPs[i] == 0)  {
+                opserr << "WARNING experimental control point not found\n";
+                opserr << "expControlPoint " << cpTag << endln;
+                opserr << "expControl dSpace " << tag << endln;
+                return TCL_ERROR;
+            }
+            argi++;
+        }
+        if (strcmp(argv[argi],"-outCP") != 0)  {
+            opserr << "WARNING expecting -outCP cpTags\n";
+            opserr << "expControl dSpace " << tag << endln;
+            return TCL_ERROR;
+        }
         argi++;
+        while (argi+numOutCPs < argc &&
+            strcmp(argv[argi+numOutCPs],"-ctrlFilters") != 0 &&
+            strcmp(argv[argi+numOutCPs],"-daqFilters") != 0)  {
+                numOutCPs++;
+        }
+        if (numOutCPs == 0)  {
+            opserr << "WARNING no outCPTags specified\n";
+            opserr << "expControl dSpace " << tag << endln;
+            return TCL_ERROR;
+        }
+        // create the array to hold the output control points
+        ExperimentalCP **outCPs = new ExperimentalCP* [numOutCPs];
+        if (outCPs == 0)  {
+            opserr << "WARNING out of memory\n";
+            opserr << "expControl dSpace " << tag << endln;
+            return TCL_ERROR;
+        }
+        for (i=0; i<numOutCPs; i++)  {
+            outCPs[i] = 0;
+            if (Tcl_GetInt(interp, argv[argi], &cpTag) != TCL_OK)  {
+                opserr << "WARNING invalid cpTag\n";
+                opserr << "expControl dSpace " << tag << endln;
+                return TCL_ERROR;
+            }
+            outCPs[i] = getExperimentalCP(cpTag);
+            if (outCPs[i] == 0)  {
+                opserr << "WARNING experimental control point not found\n";
+                opserr << "expControlPoint " << cpTag << endln;
+                opserr << "expControl dSpace " << tag << endln;
+                return TCL_ERROR;
+            }
+            argi++;
+        }
         
         // parsing was successful, allocate the control
-        theControl = new ECdSpace(tag, type, boardName);
+        theControl = new ECdSpace(tag, boardName,
+            numTrialCPs, trialCPs, numOutCPs, outCPs);
     }
     
     // ----------------------------------------------------------------------------	
     else if (strcmp(argv[1],"MTSCsi") == 0)  {
-        if (argc < 4)  {
+        if (argc < 9)  {
             opserr << "WARNING invalid number of arguments\n";
             printCommand(argc,argv);
-            opserr << "Want: expControl MTSCsi tag configFileName <rampTime> "
+            opserr << "Want: expControl MTSCsi tag configFileName rampTime -trialCP cpTags -outCP cpTags "
                 << "<-ctrlFilters (5 filterTag)> <-daqFilters (5 filterTag)>\n";
             return TCL_ERROR;
         }
         
         char *cfgFile;
-        double rampTime = 0.02;
+        double rampTime;
+        int i, cpTag;
+        int numTrialCPs = 0, numOutCPs = 0;
         
         argi = 2;
         if (Tcl_GetInt(interp, argv[argi], &tag) != TCL_OK)  {
@@ -556,73 +631,143 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
         cfgFile = new char [strlen(argv[argi])+1];
         strcpy(cfgFile,argv[argi]);
         argi++;
-        if (argc > 4 &&
-            strcmp(argv[argi],"-ctrlFilters") != 0 &&
-            strcmp(argv[argi],"-daqFilters") != 0)  {
-                if (Tcl_GetDouble(interp, argv[argi], &rampTime) != TCL_OK)  {
-                    opserr << "WARNING invalid rampTime\n";
-                    opserr << "expControl MTSCsi " << tag << endln;
-                    return TCL_ERROR;
-                }
-                argi++;
+        if (Tcl_GetDouble(interp, argv[argi], &rampTime) != TCL_OK)  {
+            opserr << "WARNING invalid rampTime\n";
+            opserr << "expControl MTSCsi " << tag << endln;
+            return TCL_ERROR;
         }
+        argi++;
+        if (strcmp(argv[argi],"-trialCP") != 0)  {
+            opserr << "WARNING expecting -trialCP cpTags\n";
+            opserr << "expControl MTSCsi " << tag << endln;
+            return TCL_ERROR;
+        }
+        argi++;
+        while (argi+numTrialCPs < argc &&
+            strcmp(argv[argi+numTrialCPs],"-outCP") != 0)  {
+                numTrialCPs++;
+        }
+        if (numTrialCPs == 0)  {
+            opserr << "WARNING no trialCPTags specified\n";
+            opserr << "expControl MTSCsi " << tag << endln;
+            return TCL_ERROR;
+        }
+        // create the array to hold the trial control points
+        ExperimentalCP **trialCPs = new ExperimentalCP* [numTrialCPs];
+        if (trialCPs == 0)  {
+            opserr << "WARNING out of memory\n";
+            opserr << "expControl MTSCsi " << tag << endln;
+            return TCL_ERROR;
+        }
+        for (i=0; i<numTrialCPs; i++)  {
+            trialCPs[i] = 0;
+            if (Tcl_GetInt(interp, argv[argi], &cpTag) != TCL_OK)  {
+                opserr << "WARNING invalid cpTag\n";
+                opserr << "expControl MTSCsi " << tag << endln;
+                return TCL_ERROR;
+            }
+            trialCPs[i] = getExperimentalCP(cpTag);
+            if (trialCPs[i] == 0)  {
+                opserr << "WARNING experimental control point not found\n";
+                opserr << "expControlPoint " << cpTag << endln;
+                opserr << "expControl MTSCsi " << tag << endln;
+                return TCL_ERROR;
+            }
+            argi++;
+        }
+        if (strcmp(argv[argi],"-outCP") != 0)  {
+            opserr << "WARNING expecting -outCP cpTags\n";
+            opserr << "expControl MTSCsi " << tag << endln;
+            return TCL_ERROR;
+        }
+        argi++;
+        while (argi+numOutCPs < argc &&
+            strcmp(argv[argi+numOutCPs],"-ctrlFilters") != 0 &&
+            strcmp(argv[argi+numOutCPs],"-daqFilters") != 0)  {
+                numOutCPs++;
+        }
+        if (numOutCPs == 0)  {
+            opserr << "WARNING no outCPTags specified\n";
+            opserr << "expControl MTSCsi " << tag << endln;
+            return TCL_ERROR;
+        }
+        // create the array to hold the output control points
+        ExperimentalCP **outCPs = new ExperimentalCP* [numOutCPs];
+        if (outCPs == 0)  {
+            opserr << "WARNING out of memory\n";
+            opserr << "expControl MTSCsi " << tag << endln;
+            return TCL_ERROR;
+        }
+        for (i=0; i<numOutCPs; i++)  {
+            outCPs[i] = 0;
+            if (Tcl_GetInt(interp, argv[argi], &cpTag) != TCL_OK)  {
+                opserr << "WARNING invalid cpTag\n";
+                opserr << "expControl MTSCsi " << tag << endln;
+                return TCL_ERROR;
+            }
+            outCPs[i] = getExperimentalCP(cpTag);
+            if (outCPs[i] == 0)  {
+                opserr << "WARNING experimental control point not found\n";
+                opserr << "expControlPoint " << cpTag << endln;
+                opserr << "expControl MTSCsi " << tag << endln;
+                return TCL_ERROR;
+            }
+            argi++;
+        }
+        
         // parsing was successful, allocate the control
-        theControl = new ECMtsCsi(tag, cfgFile, rampTime);
+        theControl = new ECMtsCsi(tag, cfgFile, rampTime,
+            numTrialCPs, trialCPs, numOutCPs, outCPs);
     }
 
-    // ----------------------------------------------------------------------------	
-    /*    else if (strcmp(argv[1],"NIEseries") == 0)  {
-    if (argc < 4)  {
-    opserr << "WARNING invalid number of arguments\n";
-    printCommand(argc,argv);
-    opserr << "Want: expControl NIEseries tag device ";
-    << "<-ctrlFilters (5 filterTag)> <-daqFilters (5 filterTag)>\n";
-    return TCL_ERROR;
-    }
-    
-    int device;
-    
-    argi = 2;
-    if (Tcl_GetInt(interp, argv[argi], &tag) != TCL_OK)  {
-    opserr << "WARNING invalid expControl NIEseries tag\n";
-    return TCL_ERROR;
-    }
-    argi++;
-    if (Tcl_GetInt(interp, argv[argi], &device) != TCL_OK)  {
-    opserr << "WARNING invalid device\n";
-    opserr << "expControl NIEseries " << tag << endln;
-    return TCL_ERROR;
-    }
-    argi++;
-    
-    // parsing was successful, allocate the control
-    theControl = new ECNIEseries(tag, device);
+    /* ----------------------------------------------------------------------------	
+    else if (strcmp(argv[1],"NIEseries") == 0)  {
+        if (argc < 4)  {
+            opserr << "WARNING invalid number of arguments\n";
+            printCommand(argc,argv);
+            opserr << "Want: expControl NIEseries tag device "
+                << "<-ctrlFilters (5 filterTag)> <-daqFilters (5 filterTag)>\n";
+            return TCL_ERROR;
+        }
+        
+        int device;
+        
+        argi = 2;
+        if (Tcl_GetInt(interp, argv[argi], &tag) != TCL_OK)  {
+            opserr << "WARNING invalid expControl NIEseries tag\n";
+            return TCL_ERROR;
+        }
+        argi++;
+        if (Tcl_GetInt(interp, argv[argi], &device) != TCL_OK)  {
+            opserr << "WARNING invalid device\n";
+            opserr << "expControl NIEseries " << tag << endln;
+            return TCL_ERROR;
+        }
+        argi++;
+        
+        // parsing was successful, allocate the control
+        theControl = new ECNIEseries(tag, device);
     }*/
 #endif
 
 #if defined _WIN32 || defined _WIN64
     // ----------------------------------------------------------------------------	
     else if (strcmp(argv[1],"xPCtarget") == 0)  {
-        if (argc < 7)  {
+        if (argc < 10)  {
             opserr << "WARNING invalid number of arguments\n";
             printCommand(argc,argv);
-            opserr << "Want: expControl xPCtarget tag type ipAddr ipPort appName <appPath> "
-                << "<-ctrlFilters (5 filterTag)> <-daqFilters (5 filterTag)>\n";
+            opserr << "Want: expControl xPCtarget tag ipAddr ipPort appFile -trialCP cpTags -outCP cpTags "
+                << "<-timeOut t> <-ctrlFilters (5 filterTag)> <-daqFilters (5 filterTag)>\n";
             return TCL_ERROR;
         }
         
-        int type, i, timeOut = 10;
-        char *ipAddr, *ipPort, *appName, *appPath = 0;
+        int i, cpTag, timeOut = 10;
+        char *ipAddr, *ipPort, *appFile;
+        int numTrialCPs = 0, numOutCPs = 0;
         
         argi = 2;
         if (Tcl_GetInt(interp, argv[argi], &tag) != TCL_OK)  {
             opserr << "WARNING invalid expControl xPCtarget tag\n";
-            return TCL_ERROR;
-        }
-        argi++;
-        if (Tcl_GetInt(interp, argv[argi], &type) != TCL_OK)  {
-            opserr << "WARNING invalid type\n";
-            opserr << "expControl xPCtarget " << tag << endln;
             return TCL_ERROR;
         }
         argi++;
@@ -632,18 +777,87 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
         ipPort = new char [strlen(argv[argi])+1];
         strcpy(ipPort,argv[argi]);
         argi++;
-        appName = new char [strlen(argv[argi])+1];
-        strcpy(appName,argv[argi]);
+        appFile = new char [strlen(argv[argi])+1];
+        strcpy(appFile,argv[argi]);
         argi++;
-        if (argc > 7 &&
-            strcmp(argv[argi],"-ctrlFilters") != 0 &&
-            strcmp(argv[argi],"-daqFilters") != 0 &&
-            strcmp(argv[argi],"-timeOut") != 0)  {
-                appPath = new char [strlen(argv[argi])+1];
-                strcpy(appPath,argv[argi]);
-                argi++;
+        if (strcmp(argv[argi],"-trialCP") != 0)  {
+            opserr << "WARNING expecting -trialCP cpTags\n";
+            opserr << "expControl xPCtarget " << tag << endln;
+            return TCL_ERROR;
         }
-        for (i = argi; i < argc; i++)  {
+        argi++;
+        while (argi+numTrialCPs < argc &&
+            strcmp(argv[argi+numTrialCPs],"-outCP") != 0)  {
+                numTrialCPs++;
+        }
+        if (numTrialCPs == 0)  {
+            opserr << "WARNING no trialCPTags specified\n";
+            opserr << "expControl xPCtarget " << tag << endln;
+            return TCL_ERROR;
+        }
+        // create the array to hold the trial control points
+        ExperimentalCP **trialCPs = new ExperimentalCP* [numTrialCPs];
+        if (trialCPs == 0)  {
+            opserr << "WARNING out of memory\n";
+            opserr << "expControl xPCtarget " << tag << endln;
+            return TCL_ERROR;
+        }
+        for (i=0; i<numTrialCPs; i++)  {
+            trialCPs[i] = 0;
+            if (Tcl_GetInt(interp, argv[argi], &cpTag) != TCL_OK)  {
+                opserr << "WARNING invalid cpTag\n";
+                opserr << "expControl xPCtarget " << tag << endln;
+                return TCL_ERROR;
+            }
+            trialCPs[i] = getExperimentalCP(cpTag);
+            if (trialCPs[i] == 0)  {
+                opserr << "WARNING experimental control point not found\n";
+                opserr << "expControlPoint " << cpTag << endln;
+                opserr << "expControl xPCtarget " << tag << endln;
+                return TCL_ERROR;
+            }
+            argi++;
+        }
+        if (strcmp(argv[argi],"-outCP") != 0)  {
+            opserr << "WARNING expecting -outCP cpTags\n";
+            opserr << "expControl xPCtarget " << tag << endln;
+            return TCL_ERROR;
+        }
+        argi++;
+        while (argi+numOutCPs < argc &&
+            strcmp(argv[argi+numOutCPs],"-ctrlFilters") != 0 &&
+            strcmp(argv[argi+numOutCPs],"-daqFilters") != 0)  {
+                numOutCPs++;
+        }
+        if (numOutCPs == 0)  {
+            opserr << "WARNING no outCPTags specified\n";
+            opserr << "expControl xPCtarget " << tag << endln;
+            return TCL_ERROR;
+        }
+        // create the array to hold the output control points
+        ExperimentalCP **outCPs = new ExperimentalCP* [numOutCPs];
+        if (outCPs == 0)  {
+            opserr << "WARNING out of memory\n";
+            opserr << "expControl xPCtarget " << tag << endln;
+            return TCL_ERROR;
+        }
+        for (i=0; i<numOutCPs; i++)  {
+            outCPs[i] = 0;
+            if (Tcl_GetInt(interp, argv[argi], &cpTag) != TCL_OK)  {
+                opserr << "WARNING invalid cpTag\n";
+                opserr << "expControl xPCtarget " << tag << endln;
+                return TCL_ERROR;
+            }
+            outCPs[i] = getExperimentalCP(cpTag);
+            if (outCPs[i] == 0)  {
+                opserr << "WARNING experimental control point not found\n";
+                opserr << "expControlPoint " << cpTag << endln;
+                opserr << "expControl xPCtarget " << tag << endln;
+                return TCL_ERROR;
+            }
+            argi++;
+        }
+        for (i=argi; i<argc; i++)  {
             if (i+1 < argc && strcmp(argv[i], "-timeOut") == 0)  {
                 if (Tcl_GetInt(interp, argv[i+1], &timeOut) != TCL_OK)  {
                     opserr << "WARNING invalid timeOut value\n";
@@ -654,49 +868,10 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
         }
         
         // parsing was successful, allocate the control
-        theControl = new ECxPCtarget(tag, type, ipAddr, ipPort,
-            appName, appPath, timeOut);
+        theControl = new ECxPCtarget(tag, ipAddr, ipPort, appFile,
+            numTrialCPs, trialCPs, numOutCPs, outCPs, timeOut);
     }
     
-    // ----------------------------------------------------------------------------	
-    /*else if (strcmp(argv[1],"xPCtargetForce") == 0)  {
-    if (argc < 7)  {
-    opserr << "WARNING invalid number of arguments\n";
-    printCommand(argc,argv);
-    opserr << "Want: expControl xPCtargetForce tag ipAddr ipPort appName <appPath> "
-    << "<-ctrlFilters (5 filterTag)> <-daqFilters (5 filterTag)>\n";
-    return TCL_ERROR;
-    }
-    
-    char *ipAddr, *ipPort, *appName, *appPath = 0;
-    
-    argi = 2;
-    if (Tcl_GetInt(interp, argv[argi], &tag) != TCL_OK)  {
-    opserr << "WARNING invalid expControl xPCtargetForce tag\n";
-    return TCL_ERROR;
-    }
-    argi++;
-    ipAddr = new char [strlen(argv[argi])+1];
-    strcpy(ipAddr,argv[argi]);
-    argi++;
-    ipPort = new char [strlen(argv[argi])+1];
-    strcpy(ipPort,argv[argi]);
-    argi++;
-    appName = new char [strlen(argv[argi])+1];
-    strcpy(appName,argv[argi]);
-    argi++;
-    if (argc > 7 &&
-    strcmp(argv[argi],"-ctrlFilters") != 0 &&
-    strcmp(argv[argi],"-daqFilters") != 0)  {
-    appPath = new char [strlen(argv[argi])+1];
-    strcpy(appPath,argv[argi]);
-    argi++;
-    }
-    
-    // parsing was successful, allocate the control
-    theControl = new ECxPCtargetForce(tag, ipAddr, ipPort, appName, appPath);
-    }*/
-
     // ----------------------------------------------------------------------------	
     else if (strcmp(argv[1],"LabVIEW") == 0)  {
         if (argc < 8)  {
@@ -707,7 +882,7 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
             return TCL_ERROR;
         }
         
-        int cpTag, ipPort = 44000;
+        int i, cpTag, ipPort = 44000;
         int numTrialCPs = 0, numOutCPs = 0;
         char *ipAddr;
         
@@ -752,7 +927,7 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
             opserr << "expControl LabVIEW " << tag << endln;
             return TCL_ERROR;
         }
-        for (int i=0; i<numTrialCPs; i++)  {
+        for (i=0; i<numTrialCPs; i++)  {
             trialCPs[i] = 0;
             if (Tcl_GetInt(interp, argv[argi], &cpTag) != TCL_OK)  {
                 opserr << "WARNING invalid cpTag\n";
@@ -791,7 +966,7 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
             opserr << "expControl LabVIEW " << tag << endln;
             return TCL_ERROR;
         }
-        for (int i=0; i<numOutCPs; i++)  {
+        for (i=0; i<numOutCPs; i++)  {
             outCPs[i] = 0;
             if (Tcl_GetInt(interp, argv[argi], &cpTag) != TCL_OK)  {
                 opserr << "WARNING invalid cpTag\n";
@@ -850,37 +1025,37 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
     
     // ----------------------------------------------------------------------------	
     else if (strcmp(argv[1],"SCRAMNetGT") == 0)  {
-    if (argc < 5)  {
-    opserr << "WARNING invalid number of arguments\n";
-    printCommand(argc,argv);
-    opserr << "Want: expControl SCRAMNetGT tag memOffset numActCh "
-    << "<-ctrlFilters (5 filterTag)> <-daqFilters (5 filterTag)>\n";
-    return TCL_ERROR;
-    }
-    
-    int memOffset, numActCh;
-    
-    argi = 2;
-    if (Tcl_GetInt(interp, argv[argi], &tag) != TCL_OK)  {
-    opserr << "WARNING invalid expControl SCRAMNetGT tag\n";
-    return TCL_ERROR;
-    }
-    argi++;
-    if (Tcl_GetInt(interp, argv[argi], &memOffset) != TCL_OK)  {
-    opserr << "WARNING invalid memOffset\n";
-    opserr << "expControl SCRAMNetGT " << tag << endln;
-    return TCL_ERROR;
-    }
-    argi++;
-    if (Tcl_GetInt(interp, argv[argi], &numActCh) != TCL_OK)  {
-    opserr << "WARNING invalid numActCh\n";
-    opserr << "expControl SCRAMNetGT " << tag << endln;
-    return TCL_ERROR;
-    }
-    argi++;
-    
-    // parsing was successful, allocate the control
-    theControl = new ECSCRAMNetGT(tag, memOffset, numActCh);
+        if (argc < 5)  {
+            opserr << "WARNING invalid number of arguments\n";
+            printCommand(argc,argv);
+            opserr << "Want: expControl SCRAMNetGT tag memOffset numActCh "
+                << "<-ctrlFilters (5 filterTag)> <-daqFilters (5 filterTag)>\n";
+            return TCL_ERROR;
+        }
+        
+        int memOffset, numActCh;
+        
+        argi = 2;
+        if (Tcl_GetInt(interp, argv[argi], &tag) != TCL_OK)  {
+            opserr << "WARNING invalid expControl SCRAMNetGT tag\n";
+            return TCL_ERROR;
+        }
+        argi++;
+        if (Tcl_GetInt(interp, argv[argi], &memOffset) != TCL_OK)  {
+            opserr << "WARNING invalid memOffset\n";
+            opserr << "expControl SCRAMNetGT " << tag << endln;
+            return TCL_ERROR;
+        }
+        argi++;
+        if (Tcl_GetInt(interp, argv[argi], &numActCh) != TCL_OK)  {
+            opserr << "WARNING invalid numActCh\n";
+            opserr << "expControl SCRAMNetGT " << tag << endln;
+            return TCL_ERROR;
+        }
+        argi++;
+        
+        // parsing was successful, allocate the control
+        theControl = new ECSCRAMNetGT(tag, memOffset, numActCh);
     }
 #endif
     
@@ -899,7 +1074,7 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
     
     // finally check for filters
     int i;
-    for (i = argi; i < argc; i++)  {
+    for (i=argi; i<argc; i++)  {
         if (i+5 < argc && strcmp(argv[i], "-ctrlFilters") == 0)  {
             int filterTag;
             ExperimentalSignalFilter *theFilter = 0;
@@ -922,7 +1097,7 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
             }
         }
     }
-    for (i = argi; i < argc; i++)  {
+    for (i=argi; i<argc; i++)  {
         if (i+5 < argc && strcmp(argv[i], "-daqFilters") == 0)  {
             int filterTag;
             ExperimentalSignalFilter *theFilter = 0;

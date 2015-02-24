@@ -45,7 +45,7 @@ ECLabVIEW::ECLabVIEW(int tag,
     ipAddress(ipaddress), ipPort(ipport),
     theSocket(0), sData(0), sendData(0), rData(0), recvData(0),
     ctrlDisp(0), ctrlForce(0), daqDisp(0), daqForce(0)
-{   
+{
     // open log file
     logFile = fopen("ECLabVIEW.log","w");
     if (logFile == 0)  {
@@ -76,16 +76,16 @@ ECLabVIEW::ECLabVIEW(int tag,
     opserr << "* and port: " << ipPort << " has been opened\n";
     opserr << "****************************************************************\n";
     opserr << endln;
-
+    
     // allocate memory for the send messages
     const int dataSize = 512;
     sData = new char [dataSize];
     sendData = new Message(sData, dataSize);
-
+    
     // allocate memory for the receive messages
     rData = new char [dataSize];
     recvData = new Message(rData, dataSize);
-
+    
     // open a session with LabVIEW
     sprintf(sData,"open-session\tOpenFresco\n");
         fprintf(logFile,"%s",sData);
@@ -93,7 +93,7 @@ ECLabVIEW::ECLabVIEW(int tag,
     theSocket->sendMsg(0, 0, *sendData, 0);
     theSocket->recvMsgUnknownSize(0, 0, *recvData, 0);
         fprintf(logFile,"%s",rData);
-
+    
     if (strcmp(strtok(rData,"\t"),"OK") != 0)  {
         opserr << "ECLabVIEW::ECLabVIEW() - "
             << "failed to open a session with LabVIEW.\n";
@@ -101,7 +101,7 @@ ECLabVIEW::ECLabVIEW(int tag,
         delete theSocket;
         exit(OF_ReturnType_failed);
     }
-
+    
     // send parameters (needed for NEES-SAM & MiniMost -> remove later)
     sprintf(sData,"set-parameter\tOPFTransaction\tnstep\t1\n");
         fprintf(logFile,"%s",sData);
@@ -109,7 +109,7 @@ ECLabVIEW::ECLabVIEW(int tag,
     theSocket->sendMsg(0, 0, *sendData, 0);
     theSocket->recvMsgUnknownSize(0, 0, *recvData, 0);
         fprintf(logFile,"%s",rData);
-
+    
     if (strcmp(strtok(rData,"\t"),"OK") != 0)  {
         opserr << "ECLabVIEW::ECLabVIEW() - "
             << "failed to set parameter with LabVIEW.\n";
@@ -270,7 +270,7 @@ int ECLabVIEW::setup()
         exit(OF_ReturnType_failed);
     }
     
-	do  {
+    do  {
         rValue += this->control();
         rValue += this->acquire();
         
@@ -326,12 +326,12 @@ int ECLabVIEW::setSize(ID sizeT, ID sizeO)
     int sizeTDisp = 0, sizeTForce = 0;
     int sizeODisp = 0, sizeOForce = 0;
     for (int i=0; i<numTrialCPs; i++)  {
-        sizeTDisp += (trialCPs[i]->getSizeRespType())(OF_Resp_Disp);
-        sizeTForce += (trialCPs[i]->getSizeRespType())(OF_Resp_Force);
+        sizeTDisp += (trialCPs[i]->getSizeRspType())(OF_Resp_Disp);
+        sizeTForce += (trialCPs[i]->getSizeRspType())(OF_Resp_Force);
     }
     for (int i=0; i<numOutCPs; i++)  {
-        sizeODisp += (outCPs[i]->getSizeRespType())(OF_Resp_Disp);
-        sizeOForce += (outCPs[i]->getSizeRespType())(OF_Resp_Force);
+        sizeODisp += (outCPs[i]->getSizeRspType())(OF_Resp_Disp);
+        sizeOForce += (outCPs[i]->getSizeRspType())(OF_Resp_Force);
     }
     if ((sizeTDisp != 0 && sizeTDisp != sizeT(OF_Resp_Disp)) ||
         (sizeTForce != 0 && sizeTForce != sizeT(OF_Resp_Force)) ||
@@ -374,7 +374,7 @@ int ECLabVIEW::setTrialResponse(const Vector* disp,
                 (*ctrlForce)(i) = theCtrlFilters[OF_Resp_Force]->filtering((*ctrlForce)(i));
         }
     }
-
+    
     rValue = this->control();
     
     return rValue;
@@ -404,13 +404,13 @@ int ECLabVIEW::getDaqResponse(Vector* disp,
         }
         *force = *daqForce;
     }
-        
+    
     return OF_ReturnType_completed;
 }
 
 
 int ECLabVIEW::commitState()
-{	
+{
     return OF_ReturnType_completed;
 }
 
@@ -542,11 +542,11 @@ int ECLabVIEW::control()
     ptm = localtime(&rawtime);
     sprintf(OPFTransactionID,"OPFTransaction%4d%02d%02d%02d%02d%02d",
         1900+ptm->tm_year,ptm->tm_mon,ptm->tm_mday,ptm->tm_hour,ptm->tm_min,ptm->tm_sec);
-
+    
     // propose ctrl values
     int dID = 0, fID = 0;
     sprintf(sData,"propose\t%s",OPFTransactionID);
-
+    
     // loop through all the trial control points
     for (int i=0; i<numTrialCPs; i++)  {
         // append trial control point name
@@ -555,51 +555,51 @@ int ECLabVIEW::control()
             //sprintf(sData,"%s\tCPNode%02d",sData,trialCPs[i]->getNodeTag());
         else
             sprintf(sData,"%s\tcontrol-point\tCPNode%02d",sData,trialCPs[i]->getNodeTag());
-
+        
         // get trial control point parameters
-        int ndm = trialCPs[i]->getNDM();
-        int numDir = trialCPs[i]->getNumDirection();
-        ID dir = trialCPs[i]->getDirection();
-        ID resp = trialCPs[i]->getResponseType();
+        int ndm = trialCPs[i]->getNodeNDM();
+        int numSignals = trialCPs[i]->getNumSignal();
+        ID dof = trialCPs[i]->getDOF();
+        ID rsp = trialCPs[i]->getRspType();
         Vector fact = trialCPs[i]->getFactor();
-
+        
         if (trialCPs[i]->hasLimits())  {
             // loop through all the trial control point parameters
             // and check if commands are within given limits
             double parameter; int c;
-            for (int j=0; j<numDir; j++)  {
+            for (int j=0; j<numSignals; j++)  {
                 // append GeomType
-                if (dir(j) == 0 || dir(j) == 3)  {
+                if (dof(j) == 0 || dof(j) == 3)  {
                     sprintf(sData,"%s\tx",sData);
                 }
-                else if (dir(j) == 1 || dir(j) == 4)  {
+                else if (dof(j) == 1 || dof(j) == 4)  {
                     sprintf(sData,"%s\ty",sData);
                 }
-                else if (dir(j) == 2 || dir(j) == 5)  {
+                else if (dof(j) == 2 || dof(j) == 5)  {
                     sprintf(sData,"%s\tz",sData);
                 }
                 else {
                     opserr << "ECLabVIEW::control() - "
-                        << "requested direction is not supported.\n";
+                        << "requested dof is not supported.\n";
                     exit(OF_ReturnType_failed);
                 }
                 // append ParameterType
-                if (dir(j) < ndm && resp(j) == OF_Resp_Disp)  {
+                if (dof(j) < ndm && rsp(j) == OF_Resp_Disp)  {
                     parameter = fact(j)*(*ctrlDisp)(dID);
                     sprintf(sData,"%s\tdisplacement",sData);
                     dID++;
                 }
-                else if (dir(j) < ndm && resp(j) == OF_Resp_Force)  {
+                else if (dof(j) < ndm && rsp(j) == OF_Resp_Force)  {
                     parameter = fact(j)*(*ctrlForce)(fID);
                     sprintf(sData,"%s\tforce",sData);
                     fID++;
                 }
-                else if (dir(j) >= ndm && resp(j) == OF_Resp_Disp)  {
+                else if (dof(j) >= ndm && rsp(j) == OF_Resp_Disp)  {
                     parameter = fact(j)*(*ctrlDisp)(dID);
                     sprintf(sData,"%s\trotation",sData);
                     dID++;
                 }
-                else if (dir(j) >= ndm && resp(j) == OF_Resp_Force)  {
+                else if (dof(j) >= ndm && rsp(j) == OF_Resp_Force)  {
                     parameter = fact(j)*(*ctrlForce)(fID);
                     sprintf(sData,"%s\tmoment",sData);
                     fID++;
@@ -644,36 +644,36 @@ int ECLabVIEW::control()
         else  {
             // loop through all the trial control point parameters
             // without checking if commands are within limits
-            for (int j=0; j<numDir; j++)  {
+            for (int j=0; j<numSignals; j++)  {
                 // append GeomType
-                if (dir(j) == 0 || dir(j) == 3)  {
+                if (dof(j) == 0 || dof(j) == 3)  {
                     sprintf(sData,"%s\tx",sData);
                 }
-                else if (dir(j) == 1 || dir(j) == 4)  {
+                else if (dof(j) == 1 || dof(j) == 4)  {
                     sprintf(sData,"%s\ty",sData);
                 }
-                else if (dir(j) == 2 || dir(j) == 5)  {
+                else if (dof(j) == 2 || dof(j) == 5)  {
                     sprintf(sData,"%s\tz",sData);
                 }
                 else {
                     opserr << "ECLabVIEW::control() - "
-                        << "requested direction is not supported.\n";
+                        << "requested dof is not supported.\n";
                     exit(OF_ReturnType_failed);
                 }
                 // append ParameterType and Parameter
-                if (dir(j) < ndm && resp(j) == OF_Resp_Disp)  {
+                if (dof(j) < ndm && rsp(j) == OF_Resp_Disp)  {
                     sprintf(sData,"%s\tdisplacement\t%.10E",sData,fact(j)*(*ctrlDisp)(dID));
                     dID++;
                 }
-                else if (dir(j) < ndm && resp(j) == OF_Resp_Force)  {
+                else if (dof(j) < ndm && rsp(j) == OF_Resp_Force)  {
                     sprintf(sData,"%s\tforce\t%.10E",sData,fact(j)*(*ctrlForce)(fID));
                     fID++;
                 }
-                else if (dir(j) >= ndm && resp(j) == OF_Resp_Disp)  {
+                else if (dof(j) >= ndm && rsp(j) == OF_Resp_Disp)  {
                     sprintf(sData,"%s\trotation\t%.10E",sData,fact(j)*(*ctrlDisp)(dID));
                     dID++;
                 }
-                else if (dir(j) >= ndm && resp(j) == OF_Resp_Force)  {
+                else if (dof(j) >= ndm && rsp(j) == OF_Resp_Force)  {
                     sprintf(sData,"%s\tmoment\t%.10E",sData,fact(j)*(*ctrlForce)(fID));
                     fID++;
                 }
@@ -697,7 +697,7 @@ int ECLabVIEW::control()
         opserr << rData << endln;
         exit(OF_ReturnType_failed);
     }
-
+    
     // execute ctrl values
     sprintf(sData,"execute\t%s\n",OPFTransactionID);
         fprintf(logFile,"%s",sData);
@@ -711,7 +711,7 @@ int ECLabVIEW::control()
         opserr << rData << endln;
         exit(OF_ReturnType_failed);
     }
-
+    
     return OF_ReturnType_completed;
 }
 
@@ -723,7 +723,7 @@ int ECLabVIEW::acquire()
     char GeomType[2];
     char ParamType[13];
     double Parameter;
-
+    
     // send acquisition request
     sprintf(sData,"get-control-point\t%s",OPFTransactionID);
     for (int i=0; i<numOutCPs; i++)  {
@@ -735,7 +735,7 @@ int ECLabVIEW::acquire()
         fprintf(logFile,"%s",sData);
     delete sendData;  sendData = new Message(sData,(int)strlen(sData));  // needed because of bug in LabVIEW-plugin
     theSocket->sendMsg(0, 0, *sendData, 0);
-
+    
     // receive output control point daq values
     int direction, response;
     int dID = 0, fID = 0;
@@ -770,16 +770,16 @@ int ECLabVIEW::acquire()
             exit(OF_ReturnType_failed);
         }
         tokenPtr = strtok(NULL,"\t");
-
+        
         // get output control point parameters
-        int ndf = trialCPs[i]->getNDF();
-        int numDir = outCPs[i]->getNumDirection();
-        ID dir = outCPs[i]->getDirection();
-        ID resp = outCPs[i]->getResponseType();
+        int ndf = trialCPs[i]->getNodeNDF();
+        int numSignals = outCPs[i]->getNumSignal();
+        ID dof = outCPs[i]->getDOF();
+        ID rsp = outCPs[i]->getRspType();
         Vector fact = outCPs[i]->getFactor();
-        ID sizeRespType = outCPs[i]->getSizeRespType();
+        ID sizeRespType = outCPs[i]->getSizeRspType();
         int sizeDisp = 0, sizeForce = 0;
-
+        
         while (tokenPtr != NULL)  {
             strcpy(GeomType,tokenPtr);
             strcpy(ParamType,strtok(NULL,"\t"));
@@ -845,13 +845,13 @@ int ECLabVIEW::acquire()
                     << " but got: " << direction+1 << endln;
                 exit(OF_ReturnType_failed);
             }
-
+            
             // assemble displacement and force daq vectors
             if (response == OF_Resp_Disp)  {
                 int id = dID;
-                for (int j=0; j<numDir; j++)  {
-                    if (resp(j) == response)  {
-                        if (dir(j) == direction)  {
+                for (int j=0; j<numSignals; j++)  {
+                    if (rsp(j) == response)  {
+                        if (dof(j) == direction)  {
                             (*daqDisp)(id) = fact(j)*Parameter;
                             sizeDisp++;
                         }
@@ -861,9 +861,9 @@ int ECLabVIEW::acquire()
             }
             else if (response == OF_Resp_Force)  {
                 int id = fID;
-                for (int j=0; j<numDir; j++)  {
-                    if (resp(j) == response)  {
-                        if (dir(j) == direction)  {
+                for (int j=0; j<numSignals; j++)  {
+                    if (rsp(j) == response)  {
+                        if (dof(j) == direction)  {
                             (*daqForce)(id) = fact(j)*Parameter;
                             sizeForce++;
                         }
@@ -873,7 +873,7 @@ int ECLabVIEW::acquire()
             }
             tokenPtr = strtok(NULL,"\t");
         }
-
+        
         // check if received number of parameters is correct
         if (sizeDisp != sizeRespType(0) || sizeForce != sizeRespType(3))  {
             opserr << "ECLabVIEW::acquire() - "
@@ -885,14 +885,6 @@ int ECLabVIEW::acquire()
         dID += sizeRespType(0);
         fID += sizeRespType(3);
     }
-
+    
     return OF_ReturnType_completed;
-}
-
-
-void ECLabVIEW::sleep(const clock_t wait)
-{
-    clock_t goal;
-    goal = wait + clock();
-    while (goal>clock());
 }

@@ -26,7 +26,7 @@
 #ifndef ECxPCtarget_h
 #define ECxPCtarget_h
 
-// Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 09/06
 // Revision: A
 //
@@ -36,12 +36,15 @@
 
 #include "ExperimentalControl.h"
 
+class ExperimentalCP;
+
 class ECxPCtarget : public ExperimentalControl
 {
 public:
     // constructors
-    ECxPCtarget(int tag, int pcType, char *ipAddress,
-        char *ipPort, char *appName, char *appPath = 0,
+    ECxPCtarget(int tag, char *ipAddress, char *ipPort, char *appFile,
+        int nTrialCPs, ExperimentalCP **trialCPs,
+        int nOutCPs, ExperimentalCP **outCPs,
         int timeOut = 10);
     ECxPCtarget(const ECxPCtarget &ec);
     
@@ -55,7 +58,7 @@ public:
     virtual int setup();
     virtual int setSize(ID sizeT, ID sizeO);
     
-    virtual int setTrialResponse(const Vector* disp, 
+    virtual int setTrialResponse(const Vector* disp,
         const Vector* vel,
         const Vector* accel,
         const Vector* force,
@@ -76,27 +79,34 @@ public:
     virtual int getResponse(int responseID, Information &info);
     
     // public methods for output
-    void Print(OPS_Stream &s, int flag = 0);    
-    
+    void Print(OPS_Stream &s, int flag = 0);
+
 protected:
     // protected methods to set and to get response
     virtual int control();
     virtual int acquire();
-    
-private:
-    void sleep(const clock_t wait);
-    
-    int pcType, port, timeOut;
-    char *ipAddress, *ipPort, *appName, *appPath;
-    char errMsg[256];
 
+private:
+    char *ipAddress;            // ip-address of xPC-target machine
+    char *ipPort;               // ip-port of xPC-target machine
+    int numTrialCPs;            // number of trial control points
+    ExperimentalCP **trialCPs;  // trial control points
+    int numOutCPs;              // number of output control points
+    ExperimentalCP **outCPs;    // output control points
+    int timeOut;                // host-target communication timeout
+    
+    char appName[256];          // name of application to be loaded
+    char appPath[256];          // path to application to be loaded
+    char errMsg[256];           // character array for error messages
+    int port;                   // value returned by xPCOpenTcpIpPort
+    
     double newTarget, switchPC, atTarget;
-    double *ctrlDisp, *ctrlVel, *ctrlAccel;
-    double *daqDisp, *daqForce;
+    int numCtrlSignals, numDaqSignals;
+    double *ctrlSignal, *daqSignal;
     
     int newTargetId, switchPCId, atTargetId;
-    int ctrlDispId, ctrlVelId, ctrlAccelId;
-    int *daqDispId, *daqForceId;
+    int ctrlSignalId;
+    int *daqSignalId;
 };
 
 #endif

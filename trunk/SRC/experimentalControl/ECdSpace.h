@@ -38,11 +38,15 @@
 
 #include <clib32.h>
 
+class ExperimentalCP;
+
 class ECdSpace : public ExperimentalControl
 {
 public:
     // constructors
-    ECdSpace(int tag, int pcType, char *boardName);	
+    ECdSpace(int tag, char *boardName,
+        int nTrialCPs, ExperimentalCP **trialCPs,
+        int nOutCPs, ExperimentalCP **outCPs);
     ECdSpace(const ECdSpace &ec);
     
     // destructor
@@ -55,7 +59,7 @@ public:
     virtual int setup();
     virtual int setSize(ID sizeT, ID sizeO);
     
-    virtual int setTrialResponse(const Vector* disp, 
+    virtual int setTrialResponse(const Vector* disp,
         const Vector* vel,
         const Vector* accel,
         const Vector* force,
@@ -76,30 +80,31 @@ public:
     virtual int getResponse(int responseID, Information &info);
     
     // public methods for output
-    void Print(OPS_Stream &s, int flag = 0);    
-    
+    void Print(OPS_Stream &s, int flag = 0);
+
 protected:
     // protected methods to set and to get response
     virtual int control();
     virtual int acquire();
-    
-private:
-    void sleep(const clock_t wait);
-    
-    int error, boardState, simState, pcType;
-    char *boardName;
 
+private:
+    char *boardName;            // name of dSpace board (DS1103, DS1104)
+    int numTrialCPs;            // number of trial control points
+    ExperimentalCP **trialCPs;  // trial control points
+    int numOutCPs;              // number of output control points
+    ExperimentalCP **outCPs;    // output control points
+    
+    int error, boardState, simState;
     unsigned int board_index;
     board_spec_tp board_spec;
-
+    
     unsigned int newTarget, switchPC, atTarget;
-    double *ctrlDisp, *ctrlVel, *ctrlAccel;
-    double *daqDisp, *daqForce;
+    int numCtrlSignals, numDaqSignals;
+    double *ctrlSignal, *daqSignal;
     
     UInt32 simStateId;
     UInt32 newTargetId, switchPCId, atTargetId;
-    UInt32 ctrlDispId, ctrlVelId, ctrlAccelId;
-    UInt32 daqDispId, daqForceId;
+    UInt32 ctrlSignalId, daqSignalId;
 };
 
 #endif
