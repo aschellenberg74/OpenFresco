@@ -51,11 +51,12 @@
 // by each object and storing the tags of the end nodes.
 EEGeneric::EEGeneric(int tag, ID nodes, ID *dof,
     ExperimentalSite *site,
-    bool iM, int addRay, const Matrix *m)
+    bool iM, int addRay, const Matrix *m, int checktime)
     : ExperimentalElement(tag, ELE_TAG_EEGeneric, site),
     connectedExternalNodes(nodes), basicDOF(1),
     numExternalNodes(0), numDOF(0), numBasicDOF(0),
     iMod(iM), addRayleigh(addRay), mass(0),
+    checkTime(checktime),
     theMatrix(1,1), theVector(1), theLoad(1),
     db(0), vb(0), ab(0), t(0),
     dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
@@ -143,11 +144,13 @@ EEGeneric::EEGeneric(int tag, ID nodes, ID *dof,
 // by each object and storing the tags of the end nodes.
 EEGeneric::EEGeneric(int tag, ID nodes, ID *dof,
     int port, char *machineInetAddr, int ssl, int udp,
-    int dataSize, bool iM, int addRay, const Matrix *m)
+    int dataSize, bool iM, int addRay, const Matrix *m,
+    int checktime)
     : ExperimentalElement(tag, ELE_TAG_EEGeneric),
     connectedExternalNodes(nodes), basicDOF(1),
     numExternalNodes(0), numDOF(0), numBasicDOF(0),
     iMod(iM), addRayleigh(addRay), mass(0),
+    checkTime(checktime),
     theMatrix(1,1), theVector(1), theLoad(1),
     theChannel(0), sData(0), sendData(0), rData(0), recvData(0),
     db(0), vb(0), ab(0), t(0),
@@ -465,7 +468,7 @@ int EEGeneric::update()
     // do not check time for right now because of transformation constraint
     // handler calling update at beginning of new step when applying load
     // if (dbDelta.pNorm(2) > DBL_EPSILON || (*t)(0) > tLast)  {
-    if (dbDelta.pNorm(2) > DBL_EPSILON)  {
+    if (dbDelta.pNorm(2) > DBL_EPSILON  ||  (checkTime && (*t)(0) > tLast))  {
         // set the trial response at the site
         if (theSite != 0)  {
             theSite->setTrialResponse(db, vb, ab, (Vector*)0, t);

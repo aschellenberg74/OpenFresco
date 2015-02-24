@@ -52,18 +52,18 @@ static void printCommand(int argc, TCL_Char **argv)
 int addEEGeneric(ClientData clientData, Tcl_Interp *interp,  int argc, 
     TCL_Char **argv, Domain *theTclDomain, int eleArgStart)
 {
-	ExperimentalElement *theExpElement = 0;
+    ExperimentalElement *theExpElement = 0;
     
-	// check the number of arguments is correct
-	if ((argc-eleArgStart) < 10)  {
-		opserr << "WARNING insufficient arguments\n";
-		printCommand(argc, argv);
-		opserr << "Want: expElement generic eleTag -node Ndi -dof dofNdi -dof dofNdj ... -site siteTag -initStif Kij <-iMod> <-noRayleigh> <-mass Mij>\n";
-		opserr << "  or: expElement generic eleTag -node Ndi -dof dofNdi -dof dofNdj ... -server ipPort <ipAddr> <-ssl> <-udp> <-dataSize size> -initStif Kij <-iMod> <-noRayleigh> <-mass Mij>\n";
-		return TCL_ERROR;
-	}    
-	
-	// get the id and end nodes     
+    // check the number of arguments is correct
+    if ((argc-eleArgStart) < 10)  {
+        opserr << "WARNING insufficient arguments\n";
+        printCommand(argc, argv);
+        opserr << "Want: expElement generic eleTag -node Ndi -dof dofNdi -dof dofNdj ... -site siteTag -initStif Kij <-iMod> <-noRayleigh> <-mass Mij> <-checkTime>\n";
+        opserr << "  or: expElement generic eleTag -node Ndi -dof dofNdi -dof dofNdj ... -server ipPort <ipAddr> <-ssl> <-udp> <-dataSize size> -initStif Kij <-iMod> <-noRayleigh> <-mass Mij> <-checkTime>\n";
+        return TCL_ERROR;
+    }    
+    
+    // get the id and end nodes     
     int tag, siteTag, node, dof, ipPort, argi, i, j, k;
     int numNodes = 0, numDOFj = 0, numDOF = 0;
     ExperimentalSite *theSite = 0;
@@ -73,17 +73,18 @@ int addEEGeneric(ClientData clientData, Tcl_Interp *interp,  int argc,
     bool iMod = false;
     int doRayleigh = 1;
     Matrix *mass = 0;
-
-	if (Tcl_GetInt(interp, argv[1+eleArgStart], &tag) != TCL_OK)  {
-		opserr << "WARNING invalid expElement generic eleTag\n";
-		return TCL_ERROR;
-	}
+    int checkTime = 0;
+    
+    if (Tcl_GetInt(interp, argv[1+eleArgStart], &tag) != TCL_OK)  {
+        opserr << "WARNING invalid expElement generic eleTag\n";
+        return TCL_ERROR;
+    }
     // read the number of nodes
     if (strcmp(argv[2+eleArgStart], "-node") != 0)  {
-		opserr << "WARNING expecting -node flag\n";
-		opserr << "expElement generic element: " << tag << endln;
-		return TCL_ERROR;
-	}
+        opserr << "WARNING expecting -node flag\n";
+        opserr << "expElement generic element: " << tag << endln;
+        return TCL_ERROR;
+    }
     argi = 3+eleArgStart;
     i = argi;
     while (i < argc && strcmp(argv[i], "-dof") != 0)  {
@@ -91,25 +92,25 @@ int addEEGeneric(ClientData clientData, Tcl_Interp *interp,  int argc,
         i++;
     }
     if (numNodes == 0)  {
-		opserr << "WARNING no nodes specified\n";
-		opserr << "expElement generic element: " << tag << endln;
-		return TCL_ERROR;
-	}
+        opserr << "WARNING no nodes specified\n";
+        opserr << "expElement generic element: " << tag << endln;
+        return TCL_ERROR;
+    }
     // create the ID arrays to hold the nodes and dofs
     ID nodes(numNodes);
     ID *dofs = new ID [numNodes];
     if (dofs == 0)  {
-		opserr << "WARNING out of memory\n";
-		opserr << "expElement generic element: " << tag << endln;
-		return TCL_ERROR;
-	}
+        opserr << "WARNING out of memory\n";
+        opserr << "expElement generic element: " << tag << endln;
+        return TCL_ERROR;
+    }
     // fill in the nodes ID
     for (i=0; i<numNodes; i++)  {
         if (Tcl_GetInt(interp, argv[argi], &node) != TCL_OK)  {
-		    opserr << "WARNING invalid node\n";
-		    opserr << "expElement generic element: " << tag << endln;
-		    return TCL_ERROR;
-	    }
+            opserr << "WARNING invalid node\n";
+            opserr << "expElement generic element: " << tag << endln;
+            return TCL_ERROR;
+        }
         nodes(i) = node;
         argi++; 
     }
@@ -117,28 +118,28 @@ int addEEGeneric(ClientData clientData, Tcl_Interp *interp,  int argc,
         // read the number of dofs per node j
         numDOFj = 0;
         if (strcmp(argv[argi], "-dof") != 0)  {
-		    opserr << "WARNING expect -dof flag\n";
-		    opserr << "expElement generic element: " << tag << endln;
-		    return TCL_ERROR;
-	    }
+            opserr << "WARNING expect -dof flag\n";
+            opserr << "expElement generic element: " << tag << endln;
+            return TCL_ERROR;
+        }
         argi++;
         i = argi;
         while (i < argc &&
             strcmp(argv[i], "-dof") != 0 && 
             strcmp(argv[i], "-site") != 0 && 
             strcmp(argv[i], "-server") != 0)  {
-            numDOFj++;
-            numDOF++;
-            i++;
+                numDOFj++;
+                numDOF++;
+                i++;
         }
         // fill in the dofs ID array
         ID dofsj(numDOFj);
         for (i=0; i<numDOFj; i++)  {
             if (Tcl_GetInt(interp, argv[argi], &dof) != TCL_OK)  {
-		        opserr << "WARNING invalid dof\n";
-		        opserr << "expElement generic element: " << tag << endln;
-		        return TCL_ERROR;
-	        }
+                opserr << "WARNING invalid dof\n";
+                opserr << "expElement generic element: " << tag << endln;
+                return TCL_ERROR;
+            }
             dofsj(i) = dof-1;
             argi++; 
         }
@@ -146,35 +147,35 @@ int addEEGeneric(ClientData clientData, Tcl_Interp *interp,  int argc,
     }
     if (strcmp(argv[argi], "-site") == 0)  {
         argi++;
-	    if (Tcl_GetInt(interp, argv[argi], &siteTag) != TCL_OK)  {
-		    opserr << "WARNING invalid siteTag\n";
-		    opserr << "expElement generic element: " << tag << endln;
-		    return TCL_ERROR;
-	    }
+        if (Tcl_GetInt(interp, argv[argi], &siteTag) != TCL_OK)  {
+            opserr << "WARNING invalid siteTag\n";
+            opserr << "expElement generic element: " << tag << endln;
+            return TCL_ERROR;
+        }
         argi++;
-	    theSite = getExperimentalSite(siteTag);
-	    if (theSite == 0)  {
-		    opserr << "WARNING experimental site not found\n";
-		    opserr << "expSite: " << siteTag << endln;
-		    opserr << "expElement generic element: " << tag << endln;
-		    return TCL_ERROR;
-	    }
+        theSite = getExperimentalSite(siteTag);
+        if (theSite == 0)  {
+            opserr << "WARNING experimental site not found\n";
+            opserr << "expSite: " << siteTag << endln;
+            opserr << "expElement generic element: " << tag << endln;
+            return TCL_ERROR;
+        }
     }
     else if (strcmp(argv[argi], "-server") == 0)  {
         argi++;
         if (Tcl_GetInt(interp, argv[argi], &ipPort) != TCL_OK)  {
-	        opserr << "WARNING invalid ipPort\n";
-	        opserr << "expElement generic element: " << tag << endln;
-	        return TCL_ERROR;
+            opserr << "WARNING invalid ipPort\n";
+            opserr << "expElement generic element: " << tag << endln;
+            return TCL_ERROR;
         }
         argi++;
         if (strcmp(argv[argi], "-initStif") != 0 &&
             strcmp(argv[argi], "-ssl") != 0 &&
             strcmp(argv[argi], "-udp") != 0 &&
             strcmp(argv[argi], "-dataSize") != 0)  {
-            ipAddr = new char [strlen(argv[argi])+1];
-            strcpy(ipAddr,argv[argi]);
-            argi++;
+                ipAddr = new char [strlen(argv[argi])+1];
+                strcpy(ipAddr,argv[argi]);
+                argi++;
         }
         else  {
             ipAddr = new char [9+1];
@@ -187,17 +188,17 @@ int addEEGeneric(ClientData clientData, Tcl_Interp *interp,  int argc,
                 udp = 1;
             else if (strcmp(argv[i], "-dataSize") == 0)  {
                 if (Tcl_GetInt(interp, argv[i+1], &dataSize) != TCL_OK)  {
-		            opserr << "WARNING invalid dataSize\n";
-		            opserr << "expElement generic element: " << tag << endln;
-		            return TCL_ERROR;
-	            }
+                    opserr << "WARNING invalid dataSize\n";
+                    opserr << "expElement generic element: " << tag << endln;
+                    return TCL_ERROR;
+                }
             }
         }
     }
     else  {
         opserr << "WARNING expecting -site or -server string but got ";
         opserr << argv[argi] << endln;
-	    opserr << "expElement generic element: " << tag << endln;
+        opserr << "expElement generic element: " << tag << endln;
         return TCL_ERROR;
     }
     for (i=argi; i<argc; i++)  {
@@ -205,102 +206,98 @@ int addEEGeneric(ClientData clientData, Tcl_Interp *interp,  int argc,
             iMod = true;
         }
     }
-    for (i = 7+eleArgStart; i < argc; i++)  {
+    for (i = argi; i < argc; i++)  {
         if (strcmp(argv[i], "-doRayleigh") == 0)  {
             doRayleigh = 1;
         } else if (strcmp(argv[i], "-noRayleigh") == 0)  {
             doRayleigh = 0;
         }
     }
-	for (i=argi; i<argc; i++)  {
-		if (strcmp(argv[i], "-mass") == 0)  {
-			if (argc-1 < i+numDOF*numDOF)  {
-				opserr << "WARNING incorrect number of mass terms\n";
-				opserr << "expElement generic element: " << tag << endln;
-				return TCL_ERROR;      
-			}
-			mass = new Matrix(numDOF,numDOF);
-			double m;
-			for (j=0; j<numDOF; j++)  {
-				for (k=0; k<numDOF; k++)  {
-					if (Tcl_GetDouble(interp, argv[i+1 + numDOF*j+k], &m) != TCL_OK)  {
-						opserr << "WARNING invalid mass term\n";
-						opserr << "expElement generic element: " << tag << endln;
-						return TCL_ERROR;
-					}
-					(*mass)(j,k) = m;
-				}
-			}
-		}
-	}
-    
-	// now create the EEGeneric
-    if (theSite != 0)  {
-        if (mass == 0)  {
-	        theExpElement = new EEGeneric(tag, nodes, dofs, theSite,
-                iMod, doRayleigh);
-        } else  {
-            theExpElement = new EEGeneric(tag, nodes, dofs, theSite,
-                iMod, doRayleigh, mass);
-        }
-    } else  {
-        if (mass == 0)  {
-	        theExpElement = new EEGeneric(tag, nodes, dofs, ipPort,
-                ipAddr, ssl, udp, dataSize, iMod, doRayleigh);
-        } else  {
-            theExpElement = new EEGeneric(tag, nodes, dofs, ipPort,
-                ipAddr, ssl, udp, dataSize, iMod, doRayleigh, mass);
+    for (i=argi; i<argc; i++)  {
+        if (strcmp(argv[i], "-mass") == 0)  {
+            if (argc-1 < i+numDOF*numDOF)  {
+                opserr << "WARNING incorrect number of mass terms\n";
+                opserr << "expElement generic element: " << tag << endln;
+                return TCL_ERROR;      
+            }
+            mass = new Matrix(numDOF,numDOF);
+            double m;
+            for (j=0; j<numDOF; j++)  {
+                for (k=0; k<numDOF; k++)  {
+                    if (Tcl_GetDouble(interp, argv[i+1 + numDOF*j+k], &m) != TCL_OK)  {
+                        opserr << "WARNING invalid mass term\n";
+                        opserr << "expElement generic element: " << tag << endln;
+                        return TCL_ERROR;
+                    }
+                    (*mass)(j,k) = m;
+                }
+            }
         }
     }
-	
+    for (i=argi; i<argc; i++)  {
+        if (strcmp(argv[i], "-checkTime") == 0)  {
+            checkTime = 1;
+        }
+    }
+    
+    // now create the EEGeneric
+    if (theSite != 0)  {
+        theExpElement = new EEGeneric(tag, nodes, dofs, theSite,
+            iMod, doRayleigh, mass, checkTime);
+    } else  {
+        theExpElement = new EEGeneric(tag, nodes, dofs, ipPort,
+            ipAddr, ssl, udp, dataSize, iMod, doRayleigh, mass,
+            checkTime);
+    }
+    
     // cleanup dynamic memory
     if (dofs != 0)
         delete [] dofs;
     
-	if (theExpElement == 0)  {
-		opserr << "WARNING ran out of memory creating element\n";
-		opserr << "expElement generic element: " << tag << endln;
-		return TCL_ERROR;
-	}
-	
-	// then add the EEGeneric to the domain
-	if (theTclDomain->addElement(theExpElement) == false)  {
-		opserr << "WARNING could not add element to the domain\n";
-		opserr << "expElement generic element: " << tag << endln;
-		delete theExpElement;
-		return TCL_ERROR;
-	}
-
-	// finally check for initial stiffness terms
+    if (theExpElement == 0)  {
+        opserr << "WARNING ran out of memory creating element\n";
+        opserr << "expElement generic element: " << tag << endln;
+        return TCL_ERROR;
+    }
+    
+    // then add the EEGeneric to the domain
+    if (theTclDomain->addElement(theExpElement) == false)  {
+        opserr << "WARNING could not add element to the domain\n";
+        opserr << "expElement generic element: " << tag << endln;
+        delete theExpElement;
+        return TCL_ERROR;
+    }
+    
+    // finally check for initial stiffness terms
     int setInitStif = -1;
-	for (i=argi; i<argc; i++)  {
-		if (strcmp(argv[i], "-initStif") == 0)  {
-			if (argc-1 < i+numDOF*numDOF)  {
-				opserr << "WARNING incorrect number of inital stiffness terms\n";
-				opserr << "expElement generic element: " << tag << endln;
-				return TCL_ERROR;      
-			}
-			Matrix theInitStif(numDOF,numDOF);
-			double stif;
-			for (j=0; j<numDOF; j++)  {
-				for (k=0; k<numDOF; k++)  {
-					if (Tcl_GetDouble(interp, argv[i+1 + numDOF*j+k], &stif) != TCL_OK)  {
-						opserr << "WARNING invalid initial stiffness term\n";
-						opserr << "expElement generic element: " << tag << endln;
-						return TCL_ERROR;
-					}
-					theInitStif(j,k) = stif;
-				}
-			}
-			setInitStif = theExpElement->setInitialStiff(theInitStif);
-		}
-	}
+    for (i=argi; i<argc; i++)  {
+        if (strcmp(argv[i], "-initStif") == 0)  {
+            if (argc-1 < i+numDOF*numDOF)  {
+                opserr << "WARNING incorrect number of inital stiffness terms\n";
+                opserr << "expElement generic element: " << tag << endln;
+                return TCL_ERROR;      
+            }
+            Matrix theInitStif(numDOF,numDOF);
+            double stif;
+            for (j=0; j<numDOF; j++)  {
+                for (k=0; k<numDOF; k++)  {
+                    if (Tcl_GetDouble(interp, argv[i+1 + numDOF*j+k], &stif) != TCL_OK)  {
+                        opserr << "WARNING invalid initial stiffness term\n";
+                        opserr << "expElement generic element: " << tag << endln;
+                        return TCL_ERROR;
+                    }
+                    theInitStif(j,k) = stif;
+                }
+            }
+            setInitStif = theExpElement->setInitialStiff(theInitStif);
+        }
+    }
     if (setInitStif != 0)  {
         opserr << "WARNING initial stiffness not set\n";
         opserr << "expElement generic element: " << tag << endln;
         return TCL_ERROR;
     }
     
-	// if get here we have sucessfully created the EEGeneric and added it to the domain
-	return TCL_OK;
+    // if get here we have sucessfully created the EEGeneric and added it to the domain
+    return TCL_OK;
 }
