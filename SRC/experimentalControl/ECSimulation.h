@@ -55,7 +55,7 @@ public:
     virtual int setup() = 0;
     virtual int setSize(ID sizeT, ID sizeO) = 0;
     
-    virtual int setTrialResponse(const Vector* disp, 
+    virtual int setTrialResponse(const Vector* disp,
         const Vector* vel,
         const Vector* accel,
         const Vector* force,
@@ -67,7 +67,7 @@ public:
         Vector* time) = 0;
     
     virtual ExperimentalControl *getCopy() = 0;
-    
+
 protected:
     // protected methods to set and to get response
     virtual int control() = 0;

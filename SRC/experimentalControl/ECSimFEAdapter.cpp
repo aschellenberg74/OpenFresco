@@ -23,7 +23,7 @@
 // $Date$
 // $URL$
 
-// Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 09/07
 // Revision: A
 //
@@ -36,14 +36,14 @@
 #include <TCP_Socket.h>
 
 
-ECSimFEAdapter::ECSimFEAdapter(int tag,    
+ECSimFEAdapter::ECSimFEAdapter(int tag,
     char *ipaddress, int ipport)
     : ECSimulation(tag),
     ipAddress(ipaddress), ipPort(ipport),
     dataSize(OF_Network_dataSize), theChannel(0),
     sData(0), sendData(0), rData(0), recvData(0),
     ctrlDisp(0), ctrlForce(0), daqDisp(0), daqForce(0)
-{   
+{
     // setup the connection
     theChannel = new TCP_Socket(ipPort, ipAddress);
     if (theChannel->setUpConnection() != 0)  {
@@ -81,12 +81,12 @@ ECSimFEAdapter::ECSimFEAdapter(const ECSimFEAdapter &ec)
     ipAddress = ec.ipAddress;
     ipPort = ec.ipPort;
     theChannel = ec.theChannel;
-
+    
     // allocate memory for the send vectors
     sData = new double [dataSize];
     sendData = new Vector(sData, dataSize);
     sendData->Zero();
-
+    
     // allocate memory for the receive vectors
     rData = new double [dataSize];
     recvData = new Vector(rData, dataSize);
@@ -96,10 +96,11 @@ ECSimFEAdapter::ECSimFEAdapter(const ECSimFEAdapter &ec)
 
 ECSimFEAdapter::~ECSimFEAdapter()
 {
-    // send termination to adapter element
+    // send termination to adapter element (twice for reliability)
     sData[0] = OF_RemoteTest_DIE;
     theChannel->sendVector(0, 0, *sendData, 0);
-
+    theChannel->sendVector(0, 0, *sendData, 0);
+    
     // delete memory of ctrl vectors
     if (ctrlDisp != 0)
         delete ctrlDisp;
@@ -111,7 +112,7 @@ ECSimFEAdapter::~ECSimFEAdapter()
         delete daqDisp;
     if (daqForce != 0)
         delete daqForce;
-
+    
     // delete memory of string
     if (ipAddress != 0)
         delete [] ipAddress;
@@ -127,7 +128,7 @@ ECSimFEAdapter::~ECSimFEAdapter()
         delete [] rData;
     if (theChannel != 0)
         delete theChannel;
-
+    
     opserr << endln;
     opserr << "***********************************************************\n";
     opserr << "* The connection with the adapter element has been closed *\n";
@@ -176,7 +177,7 @@ int ECSimFEAdapter::setup()
     }
     idData(2*OF_Resp_All) = dataSize;
     theChannel->sendID(0, 0, idData, 0);
-
+    
     // print experimental control information
     this->Print(opserr);
     
@@ -233,7 +234,7 @@ int ECSimFEAdapter::setTrialResponse(const Vector* disp,
                 (*ctrlForce)(i) = theCtrlFilters[OF_Resp_Force]->filtering((*ctrlForce)(i));
         }
     }
-
+    
     rValue = this->control();
     
     return rValue;
@@ -263,13 +264,13 @@ int ECSimFEAdapter::getDaqResponse(Vector* disp,
         }
         *force = *daqForce;
     }
-        
+    
     return OF_ReturnType_completed;
 }
 
 
 int ECSimFEAdapter::commitState()
-{	
+{
     return OF_ReturnType_completed;
 }
 
@@ -398,7 +399,7 @@ int ECSimFEAdapter::control()
 {
     sData[0] = OF_RemoteTest_setTrialResponse;
     theChannel->sendVector(0, 0, *sendData, 0);
-
+    
     return OF_ReturnType_completed;
 }
 
@@ -408,14 +409,6 @@ int ECSimFEAdapter::acquire()
     sData[0] = OF_RemoteTest_getForce;
     theChannel->sendVector(0, 0, *sendData, 0);
     theChannel->recvVector(0, 0, *recvData, 0);
-
+    
     return OF_ReturnType_completed;
-}
-
-
-void ECSimFEAdapter::sleep(const clock_t wait)
-{
-    clock_t goal;
-    goal = wait + clock();
-    while (goal>clock());
 }
