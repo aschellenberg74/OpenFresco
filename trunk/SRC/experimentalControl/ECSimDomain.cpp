@@ -123,9 +123,9 @@ ECSimDomain::ECSimDomain(const ECSimDomain& ec)
     daqDisp(0), daqVel(0), daqAccel(0), daqForce(0)
 {
     numTrialCPs = ec.numTrialCPs;
-    trialCPs = ec.trialCPs;
-    numOutCPs = ec.numOutCPs;
-    outCPs = ec.outCPs;
+    trialCPs    = ec.trialCPs;
+    numOutCPs   = ec.numOutCPs;
+    outCPs      = ec.outCPs;
     
     // initialize the domain
     theDomain = ec.theDomain;
@@ -179,15 +179,17 @@ ECSimDomain::~ECSimDomain()
     // delete memory of control points
     int i;
     if (trialCPs != 0)  {
-        for (i=0; i<numTrialCPs; i++)
+        for (i=0; i<numTrialCPs; i++)  {
             if (trialCPs[i] != 0)
                 delete trialCPs[i];
+        }
         delete [] trialCPs;
     }
     if (outCPs != 0)  {
-        for (i=0; i<numOutCPs; i++)
+        for (i=0; i<numOutCPs; i++)  {
             if (outCPs[i] != 0)
                 delete outCPs[i];
+        }
         delete [] outCPs;
     }
     
@@ -272,7 +274,7 @@ int ECSimDomain::setup()
     
     // find total number of required SPs
     for (int i=0; i<numTrialCPs; i++)
-        numSPs += trialCPs[i]->getNumUniqueDir();
+        numSPs += trialCPs[i]->getNumDOF();
     
     // create array of single point constraints
     theSPs = new SP_Constraint* [numSPs];
@@ -284,8 +286,8 @@ int ECSimDomain::setup()
     for (int i=0; i<numTrialCPs; i++)  {
         // get trial control point parameters
         int nodeTag = trialCPs[i]->getNodeTag();
-        int numDir = trialCPs[i]->getNumUniqueDir();
-        ID dir = trialCPs[i]->getUniqueDir();
+        int numDir = trialCPs[i]->getNumDOF();
+        ID dir = trialCPs[i]->getUniqueDOF();
         
         // loop through all the directions
         for (int j=0; j<numDir; j++)  {
@@ -313,23 +315,23 @@ int ECSimDomain::setup()
     }
     
     theModel = new AnalysisModel();
-
+    
     theTest = new CTestNormDispIncr(1.0E-8, 25, 0);
     //theTest = new CTestNormUnbalance(1.0E-8, 25, 0);
     //theTest = new CTestEnergyIncr(1.0E-8, 25, 0);
-
+    
     theAlgorithm = new NewtonRaphson(*theTest);
     //theLineSearch = new RegulaFalsiLineSearch(0.8, 10, 0.1, 10.0, 1);
     //theAlgorithm = new NewtonLineSearch(*theTest, theLineSearch);
-
+    
     theIntegrator = new LoadControl(1.0, 1, 1.0, 1.0);
-
+    
     //theHandler = new TransformationConstraintHandler();
     theHandler = new PenaltyConstraintHandler(1.0E12, 1.0E12);
     //theHandler = new LagrangeConstraintHandler(1.0, 1.0);
-
+    
     theNumberer = new PlainNumberer();
-
+    
     BandGenLinSolver *theSolver = new BandGenLinLapackSolver();
     theSOE = new BandGenLinSOE(*theSolver);
     //ProfileSPDLinSolver *theSolver = new ProfileSPDLinDirectSolver();
@@ -356,7 +358,7 @@ int ECSimDomain::setSize(ID sizeT, ID sizeO)
 {
     // check sizeTrial and sizeOut
     // for ECSimDomain object
-
+    
     // ECSimDomain objects can use 
     // disp, vel, accel and force for trial and
     // disp, vel, accel and force for output
@@ -364,12 +366,12 @@ int ECSimDomain::setSize(ID sizeT, ID sizeO)
     int sizeTDisp = 0, sizeTForce = 0;
     int sizeODisp = 0, sizeOForce = 0;
     for (int i=0; i<numTrialCPs; i++)  {
-        sizeTDisp  += (trialCPs[i]->getSizeRespType())(OF_Resp_Disp);
-        sizeTForce += (trialCPs[i]->getSizeRespType())(OF_Resp_Force);
+        sizeTDisp  += (trialCPs[i]->getSizeRspType())(OF_Resp_Disp);
+        sizeTForce += (trialCPs[i]->getSizeRspType())(OF_Resp_Force);
     }
     for (int i=0; i<numOutCPs; i++)  {
-        sizeODisp  += (outCPs[i]->getSizeRespType())(OF_Resp_Disp);
-        sizeOForce += (outCPs[i]->getSizeRespType())(OF_Resp_Force);
+        sizeODisp  += (outCPs[i]->getSizeRspType())(OF_Resp_Disp);
+        sizeOForce += (outCPs[i]->getSizeRspType())(OF_Resp_Force);
     }
     if ((sizeTDisp != 0 && sizeTDisp != sizeT(OF_Resp_Disp)) ||
         (sizeTForce != 0 && sizeTForce != sizeT(OF_Resp_Force)) ||
@@ -379,10 +381,10 @@ int ECSimDomain::setSize(ID sizeT, ID sizeO)
         opserr << "see User Manual.\n";
         exit(OF_ReturnType_failed);
     }
-
-    *sizeCtrl = sizeT;
-    *sizeDaq  = sizeO;
-
+    
+    (*sizeCtrl) = sizeT;
+    (*sizeDaq)  = sizeO;
+    
     return OF_ReturnType_completed;
 }
 
@@ -422,9 +424,9 @@ int ECSimDomain::setTrialResponse(const Vector* disp,
                 ctrlForce[i] = theCtrlFilters[OF_Resp_Force]->filtering(ctrlForce[i]);
         }
     }
-
+    
     rValue = this->control();
-
+    
     return rValue;
 }
 
@@ -436,7 +438,7 @@ int ECSimDomain::getDaqResponse(Vector* disp,
     Vector* time)
 {
     this->acquire();
-
+    
     int i;
     if (disp != 0)  {
         for (i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)  {
@@ -466,7 +468,7 @@ int ECSimDomain::getDaqResponse(Vector* disp,
             (*force)(i) = daqForce[i];
         }
     }
-
+    
     return OF_ReturnType_completed;
 }
 
@@ -657,12 +659,11 @@ void ECSimDomain::Print(OPS_Stream &s, int flag)
 {
     s << "****************************************************************\n";
     s << "* ExperimentalControl: " << this->getTag() << endln; 
-    s << "*   type: ECSimDomain\n";
-    s << "*   trialCPs:";
+    s << "*   type: ECSimDomain";
+    s << "\n*   trialCPs:";
     for (int i=0; i<numTrialCPs; i++)
         s << " " << trialCPs[i]->getTag();
-    s << endln;
-    s << "*   outCPs:";
+    s << "\n*   outCPs:";
     for (int i=0; i<numOutCPs; i++)
         s << " " << outCPs[i]->getTag();
     s << "\n*   ctrlFilters:";
@@ -679,9 +680,7 @@ void ECSimDomain::Print(OPS_Stream &s, int flag)
         else
             s << " 0";
     }
-    s << endln;
-    s << "****************************************************************\n";
-    s << endln;
+    s << "\n****************************************************************\n\n";
 }
 
 
@@ -698,14 +697,14 @@ int ECSimDomain::acquire()
     // get nodal reactions if forces need to be acquired
     if ((*sizeDaq)(OF_Resp_Force) != 0)
         theDomain->calculateNodalReactions(true);
-
+    
     // loop through all the output control points
     int iSP = 0;
     for (int i=0; i<numOutCPs; i++)  {
         // get output control point parameters
-        int numDir = outCPs[i]->getNumUniqueDir();
-        ID dir = outCPs[i]->getUniqueDir();
-
+        int numDir = outCPs[i]->getNumDOF();
+        ID dir = outCPs[i]->getUniqueDOF();
+        
         // loop through all the directions
         for (int j=0; j<numDir; j++)  {
             if ((*sizeDaq)(OF_Resp_Disp) != 0)  {
@@ -727,6 +726,6 @@ int ECSimDomain::acquire()
             iSP++;
         }
     }
-
+    
     return OF_ReturnType_completed;
 }

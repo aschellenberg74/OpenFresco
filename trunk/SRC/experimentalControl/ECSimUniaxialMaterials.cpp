@@ -47,7 +47,7 @@ ECSimUniaxialMaterials::ECSimUniaxialMaterials(int tag,
             << "null specimen array passed.\n";
         exit(OF_ReturnType_failed);
     }
-
+    
     // allocate memory for the uniaxial materials
     theSpecimen = new UniaxialMaterial* [numMats];
     if (theSpecimen == 0)  {
@@ -55,7 +55,7 @@ ECSimUniaxialMaterials::ECSimUniaxialMaterials(int tag,
             << "failed to allocate pointers for uniaxial materials.\n";
         exit(OF_ReturnType_failed);
     }
-
+    
     // get copies of the uniaxial materials
     for (int i=0; i<numMats; i++)  {
         if (specimen[i] == 0) {
@@ -87,7 +87,7 @@ ECSimUniaxialMaterials::ECSimUniaxialMaterials(const ECSimUniaxialMaterials& ec)
             << "failed to allocate pointers for uniaxial materials.\n";
         exit(OF_ReturnType_failed);
     }
-
+    
     // get copies of the uniaxial materials
     for (int i=0; i<numMats; i++)  {
         if (ec.theSpecimen[i] == 0) {
@@ -427,7 +427,7 @@ void ECSimUniaxialMaterials::Print(OPS_Stream &s, int flag)
 int ECSimUniaxialMaterials::control()
 {
     int rValue = 0;
-
+    
     for (int i=0; i<numMats; i++)  {
         rValue += theSpecimen[i]->setTrialStrain((*ctrlDisp)(i),(*ctrlVel)(i));
     }

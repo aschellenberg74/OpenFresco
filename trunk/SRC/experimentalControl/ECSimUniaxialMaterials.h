@@ -57,7 +57,7 @@ public:
     virtual int setup();
     virtual int setSize(ID sizeT, ID sizeO);
     
-    virtual int setTrialResponse(const Vector* disp, 
+    virtual int setTrialResponse(const Vector* disp,
         const Vector* vel,
         const Vector* accel,
         const Vector* force,
@@ -69,27 +69,27 @@ public:
         Vector* time);
     
     virtual int commitState();
-
+    
     virtual ExperimentalControl *getCopy();
-        
+    
     // public methods for experimental control recorder
     virtual Response *setResponse(const char **argv, int argc,
         OPS_Stream &output);
     virtual int getResponse(int responseID, Information &info);
     
     // public methods for output
-    void Print(OPS_Stream &s, int flag = 0);    
-    
+    void Print(OPS_Stream &s, int flag = 0);
+
 protected:
     // protected methods to set and to get response
     virtual int control();
     virtual int acquire();
-    
+
 private:
     int numMats;                     // number of uniaxial materials
     UniaxialMaterial **theSpecimen;  // uniaxial materials
     
-    Vector *ctrlDisp, *ctrlVel;    
+    Vector *ctrlDisp, *ctrlVel;
     Vector *daqDisp, *daqVel, *daqForce;
 };
 
