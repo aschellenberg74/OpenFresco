@@ -26,7 +26,7 @@
 #ifndef ESThreeActuatorsJntOff2d_h
 #define ESThreeActuatorsJntOff2d_h
 
-// Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 01/07
 // Revision: A
 //
@@ -54,6 +54,9 @@ public:
     
     // destructor
     virtual ~ESThreeActuatorsJntOff2d();
+    
+    // method to get class type
+    const char *getClassType() const {return "ESThreeActuatorsJntOff2d";};
     
     // public methods
     virtual int setup();

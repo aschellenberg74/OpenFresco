@@ -26,7 +26,7 @@
 #ifndef ESInvertedVBraceJntOff2d_h
 #define ESInvertedVBraceJntOff2d_h
 
-// Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 09/06
 // Revision: A
 //
@@ -55,6 +55,9 @@ public:
     
     // destructor
     virtual ~ESInvertedVBraceJntOff2d();
+    
+    // method to get class type
+    const char *getClassType() const {return "ESInvertedVBraceJntOff2d";};
     
     // public methods
     virtual int setup();
