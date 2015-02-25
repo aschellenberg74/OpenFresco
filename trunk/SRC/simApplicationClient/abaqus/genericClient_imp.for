@@ -29,7 +29,7 @@
 ** $Date$
 ** $Source: $
 
-** Written: Andreas Schellenberg
+** Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 ** Created: 03/09
 ** Revision: A
 

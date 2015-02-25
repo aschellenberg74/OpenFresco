@@ -406,7 +406,7 @@ Domain::addElement(Element *element)
       int nodeTag = nodes(i);
       Node *nodePtr = this->getNode(nodeTag);
       if (nodePtr == 0) {
-	  opserr << "WARNING Domain::addElement - In element " << *element;
+	opserr << "WARNING Domain::addElement - In element " << eleTag;
 	  opserr << "\n no Node " << nodeTag << " exists in the domain\n";
 	  return false;
       }
@@ -2239,6 +2239,16 @@ Domain::getRegion(int tag)
 	return theRegions[i];
 
     return 0;
+}
+
+void
+Domain::getRegionTags(ID& rtags) const
+{
+    rtags.resize(numRegions);
+    for(int i=0; i<numRegions; i++) {
+        rtags(i) = theRegions[i]->getTag();
+    }
+
 }
 
 typedef map<int, int> MAP_INT;

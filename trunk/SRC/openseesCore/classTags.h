@@ -194,6 +194,10 @@
 #define MAT_TAG_ResilienceMaterialHR            80
 #define MAT_TAG_CFSSSWP                         81
 #define MAT_TAG_CFSWSWP                         82
+#define MAT_TAG_ResilienceLow                   83
+#define MAT_TAG_Bilin02                         84
+#define MAT_TAG_ModIMKPeakOriented02            85
+#define MAT_TAG_ModIMKPinching02                86
 
 #define MAT_TAG_PySimple1                    205
 #define MAT_TAG_TzSimple1                    206
@@ -378,10 +382,10 @@
 #define ND_TAG_ManzariDafalias                  14012
 #define ND_TAG_ManzariDafalias3D                14013
 #define ND_TAG_ManzariDafaliasPlaneStrain       14014
-
-
-
-
+// Manzari Dafalias material - A. Ghofrani
+#define ND_TAG_ManzariDafaliasRO                14015
+#define ND_TAG_ManzariDafalias3DRO              14016
+#define ND_TAG_ManzariDafaliasPlaneStrainRO     14017
 
 // MultiaxialCyclicPlasticity, add by Gang Wang
 #define ND_TAG_MultiaxialCyclicPlasticity             10031
@@ -531,16 +535,13 @@
 #define ELE_TAG_OnePointHingedBeam3d    70
 #define ELE_TAG_BeamColumnJoint2d       71
 #define ELE_TAG_BeamColumnJoint3d       72
-
 #define ELE_TAG_ForceBeamColumn2d       73
 #define ELE_TAG_ForceBeamColumn3d       74
 #define ELE_TAG_ElasticForceBeamColumn2d 75
 #define ELE_TAG_ElasticForceBeamColumn3d 76
 #define ELE_TAG_ForceBeamColumnCBDI2d   77
 #define ELE_TAG_ForceBeamColumnCBDI3d   78
-
 #define ELE_TAG_DispBeamColumn2dInt     79
-
 #define ELE_TAG_InternalSpring          80
 #define ELE_TAG_SimpleJoint2D           81
 #define ELE_TAG_Joint2D                 82
@@ -607,7 +608,7 @@
 #define ELE_TAG_PFEMElement3D          141
 #define ELE_TAG_PFEMElement2DCompressible 142
 #define ELE_TAG_PFEMElement2DBubble       143
-#define ELE_TAG_PFEMElement2D73           144
+#define ELE_TAG_PFEMElement2Dmini         144
 #define ELE_TAG_ElasticTimoshenkoBeam2d   145
 #define ELE_TAG_ElasticTimoshenkoBeam3d   146
 #define ELE_TAG_ElastomericBearingUFRP2d  147
@@ -618,10 +619,12 @@
 #define ELE_TAG_ElastomericX              152
 #define ELE_TAG_LeadRubberX               153
 #define ELE_TAG_PileToe3D                 154
+#define ELE_TAG_N4BiaxialTruss            155
 
 #define ELE_TAG_MultipleShearSpring 6201
 #define ELE_TAG_MultipleNormalSpring 6202
 #define ELE_TAG_KikuchiBearing 6203
+#define ELE_TAG_YamamotoBiaxialHDR 6204
 
 #define FRN_TAG_Coulomb            1
 #define FRN_TAG_VelDependent       2
@@ -690,7 +693,7 @@
 #define CNSTRNT_TAG_MP_Joint2D          5
 #define CNSTRNT_TAG_MP_SimpleJoint2D    6
 #define CNSTRNT_TAG_MP_Joint3D          7
-#define CNSTRNT_TAG_Pressure_Constraint    8
+#define CNSTRNT_TAG_Pressure_Constraint 8
 
 
 #define MATRIX_TAG_Matrix 	1
