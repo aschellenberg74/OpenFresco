@@ -26,7 +26,7 @@
 #ifndef ESThreeActuators2d_h
 #define ESThreeActuators2d_h
 
-// Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 09/06
 // Revision: A
 //
@@ -52,6 +52,9 @@ public:
     
     // destructor
     virtual ~ESThreeActuators2d();
+    
+    // method to get class type
+    const char *getClassType() const {return "ESThreeActuators2d";};
     
     // public methods
     virtual int setup();

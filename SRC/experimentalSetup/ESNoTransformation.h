@@ -26,7 +26,7 @@
 #ifndef ESNoTransformation_h
 #define ESNoTransformation_h
 
-// Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 09/06
 // Revision: A
 //
@@ -49,6 +49,9 @@ public:
     // destructor
     virtual ~ESNoTransformation();
 	
+    // method to get class type
+    const char *getClassType() const {return "ESNoTransformation";};
+    
     // public methods
     virtual int setup();
     

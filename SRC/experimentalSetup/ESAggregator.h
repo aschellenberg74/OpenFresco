@@ -26,7 +26,7 @@
 #ifndef ESAggregator_h
 #define ESAggregator_h
 
-// Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 09/06
 // Revision: A
 //
@@ -47,6 +47,9 @@ public:
     
     // destructor
     virtual ~ESAggregator();
+    
+    // method to get class type
+    const char *getClassType() const {return "ESAggregator";};
     
     // public methods
     virtual int setup();

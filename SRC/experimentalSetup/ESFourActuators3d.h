@@ -26,7 +26,7 @@
 #ifndef ESFourActuators3d_h
 #define ESFourActuators3d_h
 
-// Written: VesnaTerzic (vesna@berkeley.edu)
+// Written: Vesna Terzic (vesna@berkeley.edu)
 // Created: 01/07
 // Revision: A
 //
@@ -55,6 +55,9 @@ public:
     
     // destructor
     virtual ~ESFourActuators3d();
+    
+    // method to get class type
+    const char *getClassType() const {return "ESFourActuators3d";};
     
     // public methods
     virtual int setup();
