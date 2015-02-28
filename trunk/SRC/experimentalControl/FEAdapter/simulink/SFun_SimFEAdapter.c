@@ -23,7 +23,7 @@
 // $Date$
 // $Source: $
 
-// Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 03/10
 // Revision: A
 //
@@ -317,9 +317,11 @@ static void mdlTerminate(SimStruct *S)
     // shutdown server
     sData[0] = 99;
     
+    // send termination to adapter element (twice for reliability)
     gMsg = (char_T *)sData;
     dataTypeSize = sizeof(real_T);
     nleft = dataSize[0];
+    senddata(socketID, &dataTypeSize, gMsg, &nleft, &ierr);
     senddata(socketID, &dataTypeSize, gMsg, &nleft, &ierr);
     
     closeconnection(socketID, &ierr);

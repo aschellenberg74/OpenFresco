@@ -26,7 +26,7 @@
 #ifndef ECLabVIEW_h
 #define ECLabVIEW_h
 
-// Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 01/07
 // Revision: A
 //
