@@ -1,9 +1,9 @@
 # File: OneBayFrame_Local.tcl
 # Units: [kip,in.]
 #
-# $Revision$
-# $Date$
-# $URL$
+# $Revision: $
+# $Date: $
+# $URL: $
 #
 # Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 # Created: 11/06
@@ -12,8 +12,9 @@
 # Purpose: this file contains the tcl input to perform
 # a local hybrid simulation of a one bay frame with
 # two experimental twoNodeLink elements.
-# The specimens are simulated using the SimUniaxialMaterials
-# controller.
+# The left specimen is tested using a FlexTest controller
+# and the MtsCsi experimental control. The right specimen
+# is simulated using the SimUniaxialMaterials controller.
 
 
 # ------------------------------
@@ -53,10 +54,17 @@ uniaxialMaterial Elastic 2 5.6
 #uniaxialMaterial Steel02 2 3.0 5.6 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0 
 uniaxialMaterial Elastic 3 [expr 2.0*100.0/1.0]
 
+# Define control points
+# ---------------------
+# expControlPoint $tag <-node $nodeTag> $dof $rspType <-fact $f> <-lim $l $u> <-isRel> ...
+expControlPoint 1  1 disp
+expControlPoint 2  1 disp 1 force
+
 # Define experimental control
 # ---------------------------
+# expControl MTSCsi $tag $configFileName $rampTime -trialCP $cpTags -outCP $cpTags <-ctrlFilters (5 $filterTag)> <-daqFilters (5 $filterTag)>
+expControl MTSCsi 1 "D:/Projects/MTS_CSI/OpenFresco/MtsCsi_Example/OneBayFrame/OpenFresco_mNEES.mtscs" 0.01 -trialCP 1 -outCP 2
 # expControl SimUniaxialMaterials $tag $matTags
-expControl SimUniaxialMaterials 1 1
 expControl SimUniaxialMaterials 2 2
 
 # Define experimental setup
@@ -142,41 +150,6 @@ recorder Node -file Node_Acc.out -time -node 3 4 -dof 1 accel
 recorder Element -file Elmt_Frc.out     -time -ele 1 2 3 forces
 recorder Element -file Elmt_ctrlDsp.out -time -ele 1 2   ctrlDisp
 recorder Element -file Elmt_daqDsp.out  -time -ele 1 2   daqDisp
-
-expRecorder Site -file Site_trialDsp.out -time -site 1 2 trialDisp
-expRecorder Site -file Site_trialVel.out -time -site 1 2 trialVel
-expRecorder Site -file Site_trialAcc.out -time -site 1 2 trialAccel
-expRecorder Site -file Site_trialTme.out -time -site 1 2 trialTime
-expRecorder Site -file Site_outDsp.out -time -site 1 2 outDisp
-expRecorder Site -file Site_outVel.out -time -site 1 2 outVel
-expRecorder Site -file Site_outAcc.out -time -site 1 2 outAccel
-expRecorder Site -file Site_outFrc.out -time -site 1 2 outForce
-expRecorder Site -file Site_outTme.out -time -site 1 2 outTime
-
-expRecorder Setup -file Setup_trialDsp.out -time -setup 1 2 trialDisp
-expRecorder Setup -file Setup_trialVel.out -time -setup 1 2 trialVel
-expRecorder Setup -file Setup_trialAcc.out -time -setup 1 2 trialAccel
-expRecorder Setup -file Setup_trialTme.out -time -setup 1 2 trialTime
-expRecorder Setup -file Setup_outDsp.out -time -setup 1 2 outDisp
-expRecorder Setup -file Setup_outVel.out -time -setup 1 2 outVel
-expRecorder Setup -file Setup_outAcc.out -time -setup 1 2 outAccel
-expRecorder Setup -file Setup_outFrc.out -time -setup 1 2 outForce
-expRecorder Setup -file Setup_outTme.out -time -setup 1 2 outTime
-expRecorder Setup -file Setup_ctrlDsp.out -time -setup 1 2 ctrlDisp
-expRecorder Setup -file Setup_ctrlVel.out -time -setup 1 2 ctrlVel
-expRecorder Setup -file Setup_ctrlAcc.out -time -setup 1 2 ctrlAccel
-expRecorder Setup -file Setup_ctrlTme.out -time -setup 1 2 ctrlTime
-expRecorder Setup -file Setup_daqDsp.out -time -setup 1 2 daqDisp
-expRecorder Setup -file Setup_daqVel.out -time -setup 1 2 daqVel
-expRecorder Setup -file Setup_daqAcc.out -time -setup 1 2 daqAccel
-expRecorder Setup -file Setup_daqFrc.out -time -setup 1 2 daqForce
-expRecorder Setup -file Setup_daqTme.out -time -setup 1 2 daqTime
-
-expRecorder Control -file Control_ctrlDsp.out -time -control 1 2 ctrlDisp
-expRecorder Control -file Control_ctrlVel.out -time -control 1 2 ctrlVel
-expRecorder Control -file Control_daqDsp.out -time -control 1 2 daqDisp
-expRecorder Control -file Control_daqVel.out -time -control 1 2 daqVel
-expRecorder Control -file Control_daqFrc.out -time -control 1 2 daqForce
 # --------------------------------
 # End of recorder generation
 # --------------------------------

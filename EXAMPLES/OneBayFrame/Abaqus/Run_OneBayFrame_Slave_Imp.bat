@@ -10,8 +10,8 @@ echo =============================================
 call "%pathIF%\ifortvars.bat" intel64
 
 echo.
-echo Running 'OneBayFrame__Slave_Imp.inp' Abaqus Model:
-echo ==================================================
-call abaqus job=onebayframe_slave_imp user=adapter_imp interactive
+echo Running 'OneBayFrame_Slave_Imp.inp' Abaqus Model:
+echo =================================================
+call abaqus job=onebayframe_slave_imp user=adapter_imp.obj interactive
 
 goto :eof

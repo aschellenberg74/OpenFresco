@@ -1,4 +1,5 @@
 # File: OneBayFrame_Slave.tcl (use with OneBayFrame_Master.tcl)
+# Units: [kip,in.]
 #
 # $Revision$
 # $Date$
@@ -11,7 +12,7 @@
 # Purpose: this file contains the tcl input to perform
 # a hybrid simulation of a one bay frame with
 # two experimental zero length elements.
-# The adpater element is used to communicate with the
+# The adapter element is used to communicate with the
 # main FE-software which is coordinating and executing
 # the direct integration analysis.
 
@@ -68,13 +69,13 @@ timeSeries Path 1 -filePath elcentro.txt -dt $dt -factor [expr 386.1*$scale]
 # pattern UniformExcitation $tag $dir -accel $tsTag <-vel0 $vel0>
 pattern UniformExcitation 1 1 -accel 1
 
-# calculate the rayleigh damping factors for nodes & elements
+# calculate the Rayleigh damping factors for nodes & elements
 set alphaM     1.010017396536;  # D = alphaM*M
 set betaK      0.0;             # D = betaK*Kcurrent
 set betaKinit  0.0;             # D = beatKinit*Kinit
 set betaKcomm  0.0;             # D = betaKcomm*KlastCommit
 
-# set the rayleigh damping 
+# set the Rayleigh damping 
 rayleigh $alphaM $betaK $betaKinit $betaKcomm;
 # ------------------------------
 # End of model generation
@@ -86,27 +87,21 @@ rayleigh $alphaM $betaK $betaKinit $betaKcomm;
 # ------------------------------
 # create the system of equations
 system BandGeneral
-
 # create the DOF numberer
 numberer Plain
-
 # create the constraint handler
 constraints Plain
-
 # create the convergence test
 test NormDispIncr 1.0e-12 25
 #test NormUnbalance 1.0e-12 25
 #test EnergyIncr 1.0e-12 25
-
 # create the integration scheme
 integrator LoadControl 1.0
 #integrator Newmark 0.5 0.25
 #integrator NewmarkExplicit 0.5
-
 # create the solution algorithm
 algorithm Newton
 #algorithm Linear
-
 # create the analysis object 
 analysis Static
 #analysis Transient

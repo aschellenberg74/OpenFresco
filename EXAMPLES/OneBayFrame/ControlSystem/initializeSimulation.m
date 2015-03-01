@@ -1,7 +1,11 @@
 %INITIALIZESIMULATION to initialize the parameters needed to build the Simulink model
 %
 % created by MTS
-% modified by Andreas Schellenberg (andreas.schellenberg@gmx.net) 11/2004
+% modified by Andreas Schellenberg (andreas.schellenberg@gmail.com) 11/2004
+%
+% $Revision$
+% $Date$
+% $URL$
 
 clear;
 close all;
@@ -9,14 +13,20 @@ clc;
 
 %%%%%%%%%% HYBRID CONTROLLER PARAMETERS %%%%%%%%%%
 
-% set time steps
-HybridCtrlParameters.nAct  = 1;           % number of controlled actuators
-HybridCtrlParameters.dtInt = 0.02;        % integration time step (sec)
-HybridCtrlParameters.dtSim = 2^(-3);      % simulation time step (sec)
-HybridCtrlParameters.dtCon = 1/1024;      % controller time step (sec)
-HybridCtrlParameters.delay = 0.0;         % delay due to undershoot (sec)
+% set number of degrees-of-freedom
+HybridCtrlParameters.nDOF = 1;
 
-% calculate max number of substeps
+% set time steps
+HybridCtrlParameters.upFact   = 1;          % upsample factor
+HybridCtrlParameters.dtInt    = 20/1024;    % integration time step (sec)
+HybridCtrlParameters.dtSim    = 20/1024;    % simulation time step (sec)
+HybridCtrlParameters.dtCon    = 1/1024;     % controller time step (sec)
+HybridCtrlParameters.delay    = zeros(1,HybridCtrlParameters.nDOF);
+HybridCtrlParameters.delay(1) = 0.0;        % delay compensation DOF 1 (sec)
+
+% update controller time step
+HybridCtrlParameters.dtCon = HybridCtrlParameters.dtCon/HybridCtrlParameters.upFact;
+% calculate number of substeps
 HybridCtrlParameters.N = round(HybridCtrlParameters.dtSim/HybridCtrlParameters.dtCon);
 % update simulation time step
 HybridCtrlParameters.dtSim = HybridCtrlParameters.N*HybridCtrlParameters.dtCon;
@@ -50,11 +60,11 @@ disp(HybridCtrlParameters);
 %%%%%%%%%% SIGNAL COUNTS %%%%%%%%%%
 
 nAct    = 8;                                    % number of actuators
-nAdcU	  = 12;                                   % number of user a/d channels
+nAdcU   = 12;                                   % number of user a/d channels
 nDucU   = 8;                                    % number of user ducs
-nEncU	  = 2;                                    % number of user encoders
-nDinp	  = 4;                                    % no. of digital inputs written to scramnet
-nDout	  = 4;                                    % no. of digital outputs driven by scramnet
+nEncU   = 2;                                    % number of user encoders
+nDinp   = 4;                                    % no. of digital inputs written to scramnet
+nDout   = 4;                                    % no. of digital outputs driven by scramnet
 nUDPOut = 1+7*nAct+nAdcU+nDucU+nEncU+nDinp;     % no. of outputs from simulink bridge
 nUDPInp = 1+6*nAct+nAdcU+nDucU+nEncU+nDinp;     % no. of inputs to simulink bridge
 
@@ -75,12 +85,12 @@ nUDPInp = 1+6*nAct+nAdcU+nDucU+nEncU+nDinp;     % no. of inputs to simulink brid
 % Below, you must enter the conversion factors from your units to canonical
 % units, as follows:
 % 1) Change the unit names in the "user" and "canonical" columns of the comment
-%	 text.  Do this not only for documentation purposes, but also to make it
-%	 clear to you what conversion factors you need to compute.  Pay particular
-%	 attention to selecting linear displacement and linear force units, because
-%	 they determine the canonical units of all other physical quantities.
+%    text.  Do this not only for documentation purposes, but also to make it
+%    clear to you what conversion factors you need to compute.  Pay particular
+%    attention to selecting linear displacement and linear force units, because
+%    they determine the canonical units of all other physical quantities.
 % 2) Compute the conversion factors from user to canonical units for the
-%	 variables shown (user units = conversion factor x canonical units).
+%    variables shown (user units = conversion factor x canonical units).
 %
 % Note about mass user units:  Mass user units are actually force, not mass,
 % because it is easier for users to think of mass in terms of weight.  The
@@ -93,12 +103,12 @@ areaCanon   = 1;              % area:        in^2        in^2
 volumeCanon	= 231;            % volume:      gal         in^3
 forceCanon  = 1;              % force:       kip         kip
 pressCanon  = 0.001;          % pressure:    psi         kip/in^2
-flowCanon   = 3.85;           % flow:			gpm         in^3/s
+flowCanon   = 3.85;           % flow:        gpm         in^3/s
 leakCanon   = flowCanon ...
             / pressCanon;     % leakage:     gpm/psi     in^5/kip-s
 massCanon   = 0.002588;       % mass:        kip         kip/in/s^2
 springCanon = 1;              % spring:      kip/in      kip/in
-damperCanon = 1;              % damper:      kip/in/s	   kip/in/s
+damperCanon = 1;              % damper:      kip/in/s    kip/in/s
 
 %%%%%%%%%% ACTUATOR/ACCUMULATOR PARAMETERS %%%%%%%%%%
 
@@ -117,9 +127,9 @@ ratedFlowA  = 250.0;    % gpm
 nominFlowA  = 375.0;    % gpm
 area1A      = 75.5;     % in^2
 area2A      = 75.5;     % in^2
-stroke1A	   = 20.0;     % in
-stroke2A	   = 20.0;     % in
-endLength1A	= 2.0;      % in
+stroke1A    = 20.0;     % in
+stroke2A    = 20.0;     % in
+endLength1A = 2.0;      % in
 endLength2A = 2.0;      % in
 leakageA    = 0;        % gpm/psi
 
@@ -131,8 +141,8 @@ area1B      = 55.0;     % in^2
 area2B      = 55.0;     % in^2
 stroke1B    = 40.0;     % in
 stroke2B    = 40.0;     % in
-endLength1B	= 2.0;      % in
-endLength2B	= 2.0;      % in
+endLength1B = 2.0;      % in
+endLength2B = 2.0;      % in
 leakageB    = 0;        % gpm/psi
 
 % static actuator parameters
@@ -143,30 +153,30 @@ area1C      = 113.1;    % in^2
 area2C      = 74.6;     % in^2
 stroke1C    = 72.0;     % in
 stroke2C    = 72.0;     % in
-endLength1C	= 0;        % in
-endLength2C	= 0;        % in
+endLength1C = 0;        % in
+endLength2C = 0;        % in
 leakageC    = 0;        % gpm/psi
 
 % accumulator parameters
 accumVolume = 23;       % gal
-accumNumber	= 1;
+accumNumber = 1;        % -
 precharge   = 1000;     % psi
-gasConstant	= 1.8;      % nitrogen
+gasConstant = 1.8;      % nitrogen
 pumpFlow    = 1e10;     % gpm
 
 %%%%%%%%%% PAYLOAD PARAMETERS %%%%%%%%%%
 
 % friction parameters (dynamic short actuator)
 frictionA   = 0;        % kip
-yieldDisplA	= 0.1;      % in
+yieldDisplA = 0.1;      % in
 
 % friction parameters (dynamic long actuator)
 frictionB   = 0;        % kip
-yieldDisplB	= 0.1;      % in
+yieldDisplB = 0.1;      % in
 
 % friction parameters (static actuator)
 frictionC   = 0;        % kip
-yieldDisplC	= 0.1;      % in
+yieldDisplC = 0.1;      % in
 
 % fixture & specimen parameters (dynamic short actuator)
 staticForceA = 0;       % kip
@@ -203,7 +213,7 @@ ratioPorts = 0;         % don't ratio ports
 
 % dynamic short actuator parameters
 areaA       = (area1A + area2A) / 2;
-halfLengthA	= (stroke1A + endLength1A + stroke2A + endLength2A) / 2;
+halfLengthA = (stroke1A + endLength1A + stroke2A + endLength2A) / 2;
 oilColumnA  = sqrt(2 * areaA * areaCanon * bulkModulus * pressCanon ...
    / (halfLengthA * lengthCanon * massA * massCanon)) / (2 * pi);
 maxFlowA    = ratedFlowA * sqrt(supplyPress / ratedPressA);
@@ -213,12 +223,12 @@ maxVelocA   =  (maxFlowA * flowCanon / (area1A * areaCanon)) / velocCanon;
 minVelocA   = -(maxFlowA * flowCanon / (area2A * areaCanon)) / velocCanon;
 maxForceA   =  area1A * areaCanon * (supplyPress-returnPress) * pressCanon;
 minForceA   = -area2A * areaCanon * (supplyPress-returnPress) * pressCanon;
-dampFactorA	= damping * 0.01 * 2 * pi * oilColumnA * massA * massCanon;
+dampFactorA = damping * 0.01 * 2 * pi * oilColumnA * massA * massCanon;
 actParamsA  = ...
    [bulkModulus * pressCanon;
    valveDelay;
    overlap      * 0.01;
-   ratedPressA	 * pressCanon;
+   ratedPressA  * pressCanon;
    ratedFlowA   * flowCanon;
    nominFlowA   * flowCanon;
    area1A       * areaCanon;
@@ -228,84 +238,84 @@ actParamsA  = ...
    endLength1A  * lengthCanon;
    endLength2A  * lengthCanon;
    dampFactorA;
-   leakageA	    * leakCanon;
+   leakageA     * leakCanon;
    ratioPorts;
    samplePeriod;
-   1;				% displCanon
+   1;               % displCanon
    velocCanon;
-   1;				% forceCanon
+   1;               % forceCanon
    pressCanon;
    flowCanon]';
 
 % dynamic long actuator parameters
-areaB	      = (area1B + area2B) / 2;
-halfLengthB	= (stroke1B + endLength1B + stroke2B + endLength2B) / 2;
+areaB       = (area1B + area2B) / 2;
+halfLengthB = (stroke1B + endLength1B + stroke2B + endLength2B) / 2;
 oilColumnB  = sqrt(2 * areaB * areaCanon * bulkModulus * pressCanon ...
    / (halfLengthB * lengthCanon * massB * massCanon)) / (2 * pi);
-maxFlowB	   = ratedFlowB * sqrt(supplyPress / ratedPressB);
+maxFlowB    = ratedFlowB * sqrt(supplyPress / ratedPressB);
 maxDisplB   =  (stroke2B + endLength2B) * lengthCanon;
 minDisplB   = -(stroke1B + endLength1B) * lengthCanon;
 maxVelocB   =  (maxFlowB * flowCanon / (area1B * areaCanon)) / velocCanon;
 minVelocB   = -(maxFlowB * flowCanon / (area2B * areaCanon)) / velocCanon;
 maxForceB   =  area1B * areaCanon * (supplyPress-returnPress) * pressCanon;
 minForceB   = -area2B * areaCanon * (supplyPress-returnPress) * pressCanon;
-dampFactorB	= damping * 0.01 * 2 * pi * oilColumnB * massB * massCanon;
+dampFactorB = damping * 0.01 * 2 * pi * oilColumnB * massB * massCanon;
 actParamsB  = ...
    [bulkModulus * pressCanon;
    valveDelay;
    overlap      * 0.01;
-   ratedPressB	 * pressCanon;
+   ratedPressB  * pressCanon;
    ratedFlowB   * flowCanon;
    nominFlowB   * flowCanon;
    area1B       * areaCanon;
    area2B       * areaCanon;
-   stroke1B	    * lengthCanon;
-   stroke2B	    * lengthCanon;
-   endLength1B	 * lengthCanon;
-   endLength2B	 * lengthCanon
+   stroke1B     * lengthCanon;
+   stroke2B     * lengthCanon;
+   endLength1B  * lengthCanon;
+   endLength2B  * lengthCanon
    dampFactorB;
-   leakageB		 * leakCanon;
+   leakageB     * leakCanon;
    ratioPorts;
    samplePeriod;
-   1;				% displCanon
+   1;               % displCanon
    velocCanon;
-   1;				% forceCanon
+   1;               % forceCanon
    pressCanon;
    flowCanon]';
 
 % static actuator parameters
-areaC	      = (area1C + area2C) / 2;
-halfLengthC	= (stroke1C + endLength1C + stroke2C + endLength2C) / 2;
+areaC       = (area1C + area2C) / 2;
+halfLengthC = (stroke1C + endLength1C + stroke2C + endLength2C) / 2;
 oilColumnC  = sqrt(2 * areaC * areaCanon * bulkModulus * pressCanon ...
    / (halfLengthC * lengthCanon * massC * massCanon)) / (2 * pi);
-maxFlowC	   = ratedFlowC * sqrt(supplyPress / ratedPressC);
+maxFlowC    = ratedFlowC * sqrt(supplyPress / ratedPressC);
 maxDisplC   =  (stroke2C + endLength2C) * lengthCanon;
 minDisplC   = -(stroke1C + endLength1C) * lengthCanon;
 maxVelocC   =  (maxFlowC * flowCanon / (area1C * areaCanon)) / velocCanon;
 minVelocC   = -(maxFlowC * flowCanon / (area2C * areaCanon)) / velocCanon;
 maxForceC   =  area1C * areaCanon * (supplyPress-returnPress) * pressCanon;
 minForceC   = -area2C * areaCanon * (supplyPress-returnPress) * pressCanon;
-dampFactorC	= damping * 0.01 * 2 * pi * oilColumnC * massC * massCanon;
+dampFactorC = damping * 0.01 * 2 * pi * oilColumnC * massC * massCanon;
 actParamsC  = ...
    [bulkModulus * pressCanon;
    valveDelay;
    overlap      * 0.01;
-   ratedPressC	 * pressCanon;
+   ratedPressC  * pressCanon;
    ratedFlowC   * flowCanon;
    nominFlowC   * flowCanon;
    area1C       * areaCanon;
    area2C       * areaCanon;
    stroke1C     * lengthCanon;
-   stroke2C	    * lengthCanon;
-   endLength1C	 * lengthCanon;
-   endLength2C	 * lengthCanon;
+   stroke2C     * lengthCanon;
+   endLength1C  * lengthCanon;
+   endLength2C  * lengthCanon;
    dampFactorC;
-   leakageC	    * leakCanon;
+   leakageC     * leakCanon;
    ratioPorts;
    samplePeriod;
-   1;				% displCanon
+   1;               % displCanon
    velocCanon;
-   1;				% forceCanon
+   1;               % forceCanon
    pressCanon;
    flowCanon]';
 

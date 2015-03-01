@@ -1,4 +1,5 @@
 # File: OneBayFrame_Local.tcl
+# Units: [kip,in.]
 #
 # $Revision$
 # $Date$
@@ -54,15 +55,15 @@ uniaxialMaterial Elastic 3 [expr 2.0*100.0/1.0]
 
 # Define control points
 # ---------------------
-# expControlPoint tag nodeTag dir resp <-fact f> <-lim l u> ...
-expControlPoint 1 3  ux disp -fact 0.003 -lim -0.01 0.01
-expControlPoint 2 3  ux disp -fact [expr 1.0/0.003] ux force -fact [expr 7.0/18.0]
+# expControlPoint $tag <-node $nodeTag> $dof $rspType <-fact $f> <-lim $l $u> ...
+expControlPoint 1 -node 3  ux disp -fact 0.003 -lim -0.01 0.01
+expControlPoint 2 -node 3  ux disp -fact [expr 1.0/0.003] ux force -fact [expr 7.0/18.0]
 
 # Define experimental control
 # ---------------------------
 # expControl SimUniaxialMaterials $tag $matTags
 expControl SimUniaxialMaterials 1 1
-#expControl xPCtarget 1 1 "192.168.2.20" 22222 HybridControllerD3D3_1Act "D:/PredictorCorrector/RTActualTestModels/cmAPI-xPCTarget-STS"
+#expControl xPCtarget 1 "192.168.2.20" 22222 "D:/PredictorCorrector/RTActualTestModels/cmAPI-xPCTarget-SCRAMNet-STS/HybridControllerD2D2" -trialCP 1 -outCP 2
 
 # expControl LabVIEW tag ipAddr <ipPort> -trialCP cpTags -outCP cpTags
 expControl LabVIEW 2 "127.0.0.1" 11997  -trialCP 1  -outCP 2;  # use with NEES-SAM
@@ -105,13 +106,13 @@ timeSeries Path 1 -filePath elcentro.txt -dt $dt -factor [expr 386.1*$scale]
 # pattern UniformExcitation $tag $dir -accel $tsTag <-vel0 $vel0>
 pattern UniformExcitation 1 1 -accel 1
 
-# calculate the rayleigh damping factors for nodes & elements
+# calculate the Rayleigh damping factors for nodes & elements
 set alphaM     1.010017396536;  # D = alphaM*M
 set betaK      0.0;             # D = betaK*Kcurrent
 set betaKinit  0.0;             # D = beatKinit*Kinit
 set betaKcomm  0.0;             # D = betaKcomm*KlastCommit
 
-# set the rayleigh damping 
+# set the Rayleigh damping 
 rayleigh $alphaM $betaK $betaKinit $betaKcomm
 # ------------------------------
 # End of model generation
@@ -123,23 +124,17 @@ rayleigh $alphaM $betaK $betaKinit $betaKcomm
 # ------------------------------
 # create the system of equations
 system BandGeneral
-
 # create the DOF numberer
 numberer Plain
-
 # create the constraint handler
 constraints Plain
-
 # create the convergence test
 test EnergyIncr 1.0e-6 10
-
 # create the integration scheme
 integrator NewmarkExplicit 0.5
 #integrator AlphaOS 1.0
-
 # create the solution algorithm
 algorithm Linear
-
 # create the analysis object 
 analysis Transient
 # ------------------------------

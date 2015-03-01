@@ -1,4 +1,5 @@
 # File: OneBayFrame_Server1b.tcl (use with OneBayFrame_Client1.tcl)
+# Units: [kip,in.]
 #
 # $Revision$
 # $Date$
@@ -29,11 +30,17 @@ uniaxialMaterial Elastic 1  5.6;  # UC Berkeley Cantilever Column [kip/in]
 #uniaxialMaterial Elastic 1 16.0;  # UBC Cantilever Column [kN/cm]
 #uniaxialMaterial Elastic 1 ????;  # Kyoto University Cantilever Column [??/??]
 
+# Define control points
+# ---------------------
+# expControlPoint $tag <-node $nodeTag> $dof $rspType <-fact $f> <-lim $l $u> ...
+expControlPoint 1  1 disp
+expControlPoint 2  1 disp 1 force
+
 # Define experimental control
 # ---------------------------
 # expControl SimUniaxialMaterials $tag $matTags
 expControl SimUniaxialMaterials 1 1
-#expControl xPCtarget 1 1 "192.168.2.20" 22222 HybridControllerD3D3_1Act "D:/PredictorCorrector/RTActualTestModels/cmAPI-xPCTarget-STS"
+#expControl xPCtarget 1 "192.168.2.20" 22222 "D:/PredictorCorrector/RTActualTestModels/cmAPI-xPCTarget-SCRAMNet-STS/HybridControllerD2D2" -trialCP 1 -outCP 2
 
 # Define experimental setup
 # -------------------------

@@ -1,4 +1,5 @@
-# File: OneBayFrame_Local.tcl
+# File: OneBayFrame_Local.tcl (use with Simulink control system model)
+# Units: [kip,in.]
 #
 # $Revision$
 # $Date$
@@ -73,8 +74,8 @@ expSite LocalSite 2 2
 # ----------------------------
 # left and right columns
 # expElement twoNodeLink $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-orient <$x1 $x2 $x3> $y1 $y2 $y3> <-pDelta Mratios> <-iMod> <-mass $m>
-expElement twoNodeLink 1 1 3 -dir 2 -site 1 -initStif 2.8 -orient -1 0 0
-expElement twoNodeLink 2 2 4 -dir 2 -site 2 -initStif 5.6 -orient -1 0 0
+expElement twoNodeLink 1 1 3 -dir 2 -site 1 -initStif 2.8
+expElement twoNodeLink 2 2 4 -dir 2 -site 2 -initStif 5.6
 
 # Define numerical elements
 # -------------------------
@@ -87,20 +88,20 @@ element truss 3 3 4 1.0 3
 # set time series to be passed to uniform excitation
 set dt 0.02
 set scale 1.0
-set accelSeries "Path -filePath elcentro.txt -dt $dt -factor [expr 386.1*$scale]"
+timeSeries Path 1 -filePath elcentro.txt -dt $dt -factor [expr 386.1*$scale]
 
 # create UniformExcitation load pattern
-# pattern UniformExcitation $tag $dir 
-pattern UniformExcitation  1 1 -accel $accelSeries
+# pattern UniformExcitation $tag $dir -accel $tsTag <-vel0 $vel0>
+pattern UniformExcitation 1 1 -accel 1
 
-# calculate the rayleigh damping factors for nodes & elements
+# calculate the Rayleigh damping factors for nodes & elements
 set alphaM     1.010017396536;  # D = alphaM*M
 set betaK      0.0;             # D = betaK*Kcurrent
 set betaKinit  0.0;             # D = beatKinit*Kinit
 set betaKcomm  0.0;             # D = betaKcomm*KlastCommit
 
-# set the rayleigh damping 
-rayleigh $alphaM $betaK $betaKinit $betaKcomm;
+# set the Rayleigh damping 
+rayleigh $alphaM $betaK $betaKinit $betaKcomm
 # ------------------------------
 # End of model generation
 # ------------------------------
@@ -111,25 +112,19 @@ rayleigh $alphaM $betaK $betaKinit $betaKcomm;
 # ------------------------------
 # create the system of equations
 system BandGeneral
-
 # create the DOF numberer
 numberer Plain
-
 # create the constraint handler
 constraints Plain
-
 # create the convergence test
 test EnergyIncr 1.0e-6 10
-
 # create the integration scheme
 integrator NewmarkExplicit 0.5
 #integrator AlphaOS 1.0
 #integrator Newmark 0.5 0.25
-
 # create the solution algorithm
 algorithm Linear
 #algorithm Newton
-
 # create the analysis object 
 analysis Transient
 # ------------------------------
@@ -141,13 +136,13 @@ analysis Transient
 # Start of recorder generation
 # ------------------------------
 # create the recorder objects
-recorder Node -file Node_Dsp.out -time -node 3 4 -dof 1 disp
-recorder Node -file Node_Vel.out -time -node 3 4 -dof 1 vel
-recorder Node -file Node_Acc.out -time -node 3 4 -dof 1 accel
+recorder Node -file output/Node_Dsp.out -time -node 3 4 -dof 1 disp
+recorder Node -file output/Node_Vel.out -time -node 3 4 -dof 1 vel
+recorder Node -file output/Node_Acc.out -time -node 3 4 -dof 1 accel
 
-recorder Element -file Elmt_Frc.out     -time -ele 1 2 3 forces
-recorder Element -file Elmt_ctrlDsp.out -time -ele 1 2   ctrlDisp
-recorder Element -file Elmt_daqDsp.out  -time -ele 1 2   daqDisp
+recorder Element -file output/Elmt_Frc.out     -time -ele 1 2 3 forces
+recorder Element -file output/Elmt_ctrlDsp.out -time -ele 1 2   ctrlDisp
+recorder Element -file output/Elmt_daqDsp.out  -time -ele 1 2   daqDisp
 # --------------------------------
 # End of recorder generation
 # --------------------------------
@@ -169,13 +164,13 @@ foreach lambda $lambda {
 }
 
 # open output file for writing
-set outFileID [open elapsedTime.txt w]
+set outFileID [open output/elapsedTime.txt w]
 # perform the transient analysis
 set tTot [time {
     for {set i 1} {$i < 1600} {incr i} {
-        set t [time {analyze  1  $dt}]
+        set t [time {analyze  1  [expr 20.0/1024.0]}]
         puts $outFileID $t
- 	    #puts "step $i"
+        #puts "step $i"
     }
 }]
 puts "\nElapsed Time = $tTot \n"
