@@ -1,4 +1,5 @@
 # File: OneBayFrame_Server1a.tcl (use with OneBayFrame_Client1.tcl)
+# Units: [kip,in.]
 #
 # $Revision$
 # $Date$
@@ -28,11 +29,17 @@ model BasicBuilder -ndm 2 -ndf 2
 #uniaxialMaterial Elastic 1 2.8
 uniaxialMaterial Steel02 1 1.5 2.8 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0
 
+# Define control points
+# ---------------------
+# expControlPoint $tag <-node $nodeTag> $dof $rspType <-fact $f> <-lim $l $u> ...
+expControlPoint 1  1 disp
+expControlPoint 2  1 disp 1 force
+
 # Define experimental control
 # ---------------------------
 # expControl SimUniaxialMaterials $tag $matTags
 expControl SimUniaxialMaterials 1 1
-#expControl xPCtarget 1 1 "192.168.2.20" 22222 HybridControllerD3D3_1Act "D:/PredictorCorrector/RTActualTestModels/cmAPI-xPCTarget-STS"
+#expControl xPCtarget 1 "192.168.2.20" 22222 "D:/PredictorCorrector/RTActualTestModels/cmAPI-xPCTarget-SCRAMNet-STS/HybridControllerD2D2" -trialCP 1 -outCP 2
 
 # Define experimental setup
 # -------------------------

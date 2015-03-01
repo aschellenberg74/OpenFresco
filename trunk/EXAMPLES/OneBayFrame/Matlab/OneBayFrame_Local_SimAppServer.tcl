@@ -1,5 +1,5 @@
-# File: OneBayFrame_Distr_LabServer.tcl
-# (use with OneBayFrame_Distr_Client.tcl & OneBayFrame_Distr_SimAppServer.tcl)
+# File: OneBayFrame_Local_SimAppServer.tcl
+# (use with Matlab: OneBayFrame_NewmarkExplicit.m or OneBayFrame_AlphaOS.m)
 # Units: [kip,in.]
 #
 # $Revision$
@@ -11,11 +11,10 @@
 # Revision: A
 #
 # Purpose: this file contains the tcl input to perform
-# a distributed hybrid simulation of a one bay frame
+# a local hybrid simulation of a one bay frame
 # with two experimental twoNodeLink elements.
 # The specimen is simulated using the SimUniaxialMaterials
 # controller.
-# The experimental setups are on the server sides.
 
 
 # ------------------------------
@@ -23,6 +22,12 @@
 # ------------------------------
 # create ModelBuilder (with two-dimensions and 2 DOF/node)
 model BasicBuilder -ndm 2 -ndf 2
+
+# Define geometry for model
+# -------------------------
+# node $tag $xCrd $yCrd $mass
+node  1     0.0   0.00
+node  3     0.0  54.00
 
 # Define materials
 # ----------------
@@ -49,8 +54,14 @@ expSetup OneActuator 1 -control 1 1 -sizeTrialOut 1 1
 
 # Define experimental site
 # ------------------------
-# expSite ActorSite $tag -setup $setupTag $ipPort <-ssl> <-udp>
-expSite ActorSite 1 -setup 1 8091
+# expSite LocalSite $tag $setupTag
+expSite LocalSite 1 1
+
+# Define experimental element
+# ---------------------------
+# left column
+# expElement twoNodeLink $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-orient <$x1 $x2 $x3> $y1 $y2 $y3> <-pDelta Mratios> <-iMod> <-mass $m>
+expElement twoNodeLink 1 1 3 -dir 2 -site 1 -initStif 2.8
 # ------------------------------
 # End of model generation
 # ------------------------------
@@ -59,8 +70,11 @@ expSite ActorSite 1 -setup 1 8091
 # ------------------------------
 # Start the server process
 # ------------------------------
-# startLabServer $siteTag
-startLabServer  1
+# startSimAppElemServer $eleTag $port <-ssl> <-udp>
+#startSimAppElemServer 1 8090 -udp;  # use with generic client element in FEA
+
+# startSimAppSiteServer $siteTag $port <-ssl> <-udp>
+startSimAppSiteServer 1 8090 -udp;  # use with experimental element in FEA
 exit
 # --------------------------------
 # End of analysis

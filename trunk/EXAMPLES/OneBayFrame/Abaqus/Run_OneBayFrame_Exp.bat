@@ -12,6 +12,6 @@ call "%pathIF%\ifortvars.bat" intel64
 echo.
 echo Running 'OneBayFrame_Exp.inp' Abaqus Model:
 echo ===========================================
-call abaqus job=onebayframe_exp user=genericclient_exp interactive
+call abaqus job=onebayframe_exp user=genericclient_exp.obj interactive
 
 goto :eof

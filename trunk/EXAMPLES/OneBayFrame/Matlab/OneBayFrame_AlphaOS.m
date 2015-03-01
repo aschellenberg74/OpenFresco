@@ -115,23 +115,24 @@ ElementData(3).v_pl     = 0;          %Element Plastic Deformation
 %ElementData(3).dataSize = dataSize;   %size of send and receive vectors
 
 % Determine Each Element Type
+MatType = cell(3,1);
 for e=1:3
    if ElementData(e).type == 0;           %Element Turned Off
-      MatType(e,1:6) = 'zForce';
+      MatType{e} = 'zForce';
       ElementData(e).k_el=0;
 
    elseif ElementData(e).type == 1;       %Analytical Elastic Element
-      MatType(e,1:7) = 'Elastic';
+      MatType{e} = 'Elastic';
 
    elseif ElementData(e).type == 2;
       if e == 3
-         MatType(e,1:9) = 'EP_spring';    %Analytical EP spring element
+         MatType{e} = 'EP_spring';    %Analytical EP spring element
       else
-         MatType(e,1:2) = 'EP';           %Analytical EP Element
+         MatType{e} = 'EP';           %Analytical EP Element
       end
 
    else
-      MatType(e,1:12) = 'Experimental';   %Experimental Element
+      MatType{e} = 'Experimental';   %Experimental Element
 
    end
 end
@@ -204,10 +205,9 @@ for i = 1:nsteps;
    for e = 1:3
 
       if e == 3;  % Determine if Element is a Spring Element
-         ElementPost = feval(MatType(e,:), (U_pred(1,i+1)-U_pred(2,i+1)), ElementData(e));
-
+         ElementPost = feval(MatType{e}, (U_pred(1,i+1)-U_pred(2,i+1)), ElementData(e));
       else
-         ElementPost = feval(MatType(e,:), U_pred(e,i+1), ElementData(e));
+         ElementPost = feval(MatType{e}, U_pred(e,i+1), ElementData(e));
       end
 
       p_r(e,i+1) = ElementPost.p_r;

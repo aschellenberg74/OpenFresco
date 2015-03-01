@@ -1,5 +1,6 @@
 # File: OneBayFrame_Distr_SimAppServer.tcl
 # (use with OneBayFrame_Distr_Client.tcl & OneBayFrame_Distr_LabServer.tcl)
+# Units: [kip,in.]
 #
 # $Revision$
 # $Date$

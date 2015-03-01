@@ -1,4 +1,5 @@
 # File: OneBayFrame_Local.tcl
+# Units: [kip,in.]
 #
 # $Revision$
 # $Date$
@@ -52,13 +53,21 @@ uniaxialMaterial Elastic 2 5.6
 #uniaxialMaterial Steel02 2 3.0 5.6 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0 
 uniaxialMaterial Elastic 3 [expr 2.0*100.0/1.0]
 
+# Define control points
+# ---------------------
+# expControlPoint $tag <-node $nodeTag> $dof $rspType <-fact $f> <-lim $l $u> ...
+expControlPoint 1  1 disp
+expControlPoint 2  1 disp 1 force
+
 # Define experimental control
 # ---------------------------
 # expControl SimUniaxialMaterials $tag $matTags
 expControl SimUniaxialMaterials 1 1
-#expControl xPCtarget 1 1 "192.168.2.20" 22222 HybridControllerD3D3_1Act "D:/PredictorCorrector/RTActualTestModels/cmAPI-xPCTarget-STS"
-#expControl SCRAMNet 1 381020 8
-#expControl dSpace 1 1 DS1104
+#expControl xPCtarget 1 "192.168.2.20" 22222 "D:/PredictorCorrector/RTActualTestModels/cmAPI-xPCTarget-SCRAMNet-STS/HybridControllerD2D2" -trialCP 1 -outCP 2
+#expControl SCRAMNet 1 381020 8 -trialCP 1 -outCP 2
+#expControl dSpace 1 DS1104 -trialCP 1 -outCP 2
+#expControl MTSCsi 1 "D:/Projects/MTS_CSI/OpenFresco/MtsCsi_Example/OneBayFrame/OpenFresco_mNEES.mtscs" 0.01 -trialCP 1 -outCP 2
+#expControl GenericTCP 1 "127.0.0.1" 44000 -ctrlModes 1 0 0 0 0 -daqModes 1 0 0 1 0
 expControl SimUniaxialMaterials 2 2
 
 # Define experimental setup
@@ -97,13 +106,13 @@ timeSeries Path 1 -filePath elcentro.txt -dt $dt -factor [expr 386.1*$scale]
 # pattern UniformExcitation $tag $dir -accel $tsTag <-vel0 $vel0>
 pattern UniformExcitation 1 1 -accel 1
 
-# calculate the rayleigh damping factors for nodes & elements
+# calculate the Rayleigh damping factors for nodes & elements
 set alphaM     1.010017396536;  # D = alphaM*M
 set betaK      0.0;             # D = betaK*Kcurrent
 set betaKinit  0.0;             # D = beatKinit*Kinit
 set betaKcomm  0.0;             # D = betaKcomm*KlastCommit
 
-# set the rayleigh damping 
+# set the Rayleigh damping 
 rayleigh $alphaM $betaK $betaKinit $betaKcomm
 # ------------------------------
 # End of model generation
@@ -115,23 +124,17 @@ rayleigh $alphaM $betaK $betaKinit $betaKcomm
 # ------------------------------
 # create the system of equations
 system BandGeneral
-
 # create the DOF numberer
 numberer Plain
-
 # create the constraint handler
 constraints Plain
-
 # create the convergence test
 test EnergyIncr 1.0e-6 10
-
 # create the integration scheme
 integrator NewmarkExplicit 0.5
 #integrator AlphaOS 1.0
-
 # create the solution algorithm
 algorithm Linear
-
 # create the analysis object 
 analysis Transient
 # ------------------------------

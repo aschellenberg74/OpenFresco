@@ -1,4 +1,4 @@
-# File: OneBayFrame_Local.tcl
+# File: OneBayFrame_Master.tcl (use with Run_OneBayFrame_Slave_Imp.bat)
 # Units: [kip,in.]
 #
 # $Revision$
@@ -6,14 +6,15 @@
 # $URL$
 #
 # Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
-# Created: 11/06
+# Created: 08/08
 # Revision: A
 #
 # Purpose: this file contains the tcl input to perform
-# a local hybrid simulation of a one bay frame with
-# two experimental twoNodeLink elements.
-# The specimens are simulated using the SimUniaxialMaterials
-# controller.
+# a hybrid simulation of a one bay frame with 
+# two experimental zero length elements.
+# Since the simulation of the column is performed in an
+# other FE-software, the SimFEAdapter experimental control
+# is used to communicate with such software.
 
 
 # ------------------------------
@@ -34,8 +35,8 @@ set mass4 0.02
 # node $tag $xCrd $yCrd $mass
 node  1     0.0   0.00
 node  2   100.0   0.00
-node  3     0.0  54.00  -mass $mass3 $mass3
-node  4   100.0  54.00  -mass $mass4 $mass4
+node  3     0.0  50.00  -mass $mass3 $mass3
+node  4   100.0  50.00  -mass $mass4 $mass4
 
 # set the boundary conditions
 # fix $tag $DX $DY
@@ -49,21 +50,22 @@ fix 4   0  1
 # uniaxialMaterial Steel02 $matTag $Fy $E $b $R0 $cR1 $cR2 $a1 $a2 $a3 $a4 
 #uniaxialMaterial Elastic 1 2.8
 uniaxialMaterial Steel02 1 1.5 2.8 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0
-uniaxialMaterial Elastic 2 5.6
-#uniaxialMaterial Steel02 2 3.0 5.6 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0 
+#uniaxialMaterial Elastic 2 5.6
+uniaxialMaterial Steel02 2 3.0 5.6 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0 
 uniaxialMaterial Elastic 3 [expr 2.0*100.0/1.0]
 
 # Define experimental control
 # ---------------------------
 # expControl SimUniaxialMaterials $tag $matTags
 expControl SimUniaxialMaterials 1 1
-expControl SimUniaxialMaterials 2 2
+# expControl SimFEAdapter $tag ipAddr $ipPort
+expControl SimFEAdapter 2 "127.0.0.1" 44000
 
 # Define experimental setup
 # -------------------------
 # expSetup OneActuator $tag <-control $ctrlTag> $dir -sizeTrialOut $t $o <-trialDispFact $f> ...
-expSetup OneActuator 1 -control 1 1 -sizeTrialOut 1 1
-expSetup OneActuator 2 -control 2 1 -sizeTrialOut 1 1
+expSetup OneActuator 1 -control 1 1 -sizeTrialOut 1 1 -trialDispFact -1 -outDispFact -1 -outForceFact -1
+expSetup OneActuator 2 -control 2 1 -sizeTrialOut 1 1 -trialDispFact -1 -outDispFact -1 -outForceFact -1
 
 # Define experimental site
 # ------------------------
@@ -118,12 +120,14 @@ numberer Plain
 # create the constraint handler
 constraints Plain
 # create the convergence test
-test EnergyIncr 1.0e-6 10
+test NormDispIncr 1.0e-12 10
 # create the integration scheme
+#integrator Newmark 0.5 0.25
 integrator NewmarkExplicit 0.5
 #integrator AlphaOS 1.0
 # create the solution algorithm
 algorithm Linear
+#algorithm Newton
 # create the analysis object 
 analysis Transient
 # ------------------------------
@@ -135,48 +139,13 @@ analysis Transient
 # Start of recorder generation
 # ------------------------------
 # create the recorder objects
-recorder Node -file Node_Dsp.out -time -node 3 4 -dof 1 disp
-recorder Node -file Node_Vel.out -time -node 3 4 -dof 1 vel
-recorder Node -file Node_Acc.out -time -node 3 4 -dof 1 accel
+recorder Node -file Master_Node_Dsp.out -time -node 3 4 -dof 1 disp
+recorder Node -file Master_Node_Vel.out -time -node 3 4 -dof 1 vel
+recorder Node -file Master_Node_Acc.out -time -node 3 4 -dof 1 accel
 
-recorder Element -file Elmt_Frc.out     -time -ele 1 2 3 forces
-recorder Element -file Elmt_ctrlDsp.out -time -ele 1 2   ctrlDisp
-recorder Element -file Elmt_daqDsp.out  -time -ele 1 2   daqDisp
-
-expRecorder Site -file Site_trialDsp.out -time -site 1 2 trialDisp
-expRecorder Site -file Site_trialVel.out -time -site 1 2 trialVel
-expRecorder Site -file Site_trialAcc.out -time -site 1 2 trialAccel
-expRecorder Site -file Site_trialTme.out -time -site 1 2 trialTime
-expRecorder Site -file Site_outDsp.out -time -site 1 2 outDisp
-expRecorder Site -file Site_outVel.out -time -site 1 2 outVel
-expRecorder Site -file Site_outAcc.out -time -site 1 2 outAccel
-expRecorder Site -file Site_outFrc.out -time -site 1 2 outForce
-expRecorder Site -file Site_outTme.out -time -site 1 2 outTime
-
-expRecorder Setup -file Setup_trialDsp.out -time -setup 1 2 trialDisp
-expRecorder Setup -file Setup_trialVel.out -time -setup 1 2 trialVel
-expRecorder Setup -file Setup_trialAcc.out -time -setup 1 2 trialAccel
-expRecorder Setup -file Setup_trialTme.out -time -setup 1 2 trialTime
-expRecorder Setup -file Setup_outDsp.out -time -setup 1 2 outDisp
-expRecorder Setup -file Setup_outVel.out -time -setup 1 2 outVel
-expRecorder Setup -file Setup_outAcc.out -time -setup 1 2 outAccel
-expRecorder Setup -file Setup_outFrc.out -time -setup 1 2 outForce
-expRecorder Setup -file Setup_outTme.out -time -setup 1 2 outTime
-expRecorder Setup -file Setup_ctrlDsp.out -time -setup 1 2 ctrlDisp
-expRecorder Setup -file Setup_ctrlVel.out -time -setup 1 2 ctrlVel
-expRecorder Setup -file Setup_ctrlAcc.out -time -setup 1 2 ctrlAccel
-expRecorder Setup -file Setup_ctrlTme.out -time -setup 1 2 ctrlTime
-expRecorder Setup -file Setup_daqDsp.out -time -setup 1 2 daqDisp
-expRecorder Setup -file Setup_daqVel.out -time -setup 1 2 daqVel
-expRecorder Setup -file Setup_daqAcc.out -time -setup 1 2 daqAccel
-expRecorder Setup -file Setup_daqFrc.out -time -setup 1 2 daqForce
-expRecorder Setup -file Setup_daqTme.out -time -setup 1 2 daqTime
-
-expRecorder Control -file Control_ctrlDsp.out -time -control 1 2 ctrlDisp
-expRecorder Control -file Control_ctrlVel.out -time -control 1 2 ctrlVel
-expRecorder Control -file Control_daqDsp.out -time -control 1 2 daqDisp
-expRecorder Control -file Control_daqVel.out -time -control 1 2 daqVel
-expRecorder Control -file Control_daqFrc.out -time -control 1 2 daqForce
+recorder Element -file Master_Elmt_Frc.out     -time -ele 1 2 3 forces
+recorder Element -file Master_Elmt_ctrlDsp.out -time -ele 1 2   ctrlDisp
+recorder Element -file Master_Elmt_daqDsp.out  -time -ele 1 2   daqDisp
 # --------------------------------
 # End of recorder generation
 # --------------------------------

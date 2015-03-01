@@ -1,0 +1,86 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<Configuration name='' version='1.0'>
+  <ControlPointSet>
+    <ControlPoint name='Control Point #1'>
+      <DegreeOfFreedomSet>
+        <DegreeOfFreedom name='mNEES DOF #1' mts793ControlChannel='Ch 1' mts793ControlMode='Displacement' />
+      </DegreeOfFreedomSet>
+      <FeedbackSignalSet>
+        <FeedbackSignal name='Ch 1 Displacement' mts793Signal='Ch 1 Displacement' />
+        <FeedbackSignal name='Ch 1 Force' mts793Signal='Ch 1 Force' />
+      </FeedbackSignalSet>
+    </ControlPoint>
+  </ControlPointSet>
+  <DimensionUnitSet>
+    <DimensionUnit dimension='Acceleration' unit='in/Sec^2' />
+    <DimensionUnit dimension='Acceleration_Linear' unit='in/Sec^2' />
+    <DimensionUnit dimension='Acceleration_LinearRate' unit='in/Sec^3' />
+    <DimensionUnit dimension='Acceleration_Rotary' unit='deg/Sec^2' />
+    <DimensionUnit dimension='Acceleration_RotaryRate' unit='deg/Sec^3' />
+    <DimensionUnit dimension='AccelerationRate' unit='in/Sec^3' />
+    <DimensionUnit dimension='Angle' unit='deg' />
+    <DimensionUnit dimension='AngleRate' unit='deg/Sec' />
+    <DimensionUnit dimension='Area' unit='in^2' />
+    <DimensionUnit dimension='AreaRate' unit='in^2/Sec' />
+    <DimensionUnit dimension='Compliance' unit='in^2/kip' />
+    <DimensionUnit dimension='CrackGrowthRate' unit='in/cycle' />
+    <DimensionUnit dimension='Damping' unit='kip-Sec/in' />
+    <DimensionUnit dimension='Damping_Angular' unit='in-kip-Sec/deg' />
+    <DimensionUnit dimension='Damping_Linear' unit='kip-Sec/in' />
+    <DimensionUnit dimension='Density' unit='kip/in^3' />
+    <DimensionUnit dimension='ElectricCurrent' unit='A' />
+    <DimensionUnit dimension='ElectricResistance' unit='ohms' />
+    <DimensionUnit dimension='Energy' unit='in-kip' />
+    <DimensionUnit dimension='Energy/Mass' unit='in-kip/lb' />
+    <DimensionUnit dimension='Energy/UnitArea' unit='in-kip/in^2' />
+    <DimensionUnit dimension='Energy/UnitVolume' unit='in-kip/in^3' />
+    <DimensionUnit dimension='EPA' unit='kip-in/Sq.in' />
+    <DimensionUnit dimension='EPV' unit='in-kip/Cu.in' />
+    <DimensionUnit dimension='FiberDimension' unit='lb/in' />
+    <DimensionUnit dimension='FiberStress' unit='lbf/denier' />
+    <DimensionUnit dimension='Force' unit='kip' />
+    <DimensionUnit dimension='ForceRate' unit='kip/Sec' />
+    <DimensionUnit dimension='Frequency' unit='Hz' />
+    <DimensionUnit dimension='FrequencyExponentialRate' unit='decade/Sec' />
+    <DimensionUnit dimension='FrequencyRate' unit='Hz/Sec' />
+    <DimensionUnit dimension='InverseLength' unit='1/in' />
+    <DimensionUnit dimension='InverseStiffness' unit='in/kip' />
+    <DimensionUnit dimension='Length' unit='in' />
+    <DimensionUnit dimension='LengthRate' unit='in/Sec' />
+    <DimensionUnit dimension='MagneticFlux' unit='Wb' />
+    <DimensionUnit dimension='MagneticFluxDensity' unit='Wb/mm^2' />
+    <DimensionUnit dimension='Mass' unit='lb' />
+    <DimensionUnit dimension='Percent' unit='%' />
+    <DimensionUnit dimension='PercentRate' unit='%/Sec' />
+    <DimensionUnit dimension='Power' unit='W' />
+    <DimensionUnit dimension='Pressure' unit='ksi' />
+    <DimensionUnit dimension='PressureRate' unit='ksi/Sec' />
+    <DimensionUnit dimension='Ratio' unit='unity' />
+    <DimensionUnit dimension='RatioRate' unit='unity/Sec' />
+    <DimensionUnit dimension='SegmentCount' unit='segments' />
+    <DimensionUnit dimension='SegmentNumber' unit='segment' />
+    <DimensionUnit dimension='Sensitivity' unit='V/V' />
+    <DimensionUnit dimension='Stiffness' unit='kN/mm' />
+    <DimensionUnit dimension='Stiffness_Angular' unit='in-kip/deg' />
+    <DimensionUnit dimension='Stiffness_Linear' unit='kip/in' />
+    <DimensionUnit dimension='Strain' unit='in/in' />
+    <DimensionUnit dimension='StrainRate' unit='in/in/Sec' />
+    <DimensionUnit dimension='Stress' unit='ksi' />
+    <DimensionUnit dimension='StressIntensity' unit='kip/in^1.5' />
+    <DimensionUnit dimension='StressIntensityRate' unit='kip/in^1.5/Sec' />
+    <DimensionUnit dimension='StressRate' unit='kip/in^2/Sec' />
+    <DimensionUnit dimension='Temp_Tolerance' unit='deg_F' />
+    <DimensionUnit dimension='Temperature' unit='deg_F' />
+    <DimensionUnit dimension='TemperatureRate' unit='deg_F/Sec' />
+    <DimensionUnit dimension='Thermal_Expansion_Strain' unit='(in/in)/deg_F' />
+    <DimensionUnit dimension='Time' unit='Sec' />
+    <DimensionUnit dimension='Torque' unit='in-kip' />
+    <DimensionUnit dimension='TorqueRate' unit='in-kip/Sec' />
+    <DimensionUnit dimension='Unitless' unit='unitless' />
+    <DimensionUnit dimension='Velocity' unit='in/Sec' />
+    <DimensionUnit dimension='Volts' unit='V' />
+    <DimensionUnit dimension='VoltsRate' unit='V/Sec' />
+    <DimensionUnit dimension='Volume' unit='Cu.in' />
+    <DimensionUnit dimension='VolumeRate' unit='in^3/Sec' />
+  </DimensionUnitSet>
+</Configuration>

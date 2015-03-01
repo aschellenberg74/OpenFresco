@@ -1,5 +1,6 @@
 # File: OneBayFrame_Client1.tcl
 # (use with OneBayFrame_Server1a.tcl & OneBayFrame_Server1b.tcl)
+# Units: [kip,in.]
 #
 # $Revision$
 # $Date$
@@ -48,11 +49,16 @@ fix 4   0  1
 # ----------------
 uniaxialMaterial Elastic 3 [expr 2.0*100.0/1.0]
 
+# Define experimental setup
+# -------------------------
+# expSetup OneActuator $tag <-control $ctrlTag> $dir -sizeTrialOut $t $o <-trialDispFact $f> ...
+expSetup OneActuator 2 1 -sizeTrialOut 1 1
+
 # Define experimental site
 # ------------------------
 # expSite ShadowSite $tag <-setup $setupTag> $ipAddr $ipPort <-ssl> <-udp> <-dataSize $size>
 expSite ShadowSite 1 "127.0.0.1" 8090
-expSite ShadowSite 2 "127.0.0.1" 8091
+expSite ShadowSite 2 -setup 2 "127.0.0.1" 8091
 
 # Define experimental elements
 # ----------------------------
@@ -78,13 +84,13 @@ timeSeries Path 1 -filePath elcentro.txt -dt $dt -factor [expr 386.1*$scale]
 # pattern UniformExcitation $tag $dir -accel $tsTag <-vel0 $vel0>
 pattern UniformExcitation 1 1 -accel 1
 
-# calculate the rayleigh damping factors for nodes & elements
+# calculate the Rayleigh damping factors for nodes & elements
 set alphaM     1.010017396536;  # D = alphaM*M
 set betaK      0.0;             # D = betaK*Kcurrent
 set betaKinit  0.0;             # D = beatKinit*Kinit
 set betaKcomm  0.0;             # D = betaKcomm*KlastCommit
 
-# set the rayleigh damping 
+# set the Rayleigh damping 
 rayleigh $alphaM $betaK $betaKinit $betaKcomm
 # ------------------------------
 # End of model generation
@@ -96,23 +102,17 @@ rayleigh $alphaM $betaK $betaKinit $betaKcomm
 # ------------------------------
 # create the system of equations
 system BandGeneral
-
 # create the DOF numberer
 numberer Plain
-
 # create the constraint handler
 constraints Plain
-
 # create the convergence test
 test EnergyIncr 1.0e-6 10
-
 # create the integration scheme
 integrator NewmarkExplicit 0.5
 #integrator AlphaOS 1.0
-
 # create the solution algorithm
 algorithm Linear
-
 # create the analysis object 
 analysis Transient
 # ------------------------------
@@ -141,6 +141,25 @@ expRecorder Site -file ClientSite_outVel.out -time -site 1 2 outVel
 expRecorder Site -file ClientSite_outAcc.out -time -site 1 2 outAccel
 expRecorder Site -file ClientSite_outFrc.out -time -site 1 2 outForce
 expRecorder Site -file ClientSite_outTme.out -time -site 1 2 outTime
+
+expRecorder Setup -file ClientSetup_trialDsp.out -time -setup 2 trialDisp
+expRecorder Setup -file ClientSetup_trialVel.out -time -setup 2 trialVel
+expRecorder Setup -file ClientSetup_trialAcc.out -time -setup 2 trialAccel
+expRecorder Setup -file ClientSetup_trialTme.out -time -setup 2 trialTime
+expRecorder Setup -file ClientSetup_outDsp.out -time -setup 2 outDisp
+expRecorder Setup -file ClientSetup_outVel.out -time -setup 2 outVel
+expRecorder Setup -file ClientSetup_outAcc.out -time -setup 2 outAccel
+expRecorder Setup -file ClientSetup_outFrc.out -time -setup 2 outForce
+expRecorder Setup -file ClientSetup_outTme.out -time -setup 2 outTime
+expRecorder Setup -file ClientSetup_ctrlDsp.out -time -setup 2 ctrlDisp
+expRecorder Setup -file ClientSetup_ctrlVel.out -time -setup 2 ctrlVel
+expRecorder Setup -file ClientSetup_ctrlAcc.out -time -setup 2 ctrlAccel
+expRecorder Setup -file ClientSetup_ctrlTme.out -time -setup 2 ctrlTime
+expRecorder Setup -file ClientSetup_daqDsp.out -time -setup 2 daqDisp
+expRecorder Setup -file ClientSetup_daqVel.out -time -setup 2 daqVel
+expRecorder Setup -file ClientSetup_daqAcc.out -time -setup 2 daqAccel
+expRecorder Setup -file ClientSetup_daqFrc.out -time -setup 2 daqForce
+expRecorder Setup -file ClientSetup_daqTme.out -time -setup 2 daqTime
 # --------------------------------
 # End of recorder generation
 # --------------------------------

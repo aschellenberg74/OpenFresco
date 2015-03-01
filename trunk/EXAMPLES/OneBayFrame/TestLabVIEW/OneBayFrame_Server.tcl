@@ -1,4 +1,5 @@
 # File: OneBayFrame_Server.tcl (use with OneBayFrame_Client.tcl)
+# Units: [kip,in.]
 #
 # $Revision$
 # $Date$
