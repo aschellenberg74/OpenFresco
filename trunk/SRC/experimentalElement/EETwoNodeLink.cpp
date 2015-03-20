@@ -74,10 +74,8 @@ EETwoNodeLink::EETwoNodeLink(int tag, int dim, int Nd1, int Nd2,
     dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
     dbCtrl(direction.Size()), vbCtrl(direction.Size()),
     abCtrl(direction.Size()), dl(0), Tgl(0,0), Tlb(0,0),
-    dbLast(direction.Size()), tLast(0.0),
-    kbInit(direction.Size(), direction.Size()),
-    theMatrix(0), theVector(0), theLoad(0),
-    firstWarning(true)
+    kbInit(direction.Size(), direction.Size()), tLast(0.0),
+    theMatrix(0), theVector(0), theLoad(0), firstWarning(true)
 {
     // ensure the connectedExternalNode ID is of correct size & set values
     if (connectedExternalNodes.Size() != 2)  {
@@ -192,7 +190,6 @@ EETwoNodeLink::EETwoNodeLink(int tag, int dim, int Nd1, int Nd2,
     dbCtrl.Zero();
     vbCtrl.Zero();
     abCtrl.Zero();
-    dbLast.Zero();
 }
 
 
@@ -213,10 +210,8 @@ EETwoNodeLink::EETwoNodeLink(int tag, int dim, int Nd1, int Nd2,
     dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
     dbCtrl(direction.Size()), vbCtrl(direction.Size()),
     abCtrl(direction.Size()), dl(0), Tgl(0,0), Tlb(0,0),
-    dbLast(direction.Size()), tLast(0.0),
-    kbInit(direction.Size(), direction.Size()),
-    theMatrix(0), theVector(0), theLoad(0),
-    firstWarning(true)
+    kbInit(direction.Size(), direction.Size()), tLast(0.0),
+    theMatrix(0), theVector(0), theLoad(0), firstWarning(true)
 {
     // ensure the connectedExternalNode ID is of correct size & set values
     if (connectedExternalNodes.Size() != 2)  {
@@ -383,7 +378,6 @@ EETwoNodeLink::EETwoNodeLink(int tag, int dim, int Nd1, int Nd2,
     dbCtrl.Zero();
     vbCtrl.Zero();
     abCtrl.Zero();
-    dbLast.Zero();
 }
 
 
@@ -613,35 +607,38 @@ int EETwoNodeLink::update()
     (*t)(0) = theDomain->getCurrentTime();
     
     // get global trial response
-    const Vector &dsp1 = theNodes[0]->getTrialDisp();
-    const Vector &dsp2 = theNodes[1]->getTrialDisp();
-    const Vector &vel1 = theNodes[0]->getTrialVel();
-    const Vector &vel2 = theNodes[1]->getTrialVel();
-    const Vector &acc1 = theNodes[0]->getTrialAccel();
-    const Vector &acc2 = theNodes[1]->getTrialAccel();
-    
-    int numDOF2 = numDOF/2;
-    Vector dg(numDOF), vg(numDOF), ag(numDOF), vl(numDOF), al(numDOF);
-    for (int i=0; i<numDOF2; i++)  {
-        dg(i)         = dsp1(i);  vg(i)         = vel1(i);  ag(i)         = acc1(i);
-        dg(i+numDOF2) = dsp2(i);  vg(i+numDOF2) = vel2(i);  ag(i+numDOF2) = acc2(i);
+    int ndim = 0, i;
+    Vector dg(numDOF), vg(numDOF), ag(numDOF), dgDelta(numDOF);
+    for (i=0; i<2; i++)  {
+        Vector disp = theNodes[i]->getTrialDisp();
+        Vector vel = theNodes[i]->getTrialVel();
+        Vector accel = theNodes[i]->getTrialAccel();
+        Vector dispIncr = theNodes[i]->getIncrDeltaDisp();
+        dg.Assemble(disp, ndim);
+        vg.Assemble(vel, ndim);
+        ag.Assemble(accel, ndim);
+        dgDelta.Assemble(dispIncr, ndim);
+        ndim += numDOF/2;
     }
     
     // transform response from the global to the local system
+    Vector vl(numDOF), al(numDOF), dlDelta(numDOF);
     dl.addMatrixVector(0.0, Tgl, dg, 1.0);
     vl.addMatrixVector(0.0, Tgl, vg, 1.0);
     al.addMatrixVector(0.0, Tgl, ag, 1.0);
+    dlDelta.addMatrixVector(0.0, Tgl, dgDelta, 1.0);
     
     // transform response from the local to the basic system
+    Vector dbDelta(numDir);
     db->addMatrixVector(0.0, Tlb, dl, 1.0);
     vb->addMatrixVector(0.0, Tlb, vl, 1.0);
     ab->addMatrixVector(0.0, Tlb, al, 1.0);
+    dbDelta.addMatrixVector(0.0, Tlb, dlDelta, 1.0);
     
-    Vector dbDelta = (*db) - dbLast;
     // do not check time for right now because of transformation constraint
     // handler calling update at beginning of new step when applying load
-    // if (dbDelta.pNorm(2) > DBL_EPSILON || (*t)(0) > tLast)  {
-    if (dbDelta.pNorm(2) > DBL_EPSILON)  {
+    // if (dbDelta.pNorm(0) > DBL_EPSILON || (*t)(0) > tLast)  {
+    if (dbDelta.pNorm(0) > DBL_EPSILON)  {
         // set the trial response at the site
         if (theSite != 0)  {
             theSite->setTrialResponse(db, vb, ab, (Vector*)0, t);
@@ -652,8 +649,7 @@ int EETwoNodeLink::update()
         }
     }
     
-    // save the last displacements and time
-    dbLast = (*db);
+    // save the last time
     tLast = (*t)(0);
     
     return rValue;

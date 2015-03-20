@@ -61,8 +61,7 @@ Vector EETruss::EETrussV12(12);
 // responsible for allocating the necessary space needed
 // by each object and storing the tags of the end nodes.
 EETruss::EETruss(int tag, int dim, int Nd1, int Nd2, 
-    ExperimentalSite *site,
-    bool iM, int addRay, double r)
+    ExperimentalSite *site, bool iM, int addRay, double r)
     : ExperimentalElement(tag, ELE_TAG_EETruss, site),
     numDIM(dim), numDOF(0), connectedExternalNodes(2),
     iMod(iM), addRayleigh(addRay), rho(r), L(0.0), 
@@ -70,7 +69,7 @@ EETruss::EETruss(int tag, int dim, int Nd1, int Nd2,
     db(0), vb(0), ab(0), t(0),
     dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
     dbCtrl(1), vbCtrl(1), abCtrl(1),
-    dbLast(1), tLast(0.0), kbInit(1,1)
+    kbInit(1,1), tLast(0.0)
 {
     // ensure the connectedExternalNode ID is of correct size & set values
     if (connectedExternalNodes.Size() != 2)  {
@@ -125,7 +124,6 @@ EETruss::EETruss(int tag, int dim, int Nd1, int Nd2,
     dbCtrl.Zero();
     vbCtrl.Zero();
     abCtrl.Zero();
-    dbLast.Zero();
 }
 
 
@@ -142,7 +140,7 @@ EETruss::EETruss(int tag, int dim, int Nd1, int Nd2,
     db(0), vb(0), ab(0), t(0),
     dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
     dbCtrl(1), vbCtrl(1), abCtrl(1),
-    dbLast(1), tLast(0.0), kbInit(1,1)
+    kbInit(1,1), tLast(0.0)
 {
     // ensure the connectedExternalNode ID is of correct size & set values
     if (connectedExternalNodes.Size() != 2)  {
@@ -249,7 +247,6 @@ EETruss::EETruss(int tag, int dim, int Nd1, int Nd2,
     dbCtrl.Zero();
     vbCtrl.Zero();
     abCtrl.Zero();
-    dbLast.Zero();
 }
 
 
@@ -484,25 +481,28 @@ int EETruss::update()
     (*t)(0) = theDomain->getCurrentTime();
     
     // determine dsp, vel and acc in basic system
-    const Vector &dsp1 = theNodes[0]->getTrialDisp();
-    const Vector &dsp2 = theNodes[1]->getTrialDisp();
+    const Vector &disp1 = theNodes[0]->getTrialDisp();
+    const Vector &disp2 = theNodes[1]->getTrialDisp();
     const Vector &vel1 = theNodes[0]->getTrialVel();
     const Vector &vel2 = theNodes[1]->getTrialVel();
-    const Vector &acc1 = theNodes[0]->getTrialAccel();
-    const Vector &acc2 = theNodes[1]->getTrialAccel();
+    const Vector &accel1 = theNodes[0]->getTrialAccel();
+    const Vector &accel2 = theNodes[1]->getTrialAccel();
+    const Vector &dispIncr1 = theNodes[0]->getIncrDeltaDisp();
+    const Vector &dispIncr2 = theNodes[1]->getIncrDeltaDisp();
     
     (*db)(0) = (*vb)(0) = (*ab)(0) = 0.0;
+    double dbDelta = 0.0;
     for (int i=0; i<numDIM; i++)  {
-        (*db)(0) += (dsp2(i)-dsp1(i))*cosX[i];
+        (*db)(0) += (disp2(i)-disp1(i))*cosX[i];
         (*vb)(0) += (vel2(i)-vel1(i))*cosX[i];
-        (*ab)(0) += (acc2(i)-acc1(i))*cosX[i];
+        (*ab)(0) += (accel2(i)-accel1(i))*cosX[i];
+        dbDelta  += (dispIncr2(i)-dispIncr1(i))*cosX[i];
     }
     
-    Vector dbDelta = (*db) - dbLast;
     // do not check time for right now because of transformation constraint
     // handler calling update at beginning of new step when applying load
-    // if (dbDelta.pNorm(2) > DBL_EPSILON || (*t)(0) > tLast)  {
-    if (dbDelta.pNorm(2) > DBL_EPSILON)  {
+    // if (fabs(dbDelta) > DBL_EPSILON || (*t)(0) > tLast)  {
+    if (fabs(dbDelta) > DBL_EPSILON)  {
         // set the trial response at the site
         if (theSite != 0)  {
             theSite->setTrialResponse(db, vb, ab, (Vector*)0, t);
@@ -513,8 +513,7 @@ int EETruss::update()
         }
     }
     
-    // save the last displacements and time
-    dbLast = (*db);
+    // save the last time
     tLast = (*t)(0);
     
     return rValue;

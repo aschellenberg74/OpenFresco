@@ -66,7 +66,7 @@ EEBearing3d::EEBearing3d(int tag, int Nd1, int Nd2,
     db(0), vb(0), ab(0), qb(0), t(0),
     dbDaq(0), vbDaq(0), abDaq(0), qbDaq(0), tDaq(0),
     dbCtrl(6), vbCtrl(6), abCtrl(6),
-    dl(12), Tgl(12,12), Tlb(6,12), dbLast(6), tLast(0.0), kbInit(6,6),
+    dl(12), Tgl(12,12), Tlb(6,12), kbInit(6,6), tLast(0.0),
     theLoad(12), firstWarning(true), onP0(true)
 {
     // ensure the connectedExternalNode ID is of correct size & set values
@@ -158,7 +158,6 @@ EEBearing3d::EEBearing3d(int tag, int Nd1, int Nd2,
     dbCtrl.Zero();
     vbCtrl.Zero();
     abCtrl.Zero();
-    dbLast.Zero();
 }
 
 
@@ -176,7 +175,7 @@ EEBearing3d::EEBearing3d(int tag, int Nd1, int Nd2,
     db(0), vb(0), ab(0), qb(0), t(0),
     dbDaq(0), vbDaq(0), abDaq(0), qbDaq(0), tDaq(0),
     dbCtrl(6), vbCtrl(6), abCtrl(6),
-    dl(12), Tgl(12,12), Tlb(6,12), dbLast(6), tLast(0.0), kbInit(6,6),
+    dl(12), Tgl(12,12), Tlb(6,12), kbInit(6,6), tLast(0.0),
     theLoad(12), firstWarning(true), onP0(true)
 {
     // ensure the connectedExternalNode ID is of correct size & set values
@@ -321,7 +320,6 @@ EEBearing3d::EEBearing3d(int tag, int Nd1, int Nd2,
     dbCtrl.Zero();
     vbCtrl.Zero();
     abCtrl.Zero();
-    dbLast.Zero();
 }
 
 
@@ -494,28 +492,33 @@ int EEBearing3d::update()
     (*t)(0) = theDomain->getCurrentTime();
     
     // get global trial response
-    const Vector &dsp1 = theNodes[0]->getTrialDisp();
-    const Vector &dsp2 = theNodes[1]->getTrialDisp();
-    const Vector &vel1 = theNodes[0]->getTrialVel();
-    const Vector &vel2 = theNodes[1]->getTrialVel();
-    const Vector &acc1 = theNodes[0]->getTrialAccel();
-    const Vector &acc2 = theNodes[1]->getTrialAccel();
-    
-    static Vector dg(12), vg(12), ag(12), vl(12), al(12);
-    for (int i=0; i<6; i++)  {
-        dg(i)   = dsp1(i);  vg(i)   = vel1(i);  ag(i)   = acc1(i);
-        dg(i+6) = dsp2(i);  vg(i+6) = vel2(i);  ag(i+6) = acc2(i);
+    int ndim = 0, i;
+    Vector dg(12), vg(12), ag(12), dgDelta(12);
+    for (i=0; i<2; i++)  {
+        Vector disp = theNodes[i]->getTrialDisp();
+        Vector vel = theNodes[i]->getTrialVel();
+        Vector accel = theNodes[i]->getTrialAccel();
+        Vector dispIncr = theNodes[i]->getIncrDeltaDisp();
+        dg.Assemble(disp, ndim);
+        vg.Assemble(vel, ndim);
+        ag.Assemble(accel, ndim);
+        dgDelta.Assemble(dispIncr, ndim);
+        ndim += 6;
     }
     
     // transform response from the global to the local system
+    Vector vl(12), al(12), dlDelta(12);
     dl.addMatrixVector(0.0, Tgl, dg, 1.0);
     vl.addMatrixVector(0.0, Tgl, vg, 1.0);
     al.addMatrixVector(0.0, Tgl, ag, 1.0);
+    dlDelta.addMatrixVector(0.0, Tgl, dgDelta, 1.0);
     
     // transform response from the local to the basic system
+    Vector dbDelta(6);
     db->addMatrixVector(0.0, Tlb, dl, 1.0);
     vb->addMatrixVector(0.0, Tlb, vl, 1.0);
     ab->addMatrixVector(0.0, Tlb, al, 1.0);
+    dbDelta.addMatrixVector(0.0, Tlb, dlDelta, 1.0);
     
     // 1) set axial deformations in basic x-direction
     theMaterials[0]->setTrialStrain((*db)(0), (*vb)(0));
@@ -523,11 +526,10 @@ int EEBearing3d::update()
         (*qb)(0) = theMaterials[0]->getStress();
     
     // 2) set shear deformations in basic y- and z-direction
-    Vector dbDelta = (*db) - dbLast;
     // do not check time for right now because of transformation constraint
     // handler calling update at beginning of new step when applying load
-    // if (dbDelta.pNorm(2) > DBL_EPSILON || (*t)(0) > tLast)  {
-    if (dbDelta.pNorm(2) > DBL_EPSILON)  {
+    // if (dbDelta.pNorm(0) > DBL_EPSILON || (*t)(0) > tLast)  {
+    if (dbDelta.pNorm(0) > DBL_EPSILON)  {
         // set the trial response at the site
         if (theSite != 0)  {
             theSite->setTrialResponse(db, vb, ab, qb, t);
@@ -547,8 +549,7 @@ int EEBearing3d::update()
     // 5) set rotations about basic z-direction
     theMaterials[3]->setTrialStrain((*db)(5), (*vb)(5));
     
-    // save the last displacements and time
-    dbLast = (*db);
+    // save the last time
     tLast = (*t)(0);
     
     return rValue;

@@ -147,9 +147,8 @@ private:
     Vector vbCtrl;      // ctrl velocities in basic system
     Vector abCtrl;      // ctrl accelerations in basic system
     
-    Vector dbLast;      // displacements in basic system at last update
-    double tLast;       // time at last update
     Matrix kbInit;      // stiffness matrix in basic system
+    double tLast;       // time at last update
     
     Node *theNodes[2];  // array of node pointers
     

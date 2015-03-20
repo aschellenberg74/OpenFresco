@@ -61,7 +61,7 @@ EEGeneric::EEGeneric(int tag, ID nodes, ID *dof,
     db(0), vb(0), ab(0), t(0),
     dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
     dbCtrl(1), vbCtrl(1), abCtrl(1),
-    dbLast(1), tLast(0.0), kbInit(1,1)
+    kbInit(1,1), tLast(0.0) 
 {
     // initialize nodes
     numExternalNodes = connectedExternalNodes.Size();
@@ -133,8 +133,6 @@ EEGeneric::EEGeneric(int tag, ID nodes, ID *dof,
     vbCtrl.Zero();
     abCtrl.resize(numBasicDOF);
     abCtrl.Zero();
-    dbLast.resize(numBasicDOF);
-    dbLast.Zero();
     kbInit.resize(numBasicDOF,numBasicDOF);
     kbInit.Zero();
 }
@@ -156,7 +154,7 @@ EEGeneric::EEGeneric(int tag, ID nodes, ID *dof,
     db(0), vb(0), ab(0), t(0),
     dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
     dbCtrl(1), vbCtrl(1), abCtrl(1),
-    dbLast(1), tLast(0.0), kbInit(1,1)
+    kbInit(1,1), tLast(0.0)
 {
     // initialize nodes
     numExternalNodes = connectedExternalNodes.Size();
@@ -279,8 +277,6 @@ EEGeneric::EEGeneric(int tag, ID nodes, ID *dof,
     vbCtrl.Zero();
     abCtrl.resize(numBasicDOF);
     abCtrl.Zero();
-    dbLast.resize(numBasicDOF);
-    dbLast.Zero();
     kbInit.resize(numBasicDOF,numBasicDOF);
     kbInit.Zero();
 }
@@ -453,22 +449,23 @@ int EEGeneric::update()
     // assemble response vectors
     int ndim = 0, i;
     db->Zero(); vb->Zero(); ab->Zero();
-    
+    Vector dbDelta(numBasicDOF);
     for (i=0; i<numExternalNodes; i++)  {
         Vector disp = theNodes[i]->getTrialDisp();
         Vector vel = theNodes[i]->getTrialVel();
         Vector accel = theNodes[i]->getTrialAccel();
+        Vector dispIncr = theNodes[i]->getIncrDeltaDisp();
         db->Assemble(disp(theDOF[i]), ndim);
         vb->Assemble(vel(theDOF[i]), ndim);
         ab->Assemble(accel(theDOF[i]), ndim);
+        dbDelta.Assemble(dispIncr(theDOF[i]), ndim);
         ndim += theDOF[i].Size();
     }
     
-    Vector dbDelta = (*db) - dbLast;
     // do not check time for right now because of transformation constraint
     // handler calling update at beginning of new step when applying load
-    // if (dbDelta.pNorm(2) > DBL_EPSILON || (*t)(0) > tLast)  {
-    if (dbDelta.pNorm(2) > DBL_EPSILON  ||  (checkTime && (*t)(0) > tLast))  {
+    // if (dbDelta.pNorm(0) > DBL_EPSILON || (*t)(0) > tLast)  {
+    if (dbDelta.pNorm(0) > DBL_EPSILON || (checkTime && (*t)(0) > tLast))  {
         // set the trial response at the site
         if (theSite != 0)  {
             theSite->setTrialResponse(db, vb, ab, (Vector*)0, t);
@@ -479,8 +476,7 @@ int EEGeneric::update()
         }
     }
     
-    // save the last displacements and time
-    dbLast = (*db);
+    // save the last time
     tLast = (*t)(0);
     
     return rValue;
