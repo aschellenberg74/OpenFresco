@@ -63,7 +63,7 @@ EEInvertedVBrace2d::EEInvertedVBrace2d(int tag, int Nd1, int Nd2, int Nd3,
     db(0), vb(0), ab(0), t(0),
     dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
     dbCtrl(3), vbCtrl(3), abCtrl(3),
-    dbLast(3), tLast(0.0), kbInit(3,3), T(3,9)
+    T(3,9), kbInit(3,3), tLast(0.0)
 {
     // ensure the connectedExternalNode ID is of correct size & set values
     if (connectedExternalNodes.Size() != 3)  {
@@ -117,7 +117,6 @@ EEInvertedVBrace2d::EEInvertedVBrace2d(int tag, int Nd1, int Nd2, int Nd3,
     dbCtrl.Zero();
     vbCtrl.Zero();
     abCtrl.Zero();
-    dbLast.Zero();
 }
 
 
@@ -133,7 +132,7 @@ EEInvertedVBrace2d::EEInvertedVBrace2d(int tag, int Nd1, int Nd2, int Nd3,
     db(0), vb(0), ab(0), t(0),
     dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
     dbCtrl(3), vbCtrl(3), abCtrl(3),
-    dbLast(3), tLast(0.0), kbInit(3,3), T(3,9)
+    T(3,9), kbInit(3,3), tLast(0.0)
 {
     // ensure the connectedExternalNode ID is of correct size & set values
     if (connectedExternalNodes.Size() != 3)  {
@@ -239,7 +238,6 @@ EEInvertedVBrace2d::EEInvertedVBrace2d(int tag, int Nd1, int Nd2, int Nd3,
     dbCtrl.Zero();
     vbCtrl.Zero();
     abCtrl.Zero();
-    dbLast.Zero();
 }
 
 
@@ -444,36 +442,32 @@ int EEInvertedVBrace2d::update()
     
     // linear geometry
     if (nlGeom == false)  {
-        // determine global displacements
-        const Vector &dsp1 = theNodes[0]->getTrialDisp();
-        const Vector &dsp2 = theNodes[1]->getTrialDisp();
-        const Vector &dsp3 = theNodes[2]->getTrialDisp();
-        
-        const Vector &vel1 = theNodes[0]->getTrialVel();
-        const Vector &vel2 = theNodes[1]->getTrialVel();
-        const Vector &vel3 = theNodes[2]->getTrialVel();
-        
-        const Vector &acc1 = theNodes[0]->getTrialAccel();
-        const Vector &acc2 = theNodes[1]->getTrialAccel();
-        const Vector &acc3 = theNodes[2]->getTrialAccel();
-        
-        static Vector dg(9), vg(9), ag(9);
-        for (int i=0; i<3; i++)  {
-            dg(i)   = dsp1(i);  vg(i)   = vel1(i);  ag(i)   = acc1(i);
-            dg(i+3) = dsp2(i);  vg(i+3) = vel2(i);  ag(i+3) = acc2(i);
-            dg(i+6) = dsp3(i);  vg(i+6) = vel3(i);  ag(i+6) = acc3(i);
+        // get global trial response
+        int ndim = 0, i;
+        Vector dg(9), vg(9), ag(9), dgDelta(9);
+        for (i=0; i<3; i++)  {
+            Vector disp = theNodes[i]->getTrialDisp();
+            Vector vel = theNodes[i]->getTrialVel();
+            Vector accel = theNodes[i]->getTrialAccel();
+            Vector dispIncr = theNodes[i]->getIncrDeltaDisp();
+            dg.Assemble(disp, ndim);
+            vg.Assemble(vel, ndim);
+            ag.Assemble(accel, ndim);
+            dgDelta.Assemble(dispIncr, ndim);
+            ndim += 3;
         }
         
         // transform displacements from the global to the basic system
+        Vector dbDelta(3);
         db->addMatrixVector(0.0, T, dg, 1.0);
         vb->addMatrixVector(0.0, T, vg, 1.0);
         ab->addMatrixVector(0.0, T, ag, 1.0);
+        dbDelta.addMatrixVector(0.0, T, dgDelta, 1.0);
         
-        Vector dbDelta = (*db) - dbLast;
         // do not check time for right now because of transformation constraint
         // handler calling update at beginning of new step when applying load
-        // if (dbDelta.pNorm(2) > DBL_EPSILON || (*t)(0) > tLast)  {
-        if (dbDelta.pNorm(2) > DBL_EPSILON)  {
+        // if (dbDelta.pNorm(0) > DBL_EPSILON || (*t)(0) > tLast)  {
+        if (dbDelta.pNorm(0) > DBL_EPSILON)  {
             // set the trial response at the site
             if (theSite != 0)  {
                 theSite->setTrialResponse(db, vb, ab, (Vector*)0, t);
@@ -487,10 +481,13 @@ int EEInvertedVBrace2d::update()
     // nonlinear geometry
     } else  {
         // not implemented yet
+        opserr << "EEInvertedVBrace2d::update() - " 
+            << "nonlinear geometry not implemented yet for element: "
+            << this->getTag() << endln;
+        return -1;
     }
     
-    // save the last displacements and time
-    dbLast = (*db);
+    // save the last time
     tLast = (*t)(0);
     
     return rValue;

@@ -144,9 +144,8 @@ private:
     Vector vbCtrl;      // ctrl velocities in basic system B
     Vector abCtrl;      // ctrl accelerations in basic system B
     
-    Vector dbLast;      // displacements in basic system B at last update
-    double tLast;       // time at last update
     Matrix kbInit;      // stiffness matrix in basic system B
+    double tLast;       // time at last update
     double qA0[6];      // fixed end forces in basic system A
     double pA0[6];      // reactions in basic system A
     
