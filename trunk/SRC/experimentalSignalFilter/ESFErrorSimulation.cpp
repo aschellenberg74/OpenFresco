@@ -53,3 +53,26 @@ ESFErrorSimulation::~ESFErrorSimulation()
 {
     // does nothing
 }
+
+
+Vector& ESFErrorSimulation::converting(Vector* td)
+{
+    opserr << "\nWARNING ESFErrorSimulation::converting(Vector* td) - " << endln
+    << "No conversion performed. The input vector is returned instead." << endln;
+    return *td;
+}
+
+
+Vector& ESFErrorSimulation::converting(Vector* td, Vector* tf)
+{
+    opserr << "\nWARNING ESFErrorSimulation::converting(Vector* td, const Vector* tf) - " << endln
+    << "No conversion performed. The input vector is returned instead." << endln;
+    return *tf;
+}
+
+
+int ESFErrorSimulation::setSize(const int sz)
+{
+    // does nothing
+    return OF_ReturnType_completed;
+}

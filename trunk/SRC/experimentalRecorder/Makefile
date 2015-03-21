@@ -1,9 +1,10 @@
 include ../../Makefile.def
 
-OBJS  = ExpSiteRecorder.o \
-        ExpSetupRecorder.o \
-        ExpControlRecorder.o \
-        ExpSignalFilterRecorder.o
+OBJS = ExpSiteRecorder.o \
+       ExpSetupRecorder.o \
+       ExpControlRecorder.o\
+       ExpSignalFilterRecorder.o \
+       ExpTangentStiffRecorder.o
 
 all:         $(OBJS)
 	@$(CD) response; $(MAKE);
