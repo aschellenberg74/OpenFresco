@@ -52,6 +52,9 @@ public:
     const char *getClassType() const {return "ESFErrorSimulation";};
     
     virtual double filtering(double data) = 0;
+    virtual Vector& converting(Vector* td);
+    virtual Vector& converting(Vector* td, Vector* tf);
+    virtual int setSize(const int sz);
     virtual void update() = 0;
     
     virtual ExperimentalSignalFilter *getCopy() = 0;

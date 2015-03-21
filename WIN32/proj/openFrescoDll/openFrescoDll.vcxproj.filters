@@ -42,6 +42,9 @@
     <Filter Include="openseesExtra">
       <UniqueIdentifier>{99ed70cf-1522-450c-ac56-6ca0e4be9107}</UniqueIdentifier>
     </Filter>
+    <Filter Include="experimentalTangentStiff">
+      <UniqueIdentifier>{c82a4c48-0b05-409a-ad9f-92aecbf3a25b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\SRC\utility\ExpControlSP.cpp">
@@ -577,6 +580,33 @@
     </ClCompile>
     <ClCompile Include="..\..\..\SRC\tcl\TclSimAppSiteServerCommands.cpp">
       <Filter>tcl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalRecorder\response\ExpTangentStiffResponse.cpp">
+      <Filter>experimentalRecorder\response</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalRecorder\ExpTangentStiffRecorder.cpp">
+      <Filter>experimentalRecorder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalSignalFilter\ESFKrylovForceConverter.cpp">
+      <Filter>experimentalSignalFilter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalSignalFilter\ESFTangForceConverter.cpp">
+      <Filter>experimentalSignalFilter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalTangentStiff\ETBfgs.cpp">
+      <Filter>experimentalTangentStiff</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalTangentStiff\ETBroyden.cpp">
+      <Filter>experimentalTangentStiff</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalTangentStiff\ETTranspose.cpp">
+      <Filter>experimentalTangentStiff</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalTangentStiff\ExperimentalTangentStiff.cpp">
+      <Filter>experimentalTangentStiff</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalTangentStiff\TclExpTangentStiffCommand.cpp">
+      <Filter>experimentalTangentStiff</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1137,6 +1167,30 @@
     </ClInclude>
     <ClInclude Include="..\..\..\SRC\experimentalElement\EEBearing3d.h">
       <Filter>experimentalElement</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalRecorder\response\ExpTangentStiffResponse.h">
+      <Filter>experimentalRecorder\response</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalRecorder\ExpTangentStiffRecorder.h">
+      <Filter>experimentalRecorder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalSignalFilter\ESFKrylovForceConverter.h">
+      <Filter>experimentalSignalFilter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalSignalFilter\ESFTangForceConverter.h">
+      <Filter>experimentalSignalFilter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalTangentStiff\ETBfgs.h">
+      <Filter>experimentalTangentStiff</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalTangentStiff\ETBroyden.h">
+      <Filter>experimentalTangentStiff</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalTangentStiff\ETTranspose.h">
+      <Filter>experimentalTangentStiff</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalTangentStiff\ExperimentalTangentStiff.h">
+      <Filter>experimentalTangentStiff</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

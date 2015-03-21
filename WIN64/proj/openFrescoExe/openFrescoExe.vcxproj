@@ -112,7 +112,7 @@
     <ClCompile>
       <AdditionalOptions>/D "_CRT_SECURE_NO_DEPRECATE" %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\src;..\..\..\src\experimentalControl;..\..\..\src\experimentalControl\dSpace;..\..\..\src\experimentalControl\MTSCsi;..\..\..\src\experimentalControl\NIEseries;..\..\..\src\experimentalControl\SCRAMNet;..\..\..\src\experimentalControl\SCRAMNetGT;..\..\..\src\experimentalControl\xPCtarget;..\..\..\src\experimentalElement;..\..\..\src\experimentalRecorder;..\..\..\src\experimentalRecorder\response;..\..\..\src\experimentalSetup;..\..\..\src\experimentalSignalFilter;..\..\..\src\experimentalSite;..\..\..\src\openseesCore;..\..\..\src\openseesExtra;..\..\..\src\tcl;..\..\..\src\utility;C:\Program Files\Tcl64;C:\Program Files\Tcl64\include;C:\Program Files\OpenSSL64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\src;..\..\..\src\experimentalControl;..\..\..\src\experimentalControl\dSpace;..\..\..\src\experimentalControl\MTSCsi;..\..\..\src\experimentalControl\NIEseries;..\..\..\src\experimentalControl\SCRAMNet;..\..\..\src\experimentalControl\SCRAMNetGT;..\..\..\src\experimentalControl\xPCtarget;..\..\..\src\experimentalElement;..\..\..\src\experimentalRecorder;..\..\..\src\experimentalRecorder\response;..\..\..\src\experimentalSetup;..\..\..\src\experimentalSignalFilter;..\..\..\src\experimentalSite;..\..\..\src\experimentalTangentStiff;..\..\..\src\openseesCore;..\..\..\src\openseesExtra;..\..\..\src\tcl;..\..\..\src\utility;C:\Program Files\Tcl64;C:\Program Files\Tcl64\include;C:\Program Files\OpenSSL64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_TCL85;_WIN32;WIN32;_WINDOWS;PLATFORM_WIN;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -178,7 +178,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>false</OmitFramePointers>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>..\..\..\src;..\..\..\src\experimentalControl;..\..\..\src\experimentalControl\dSpace;..\..\..\src\experimentalControl\MTSCsi;..\..\..\src\experimentalControl\NIEseries;..\..\..\src\experimentalControl\SCRAMNet;..\..\..\src\experimentalControl\SCRAMNetGT;..\..\..\src\experimentalControl\xPCtarget;..\..\..\src\experimentalElement;..\..\..\src\experimentalRecorder;..\..\..\src\experimentalRecorder\response;..\..\..\src\experimentalSetup;..\..\..\src\experimentalSignalFilter;..\..\..\src\experimentalSite;..\..\..\src\openseesCore;..\..\..\src\openseesExtra;..\..\..\src\tcl;..\..\..\src\utility;C:\Program Files\Tcl64;C:\Program Files\Tcl64\include;C:\Program Files\OpenSSL64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\src;..\..\..\src\experimentalControl;..\..\..\src\experimentalControl\dSpace;..\..\..\src\experimentalControl\MTSCsi;..\..\..\src\experimentalControl\NIEseries;..\..\..\src\experimentalControl\SCRAMNet;..\..\..\src\experimentalControl\SCRAMNetGT;..\..\..\src\experimentalControl\xPCtarget;..\..\..\src\experimentalElement;..\..\..\src\experimentalRecorder;..\..\..\src\experimentalRecorder\response;..\..\..\src\experimentalSetup;..\..\..\src\experimentalSignalFilter;..\..\..\src\experimentalSite;..\..\..\src\experimentalTangentStiff;..\..\..\src\openseesCore;..\..\..\src\openseesExtra;..\..\..\src\tcl;..\..\..\src\utility;C:\Program Files\Tcl64;C:\Program Files\Tcl64\include;C:\Program Files\OpenSSL64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_TCL85;_WIN64;WIN64;_WINDOWS;PLATFORM_WIN;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -212,6 +212,15 @@
     <ClCompile Include="..\..\..\SRC\experimentalElement\EEBearing2d.cpp" />
     <ClCompile Include="..\..\..\SRC\experimentalElement\EEBearing3d.cpp" />
     <ClCompile Include="..\..\..\SRC\experimentalElement\TclEEBearingCommand.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalRecorder\ExpTangentStiffRecorder.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalRecorder\response\ExpTangentStiffResponse.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalSignalFilter\ESFKrylovForceConverter.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalSignalFilter\ESFTangForceConverter.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalTangentStiff\ETBfgs.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalTangentStiff\ETBroyden.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalTangentStiff\ETTranspose.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalTangentStiff\ExperimentalTangentStiff.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalTangentStiff\TclExpTangentStiffCommand.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\Analysis.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\AnalysisModel.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\ArrayOfTaggedObjects.cpp" />
@@ -393,6 +402,14 @@
     <ClInclude Include="..\..\..\SRC\experimentalControl\ECSCRAMNetGT.h" />
     <ClInclude Include="..\..\..\SRC\experimentalElement\EEBearing2d.h" />
     <ClInclude Include="..\..\..\SRC\experimentalElement\EEBearing3d.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalRecorder\ExpTangentStiffRecorder.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalRecorder\response\ExpTangentStiffResponse.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalSignalFilter\ESFKrylovForceConverter.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalSignalFilter\ESFTangForceConverter.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalTangentStiff\ETBfgs.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalTangentStiff\ETBroyden.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalTangentStiff\ETTranspose.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalTangentStiff\ExperimentalTangentStiff.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\Analysis.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\AnalysisModel.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\ArrayOfTaggedObjects.h" />

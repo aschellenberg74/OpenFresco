@@ -59,6 +59,9 @@ public:
     virtual ~ExperimentalSignalFilter();
     
     virtual double filtering(double data) = 0;
+    virtual Vector& converting(Vector* td) = 0;
+    virtual Vector& converting(Vector* td, Vector* tf) = 0;
+    virtual int setSize(const int sz) = 0;
     virtual void update() = 0;
     
     virtual ExperimentalSignalFilter *getCopy() = 0;
