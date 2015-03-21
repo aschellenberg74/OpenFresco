@@ -23,7 +23,7 @@
 // $Date$
 // $URL$
 
-// Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 01/07
 // Revision: A
 //
@@ -353,7 +353,8 @@ int ECLabVIEW::setSize(ID sizeT, ID sizeO)
 }
 
 
-int ECLabVIEW::setTrialResponse(const Vector* disp,
+int ECLabVIEW::setTrialResponse(
+    const Vector* disp,
     const Vector* vel,
     const Vector* accel,
     const Vector* force,
@@ -381,7 +382,8 @@ int ECLabVIEW::setTrialResponse(const Vector* disp,
 }
 
 
-int ECLabVIEW::getDaqResponse(Vector* disp,
+int ECLabVIEW::getDaqResponse(
+    Vector* disp,
     Vector* vel,
     Vector* accel,
     Vector* force,

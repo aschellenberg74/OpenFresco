@@ -44,9 +44,10 @@ class ECdSpace : public ExperimentalControl
 {
 public:
     // constructors
-    ECdSpace(int tag, char *boardName,
+    ECdSpace(int tag,
         int nTrialCPs, ExperimentalCP **trialCPs,
-        int nOutCPs, ExperimentalCP **outCPs);
+        int nOutCPs, ExperimentalCP **outCPs,
+        char *boardName);
     ECdSpace(const ECdSpace &ec);
     
     // destructor
@@ -59,12 +60,14 @@ public:
     virtual int setup();
     virtual int setSize(ID sizeT, ID sizeO);
     
-    virtual int setTrialResponse(const Vector* disp,
+    virtual int setTrialResponse(
+        const Vector* disp,
         const Vector* vel,
         const Vector* accel,
         const Vector* force,
         const Vector* time);
-    virtual int getDaqResponse(Vector* disp,
+    virtual int getDaqResponse(
+        Vector* disp,
         Vector* vel,
         Vector* accel,
         Vector* force,
@@ -88,11 +91,11 @@ protected:
     virtual int acquire();
 
 private:
-    char *boardName;            // name of dSpace board (DS1103, DS1104)
     int numTrialCPs;            // number of trial control points
     ExperimentalCP **trialCPs;  // trial control points
     int numOutCPs;              // number of output control points
     ExperimentalCP **outCPs;    // output control points
+    char *boardName;            // name of dSpace board (DS1103, DS1104)
     
     int error, boardState, simState;
     unsigned int board_index;

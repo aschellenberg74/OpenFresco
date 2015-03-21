@@ -357,16 +357,17 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
     
     // ----------------------------------------------------------------------------	
     else if (strcmp(argv[1],"SimFEAdapter") == 0)  {
-        if (argc < 5)  {
+        if (argc < 9)  {
             opserr << "WARNING invalid number of arguments\n";
             printCommand(argc,argv);
-            opserr << "Want: expControl SimFEAdapter tag ipAddr ipPort "
+            opserr << "Want: expControl SimFEAdapter tag ipAddr ipPort -trialCP cpTags -outCP cpTags "
                 << "<-ctrlFilters (5 filterTag)> <-daqFilters (5 filterTag)>\n";
             return TCL_ERROR;
         }
         
-        int ipPort = 44000;
         char *ipAddr;
+        int i, cpTag, ipPort = 44000;
+        int numTrialCPs = 0, numOutCPs = 0;
         
         argi = 2;
         if (Tcl_GetInt(interp, argv[argi], &tag) != TCL_OK)  {
@@ -383,9 +384,87 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
             return TCL_ERROR;
         }
         argi++;
+        if (strcmp(argv[argi],"-trialCP") != 0)  {
+            opserr << "WARNING expecting -trialCP cpTags\n";
+            opserr << "expControl SimFEAdapter " << tag << endln;
+            return TCL_ERROR;
+        }
+        argi++;
+        while (argi+numTrialCPs < argc &&
+            strcmp(argv[argi+numTrialCPs],"-outCP") != 0)  {
+                numTrialCPs++;
+        }
+        if (numTrialCPs == 0)  {
+            opserr << "WARNING no trialCPTags specified\n";
+            opserr << "expControl SimFEAdapter " << tag << endln;
+            return TCL_ERROR;
+        }
+        // create the array to hold the trial control points
+        ExperimentalCP **trialCPs = new ExperimentalCP* [numTrialCPs];
+        if (trialCPs == 0)  {
+            opserr << "WARNING out of memory\n";
+            opserr << "expControl SimFEAdapter " << tag << endln;
+            return TCL_ERROR;
+        }
+        for (i=0; i<numTrialCPs; i++)  {
+            trialCPs[i] = 0;
+            if (Tcl_GetInt(interp, argv[argi], &cpTag) != TCL_OK)  {
+                opserr << "WARNING invalid cpTag\n";
+                opserr << "expControl SimFEAdapter " << tag << endln;
+                return TCL_ERROR;
+            }
+            trialCPs[i] = getExperimentalCP(cpTag);
+            if (trialCPs[i] == 0)  {
+                opserr << "WARNING experimental control point not found\n";
+                opserr << "expControlPoint " << cpTag << endln;
+                opserr << "expControl SimFEAdapter " << tag << endln;
+                return TCL_ERROR;
+            }
+            argi++;
+        }
+        if (strcmp(argv[argi],"-outCP") != 0)  {
+            opserr << "WARNING expecting -outCP cpTags\n";
+            opserr << "expControl SimFEAdapter " << tag << endln;
+            return TCL_ERROR;
+        }
+        argi++;
+        while (argi+numOutCPs < argc &&
+            strcmp(argv[argi+numOutCPs],"-ctrlFilters") != 0 &&
+            strcmp(argv[argi+numOutCPs],"-daqFilters") != 0)  {
+                numOutCPs++;
+        }
+        if (numOutCPs == 0)  {
+            opserr << "WARNING no outCPTags specified\n";
+            opserr << "expControl SimFEAdapter " << tag << endln;
+            return TCL_ERROR;
+        }
+        // create the array to hold the output control points
+        ExperimentalCP **outCPs = new ExperimentalCP* [numOutCPs];
+        if (outCPs == 0)  {
+            opserr << "WARNING out of memory\n";
+            opserr << "expControl SimFEAdapter " << tag << endln;
+            return TCL_ERROR;
+        }
+        for (i=0; i<numOutCPs; i++)  {
+            outCPs[i] = 0;
+            if (Tcl_GetInt(interp, argv[argi], &cpTag) != TCL_OK)  {
+                opserr << "WARNING invalid cpTag\n";
+                opserr << "expControl SimFEAdapter " << tag << endln;
+                return TCL_ERROR;
+            }
+            outCPs[i] = getExperimentalCP(cpTag);
+            if (outCPs[i] == 0)  {
+                opserr << "WARNING experimental control point not found\n";
+                opserr << "expControlPoint " << cpTag << endln;
+                opserr << "expControl SimFEAdapter " << tag << endln;
+                return TCL_ERROR;
+            }
+            argi++;
+        }
         
         // parsing was successful, allocate the control
-        theControl = new ECSimFEAdapter(tag, ipAddr, ipPort);
+        theControl = new ECSimFEAdapter(tag, numTrialCPs, trialCPs,
+            numOutCPs, outCPs, ipAddr, ipPort);
     }
     
     // ----------------------------------------------------------------------------	
@@ -398,8 +477,8 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
             return TCL_ERROR;
         }
         
-        int ipPort = 44000;
         char *ipAddr;
+        int ipPort = 44000;
         
         argi = 2;
         if (Tcl_GetInt(interp, argv[argi], &tag) != TCL_OK)  {
@@ -603,8 +682,8 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
         }
         
         // parsing was successful, allocate the control
-        theControl = new ECdSpace(tag, boardName,
-            numTrialCPs, trialCPs, numOutCPs, outCPs);
+        theControl = new ECdSpace(tag, numTrialCPs, trialCPs,
+            numOutCPs, outCPs, boardName);
     }
     
     // ----------------------------------------------------------------------------	
@@ -716,8 +795,8 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
         }
         
         // parsing was successful, allocate the control
-        theControl = new ECMtsCsi(tag, cfgFile, rampTime,
-            numTrialCPs, trialCPs, numOutCPs, outCPs);
+        theControl = new ECMtsCsi(tag, numTrialCPs, trialCPs,
+            numOutCPs, outCPs, cfgFile, rampTime);
     }
 
     /* ----------------------------------------------------------------------------	
@@ -761,8 +840,8 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
             return TCL_ERROR;
         }
         
-        int i, cpTag, timeOut = 10;
         char *ipAddr, *ipPort, *appFile;
+        int i, cpTag, timeOut = 10;
         int numTrialCPs = 0, numOutCPs = 0;
         
         argi = 2;
@@ -868,8 +947,8 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
         }
         
         // parsing was successful, allocate the control
-        theControl = new ECxPCtarget(tag, ipAddr, ipPort, appFile,
-            numTrialCPs, trialCPs, numOutCPs, outCPs, timeOut);
+        theControl = new ECxPCtarget(tag, numTrialCPs, trialCPs,
+            numOutCPs, outCPs, ipAddr, ipPort, appFile, timeOut);
     }
     
     // ----------------------------------------------------------------------------	
@@ -882,9 +961,9 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
             return TCL_ERROR;
         }
         
+        char *ipAddr;
         int i, cpTag, ipPort = 44000;
         int numTrialCPs = 0, numOutCPs = 0;
-        char *ipAddr;
         
         argi = 2;
         if (Tcl_GetInt(interp, argv[argi], &tag) != TCL_OK)  {

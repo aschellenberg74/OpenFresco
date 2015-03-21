@@ -42,9 +42,10 @@ class ECMtsCsi : public ExperimentalControl
 {
 public:
     // constructors
-    ECMtsCsi(int tag, char *cfgFile, double rampTime,
+    ECMtsCsi(int tag,
         int nTrialCPs, ExperimentalCP **trialCPs,
-        int nOutCPs, ExperimentalCP **outCPs);
+        int nOutCPs, ExperimentalCP **outCPs,
+        char *cfgFile, double rampTime = 0.1);
     ECMtsCsi(const ECMtsCsi& ec);
     
     // destructor
@@ -57,12 +58,14 @@ public:
     virtual int setup();
     virtual int setSize(ID sizeT, ID sizeO);
     
-    virtual int setTrialResponse(const Vector* disp,
+    virtual int setTrialResponse(
+        const Vector* disp,
         const Vector* vel,
         const Vector* accel,
         const Vector* force,
         const Vector* time);
-    virtual int getDaqResponse(Vector* disp,
+    virtual int getDaqResponse(
+        Vector* disp,
         Vector* vel,
         Vector* accel,
         Vector* force,
@@ -88,12 +91,12 @@ protected:
 private:
     Mts::ICsiController* CsiController;
     
-    char *cfgFile;              // CSI controller configuration file
-    double rampTime;            // time to ramp signals to new targets
     int numTrialCPs;            // number of trial control points
     ExperimentalCP **trialCPs;  // trial control points
     int numOutCPs;              // number of output control points
     ExperimentalCP **outCPs;    // output control points
+    char *cfgFile;              // CSI controller configuration file
+    double rampTime;            // time to ramp signals to new targets
     
     int numCtrlSignals, numDaqSignals;     // number of signals
     double *ctrlSignal, *daqSignal;        // signal arrays

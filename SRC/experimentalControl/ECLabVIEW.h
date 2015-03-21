@@ -46,7 +46,8 @@ class ECLabVIEW : public ExperimentalControl
 {
 public:
     // constructors
-    ECLabVIEW(int tag, int nTrialCPs, ExperimentalCP **trialCPs,
+    ECLabVIEW(int tag,
+        int nTrialCPs, ExperimentalCP **trialCPs,
         int nOutCPs, ExperimentalCP **outCPs,
         char *ipAddress, int ipPort = 44000);
     ECLabVIEW(const ECLabVIEW &ec);
@@ -61,12 +62,14 @@ public:
     virtual int setup();
     virtual int setSize(ID sizeT, ID sizeO);
     
-    virtual int setTrialResponse(const Vector* disp,
+    virtual int setTrialResponse(
+        const Vector* disp,
         const Vector* vel,
         const Vector* accel,
         const Vector* force,
         const Vector* time);
-    virtual int getDaqResponse(Vector* disp,
+    virtual int getDaqResponse(
+        Vector* disp,
         Vector* vel,
         Vector* accel,
         Vector* force,

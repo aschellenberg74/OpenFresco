@@ -31,17 +31,12 @@
 #include <ExperimentalCP.h>
 
 
-ECMtsCsi::ECMtsCsi(int tag, char *cfgfile, double ramptime,
-    int nTrialCPs, ExperimentalCP **trialcps,
-    int nOutCPs, ExperimentalCP **outcps)
-    : ExperimentalControl(tag),
-    CsiController(Mts::CsiFactory::newController()),
-    cfgFile(cfgfile), rampTime(ramptime),
-    numTrialCPs(nTrialCPs), numOutCPs(nOutCPs),
-    numCtrlSignals(0), numDaqSignals(0),
-    ctrlSignal(0), daqSignal(0),
-    ctrlSigOffset(0), daqSigOffset(0),
-    rampId(-1)
+ECMtsCsi::ECMtsCsi(int tag, int nTrialCPs, ExperimentalCP **trialcps,
+    int nOutCPs, ExperimentalCP **outcps, char *cfgfile, double ramptime)
+    : ExperimentalControl(tag), CsiController(Mts::CsiFactory::newController()),
+    numTrialCPs(nTrialCPs), numOutCPs(nOutCPs), cfgFile(cfgfile), rampTime(ramptime),
+    numCtrlSignals(0), numDaqSignals(0), ctrlSignal(0), daqSignal(0),
+    ctrlSigOffset(0), daqSigOffset(0), rampId(-1)
 {
     // get trial and output control points
     if (trialcps == 0 || outcps == 0)  {
@@ -100,19 +95,16 @@ ECMtsCsi::ECMtsCsi(int tag, char *cfgfile, double ramptime,
 
 
 ECMtsCsi::ECMtsCsi(const ECMtsCsi& ec)
-    : ExperimentalControl(ec),
-    CsiController(Mts::CsiFactory::newController()),
-    numCtrlSignals(0), numDaqSignals(0),
-    ctrlSignal(0), daqSignal(0),
-    ctrlSigOffset(0), daqSigOffset(0),
-    rampId(-1)
+    : ExperimentalControl(ec), CsiController(Mts::CsiFactory::newController()),
+    numCtrlSignals(0), numDaqSignals(0), ctrlSignal(0), daqSignal(0),
+    ctrlSigOffset(0), daqSigOffset(0), rampId(-1)
 {
-    cfgFile     = ec.cfgFile;
-    rampTime    = ec.rampTime;
     numTrialCPs = ec.numTrialCPs;
     trialCPs    = ec.trialCPs;
     numOutCPs   = ec.numOutCPs;
     outCPs      = ec.outCPs;
+    cfgFile     = ec.cfgFile;
+    rampTime    = ec.rampTime;
     
     numCtrlSignals = ec.numCtrlSignals;
     numDaqSignals  = ec.numDaqSignals;
@@ -147,6 +139,10 @@ ECMtsCsi::~ECMtsCsi()
     if (daqSignal != 0)
         delete [] daqSignal;
     
+    // delete memory of string
+    if (cfgFile != 0)
+        delete [] cfgFile;
+    
     // delete memory of control points
     int i;
     if (trialCPs != 0)  {
@@ -163,10 +159,6 @@ ECMtsCsi::~ECMtsCsi()
         }
         delete [] outCPs;
     }
-    
-    // delete memory of string
-    if (cfgFile != 0)
-        delete [] cfgFile;
     
     opserr << endln;
     opserr << "*************************************\n";
@@ -329,7 +321,7 @@ int ECMtsCsi::setSize(ID sizeT, ID sizeO)
     //     disp, vel, accel, force and time for output
     
     // get maximum dof IDs for each trial response quantity
-    int mdfTDisp = 0, mdfTForce = 0, mdfTTime = 0, mdfTVel = 0, mdfTAccel = 0;
+    ID maxdofT(OF_Resp_All);
     for (int i=0; i<numTrialCPs; i++)  {
         // get trial control point parameters
         int numSignals = trialCPs[i]->getNumSignal();
@@ -338,20 +330,12 @@ int ECMtsCsi::setSize(ID sizeT, ID sizeO)
         
         // loop through all the trial control point signals
         for (int j=0; j<numSignals; j++)  {
-            if (rsp(j) == OF_Resp_Disp)
-                mdfTDisp = dof(j) > mdfTDisp ? dof(j) : mdfTDisp;
-            else if (rsp(j) == OF_Resp_Force)
-                mdfTForce = dof(j) > mdfTForce ? dof(j) : mdfTForce;
-            else if (rsp(j) == OF_Resp_Time)
-                mdfTTime = dof(j) > mdfTTime ? dof(j) : mdfTTime;
-            else if (rsp(j) == OF_Resp_Vel)
-                mdfTVel = dof(j) > mdfTVel ? dof(j) : mdfTVel;
-            else if (rsp(j) == OF_Resp_Accel)
-                mdfTAccel = dof(j) > mdfTAccel ? dof(j) : mdfTAccel;
+            dof(j)++;  // switch to 1-based indexing
+            maxdofT(rsp(j)) = dof(j) > maxdofT(rsp(j)) ? dof(j) : maxdofT(rsp(j));
         }
     }
     // get maximum dof IDs for each output response quantity
-    int mdfODisp = 0, mdfOForce = 0, mdfOTime = 0, mdfOVel = 0, mdfOAccel = 0;
+    ID maxdofO(OF_Resp_All);
     for (int i=0; i<numOutCPs; i++)  {
         // get output control point parameters
         int numSignals = outCPs[i]->getNumSignal();
@@ -360,38 +344,24 @@ int ECMtsCsi::setSize(ID sizeT, ID sizeO)
         
         // loop through all the output control point signals
         for (int j=0; j<numSignals; j++)  {
-            if (rsp(j) == OF_Resp_Disp)
-                mdfODisp = dof(j) > mdfODisp ? dof(j) : mdfODisp;
-            else if (rsp(j) == OF_Resp_Force)
-                mdfOForce = dof(j) > mdfOForce ? dof(j) : mdfOForce;
-            else if (rsp(j) == OF_Resp_Time)
-                mdfOTime = dof(j) > mdfOTime ? dof(j) : mdfOTime;
-            else if (rsp(j) == OF_Resp_Vel)
-                mdfOVel = dof(j) > mdfOVel ? dof(j) : mdfOVel;
-            else if (rsp(j) == OF_Resp_Accel)
-                mdfOAccel = dof(j) > mdfOAccel ? dof(j) : mdfOAccel;
+            dof(j)++;  // switch to 1-based indexing
+            maxdofO(rsp(j)) = dof(j) > maxdofO(rsp(j)) ? dof(j) : maxdofO(rsp(j));
         }
     }
     // now check if dof IDs are within limits
-    if ((mdfTDisp  != 0  &&  mdfTDisp  > sizeT(OF_Resp_Disp))  ||
-        (mdfTVel   != 0  &&  mdfTVel   > sizeT(OF_Resp_Vel))   ||
-        (mdfTAccel != 0  &&  mdfTAccel > sizeT(OF_Resp_Accel)) ||
-        (mdfTForce != 0  &&  mdfTForce > sizeT(OF_Resp_Force)) ||
-        (mdfTTime  != 0  &&  mdfTTime  > sizeT(OF_Resp_Time))  ||
-        (mdfODisp  != 0  &&  mdfODisp  > sizeO(OF_Resp_Disp))  ||
-        (mdfOVel   != 0  &&  mdfOVel   > sizeO(OF_Resp_Vel))   ||
-        (mdfOAccel != 0  &&  mdfOAccel > sizeO(OF_Resp_Accel)) ||
-        (mdfOForce != 0  &&  mdfOForce > sizeO(OF_Resp_Force)) ||
-        (mdfOTime  != 0  &&  mdfOTime  > sizeO(OF_Resp_Time)))  {
-        opserr << "ECMtsCsi::setSize() - wrong sizeTrial/Out\n";
-        opserr << "see User Manual.\n";
-        CsiController->reset();
-        delete CsiController;
-        exit(OF_ReturnType_failed);
+    for (int i=0; i<OF_Resp_All; i++)  {
+        if ((maxdofT(i) != 0  &&  maxdofT(i) > sizeT(i)) || 
+            (maxdofO(i) != 0  &&  maxdofO(i) > sizeO(i)))  {
+            opserr << "ECMtsCsi::setSize() - wrong sizeTrial/Out\n";
+            opserr << "see User Manual.\n";
+            CsiController->reset();
+            delete CsiController;
+            exit(OF_ReturnType_failed);
+        }
     }
-    
-    (*sizeCtrl) = sizeT;
-    (*sizeDaq)  = sizeO;
+    // finally assign sizes
+    (*sizeCtrl) = maxdofT;
+    (*sizeDaq)  = maxdofO;
     
     // check sizes of signals defined in the CSI configuration
     // the loaded configuration must contain:
@@ -464,7 +434,8 @@ int ECMtsCsi::setSize(ID sizeT, ID sizeO)
 }
 
 
-int ECMtsCsi::setTrialResponse(const Vector* disp,
+int ECMtsCsi::setTrialResponse(
+    const Vector* disp,
     const Vector* vel,
     const Vector* accel,
     const Vector* force,
@@ -565,7 +536,8 @@ int ECMtsCsi::setTrialResponse(const Vector* disp,
 }
 
 
-int ECMtsCsi::getDaqResponse(Vector* disp,
+int ECMtsCsi::getDaqResponse(
+    Vector* disp,
     Vector* vel,
     Vector* accel,
     Vector* force,
