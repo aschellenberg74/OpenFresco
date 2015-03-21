@@ -14,14 +14,14 @@ clc;
 
 % connect to target and stop model
 try %#ok<TRYNC>
-   tg = xpc;
-   tg.stop;
+    tg = xpc;
+    tg.stop;
 end
 
 % get the variables saved on the target
 data = getXPCtargetVar({'targSig','commSig','measSig', ...
-   'state','count','flag','measDsp','measFrc'}, ...
-   '192.168.2.20','22222');
+    'state','count','flag','measDsp','measFrc'}, ...
+    '192.168.2.20','22222');
 
 % save data structure to file
 save(outputFile,'data');

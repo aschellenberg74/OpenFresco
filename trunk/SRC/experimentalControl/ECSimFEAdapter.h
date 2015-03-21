@@ -37,12 +37,16 @@
 #include "ECSimulation.h"
 
 class Channel;
+class ExperimentalCP;
 
 class ECSimFEAdapter : public ECSimulation
 {
 public:
     // constructors
-    ECSimFEAdapter(int tag, char *ipAddress, int ipPort = 44000);
+    ECSimFEAdapter(int tag,
+        int nTrialCPs, ExperimentalCP **trialCPs,
+        int nOutCPs, ExperimentalCP **outCPs,
+        char *ipAddress, int ipPort = 44000);
     ECSimFEAdapter(const ECSimFEAdapter &ec);
     
     // destructor
@@ -55,12 +59,14 @@ public:
     virtual int setup();
     virtual int setSize(ID sizeT, ID sizeO);
     
-    virtual int setTrialResponse(const Vector* disp,
+    virtual int setTrialResponse(
+        const Vector* disp,
         const Vector* vel,
         const Vector* accel,
         const Vector* force,
         const Vector* time);
-    virtual int getDaqResponse(Vector* disp,
+    virtual int getDaqResponse(
+        Vector* disp,
         Vector* vel,
         Vector* accel,
         Vector* force,
@@ -84,9 +90,13 @@ protected:
     virtual int acquire();
 
 private:
+    int numTrialCPs;            // number of trial control points
+    ExperimentalCP **trialCPs;  // trial control points
+    int numOutCPs;              // number of output control points
+    ExperimentalCP **outCPs;    // output control points
     char *ipAddress;            // ip address
     int ipPort;                 // ip port
-    const int dataSize;         // data size of network transactions
+    int dataSize;               // data size of network transactions
     
     Channel *theChannel;        // channel
     double *sData;              // send data array
@@ -94,8 +104,8 @@ private:
     double *rData;              // receive data array
     Vector *recvData;           // receive vector
     
-    Vector *ctrlDisp, *ctrlForce;
-    Vector *daqDisp, *daqForce;
+    int numCtrlSignals, numDaqSignals;
+    Vector *ctrlSignal, *daqSignal;
 };
 
 #endif

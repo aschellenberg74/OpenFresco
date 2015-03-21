@@ -24,6 +24,7 @@ else
    fs  = xpctarget.fs('TCPIP',ipAddress,ipPort);
 end
 
+drive = 'C:';
 errorMsg = 0;
 numVar = length(fileName);
 for i=1:numVar
@@ -33,7 +34,7 @@ for i=1:numVar
       waitbar((i-1)/(numVar+1),wbHandle,['Downloading "',fileName{i},'.dat" variable ......']);
       
       % get the file from target
-      ftp.get([fileName{i},'.dat']);
+      ftp.get(fullfile(drive,[fileName{i},'.dat']));
       
       % convert from target file format and save
       temp = readxpcfile([fileName{i},'.dat']);
@@ -50,7 +51,7 @@ for i=1:numVar
       try
          clear temp;
          delete([fileName{i},'.dat']);
-         removefile(fs,[fileName{i},'.dat']);
+         removefile(fs,fullfile(drive,[fileName{i},'.dat']));
       catch errorMsg
          disp(['Could not delete "',fileName{i},'.dat" variable:']);
          disp(errorMsg);
