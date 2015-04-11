@@ -63,7 +63,7 @@ EEInvertedVBrace2d::EEInvertedVBrace2d(int tag, int Nd1, int Nd2, int Nd3,
     db(0), vb(0), ab(0), t(0),
     dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
     dbCtrl(3), vbCtrl(3), abCtrl(3),
-    T(3,9), kbInit(3,3), tLast(0.0)
+    T(3,9), kbInit(3,3), dbLast(3), tLast(0.0)
 {
     // ensure the connectedExternalNode ID is of correct size & set values
     if (connectedExternalNodes.Size() != 3)  {
@@ -117,6 +117,7 @@ EEInvertedVBrace2d::EEInvertedVBrace2d(int tag, int Nd1, int Nd2, int Nd3,
     dbCtrl.Zero();
     vbCtrl.Zero();
     abCtrl.Zero();
+    dbLast.Zero();
 }
 
 
@@ -132,7 +133,7 @@ EEInvertedVBrace2d::EEInvertedVBrace2d(int tag, int Nd1, int Nd2, int Nd3,
     db(0), vb(0), ab(0), t(0),
     dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
     dbCtrl(3), vbCtrl(3), abCtrl(3),
-    T(3,9), kbInit(3,3), tLast(0.0)
+    T(3,9), kbInit(3,3), dbLast(3), tLast(0.0)
 {
     // ensure the connectedExternalNode ID is of correct size & set values
     if (connectedExternalNodes.Size() != 3)  {
@@ -238,6 +239,7 @@ EEInvertedVBrace2d::EEInvertedVBrace2d(int tag, int Nd1, int Nd2, int Nd3,
     dbCtrl.Zero();
     vbCtrl.Zero();
     abCtrl.Zero();
+    dbLast.Zero();
 }
 
 
@@ -428,6 +430,16 @@ int EEInvertedVBrace2d::commitState()
     // commit the base class
     rValue += this->Element::commitState();
     
+    // update dbLast
+    int ndim = 0, i;
+    Vector dgLast(9);
+    for (i=0; i<3; i++)  {
+        Vector disp = theNodes[i]->getTrialDisp();
+        dgLast.Assemble(disp, ndim);
+        ndim += 3;
+    }
+    dbLast.addMatrixVector(0.0, T, dgLast, 1.0);
+    
     return rValue;
 }
 
@@ -444,26 +456,23 @@ int EEInvertedVBrace2d::update()
     if (nlGeom == false)  {
         // get global trial response
         int ndim = 0, i;
-        Vector dg(9), vg(9), ag(9), dgDelta(9);
+        Vector dg(9), vg(9), ag(9);
         for (i=0; i<3; i++)  {
             Vector disp = theNodes[i]->getTrialDisp();
             Vector vel = theNodes[i]->getTrialVel();
             Vector accel = theNodes[i]->getTrialAccel();
-            Vector dispIncr = theNodes[i]->getIncrDeltaDisp();
             dg.Assemble(disp, ndim);
             vg.Assemble(vel, ndim);
             ag.Assemble(accel, ndim);
-            dgDelta.Assemble(dispIncr, ndim);
             ndim += 3;
         }
         
         // transform displacements from the global to the basic system
-        Vector dbDelta(3);
         db->addMatrixVector(0.0, T, dg, 1.0);
         vb->addMatrixVector(0.0, T, vg, 1.0);
         ab->addMatrixVector(0.0, T, ag, 1.0);
-        dbDelta.addMatrixVector(0.0, T, dgDelta, 1.0);
         
+        Vector dbDelta = (*db) - dbLast;
         // do not check time for right now because of transformation constraint
         // handler calling update at beginning of new step when applying load
         // if (dbDelta.pNorm(0) > DBL_EPSILON || (*t)(0) > tLast)  {
@@ -487,7 +496,8 @@ int EEInvertedVBrace2d::update()
         return -1;
     }
     
-    // save the last time
+    // save the last displacements and time
+    dbLast = (*db);
     tLast = (*t)(0);
     
     return rValue;

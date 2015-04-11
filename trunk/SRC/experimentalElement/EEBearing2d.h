@@ -122,7 +122,7 @@ private:
     ID connectedExternalNodes;          // contains the tags of the end nodes
     Node *theNodes[2];                  // array of nodes
     UniaxialMaterial *theMaterials[2];  // array of uniaxial materials
-
+    
     // parameters
     int pFrcCtrl;       // flag to switch to axial force control
     Vector x;           // local x direction
@@ -161,6 +161,7 @@ private:
     Matrix Tlb;         // transformation matrix from local to basic system
     
     Matrix kbInit;      // stiffness matrix in basic system
+    Vector dbLast;      // displacements in basic system at last update
     double tLast;       // time at last update
     
     static Matrix theMatrix;    // a class wide Matrix

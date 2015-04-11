@@ -66,7 +66,7 @@ EEBearing2d::EEBearing2d(int tag, int Nd1, int Nd2,
     db(0), vb(0), ab(0), qb(0), t(0),
     dbDaq(0), vbDaq(0), abDaq(0), qbDaq(0), tDaq(0),
     dbCtrl(3), vbCtrl(3), abCtrl(3),
-    dl(6), Tgl(6,6), Tlb(3,6), kbInit(3,3), tLast(0.0),
+    dl(6), Tgl(6,6), Tlb(3,6), kbInit(3,3), dbLast(3), tLast(0.0),
     theLoad(6), firstWarning(true), onP0(true)
 {
     // ensure the connectedExternalNode ID is of correct size & set values
@@ -152,6 +152,7 @@ EEBearing2d::EEBearing2d(int tag, int Nd1, int Nd2,
     dbCtrl.Zero();
     vbCtrl.Zero();
     abCtrl.Zero();
+    dbLast.Zero();
 }
 
 
@@ -169,7 +170,7 @@ EEBearing2d::EEBearing2d(int tag, int Nd1, int Nd2,
     db(0), vb(0), ab(0), qb(0), t(0),
     dbDaq(0), vbDaq(0), abDaq(0), qbDaq(0), tDaq(0),
     dbCtrl(3), vbCtrl(3), abCtrl(3),
-    dl(6), Tgl(6,6), Tlb(3,6), kbInit(3,3), tLast(0.0),
+    dl(6), Tgl(6,6), Tlb(3,6), kbInit(3,3), dbLast(3), tLast(0.0),
     theLoad(6), firstWarning(true), onP0(true)
 {
     // ensure the connectedExternalNode ID is of correct size & set values
@@ -308,6 +309,7 @@ EEBearing2d::EEBearing2d(int tag, int Nd1, int Nd2,
     dbCtrl.Zero();
     vbCtrl.Zero();
     abCtrl.Zero();
+    dbLast.Zero();
 }
 
 
@@ -467,6 +469,17 @@ int EEBearing2d::commitState()
     // commit the base class
     rValue += this->Element::commitState();
     
+    // update dbLast
+    int ndim = 0, i;
+    Vector dgLast(6), dlLast(6);
+    for (i=0; i<2; i++)  {
+        Vector disp = theNodes[i]->getTrialDisp();
+        dgLast.Assemble(disp, ndim);
+        ndim += 3;
+    }
+    dlLast.addMatrixVector(0.0, Tgl, dgLast, 1.0);
+    dbLast.addMatrixVector(0.0, Tlb, dlLast, 1.0);
+    
     return rValue;
 }
 
@@ -481,32 +494,27 @@ int EEBearing2d::update()
     
     // get global trial response
     int ndim = 0, i;
-    Vector dg(6), vg(6), ag(6), dgDelta(6);
+    Vector dg(6), vg(6), ag(6);
     for (i=0; i<2; i++)  {
         Vector disp = theNodes[i]->getTrialDisp();
         Vector vel = theNodes[i]->getTrialVel();
         Vector accel = theNodes[i]->getTrialAccel();
-        Vector dispIncr = theNodes[i]->getIncrDeltaDisp();
         dg.Assemble(disp, ndim);
         vg.Assemble(vel, ndim);
         ag.Assemble(accel, ndim);
-        dgDelta.Assemble(dispIncr, ndim);
         ndim += 3;
     }
     
     // transform response from the global to the local system
-    Vector vl(6), al(6), dlDelta(6);
+    Vector vl(6), al(6);
     dl.addMatrixVector(0.0, Tgl, dg, 1.0);
     vl.addMatrixVector(0.0, Tgl, vg, 1.0);
     al.addMatrixVector(0.0, Tgl, ag, 1.0);
-    dlDelta.addMatrixVector(0.0, Tgl, dgDelta, 1.0);
     
     // transform response from the local to the basic system
-    Vector dbDelta(3);
     db->addMatrixVector(0.0, Tlb, dl, 1.0);
     vb->addMatrixVector(0.0, Tlb, vl, 1.0);
     ab->addMatrixVector(0.0, Tlb, al, 1.0);
-    dbDelta.addMatrixVector(0.0, Tlb, dlDelta, 1.0);
     
     // 1) set axial deformations in basic x-direction
     theMaterials[0]->setTrialStrain((*db)(0), (*vb)(0));
@@ -514,6 +522,7 @@ int EEBearing2d::update()
         (*qb)(0) = theMaterials[0]->getStress();
     
     // 2) set shear deformations in basic y-direction
+    Vector dbDelta = (*db) - dbLast;
     // do not check time for right now because of transformation constraint
     // handler calling update at beginning of new step when applying load
     // if (dbDelta.pNorm(0) > DBL_EPSILON || (*t)(0) > tLast)  {
@@ -531,7 +540,8 @@ int EEBearing2d::update()
     // 3) set rotations about basic z-direction
     theMaterials[1]->setTrialStrain((*db)(2), (*vb)(2));
     
-    // save the last time
+    // save the last displacements and time
+    dbLast = (*db);
     tLast = (*t)(0);
     
     return rValue;

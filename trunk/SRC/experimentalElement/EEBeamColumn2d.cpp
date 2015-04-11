@@ -66,7 +66,8 @@ EEBeamColumn2d::EEBeamColumn2d(int tag, int Nd1, int Nd2,
     db(0), vb(0), ab(0), t(0),
     dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
     dbCtrl(3), vbCtrl(3), abCtrl(3),
-    kbInit(3,3), tLast(0.0), firstWarning(true)
+    kbInit(3,3), dbLast(3), tLast(0.0),
+    firstWarning(true)
 {
     // ensure the connectedExternalNode ID is of correct size & set values
     if (connectedExternalNodes.Size() != 2)  {
@@ -128,6 +129,7 @@ EEBeamColumn2d::EEBeamColumn2d(int tag, int Nd1, int Nd2,
     dbCtrl.Zero();
     vbCtrl.Zero();
     abCtrl.Zero();
+    dbLast.Zero();
     for (i=0; i<3; i++)  {
         qA0[i] = 0.0;
         pA0[i] = 0.0;
@@ -148,7 +150,8 @@ EEBeamColumn2d::EEBeamColumn2d(int tag, int Nd1, int Nd2,
     db(0), vb(0), ab(0), t(0),
     dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
     dbCtrl(3), vbCtrl(3), abCtrl(3),
-    kbInit(3,3), tLast(0.0), firstWarning(true)
+    kbInit(3,3), dbLast(3), tLast(0.0),
+    firstWarning(true)
 {
     // ensure the connectedExternalNode ID is of correct size & set values
     if (connectedExternalNodes.Size() != 2)  {
@@ -262,6 +265,7 @@ EEBeamColumn2d::EEBeamColumn2d(int tag, int Nd1, int Nd2,
     dbCtrl.Zero();
     vbCtrl.Zero();
     abCtrl.Zero();
+    dbLast.Zero();
     for (i=0; i<3; i++)  {
         qA0[i] = 0.0;
         pA0[i] = 0.0;
@@ -429,6 +433,12 @@ int EEBeamColumn2d::commitState()
     // commit the base class
     rValue += this->Element::commitState();
     
+    // update dbLast
+    const Vector &dbA = theCoordTransf->getBasicTrialDisp();
+    dbLast(0) = (L+dbA(0))*cos(dbA(1))-L;
+    dbLast(1) = -(L+dbA(0))*sin(dbA(1));
+    dbLast(2) = -dbA(1)+dbA(2);
+    
     return rValue;
 }
 
@@ -448,10 +458,8 @@ int EEBeamColumn2d::update()
     const Vector &dbA = theCoordTransf->getBasicTrialDisp();
     const Vector &vbA = theCoordTransf->getBasicTrialVel();
     const Vector &abA = theCoordTransf->getBasicTrialAccel();
-    const Vector &dbDeltaA = theCoordTransf->getBasicIncrDeltaDisp();
     
     /* transform displacements from basic sys A to basic sys B (linear)
-    Vector dbDelta(3);
     (*db)[0] = dbA(0);
     (*db)[1] = -L*dbA(1);
     (*db)[2] = -dbA(1)+dbA(2);
@@ -460,13 +468,9 @@ int EEBeamColumn2d::update()
     (*vb)[2] = -vbA(1)+vbA(2);
     (*ab)[0] = abA(0);
     (*ab)[1] = -L*abA(1);
-    (*ab)[2] = -abA(1)+abA(2);
-    dbDelta(0) = dbDeltaA(0);
-    dbDelta(1) = -L*dbDeltaA(1);
-    dbDelta(2) = -dbDeltaA(1)+dbDeltaA(2);*/
+    (*ab)[2] = -abA(1)+abA(2);*/
     
     // transform displacements from basic sys A to basic sys B (nonlinear)
-    Vector dbDelta(3);
     (*db)[0] = (L+dbA(0))*cos(dbA(1))-L;
     (*db)[1] = -(L+dbA(0))*sin(dbA(1));
     (*db)[2] = -dbA(1)+dbA(2);
@@ -476,10 +480,8 @@ int EEBeamColumn2d::update()
     (*ab)[0] = abA(0)*cos(dbA(1))-2*vbA(0)*sin(dbA(1))*vbA(1)-(L+dbA(0))*cos(dbA(1))*pow(vbA(1),2)-(L+dbA(0))*sin(dbA(1))*abA(1);
     (*ab)[1] = -abA(0)*sin(dbA(1))-2*vbA(0)*cos(dbA(1))*vbA(1)+(L+dbA(0))*sin(dbA(1))*pow(vbA(1),2)-(L+dbA(0))*cos(dbA(1))*abA(1);
     (*ab)[2] = -abA(1)+abA(2);
-    dbDelta(0) = (L+dbDeltaA(0))*cos(dbDeltaA(1))-L;
-    dbDelta(1) = -(L+dbDeltaA(0))*sin(dbDeltaA(1));
-    dbDelta(2) = -dbDeltaA(1)+dbDeltaA(2);
     
+    Vector dbDelta = (*db) - dbLast;
     // do not check time for right now because of transformation constraint
     // handler calling update at beginning of new step when applying load
     // if (dbDelta.pNorm(0) > DBL_EPSILON || (*t)(0) > tLast)  {
@@ -494,7 +496,8 @@ int EEBeamColumn2d::update()
         }
     }
     
-    // save the last time
+    // save the last displacements and time
+    dbLast = (*db);
     tLast = (*t)(0);
     
     return rValue;

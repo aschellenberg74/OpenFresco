@@ -69,7 +69,8 @@ EETrussCorot::EETrussCorot(int tag, int dim, int Nd1, int Nd2,
     db(0), vb(0), ab(0), t(0),
     dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
     dbCtrl(1), vbCtrl(1), abCtrl(1),
-    kbInit(1,1), tLast(0.0), firstWarning(true)
+    kbInit(1,1), dbLast(1), tLast(0.0),
+    firstWarning(true)
 {
     // ensure the connectedExternalNode ID is of correct size & set values
     if (connectedExternalNodes.Size() != 2)  {
@@ -119,6 +120,7 @@ EETrussCorot::EETrussCorot(int tag, int dim, int Nd1, int Nd2,
     dbCtrl.Zero();
     vbCtrl.Zero();
     abCtrl.Zero();
+    dbLast.Zero();
 }
 
 
@@ -135,7 +137,8 @@ EETrussCorot::EETrussCorot(int tag, int dim, int Nd1, int Nd2,
     db(0), vb(0), ab(0), t(0),
     dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
     dbCtrl(1), vbCtrl(1), abCtrl(1),
-    kbInit(1,1), tLast(0.0), firstWarning(true)
+    kbInit(1,1), dbLast(1), tLast(0.0),
+    firstWarning(true)
 {
     // ensure the connectedExternalNode ID is of correct size & set values
     if (connectedExternalNodes.Size() != 2)  {
@@ -237,6 +240,7 @@ EETrussCorot::EETrussCorot(int tag, int dim, int Nd1, int Nd2,
     dbCtrl.Zero();
     vbCtrl.Zero();
     abCtrl.Zero();
+    dbLast.Zero();
 }
 
 
@@ -498,6 +502,19 @@ int EETrussCorot::commitState()
     // commit the base class
     rValue += this->Element::commitState();
     
+    // update dbLast
+    const Vector &disp1 = theNodes[0]->getTrialDisp();
+    const Vector &disp2 = theNodes[1]->getTrialDisp();
+    d21[0] = L; d21[1] = d21[2] = 0.0;
+    for (int i=0; i<numDIM; i++)  {
+        double deltaDisp = disp2(i) - disp1(i);
+        d21[0] += deltaDisp*R(0,i);
+        d21[1] += deltaDisp*R(1,i);
+        d21[2] += deltaDisp*R(2,i);
+    }
+    Ln = sqrt(d21[0]*d21[0] + d21[1]*d21[1] + d21[2]*d21[2]);
+    dbLast(0) = Ln - L;
+    
     return rValue;
 }
 
@@ -517,15 +534,11 @@ int EETrussCorot::update()
     const Vector &vel2 = theNodes[1]->getTrialVel();
     const Vector &accel1 = theNodes[0]->getTrialAccel();
     const Vector &accel2 = theNodes[1]->getTrialAccel();
-    const Vector &dispIncr1 = theNodes[0]->getIncrDeltaDisp();
-    const Vector &dispIncr2 = theNodes[1]->getIncrDeltaDisp();
     
     // initial offsets
-    double d21Last[3];
     d21[0] = L; d21[1] = d21[2] = 0.0;
     v21[0] = v21[1] = v21[2] = 0.0;
     a21[0] = a21[1] = a21[2] = 0.0;
-    d21Last[0] = L; d21Last[1] = d21Last[2] = 0.0;
     
     // update offsets in basic system
     for (int i=0; i<numDIM; i++)  {
@@ -541,11 +554,6 @@ int EETrussCorot::update()
         a21[0] += deltaAccel*R(0,i);
         a21[1] += deltaAccel*R(1,i);
         a21[2] += deltaAccel*R(2,i);
-        double deltaDispLast = (disp2(i)-dispIncr2(i))
-                             - (disp1(i)-dispIncr1(i));
-        d21Last[0] += deltaDispLast*R(0,i);
-        d21Last[1] += deltaDispLast*R(1,i);
-        d21Last[2] += deltaDispLast*R(2,i);
     }
     
     // compute new length and deformation
@@ -556,14 +564,12 @@ int EETrussCorot::update()
     (*db)(0) = Ln - L;
     (*vb)(0) = c1/Ln;
     (*ab)(0) = c2/Ln - (c1*c1)/(Ln*Ln*Ln);
-    double LnLast = sqrt(d21Last[0]*d21Last[0] + d21Last[1]*d21Last[1]
-                  + d21Last[2]*d21Last[2]);
-    double dbDelta = (Ln - L) - (LnLast - L);
-
+    
+    Vector dbDelta = (*db) - dbLast;
     // do not check time for right now because of transformation constraint
     // handler calling update at beginning of new step when applying load
-    // if (fabs(dbDelta) > DBL_EPSILON || (*t)(0) > tLast)  {
-    if (fabs(dbDelta) > DBL_EPSILON)  {
+    // if (dbDelta.pNorm(0) > DBL_EPSILON || (*t)(0) > tLast)  {
+    if (dbDelta.pNorm(0) > DBL_EPSILON)  {
         // set the trial response at the site
         if (theSite != 0)  {
             theSite->setTrialResponse(db, vb, ab, (Vector*)0, t);
@@ -574,7 +580,8 @@ int EETrussCorot::update()
         }
     }
     
-    // save the last time
+    // save the last displacements and time
+    dbLast = (*db);
     tLast = (*t)(0);
     
     return rValue;
