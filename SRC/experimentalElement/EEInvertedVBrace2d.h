@@ -144,6 +144,7 @@ private:
     Matrix T;               // transformation matrix
     
     Matrix kbInit;      // stiffness matrix in basic system
+    Vector dbLast;      // displacements in basic system at last update
     double tLast;       // time at last update
     
     Node *theNodes[3];

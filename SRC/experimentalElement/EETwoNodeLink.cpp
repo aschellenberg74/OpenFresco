@@ -74,8 +74,10 @@ EETwoNodeLink::EETwoNodeLink(int tag, int dim, int Nd1, int Nd2,
     dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
     dbCtrl(direction.Size()), vbCtrl(direction.Size()),
     abCtrl(direction.Size()), dl(0), Tgl(0,0), Tlb(0,0),
-    kbInit(direction.Size(), direction.Size()), tLast(0.0),
-    theMatrix(0), theVector(0), theLoad(0), firstWarning(true)
+    kbInit(direction.Size(), direction.Size()),
+    dbLast(direction.Size()), tLast(0.0),
+    theMatrix(0), theVector(0), theLoad(0),
+    firstWarning(true)
 {
     // ensure the connectedExternalNode ID is of correct size & set values
     if (connectedExternalNodes.Size() != 2)  {
@@ -190,6 +192,7 @@ EETwoNodeLink::EETwoNodeLink(int tag, int dim, int Nd1, int Nd2,
     dbCtrl.Zero();
     vbCtrl.Zero();
     abCtrl.Zero();
+    dbLast.Zero();
 }
 
 
@@ -210,8 +213,10 @@ EETwoNodeLink::EETwoNodeLink(int tag, int dim, int Nd1, int Nd2,
     dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
     dbCtrl(direction.Size()), vbCtrl(direction.Size()),
     abCtrl(direction.Size()), dl(0), Tgl(0,0), Tlb(0,0),
-    kbInit(direction.Size(), direction.Size()), tLast(0.0),
-    theMatrix(0), theVector(0), theLoad(0), firstWarning(true)
+    kbInit(direction.Size(), direction.Size()),
+    dbLast(direction.Size()), tLast(0.0),
+    theMatrix(0), theVector(0), theLoad(0),
+    firstWarning(true)
 {
     // ensure the connectedExternalNode ID is of correct size & set values
     if (connectedExternalNodes.Size() != 2)  {
@@ -378,6 +383,7 @@ EETwoNodeLink::EETwoNodeLink(int tag, int dim, int Nd1, int Nd2,
     dbCtrl.Zero();
     vbCtrl.Zero();
     abCtrl.Zero();
+    dbLast.Zero();
 }
 
 
@@ -594,6 +600,17 @@ int EETwoNodeLink::commitState()
     // commit the base class
     rValue += this->Element::commitState();
     
+    // update dbLast
+    int ndim = 0, i;
+    Vector dgLast(numDOF), dlLast(numDOF);
+    for (i=0; i<2; i++)  {
+        Vector disp = theNodes[i]->getTrialDisp();
+        dgLast.Assemble(disp, ndim);
+        ndim += numDOF/2;
+    }
+    dlLast.addMatrixVector(0.0, Tgl, dgLast, 1.0);
+    dbLast.addMatrixVector(0.0, Tlb, dlLast, 1.0);
+    
     return rValue;
 }
 
@@ -608,33 +625,29 @@ int EETwoNodeLink::update()
     
     // get global trial response
     int ndim = 0, i;
-    Vector dg(numDOF), vg(numDOF), ag(numDOF), dgDelta(numDOF);
+    Vector dg(numDOF), vg(numDOF), ag(numDOF);
     for (i=0; i<2; i++)  {
         Vector disp = theNodes[i]->getTrialDisp();
         Vector vel = theNodes[i]->getTrialVel();
         Vector accel = theNodes[i]->getTrialAccel();
-        Vector dispIncr = theNodes[i]->getIncrDeltaDisp();
         dg.Assemble(disp, ndim);
         vg.Assemble(vel, ndim);
         ag.Assemble(accel, ndim);
-        dgDelta.Assemble(dispIncr, ndim);
         ndim += numDOF/2;
     }
     
     // transform response from the global to the local system
-    Vector vl(numDOF), al(numDOF), dlDelta(numDOF);
+    Vector vl(numDOF), al(numDOF);
     dl.addMatrixVector(0.0, Tgl, dg, 1.0);
     vl.addMatrixVector(0.0, Tgl, vg, 1.0);
     al.addMatrixVector(0.0, Tgl, ag, 1.0);
-    dlDelta.addMatrixVector(0.0, Tgl, dgDelta, 1.0);
     
     // transform response from the local to the basic system
-    Vector dbDelta(numDir);
     db->addMatrixVector(0.0, Tlb, dl, 1.0);
     vb->addMatrixVector(0.0, Tlb, vl, 1.0);
     ab->addMatrixVector(0.0, Tlb, al, 1.0);
-    dbDelta.addMatrixVector(0.0, Tlb, dlDelta, 1.0);
     
+    Vector dbDelta = (*db) - dbLast;
     // do not check time for right now because of transformation constraint
     // handler calling update at beginning of new step when applying load
     // if (dbDelta.pNorm(0) > DBL_EPSILON || (*t)(0) > tLast)  {
@@ -649,7 +662,8 @@ int EETwoNodeLink::update()
         }
     }
     
-    // save the last time
+    // save the last displacements and time
+    dbLast = (*db);
     tLast = (*t)(0);
     
     return rValue;

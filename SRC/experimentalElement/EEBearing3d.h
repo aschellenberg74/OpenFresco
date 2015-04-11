@@ -161,6 +161,7 @@ private:
     Matrix Tlb;         // transformation matrix from local to basic system
     
     Matrix kbInit;      // stiffness matrix in basic system
+    Vector dbLast;      // displacements in basic system at last update
     double tLast;       // time at last update
     
     static Matrix theMatrix;    // a class wide Matrix
