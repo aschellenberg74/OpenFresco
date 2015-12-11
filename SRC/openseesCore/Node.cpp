@@ -54,9 +54,102 @@
 // AddingSensitivity:END ////////////////////////////
 
 #include <OPS_Globals.h>
+#include <elementAPI.h>
+#include <string>
 
 Matrix **Node::theMatrices = 0;
+Matrix **Node::theVectors = 0;
 int Node::numMatrices = 0;
+
+void* OPS_Node()
+{
+    int ndm = OPS_GetNDM();
+    int ndf = OPS_GetNDF();
+
+    if(ndm<=0 || ndf<=0) {
+	opserr<<"zero ndm or ndf\n";
+	return 0;
+    }
+
+    if(OPS_GetNumRemainingInputArgs() < 1+ndm) {
+	opserr<<"insufficient number of arguments\n";
+	return 0;
+    }
+
+    // get tag
+    int tag = 0;
+    int numData = 1;
+    OPS_GetIntInput(&numData, &tag);
+
+    // get crds
+    Vector crds(ndm);
+    double* ptr = &crds(0);
+    OPS_GetDoubleInput(&ndm, ptr);
+
+    // create node
+    Node* theNode = 0;
+    if(ndm == 1) {
+	theNode = new Node(tag,ndf,crds(0));
+    } else if(ndm == 2) {
+	theNode = new Node(tag,ndf,crds(0),crds(1));
+    } else {
+	theNode = new Node(tag,ndf,crds(0),crds(1),crds(2));
+    }
+    if(theNode == 0) {
+	opserr<<"run out of memory for node "<<tag<<"\n";
+	return 0;
+    }
+
+    // check options
+    while(OPS_GetNumRemainingInputArgs() > 0) {
+	std::string type = OPS_GetString();
+	if(type=="-disp" || type=="-Disp") {
+	    if(OPS_GetNumRemainingInputArgs() < ndf) {
+		opserr<<"incorrect number of nodal disp terms\n";
+		delete theNode;
+		return 0;
+	    }
+	    Vector data(ndf);
+	    OPS_GetDoubleInput(&ndf, &data(0));
+	    theNode->setTrialDisp(data);
+	    theNode->commitState();
+	} else if(type=="-vel" || type=="-Vel") {
+	    if(OPS_GetNumRemainingInputArgs() < ndf) {
+		opserr<<"incorrect number of nodal vel terms\n";
+		delete theNode;
+		return 0;
+	    }
+	    Vector data(ndf);
+	    OPS_GetDoubleInput(&ndf, &data(0));
+	    theNode->setTrialVel(data);
+	    theNode->commitState();
+	} else if(type=="-mass" || type=="-Mass") {
+	    if(OPS_GetNumRemainingInputArgs() < ndf) {
+		opserr<<"incorrect number of nodal mass terms\n";
+		delete theNode;
+		return 0;
+	    }
+	    Vector data(ndf);
+	    OPS_GetDoubleInput(&ndf, &data(0));
+	    Matrix ndmass(ndf,ndf);
+	    for(int i=0; i<ndf; i++) {
+		ndmass(i,i) = data(i);
+	    }
+	    theNode->setMass(ndmass);
+	} else if(type=="-dispLoc" || type=="-dispLoc") {
+	    if(OPS_GetNumRemainingInputArgs() < ndm) {
+		opserr<<"incorrect number of nodal mass terms\n";
+		delete theNode;
+		return 0;
+	    }
+	    Vector data(ndm);
+	    OPS_GetDoubleInput(&ndm, &data(0));
+	    theNode->setDisplayCrds(data);
+	}
+    }
+
+    return theNode;
+}
 
 // for FEM_Object Broker to use
 Node::Node(int theClassTag)
@@ -67,7 +160,7 @@ Node::Node(int theClassTag)
  incrDeltaDisp(0),
  disp(0), vel(0), accel(0), dbTag1(0), dbTag2(0), dbTag3(0), dbTag4(0),
  R(0), mass(0), unbalLoadWithInertia(0), alphaM(0.0), theEigenvectors(0), 
- index(-1), reaction(0)
+ index(-1), reaction(0), displayLocation(0)
 {
   // for FEM_ObjectBroker, recvSelf() must be invoked on object
 
@@ -88,7 +181,7 @@ Node::Node(int tag, int theClassTag)
  incrDeltaDisp(0), 
  disp(0), vel(0), accel(0), dbTag1(0), dbTag2(0), dbTag3(0), dbTag4(0),
   R(0), mass(0), unbalLoadWithInertia(0), alphaM(0.0), theEigenvectors(0), 
- index(-1), reaction(0)
+ index(-1), reaction(0), displayLocation(0)
 {
   // for subclasses - they must implement all the methods with
   // their own data structures.
@@ -101,7 +194,7 @@ Node::Node(int tag, int theClassTag)
   // AddingSensitivity:END ///////////////////////////////////////////
 }
 
-Node::Node(int tag, int ndof, double Crd1)
+Node::Node(int tag, int ndof, double Crd1, Vector *dLoc)
 :DomainComponent(tag,NOD_TAG_Node), 
  numberDOF(ndof), theDOF_GroupPtr(0),
  Crd(0), commitDisp(0), commitVel(0), commitAccel(0), 
@@ -109,7 +202,7 @@ Node::Node(int tag, int ndof, double Crd1)
  incrDeltaDisp(0), 
  disp(0), vel(0), accel(0), dbTag1(0), dbTag2(0), dbTag3(0), dbTag4(0),
  R(0), mass(0), unbalLoadWithInertia(0), alphaM(0.0), theEigenvectors(0), 
- index(-1), reaction(0)
+ index(-1), reaction(0), displayLocation(0)
 {
   // AddingSensitivity:BEGIN /////////////////////////////////////////
   dispSensitivity = 0;
@@ -120,6 +213,10 @@ Node::Node(int tag, int ndof, double Crd1)
   
   Crd = new Vector(1);
   (*Crd)(0) = Crd1;
+
+  if (dLoc != 0) {
+    displayLocation = new Vector(*dLoc);
+  }
   
   index = -1;
   if (numMatrices != 0) {
@@ -154,7 +251,7 @@ Node::Node(int tag, int ndof, double Crd1)
 
 //  Node(int tag, int ndof, double Crd1, double yCrd);
 //	constructor for 2d nodes
-Node::Node(int tag, int ndof, double Crd1, double Crd2)
+Node::Node(int tag, int ndof, double Crd1, double Crd2, Vector *dLoc)
 :DomainComponent(tag,NOD_TAG_Node), 
  numberDOF(ndof), theDOF_GroupPtr(0),
  Crd(0), commitDisp(0), commitVel(0), commitAccel(0), 
@@ -162,7 +259,7 @@ Node::Node(int tag, int ndof, double Crd1, double Crd2)
  incrDeltaDisp(0), 
  disp(0), vel(0), accel(0), dbTag1(0), dbTag2(0), dbTag3(0), dbTag4(0),
  R(0), mass(0), unbalLoadWithInertia(0), alphaM(0.0), theEigenvectors(0),
- reaction(0)
+ reaction(0), displayLocation(0)
 {
   // AddingSensitivity:BEGIN /////////////////////////////////////////
   dispSensitivity = 0;
@@ -174,6 +271,10 @@ Node::Node(int tag, int ndof, double Crd1, double Crd2)
   Crd = new Vector(2);
   (*Crd)(0) = Crd1;
   (*Crd)(1) = Crd2;
+
+  if (dLoc != 0) {
+    displayLocation = new Vector(*dLoc);
+  }
   
   index = -1;
   if (numMatrices != 0) {
@@ -209,7 +310,7 @@ Node::Node(int tag, int ndof, double Crd1, double Crd2)
 //  Node(int tag, int ndof, double Crd1, double Crd2, double zCrd);
 //	constructor for 3d nodes
 
-Node::Node(int tag, int ndof, double Crd1, double Crd2, double Crd3)
+ Node::Node(int tag, int ndof, double Crd1, double Crd2, double Crd3, Vector *dLoc)
 :DomainComponent(tag,NOD_TAG_Node), 
  numberDOF(ndof), theDOF_GroupPtr(0),
  Crd(0), commitDisp(0), commitVel(0), commitAccel(0), 
@@ -217,7 +318,7 @@ Node::Node(int tag, int ndof, double Crd1, double Crd2, double Crd3)
  incrDeltaDisp(0), 
  disp(0), vel(0), accel(0), dbTag1(0), dbTag2(0), dbTag3(0), dbTag4(0),
  R(0), mass(0), unbalLoadWithInertia(0), alphaM(0.0), theEigenvectors(0),
- reaction(0)
+ reaction(0), displayLocation(0)
 {
   // AddingSensitivity:BEGIN /////////////////////////////////////////
   dispSensitivity = 0;
@@ -230,6 +331,10 @@ Node::Node(int tag, int ndof, double Crd1, double Crd2, double Crd3)
   (*Crd)(0) = Crd1;
   (*Crd)(1) = Crd2;
   (*Crd)(2) = Crd3;    
+
+  if (dLoc != 0) {
+    displayLocation = new Vector(*dLoc);
+  }
   
   index = -1;
   if (numMatrices != 0) {
@@ -273,7 +378,7 @@ Node::Node(const Node &otherNode, bool copyMass)
  incrDeltaDisp(0), 
  disp(0), vel(0), accel(0), dbTag1(0), dbTag2(0), dbTag3(0), dbTag4(0),
  R(0), mass(0), unbalLoadWithInertia(0), alphaM(0.0), theEigenvectors(0),
- reaction(0)
+   reaction(0), displayLocation(0)
 {
   // AddingSensitivity:BEGIN /////////////////////////////////////////
   dispSensitivity = 0;
@@ -286,6 +391,10 @@ Node::Node(const Node &otherNode, bool copyMass)
   if (Crd == 0) {
     opserr << " FATAL Node::Node(node *) - ran out of memory for Crd\n";
     exit(-1);
+  }
+
+  if (otherNode.displayLocation != 0) {
+    displayLocation = new Vector(*(otherNode.displayLocation));
   }
 
   if (otherNode.commitDisp != 0) {
@@ -440,6 +549,10 @@ Node::~Node()
 
     if (reaction != 0)
       delete reaction;
+
+
+    if (displayLocation != 0)
+      delete displayLocation;
 
     if (theDOF_GroupPtr != 0)
       theDOF_GroupPtr->resetNodePtr();
@@ -613,6 +726,7 @@ Node::setTrialDisp(double value, int dof)
     // check vector arg is of correct size
     if (dof < 0 || dof >=  numberDOF) {
       opserr << "WARNING Node::setTrialDisp() - incompatable sizes\n";
+      opserr << "node: " << this->getTag() << endln;
       return -2;
     }    
 
@@ -641,9 +755,10 @@ Node::setTrialDisp(const Vector &newTrialDisp)
 {
     // check vector arg is of correct size
     if (newTrialDisp.Size() != numberDOF) {
-	    opserr << "WARNING Node::setTrialDisp() - incompatable sizes\n";
-	    return -2;
-	}    
+      opserr << "WARNING Node::setTrialDisp() - incompatable sizes\n";
+      opserr << "node: " << this->getTag() << endln;
+      return -2;
+    }    
 
     // construct memory and Vectors for trial and committed
     // accel on first call to this method, getTrialDisp(),
@@ -908,19 +1023,16 @@ Node::addInertiaLoadSensitivityToUnbalance(const Vector &accelG, double fact, bo
   //(*unbalLoad) -= ((*mass) * (*R) * accelG)*fact;
 
 
-
 	Matrix massSens(mass->noRows(),mass->noCols());
-	if (parameterID != 0) {
-		massSens(parameterID-1,parameterID-1) = 1.0;
-	}
+	massSens = this->getMassSensitivity();
 
 	Matrix MR(mass->noRows(), R->noCols());
 
 	if (somethingRandomInMotions) {
-		MR.addMatrixProduct(0.0, *mass, *R, 1.0);
+	  MR.addMatrixProduct(0.0, *mass, *R, 1.0);
 	}
 	else {
-		MR.addMatrixProduct(0.0, massSens, *R, 1.0);
+	  MR.addMatrixProduct(0.0, massSens, *R, 1.0);
 	}
 	unbalLoad->addMatrixVector(1.0, MR, accelG, -fact);
 
@@ -1612,6 +1724,7 @@ Node::Print(OPS_Stream &s, int flag)
     if (mass != 0) {
 	s << "\tMass : " << *mass;
 	s << "\t Rayleigh Factor: alphaM: " << alphaM << endln;
+	s << "\t Rayleigh Forces: " << *this->getResponse(RayleighForces);
     }
     if (theEigenvectors != 0)
 	s << "\t Eigenvectors: " << *theEigenvectors;
@@ -1631,14 +1744,11 @@ Node::displaySelf(Renderer &theRenderer, int displayMode, float fact)
   if (displayMode == 0)
     return 0;
 
-  const Vector &theDisp = this->getDisp();
+//  const Vector &theDisp = this->getDisp();
   static Vector position(3);
 
-  for (int i=0; i<3; i++)
-    if (i <Crd->Size())
-      position(i) = (*Crd)(i) + theDisp(i)*fact;	
-    else
-      position(i) = 0.0;	      
+  this->getDisplayCrds(position, fact);
+
   
   if (displayMode == -1) { 
     // draw a text string containing tag
@@ -1751,6 +1861,15 @@ Node::getMassSensitivity(void)
 		if ( (parameterID == 1) || (parameterID == 2) || (parameterID == 3) ) {
 			massSens(parameterID-1,parameterID-1) = 1.0;
 		}
+		if (parameterID == 7) {
+		  massSens(0,0) = 1.0;
+		  massSens(1,1) = 1.0;
+		}
+		if (parameterID == 8) {
+		  massSens(0,0) = 1.0;
+		  massSens(1,1) = 1.0;
+		  massSens(2,2) = 1.0;
+		}
 		return massSens;
 	}
 }
@@ -1784,24 +1903,42 @@ Node::setParameter(const char **argv, int argc, Parameter &param)
 
   if ((strstr(argv[0],"mass") != 0) || (strstr(argv[0],"-mass") != 0)) { 
     int direction = 0; // atoi(argv[1]);
-    if ((strcmp(argv[1],"x") == 0)||(strcmp(argv[1],"X") == 0)||(strcmp(argv[1],"1") == 0))
+    if ((strcmp(argv[1],"x") == 0)||(strcmp(argv[1],"X") == 0)||(strcmp(argv[1],"1") == 0)) {
       direction = 1;
-    else if ((strcmp(argv[1],"y") == 0)||(strcmp(argv[1],"Y") == 0)||(strcmp(argv[1],"2") == 0))
+      if (mass != 0)
+	param.setValue((*mass)(0,0));
+    }
+    else if ((strcmp(argv[1],"y") == 0)||(strcmp(argv[1],"Y") == 0)||(strcmp(argv[1],"2") == 0)) {
       direction = 2;
-    else if ((strcmp(argv[1],"z") == 0)||(strcmp(argv[1],"Z") == 0)||(strcmp(argv[1],"3") == 0))					
+      if (mass != 0)
+	param.setValue((*mass)(1,1));
+    }
+    else if ((strcmp(argv[1],"z") == 0)||(strcmp(argv[1],"Z") == 0)||(strcmp(argv[1],"3") == 0)) {
       direction = 3;
-    else if ((strcmp(argv[1],"xy") == 0)||(strcmp(argv[1],"XY") == 0))
+      if (mass != 0)
+	param.setValue((*mass)(2,2));
+    }
+    else if ((strcmp(argv[1],"xy") == 0)||(strcmp(argv[1],"XY") == 0)) {
       direction = 7;
-    else if ((strcmp(argv[1],"xyz") == 0)||(strcmp(argv[1],"XYZ") == 0))
+      if (mass != 0)
+	param.setValue((*mass)(0,0));
+    }
+    else if ((strcmp(argv[1],"xyz") == 0)||(strcmp(argv[1],"XYZ") == 0)) {
       direction = 8;
+      if (mass != 0)
+	param.setValue((*mass)(0,0));
+    }
     
     if ((direction >= 1 && direction <= 3) || direction == 7 || direction == 8)
       return param.addObject(direction, this);
   }
   else if (strstr(argv[0],"coord") != 0) {
     int direction = atoi(argv[1]);
-    if (direction >= 1 && direction <= 3)
+    if (direction >= 1 && direction <= 3) {
+      if (Crd != 0)
+	param.setValue((*Crd)(direction-1));
       return param.addObject(direction+3, this);
+    }
   }
   else
     opserr << "WARNING: Could not set parameter in Node. " << endln;
@@ -2026,7 +2163,20 @@ Node::getResponse(NodeResponseType responseType)
     return &(this->getIncrDeltaDisp());
   else if (responseType == Reaction) 
     return &(this->getReaction());
-  else
+  else if (responseType == Unbalance) 
+    return &(this->getUnbalancedLoad());
+  else if (responseType == RayleighForces) {
+    if (unbalLoadWithInertia == 0) {
+      unbalLoadWithInertia = new Vector(this->getUnbalancedLoad());
+    }
+    if (alphaM != 0.0 && mass != 0) {
+      const Vector &theVel = this->getTrialVel(); // in case vel not created
+      unbalLoadWithInertia->addMatrixVector(0.0, *mass, theVel, -alphaM);
+    } else
+      unbalLoadWithInertia->Zero();
+
+    return unbalLoadWithInertia;
+  } else
     return NULL;
 
   return result;
@@ -2088,6 +2238,8 @@ Node::setCrds(const Vector &newCrds)
   if (Crd != 0 && Crd->Size() == newCrds.Size()) {
     (*Crd) = newCrds;
 
+	return;
+
     // Need to "setDomain" to make the change take effect. 
     Domain *theDomain = this->getDomain();
     ElementIter &theElements = theDomain->getElements();
@@ -2096,4 +2248,51 @@ Node::setCrds(const Vector &newCrds)
       theElement->setDomain(theDomain);
     }
   }
+}
+
+int
+Node::getDisplayCrds(Vector &res, double fact) 
+{
+  int ndm = Crd->Size();
+  int resSize = res.Size();
+
+  if (resSize < ndm)
+    return -1;
+
+  if (commitDisp != 0) {
+    if (displayLocation != 0)
+      for (int i=0; i<ndm; i++)
+	res(i) = (*displayLocation)(i)+(*commitDisp)(i)*fact;
+    else
+      for (int i=0; i<ndm; i++)
+	res(i) = (*Crd)(i)+(*commitDisp)(i)*fact;
+  } else {
+    if (displayLocation != 0)
+      for (int i=0; i<ndm; i++)
+	res(i) = (*displayLocation)(i);
+    else
+      for (int i=0; i<ndm; i++)
+	res(i) = (*Crd)(i);
+  }
+
+  // zero rest
+  for (int i=ndm; i<resSize; i++)
+    res(i) = 0;
+
+  return 0;
+}
+
+int
+Node::setDisplayCrds(const Vector &theCrds) 
+{
+  if (theCrds.Size() != Crd->Size()) {
+    return -1;
+  }
+
+  if (displayLocation == 0) {
+    displayLocation = new Vector(theCrds);
+  } else {
+    *displayLocation = theCrds;
+  }
+  return 0;
 }

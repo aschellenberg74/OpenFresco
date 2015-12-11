@@ -530,6 +530,18 @@ AnalysisModel::getEigenvalues(void)
 }	
 
 
+
+const Vector *
+AnalysisModel::getModalDampingFactors(void){
+  return myDomain->getModalDampingFactors();
+}
+
+bool 
+AnalysisModel::inclModalDampingMatrix(void)
+{
+  return myDomain->inclModalDampingMatrix();
+}
+
 void 
 AnalysisModel::setEigenvector(int mode, const Vector &eigenvalue)
 {
@@ -578,6 +590,7 @@ AnalysisModel::updateDomain(void)
 int
 AnalysisModel::updateDomain(double newTime, double dT)
 {
+
     // check to see there is a Domain linked to the Model
 
     if (myDomain == 0) {

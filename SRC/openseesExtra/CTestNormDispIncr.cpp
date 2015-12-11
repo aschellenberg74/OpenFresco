@@ -28,7 +28,36 @@
 #include <Channel.h>
 #include <EquiSolnAlgo.h>
 #include <LinearSOE.h>
+#include <elementAPI.h>
 
+void* OPS_CTestNormDispIncr()
+{
+    if(OPS_GetNumRemainingInputArgs() < 2) {
+	opserr<<"insufficient number of arguments\n";
+	return 0;
+    }
+
+    // tolerance
+    double tol = 1e-6;
+    int numData = 1;
+    if(OPS_GetDoubleInput(&numData,&tol) < 0) return 0;
+
+    // maxIter
+    numData = OPS_GetNumRemainingInputArgs();
+    if(numData > 3) numData = 3;
+    int data[3] = {0,0,2};
+    if(OPS_GetIntInput(&numData,&data[0]) < 0) return 0;
+
+    // maxTol
+    double maxTol = OPS_MAXTOL;
+    if(OPS_GetNumRemainingInputArgs() > 0) {
+	numData = 1;
+	if(OPS_GetDoubleInput(&numData,&maxTol) < 0) return 0;
+    }
+    
+    // create test
+    return new CTestNormDispIncr(tol,data[0],data[1],data[2],maxTol);
+}
 
 CTestNormDispIncr::CTestNormDispIncr()	    	
     : ConvergenceTest(CONVERGENCE_TEST_CTestNormDispIncr),
@@ -42,7 +71,7 @@ CTestNormDispIncr::CTestNormDispIncr()
 CTestNormDispIncr::CTestNormDispIncr(double theTol, int maxIter, int printIt, int normType, double max)
     : ConvergenceTest(CONVERGENCE_TEST_CTestNormDispIncr),
       theSOE(0), tol(theTol), maxTol(max), maxNumIter(maxIter), currentIter(0), printFlag(printIt),
-      norms(maxIter), nType(normType)
+      nType(normType), norms(maxIter)
 {
     
 }
@@ -57,7 +86,7 @@ CTestNormDispIncr::~CTestNormDispIncr()
 ConvergenceTest* CTestNormDispIncr::getCopy(int iterations)
 {
     CTestNormDispIncr *theCopy ;
-    theCopy = new CTestNormDispIncr(this->tol, iterations, this->printFlag, this->nType, this->maxTol) ;
+    theCopy = new CTestNormDispIncr(this->tol, iterations, 0, this->nType, this->maxTol) ;
     
     theCopy->theSOE = this->theSOE ;
     
@@ -74,12 +103,8 @@ void CTestNormDispIncr::setTolerance(double newTol)
 int CTestNormDispIncr::setEquiSolnAlgo(EquiSolnAlgo &theAlgo)
 {
     theSOE = theAlgo.getLinearSOEptr();
-    if (theSOE == 0) {
-        opserr << "WARNING: CTestNormDispIncr::setEquiSolnAlgo() - no SOE\n";	
-        return -1;
-    }
-    else
-      return 0;
+   
+    return 0;
 }
 
 
@@ -87,8 +112,10 @@ int CTestNormDispIncr::test(void)
 {
     // check to ensure the SOE has been set - this should not happen if the 
     // return from start() is checked
-    if (theSOE == 0)
+    if (theSOE == 0) {
+		  opserr << "WARNING: CTestNormDispIncr::test() - no SOE set.\n";	
         return -2;
+	}
     
     // check to ensure the algo does invoke start() - this is needed otherwise
     // may never get convergence later on in analysis!
@@ -149,7 +176,9 @@ int CTestNormDispIncr::test(void)
     // algo failed to converged after specified number of iterations - return FAILURE -2
     else if (currentIter >= maxNumIter || norm > maxTol) { // failes to converge
         opserr << "WARNING: CTestNormDispIncr::test() - failed to converge \n";
-        opserr << "after: " << currentIter << " iterations\n";	
+        opserr << "after: " << currentIter << " iterations ";	
+        opserr << " current Norm: " << norm << " (max: " << tol;
+        opserr << ", Norm deltaR: " << theSOE->getB().pNorm(nType) << ")\n";
         currentIter++;    
         return -2;
     } 

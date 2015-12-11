@@ -200,6 +200,9 @@
 #define MAT_TAG_ModIMKPinching02                86
 #define MAT_TAG_Steel4                          87
 #define MAT_TAG_SimpleFractureMaterial          88
+#define MAT_TAG_BilinearOilDamper               89
+#define MAT_TAG_ConcreteCM                      90
+#define MAT_TAG_SteelMPF                        91
 
 
 #define MAT_TAG_PySimple1                    205
@@ -283,8 +286,9 @@
 #define SEC_TAG_FiberSection2dInt		25
 #define SEC_TAG_FiberSection2dThermal		26
 #define SEC_TAG_LayeredShellFiberSection        27
-
-
+#define SEC_TAG_ElasticWarpingShear2d           28
+#define SEC_TAG_DoubleMembranePlateFiberSection 29
+#define SEC_TAG_NDFiberSectionWarping2d         30
 
 #define SEC_TAG_McftSection2dfiber 7601
 
@@ -325,7 +329,8 @@
 #define ND_TAG_CycLiqCPSP3D                       39
 #define ND_TAG_CycLiqCPSPPlaneStrain              40
 #define ND_TAG_ConcreteS                          41
-
+#define ND_TAG_MaterialCMM                        42
+#define ND_TAG_FSAM                               43
 
 
 #define ND_TAG_FluidSolidPorousMaterial        100
@@ -389,6 +394,10 @@
 #define ND_TAG_ManzariDafaliasRO                14015
 #define ND_TAG_ManzariDafalias3DRO              14016
 #define ND_TAG_ManzariDafaliasPlaneStrainRO     14017
+// Stress-Dilatancy material - C.McGann
+#define ND_TAG_StressDensityModel             14018
+#define ND_TAG_StressDensityModel2D           14019
+#define ND_TAG_StressDensityModel3D           14020
 
 // MultiaxialCyclicPlasticity, add by Gang Wang
 #define ND_TAG_MultiaxialCyclicPlasticity             10031
@@ -447,6 +456,7 @@
 #define PATTERN_TAG_FirePattern           3
 #define PATTERN_TAG_PBowlLoading	  4
 #define PATTERN_TAG_DRMLoadPattern        5
+#define PATTERN_TAG_UniformRotationalExcitation     6
 
 #define LOAD_TAG_Beam2dUniformLoad        3
 #define LOAD_TAG_Beam2dPointLoad          4
@@ -519,7 +529,7 @@
 #define ELE_TAG_BBarBrickUP             51
 #define ELE_TAG_PlateMITC4              52
 #define ELE_TAG_ShellMITC4              53
-#define ELE_TAG_ShellNL                 54 //Tesser
+#define ELE_TAG_ShellMITC9              54 //Tesser
 #define ELE_TAG_Plate1                  55
 #define ELE_TAG_Brick                   56
 #define ELE_TAG_BbarBrick               57
@@ -530,6 +540,7 @@
 #define ELE_TAG_DispBeamColumn2d        62
 #define ELE_TAG_TimoshenkoBeamColumn2d  63
 #define ELE_TAG_DispBeamColumn3d        64
+#define ELE_TAG_DispBeamColumnWarping3d        641
 #define ELE_TAG_HingedBeam2d            65
 #define ELE_TAG_HingedBeam3d            66
 #define ELE_TAG_TwoPointHingedBeam2d    67
@@ -539,8 +550,10 @@
 #define ELE_TAG_BeamColumnJoint2d       71
 #define ELE_TAG_BeamColumnJoint3d       72
 #define ELE_TAG_ForceBeamColumn2d       73
+#define ELE_TAG_ForceBeamColumnWarping2d 731
 #define ELE_TAG_ForceBeamColumn3d       74
 #define ELE_TAG_ElasticForceBeamColumn2d 75
+#define ELE_TAG_ElasticForceBeamColumnWarping2d 751
 #define ELE_TAG_ElasticForceBeamColumn3d 76
 #define ELE_TAG_ForceBeamColumnCBDI2d   77
 #define ELE_TAG_ForceBeamColumnCBDI3d   78
@@ -595,6 +608,7 @@
 #define ELE_TAG_BeamEndContact3Dp      125
 #define ELE_TAG_Quad4FiberOverlay      126
 #define ELE_TAG_Brick8FiberOverlay     127
+#define ELE_TAG_QuadBeamEmbedContact   500
 #define ELE_TAG_DispBeamColumn2dThermal 128
 #define ELE_TAG_TPB1D                  129
 #define ELE_TAG_TFP_Bearing            130
@@ -623,11 +637,15 @@
 #define ELE_TAG_LeadRubberX               153
 #define ELE_TAG_PileToe3D                 154
 #define ELE_TAG_N4BiaxialTruss            155
-
-#define ELE_TAG_MultipleShearSpring 6201
-#define ELE_TAG_MultipleNormalSpring 6202
-#define ELE_TAG_KikuchiBearing 6203
-#define ELE_TAG_YamamotoBiaxialHDR 6204
+#define ELE_TAG_ShellDKGQ                 156
+#define ELE_TAG_ShellNLDKGQ               157
+#define ELE_TAG_MultipleShearSpring       158
+#define ELE_TAG_MultipleNormalSpring      159
+#define ELE_TAG_KikuchiBearing            160
+#define ELE_TAG_YamamotoBiaxialHDR        161
+#define ELE_TAG_MVLEM                     162
+#define ELE_TAG_SFI_MVLEM                 163
+#define ELE_TAG_PFEMElement2DFIC          164
 
 #define FRN_TAG_Coulomb            1
 #define FRN_TAG_VelDependent       2
@@ -674,6 +692,7 @@
 #define CRDTR_TAG_PDeltaCrdTransf2d 2
 #define CRDTR_TAG_ModerateDispCrdTransf2d 8
 #define CRDTR_TAG_CorotCrdTransf2d  3
+#define CRDTR_TAG_CorotCrdTransfWarping2d 31
 #define CRDTR_TAG_LinearCrdTransf3d 4
 #define CRDTR_TAG_PDeltaCrdTransf3d 5
 #define CRDTR_TAG_ModerateDispCrdTransf3d 9
@@ -879,6 +898,7 @@
 #define RECORDER_TAGS_NormElementRecorder	16
 #define RECORDER_TAGS_NormNodeRecorder	        17
 #define RECORDER_TAGS_NormEnvelopeElementRecorder	18
+#define RECORDER_TAGS_PVDRecorder               19
 
 #define OPS_STREAM_TAGS_FileStream		1
 #define OPS_STREAM_TAGS_StandardStream		2
@@ -944,4 +964,3 @@
 #define CHANNEL_TAGS_FileDatastore	  1
 
 #endif
-

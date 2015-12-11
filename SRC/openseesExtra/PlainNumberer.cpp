@@ -53,6 +53,11 @@
 #include <Node.h>
 #include <MP_ConstraintIter.h>
 
+void* OPS_PlainNumberer()
+{
+    return new PlainNumberer();
+}
+
 PlainNumberer::PlainNumberer() 
 :DOF_Numberer(NUMBERER_TAG_PlainNumberer)
 {
