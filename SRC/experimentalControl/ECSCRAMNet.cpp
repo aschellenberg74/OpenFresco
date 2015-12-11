@@ -12,7 +12,7 @@
 ** and redistribution, and for a DISCLAIMER OF ALL WARRANTIES.        **
 **                                                                    **
 ** Developed by:                                                      **
-**   Andreas Schellenberg (andreas.schellenberg@gmx.net)              **
+**   Andreas Schellenberg (andreas.schellenberg@gmail.com)            **
 **   Yoshikazu Takahashi (yos@catfish.dpri.kyoto-u.ac.jp)             **
 **   Gregory L. Fenves (fenves@berkeley.edu)                          **
 **   Stephen A. Mahin (mahin@berkeley.edu)                            **
@@ -42,7 +42,8 @@ ECSCRAMNet::ECSCRAMNet(int tag, int memoffset, int numdof)
     memPtrBASE(0), memPtrOPF(0),
     newTarget(0), switchPC(0), atTarget(0),
     ctrlDisp(0), ctrlVel(0), ctrlAccel(0), ctrlForce(0), ctrlTime(0),
-    daqDisp(0), daqVel(0), daqAccel(0), daqForce(0), daqTime(0)
+    daqDisp(0), daqVel(0), daqAccel(0), daqForce(0), daqTime(0),
+    trialDispOffset(numdof), getOffset(1)
 {
 #ifdef _WIN32
     // map the SCRAMNet control status registers (CSRs)
@@ -79,6 +80,10 @@ ECSCRAMNet::ECSCRAMNet(int tag, int memoffset, int numdof)
     }
 #endif
     
+    // set OpenFresco nodeID (MTS controller = node1, xPCtarget = node2)
+    unsigned short nodeID = 3;
+    scr_csr_write(SCR_CSR3, nodeID);
+    
     // set the transaction mode for memory access to Longword (32-bit)
     // Long_mode = 0 (32-bit), Word_mode = 1 (16-bit), Byte_mode = 2 (8-bit)
     // | no swap 32-bit | 00 | Q(31:24) | Q(23:16) | Q(15:8)  | Q(7:0)   |
@@ -91,7 +96,7 @@ ECSCRAMNet::ECSCRAMNet(int tag, int memoffset, int numdof)
     
     // set CSR0 bits so node can receive and transmit data
     unsigned short csrValue = 0x8003;
-    scr_csr_write(SCR_CSR0,csrValue);
+    scr_csr_write(SCR_CSR0, csrValue);
     
     // get the pointer to the base memory address
     memPtrBASE = (int*) get_base_mem();
@@ -101,10 +106,8 @@ ECSCRAMNet::ECSCRAMNet(int tag, int memoffset, int numdof)
     memPtrOPF = (float*) (memPtrBASE + (memOffset/4));
     float *memPtr = memPtrOPF;
     
-    // setup pointers to state flags
-    newTarget = (unsigned int*) memPtr;  memPtr++;
-    switchPC  = (unsigned int*) memPtr;  memPtr++;
-    atTarget  = (unsigned int*) memPtr;  memPtr++;
+    // setup pointers to newTarget flag
+    newTarget = (int*) memPtr;  memPtr++;
     
     // setup pointers to control memory locations
     ctrlDisp  = memPtr;  memPtr += numDOF;
@@ -112,6 +115,10 @@ ECSCRAMNet::ECSCRAMNet(int tag, int memoffset, int numdof)
     ctrlAccel = memPtr;  memPtr += numDOF;
     ctrlForce = memPtr;  memPtr += numDOF;
     ctrlTime  = memPtr;  memPtr += numDOF;
+    
+    // setup pointers to switchPC and atTarget flags
+    switchPC  = (int*) memPtr;  memPtr++;
+    atTarget  = (int*) memPtr;  memPtr++;
     
     // setup pointers to daq memory locations
     daqDisp  = memPtr;  memPtr += numDOF;
@@ -122,14 +129,12 @@ ECSCRAMNet::ECSCRAMNet(int tag, int memoffset, int numdof)
     
     // initialize everything to zero
     newTarget[0] = 0;
-    switchPC[0]  = 0;
-    atTarget[0]  = 0;
     for (int i=0; i<numDOF; i++)  {
-        ctrlDisp[i]  = 0.0;  daqDisp[i]  = 0.0;
-        ctrlVel[i]   = 0.0;  daqVel[i]   = 0.0;
-        ctrlAccel[i] = 0.0;  daqAccel[i] = 0.0;
-        ctrlForce[i] = 0.0;  daqForce[i] = 0.0;
-        ctrlTime[i]  = 0.0;  daqTime[i]  = 0.0;
+        ctrlDisp[i]  = 0.0;
+        ctrlVel[i]   = 0.0;
+        ctrlAccel[i] = 0.0;
+        ctrlForce[i] = 0.0;
+        ctrlTime[i]  = 0.0;
     }
     
     opserr << "************************************************\n";
@@ -145,7 +150,8 @@ ECSCRAMNet::ECSCRAMNet(const ECSCRAMNet &ec)
     memPtrBASE(0), memPtrOPF(0),
     newTarget(0), switchPC(0), atTarget(0),
     ctrlDisp(0), ctrlVel(0), ctrlAccel(0), ctrlForce(0), ctrlTime(0),
-    daqDisp(0), daqVel(0), daqAccel(0), daqForce(0), daqTime(0)
+    daqDisp(0), daqVel(0), daqAccel(0), daqForce(0), daqTime(0),
+    trialDispOffset(ec.numDOF), getOffset(1)
 {
     memPtrBASE = ec.memPtrBASE;
     memPtrOPF  = ec.memPtrOPF;
@@ -169,6 +175,20 @@ ECSCRAMNet::ECSCRAMNet(const ECSCRAMNet &ec)
 
 ECSCRAMNet::~ECSCRAMNet()
 {
+    // stop predictor-corrector
+    newTarget[0] = -1;
+    this->ExperimentalControl::sleep(10);
+    
+    // set everything back to zero
+    newTarget[0] = 0;
+    for (int i=0; i<numDOF; i++)  {
+        ctrlDisp[i]  = 0.0;
+        ctrlVel[i]   = 0.0;
+        ctrlAccel[i] = 0.0;
+        ctrlForce[i] = 0.0;
+        ctrlTime[i]  = 0.0;
+    }
+    
     // unmap the SCRAMNet control status registers (CSRs)
     int rValue = scr_reg_mm(UNMAP);
     if (rValue != 0)  {
@@ -201,7 +221,8 @@ int ECSCRAMNet::setup()
     this->Print(opserr);
     
     opserr << "****************************************************************\n";
-    opserr << "* Make sure that offset values of controller are set to ZERO   *\n";
+    opserr << "* Make sure that offset values of controller are set to ZERO,  *\n";
+    opserr << "* then start the Simulink model by typing tg.start in Matlab   *\n";
     opserr << "*                                                              *\n";
     opserr << "* Press 'Enter' to proceed or 'c' to cancel the initialization *\n";
     opserr << "****************************************************************\n";
@@ -285,45 +306,66 @@ int ECSCRAMNet::setSize(ID sizeT, ID sizeO)
 }
 
 
-int ECSCRAMNet::setTrialResponse(const Vector* disp,
+int ECSCRAMNet::setTrialResponse(
+    const Vector* disp,
     const Vector* vel,
     const Vector* accel,
     const Vector* force,
     const Vector* time)
 {
     int i, rValue = 0;
+    
+    if (getOffset == 1)  {
+        if (disp != 0)  {
+            for (i=0; i<(*sizeCtrl)(OF_Resp_Disp); i++)
+                trialDispOffset(i) = -(*disp)(i);
+        }
+        getOffset = 0;
+    }
+    
     if (disp != 0)  {
-        for (i=0; i<(*sizeCtrl)(OF_Resp_Disp); i++)  {
-            ctrlDisp[i] = float((*disp)(i));
-            if (theCtrlFilters[OF_Resp_Disp] != 0)
-                ctrlDisp[i] = float(theCtrlFilters[OF_Resp_Disp]->filtering(ctrlDisp[i]));
+        if (theCtrlFilters[OF_Resp_Disp] == 0)  {
+            for (i=0; i<(*sizeCtrl)(OF_Resp_Disp); i++)
+                ctrlDisp[i] = float((*disp)(i) + trialDispOffset(i));
+        } else  {
+            for (i=0; i<(*sizeCtrl)(OF_Resp_Disp); i++)
+                ctrlDisp[i] = float(theCtrlFilters[OF_Resp_Disp]->filtering(ctrlDisp[i] + trialDispOffset(i)));
         }
     }
     if (vel != 0)  {
-        for (i=0; i<(*sizeCtrl)(OF_Resp_Vel); i++)  {
-            ctrlVel[i] = float((*vel)(i));
-            if (theCtrlFilters[OF_Resp_Vel] != 0)
+        if (theCtrlFilters[OF_Resp_Vel] == 0)  {
+            for (i=0; i<(*sizeCtrl)(OF_Resp_Vel); i++)
+                ctrlVel[i] = float((*vel)(i));
+        }
+        else  {
+            for (i=0; i<(*sizeCtrl)(OF_Resp_Vel); i++)
                 ctrlVel[i] = float(theCtrlFilters[OF_Resp_Vel]->filtering(ctrlVel[i]));
         }
     }
     if (accel != 0)  {
-        for (i=0; i<(*sizeCtrl)(OF_Resp_Accel); i++)  {
-            ctrlAccel[i] = float((*accel)(i));
-            if (theCtrlFilters[OF_Resp_Accel] != 0)
+        if (theCtrlFilters[OF_Resp_Accel] == 0)  {
+            for (i=0; i<(*sizeCtrl)(OF_Resp_Accel); i++)
+                ctrlAccel[i] = float((*accel)(i));
+        } else  {
+            for (i=0; i<(*sizeCtrl)(OF_Resp_Accel); i++)
                 ctrlAccel[i] = float(theCtrlFilters[OF_Resp_Accel]->filtering(ctrlAccel[i]));
         }
     }
     if (force != 0)  {
-        for (i=0; i<(*sizeCtrl)(OF_Resp_Force); i++)  {
-            ctrlForce[i] = float((*force)(i));
-            if (theCtrlFilters[OF_Resp_Force] != 0)
+        if (theCtrlFilters[OF_Resp_Force] == 0)  {
+            for (i=0; i<(*sizeCtrl)(OF_Resp_Force); i++)
+                ctrlForce[i] = float((*force)(i));
+        } else  {
+            for (i=0; i<(*sizeCtrl)(OF_Resp_Force); i++)
                 ctrlForce[i] = float(theCtrlFilters[OF_Resp_Force]->filtering(ctrlForce[i]));
         }
     }
     if (time != 0)  {
-        for (i=0; i<(*sizeCtrl)(OF_Resp_Time); i++)  {
-            ctrlTime[i] = float((*time)(i));
-            if (theCtrlFilters[OF_Resp_Time] != 0)
+        if (theCtrlFilters[OF_Resp_Time] == 0)  {
+            for (i=0; i<(*sizeCtrl)(OF_Resp_Time); i++)
+                ctrlTime[i] = float((*time)(i));
+        } else  {
+            for (i=0; i<(*sizeCtrl)(OF_Resp_Time); i++)
                 ctrlTime[i] = float(theCtrlFilters[OF_Resp_Time]->filtering(ctrlTime[i]));
         }
     }
@@ -334,7 +376,8 @@ int ECSCRAMNet::setTrialResponse(const Vector* disp,
 }
 
 
-int ECSCRAMNet::getDaqResponse(Vector* disp,
+int ECSCRAMNet::getDaqResponse(
+    Vector* disp,
     Vector* vel,
     Vector* accel,
     Vector* force,
@@ -344,38 +387,48 @@ int ECSCRAMNet::getDaqResponse(Vector* disp,
     
     int i;
     if (disp != 0)  {
-        for (i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)  {
-            if (theDaqFilters[OF_Resp_Disp] != 0)
-                daqDisp[i] = float(theDaqFilters[OF_Resp_Disp]->filtering(daqDisp[i]));
-            (*disp)(i) = daqDisp[i];
+        if (theDaqFilters[OF_Resp_Disp] == 0)  {
+            for (i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)
+                (*disp)(i) = daqDisp[i];
+        } else  {
+            for (i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)
+                (*disp)(i) = theDaqFilters[OF_Resp_Disp]->filtering(daqDisp[i]);
         }
     }
     if (vel != 0)  {
-        for (i=0; i<(*sizeDaq)(OF_Resp_Vel); i++)  {
-            if (theDaqFilters[OF_Resp_Vel] != 0)
-                daqVel[i] = float(theDaqFilters[OF_Resp_Vel]->filtering(daqVel[i]));
-            (*vel)(i) = daqVel[i];
+        if (theDaqFilters[OF_Resp_Vel] == 0)  {
+            for (i=0; i<(*sizeDaq)(OF_Resp_Vel); i++)
+                (*vel)(i) = daqVel[i];
+        } else  {
+            for (i=0; i<(*sizeDaq)(OF_Resp_Vel); i++)
+                (*vel)(i) = theDaqFilters[OF_Resp_Vel]->filtering(daqVel[i]);
         }
     }
     if (accel != 0)  {
-        for (i=0; i<(*sizeDaq)(OF_Resp_Accel); i++)  {
-            if (theDaqFilters[OF_Resp_Accel] != 0)
-                daqAccel[i] = float(theDaqFilters[OF_Resp_Accel]->filtering(daqAccel[i]));
-            (*accel)(i) = daqAccel[i];
+        if (theDaqFilters[OF_Resp_Accel] == 0)  {
+            for (i=0; i<(*sizeDaq)(OF_Resp_Accel); i++)
+                (*accel)(i) = daqAccel[i];
+        } else  {
+            for (i=0; i<(*sizeDaq)(OF_Resp_Accel); i++)
+                (*accel)(i) = theDaqFilters[OF_Resp_Accel]->filtering(daqAccel[i]);
         }
     }
     if (force != 0)  {
-        for (i=0; i<(*sizeDaq)(OF_Resp_Force); i++)  {
-            if (theDaqFilters[OF_Resp_Force] != 0)
-                daqForce[i] = float(theDaqFilters[OF_Resp_Force]->filtering(daqForce[i]));
-            (*force)(i) = daqForce[i];
+        if (theDaqFilters[OF_Resp_Force] == 0)  {
+            for (i=0; i<(*sizeDaq)(OF_Resp_Force); i++)
+                (*force)(i) = daqForce[i];
+        } else  {
+            for (i=0; i<(*sizeDaq)(OF_Resp_Force); i++)
+                (*force)(i) = theDaqFilters[OF_Resp_Force]->filtering(daqForce[i]);
         }
     }
     if (time != 0)  {
-        for (i=0; i<(*sizeDaq)(OF_Resp_Time); i++)  {
-            if (theDaqFilters[OF_Resp_Time] != 0)
-                daqTime[i] = float(theDaqFilters[OF_Resp_Time]->filtering(daqTime[i]));
-            (*time)(i) = daqTime[i];
+        if (theDaqFilters[OF_Resp_Time] == 0)  {
+            for (i=0; i<(*sizeDaq)(OF_Resp_Time); i++)
+                (*time)(i) = daqTime[i];
+        } else  {
+            for (i=0; i<(*sizeDaq)(OF_Resp_Time); i++)
+                (*time)(i) = theDaqFilters[OF_Resp_Time]->filtering(daqTime[i]);
         }
     }
     

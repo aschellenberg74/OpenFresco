@@ -67,8 +67,6 @@
 #define STATE_STOPPED           0x10010000
 
 
-
-
 char * StatusName( NTSTATUS status);
 /* Return string name representing Nt status code  */
 
@@ -118,4 +116,4 @@ VOID PnpScrStartWriteIrp(PDEVICE_OBJECT DeviceObject, PIRP Irp);
 VOID PnpScrStartReadIrp(PDEVICE_OBJECT DeviceObject, PIRP Irp);
 
 
-#define DEBUG_LOG_ERROR(status) 	DbgPrint("%s: Log Status=%s \n",DRIVER_NAME,StatusName(status))	
+// #define DEBUG_LOG_ERROR(status) 	DbgPrint("%s: Log Status=%s \n",DRIVER_NAME,StatusName(status))	
