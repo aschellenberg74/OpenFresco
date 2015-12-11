@@ -120,7 +120,7 @@ ExperimentalTangentStiff* ETBfgs::getCopy()
 
 void ETBfgs::Print(OPS_Stream &s, int flag)
 {
-    s << "Experimental Tangent: " << this->getTag(); 
+    s << "Experimental Tangent: " << this->getTag();
     s << "  type: ETBfgs\n";
 }
 

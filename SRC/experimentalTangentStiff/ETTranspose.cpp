@@ -129,7 +129,7 @@ Matrix& ETTranspose::updateTangentStiff(const Vector* incrDisp,
         tempDDT.addMatrixProduct(0.0, iDMatrix, iDMatrixT, 1.0);
         tempDFT.addMatrixProduct(0.0, iDMatrix, iFMatrixT, 1.0);
         tempDDT.Solve(tempDFT, theStiffT);
-        this->MatTranspose(theStiff, &theStiffT);		
+        this->MatTranspose(theStiff, &theStiffT);
     }
     
     return *theStiff;
