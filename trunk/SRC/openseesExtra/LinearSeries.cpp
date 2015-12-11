@@ -40,10 +40,9 @@
 #include <Channel.h>
 
 #include <elementAPI.h>
-#define OPS_Export 
 
-OPS_Export void *
-OPS_NewLinearSeries(void)
+void *
+OPS_LinearSeries(void)
 {
   // Pointer to a uniaxial material that will be returned
   TimeSeries *theSeries = 0;
@@ -66,16 +65,16 @@ OPS_NewLinearSeries(void)
     }
 
     if (numRemainingArgs > 1) {
-	char argvS[10];
-	if (OPS_GetString(argvS, 10) != 0) {
-	  opserr << "WARNING invalid string in LinearSeries with tag: " << tag << endln;
-	  return 0;
-	}
-	numData = 1;
-	if (OPS_GetDouble(&numData, &cFactor) != 0) {
-	  opserr << "WARNING invalid factor in  LinearSeries with tag: " << tag << endln;
-	  return 0;
-	}
+      const char *argvS = OPS_GetString();
+	   if (argvS == 0) {
+		  opserr << "WARNING strig error in  LinearSeries with tag: " << tag << endln;
+		return 0;
+	  }
+      numData = 1;
+      if (OPS_GetDouble(&numData, &cFactor) != 0) {
+	opserr << "WARNING invalid factor in  LinearSeries with tag: " << tag << endln;
+	return 0;
+      }
     }
   }
 

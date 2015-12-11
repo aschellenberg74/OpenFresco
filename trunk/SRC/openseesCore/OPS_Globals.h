@@ -27,7 +27,9 @@
 // Description: This file contains global variables used in OpenSees files.
 // if you change some of the variables, you must recompile ALL the code.
 
-#define OPS_VERSION "2.4.5 (rev 5855)"
+
+#define OPS_VERSION "2.4.6 (rev 6123)"
+
 
 #define _USING_OpenSees_STREAMS
 #include <OPS_Stream.h>
@@ -36,19 +38,10 @@ extern OPS_Stream *opserrPtr;
 #define opserr (*opserrPtr)
 #define endln "\n"
 
-
 #include <string.h>
 #include <stdlib.h>
 
-// #define _USING_STL_STREAMS
-// #include <iostream>
-// using std::cerr;
-// using std::ostream;
-// #define opserr cerr
-// #define OPS_Stream ostream
-// #define endln endl
-
-enum NodeResponseType { Disp = 1, Vel = 2, Accel =3, IncrDisp =4, IncrDeltaDisp =5, Reaction =6};
+enum NodeResponseType { Disp = 1, Vel = 2, Accel =3, IncrDisp =4, IncrDeltaDisp =5, Reaction =6, Unbalance =7, RayleighForces =8};
 
 #ifdef _TCL85
 #define TCL_Char const char
@@ -77,7 +70,5 @@ extern bool  ops_InitialStateAnalysis;
 #define OPS_DISPLAYMODE_STRESS 5
 #define OPS_DISPLAYMODE_STRAIN 7
 #define OPS_DISPLAYMODE_AXIAL 11
-
-// 13 18 19 23 29 31 37 41 43 47 53
 
 #endif

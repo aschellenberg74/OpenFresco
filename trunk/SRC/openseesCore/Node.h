@@ -55,9 +55,9 @@ class Node : public DomainComponent
     // constructors
     Node(int classTag);
     Node(int tag, int classTag);
-    Node(int tag, int ndof, double Crd1);
-    Node(int tag, int ndof, double Crd1, double Crd2);
-    Node(int tag, int ndof, double Crd1, double Crd2, double Crd3);
+    Node(int tag, int ndof, double Crd1, Vector *displayLoc = 0);
+    Node(int tag, int ndof, double Crd1, double Crd2, Vector *displayLoc = 0);
+    Node(int tag, int ndof, double Crd1, double Crd2, double Crd3, Vector *displayLoc = 0);
     Node(const Node &theCopy, bool copyMass = true);        
     
     // destructor
@@ -70,6 +70,8 @@ class Node : public DomainComponent
 
     // public methods for obtaining the nodal coordinates
     virtual const Vector &getCrds(void) const;
+    virtual int getDisplayCrds(Vector &results, double fact);
+    virtual int setDisplayCrds(const Vector &theCrds);
 
     // public methods for obtaining committed and trial 
     // response quantities of the node
@@ -150,12 +152,13 @@ class Node : public DomainComponent
     virtual int   addReactionForce(const Vector &, double factor);
     virtual int   resetReactionForce(int flag);
     virtual const Vector *getResponse(NodeResponseType);
-    
- protected:
+
     virtual void setCrds(double Crd1);
     virtual void setCrds(double Crd1, double Crd2);
     virtual void setCrds(double Crd1, double Crd2, double Crd3);
     virtual void setCrds(const Vector &);
+
+  protected:
 
   private:
     // priavte methods used to create the Vector objects 
@@ -194,9 +197,12 @@ class Node : public DomainComponent
 
     static Matrix **theMatrices;
     static int numMatrices;
+    static Matrix **theVectors;
+    static int numVectors;
     int index;
 
     Vector *reaction;
+    Vector *displayLocation;
 };
 
 #endif
