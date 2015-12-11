@@ -461,8 +461,9 @@ int EEBeamColumn3d::update()
     
     // determine dsp, vel and acc in basic system A
     const Vector &dbA = theCoordTransf->getBasicTrialDisp();
-    const Vector &vbA = theCoordTransf->getBasicTrialVel();
-    const Vector &abA = theCoordTransf->getBasicTrialAccel();
+    //const Vector &vbA = theCoordTransf->getBasicTrialVel();    // not implemented yet
+    //const Vector &abA = theCoordTransf->getBasicTrialAccel();  // not implemented yet
+    Vector vbA(6), abA(6);
     
     // transform displacements from basic sys A to basic sys B (linear)
     (*db)[0] = dbA(0);
@@ -1053,10 +1054,10 @@ Response* EEBeamColumn3d::setResponse(const char **argv, int argc,
         output.tag("ResponseType","Vz_1");
         output.tag("ResponseType","T_1");
         output.tag("ResponseType","My_1");
-        output.tag("ResponseType","Tz_1");
+        output.tag("ResponseType","Mz_1");
         output.tag("ResponseType","N_2");
-        output.tag("ResponseType","Py_2");
-        output.tag("ResponseType","Pz_2");
+        output.tag("ResponseType","Vy_2");
+        output.tag("ResponseType","Vz_2");
         output.tag("ResponseType","T_2");
         output.tag("ResponseType","My_2");
         output.tag("ResponseType","Mz_2");
@@ -1070,12 +1071,12 @@ Response* EEBeamColumn3d::setResponse(const char **argv, int argc,
         strcmp(argv[0],"daqForce") == 0 ||
         strcmp(argv[0],"daqForces") == 0)
     {
-        output.tag("ResponseType","q1");
-        output.tag("ResponseType","q2");
-        output.tag("ResponseType","q3");
-        output.tag("ResponseType","q4");
-        output.tag("ResponseType","q5");
-        output.tag("ResponseType","q6");
+        output.tag("ResponseType","qb1");
+        output.tag("ResponseType","qb2");
+        output.tag("ResponseType","qb3");
+        output.tag("ResponseType","qb4");
+        output.tag("ResponseType","qb5");
+        output.tag("ResponseType","qb6");
         
         theResponse = new ElementResponse(this, 3, Vector(6));
     }
