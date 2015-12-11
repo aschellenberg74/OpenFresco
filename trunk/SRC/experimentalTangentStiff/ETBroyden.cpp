@@ -49,7 +49,7 @@ ETBroyden::ETBroyden(const ETBroyden& ets)
 
 ETBroyden::~ETBroyden()
 {
-	// invoke the destructor on any objects created by the object
+    // invoke the destructor on any objects created by the object
     // that the object still holds a pointer to
     if (theStiff != 0)
         delete theStiff;
@@ -58,42 +58,42 @@ ETBroyden::~ETBroyden()
 
 Matrix& ETBroyden::updateTangentStiff(
     const Vector* disp,
-	const Vector* vel,
-	const Vector* accel,
-	const Vector* force,
-	const Vector* time,
-	const Matrix* kInit,
-	const Matrix* kPrev)
+    const Vector* vel,
+    const Vector* accel,
+    const Vector* force,
+    const Vector* time,
+    const Matrix* kInit,
+    const Matrix* kPrev)
 {
-	// Using incremental disp and force
-	int dimR = kPrev->noRows();
-	int dimC = kPrev->noCols();
-	int szD	 = disp->Size();
+    // Using incremental disp and force
+    int dimR = kPrev->noRows();
+    int dimC = kPrev->noCols();
+    int szD	 = disp->Size();
     
-	// FIX ME add size check
-	theStiff = new Matrix(dimR, dimC);
-	theStiff->Zero();
-    	
-	double normD = disp->Norm();
-	if (normD == 0.0) {
-		*theStiff = *kPrev;
-	} else {
-		double factor = 1.0/(normD*normD);
-		Vector tempV(szD);
-		tempV.Zero();
-	    
-		// Perform rank 1 update
-		tempV.addMatrixVector(0.0, (*kPrev), (*disp), 1.0);
-		tempV.addVector(-1.0, (*force), 1.0);
-	    
-		for (int i = 0; i < dimR; i++) {
-			for (int j = 0; j < dimC; j++) {
-				(*theStiff)(i,j) = (*kPrev)(i,j) + factor * tempV(i) * (*disp)(j);
-			}
-		}
-	}
+    // FIX ME add size check
+    theStiff = new Matrix(dimR, dimC);
+    theStiff->Zero();
     
-	return *theStiff;
+    double normD = disp->Norm();
+    if (normD == 0.0) {
+        *theStiff = *kPrev;
+    } else {
+        double factor = 1.0/(normD*normD);
+        Vector tempV(szD);
+        tempV.Zero();
+        
+        // Perform rank 1 update
+        tempV.addMatrixVector(0.0, (*kPrev), (*disp), 1.0);
+        tempV.addVector(-1.0, (*force), 1.0);
+        
+        for (int i = 0; i < dimR; i++) {
+            for (int j = 0; j < dimC; j++) {
+                (*theStiff)(i,j) = (*kPrev)(i,j) + factor * tempV(i) * (*disp)(j);
+            }
+        }
+    }
+    
+    return *theStiff;
 }
 
 
@@ -105,8 +105,8 @@ ExperimentalTangentStiff* ETBroyden::getCopy()
 
 void ETBroyden::Print(OPS_Stream &s, int flag)
 {
-	s << "Experimental Tangent: " << this->getTag(); 
-	s << "  type: ETBroyden\n";
+    s << "Experimental Tangent: " << this->getTag(); 
+    s << "  type: ETBroyden\n";
 }
 
 
@@ -115,7 +115,7 @@ Response* ETBroyden::setResponse(const char **argv,
 {
     Response *theResponse = 0;
     
-	// FIX ME
+    // FIX ME
     
     return theResponse;
 }

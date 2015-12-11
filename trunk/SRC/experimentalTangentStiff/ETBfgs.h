@@ -72,7 +72,7 @@ public:
         OPS_Stream &output);
     int getResponse(int responseID, Information &info);
 
-private:    
+private:
     // utility method for calculating the change in stiffness
     int calculateDeltaK(double fD,
         const Vector* incrDisp,
@@ -83,8 +83,8 @@ private:
     // utility method for calculating the Frobenius norm
     double fNorm(const Matrix* dK);
     
-    double eps;			// the user-defined factor for updating
-    Matrix *theStiff;	// the tangent stiffness Matrix
+    double eps;         // the user-defined factor for updating
+    Matrix *theStiff;   // the tangent stiffness Matrix
 };
 
 #endif

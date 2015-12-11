@@ -73,12 +73,12 @@ public:
     int getResponse(int responseID, Information &info);
 
 private:
-    int numCol;			// number of cols to be used
-    //int counter;		// number of time 
-    Matrix *theStiff;	// the tangent stiffness Matrix
-    Matrix iDMatrix;	// the incremental displacement Matrix
-    Matrix iFMatrix;	// the incremental force Matrix
-    int MatTranspose(Matrix* kT, const Matrix* k);	// transpose method
+    int numCol;         // number of cols to be used
+    //int counter;      // number of time 
+    Matrix *theStiff;   // the tangent stiffness Matrix
+    Matrix iDMatrix;    // the incremental displacement Matrix
+    Matrix iFMatrix;    // the incremental force Matrix
+    int MatTranspose(Matrix* kT, const Matrix* k);  // transpose method
 };
 
 #endif

@@ -69,7 +69,7 @@ public:
         OPS_Stream &output);
     int getResponse(int responseID, Information &info);
 
-private:    
+private:
     Matrix *theStiff;  // the tangent stiffness Matrix
 };
 
