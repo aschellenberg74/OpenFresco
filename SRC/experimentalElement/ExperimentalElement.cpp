@@ -45,10 +45,10 @@
 #include <string.h>
 
 
-ExperimentalElement::ExperimentalElement(int tag, 
+ExperimentalElement::ExperimentalElement(int tag,
     int classTag,
     ExperimentalSite *site)
-    : Element(tag,classTag),
+    : Element(tag, classTag),
     theSite(site),
     sizeCtrl(0), sizeDaq(0),
     theInitStiff(1,1),
@@ -62,11 +62,13 @@ ExperimentalElement::~ExperimentalElement()
 {
     if (theSite != 0)
         delete theSite;
+    if (theTangStiff != 0)
+        delete theTangStiff;
     
     if (sizeCtrl != 0)
         delete sizeCtrl;
     if (sizeDaq != 0)
-        delete sizeDaq;    
+        delete sizeDaq;
 }
 
 
@@ -83,7 +85,7 @@ const Matrix& ExperimentalElement::getTangentStiff()
         firstWarning = false;
     }
     
-    return  this->getInitialStiff();
+    return theInitStiff;
 }
 
 
@@ -94,37 +96,37 @@ const Matrix& ExperimentalElement::getInitialStiff()
 
 
 const Vector& ExperimentalElement::getDisp()
-{	
+{
     // return global vector with all components zero
     static Vector dg(this->getNumDOF());
-
+    
     return dg;
 }
 
 
 const Vector& ExperimentalElement::getVel()
-{	
+{
     // return global vector with all components zero
     static Vector vg(this->getNumDOF());
-
+    
     return vg;
 }
 
 
 const Vector& ExperimentalElement::getAccel()
-{	
+{
     // return global vector with all components zero
     static Vector ag(this->getNumDOF());
-
+    
     return ag;
 }
 
 
 const Vector& ExperimentalElement::getTime()
-{	
+{
     // return global vector with all components zero
     static Vector time(1);
-
+    
     return time;
 }
 
@@ -141,7 +143,7 @@ int ExperimentalElement::revertToLastCommit()
 
 
 int ExperimentalElement::revertToStart()
-{   
+{
     opserr << "ExperimentalElement::revertToStart() - "
         << "Element: " << this->getTag() << endln
         << "Can't revert to start. This is an experimental element."
