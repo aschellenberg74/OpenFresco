@@ -7,7 +7,7 @@
 */
 
 #define CORE_VERSION     "1.64"
-#define COPYRIGHT        "Copyright 1997"
+#define COPYRIGHT        "Copyright 2005"
 
 struct rw_scr
 {
@@ -167,7 +167,9 @@ struct scr_csr
 /* scr_nwh_mm() has changed to scr_wml_mm() */
 #define scr_nwh_mm     scr_wml_mm
 
-#ifndef _WINNT /* Windows NT(tm) prototypes in scrproto.h */
+
+//#ifndef _WINNT /* Windows NT(tm) prototypes in scrproto.h */
+#ifndef _WINNT
 #ifndef NO_PROTO
 
 void scr_acr_mm( int );

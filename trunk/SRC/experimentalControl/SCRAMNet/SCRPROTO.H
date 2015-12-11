@@ -4,106 +4,15 @@
     -----------------------------------------------------------------------------
     */
     #include <stdio.h> // FILE
-    
+
+#ifndef _WINNT
+#define _WINNT
+#endif
+
     #define Long_mode 0
     #define Word_mode 1
     #define Byte_mode 2
-    
-    #ifndef _WINNT
-    
-    BOOL DLL_DEF sp_scram_init(BYTE CardNumber);
-    // initialize the board by reading values from ini file, mapping SCRAMNet 
-    // Registers, Mapping SCRAMNet Memory, and setting node ID and timeout 
-    // values equal to the values specifed in the ini file.
-    
-    SCR_LONG_PTR DLL_DEF get_base_mem( BYTE CardNumber);
-    // Return a virtual pointer to a block of memory mapped into the SCRAMNet 
-    // cards physical address space.
-    
-    BOOL DLL_DEF SetScrTransactionType(BYTE CardNumber, BYTE mode);
-    // This function configures the SCRAMNet Card to swap the values read from 
-    // memory according the paramater passed to the function.
-    // **************************************************************************
-    // * Paramater * Swap mode      * data bits translation                     *
-    // **************************************************************************
-    // *           *                * D(31:24) * D(23:16) * D(15:8)  *  D(7:0)  *
-    // **************************************************************************
-    // * Long_mode * no swap 32-bit * Q(31:24) * Q(23:16) * Q(15:8)  *  Q(7:0)  *
-    // * Word_mode * 16 bit         * Q(15:8)  * Q(7:0)   * Q(31:24) * Q(23:16) *
-    // * Byte_mode * 8 bit          * Q(7:0)   * Q(15:8)  * Q(23:16) * Q(31:24) *
-    // **************************************************************************
-    
-    BYTE DLL_DEF GetScrTransactionType( BYTE CardNumber );
-    // this function return a byte representing the current swaping mode.
-    
-    WORD DLL_DEF scr_csr_read( BYTE CardNumber, BYTE csr_number );
-    // Returns contents of CSR register specifed as a parameter.
-    
-    void DLL_DEF scr_csr_write( BYTE CardNumber, BYTE csr_number, WORD regval );
-    // Write given value to the CSR register specifed as a parameter.
-    
-    DWORD DLL_DEF ReadSCRLong( BYTE nCardNumber, DWORD offset, DWORDPTR lnValue);  
-    // Returns long word value read from scramnet card at the given offset. 
-    // offset specifed as number of long words from base address to desired value.
-    
-    DWORD DLL_DEF WriteSCRLong( BYTE nCardNumber, DWORD offset, DWORD lnValue);
-    // returns long word writen to SCRAMNet card at the given offset. 
-    // offset specifed as number of long words from base address to desired value.
-    
-    WORD DLL_DEF ReadSCRWord( BYTE nCardNumber, DWORD offset, WORDPTR nValue);
-    // returns word value read from scramnet card at the given offset. 
-    // offset specifed as number of words from base address to desired value.
-    
-    WORD DLL_DEF WriteSCRWord( BYTE nCardNumber, DWORD offset, WORD nValue);
-    // returns word writen to SCRAMNet card at the given offset. 
-    // offset specifed as number of words from base address to desired value.
-    
-    BYTE DLL_DEF ReadSCRByte( BYTE nCardNumber, DWORD offset, BYTEPTR nValue);
-    // returns byte value read from scramnet card at the given offset. 
-    // offset specifed as number of bytes from base address to desired value.
-    
-    BYTE DLL_DEF WriteSCRByte( BYTE nCardNumber, DWORD offset, BYTE lnValue);
-    // returns byte writen to SCRAMNet card at the given offset. 
-    // offset specifed as number of bytes from base address to desired value.
-    
-    DWORD DLL_DEF get_scr_phy_csr_addr(BYTE CardNumber); 
-    // Returns physical memory address of the SCRAMNet CSR base resgister.
-    
-    DWORD DLL_DEF get_scr_phy_mem_addr(BYTE CardNumber);
-    // Returns physical memory address of SCRAMNet memory base address.
-    
-    BYTE  DLL_DEF get_scr_node_id( BYTE CardNumber);
-    // Returns a byte value in range 0 to 255 for SCRAMNet node id.
-    
-    BYTE  DLL_DEF get_scr_time_out( BYTE CardNumber );
-    // Returns a byte value in range 0 to 255 for SCRAMNet Timeout value
-    
-    DWORD DLL_DEF get_scr_user_mem_size( BYTE CardNumber);
-    // Return an unsigned long value equal to the memory size in bytes 
-    // specifed in the SCRAMNET.INI file.
-    // Note: ini file specifies memory size in Kbytes. Function returns bytes.
-    
-    DWORD DLL_DEF sp_mem_size( BYTE CardNumber );
-    // Return an unsigned long values equal to the number of bytes of 
-    // of SCRAMNet memmory as represented in csr 8.
-                         
-    void  DLL_DEF scr_board_status(BYTE CardNumber, HWND hwndParent);
-    // displays a message window with SCRAMNet configuration information in it.
-    
-    void DLL_DEF scr_mclr_mm( BYTE CardNumber, int arg );
-    // Clear all of memory or ACR bits depending on parameter passed in arg.
-    // To clear memory use defined value 'MEM' as the parameter or 
-    // to clear ACR  use defined value 'ACR'.
-    
-    int scr_brd_select( int brd );
-    // Changes control of SCRAMNet boards
-    
-    
-    // ******************************************************************* 
-    // * Windows NT functions (full implementation of the SCRAMNet API). *
-    // ******************************************************************* 
-    #else /* _WINNT */
-    
+       
     /* Handle C++ name mangling. */
     #ifdef _cplusplus
     extern "C" {
@@ -111,8 +20,8 @@
     
     /* Define interrupt object name. */
     #define SCR_INTERRUPT_OBJECT "SCRAMNet_Int_Object"
-     DLL_DEF SCR_INT CALL_CONV scr_long_mem_exist( SCR_LONG_PTR mem_ptr );
-    //DLL_DEF SCR_INT CALL_CONV scr_long_mem_exist( SCR_LONG_PTR mem_ptr );
+    
+    DLL_DEF SCR_INT CALL_CONV scr_long_mem_exist( SCR_LONG_PTR mem_ptr );
     // Determines if long word memory location is valid.
     
     DLL_DEF SCR_INT CALL_CONV scr_short_mem_exist( SCR_SHORT_PTR mem_ptr );
@@ -358,9 +267,18 @@
     DLL_DEF SCR_INT CALL_CONV scr_delay(UINT delay);
     // Provides a general delay in ms
     
+	DLL_DEF BOOL CALL_CONV sw_int_flush( void );
+    // Connect interrupt processing.
+
+	DLL_DEF BOOL CALL_CONV sw_set_debugLevel( UINT32 level ); 
+	// Alter debuglevel flag used to control which debugPrint
+
+	DLL_DEF UINT32 CALL_CONV sw_get_debugLevel( void ); 
+	// get debuglevel flag used to control which debugPrint
+    
     #ifdef _cplusplus
     }
+
     #endif
-    
-    #endif /* _WINNT */
+       
     

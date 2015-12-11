@@ -57,12 +57,14 @@ public:
     virtual int setup();
     virtual int setSize(ID sizeT, ID sizeO);
     
-    virtual int setTrialResponse(const Vector* disp,
+    virtual int setTrialResponse(
+        const Vector* disp,
         const Vector* vel,
         const Vector* accel,
         const Vector* force,
         const Vector* time);
-    virtual int getDaqResponse(Vector* disp,
+    virtual int getDaqResponse(
+        Vector* disp,
         Vector* vel,
         Vector* accel,
         Vector* force,
@@ -99,8 +101,10 @@ private:
     int *newTarget, *switchPC, *atTarget;
     float *ctrlDisp, *ctrlVel, *ctrlAccel, *ctrlForce, *ctrlTime;
     float *daqDisp, *daqVel, *daqAccel, *daqForce, *daqTime;
+    Vector trialDispOffset;
     
     int flag;                       // flag to check states of Simulink model
+    int getOffset;                  // flag to get initial trial disp offsets
 };
 
 #endif

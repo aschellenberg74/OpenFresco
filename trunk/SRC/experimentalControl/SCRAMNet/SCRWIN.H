@@ -47,80 +47,51 @@
    Definition can also be placed directly in the source code with #define directives.
 */
 
-
-#if defined (WIN16) && defined (DLL_DEF)
-#undef DLL_DEF
-#define DLL_DEF far __pascal _export
-#endif
-
-#if defined (WIN16) && !defined (DLL_DEF)
-#define DLL_DEF far __pascal
-#endif
-
-#if !defined(WIN16) && defined (DLL_DEF)                                                
+#if  defined (DLL_DEF)                                                
 #undef DLL_DEF
 #define DLL_DEF  __declspec(dllexport) 
 #endif
 
-#if !defined (WIN16) && !defined (DLL_DEF)
+#if !defined (DLL_DEF)
 #define DLL_DEF  __declspec(dllimport) 
 #endif
 
-#if !defined (WIN16) && !defined (C_CALL_CONV)
-#define CALL_CONV  __stdcall 
+#if !defined (C_CALL_CONV)
+#define CALL_CONV  _stdcall 
 #endif
 
-#if !defined (WIN16) && defined (C_CALL_CONV)
-#define CALL_CONV  __cdecl 
+#if defined (C_CALL_CONV)
+#define CALL_CONV  _cdecl 
 #endif
 
-/* 
-------------------------------------------------------------------------------
-the following macro is for use in applications where the keyword export needs 
-to be included for 16-bit application but excluded for 32-bit applications.
-------------------------------------------------------------------------------
-*/
-
-#ifdef WIN16
-#define EXPORT16 __export
-#else
-#define EXPORT16
+#ifdef _win64
+#undef CALL_CONV
+#define CALL_CONV  FASTCALL
 #endif
 
 /* 
 ------------------------------------------------------------------------------
-16/32 BIT COMPILER DEPENDENT TYPE DEFINITIONS.
+32 BIT COMPILER DEPENDENT TYPE DEFINITIONS.
 ------------------------------------------------------------------------------
 */
 
-#ifdef WIN16
-   typedef volatile unsigned long int huge * SCR_LONG_PTR;
-   typedef volatile unsigned short int huge * SCR_SHORT_PTR;
-   typedef volatile unsigned char huge * SCR_BYTE_PTR;
-   typedef volatile unsigned short __huge * USHUGE;
-   typedef volatile unsigned long _huge * DWORDPTR;
-   typedef volatile unsigned short huge * WORDPTR;
-   typedef volatile unsigned char huge * BYTEPTR;
-   typedef unsigned int					SCR_INT;
-#else
    typedef volatile unsigned long int * SCR_LONG_PTR;
    typedef volatile unsigned short int * SCR_SHORT_PTR;
    typedef volatile unsigned char * SCR_BYTE_PTR;
    typedef volatile unsigned long * DWORDPTR;
    typedef volatile unsigned short * WORDPTR;
    typedef volatile unsigned char * BYTEPTR;
+   //DLC 8-5-05 added new data type to use for holding address values
+   typedef DWORD64 SCR_ADDR_TYPE;
+
+   /* DLC 3-20-08 - modified type to fource 32-bit */
+/*
 #ifndef NTPCI_COMPATABLE 
 	typedef short	SCR_INT;
 #else
-   typedef					int 	SCR_INT;
+   typedef	int 	SCR_INT;
 #endif
-#endif
-
-#ifndef _WINNT
-typedef unsigned short int USINT;
-typedef unsigned char UCHAR;
-typedef unsigned long ULINT;
-#define DEF_CARD_NUM 0
-#endif
+*/
+   typedef	DWORD32 	SCR_INT;
 
 #endif /* __SCRWIN__ */

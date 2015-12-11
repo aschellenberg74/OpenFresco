@@ -12,7 +12,7 @@
 ** and redistribution, and for a DISCLAIMER OF ALL WARRANTIES.        **
 **                                                                    **
 ** Developed by:                                                      **
-**   Andreas Schellenberg (andreas.schellenberg@gmx.net)              **
+**   Andreas Schellenberg (andreas.schellenberg@gmail.com)            **
 **   Yoshikazu Takahashi (yos@catfish.dpri.kyoto-u.ac.jp)             **
 **   Gregory L. Fenves (fenves@berkeley.edu)                          **
 **   Stephen A. Mahin (mahin@berkeley.edu)                            **
@@ -53,12 +53,14 @@ public:
     virtual int setup();
     virtual int setSize(ID sizeT, ID sizeO);
     
-    virtual int setTrialResponse(const Vector* disp,
+    virtual int setTrialResponse(
+        const Vector* disp,
         const Vector* vel,
         const Vector* accel,
         const Vector* force,
         const Vector* time);
-    virtual int getDaqResponse(Vector* disp,
+    virtual int getDaqResponse(
+        Vector* disp,
         Vector* vel,
         Vector* accel,
         Vector* force,
@@ -88,11 +90,13 @@ private:
     const int *memPtrBASE;          // pointer to SCRAMNet base memory address
     float *memPtrOPF;               // pointer to OpenFresco base memory address
     
-    unsigned int *newTarget, *switchPC, *atTarget;
+    int *newTarget, *switchPC, *atTarget;
     float *ctrlDisp, *ctrlVel, *ctrlAccel, *ctrlForce, *ctrlTime;
     float *daqDisp, *daqVel, *daqAccel, *daqForce, *daqTime;
+    Vector trialDispOffset;
     
-    unsigned int flag;              // flag to check states of Simulink model
+    int flag;                       // flag to check states of Simulink model
+    int getOffset;                  // flag to get initial trial dsip offset
 };
 
 #endif

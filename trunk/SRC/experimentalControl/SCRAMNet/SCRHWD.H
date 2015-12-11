@@ -12,46 +12,44 @@
   **
   **     Modified 16-Feb-96 DEM
   **			  01-Oct-96 KWS (WinNT Mods)
+  **              03-Mar-08 DLC (chend MAX)DMA_CHAUNK SIZE to 1MB)
   **
   ********************************************************************
 */
 
-#define HWD_VERSION "PCI-2.00"
+#define HWD_VERSION "PCI-2.02"
 
-#ifdef _WINNT
+#ifdef _WINNT /* Windows NT(tm) prototypes in scrproto.h */
 #include <scrwin.h>
 #include <scrproto.h>
 #endif
 
 #define ACR_MASK     0x1f
 
-#ifndef _WINNT
 
-#ifdef MSC7
-
-#define ACR_SHIFT     16
-
-typedef unsigned long int volatile huge * SCR_LONG_PTR;
-typedef unsigned short int volatile huge * SCR_SHORT_PTR;
-typedef unsigned char volatile huge * SCR_BYTE_PTR;
-typedef unsigned long SCR_LONG_DATA;
-
-#else /* MSC7 */
-
+#ifndef _WINNT 
+/* DLC */
+#ifdef DRIVER   
+   typedef volatile unsigned long * DWORDPTR;
+   typedef volatile unsigned short * WORDPTR;
+   typedef volatile unsigned char * BYTEPTR;   
+#endif
 #define ACR_SHIFT     0
 
 typedef unsigned long int volatile * SCR_LONG_PTR;
 typedef unsigned short int volatile * SCR_SHORT_PTR;
 typedef unsigned char volatile * SCR_BYTE_PTR;
-
-#endif /* MSC7 */
+//DLC 8-5-05 added new data type to use for holding address values
+typedef DWORD64 SCR_ADDR_TYPE;
 
 #else /* _WINNT */
 
 #define ACR_SHIFT     0
 typedef unsigned long SCR_LONG_DATA;
 
+
 #endif /* _WINNT */
+
 
 typedef struct
 {
@@ -207,7 +205,8 @@ extern SCRAM_CFG Scramnet_config;
 #define CSR5_RB    0x4000  /* Retry bit */
 #define CSR5_IFE   0x8000  /* Interrupt fifo empty */
 
-#define MAX_SCRAM_MEM    0x800000 /* 8 MB Max. SCRAMNet Memory Size */
+//#define MAX_SCRAM_MEM    0x800000 /* 8 MB Max. SCRAMNet Memory Size */
+#define SCR_MAX_DMA_LEN    0x100000 /* 1 MB Max DMA transfer lenght*/
 
 #define SCR_IOCTL_MAX  15      /* Maximum ioctl command value. */
 
@@ -452,104 +451,5 @@ extern SCRAM_CFG Scramnet_config;
 #define MAIL_WR_STAT                    0xD8 
 #define MAIL_RD_STAT                    0xDA
 #define SYSTEM                          0x78
-
-#ifndef _WINNT /* Functions *NOT* required for NT. */
-
-/*
-** V3 prototypes
-*/
-int find_pci_device( unsigned short device_id, unsigned short vendor_id,
-                     unsigned short index, unsigned char* bus_number,
-                     unsigned char* device_and_function );
- 
-int find_pci_class_code( unsigned long class_code, unsigned short index,
-                         unsigned char* bus_number, 
-                         unsigned char* device_and_function );
- 
-int generate_special_cycle( unsigned char bus_number, 
-                            unsigned long special_cycle_data );
- 
-int read_configuration_byte( unsigned char bus_number, 
-                             unsigned char device_and_function,
-                             unsigned char register_number,
-                             unsigned char* byte_read );
- 
-int read_configuration_word( unsigned char bus_number,
-                             unsigned char device_and_function,
-                             unsigned char register_number,
-                             unsigned short* word_read );
- 
-int read_configuration_dword( unsigned char bus_number,
-                                     unsigned char device_and_function,
-                                     unsigned char register_number,
-                                     unsigned long* dword_read );
- 
-int write_configuration_byte( unsigned char bus_number,
-                              unsigned char device_and_function,
-                              unsigned char register_number,
-                              unsigned char byte_to_write);
- 
-int write_configuration_word( unsigned char bus_number,
-                              unsigned char device_and_function,
-                              unsigned char register_number,
-                              unsigned short word_to_write );
- 
-int write_configuration_dword( unsigned char bus_number,
-                               unsigned char device_and_function,
-                               unsigned char register_number,
-                               unsigned long dword_to_write );
- 
-void insb( unsigned short port, void* buf, int count );
-void insw( unsigned short port, void* buf, int count );
-void insd( unsigned short port, void* buf, int count );
- 
-void outsb( unsigned short port, void* buf, int count );
-void outsw( unsigned short port, void* buf, int count );
-void outsd( unsigned short port, void* buf, int count );
-
-int read_configuration_area( unsigned char function,
-                             unsigned char bus_number,
-			     unsigned char device_and_function,
-			     unsigned char register_number,
-                             unsigned long* data );
-
-#ifndef NO_PROTO
-
-extern void GetSegRegs(void); /* For the ISR */
-int scr_csr_exist( int );
-unsigned short scr_csr_read( unsigned );
-unsigned long scr_csr32_read( unsigned );
-void scr_csr_write( unsigned, unsigned short );
-unsigned char scr_acr_read( unsigned long );
-void scr_acr_write( unsigned long, unsigned char );
-SCR_LONG_PTR get_base_mem( void );
-SCR_LONG_PTR get_base_mem1( void );
-int scr_long_mem_exist( SCR_LONG_PTR );
-int scr_short_mem_exist( SCR_SHORT_PTR );
-int scr_byte_mem_exist( SCR_BYTE_PTR );
-int scr_mem_mm( int );
-int scr_reg_mm( int );
-int scr_brd_select( int );
-
-
-#else  /* NO_PROTO */
-
-int scr_csr_exist();
-unsigned short scr_csr_read();
-void scr_csr_write();
-unsigned char scr_acr_read();
-void scr_acr_write();
-SCR_LONG_PTR get_base_mem();
-int scr_long_mem_exist();
-int scr_short_mem_exist();
-int scr_byte_mem_exist();
-int scr_mem_mm();
-int scr_reg_mm();
-int scr_brd_select();
-
-
-#endif /* NO_PROTO */
-
-#endif /* _WINNT */
 
 #endif /* __SCRPCI__*/
