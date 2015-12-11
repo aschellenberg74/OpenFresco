@@ -37,6 +37,12 @@
 
 #define OPF_VERSION "2.7.0 (Build 385)"
 
+#ifndef _WIN64
+#define WIN_ARCH "32-Bit"
+#else
+#define WIN_ARCH "64-Bit"
+#endif
+
 #ifndef _bool_h
 #include "bool.h"
 #endif
