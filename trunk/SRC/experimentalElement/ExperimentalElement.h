@@ -38,6 +38,7 @@
 // ExperimentalElement objects are associated with experimental site objects.
 
 #include <ExperimentalSite.h>
+#include <ExperimentalTangentStiff.h>
 
 #include <Element.h>
 #include <Matrix.h>
@@ -61,7 +62,7 @@ public:
     virtual int setInitialStiff(const Matrix& stiff) = 0;
     const Matrix &getTangentStiff();
     const Matrix &getInitialStiff();
-
+    
     // public methods to obtain the daq response in global system
     virtual const Vector &getDisp();
     virtual const Vector &getVel();
@@ -69,8 +70,10 @@ public:
     virtual const Vector &getTime();
 
 protected:
-    // pointer of ExperimentalSite
+    // pointer of ExperimentalSite object
     ExperimentalSite* theSite;
+    // pointer of ExperimentalTangentStiff object
+    ExperimentalTangentStiff* theTangStiff;
     
     // sizeCtrl/Daq
     // [0]:disp, [1]:vel, [2]:accel, [3]:force, [4]:time
