@@ -285,6 +285,9 @@ int ExperimentalSite::commitState(Vector* time)
 {
     int rValue = 0;
     
+    // update the commitTag
+    commitTag++;
+    
     // update the trial time vector
     if (time != 0 && tTime != 0)
         *tTime = *time;
@@ -309,9 +312,6 @@ int ExperimentalSite::commitState(Vector* time)
             if (theRecorders[i] != 0)
                 theRecorders[i]->record(commitTag, commitTag);
     }
-    
-    // update the commitTag
-    commitTag++;
     
     return rValue;
 }
@@ -755,111 +755,3 @@ void ExperimentalSite::setOut()
         }
     }
 }
-
-
-/*void ExperimentalSite::setTrialCPs(ArrayOfTaggedObjects &theCPs)
-{
-    int nTrial = theCPs.getNumComponents();
-    if (cpsTrial != 0)
-        delete cpsTrial;
-    if (nTrial == 0) {
-        opserr << "ExperimentalSite::setTrialCPs() - "
-            << "invalid size of cpsTrial";
-    }
-    cpsTrial = new ArrayOfTaggedObjects(nTrial*OF_Resp_All);
-    
-    if (sizeTrial != 0)
-        delete [] sizeTrial;
-    sizeTrial = new ID(OF_Resp_All);
-    sizeTrial->Zero();
-    
-    for (int i=1; i<=nTrial; i++) {
-        TaggedObject *mc = theCPs.getComponentPtr(i);
-        if (mc == 0) {
-            opserr << "ExperimentalSite::setTrialCPs() - "
-                << "failed to get ExperimentalCP\n";
-            exit(OF_ReturnType_failed);
-        }
-        ExperimentalCP *theCP = (ExperimentalCP*)mc;
-        cpsTrial->addComponent(theCP->getCopy());
-        
-        int respType = theCP->getResponseType();
-        switch(respType) {
-        case OF_Resp_Disp:
-            (*sizeTrial)(OF_Resp_Disp)++;
-            break;
-        case OF_Resp_Vel:
-            (*sizeTrial)(OF_Resp_Vel)++;
-            break;
-        case OF_Resp_Accel:
-            (*sizeTrial)(OF_Resp_Accel)++;
-            break;
-        case OF_Resp_Force:
-            (*sizeTrial)(OF_Resp_Force)++;
-            break;
-        case OF_Resp_Time:
-            (*sizeTrial)(OF_Resp_Time)++;
-            break;
-        case OF_Resp_All:
-            for (int i=0; i<OF_Resp_All; i++)
-                (*sizeTrial)(i)++;
-            break;
-        }
-    }
-    
-    this->setTrial();
-}
-
-
-void ExperimentalSite::setOutCPs(ArrayOfTaggedObjects &theCPs)
-{
-    int nOutput = theCPs.getNumComponents();
-    if (cpsOut != 0)
-        delete cpsOut;
-    if (nOutput == 0) {
-        opserr << "ExperimentalSite::setOutCPs() - "
-            << "invalid size of cpsOut";
-    }
-    cpsOut = new ArrayOfTaggedObjects(nOutput*OF_Resp_All);
-    
-    if (sizeOut != 0)
-        delete [] sizeOut;
-    sizeOut = new ID(OF_Resp_All);
-    sizeOut->Zero();
-    
-    for (int i=1; i<=nOutput; i++) {
-        TaggedObject *mc = theCPs.getComponentPtr(i);
-        if (mc == 0) {
-            opserr << "ExperimentalSite::setOutCPs() - "
-                << "failed to get ExperimentalCP\n";
-            exit(OF_ReturnType_failed);
-        }
-        ExperimentalCP *theCP = (ExperimentalCP*)mc;
-        cpsOut->addComponent(theCP->getCopy());
-        
-        int respType = theCP->getResponseType();
-        switch(respType) {
-        case OF_Resp_Disp:
-            (*sizeOut)(OF_Resp_Disp)++;
-            break;
-        case OF_Resp_Vel:
-            (*sizeOut)(OF_Resp_Vel)++;
-            break;
-        case OF_Resp_Accel:
-            (*sizeOut)(OF_Resp_Accel)++;
-            break;
-        case OF_Resp_Force:
-            (*sizeOut)(OF_Resp_Force)++;
-            break;
-        case OF_Resp_Time:
-            (*sizeOut)(OF_Resp_Time)++;
-            break;
-        case OF_Resp_All:
-            for (int i=0; i<OF_Resp_All; i++)
-                (*sizeOut)(i)++;
-            break;
-        }
-    }
-    
-    this->setOut();
-}*/
