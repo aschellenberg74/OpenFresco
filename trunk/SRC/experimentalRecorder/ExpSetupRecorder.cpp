@@ -23,7 +23,7 @@
 // $Date$
 // $URL$
 
-// Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 08/08
 // Revision: A
 //
@@ -70,7 +70,7 @@ ExpSetupRecorder::ExpSetupRecorder(int numsetups,
     
     // Set the response objects:
     //   1. create an array of pointers and zero them
-    //   2. iterate over the sites invoking setResponse() to get the new objects & determine size of data
+    //   2. iterate over the setups invoking setResponse() to get the new objects & determine size of data
     theResponses = new Response *[numSetups];
     if (theResponses == 0)  {
         opserr << "ExpSetupRecorder::ExpSetupRecorder() - out of memory\n";
@@ -79,7 +79,7 @@ ExpSetupRecorder::ExpSetupRecorder(int numsetups,
     for (int i=0; i<numSetups; i++)
         theResponses[i] = 0;
     
-    // loop over sites & set Responses
+    // loop over setups & set Responses
     for (int i=0; i<numSetups; i++)  {
         theResponses[i] = theSetups[i]->setResponse((const char **)responseArgs, numArgs, *theOutputStream);
         if (theResponses[i] != 0) {
@@ -98,6 +98,9 @@ ExpSetupRecorder::ExpSetupRecorder(int numsetups,
     }
     
     theOutputStream->tag("Data");
+    
+    // record once at zero
+    this->record(0, 0.0);
 }
 
 
@@ -137,10 +140,10 @@ int ExpSetupRecorder::record(int commitTag, double timeStamp)
         if (echoTime == true) 
             (*data)(loc++) = timeStamp;
         
-        // for each site if responses exist, put them in response vector
+        // for each setup if responses exist, put them in response vector
         for (int i=0; i<numSetups; i++)  {
             if (theResponses[i] != 0)  {
-                // ask the site for the reponse
+                // ask the setup for the response
                 int res;
                 if ((res = theResponses[i]->getResponse()) < 0)  {
                     result += res;

@@ -70,7 +70,7 @@ ExpControlRecorder::ExpControlRecorder(int numcontrols,
     
     // Set the response objects:
     //   1. create an array of pointers and zero them
-    //   2. iterate over the sites invoking setResponse() to get the new objects & determine size of data
+    //   2. iterate over the controls invoking setResponse() to get the new objects & determine size of data
     theResponses = new Response *[numControls];
     if (theResponses == 0)  {
         opserr << "ExpControlRecorder::ExpControlRecorder() - out of memory\n";
@@ -79,7 +79,7 @@ ExpControlRecorder::ExpControlRecorder(int numcontrols,
     for (int i=0; i<numControls; i++)
         theResponses[i] = 0;
     
-    // loop over sites & set Responses
+    // loop over controls & set Responses
     for (int i=0; i<numControls; i++)  {
         theResponses[i] = theControls[i]->setResponse((const char **)responseArgs, numArgs, *theOutputStream);
         if (theResponses[i] != 0) {
@@ -98,6 +98,9 @@ ExpControlRecorder::ExpControlRecorder(int numcontrols,
     }
     
     theOutputStream->tag("Data");
+    
+    // record once at zero
+    this->record(0, 0.0);
 }
 
 
@@ -137,10 +140,10 @@ int ExpControlRecorder::record(int commitTag, double timeStamp)
         if (echoTime == true) 
             (*data)(loc++) = timeStamp;
         
-        // for each site if responses exist, put them in response vector
+        // for each control if responses exist, put them in response vector
         for (int i=0; i<numControls; i++)  {
             if (theResponses[i] != 0)  {
-                // ask the site for the reponse
+                // ask the control for the response
                 int res;
                 if ((res = theResponses[i]->getResponse()) < 0)  {
                     result += res;

@@ -23,7 +23,7 @@
 // $Date$
 // $URL$
 
-// Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 08/08
 // Revision: A
 //
@@ -98,6 +98,9 @@ ExpSiteRecorder::ExpSiteRecorder(int numsites,
     }
     
     theOutputStream->tag("Data");
+    
+    // record once at zero
+    this->record(0, 0.0);
 }
 
 
@@ -140,7 +143,7 @@ int ExpSiteRecorder::record(int commitTag, double timeStamp)
         // for each site if responses exist, put them in response vector
         for (int i=0; i<numSites; i++)  {
             if (theResponses[i] != 0)  {
-                // ask the site for the reponse
+                // ask the site for the response
                 int res;
                 if ((res = theResponses[i]->getResponse()) < 0)  {
                     result += res;

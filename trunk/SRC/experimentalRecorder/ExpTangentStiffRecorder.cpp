@@ -71,7 +71,7 @@ ExpTangentStiffRecorder::ExpTangentStiffRecorder(int numtangstiffs,
     
     // Set the response objects:
     //   1. create an array of pointers and zero them
-    //   2. iterate over the sites invoking setResponse() to get the new objects & determine size of data
+    //   2. iterate over the tangent stiffnesses invoking setResponse() to get the new objects & determine size of data
     theResponses = new Response *[numTangStiffs];
     if (theResponses == 0)  {
         opserr << "ExpTangentStiffRecorder::ExpTangentStiffRecorder() - out of memory\n";
@@ -80,7 +80,7 @@ ExpTangentStiffRecorder::ExpTangentStiffRecorder(int numtangstiffs,
     for (int i=0; i<numTangStiffs; i++)
         theResponses[i] = 0;
     
-    // loop over sites & set Responses
+    // loop over tangent stiffnesses & set Responses
     for (int i=0; i<numTangStiffs; i++)  {
         theResponses[i] = theTangStiffs[i]->setResponse((const char **)responseArgs, numArgs, *theOutputStream);
         if (theResponses[i] != 0) {
@@ -99,6 +99,9 @@ ExpTangentStiffRecorder::ExpTangentStiffRecorder(int numtangstiffs,
     }
     
     theOutputStream->tag("Data");
+    
+    // record once at zero
+    this->record(0, 0.0);
 }
 
 
@@ -138,10 +141,10 @@ int ExpTangentStiffRecorder::record(int commitTag, double timeStamp)
         if (echoTime == true) 
             (*data)(loc++) = timeStamp;
         
-        // for each site if responses exist, put them in response vector
+        // for each tangent stiffness if responses exist, put them in response vector
         for (int i=0; i<numTangStiffs; i++)  {
             if (theResponses[i] != 0)  {
-                // ask the site for the reponse
+                // ask the tangent stiffness for the response
                 int res;
                 if ((res = theResponses[i]->getResponse()) < 0)  {
                     result += res;
