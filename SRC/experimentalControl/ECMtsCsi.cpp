@@ -19,7 +19,7 @@
 
 // $Revision$
 // $Date$
-// $Source: $
+// $URL$
 
 // Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 01/07
@@ -32,11 +32,14 @@
 
 
 ECMtsCsi::ECMtsCsi(int tag, int nTrialCPs, ExperimentalCP **trialcps,
-    int nOutCPs, ExperimentalCP **outcps, char *cfgfile, double ramptime)
+    int nOutCPs, ExperimentalCP **outcps, char *cfgfile, double ramptime,
+    int reltrial)
     : ExperimentalControl(tag), CsiController(Mts::CsiFactory::newController()),
     numTrialCPs(nTrialCPs), numOutCPs(nOutCPs), cfgFile(cfgfile), rampTime(ramptime),
     numCtrlSignals(0), numDaqSignals(0), ctrlSignal(0), daqSignal(0),
-    ctrlSigOffset(0), daqSigOffset(0), rampId(-1)
+    ctrlSigOffset(0), daqSigOffset(0), trialSigOffset(0),
+    useRelativeTrial(reltrial), gotRelativeTrial(!reltrial),
+    rampId(-1)
 {
     // get trial and output control points
     if (trialcps == 0 || outcps == 0)  {
@@ -47,34 +50,11 @@ ECMtsCsi::ECMtsCsi(int tag, int nTrialCPs, ExperimentalCP **trialcps,
     trialCPs = trialcps;
     outCPs = outcps;
     
-    // get total number of control and daq signals and
-    // check if any signals use relative reference
-    int ctrlIsRelative = 0;
-    for (int i=0; i<numTrialCPs; i++)  {
-        int numSignals = trialCPs[i]->getNumSignal();
-        numCtrlSignals += numSignals;
-        
-        int j = 0;
-        ID isRel = trialCPs[i]->getSigRefType();
-        while (!ctrlIsRelative && j < numSignals)
-            ctrlIsRelative = isRel(j++);
-    }
-    int daqIsRelative = 0;
-    for (int i=0; i<numOutCPs; i++)  {
-        int numSignals = outCPs[i]->getNumSignal();
-        numDaqSignals += numSignals;
-        
-        int j = 0;
-        ID isRel = outCPs[i]->getSigRefType();
-        while (!daqIsRelative && j < numSignals)
-            daqIsRelative = isRel(j++);
-    }
-    
-    // resize offsets if any signals use relative reference
-    if (ctrlIsRelative)
-        ctrlSigOffset.resize(numCtrlSignals);
-    if (daqIsRelative)
-        daqSigOffset.resize(numDaqSignals);
+    // get total number of control and daq signals
+    for (int i=0; i<numTrialCPs; i++)
+        numCtrlSignals += trialCPs[i]->getNumSignal();
+    for (int i=0; i<numOutCPs; i++)
+        numDaqSignals += outCPs[i]->getNumSignal();
     
     // load configuration file for CSI controller
     try  {
@@ -97,7 +77,9 @@ ECMtsCsi::ECMtsCsi(int tag, int nTrialCPs, ExperimentalCP **trialcps,
 ECMtsCsi::ECMtsCsi(const ECMtsCsi& ec)
     : ExperimentalControl(ec), CsiController(Mts::CsiFactory::newController()),
     numCtrlSignals(0), numDaqSignals(0), ctrlSignal(0), daqSignal(0),
-    ctrlSigOffset(0), daqSigOffset(0), rampId(-1)
+    ctrlSigOffset(0), daqSigOffset(0), trialSigOffset(0),
+    useRelativeTrial(0), gotRelativeTrial(1),
+    rampId(-1)
 {
     numTrialCPs = ec.numTrialCPs;
     trialCPs    = ec.trialCPs;
@@ -106,10 +88,10 @@ ECMtsCsi::ECMtsCsi(const ECMtsCsi& ec)
     cfgFile     = ec.cfgFile;
     rampTime    = ec.rampTime;
     
-    numCtrlSignals = ec.numCtrlSignals;
-    numDaqSignals  = ec.numDaqSignals;
-    ctrlSigOffset  = ec.ctrlSigOffset;
-    daqSigOffset   = ec.daqSigOffset;
+    numCtrlSignals   = ec.numCtrlSignals;
+    numDaqSignals    = ec.numDaqSignals;
+    useRelativeTrial = ec.useRelativeTrial;
+    gotRelativeTrial = ec.gotRelativeTrial;
     
     // load configuration file for CSI controller
     try  {
@@ -199,6 +181,16 @@ int ECMtsCsi::setup()
     for (int i=0; i<numDaqSignals; i++)
         daqSignal[i] = 0.0;
     
+    // resize ctrl and daq signal offset vectors
+    ctrlSigOffset.resize(numCtrlSignals);
+    ctrlSigOffset.Zero();
+    daqSigOffset.resize(numDaqSignals);
+    daqSigOffset.Zero();
+    
+    // resize trial signal offset vector
+    trialSigOffset.resize(numCtrlSignals);
+    trialSigOffset.Zero();
+    
     // print experimental control information
     this->Print(opserr);
     
@@ -233,50 +225,49 @@ int ECMtsCsi::setup()
         //rValue += this->control();  // CHECK IF WE NEED THIS, CHECK rampId
         rValue += this->acquire();
         
-        if (ctrlSigOffset.Size() > 0)  {
-            int kT = 0;
-            for (int iT=0; iT<numTrialCPs; iT++)  {
-                // get trial control point parameters
-                int numSigT = trialCPs[iT]->getNumSignal();
-                ID dofT = trialCPs[iT]->getDOF();
-                ID rspT = trialCPs[iT]->getRspType();
-                ID isRelT = trialCPs[iT]->getSigRefType();
-                // loop through all the trial control point signals
-                for (int jT=0; jT<numSigT; jT++)  {
-                    if (isRelT(jT))  {
-                        // now search through ouput control points to
-                        // find the signal with the same DOF and rspType
-                        int kO = 0;
-                        for (int iO=0; iO<numOutCPs; iO++)  {
-                            int numSigO = outCPs[iO]->getNumSignal();
-                            ID dofO = outCPs[iO]->getDOF();
-                            ID rspO = outCPs[iO]->getRspType();
-                            // loop through all the output control point signals
-                            for (int jO=0; jO<numSigO; jO++)  {
-                                if (dofT(jT)==dofO(jO) && rspT(jT)==rspO(jO))
-                                    ctrlSigOffset(kT) = daqSignal[kO];
-                                kO++;
+        int kT = 0;
+        for (int iT=0; iT<numTrialCPs; iT++)  {
+            // get trial control point parameters
+            int numSigT = trialCPs[iT]->getNumSignal();
+            ID dofT = trialCPs[iT]->getDOF();
+            ID rspT = trialCPs[iT]->getRspType();
+            ID isRelT = trialCPs[iT]->getSigRefType();
+            // loop through all the trial control point signals
+            for (int jT=0; jT<numSigT; jT++)  {
+                if (isRelT(jT))  {
+                    // now search through ouput control points to
+                    // find the signal with the same DOF and rspType
+                    int kO = 0;
+                    for (int iO=0; iO<numOutCPs; iO++)  {
+                        int numSigO = outCPs[iO]->getNumSignal();
+                        ID dofO = outCPs[iO]->getDOF();
+                        ID rspO = outCPs[iO]->getRspType();
+                        // loop through all the output control point signals
+                        for (int jO=0; jO<numSigO; jO++)  {
+                            if (dofT(jT)==dofO(jO) && rspT(jT)==rspO(jO))  {
+                                ctrlSigOffset(kT) = daqSignal[kO];
+                                ctrlSignal[kT] = ctrlSigOffset(kT);
                             }
+                            kO++;
                         }
                     }
-                    kT++;
                 }
+                kT++;
             }
         }
-        if (daqSigOffset.Size() > 0)  {
-            int k = 0;
-            for (int i=0; i<numOutCPs; i++)  {
-                // get output control point parameters
-                int numSignals = outCPs[i]->getNumSignal();
-                ID isRel = outCPs[i]->getSigRefType();
-                // loop through all the output control point signals
-                for (int j=0; j<numSignals; j++)  {
-                    if (isRel(j))  {
-                        daqSigOffset(k) = -daqSignal[k];
-                        daqSignal[k] = 0.0;
-                    }
-                    k++;
+        
+        int kO = 0;
+        for (int i=0; i<numOutCPs; i++)  {
+            // get output control point parameters
+            int numSignals = outCPs[i]->getNumSignal();
+            ID isRel = outCPs[i]->getSigRefType();
+            // loop through all the output control point signals
+            for (int j=0; j<numSignals; j++)  {
+                if (isRel(j))  {
+                    daqSigOffset(kO) = -daqSignal[kO];
+                    daqSignal[kO] = 0.0;
                 }
+                kO++;
             }
         }
         
@@ -449,31 +440,42 @@ int ECMtsCsi::setTrialResponse(
         ID dof = trialCPs[i]->getDOF();
         ID rsp = trialCPs[i]->getRspType();
         
+        // control point has no limits defined
         if (trialCPs[i]->hasLimits() == 0)  {
             // loop through all the trial control point dofs
             for (int j=0; j<numSignals; j++)  {
                 // assemble the control signal array
-                if (rsp(j) == OF_Resp_Disp  &&  disp != 0)  {
+                if (rsp(j) == OF_Resp_Disp  &&  disp != 0)
                     ctrlSignal[k] = (*disp)(dof(j));
-                }
-                else if (rsp(j) == OF_Resp_Force  &&  force != 0)  {
+                else if (rsp(j) == OF_Resp_Force  &&  force != 0)
                     ctrlSignal[k] = (*force)(dof(j));
-                }
-                else if (rsp(j) == OF_Resp_Time  &&  time != 0)  {
+                else if (rsp(j) == OF_Resp_Time  &&  time != 0)
                     ctrlSignal[k] = (*time)(dof(j));
-                }
-                else if (rsp(j) == OF_Resp_Vel  &&  vel != 0)  {
+                else if (rsp(j) == OF_Resp_Vel  &&  vel != 0)
                     ctrlSignal[k] = (*vel)(dof(j));
-                }
-                else if (rsp(j) == OF_Resp_Accel  &&  accel != 0)  {
+                else if (rsp(j) == OF_Resp_Accel  &&  accel != 0)
                     ctrlSignal[k] = (*accel)(dof(j));
-                }
-                // filter control signal if the filter exists
+                
+                // get initial trial signal offsets
+                if (gotRelativeTrial == 0  &&  ctrlSignal[k] != 0)
+                    trialSigOffset(k) = -ctrlSignal[k];
+                
+                // apply trial signal offsets if they are not zero
+                if (trialSigOffset(k) != 0)
+                    ctrlSignal[k] += trialSigOffset(k);
+                
+                // filter control signals if any filters exist
                 if (theCtrlFilters[rsp(j)] != 0)
                     ctrlSignal[k] = theCtrlFilters[rsp(j)]->filtering(ctrlSignal[k]);
+                
+                // apply control signal offsets if they are not zero
+                if (ctrlSigOffset(k) != 0)
+                    ctrlSignal[k] += ctrlSigOffset(k);
+                
                 k++;
             }
         
+        // control point has limits defined
         } else  {
             Vector lowerLim = trialCPs[i]->getLowerLimit();
             Vector upperLim = trialCPs[i]->getUpperLimit();
@@ -521,13 +523,31 @@ int ECMtsCsi::setTrialResponse(
                     else if ((*accel)(dof(j)) >= upperLim(j))
                         ctrlSignal[k] = upperLim(j);
                 }
-                // filter control signal if the filter exists
+                
+                // get initial trial signal offsets
+                if (gotRelativeTrial == 0  &&  ctrlSignal[k] != 0)
+                    trialSigOffset(k) = -ctrlSignal[k];
+                
+                // apply trial signal offsets if they are not zero
+                if (trialSigOffset(k) != 0)
+                    ctrlSignal[k] += trialSigOffset(k);
+                
+                // filter control signals if any filters exist
                 if (theCtrlFilters[rsp(j)] != 0)
                     ctrlSignal[k] = theCtrlFilters[rsp(j)]->filtering(ctrlSignal[k]);
+                
+                // apply control signal offsets if they are not zero
+                if (ctrlSigOffset(k) != 0)
+                    ctrlSignal[k] += ctrlSigOffset(k);
+                
+                // increment counter
                 k++;
             }
         }
     }
+    
+    // set flag that relative trial signal has been obtained
+    gotRelativeTrial = 1;
     
     // send control signal array to controller
     k += this->control();
@@ -556,25 +576,27 @@ int ECMtsCsi::getDaqResponse(
         
         // loop through all the output control point dofs
         for (int j=0; j<numSignals; j++)  {
-            // filter daq signal if the filter exists
+            // apply daq signal offsets if they are not zero
+            if (daqSigOffset(k) != 0)
+                daqSignal[k] += daqSigOffset(k);
+            
+            // filter daq signals if any filters exist
             if (theDaqFilters[rsp(j)] != 0)
                 daqSignal[k] = theDaqFilters[rsp(j)]->filtering(daqSignal[k]);
+            
             // populate the daq response vectors
-            if (rsp(j) == OF_Resp_Disp  &&  disp != 0)  {
+            if (rsp(j) == OF_Resp_Disp  &&  disp != 0)
                 (*disp)(dof(j)) = daqSignal[k];
-            }
-            else if (rsp(j) == OF_Resp_Force  &&  force != 0)  {
+            else if (rsp(j) == OF_Resp_Force  &&  force != 0)
                 (*force)(dof(j)) = daqSignal[k];
-            }
-            else if (rsp(j) == OF_Resp_Time  &&  time != 0)  {
+            else if (rsp(j) == OF_Resp_Time  &&  time != 0)
                 (*time)(dof(j)) = daqSignal[k];
-            }
-            else if (rsp(j) == OF_Resp_Vel  &&  vel != 0)  {
+            else if (rsp(j) == OF_Resp_Vel  &&  vel != 0)
                 (*vel)(dof(j)) = daqSignal[k];
-            }
-            else if (rsp(j) == OF_Resp_Accel  &&  accel != 0)  {
+            else if (rsp(j) == OF_Resp_Accel  &&  accel != 0)
                 (*accel)(dof(j)) = daqSignal[k];
-            }
+            
+            // increment counter
             k++;
         }
     }
@@ -664,21 +686,25 @@ void ECMtsCsi::Print(OPS_Stream &s, int flag)
     s << "* ExperimentalControl: " << this->getTag() << endln; 
     s << "*   type: ECMtsCsi\n";
     s << "*   cfgFile: " << cfgFile << endln;
-    s << "*   rampTime: " << rampTime << endln;
-    s << "*   trialCPs:";
+    s << "*   rampTime: " << rampTime << " sec" << endln;
+    s << "*   trialCP tag(s):";
     for (int i=0; i<numTrialCPs; i++)
         s << " " << trialCPs[i]->getTag();
-    s << "\n*   outCPs:";
+    s << "\n*   outCP tag(s):";
     for (int i=0; i<numOutCPs; i++)
         s << " " << outCPs[i]->getTag();
-    s << "\n*   ctrlFilters:";
+    if (useRelativeTrial == 0)
+        s << "\n*   useRelativeTrial: no";
+    else
+        s << "\n*   useRelativeTrial: yes";
+    s << "\n*   ctrlFilter tags:";
     for (int i=0; i<OF_Resp_All; i++)  {
         if (theCtrlFilters[i] != 0)
             s << " " << theCtrlFilters[i]->getTag();
         else
             s << " 0";
     }
-    s << "\n*   daqFilters:";
+    s << "\n*   daqFilter tags:";
     for (int i=0; i<OF_Resp_All; i++)  {
         if (theDaqFilters[i] != 0)
             s << " " << theDaqFilters[i]->getTag();
@@ -698,12 +724,8 @@ int ECMtsCsi::control()
     ramp->setRampTime(rampTime);
     
     // set ramp commands for all the control signals
-    for (int i=0; i<numCtrlSignals; i++)  {
-        if (ctrlSigOffset.Size() > 0)
-            ctrlSignal[i] += ctrlSigOffset(i);
-        
+    for (int i=0; i<numCtrlSignals; i++)
         (*ramp)[i] = ctrlSignal[i];
-    }
     
     // now run the ramp
     try  {
@@ -728,10 +750,6 @@ int ECMtsCsi::acquire()
     // if rampID = -1 the current feedback is returned
     try  {
         CsiController->acquireFeedback(rampId, daqSignal);
-        if (daqSigOffset.Size() > 0)  {
-            for (int i=0; i<numDaqSignals; i++)
-                daqSignal[i] += daqSigOffset(i);
-        }
     }
     catch (const Mts::ICsiException& xcp)  {
         opserr << "ECMtsCsi::acquire() - "
