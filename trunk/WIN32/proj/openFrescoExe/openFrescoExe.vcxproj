@@ -141,6 +141,9 @@
     <ClCompile Include="..\..\..\SRC\openseesCore\DOF_GrpIter.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\Domain.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\DomainComponent.cpp" />
+    <ClCompile Include="..\..\..\SRC\openseesCore\DummyStream.cpp" />
+    <ClCompile Include="..\..\..\SRC\openseesCore\EigenSOE.cpp" />
+    <ClCompile Include="..\..\..\SRC\openseesCore\EigenSolver.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\Element.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\ElementalLoad.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\ElementalLoadIter.cpp" />
@@ -152,6 +155,8 @@
     <ClCompile Include="..\..\..\SRC\openseesCore\FiberResponse.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\File.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\FileIter.cpp" />
+    <ClCompile Include="..\..\..\SRC\openseesCore\FrictionModel.cpp" />
+    <ClCompile Include="..\..\..\SRC\openseesCore\FrictionResponse.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\Graph.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\ID.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\IncrementalIntegrator.cpp" />
@@ -212,7 +217,6 @@
     <ClCompile Include="..\..\..\SRC\openseesExtra\CTestNormDispIncr.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\DatabaseStream.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\DOF_Numberer.cpp" />
-    <ClCompile Include="..\..\..\SRC\openseesExtra\DummyStream.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\EquiSolnAlgo.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\LimitCurve.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\LinearSeries.cpp" />
@@ -336,6 +340,9 @@
     <ClInclude Include="..\..\..\SRC\openseesCore\Domain.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\DomainComponent.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\DomainDecompositionAnalysis.h" />
+    <ClInclude Include="..\..\..\SRC\openseesCore\DummyStream.h" />
+    <ClInclude Include="..\..\..\SRC\openseesCore\EigenSOE.h" />
+    <ClInclude Include="..\..\..\SRC\openseesCore\EigenSolver.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\Element.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\ElementalLoad.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\ElementalLoadIter.h" />
@@ -351,6 +358,8 @@
     <ClInclude Include="..\..\..\SRC\openseesCore\FiberResponse.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\File.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\FileIter.h" />
+    <ClInclude Include="..\..\..\SRC\openseesCore\FrictionModel.h" />
+    <ClInclude Include="..\..\..\SRC\openseesCore\FrictionResponse.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\G3Globals.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\Graph.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\ID.h" />
@@ -382,6 +391,7 @@
     <ClInclude Include="..\..\..\SRC\openseesCore\OPS_Stream.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\Parameter.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\ParameterIter.h" />
+    <ClInclude Include="..\..\..\SRC\openseesCore\PlainMap.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\PlaneStrainMaterial.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\PlaneStressMaterial.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\PlateFiberMaterial.h" />
@@ -425,8 +435,6 @@
     <ClInclude Include="..\..\..\SRC\openseesExtra\CTestNormDispIncr.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\DatabaseStream.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\DOF_Numberer.h" />
-    <ClInclude Include="..\..\..\SRC\openseesExtra\DummyStream.h" />
-    <ClInclude Include="..\..\..\SRC\openseesExtra\EigenSOE.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\EquiSolnAlgo.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\GraphNumberer.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\GroundMotion.h" />
