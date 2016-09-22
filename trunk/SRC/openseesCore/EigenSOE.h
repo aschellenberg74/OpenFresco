@@ -1,5 +1,5 @@
-// $Revision$
-// $Date$
+// $Revision: 1.3 $
+// $Date: 2009-05-14 22:45:57 $
 // $Source: /usr/local/cvs/OpenSees/SRC/system_of_eqn/eigenSOE/EigenSOE.h,v $
 
 // Written: Jun Peng

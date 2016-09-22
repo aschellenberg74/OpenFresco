@@ -23,7 +23,7 @@
 // $Date$
 // $URL$
 
-// Written: Frank McKenna
+// Written: Frank McKenna & Andreas Schellenberg
 // Created: 05/11
 // Revision: A
 //
@@ -41,7 +41,9 @@
 #include <TclModelBuilder.h>
 #include <UniaxialMaterial.h>
 #include <NDMaterial.h>
+//#include <SectionForceDeformation.h>
 #include <CrdTransf.h>
+#include <FrictionModel.h>
 #include <LimitCurve.h>
 //#include <WrapperUniaxialMaterial.h>
 //#include <WrapperNDMaterial.h>
@@ -140,6 +142,15 @@ extern "C" int OPS_Error(char *errorMessage, int length)
 extern "C" int OPS_GetNumRemainingInputArgs()
 {
     return maxArg-currentArg;
+}
+
+
+extern "C" int OPS_ResetCurrentInputArg(int cArg)
+{
+    if (cArg < 0) currentArg += cArg;
+    else currentArg = cArg;
+    
+    return 0;
 }
 
 
@@ -372,7 +383,7 @@ extern "C" matObj *OPS_GetMaterialType(char *type, int sizeType)
                 matFunction = matFunction->next;
         }
 
-        // ty to load new routine from dynamic library in load path
+        // try to load new routine from dynamic library in load path
         matFunct matFunctPtr;
         void *libHandle;
 
@@ -875,20 +886,26 @@ UniaxialMaterial *OPS_GetUniaxialMaterial(int matTag)
 
 NDMaterial *OPS_GetNDMaterial(int matTag)
 {
-    return theModelBuilder->getNDMaterial(matTag);
+    return OPS_getNDMaterial(matTag);
 }
 
 
-CrdTransf *OPS_GetCrdTransfPtr(int tag)
+/*SectionForceDeformation *OPS_GetSectionForceDeformation(int secTag)
 {
-    return OPS_GetCrdTransf(tag);
-}
-
-
-/*SectionForceDeformation *OPS_GetSectionForceDeformation(int matTag)
-{
-    return theModelBuilder->getSection(matTag);
+    return OPS_getSectionForceDeformation(secTag);
 }*/
+
+
+CrdTransf *OPS_GetCrdTransf(int crdTag)
+{
+    return OPS_getCrdTransf(crdTag);
+}
+
+
+FrictionModel *OPS_GetFrictionModel(int frnTag)
+{
+    return OPS_getFrictionModel(frnTag);
+}
 
 
 int OPS_ResetInput(ClientData clientData, Tcl_Interp *interp,  

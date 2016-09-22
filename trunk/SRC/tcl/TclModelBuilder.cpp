@@ -23,7 +23,7 @@
 // $Date$
 // $URL$
 
-// Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 05/11
 // Revision: A
 //
@@ -68,6 +68,7 @@
 
 #include <UniaxialMaterial.h>
 #include <NDMaterial.h>
+#include <FrictionModel.h>
 
 //#include <ImposedMotionSP.h>
 //#include <ImposedMotionSP1.h>
@@ -130,7 +131,19 @@ int TclCommand_addNDMaterial(ClientData clientData, Tcl_Interp *interp, int argc
 int TclCommand_addHomogeneousBC(ClientData clientData, Tcl_Interp *interp,
     int argc, TCL_Char **argv);
 
+int TclCommand_addHomogeneousBC_X(ClientData clientData, Tcl_Interp *interp,
+    int argc, TCL_Char **argv);
+
+int TclCommand_addHomogeneousBC_Y(ClientData clientData, Tcl_Interp *interp,
+    int argc, TCL_Char **argv);
+
+int TclCommand_addHomogeneousBC_Z(ClientData clientData, Tcl_Interp *interp,
+    int argc, TCL_Char **argv);
+
 //int TclCommand_addEqualDOF_MP(ClientData clientData, Tcl_Interp *interp,
+//    int argc, TCL_Char **argv);
+
+//int TclCommand_addEqualDOF_MP_Mixed (ClientData clientData, Tcl_Interp *interp,
 //    int argc, TCL_Char **argv);
 
 //int TclCommand_RigidLink(ClientData clientData, Tcl_Interp *interp, int argc,
@@ -158,6 +171,9 @@ int TclCommand_addHomogeneousBC(ClientData clientData, Tcl_Interp *interp,
 //    int argc, TCL_Char **argv);
 
 int TclCommand_addRemoGeomTransf(ClientData clientData, Tcl_Interp *interp, 
+    int argc, TCL_Char **argv);
+
+int TclCommand_addFrictionModel(ClientData clientData, Tcl_Interp *interp, 
     int argc, TCL_Char **argv);
 
 /*#ifdef OO_HYSTERETIC
@@ -203,8 +219,6 @@ TclModelBuilder::TclModelBuilder(Domain &thedomain,
     Tcl_Interp *interp, int NDM, int NDF)
     : ModelBuilder(thedomain), theInterp(interp), ndm(NDM), ndf(NDF)
 {
-    //theUniaxialMaterials = new ArrayOfTaggedObjects(32);
-    theNDMaterials = new ArrayOfTaggedObjects(32);
     //theSections = new ArrayOfTaggedObjects(32);
     //theSectionRepresents = new ArrayOfTaggedObjects(32);  
     /*#ifdef OO_HYSTERETIC
@@ -233,6 +247,9 @@ TclModelBuilder::TclModelBuilder(Domain &thedomain,
     Tcl_CreateCommand(interp, "uniaxialMaterial", TclCommand_addUniaxialMaterial,
         (ClientData)NULL, NULL);
 
+    //Tcl_CreateCommand(interp, "limitCurve", TclCommand_addLimitCurve,
+    //    (ClientData)NULL, NULL);
+
     Tcl_CreateCommand(interp, "nDMaterial", TclCommand_addNDMaterial,
         (ClientData)NULL, NULL);
 
@@ -255,6 +272,15 @@ TclModelBuilder::TclModelBuilder(Domain &thedomain,
     //    (ClientData)NULL, NULL);
 
     Tcl_CreateCommand(interp, "fix", TclCommand_addHomogeneousBC,
+        (ClientData)NULL, NULL);
+
+    Tcl_CreateCommand(interp, "fixX", TclCommand_addHomogeneousBC_X,
+        (ClientData)NULL, NULL);
+
+    Tcl_CreateCommand(interp, "fixY", TclCommand_addHomogeneousBC_Y,
+        (ClientData)NULL, NULL);
+
+    Tcl_CreateCommand(interp, "fixZ", TclCommand_addHomogeneousBC_Z,
         (ClientData)NULL, NULL);
 
     //Tcl_CreateCommand(interp, "sp", TclCommand_addSP,
@@ -282,6 +308,9 @@ TclModelBuilder::TclModelBuilder(Domain &thedomain,
     //    (ClientData)NULL, NULL);
 
     Tcl_CreateCommand(interp, "geomTransf", TclCommand_addRemoGeomTransf,
+        (ClientData)NULL, NULL);
+
+    Tcl_CreateCommand(interp, "frictionModel", TclCommand_addFrictionModel,
         (ClientData)NULL, NULL);
 
     /*#ifdef OO_HYSTERETIC
@@ -320,11 +349,12 @@ TclModelBuilder::TclModelBuilder(Domain &thedomain,
 TclModelBuilder::~TclModelBuilder()
 {
     //OPS_clearAllTimeSeries();
-    OPS_ClearAllCrdTransf();
     OPS_clearAllUniaxialMaterial();
+    OPS_clearAllNDMaterial();
+    //OPS_clearAllSectionForceDeformation();
+    OPS_clearAllCrdTransf();
+    OPS_clearAllFrictionModel();
 
-    //theUniaxialMaterials->clearAll();
-    theNDMaterials->clearAll();
     //theSections->clearAll(); 
     //theSectionRepresents->clearAll();
 
@@ -336,8 +366,6 @@ TclModelBuilder::~TclModelBuilder()
     theHystereticBackbones->clearAll();*/
 
     // free up memory allocated in the constructor
-    //delete theUniaxialMaterials;
-    delete theNDMaterials;
     //delete theSections;
     //delete theSectionRepresents;
 
@@ -368,11 +396,15 @@ TclModelBuilder::~TclModelBuilder()
     //Tcl_DeleteCommand(theInterp, "load");
     //Tcl_DeleteCommand(theInterp, "mass");
     Tcl_DeleteCommand(theInterp, "fix");
+    Tcl_DeleteCommand(theInterp, "fixX");
+    Tcl_DeleteCommand(theInterp, "fixY");
+    Tcl_DeleteCommand(theInterp, "fixZ");
     //Tcl_DeleteCommand(theInterp, "sp");
     //Tcl_DeleteCommand(theInterp, "imposedSupportMotion");
     //Tcl_DeleteCommand(theInterp, "groundMotion");
     //Tcl_DeleteCommand(theInterp, "equalDOF");
     //Tcl_DeleteCommand(theInterp, "mp");
+    Tcl_DeleteCommand(theInterp, "frictionModel");
 
     /*#ifdef OO_HYSTERETIC
     Tcl_DeleteCommand(theInterp, "unloadingRule");
@@ -1742,6 +1774,175 @@ int TclCommand_addHomogeneousBC(ClientData clientData, Tcl_Interp *interp,
 }
 
 
+int TclCommand_addHomogeneousBC_X(ClientData clientData, Tcl_Interp *interp,
+    int argc, TCL_Char **argv)
+{
+    // ensure the destructor has not been called - 
+    if (theModelBuilder == 0) {
+        opserr << "WARNING builder has been destroyed - elasticBeam \n";
+        return TCL_ERROR;
+    }
+
+    //  int ndf = theTclBuilder->getNDF();
+    int ndf = argc - 2;
+    if (strcmp(argv[argc-2],"-tol") == 0)
+        ndf -= 2;
+
+    // check number of arguments
+    if (argc < (2 + ndf)) {
+        opserr << "WARNING bad command - want: fixX xLoc " << ndf << " [0,1] conditions";
+        printCommand(argc, argv);
+        return TCL_ERROR;
+    }
+
+    // get the xCrd of nodes to be constrained
+    double xLoc;
+    if (Tcl_GetDouble(interp, argv[1], &xLoc) != TCL_OK) {
+        opserr << "WARNING invalid xCrd - fixX xLoc " << ndf << " [0,1] conditions\n";
+        return TCL_ERROR;
+    }
+
+    // read in the fixities
+    ID fixity(ndf);
+    for (int i=0; i<ndf; i++) {
+        if (Tcl_GetInt(interp, argv[2+i], &fixity(i)) != TCL_OK) {
+            opserr << "WARNING invalid fixity " << i+1 << " - fixX " << xLoc;
+            opserr << " " << ndf << " fixities\n";
+            return TCL_ERROR;
+        }
+    }
+
+    // set the tolerance, the allowable difference in nodal coordinate and
+    // what the value user specified to see if node is constrained or not
+    double tol = 1.0e-10;
+    if (argc >= (4 + ndf)) {
+        if (strcmp(argv[2+ndf],"-tol") == 0)
+            if (Tcl_GetDouble(interp, argv[3+ndf], &tol) != TCL_OK) {
+                opserr << "WARNING invalid tol specified - fixX " << xLoc << endln;
+                return TCL_ERROR;
+            }
+    }
+
+    theDomain->addSP_Constraint(0, xLoc, fixity, tol);
+
+    // if get here we have sucessfully created the node and added it to the domain
+    return TCL_OK;
+}
+
+
+int TclCommand_addHomogeneousBC_Y(ClientData clientData, Tcl_Interp *interp,
+    int argc, TCL_Char **argv)
+{
+    // ensure the destructor has not been called - 
+    if (theModelBuilder == 0) {
+        opserr << "WARNING builder has been destroyed - elasticBeam \n";
+        return TCL_ERROR;
+    }
+
+    //  int ndf = theTclBuilder->getNDF();
+    int ndf = argc - 2;
+    if (strcmp(argv[argc-2],"-tol") == 0)
+        ndf -= 2;
+
+    // check number of arguments
+    if (argc < (2 + ndf)) {
+        opserr << "WARNING bad command - want: fixY yLoc " << ndf << " [0,1] conditions";
+        printCommand(argc, argv);
+        return TCL_ERROR;
+    }
+
+    // get the yCrd of nodes to be constrained
+    double yLoc;
+    if (Tcl_GetDouble(interp, argv[1], &yLoc) != TCL_OK) {
+        opserr << "WARNING invalid yCrd - fixY yLoc " << ndf << " [0,1] conditions\n";
+        return TCL_ERROR;
+    }
+
+    // read in the fixities
+    ID fixity(ndf);
+    for (int i=0; i<ndf; i++) {
+        if (Tcl_GetInt(interp, argv[2+i], &fixity(i)) != TCL_OK) {
+            opserr << "WARNING invalid fixity " << i+1 << " - fixY " << yLoc;
+            opserr << " " << ndf << " fixities\n";
+            return TCL_ERROR;
+        }
+    }
+
+    // set the tolerance, the allowable difference in nodal coordinate and
+    // what the value user specified to see if node is constrained or not
+    double tol = 1.0e-10;
+    if (argc >= (4 + ndf)) {
+        if (strcmp(argv[2+ndf],"-tol") == 0)
+            if (Tcl_GetDouble(interp, argv[3+ndf], &tol) != TCL_OK) {
+                opserr << "WARNING invalid tol specified - fixY " << yLoc << endln;
+                return TCL_ERROR;
+            }
+    }
+
+
+    theDomain->addSP_Constraint(1, yLoc, fixity, tol);
+
+    // if get here we have sucessfully created the node and added it to the domain
+    return TCL_OK;
+}
+
+
+int TclCommand_addHomogeneousBC_Z(ClientData clientData, Tcl_Interp *interp,
+    int argc, TCL_Char **argv)
+{
+    // ensure the destructor has not been called - 
+    if (theModelBuilder == 0) {
+        opserr << "WARNING builder has been destroyed - elasticBeam \n";
+        return TCL_ERROR;
+    }
+
+    //int ndf = theTclBuilder->getNDF();
+    int ndf = argc - 2;
+    if (strcmp(argv[argc-2],"-tol") == 0)
+        ndf -= 2;
+
+    // check number of arguments
+    if (argc < (2 + ndf)) {
+        opserr << "WARNING bad command - want: fixZ zLoc " << ndf << " [0,1] conditions";
+        printCommand(argc, argv);
+        return TCL_ERROR;
+    }
+
+    // get the yCrd of nodes to be constrained
+    double zLoc;
+    if (Tcl_GetDouble(interp, argv[1], &zLoc) != TCL_OK) {
+        opserr << "WARNING invalid zCrd - fixZ zLoc " << ndf << " [0,1] conditions\n";
+        return TCL_ERROR;
+    }
+
+    // read in the fixities
+    ID fixity(ndf);
+    for (int i=0; i<ndf; i++) {
+        if (Tcl_GetInt(interp, argv[2+i], &fixity(i)) != TCL_OK) {
+            opserr << "WARNING invalid fixity " << i+1 << " - fixZ " << zLoc;
+            opserr << " " << ndf << " fixities\n";
+            return TCL_ERROR;
+        }
+    }
+
+    // set the tolerance, the allowable difference in nodal coordinate and
+    // what the value user specified to see if node is constrained or not
+    double tol = 1.0e-10;
+    if (argc >= (4 + ndf)) {
+        if (strcmp(argv[2+ndf],"-tol") == 0)
+            if (Tcl_GetDouble(interp, argv[3+ndf], &tol) != TCL_OK) {
+                opserr << "WARNING invalid tol specified - fixZ " << zLoc << endln;
+                return TCL_ERROR;
+            }
+    }
+
+    theDomain->addSP_Constraint(2, zLoc, fixity, tol);
+
+    // if get here we have sucessfully created the node and added it to the domain
+    return TCL_OK;
+}
+
+
 /*int TclCommand_addSP(ClientData clientData, Tcl_Interp *interp,
 int argc, TCL_Char **argv)
 {
@@ -2147,6 +2348,17 @@ int argc,	TCL_Char **argv)
 return TclModelBuilderHystereticBackboneCommand(clientData, interp, 
 argc, argv, theModelBuilder);
 }*/
+
+
+extern int TclModelBuilderFrictionModelCommand (ClientData clienData,
+    Tcl_Interp *interp, int argc, TCL_Char **argv,
+    Domain *theDomain);
+
+int TclCommand_addFrictionModel(ClientData clientData,
+    Tcl_Interp *interp, int argc, TCL_Char **argv)
+{
+    return TclModelBuilderFrictionModelCommand(clientData, interp, argc, argv, theDomain);
+}
 
 
 /*int TclCommand_Package(ClientData clientData, Tcl_Interp *interp, int argc, TCL_Char **argv)

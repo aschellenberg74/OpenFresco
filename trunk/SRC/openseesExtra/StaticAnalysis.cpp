@@ -47,16 +47,20 @@
 #include <ID.h>
 #include <Graph.h>
 #include <Timer.h>
+#include <Integrator.h>//Abbas
 
 // AddingSensitivity:BEGIN //////////////////////////////////
 #ifdef _RELIABILITY
-#include <SensitivityAlgorithm.h>
+//#include <SensitivityAlgorithm.h>
+#include<Integrator.h>
 #endif
 // AddingSensitivity:END ////////////////////////////////////
 
 
 // Constructor
 //    sets theModel and theSysOFEqn to 0 and the Algorithm to the one supplied
+
+
 
 StaticAnalysis::StaticAnalysis(Domain &the_Domain,
 			       ConstraintHandler &theHandler,
@@ -86,7 +90,7 @@ StaticAnalysis::StaticAnalysis(Domain &the_Domain,
 
     // AddingSensitivity:BEGIN ////////////////////////////////////
 #ifdef _RELIABILITY
-    theSensitivityAlgorithm = 0;
+
 #endif
     // AddingSensitivity:END //////////////////////////////////////
 }    
@@ -119,8 +123,7 @@ StaticAnalysis::clearAll(void)
     delete theTest;
   if (theEigenSOE != 0)
     delete theEigenSOE;
-
-  // now set the pointers to NULL
+  
   theAnalysisModel =0;
   theConstraintHandler =0;
   theDOF_Numberer =0;
@@ -129,11 +132,12 @@ StaticAnalysis::clearAll(void)
   theSOE =0;
   theEigenSOE =0;
   theTest = 0;
-
+  
   // AddingSensitivity:BEGIN ////////////////////////////////////
 #ifdef _RELIABILITY
-  delete theSensitivityAlgorithm;
-  theSensitivityAlgorithm =0;
+  //if(theSensitivityAlgorithm !=0)
+  //delete theSensitivityAlgorithm;
+  //theSensitivityAlgorithm =0;
 #endif
   // AddingSensitivity:END //////////////////////////////////////
 }    
@@ -148,6 +152,7 @@ StaticAnalysis::analyze(int numSteps)
     for (int i=0; i<numSteps; i++) {
 
 	result = theAnalysisModel->analysisStep();
+
 	if (result < 0) {
 	    opserr << "StaticAnalysis::analyze() - the AnalysisModel failed";
 	    opserr << " at iteration: " << i << " with domain at load factor ";
@@ -162,6 +167,7 @@ StaticAnalysis::analyze(int numSteps)
 
 	int stamp = the_Domain->hasDomainChanged();
 
+	
 	if (stamp != domainStamp) {
 	    domainStamp = stamp;
 
@@ -181,10 +187,12 @@ StaticAnalysis::analyze(int numSteps)
 	    opserr << the_Domain->getCurrentTime() << endln;
 	    the_Domain->revertToLastCommit();
 	    theIntegrator->revertToLastStep();
+
+	 
 	    return -2;
 	}
 
-	result = theAlgorithm->solveCurrentStep();
+           result = theAlgorithm->solveCurrentStep();
 	if (result < 0) {
 	    opserr << "StaticAnalysis::analyze() - the Algorithm failed";
 	    opserr << " at iteration: " << i << " with domain at load factor ";
@@ -196,19 +204,25 @@ StaticAnalysis::analyze(int numSteps)
 	}    
 
 // AddingSensitivity:BEGIN ////////////////////////////////////
+
 #ifdef _RELIABILITY
-	if (theSensitivityAlgorithm != 0) {
-		result = theSensitivityAlgorithm->computeSensitivities();
-		if (result < 0) {
-			opserr << "StaticAnalysis::analyze() - the SensitivityAlgorithm failed";
-			opserr << " at iteration: " << i << " with domain at load factor ";
-			opserr << the_Domain->getCurrentTime() << endln;
-			the_Domain->revertToLastCommit();	    
-			theIntegrator->revertToLastStep();
-			return -5;
-		}    
-	}
+
+//	if (theSensitivityAlgorithm != 0) {
+//	opserr<<"Static analysiss:reliability is defined"<<endln;
+
+//		result = theSensitivityAlgorithm->computeSensitivities();
+//		if (result < 0) {
+//			opserr << "StaticAnalysis::analyze() - the SensitivityAlgorithm failed";
+//			opserr << " at iteration: " << i << " with domain at load factor ";
+//			opserr << the_Domain->getCurrentTime() << endln;
+//			the_Domain->revertToLastCommit();	    
+//			theIntegrator->revertToLastStep();
+//			return -5;
+//		}    
+//	}
 #endif
+
+
 // AddingSensitivity:END //////////////////////////////////////
 
 	result = theIntegrator->commit();
@@ -256,7 +270,6 @@ StaticAnalysis::eigen(int numMode, bool generalized, bool findSmallest)
       }	
     }
 
-
     //
     // zero A and M
     //
@@ -280,8 +293,9 @@ StaticAnalysis::eigen(int numMode, bool generalized, bool findSmallest)
 	result = -2;
       }
     }
+   
 
-    //
+
     // if generalized is true, form M
     //
 
@@ -453,22 +467,25 @@ StaticAnalysis::domainChanged(void)
 }    
 
 // AddingSensitivity:BEGIN //////////////////////////////
+
 #ifdef _RELIABILITY
 int 
-StaticAnalysis::setSensitivityAlgorithm(SensitivityAlgorithm *passedSensitivityAlgorithm)
+StaticAnalysis::setSensitivityAlgorithm(Integrator *passedSensitivityAlgorithm)
 {
-    int result = 0;
-
-    // invoke the destructor on the old one
-    if (theSensitivityAlgorithm != 0) {
-      delete theSensitivityAlgorithm;
-    }
-    
-    theSensitivityAlgorithm = passedSensitivityAlgorithm;
-    
+  opserr << "StaticAnalysis::setSensitivityAlgorithm() - DOES NOTHING!\n";
+  int result = 0;
+  
+  // invoke the destructor on the old one
+  //  if (theSensitivityAlgorithm != 0) {
+  //    delete theSensitivityAlgorithm;
+  //  }
+  
+  //theSensitivityAlgorithm = passedSensitivityAlgorithm;
+  
     return 0;
 }
 #endif
+
 // AddingSensitivity:END ///////////////////////////////
 
 
@@ -521,7 +538,6 @@ StaticAnalysis::setIntegrator(StaticIntegrator &theNewIntegrator)
     if (theIntegrator != 0) {
 	delete theIntegrator;
     }
-
     // set the links needed by the other objects in the aggregation
     Domain *the_Domain = this->getDomainPtr();
   
@@ -537,7 +553,6 @@ StaticAnalysis::setIntegrator(StaticIntegrator &theNewIntegrator)
     if (domainStamp != 0)
       theIntegrator->domainChanged();
     */
-
   return 0;
 
 }

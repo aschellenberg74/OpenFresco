@@ -106,7 +106,7 @@ int addEEBeamColumn(ClientData clientData, Tcl_Interp *interp, int argc,
 			opserr << "expElement beamColumn element: " << tag << endln;
 			return TCL_ERROR;
 		}
-		theTrans = OPS_GetCrdTransfPtr(transId);
+		theTrans = OPS_GetCrdTransf(transId);
 		if (theTrans == 0)  {
 			opserr << "WARNING transformation object not found\n";
 	        opserr << "expElement beamColumn element: " << tag << endln;
@@ -286,7 +286,7 @@ int addEEBeamColumn(ClientData clientData, Tcl_Interp *interp, int argc,
 			opserr << "expElement beamColumn element: " << tag << endln;
 			return TCL_ERROR;
 		}
-		theTrans = OPS_GetCrdTransfPtr(transId);
+		theTrans = OPS_GetCrdTransf(transId);
 		if (theTrans == 0)  {
 			opserr << "WARNING transformation object not found\n";
 	        opserr << "expElement beamColumn element: " << tag << endln;

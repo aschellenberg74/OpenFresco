@@ -18,8 +18,8 @@
 **                                                                    **
 ** ****************************************************************** */
                                                                         
-// $Revision$
-// $Date$
+// $Revision: 1.1 $
+// $Date: 2006-08-03 23:34:32 $
 // $Source: /usr/local/cvs/OpenSees/SRC/handler/DummyStream.h,v $
 
 #ifndef _DummyStream
