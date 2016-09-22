@@ -18,93 +18,47 @@
 **                                                                    **
 ** ****************************************************************** */
                                                                         
-// $Revision$
-// $Date$
-// $Source: /usr/local/cvs/OpenSees/SRC/system_of_eqn/linearSOE/LinearSOE.cpp,v $
+// $Revision: 1.2 $
+// $Date: 2001-07-26 00:56:05 $
+// $Source: /usr/local/cvs/OpenSees/SRC/renderer/PlainMap.h,v $
                                                                         
                                                                         
+// File: ~/graphics/PlainMap.h
+//
 // Written: fmk 
-// Created: 11/96
+// Created: 10/98
+// Revision: A
 //
-// Description: This file contains the implementation of LinearSOE.
+// Description: This file contains the class definition for PlainMap.
+// PlainMap is an abstract base class. An PlainMap object is used
+// to determine the r,g,b values given an input value.
 //
-// What: "@(#) LinearSOE.C, revA"
+// What: "@(#) PlainMap.h, revA"
 
-#include<LinearSOE.h>
-#include<LinearSOESolver.h>
+#ifndef PlainMap_h
+#define PlainMap_h
 
-LinearSOE::LinearSOE(LinearSOESolver &theLinearSOESolver, int classtag)
-    :MovableObject(classtag), theModel(0), theSolver(&theLinearSOESolver)
+#include <ColorMap.h>
+
+class PlainMap: public ColorMap
 {
+  public:
+    PlainMap();
+    float getRed(float value);
+    float getGreen(float value);
+    float getBlue(float value);
+    int   getRGB(float value, float &red, float &green, float &blue);
+    int   startImage();
 
-}
-
-LinearSOE::LinearSOE(int classtag)
-:MovableObject(classtag), theModel(0), theSolver(0)
-{
-
-}
-
-
-LinearSOE::~LinearSOE()
-{
-  if (theSolver != 0)
-    delete theSolver;
-}
-
-int 
-LinearSOE::solve(void)
-{
-  if (theSolver != 0)
-    return (theSolver->solve());
-  else 
-    return -1;
-}
-
-int
-LinearSOE::formAp(const Vector &p, Vector &Ap)
-{
-  return 0;
-}
-
-double
-LinearSOE::getDeterminant(void)
-{
-  if (theSolver != 0)
-    return theSolver->getDeterminant();
-  else 
-    return 0;
-}
+  protected:
+    
+  private:
+    float max, min;
+    float maxLast, minLast;
+    float *data;
+    int sizeData;
+};
 
 
+#endif
 
-int 
-LinearSOE::setSolver(LinearSOESolver &newSolver)
-{
-    theSolver = &newSolver;
-    return 0;
-}
-
-LinearSOESolver *
-LinearSOE::getSolver(void)
-{
-    return theSolver;
-}
-
-int 
-LinearSOE::setLinks(AnalysisModel &theModel)
-{
-    this->theModel = &theModel;
-    return 0;
-}
-
-
-int
-LinearSOE::addA(const Matrix &) {
-  return -1;
-}
-
-int
-LinearSOE::addColA(const Vector &col, int colIndex, double fact) {
-  return -1;
-}

@@ -17,48 +17,45 @@
 **   Filip C. Filippou (filippou@ce.berkeley.edu)                     **
 **                                                                    **
 ** ****************************************************************** */
-                                                                        
-// $Revision$
-// $Date$
-// $Source: /usr/local/cvs/OpenSees/SRC/domain/load/Load.h,v $
-                                                                        
-                                                                        
-#ifndef Load_h
-#define Load_h
 
-// File: ~/domain/load/Load.h
-//
-// Written: fmk 
-// Created: 11/96
+// $Revision: 4952 $
+// $Date: 2012-08-08 22:56:05 -0700 (Wed, 08 Aug 2012) $
+// $URL: svn://opensees.berkeley.edu/usr/local/svn/OpenSees/trunk/SRC/element/frictionBearing/frictionModel/FrictionResponse.h $
+
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
+// Created: 02/06
 // Revision: A
 //
-// Purpose: This file contains the class definition for Load.
-// Load is an abstract class. A Load object is used to add load
-// to the model. 
-//
-// What: "@(#) Load.h, revA"
+// Description: This file contains the FrictionResponse class interface
 
-#include <ID.h>
-#include <DomainComponent.h>
+#ifndef FrictionResponse_h
+#define FrictionResponse_h
 
-class Load : public DomainComponent    
+#include <Response.h>
+#include <Information.h>
+
+class FrictionModel;
+
+class ID;
+class Vector;
+class Matrix;
+
+class FrictionResponse : public Response
 {
-  public:
-    Load(int tag, int classTag);
-
-    virtual ~Load();
-
-    // pure virtual functions
-    virtual void applyLoad(double loadfactor) =0;
-    virtual void applyLoadSensitivity(double loadfactor) {return;}
+public:
+    FrictionResponse(FrictionModel *frn, int id);
+    FrictionResponse(FrictionModel *frn, int id, int val);
+    FrictionResponse(FrictionModel *frn, int id, double val);
+    FrictionResponse(FrictionModel *frn, int id, const ID &val);
+    FrictionResponse(FrictionModel *frn, int id, const Vector &val);
+    FrictionResponse(FrictionModel *frn, int id, const Matrix &val);
+    ~FrictionResponse();
     
-    virtual void setLoadPatternTag(int loadPaternTag);
-    virtual int  getLoadPatternTag(void) const;
-
-  protected:
-	
-  private:
-    int loadPatternTag;
+    int getResponse();
+    
+private:
+    FrictionModel *theFriction;
+    int responseID;
 };
 
 #endif

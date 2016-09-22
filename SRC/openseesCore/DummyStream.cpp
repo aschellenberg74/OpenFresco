@@ -18,47 +18,24 @@
 **                                                                    **
 ** ****************************************************************** */
                                                                         
-// $Revision$
-// $Date$
-// $Source: /usr/local/cvs/OpenSees/SRC/domain/load/Load.h,v $
-                                                                        
-                                                                        
-#ifndef Load_h
-#define Load_h
+// $Revision: 1.1 $
+// $Date: 2006-08-03 23:34:32 $
+// $Source: /usr/local/cvs/OpenSees/SRC/handler/DummyStream.cpp,v $
 
-// File: ~/domain/load/Load.h
-//
-// Written: fmk 
-// Created: 11/96
-// Revision: A
-//
-// Purpose: This file contains the class definition for Load.
-// Load is an abstract class. A Load object is used to add load
-// to the model. 
-//
-// What: "@(#) Load.h, revA"
+#include <DummyStream.h>
+#include <Vector.h>
+#include <iostream>
+#include <iomanip>
+using std::cerr;
+using std::ios;
+using std::setiosflags;
 
-#include <ID.h>
-#include <DomainComponent.h>
-
-class Load : public DomainComponent    
+DummyStream::DummyStream()
+  :OPS_Stream(OPS_STREAM_TAGS_DummyStream) 
 {
-  public:
-    Load(int tag, int classTag);
 
-    virtual ~Load();
+}
+DummyStream::~DummyStream()
+{
 
-    // pure virtual functions
-    virtual void applyLoad(double loadfactor) =0;
-    virtual void applyLoadSensitivity(double loadfactor) {return;}
-    
-    virtual void setLoadPatternTag(int loadPaternTag);
-    virtual int  getLoadPatternTag(void) const;
-
-  protected:
-	
-  private:
-    int loadPatternTag;
-};
-
-#endif
+}

@@ -17,25 +17,70 @@
 **   Filip C. Filippou (filippou@ce.berkeley.edu)                     **
 **                                                                    **
 ** ****************************************************************** */
-                                                                        
-// $Revision$
-// $Date$
-// $Source: /usr/local/cvs/OpenSees/SRC/handler/DummyStream.cpp,v $
 
-#include <DummyStream.h>
-#include <Vector.h>
-#include <iostream>
-#include <iomanip>
-using std::cerr;
-using std::ios;
-using std::setiosflags;
+// $Revision: 4952 $
+// $Date: 2012-08-08 22:56:05 -0700 (Wed, 08 Aug 2012) $
+// $URL: svn://opensees.berkeley.edu/usr/local/svn/OpenSees/trunk/SRC/element/frictionBearing/frictionModel/FrictionResponse.cpp $
 
-DummyStream::DummyStream()
-  :OPS_Stream(OPS_STREAM_TAGS_DummyStream) 
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
+// Created: 02/06
+// Revision: A
+//
+// Description: This file contains the FrictionResponse class implementation
+
+#include <FrictionResponse.h>
+#include <FrictionModel.h>
+
+
+FrictionResponse::FrictionResponse(FrictionModel *frn, int id)
+    : Response(), theFriction(frn), responseID(id)
 {
 
 }
-DummyStream::~DummyStream()
+
+
+FrictionResponse::FrictionResponse(FrictionModel *frn, int id, int val)
+    : Response(val), theFriction(frn), responseID(id)
 {
 
+}
+
+
+FrictionResponse::FrictionResponse(FrictionModel *frn, int id, double val)
+    : Response(val), theFriction(frn), responseID(id)
+{
+
+}
+
+
+FrictionResponse::FrictionResponse(FrictionModel *frn, int id, const ID &val)
+    : Response(val), theFriction(frn), responseID(id)
+{
+
+}
+
+
+FrictionResponse::FrictionResponse(FrictionModel *frn, int id, const Vector &val)
+    : Response(val), theFriction(frn), responseID(id)
+{
+
+}
+
+
+FrictionResponse::FrictionResponse(FrictionModel *frn, int id, const Matrix &val)
+    : Response(val), theFriction(frn), responseID(id)
+{
+
+}
+
+
+FrictionResponse::~FrictionResponse()
+{
+
+}
+
+
+int FrictionResponse::getResponse()
+{
+    return theFriction->getResponse(responseID, myInfo);
 }

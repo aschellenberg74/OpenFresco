@@ -64,7 +64,10 @@ void* OPS_LoadPattern()
     // get tags
     int tags[2];
     int numData = 2;
-    if(OPS_GetIntInput(&numData, &tags[0]) < 0) return 0;
+    if(OPS_GetIntInput(&numData, &tags[0]) < 0) {
+	opserr << "WARNING failed to get load pattern tag\n";
+	return 0;
+    }
 
     // get factor
     double fact = 1.0;
@@ -72,7 +75,10 @@ void* OPS_LoadPattern()
 	std::string type = OPS_GetString();
 	if(type=="-fact" || type=="-factor") {
 	    numData = 1;
-	    if(OPS_GetDoubleInput(&numData,&fact) < 0) return 0;
+	    if(OPS_GetDoubleInput(&numData,&fact) < 0) {
+		opserr << "WARNING failed to get load pattern factor\n";
+		return 0;
+	    }
 	}
     }
 
@@ -92,8 +98,6 @@ void* OPS_LoadPattern()
 	// clean up the memory and return an error
 	if(thePattern != 0)
 	    delete thePattern;
-	if(theSeries != 0)
-	    delete theSeries;
 	return 0;
     }
     
@@ -130,6 +134,7 @@ LoadPattern::LoadPattern(int tag, int clasTag, double fact)
     }  
     // AddingSensitivity:BEGIN /////////////////////////////
     randomLoads = 0;
+    dLambdadh = 0;
     // AddingSensitivity:END ///////////////////////////////
 }
 
@@ -162,6 +167,7 @@ LoadPattern::LoadPattern()
     }
     // AddingSensitivity:BEGIN /////////////////////////////
     randomLoads = 0;
+    dLambdadh = 0;
     // AddingSensitivity:END ///////////////////////////////
 }
 
@@ -194,6 +200,7 @@ LoadPattern::LoadPattern(int tag, double fact)
     }
     // AddingSensitivity:BEGIN /////////////////////////////
     randomLoads = 0;
+    dLambdadh = 0;
     // AddingSensitivity:END ///////////////////////////////
 }
 
@@ -227,6 +234,8 @@ LoadPattern::~LoadPattern()
     // AddingSensitivity:BEGIN /////////////////////////////
     if (randomLoads != 0)
       delete randomLoads;
+    if (dLambdadh != 0)
+      delete dLambdadh;
     // AddingSensitivity:END ///////////////////////////////
 }
 
@@ -241,7 +250,6 @@ LoadPattern::setTimeSeries(TimeSeries *theTimeSeries)
     // set the pointer to the new series object
     theSeries = theTimeSeries;
 }
-
 
 void
 LoadPattern::setDomain(Domain *theDomain)
@@ -492,14 +500,14 @@ LoadPattern::sendSelf(int cTag, Channel &theChannel)
     return -1;
   }    
   
-  if (isConstant == 0) {
+ 
     Vector data(2);
     data(0) = loadFactor;
     data(1) = scaleFactor;
     if (theChannel.sendVector(myDbTag, cTag, data) < 0) {
       opserr << "LoadPattern::sendSelf - channel failed to send the Vector\n";
       return -2;
-    }
+  
 
   }
 
@@ -686,7 +694,7 @@ LoadPattern::recvSelf(int cTag, Channel &theChannel, FEM_ObjectBroker &theBroker
 
   this->setTag(lpData(10));
 
-  if (isConstant == 0) { // we must recv the load factor in a Vector
+ 
     Vector data(2);
     if (theChannel.recvVector(myDbTag, cTag, data) < 0) {
       opserr << "LoadPattern::recvSelf - channel failed to recv the Vector\n";
@@ -694,7 +702,7 @@ LoadPattern::recvSelf(int cTag, Channel &theChannel, FEM_ObjectBroker &theBroker
     }
     loadFactor = data(0);
     scaleFactor = data(1);
-  }
+  
   
   // read data about the time series
   if (lpData(8) != -1) {
@@ -958,16 +966,26 @@ LoadPattern::getMotion(int tag)
 void
 LoadPattern::applyLoadSensitivity(double pseudoTime)
 {
-  if (theSeries != 0 && isConstant != 0) {
-    loadFactor = theSeries->getFactorSensitivity(pseudoTime);
-    loadFactor *= scaleFactor;
-  }
+    // P*dfactor/dh
+    if (theSeries != 0 && isConstant != 0) {
+	loadFactor = theSeries->getFactorSensitivity(pseudoTime);
+	loadFactor *= scaleFactor;
+    }
   
-  NodalLoad *nodLoad;
-  NodalLoadIter &theNodalIter = this->getNodalLoads();
-  while ((nodLoad = theNodalIter()) != 0)
-    nodLoad->applyLoad(loadFactor);
-  
+    NodalLoad *nodLoad;
+    NodalLoadIter &theNodalIter = this->getNodalLoads();
+    while ((nodLoad = theNodalIter()) != 0)
+	nodLoad->applyLoad(loadFactor);
+
+    // factor*dP/dh
+    if (theSeries != 0 && isConstant != 0) {
+	loadFactor = theSeries->getFactor(pseudoTime);
+	loadFactor *= scaleFactor;
+    }
+
+    NodalLoadIter &theNodalIter2 = this->getNodalLoads();
+    while ((nodLoad = theNodalIter2()) != 0)
+	nodLoad->applyLoadSensitivity(loadFactor);
   
   // Don't inlude element loads and sp constraints for now
   /*
@@ -1245,6 +1263,36 @@ LoadPattern::getExternalForceSensitivity(int gradNumber)
     }
 
     return (*randomLoads);
+}
+
+int
+LoadPattern::saveLoadFactorSensitivity(double dlambdadh, int gradIndex, int numGrads)
+{
+  if (dLambdadh == 0) {
+    dLambdadh = new Vector(numGrads);
+  }
+  if (dLambdadh != 0 && dLambdadh->Size() != numGrads) {
+    delete dLambdadh;
+    dLambdadh = new Vector(numGrads);
+  }
+
+  if (gradIndex >= 0 && gradIndex < numGrads) {
+    (*dLambdadh)(gradIndex) = dlambdadh;
+    return 0;
+  }
+  else {
+    opserr << "LoadPattern::saveLoadFactorSensitivity -- gradIndex out of bounds" << endln;
+    return -1;
+  }
+}
+
+double
+LoadPattern::getLoadFactorSensitivity(int gradIndex)
+{
+  if (dLambdadh != 0 && gradIndex >= 0 && gradIndex < dLambdadh->Size())
+    return (*dLambdadh)(gradIndex);
+  else
+    return 0.0;
 }
 
 // AddingSensitivity:END //////////////////////////////////////
