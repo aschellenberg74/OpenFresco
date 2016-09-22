@@ -312,9 +312,6 @@
     <ClCompile Include="..\..\..\SRC\openseesExtra\XmlFileStream.cpp">
       <Filter>openseesExtra</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\SRC\openseesExtra\DummyStream.cpp">
-      <Filter>openseesExtra</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\MSVCerrno.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -615,6 +612,21 @@
     <ClCompile Include="..\..\..\SRC\experimentalTangentStiff\TclExpTangentStiffCommand.cpp">
       <Filter>experimentalTangentStiff</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\FrictionModel.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\FrictionResponse.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\DummyStream.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\EigenSOE.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\EigenSolver.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\SRC\utility\ExpControlSP.h">
@@ -782,9 +794,6 @@
     <ClInclude Include="..\..\..\SRC\openseesExtra\DOF_Numberer.h">
       <Filter>openseesExtra</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\SRC\openseesExtra\EigenSOE.h">
-      <Filter>openseesExtra</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\SRC\openseesExtra\EquiSolnAlgo.h">
       <Filter>openseesExtra</Filter>
     </ClInclude>
@@ -858,9 +867,6 @@
       <Filter>openseesExtra</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\SRC\openseesExtra\XmlFileStream.h">
-      <Filter>openseesExtra</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\SRC\openseesExtra\DummyStream.h">
       <Filter>openseesExtra</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\SRC\openseesExtra2\packages.h">
@@ -1204,6 +1210,24 @@
     </ClInclude>
     <ClInclude Include="..\..\..\SRC\experimentalTangentStiff\ExperimentalTangentStiff.h">
       <Filter>experimentalTangentStiff</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\FrictionModel.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\FrictionResponse.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\DummyStream.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\EigenSOE.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\EigenSolver.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\PlainMap.h">
+      <Filter>openseesCore</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
