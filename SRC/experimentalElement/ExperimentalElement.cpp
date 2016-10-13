@@ -49,7 +49,7 @@ ExperimentalElement::ExperimentalElement(int tag,
     int classTag,
     ExperimentalSite *site)
     : Element(tag, classTag),
-    theSite(site),
+    theSite(site), theTangStiff(0),
     sizeCtrl(0), sizeDaq(0),
     theInitStiff(1,1),
     firstWarning(true)

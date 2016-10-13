@@ -70,9 +70,9 @@ public:
     virtual const Vector &getTime();
 
 protected:
-    // pointer of ExperimentalSite object
+    // pointer to ExperimentalSite object
     ExperimentalSite* theSite;
-    // pointer of ExperimentalTangentStiff object
+    // pointer to ExperimentalTangentStiff object
     ExperimentalTangentStiff* theTangStiff;
     
     // sizeCtrl/Daq
