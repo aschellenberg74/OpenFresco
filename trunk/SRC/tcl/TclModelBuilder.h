@@ -41,7 +41,7 @@
 class TaggedObjectStorage;
 //class SectionForceDeformation;
 //class SectionRepres;
-class NDMaterial;
+//class NDMaterial;
 //class YieldSurface_BC;
 //class YS_Evolution;
 //class PlasticHardeningMaterial;
@@ -62,19 +62,19 @@ public:
     int getNDM() const;
     int getNDF() const;
 
-    // methods needed for the continuum elements and generic section
+    /* methods needed for the continuum elements and generic section
     // models to add/get ND material models
     int addNDMaterial(NDMaterial &theMaterial);
     NDMaterial *getNDMaterial(int tag);
 
-    /* methods needed for the nonlinear beam column elements to
+    // methods needed for the nonlinear beam column elements to
     // add/get section objects
     int addSection(SectionForceDeformation &theSection);
     SectionForceDeformation *getSection(int tag);
     int addSectionRepres(SectionRepres &theSectionRepres);
-    SectionRepres *getSectionRepres(int tag);*/
+    SectionRepres *getSectionRepres(int tag);
 
-/*#ifdef OO_HYSTERETIC
+#ifdef OO_HYSTERETIC
     // methods needed to add/get material state relationships
     int addStiffnessDegradation(StiffnessDegradation &theDegr);
     StiffnessDegradation *getStiffnessDegradation(int tag);
@@ -93,11 +93,11 @@ private:
     int ndm;	// space dimension of the mesh
     int ndf;	// number of degrees of freedom per node
 
-    TaggedObjectStorage *theNDMaterials;
+    /*TaggedObjectStorage *theNDMaterials;
     //TaggedObjectStorage *theSections;
     //TaggedObjectStorage *theSectionRepresents;
 
-/*#ifdef OO_HYSTERETIC
+#ifdef OO_HYSTERETIC
     TaggedObjectStorage *theStiffnessDegradations;
     TaggedObjectStorage *theUnloadingRules;
     TaggedObjectStorage *theStrengthDegradations;

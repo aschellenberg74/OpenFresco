@@ -534,7 +534,7 @@ return 0;
 // do a cast and return
 HystereticBackbone *result = (HystereticBackbone *)mc;
 return result;
-}*/
+}
 
 
 int TclModelBuilder::addNDMaterial(NDMaterial &theMaterial)
@@ -561,7 +561,7 @@ NDMaterial* TclModelBuilder::getNDMaterial(int tag)
 }
 
 
-/*int TclModelBuilder::addSection(SectionForceDeformation &theSection)
+int TclModelBuilder::addSection(SectionForceDeformation &theSection)
 {
 bool result = theSections->addComponent(&theSection);
 if (result == true)
