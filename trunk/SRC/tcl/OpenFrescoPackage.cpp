@@ -51,6 +51,7 @@ Domain *theDomain = 0;
 // experimental control point commands
 extern int TclExpCPCommand(ClientData clientData, Tcl_Interp *interp,
     int argc, TCL_Char **argv, Domain *theDomain);
+extern int clearExperimentalCPs(Tcl_Interp *interp);
 
 int openFresco_addExperimentalCP(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
@@ -61,6 +62,7 @@ int openFresco_addExperimentalCP(ClientData clientData,
 // experimental signal filter commands
 extern int TclExpSignalFilterCommand(ClientData clientData, Tcl_Interp *interp,
     int argc, TCL_Char **argv, Domain *theDomain);
+extern int clearExperimentalSignalFilters(Tcl_Interp *interp);
 
 int openFresco_addExperimentalSignalFilter(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
@@ -71,6 +73,7 @@ int openFresco_addExperimentalSignalFilter(ClientData clientData,
 // experimental control commands
 extern int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
     int argc, TCL_Char **argv, Domain *theDomain);
+extern int clearExperimentalControls(Tcl_Interp *interp);
 
 int openFresco_addExperimentalControl(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
@@ -81,6 +84,7 @@ int openFresco_addExperimentalControl(ClientData clientData,
 // experimental setup commands
 extern int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp,
     int argc, TCL_Char **argv, Domain *theDomain);
+extern int clearExperimentalSetups(Tcl_Interp *interp);
 
 int openFresco_addExperimentalSetup(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
@@ -91,11 +95,23 @@ int openFresco_addExperimentalSetup(ClientData clientData,
 // experimental site commands
 extern int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp,
     int argc, TCL_Char **argv, Domain *theDomain);
+extern int clearExperimentalSites(Tcl_Interp *interp);
 
 int openFresco_addExperimentalSite(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
 { 
     return TclExpSiteCommand(clientData, interp, argc, argv, theDomain);
+}
+
+// experimental tangent stiffness commands
+extern int TclExpTangentStiffCommand(ClientData clientData, Tcl_Interp *interp,
+    int argc, TCL_Char **argv, Domain *theDomain);
+extern int clearExperimentalTangentStiffs(Tcl_Interp *interp);
+
+int openFresco_addExperimentalTangentStiff(ClientData clientData,
+    Tcl_Interp *interp, int argc, TCL_Char **argv)
+{ 
+    return TclExpTangentStiffCommand(clientData, interp, argc, argv, theDomain);
 }
 
 // experimental element commands
@@ -179,6 +195,29 @@ int openFresco_startSimAppElemServer(ClientData clientData,
 }
 
 
+// wipe entire model command
+int openFresco_wipeModel(ClientData clientData,
+    Tcl_Interp *interp, int argc, TCL_Char **argv)
+{
+    /*if (theDatabase != 0)  {
+        delete theDatabase;
+        theDatabase = 0;
+    }*/
+    
+    if (theDomain != 0)
+        theDomain->clearAll();
+    
+    clearExperimentalCPs(interp);
+    clearExperimentalSignalFilters(interp);
+    clearExperimentalControls(interp);
+    clearExperimentalSetups(interp);
+    clearExperimentalSites(interp);
+    clearExperimentalTangentStiffs(interp);
+
+    return TCL_OK;  
+}
+
+
 // This is a package initialization procedure, which is called
 // by Tcl when this package is to be added to an interpreter.
 extern "C" DllExport int
@@ -221,6 +260,9 @@ OpenFresco(ClientData clientData, Tcl_Interp *interp, int argc,
     Tcl_CreateCommand(interp, "expSite", openFresco_addExperimentalSite,
         (ClientData)NULL, NULL);
     
+    Tcl_CreateCommand(interp, "expTangentStiff", openFresco_addExperimentalTangentStiff,
+        (ClientData)NULL, NULL);
+    
     Tcl_CreateCommand(interp, "expElement", openFresco_addExperimentalElement,
         (ClientData)NULL, NULL);
     
@@ -244,6 +286,9 @@ OpenFresco(ClientData clientData, Tcl_Interp *interp, int argc,
     
     Tcl_CreateCommand(interp, "startSimAppElemServer", openFresco_startSimAppElemServer,
         (ClientData)NULL, NULL);
+    
+    Tcl_CreateCommand(interp, "wipeExp", openFresco_wipeModel,
+        (ClientData)NULL, NULL); 
     
     return TCL_OK;
 }
