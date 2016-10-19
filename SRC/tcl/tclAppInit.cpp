@@ -221,6 +221,17 @@ int openFresco_addExperimentalSite(ClientData clientData,
     return TclExpSiteCommand(clientData, interp, argc, argv, theDomain);
 }
 
+// experimental tangent stiffness commands
+extern int TclExpTangentStiffCommand(ClientData clientData, Tcl_Interp *interp,
+    int argc, TCL_Char **argv, Domain *theDomain);
+extern int clearExperimentalTangentStiffs(Tcl_Interp *interp);
+
+int openFresco_addExperimentalTangentStiff(ClientData clientData,
+    Tcl_Interp *interp, int argc, TCL_Char **argv)
+{ 
+    return TclExpTangentStiffCommand(clientData, interp, argc, argv, theDomain);
+}
+
 // experimental element commands
 extern int TclExpElementCommand(ClientData clientData, Tcl_Interp *interp,
     int argc, TCL_Char **argv, Domain *theDomain);
@@ -329,13 +340,15 @@ int openFresco_wipeModel(ClientData clientData,
     clearExperimentalControls(interp);
     clearExperimentalSetups(interp);
     clearExperimentalSites(interp);
-    
+    clearExperimentalTangentStiffs(interp);
+
     return TCL_OK;  
 }
 
 
 extern int OPS_ResetInput(ClientData clientData, Tcl_Interp *interp, int cArg,
     int mArg, TCL_Char **argv, Domain *theDomain, TclModelBuilder *theBuilder);
+
 
 // model builder command
 int specifyModelBuilder(ClientData clientData, Tcl_Interp *interp,
@@ -621,6 +634,9 @@ int Tcl_AppInit(Tcl_Interp *interp)
         (ClientData)NULL, NULL);
     
     Tcl_CreateCommand(interp, "expSite", openFresco_addExperimentalSite,
+        (ClientData)NULL, NULL);
+    
+    Tcl_CreateCommand(interp, "expTangentStiff", openFresco_addExperimentalTangentStiff,
         (ClientData)NULL, NULL);
     
     Tcl_CreateCommand(interp, "expElement", openFresco_addExperimentalElement,
