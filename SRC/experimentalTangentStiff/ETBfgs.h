@@ -44,7 +44,7 @@ class ETBfgs : public ExperimentalTangentStiff
 {
 public:
     // constructors
-    ETBfgs(int tag, double e = 0.1);
+    ETBfgs(int tag, double eps = 0.1);
     ETBfgs(const ETBfgs& ets);
     
     // destructor

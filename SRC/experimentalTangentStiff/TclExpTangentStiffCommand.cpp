@@ -75,6 +75,16 @@ extern ExperimentalTangentStiff *getExperimentalTangentStiff(int tag)
 }
 
 
+extern int clearExperimentalTangentStiffs(Tcl_Interp *interp)
+{
+    if (theExperimentalTangentStiffs != 0) {
+        theExperimentalTangentStiffs->clearAll(false);
+    }
+    
+    return 0;
+}
+
+
 static void printCommand(int argc, TCL_Char **argv)
 {
     opserr << "Input command: ";

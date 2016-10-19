@@ -47,9 +47,10 @@
 
 ExperimentalElement::ExperimentalElement(int tag,
     int classTag,
-    ExperimentalSite *site)
+    ExperimentalSite *site,
+    ExperimentalTangentStiff *tang)
     : Element(tag, classTag),
-    theSite(site), theTangStiff(0),
+    theSite(site), theTangStiff(tang),
     sizeCtrl(0), sizeDaq(0),
     theInitStiff(1,1),
     firstWarning(true)

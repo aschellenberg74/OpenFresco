@@ -39,7 +39,6 @@ class ExperimentalSignalFilter;
 class ID;
 class Vector;
 class Matrix;
-class Tensor;
 
 class ExpSignalFilterResponse : public Response
 {

@@ -61,15 +61,18 @@ Vector EETrussCorot::EETrussCorotV12(12);
 // responsible for allocating the necessary space needed
 // by each object and storing the tags of the end nodes.
 EETrussCorot::EETrussCorot(int tag, int dim, int Nd1, int Nd2,
-    ExperimentalSite *site, bool iM, int addRay, double r)
-    : ExperimentalElement(tag, ELE_TAG_EETrussCorot, site),
+    ExperimentalSite *site, ExperimentalTangentStiff *tang,
+    bool iM, int addRay, double r, int cm)
+    : ExperimentalElement(tag, ELE_TAG_EETrussCorot, site, tang),
     numDIM(dim), numDOF(0), connectedExternalNodes(2),
-    iMod(iM), addRayleigh(addRay), rho(r), L(0.0), Ln(0.0), R(3,3),
+    iMod(iM), addRayleigh(addRay), rho(r), cMass(cm),
+    L(0.0), Ln(0.0), R(3,3),
     theMatrix(0), theVector(0), theLoad(0),
     db(0), vb(0), ab(0), t(0),
-    dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
+    dbDaq(0), vbDaq(0), abDaq(0), qbDaq(0), tDaq(0),
     dbCtrl(1), vbCtrl(1), abCtrl(1),
-    kbInit(1,1), dbLast(1), tLast(0.0),
+    kb(1,1), kbInit(1,1), kbLast(1,1),
+    dbLast(1), dbDaqLast(1), qbDaqLast(1), tLast(0.0),
     firstWarning(true)
 {
     // ensure the connectedExternalNode ID is of correct size & set values
@@ -113,7 +116,7 @@ EETrussCorot::EETrussCorot(int tag, int dim, int Nd1, int Nd2,
     dbDaq = new Vector(1);
     vbDaq = new Vector(1);
     abDaq = new Vector(1);
-    qDaq  = new Vector(1);
+    qbDaq = new Vector(1);
     tDaq  = new Vector(1);
     
     // initialize additional vectors
@@ -121,6 +124,8 @@ EETrussCorot::EETrussCorot(int tag, int dim, int Nd1, int Nd2,
     vbCtrl.Zero();
     abCtrl.Zero();
     dbLast.Zero();
+    dbDaqLast.Zero();
+    qbDaqLast.Zero();
 }
 
 
@@ -128,16 +133,19 @@ EETrussCorot::EETrussCorot(int tag, int dim, int Nd1, int Nd2,
 // by each object and storing the tags of the end nodes.
 EETrussCorot::EETrussCorot(int tag, int dim, int Nd1, int Nd2,
     int port, char *machineInetAddr, int ssl, int udp,
-    int dataSize, bool iM, int addRay, double r)
-    : ExperimentalElement(tag, ELE_TAG_EETrussCorot),
+    int dataSize, ExperimentalTangentStiff *tang,
+    bool iM, int addRay, double r, int cm)
+    : ExperimentalElement(tag, ELE_TAG_EETrussCorot, NULL, tang),
     numDIM(dim), numDOF(0), connectedExternalNodes(2),
-    iMod(iM), addRayleigh(addRay), rho(r), L(0.0), Ln(0.0), R(3,3),
+    iMod(iM), addRayleigh(addRay), rho(r), cMass(cm),
+    L(0.0), Ln(0.0), R(3,3),
     theMatrix(0), theVector(0), theLoad(0),
     theChannel(0), sData(0), sendData(0), rData(0), recvData(0),
     db(0), vb(0), ab(0), t(0),
-    dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
+    dbDaq(0), vbDaq(0), abDaq(0), qbDaq(0), tDaq(0),
     dbCtrl(1), vbCtrl(1), abCtrl(1),
-    kbInit(1,1), dbLast(1), tLast(0.0),
+    kb(1,1), kbInit(1,1), kbLast(1,1),
+    dbLast(1), dbDaqLast(1), qbDaqLast(1), tLast(0.0),
     firstWarning(true)
 {
     // ensure the connectedExternalNode ID is of correct size & set values
@@ -231,7 +239,7 @@ EETrussCorot::EETrussCorot(int tag, int dim, int Nd1, int Nd2,
     id += 1;
     abDaq = new Vector(&rData[id], 1);
     id += 1;
-    qDaq = new Vector(&rData[id], 1);
+    qbDaq = new Vector(&rData[id], 1);
     id += 1;
     tDaq = new Vector(&rData[id], 1);
     recvData->Zero();
@@ -241,6 +249,8 @@ EETrussCorot::EETrussCorot(int tag, int dim, int Nd1, int Nd2,
     vbCtrl.Zero();
     abCtrl.Zero();
     dbLast.Zero();
+    dbDaqLast.Zero();
+    qbDaqLast.Zero();
 }
 
 
@@ -267,8 +277,8 @@ EETrussCorot::~EETrussCorot()
         delete vbDaq;
     if (abDaq != 0)
         delete abDaq;
-    if (qDaq != 0)
-        delete qDaq;
+    if (qbDaq != 0)
+        delete qbDaq;
     if (tDaq != 0)
         delete tDaq;
     
@@ -406,7 +416,7 @@ void EETrussCorot::setDomain(Domain *theDomain)
     }
     
     // set the initial stiffness matrix size
-    theInitStiff.resize(numDOF,numDOF);
+    theInitStiff.resize(numDOF, numDOF);
     
     if (!theLoad)
         theLoad = new Vector(numDOF);
@@ -523,11 +533,18 @@ int EETrussCorot::update()
 {
     int rValue = 0;
     
+    // save the last response parameters
+    tLast = (*t)(0);
+    dbLast = (*db);
+    dbDaqLast = (*dbDaq);
+    qbDaqLast = (*qbDaq);
+    kbLast = kb;
+    
     // get current time
     Domain *theDomain = this->getDomain();
     (*t)(0) = theDomain->getCurrentTime();
     
-    // determine dsp, vel and acc in basic system
+    // determine current dsp, vel and acc in basic system
     const Vector &disp1 = theNodes[0]->getTrialDisp();
     const Vector &disp2 = theNodes[1]->getTrialDisp();
     const Vector &vel1 = theNodes[0]->getTrialVel();
@@ -565,6 +582,7 @@ int EETrussCorot::update()
     (*vb)(0) = c1/Ln;
     (*ab)(0) = c2/Ln - (c1*c1)/(Ln*Ln*Ln);
     
+    // calculate incremental displacement command
     Vector dbDelta = (*db) - dbLast;
     // do not check time for right now because of transformation constraint
     // handler calling update at beginning of new step when applying load
@@ -580,10 +598,6 @@ int EETrussCorot::update()
         }
     }
     
-    // save the last displacements and time
-    dbLast = (*db);
-    tLast = (*t)(0);
-    
     return rValue;
 }
 
@@ -596,7 +610,7 @@ int EETrussCorot::setInitialStiff(const Matrix& kbinit)
             << this->getTag() << endln;
         return -1;
     }
-    kbInit = kbinit;
+    kb = kbInit = kbLast = kbinit;
     
     // transform the stiffness from the basic to the local system
     static Matrix kl(3,3);
@@ -628,55 +642,62 @@ const Matrix& EETrussCorot::getTangentStiff()
     // zero the global matrix
     theMatrix->Zero();
     
-    if (firstWarning == true)  {
-        opserr << "\nWARNING EETrussCorot::getTangentStiff() - "
-            << "Element: " << this->getTag() << endln
-            << "TangentStiff cannot be calculated." << endln
-            << "Return InitialStiff including GeometricStiff instead."
-            << endln;
-        opserr << "Subsequent getTangentStiff warnings will be suppressed."
-            << endln;
+    if (theTangStiff != 0)  {
+        // get current daq displacement and resisting force
+        this->getBasicDisp();
+        this->getBasicForce();
         
-        firstWarning = false;
-    }
-    
-    // get daq resisting forces
-    if (theSite != 0)  {
-        (*qDaq) = theSite->getForce();
+        // calculate incremental displacement and force vectors
+        Vector dbDaqIncr = (*dbDaq) - dbDaqLast;
+        Vector qbDaqIncr = (*qbDaq) - qbDaqLast;
+        
+        // get updated kb matrix
+        kb = theTangStiff->updateTangentStiff(&dbDaqIncr, (Vector*)0,
+            (Vector*)0, &qbDaqIncr, (Vector*)0, &kbInit, &kbLast);
+        
+        // apply optional initial stiffness modification
+        if (iMod == true)  {
+            // correct for displacement control errors using I-Modification
+            qbDaq->addMatrixVector(1.0, kbInit, (*dbDaq) - (*db), -1.0);
+        }
     }
     else  {
-        sData[0] = OF_RemoteTest_getForce;
-        theChannel->sendVector(0, 0, *sendData, 0);
-        theChannel->recvVector(0, 0, *recvData, 0);
-    }
-    
-    // apply optional initial stiffness modification
-    if (iMod == true)  {
-        // get daq displacements
-        if (theSite != 0)  {
-            (*dbDaq) = theSite->getDisp();
-        }
-        else  {
-            sData[0] = OF_RemoteTest_getDisp;
-            theChannel->sendVector(0, 0, *sendData, 0);
-            theChannel->recvVector(0, 0, *recvData, 0);
+        if (firstWarning == true)  {
+            opserr << "\nWARNING EETrussCorot::getTangentStiff() - "
+                << "Element: " << this->getTag() << endln
+                << "TangentStiff cannot be calculated." << endln
+                << "Return InitialStiff including GeometricStiff instead."
+                << endln;
+            opserr << "Subsequent getTangentStiff warnings will be suppressed."
+                << endln;
+            
+            firstWarning = false;
         }
         
-        // correct for displacement control errors using I-Modification
-        qDaq->addMatrixVector(1.0, kbInit, (*dbDaq) - (*db), -1.0);
+        // get current daq resisting force
+        this->getBasicForce();
+        
+        // apply optional initial stiffness modification
+        if (iMod == true)  {
+            // get daq displacement
+            this->getBasicDisp();
+            
+            // correct for displacement control errors using I-Modification
+            qbDaq->addMatrixVector(1.0, kbInit, (*dbDaq) - (*db), -1.0);
+        }
     }
     
     // transform the stiffness from the basic to the local system
     int i,j;
     static Matrix kl(3,3);
-    double EAoverL3 = kbInit(0,0)/(Ln*Ln);
+    double EAoverL3 = kb(0,0)/(Ln*Ln);
     for (i=0; i<3; i++)
         for (j=0; j<3; j++)
             kl(i,j) = EAoverL3*d21[i]*d21[j];
     
     // add geometric stiffness portion
-    double SL = (*qDaq)(0)/Ln;
-    double SA = (*qDaq)(0)/(Ln*Ln*Ln);
+    double SL = (*qbDaq)(0)/Ln;
+    double SA = (*qbDaq)(0)/(Ln*Ln*Ln);
     for (i=0; i<3; i++)  {
         kl(i,i) += SL;
         for (j=0; j<3; j++)
@@ -720,14 +741,26 @@ const Matrix& EETrussCorot::getMass()
 {
     // zero the global matrix
     theMatrix->Zero();
+    int numDOF2 = numDOF/2;
     
     // form mass matrix
     if (L != 0.0 && rho != 0.0)  {
-        double m = 0.5*rho*L;
-        int numDOF2 = numDOF/2;
-        for (int i=0; i<numDIM; i++)  {
-            (*theMatrix)(i,i) = m;
-            (*theMatrix)(i+numDOF2,i+numDOF2) = m;
+        // lumped mass matrix
+        if (cMass == 0) {
+            double m = 0.5*rho*L;
+            for (int i=0; i<numDIM; i++)  {
+                (*theMatrix)(i,i) = m;
+                (*theMatrix)(i+numDOF2,i+numDOF2) = m;
+            }
+        // consistent mass matrix
+        } else  {
+            double m = rho*L/6.0;
+            for (int i=0; i<numDIM; i++)  {
+                (*theMatrix)(i,i) = 2.0*m;
+                (*theMatrix)(i,i+numDOF2) = m;
+                (*theMatrix)(i+numDOF2,i) = m;
+                (*theMatrix)(i+numDOF2,i+numDOF2) = 2.0*m;
+            }
         }
     }
     
@@ -763,7 +796,6 @@ int EETrussCorot::addInertiaLoadToUnbalance(const Vector &accel)
     const Vector &Raccel2 = theNodes[1]->getRV(accel);
     
     int nodalDOF = numDOF/2;
-    
     if (nodalDOF != Raccel1.Size() || nodalDOF != Raccel2.Size()) {
         opserr <<"EETrussCorot::addInertiaLoadToUnbalance() - "
             << "matrix and vector sizes are incompatible\n";
@@ -771,17 +803,20 @@ int EETrussCorot::addInertiaLoadToUnbalance(const Vector &accel)
     }
     
     // want to add ( - fact * M R * accel ) to unbalance
-    double m = 0.5*rho*L;
-    for (int i=0; i<numDIM; i++) {
-        double val1 = Raccel1(i);
-        double val2 = Raccel2(i);
-        
-        // perform - fact * M*(R * accel) // remember M a diagonal matrix
-        val1 *= -m;
-        val2 *= -m;
-        
-        (*theLoad)(i) += val1;
-        (*theLoad)(i+nodalDOF) += val2;
+    // lumped mass matrix
+    if (cMass == 0)  {
+        double m = 0.5*rho*L;
+        for (int i=0; i<numDIM; i++) {
+            (*theLoad)(i) -= m*Raccel1(i);
+            (*theLoad)(i+nodalDOF) -= m*Raccel2(i);
+        }
+    // consistent mass matrix
+    } else  {
+        double m = rho*L/6.0;
+        for (int i=0; i<numDIM; i++) {
+            (*theLoad)(i) -= 2.0*m*Raccel1(i) + m*Raccel2(i);
+            (*theLoad)(i+nodalDOF) -= m*Raccel1(i) + 2.0*m*Raccel2(i);
+        }
     }
     
     return 0;
@@ -793,42 +828,28 @@ const Vector& EETrussCorot::getResistingForce()
     // zero the global residual
     theVector->Zero();
     
-    // get daq resisting forces
-    if (theSite != 0)  {
-        (*qDaq) = theSite->getForce();
-    }
-    else  {
-        sData[0] = OF_RemoteTest_getForce;
-        theChannel->sendVector(0, 0, *sendData, 0);
-        theChannel->recvVector(0, 0, *recvData, 0);
-    }
+    // get current daq resisting force
+    this->getBasicForce();
     
     // apply optional initial stiffness modification
     if (iMod == true)  {
-        // get daq displacements
-        if (theSite != 0)  {
-            (*dbDaq) = theSite->getDisp();
-        }
-        else  {
-            sData[0] = OF_RemoteTest_getDisp;
-            theChannel->sendVector(0, 0, *sendData, 0);
-            theChannel->recvVector(0, 0, *recvData, 0);
-        }
+        // get current daq displacement
+        this->getBasicDisp();
         
         // correct for displacement control errors using I-Modification
-        qDaq->addMatrixVector(1.0, kbInit, (*dbDaq) - (*db), -1.0);
+        qbDaq->addMatrixVector(1.0, kbInit, (*dbDaq) - (*db), -1.0);
     }
     
-    // save corresponding ctrl displacements for recorder
+    // save corresponding ctrl values for recorder
     dbCtrl = (*db);
     vbCtrl = (*vb);
     abCtrl = (*ab);
     
     // transform the forces from the basic to the local system
     static Vector ql(3);
-    ql(0) = d21[0]/Ln*(*qDaq)(0);
-    ql(1) = d21[1]/Ln*(*qDaq)(0);
-    ql(2) = d21[2]/Ln*(*qDaq)(0);
+    ql(0) = d21[0]/Ln*(*qbDaq)(0);
+    ql(1) = d21[1]/Ln*(*qbDaq)(0);
+    ql(2) = d21[2]/Ln*(*qbDaq)(0);
     
     // transform the forces from the local to the global system
     static Vector qg(3);
@@ -851,7 +872,7 @@ const Vector& EETrussCorot::getResistingForce()
 const Vector& EETrussCorot::getResistingForceIncInertia()
 {
     // this already includes damping forces from specimen
-    *theVector = this->getResistingForce();
+    this->getResistingForce();
     
     // add the damping forces from rayleigh damping
     if (addRayleigh == 1)  {
@@ -863,12 +884,22 @@ const Vector& EETrussCorot::getResistingForceIncInertia()
     if (L != 0.0 && rho != 0.0)  {
         const Vector &accel1 = theNodes[0]->getTrialAccel();
         const Vector &accel2 = theNodes[1]->getTrialAccel();
-        
         int numDOF2 = numDOF/2;
-        double m = 0.5*rho*L;
-        for (int i=0; i<numDIM; i++) {
-            (*theVector)(i) += m * accel1(i);
-            (*theVector)(i+numDOF2) += m * accel2(i);
+        
+        // lumped mass matrix
+        if (cMass == 0)  {
+            double m = 0.5*rho*L;
+            for (int i=0; i<numDIM; i++) {
+                (*theVector)(i) += m * accel1(i);
+                (*theVector)(i+numDOF2) += m * accel2(i);
+            }
+        // consistent mass matrix
+        } else  {
+            double m = rho*L/6.0;
+            for (int i=0; i<numDIM; i++) {
+                (*theVector)(i) += 2.0*m*accel1(i) + m*accel2(i);
+                (*theVector)(i+numDOF2) += m*accel1(i) + 2.0*m*accel2(i);
+            }
         }
     }
     
@@ -936,6 +967,21 @@ const Vector& EETrussCorot::getBasicAccel()
 }
 
 
+const Vector& EETrussCorot::getBasicForce()
+{
+    if (theSite != 0)  {
+        (*qbDaq) = theSite->getForce();
+    }
+    else  {
+        sData[0] = OF_RemoteTest_getForce;
+        theChannel->sendVector(0, 0, *sendData, 0);
+        theChannel->recvVector(0, 0, *recvData, 0);
+    }
+    
+    return *qbDaq;
+}
+
+
 int EETrussCorot::sendSelf(int commitTag, Channel &theChannel)
 {
     // has not been implemented yet.....
@@ -984,8 +1030,11 @@ void EETrussCorot::Print(OPS_Stream &s, int flag)
             << ", jNode: " << connectedExternalNodes(1) << endln;
         if (theSite != 0)
             s << "  ExperimentalSite: " << theSite->getTag() << endln;
+        if (theTangStiff != 0)
+            s << "  ExperimentalTangStiff: " << theTangStiff->getTag() << endln;
         s << "  addRayleigh: " << addRayleigh;
-        s << "  mass per unit length: " << rho << endln;
+        s << ", mass/length: " << rho;
+        s << ", cMass: " << cMass << endln;
         // determine resisting forces in global system
         s << "  resisting force: " << this->getResistingForce() << endln;
     } else if (flag == 1)  {
@@ -1037,7 +1086,7 @@ Response* EETrussCorot::setResponse(const char **argv, int argc,
         strcmp(argv[0],"daqForce") == 0 ||
         strcmp(argv[0],"daqForces") == 0)
     {
-        output.tag("ResponseType","q1");
+        output.tag("ResponseType","qb1");
         
         theResponse = new ElementResponse(this, 3, Vector(1));
     }
@@ -1122,14 +1171,14 @@ int EETrussCorot::getResponse(int responseID, Information &eleInfo)
         
     case 2:  // local forces
         theVector->Zero();
-        // Axial
-        (*theVector)(0)        = -(*qDaq)(0);
-        (*theVector)(numDOF/2) =  (*qDaq)(0);
+        // axial (qbDaq is already current)
+        (*theVector)(0)        = -(*qbDaq)(0);
+        (*theVector)(numDOF/2) =  (*qbDaq)(0);
         
         return eleInfo.setVector(*theVector);
         
-    case 3:  // basic force
-        return eleInfo.setVector(*qDaq);
+    case 3:  // basic force (qbDaq is already current)
+        return eleInfo.setVector(*qbDaq);
         
     case 4:  // ctrl basic displacement
         return eleInfo.setVector(dbCtrl);

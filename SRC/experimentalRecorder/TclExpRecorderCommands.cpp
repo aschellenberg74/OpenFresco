@@ -42,6 +42,7 @@
 #include <ExpSetupRecorder.h>
 #include <ExpControlRecorder.h>
 #include <ExpSignalFilterRecorder.h>
+#include <ExpTangentStiffRecorder.h>
 
 // output streams
 #include <StandardStream.h>
@@ -59,6 +60,7 @@ extern ExperimentalSite *getExperimentalSiteFirst();
 extern ExperimentalSetup *getExperimentalSetup(int tag);
 extern ExperimentalControl *getExperimentalControl(int tag);
 extern ExperimentalSignalFilter *getExperimentalSignalFilter(int tag);
+extern ExperimentalTangentStiff *getExperimentalTangentStiff(int tag);
 
 
 int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
@@ -954,6 +956,226 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         // cleanup dynamic memory
         if (filterTags != 0)
             delete filterTags;
+        if (data != 0)
+            delete [] data;
+    }
+    // ----------------------------------------------------------------------------	
+    else if (strcmp(argv[1],"TangentStiff") == 0)  {
+        int numTangStif = 0;
+        ID *tangStifTags = 0;
+        ExperimentalTangentStiff **theTangStiffs = 0;
+        bool echoTime = false;
+        outputMode eMode = STANDARD_STREAM; 
+        double deltaT = 0.0;
+        int precision = 6;
+        bool doScientific = false;
+        bool closeOnWrite = false;
+        const char *inetAddr = 0;
+        int inetPort;
+        int i, j, argi = 2;
+        int flags = 0;
+        int sizeData = 0;
+
+        while (flags == 0 && argi < argc)  {
+            
+            if (strcmp(argv[argi],"-tangStif") == 0)  {
+                if (argc < argi+2)  {
+                    opserr << "WARNING expRecorder TangentStiff .. -tangStif tags .. - no tangent stiffness tags specified\n";
+                    return TCL_ERROR;
+                }
+                
+                // read in a list of tangent stiffnesses until end of command or other flag
+                argi++;
+                int tangStifTag;
+                tangStifTags = new ID(0,32);
+                while (argi < argc && Tcl_GetInt(interp, argv[argi], &tangStifTag) == TCL_OK)  {
+                    (*tangStifTags)[numTangStif] = tangStifTag;
+                    numTangStif++;
+                    argi++;
+                }
+                Tcl_ResetResult(interp);
+                
+                if (argi == argc)  {
+                    opserr << "WARNING no response type specified for experimental tangent stiffness recorder\n";
+                    delete tangStifTags;
+                    return TCL_ERROR;
+                }
+                
+                if (strcmp(argv[argi],"all") == 0)  {
+                    tangStifTags = 0;
+                    argi++;
+                }
+            }
+            
+            else if (strcmp(argv[argi],"-tangStifRange") == 0)  {
+                if (argc < argi+3)  {
+                    opserr << "WARNING expRecorder TangentStiff .. -tangStifRange start end  .. - no tangent stiffness tags specified\n";
+                    return TCL_ERROR;
+                }
+                
+                // read in start and end tags of two tangent stiffnesses & add set [start,end]
+                int start, end;
+                if (Tcl_GetInt(interp, argv[argi+1], &start) != TCL_OK)  {
+                    opserr << "WARNING expRecorder TangentStiff -tangStifRange start end - invalid start " << argv[argi+1] << endln;
+                    return TCL_ERROR;
+                }
+                if (Tcl_GetInt(interp, argv[argi+2], &end) != TCL_OK)  {
+                    opserr << "WARNING expRecorder TangentStiff -tangStifRange start end - invalid end " << argv[argi+2] << endln;
+                    return TCL_ERROR;
+                }
+                if (start > end)  {
+                    int swap = end;
+                    end = start;
+                    start = swap;
+                }
+                
+                tangStifTags = new ID(end-start);	  
+                if (tangStifTags == 0)  {
+                    opserr << "WARNING expRecorder TangentStiff -tangStifRange start end - out of memory\n";
+                    return TCL_ERROR;
+                }
+                for (i=start; i<=end; i++)
+                    (*tangStifTags)[numTangStif++] = i;	    
+                argi += 3;
+            } 
+            
+            else if ((strcmp(argv[argi],"-time") == 0) || (strcmp(argv[argi],"-load") == 0))  { 
+                echoTime = true;
+                argi++;
+            } 
+            
+            else if ((strcmp(argv[argi],"-dT") == 0) || (strcmp(argv[argi],"-dt") == 0))  {
+                argi++;
+                if (Tcl_GetDouble(interp, argv[argi], &deltaT) != TCL_OK)	
+                    return TCL_ERROR;	
+                argi++;
+            } 
+            
+            else if (strcmp(argv[argi],"-precision") == 0)  {
+                argi++;
+                if (Tcl_GetInt(interp, argv[argi], &precision) != TCL_OK)	
+                    return TCL_ERROR;		  
+                argi++;
+            }
+            
+            else if (strcmp(argv[argi],"-scientific") == 0)  {
+                doScientific = true;
+                argi++;
+            }
+            
+            else if (strcmp(argv[argi],"-closeOnWrite") == 0)  {
+                closeOnWrite = true;
+                argi++;
+            }
+            
+            else if (strcmp(argv[argi],"-file") == 0)  {
+                fileName = argv[argi+1];
+                const char *pwd = OPS_GetInterpPWD();
+                theSimulationInfo->addOutputFile(fileName,pwd);
+                eMode = DATA_STREAM;
+                argi += 2;
+            }
+            
+            else if ((strcmp(argv[argi],"-csv") == 0) || (strcmp(argv[argi],"-fileCSV") == 0))  {
+                fileName = argv[argi+1];
+                const char *pwd = OPS_GetInterpPWD();
+                theSimulationInfo->addOutputFile(fileName,pwd);
+                eMode = DATA_STREAM_CSV;
+                argi += 2;
+            }
+            
+            else if ((strcmp(argv[argi],"-xml") == 0) || (strcmp(argv[argi],"-nees") == 0))  {
+                fileName = argv[argi+1];
+                const char *pwd = OPS_GetInterpPWD();
+                theSimulationInfo->addOutputFile(fileName,pwd);
+                eMode = XML_STREAM;
+                argi += 2;
+            }	    
+            
+            else if ((strcmp(argv[argi],"-binary") == 0))  {
+                fileName = argv[argi+1];
+                const char *pwd = OPS_GetInterpPWD();
+                theSimulationInfo->addOutputFile(fileName,pwd);
+                eMode = BINARY_STREAM;
+                argi += 2;
+            }	    
+            
+            else if ((strcmp(argv[argi],"-tcp") == 0) || (strcmp(argv[argi],"-TCP") == 0))  {
+                inetAddr = argv[argi+1];
+                if (Tcl_GetInt(interp, argv[argi+2], &inetPort) != TCL_OK)
+                    return TCL_ERROR;
+                eMode = TCP_STREAM;
+                argi += 3;
+            }	    
+            
+            else if (strcmp(argv[argi],"-database") == 0)  {
+                theRecorderDatabase = OPS_GetFEDatastore();
+                if (theRecorderDatabase != 0)  {
+                    tableName = argv[argi+1];
+                    eMode = DATABASE_STREAM;
+                } else {
+                    opserr << "WARNING expRecorder TangentStiff .. -database &lt;fileName&gt; - NO CURRENT DATABASE, results to File instead\n";
+                    fileName = argv[argi+1];
+                }
+                argi += 2;
+            }
+            
+            else  {
+                // first unknown string then is assumed to start 
+                // experimental tangent stiffness response requests
+                sizeData = argc-argi;
+                flags = 1;
+            }
+        }
+        
+        if (sizeData <= 0)
+            opserr << "WARNING no data response type specified for experimental tangent stiffness recorder\n";
+        
+        const char **data = new const char *[sizeData];
+        
+        for (i=argi, j=0; i<argc; i++, j++)
+            data[j] = argv[i];
+        
+        // construct the theOutputStream
+        if (eMode == DATA_STREAM && fileName != 0)  {
+            theOutputStream = new DataFileStream(fileName, OVERWRITE, 2, 0, closeOnWrite, precision, doScientific);
+        } else if (eMode == DATA_STREAM_CSV && fileName != 0)  {
+	        theOutputStream = new DataFileStream(fileName, OVERWRITE, 2, 1, closeOnWrite, precision, doScientific);
+        } else if (eMode == XML_STREAM && fileName != 0)  {
+            theOutputStream = new XmlFileStream(fileName);
+        } else if (eMode == BINARY_STREAM && fileName != 0)  {
+            theOutputStream = new BinaryFileStream(fileName);
+        } else if (eMode == TCP_STREAM && inetAddr != 0)  {
+	        theOutputStream = new TCP_Stream(inetPort, inetAddr);
+        } else if (eMode == DATABASE_STREAM && tableName != 0)  {
+            theOutputStream = new DatabaseStream(OPS_GetFEDatastore(), tableName);
+        } else
+            theOutputStream = new StandardStream();
+        
+        // set precision for stream
+        theOutputStream->setPrecision(precision);
+        
+        // construct array of experimental tangent stiffnesses
+        theTangStiffs = new ExperimentalTangentStiff* [numTangStif];
+        if (theTangStiffs == 0)  {
+		    opserr << "WARNING out of memory creating experimental tangent stiffness recorder\n";
+		    return TCL_ERROR;
+	    }
+        for (int i=0; i<numTangStif; i++)  {
+            theTangStiffs[i] = getExperimentalTangentStiff((*tangStifTags)(i));
+            if (theTangStiffs[i] == 0)  {
+		        opserr << "WARNING experimental tangent stiffness with tag "
+                    << (*tangStifTags)(i) << " not found\n";
+		        return TCL_ERROR;
+            }
+	    }
+        
+        // now create the ExpTangentStiffRecorder
+        (*theRecorder) = new ExpTangentStiffRecorder(numTangStif, theTangStiffs, data, sizeData, echoTime, *theOutputStream, deltaT);
+        
+        // cleanup dynamic memory
+        if (tangStifTags != 0)
+            delete tangStifTags;
         if (data != 0)
             delete [] data;
     }
