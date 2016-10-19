@@ -39,7 +39,6 @@ class ExperimentalControl;
 class ID;
 class Vector;
 class Matrix;
-class Tensor;
 
 class ExpControlResponse : public Response
 {

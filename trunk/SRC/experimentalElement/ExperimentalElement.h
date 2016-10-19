@@ -49,7 +49,8 @@ public:
     // constructor
     ExperimentalElement(int tag, 
         int classTag,
-        ExperimentalSite *site = 0);
+        ExperimentalSite *site = 0,
+        ExperimentalTangentStiff *tangStiff = 0);
     
     // destructor
     virtual ~ExperimentalElement();

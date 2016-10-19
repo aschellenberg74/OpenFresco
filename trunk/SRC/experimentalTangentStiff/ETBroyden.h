@@ -51,10 +51,10 @@ public:
     const char *getClassType() const {return "ETBroyden";};
     
     virtual Matrix& updateTangentStiff(
-        const Vector* disp,
-        const Vector* vel,
-        const Vector* accel,
-        const Vector* force,
+        const Vector* incrDisp,
+        const Vector* incrVel,
+        const Vector* incrAccel,
+        const Vector* incrForce,
         const Vector* time,
         const Matrix* kInit,
         const Matrix* kPrev);

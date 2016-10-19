@@ -60,7 +60,8 @@ ETTranspose::~ETTranspose()
 }
 
 
-Matrix& ETTranspose::updateTangentStiff(const Vector* incrDisp,
+Matrix& ETTranspose::updateTangentStiff(
+    const Vector* incrDisp,
     const Vector* incrVel,
     const Vector* incrAccel,
     const Vector* incrForce,
@@ -68,7 +69,7 @@ Matrix& ETTranspose::updateTangentStiff(const Vector* incrDisp,
     const Matrix* kInit,
     const Matrix* kPrev)
 {
-    // Using incremental disp and force
+    // using incremental disp and force
     int dimR = kPrev->noRows();
     int dimC = kPrev->noCols();
     int szD	 = incrDisp->Size();
@@ -119,7 +120,7 @@ Matrix& ETTranspose::updateTangentStiff(const Vector* incrDisp,
     this->MatTranspose(&iDMatrixT, &iDMatrix);
     this->MatTranspose(&iFMatrixT, &iFMatrix);
     
-    // Check how many columns are in iDMatrix
+    // check how many columns are in iDMatrix
     if ((dimCiDM+1) < dimC) {
         theStiff->addMatrix(0.0, (*kInit), 1.0);
     } else if ((dimCiDM+1) == dimC) {
@@ -146,6 +147,7 @@ void ETTranspose::Print(OPS_Stream &s, int flag)
 {
     s << "Experimental Tangent: " << this->getTag(); 
     s << "  type: ETTranspose\n";
+    s << "  numCol: " << numCol << endln;
 }
 
 
@@ -154,7 +156,21 @@ Response* ETTranspose::setResponse(const char **argv,
 {
     Response *theResponse = 0;
     
-    // FIX ME
+    output.tag("ExpTangentStiffOutput");
+    output.attr("tangStifType",this->getClassType());
+    output.attr("tangStifTag",this->getTag());
+    
+    // tangent stiffness
+    if (strcmp(argv[0],"kt") == 0 ||
+        strcmp(argv[0],"Kt") == 0 ||
+        strcmp(argv[0],"tangStif") == 0 ||
+        strcmp(argv[0],"tangStiff") == 0 ||
+        strcmp(argv[0],"tangentStif") == 0 ||
+        strcmp(argv[0],"tangentStiff") == 0)
+    {
+        output.tag("ResponseType","tangStif");
+        theResponse = new ExpTangentStiffResponse(this, 1, Matrix(1,1));
+    }
     
     return theResponse;
 }
@@ -163,8 +179,14 @@ Response* ETTranspose::setResponse(const char **argv,
 int ETTranspose::getResponse(int responseID,
     Information &info)
 {
-    // each subclass must implement its own response
-    return -1;
+    switch (responseID)  {
+    case 1:  // tangent stiffness
+        if (theStiff != 0)
+            return info.setMatrix(*theStiff);
+        
+    default:
+        return OF_ReturnType_failed;
+    }
 }
 
 

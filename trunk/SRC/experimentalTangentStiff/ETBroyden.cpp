@@ -57,24 +57,24 @@ ETBroyden::~ETBroyden()
 
 
 Matrix& ETBroyden::updateTangentStiff(
-    const Vector* disp,
-    const Vector* vel,
-    const Vector* accel,
-    const Vector* force,
+    const Vector* incrDisp,
+    const Vector* incrVel,
+    const Vector* incrAccel,
+    const Vector* incrForce,
     const Vector* time,
     const Matrix* kInit,
     const Matrix* kPrev)
 {
-    // Using incremental disp and force
+    // using incremental disp and force
     int dimR = kPrev->noRows();
     int dimC = kPrev->noCols();
-    int szD	 = disp->Size();
+    int szD	 = incrDisp->Size();
     
     // FIX ME add size check
     theStiff = new Matrix(dimR, dimC);
     theStiff->Zero();
     
-    double normD = disp->Norm();
+    double normD = incrDisp->Norm();
     if (normD == 0.0) {
         *theStiff = *kPrev;
     } else {
@@ -82,13 +82,13 @@ Matrix& ETBroyden::updateTangentStiff(
         Vector tempV(szD);
         tempV.Zero();
         
-        // Perform rank 1 update
-        tempV.addMatrixVector(0.0, (*kPrev), (*disp), 1.0);
-        tempV.addVector(-1.0, (*force), 1.0);
+        // perform rank 1 update
+        tempV.addMatrixVector(0.0, (*kPrev), (*incrDisp), 1.0);
+        tempV.addVector(-1.0, (*incrForce), 1.0);
         
         for (int i = 0; i < dimR; i++) {
             for (int j = 0; j < dimC; j++) {
-                (*theStiff)(i,j) = (*kPrev)(i,j) + factor * tempV(i) * (*disp)(j);
+                (*theStiff)(i,j) = (*kPrev)(i,j) + factor*tempV(i)*(*incrDisp)(j);
             }
         }
     }
@@ -115,7 +115,21 @@ Response* ETBroyden::setResponse(const char **argv,
 {
     Response *theResponse = 0;
     
-    // FIX ME
+    output.tag("ExpTangentStiffOutput");
+    output.attr("tangStifType",this->getClassType());
+    output.attr("tangStifTag",this->getTag());
+    
+    // tangent stiffness
+    if (strcmp(argv[0],"kt") == 0 ||
+        strcmp(argv[0],"Kt") == 0 ||
+        strcmp(argv[0],"tangStif") == 0 ||
+        strcmp(argv[0],"tangStiff") == 0 ||
+        strcmp(argv[0],"tangentStif") == 0 ||
+        strcmp(argv[0],"tangentStiff") == 0)
+    {
+        output.tag("ResponseType","tangStif");
+        theResponse = new ExpTangentStiffResponse(this, 1, Matrix(1,1));
+    }
     
     return theResponse;
 }
@@ -124,6 +138,12 @@ Response* ETBroyden::setResponse(const char **argv,
 int ETBroyden::getResponse(int responseID,
     Information &info)
 {
-    // each subclass must implement its own response
-    return -1;
+    switch (responseID)  {
+    case 1:  // tangent stiffness
+        if (theStiff != 0)
+            return info.setMatrix(*theStiff);
+        
+    default:
+        return OF_ReturnType_failed;
+    }
 }

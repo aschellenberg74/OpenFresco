@@ -68,7 +68,7 @@ Matrix& ETBfgs::updateTangentStiff(
     const Matrix* kInit,
     const Matrix* kPrev)
 {
-    // Using incremental disp and force
+    // using incremental disp and force
     int dimR = kPrev->noRows();
     int dimC = kPrev->noCols();
     int szD	 = incrDisp->Size();
@@ -122,6 +122,7 @@ void ETBfgs::Print(OPS_Stream &s, int flag)
 {
     s << "Experimental Tangent: " << this->getTag();
     s << "  type: ETBfgs\n";
+    s << "  eps: " << eps  << endln;
 }
 
 
@@ -130,7 +131,21 @@ Response* ETBfgs::setResponse(const char **argv,
 {
     Response *theResponse = 0;
     
-    // FIX ME
+    output.tag("ExpTangentStiffOutput");
+    output.attr("tangStifType",this->getClassType());
+    output.attr("tangStifTag",this->getTag());
+    
+    // tangent stiffness
+    if (strcmp(argv[0],"kt") == 0 ||
+        strcmp(argv[0],"Kt") == 0 ||
+        strcmp(argv[0],"tangStif") == 0 ||
+        strcmp(argv[0],"tangStiff") == 0 ||
+        strcmp(argv[0],"tangentStif") == 0 ||
+        strcmp(argv[0],"tangentStiff") == 0)
+    {
+        output.tag("ResponseType","tangStif");
+        theResponse = new ExpTangentStiffResponse(this, 1, Matrix(1,1));
+    }
     
     return theResponse;
 }
@@ -139,8 +154,14 @@ Response* ETBfgs::setResponse(const char **argv,
 int ETBfgs::getResponse(int responseID,
     Information &info)
 {
-    // each subclass must implement its own response
-    return -1;
+    switch (responseID)  {
+    case 1:  // tangent stiffness
+        if (theStiff != 0)
+            return info.setMatrix(*theStiff);
+        
+    default:
+        return OF_ReturnType_failed;
+    }
 }
 
 

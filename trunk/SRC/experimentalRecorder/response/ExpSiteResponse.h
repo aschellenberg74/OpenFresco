@@ -39,7 +39,6 @@ class ExperimentalSite;
 class ID;
 class Vector;
 class Matrix;
-class Tensor;
 
 class ExpSiteResponse : public Response
 {

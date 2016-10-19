@@ -47,13 +47,17 @@ class EETrussCorot : public ExperimentalElement
 {
 public:
     // constructors
-    EETrussCorot(int tag, int dimension, int Nd1, int Nd2, 
+    EETrussCorot(int tag, int dimension, int Nd1, int Nd2,
         ExperimentalSite *site,
-        bool iMod = false, int addRayleigh = 1, double rho = 0.0);
-    EETrussCorot(int tag, int dimension, int Nd1, int Nd2, 
+        ExperimentalTangentStiff *tangStiff = 0,
+        bool iMod = false, int addRayleigh = 1,
+        double rho = 0.0, int cMass = 0);
+    EETrussCorot(int tag, int dimension, int Nd1, int Nd2,
         int port, char *machineInetAddress = 0,
         int ssl = 0, int udp = 0, int dataSize = OF_Network_dataSize,
-        bool iMod = false, int addRayleigh = 1, double rho = 0.0);
+        ExperimentalTangentStiff *tangStiff = 0,
+        bool iMod = false, int addRayleigh = 1,
+        double rho = 0.0, int cMass = 0);
     
     // destructor
     ~EETrussCorot();
@@ -93,6 +97,7 @@ public:
     const Vector &getBasicDisp();
     const Vector &getBasicVel();
     const Vector &getBasicAccel();
+    const Vector &getBasicForce();
     
     // public methods for element output
     int sendSelf(int commitTag, Channel &theChannel);
@@ -115,6 +120,7 @@ private:
     bool iMod;          // I-Modification flag
     int addRayleigh;    // flag to add Rayleigh damping
     double rho;         // rho: mass per unit length
+    int cMass;          // consistent mass flag
     double L;           // undeformed element length
     double Ln;          // current element length
     double d21[3];      // current displacement offsets in basic system
@@ -140,15 +146,20 @@ private:
     Vector *dbDaq;      // daq displacements in basic system
     Vector *vbDaq;      // daq velocities in basic system
     Vector *abDaq;      // daq accelerations in basic system
-    Vector *qDaq;       // daq forces in basic system
+    Vector *qbDaq;      // daq forces in basic system
     Vector *tDaq;       // daq time
     
     Vector dbCtrl;      // ctrl displacements in basic system
     Vector vbCtrl;      // ctrl velocities in basic system
     Vector abCtrl;      // ctrl accelerations in basic system
     
-    Matrix kbInit;      // stiffness matrix in basic system
+    Matrix kb;          // tangent stiffness matrix in basic system
+    Matrix kbInit;      // initial stiffness matrix in basic system
+    Matrix kbLast;      // tangent stiffness matrix in basic system at last update
+    
     Vector dbLast;      // displacements in basic system at last update
+    Vector dbDaqLast;   // daq disp in basic system at last update
+    Vector qbDaqLast;   // daq force in basic system at last update
     double tLast;       // time at last update
     
     Node *theNodes[2];  // array of node pointers

@@ -67,7 +67,7 @@ public:
     
     virtual ExperimentalTangentStiff *getCopy() = 0;
     
-    // public methods for experimental signal filter recorder
+    // public methods for experimental tangent stiffness recorder
     virtual Response *setResponse(const char **argv, int argc,
         OPS_Stream &output);
     virtual int getResponse(int responseID, Information &info);

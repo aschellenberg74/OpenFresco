@@ -39,7 +39,6 @@ class ExperimentalTangentStiff;
 class ID;
 class Vector;
 class Matrix;
-class Tensor;
 
 class ExpTangentStiffResponse : public Response
 {
