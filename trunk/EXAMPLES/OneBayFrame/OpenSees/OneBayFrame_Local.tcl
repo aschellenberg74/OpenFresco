@@ -19,6 +19,7 @@
 # ------------------------------
 # Start of model generation
 # ------------------------------
+logFile "OneBayFrame_Local.log"
 # create ModelBuilder (with two-dimensions and 2 DOF/node)
 model BasicBuilder -ndm 2 -ndf 2
 
@@ -82,11 +83,20 @@ expSetup OneActuator 2 -control 2 1 -sizeTrialOut 1 1
 expSite LocalSite 1 1
 expSite LocalSite 2 2
 
+# Define experimental tangent stiffness
+# -------------------------------------
+# expTangentStiff Broyden $tag
+expTangentStiff Broyden 1
+# expTangentStiff BFGS $tag <-eps $value>
+#expTangentStiff BFGS 1
+# expTangentStiff Transpose $tag $numCols
+#expTangentStiff Transpose 1 1
+
 # Define experimental elements
 # ----------------------------
 # left and right columns
-# expElement twoNodeLink $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-orient <$x1 $x2 $x3> $y1 $y2 $y3> <-pDelta Mratios> <-iMod> <-mass $m>
-expElement twoNodeLink 1 1 3 -dir 2 -site 1 -initStif 2.8
+# expElement twoNodeLink $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-tangStif tangStifTag> <-orient <$x1 $x2 $x3> $y1 $y2 $y3> <-pDelta Mratios> <-iMod> <-mass $m>
+expElement twoNodeLink 1 1 3 -dir 2 -site 1 -initStif 2.8 -tangStif 1
 expElement twoNodeLink 2 2 4 -dir 2 -site 2 -initStif 5.6
 
 # Define numerical elements
@@ -150,9 +160,10 @@ recorder Node -file Node_Dsp.out -time -node 3 4 -dof 1 disp
 recorder Node -file Node_Vel.out -time -node 3 4 -dof 1 vel
 recorder Node -file Node_Acc.out -time -node 3 4 -dof 1 accel
 
-recorder Element -file Elmt_Frc.out     -time -ele 1 2 3 forces
-recorder Element -file Elmt_ctrlDsp.out -time -ele 1 2   ctrlDisp
-recorder Element -file Elmt_daqDsp.out  -time -ele 1 2   daqDisp
+recorder Element -file Elmt_Frc.out      -time -ele 1 2 3 forces
+recorder Element -file Elmt_ctrlDsp.out  -time -ele 1 2   ctrlDisp
+recorder Element -file Elmt_daqDsp.out   -time -ele 1 2   daqDisp
+recorder Element -file Elmt_tangStif.out -time -ele 1     tangStif stif
 # --------------------------------
 # End of recorder generation
 # --------------------------------
@@ -161,6 +172,7 @@ recorder Element -file Elmt_daqDsp.out  -time -ele 1 2   daqDisp
 # ------------------------------
 # Finally perform the analysis
 # ------------------------------
+record
 # perform an eigenvalue analysis
 set pi [expr acos(-1.0)]
 set lambda [eigen -fullGenLapack 2]
@@ -186,7 +198,7 @@ set tTot [time {
 puts "\nElapsed Time = $tTot \n"
 # close the output file
 close $outFileID
-
+wipeExp
 wipe
 exit
 # --------------------------------

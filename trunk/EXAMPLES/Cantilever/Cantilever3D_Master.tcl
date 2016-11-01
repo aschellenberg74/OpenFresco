@@ -1,4 +1,5 @@
-# File: Cantilever_Master.tcl (use with Cantilever_Slave.tcl)
+# File: Cantilever3D_Master.tcl (use with Cantilever3D_Slave.tcl)
+# Units: [kip,in.]
 #
 # $Revision$
 # $Date$
@@ -19,8 +20,9 @@
 # ------------------------------
 # Start of model generation
 # ------------------------------
+logFile "Cantilever3D_Master.log"
 # create ModelBuilder (with two-dimensions and 2 DOF/node)
-model BasicBuilder -ndm 2 -ndf 3
+model BasicBuilder -ndm 3 -ndf 6
 
 # Load OpenFresco package
 # -----------------------
@@ -29,24 +31,30 @@ loadPackage OpenFresco
 
 # Define geometry for model
 # -------------------------
-# node $tag $xCrd $yCrd $mass
-node  1     0.0    0.0
-node  2     0.0   54.0  -mass 0.08 0.08 0.0
+# node $tag $xCrd $yCrd $zCrd $mass
+node  1     0.0   0.0    0.0
+node  2     0.0   0.0   54.0  -mass 0.08 0.08 0.08 0.0 0.0 0.0
 
 # set the boundary conditions
-# fix $tag $DX $DY $RZ
-fix 1   1  1  1
-fix 2   0  0  0
+# fix $tag $DX $DY $DZ $RX $RY $RZ
+fix 1   1  1  1  1  1  1
+fix 2   0  0  0  0  0  0
+
+# Define control points
+# ---------------------
+# expControlPoint $cpTag <-node $nodeTag> $dof $rspType <-fact $f> <-lim $l $u> <-isRel> ...
+expControlPoint 1  1 disp  2 disp
+expControlPoint 2  1 disp  2 disp  1 force  2 force 
 
 # Define experimental control
 # ---------------------------
-# expControl SimFEAdapter $tag ipAddr $ipPort
-expControl SimFEAdapter 1 "127.0.0.1" 44000
+# expControl SimFEAdapter $tag ipAddr $ipPort -trialCP $cpTags -outCP $cpTags
+expControl SimFEAdapter 1 "127.0.0.1" 44000 -trialCP 1 -outCP 2
 
 # Define experimental setup
 # -------------------------
-# expSetup OneActuator $tag <-control $ctrlTag> $dir -sizeTrialOut $t $o <-trialDispFact $f> ...
-expSetup OneActuator 1 -control 1 2 -sizeTrialOut 3 3 -ctrlDispFact -1.0 -daqDispFact -1.0 -daqForceFact -1.0
+# expSetup NoTransformation $tag <-control $ctrlTag> -dir $dirs -sizeTrialOut $t $o <-trialDispFact $f> ...
+expSetup NoTransformation 1 -control 1 -dir 2 3 -sizeTrialOut 6 6 -ctrlDispFact -1.0 1.0 -daqDispFact -1.0 1.0 -daqForceFact -1.0 1.0
 
 # Define experimental site
 # ------------------------
@@ -74,13 +82,13 @@ timeSeries Path 1 -filePath elcentro.txt -dt $dt -factor [expr 386.1*$scale]
 # pattern UniformExcitation $tag $dir -accel $tsTag <-vel0 $vel0>
 pattern UniformExcitation 1 1 -accel 1
 
-# calculate the rayleigh damping factors for nodes & elements
+# calculate the Rayleigh damping factors for nodes & elements
 set alphaM     1.010017396536;  # D = alphaM*M
 set betaK      0.0;             # D = betaK*Kcurrent
 set betaKinit  0.0;             # D = beatKinit*Kinit
 set betaKcomm  0.0;             # D = betaKcomm*KlastCommit
 
-# set the rayleigh damping 
+# set the Rayleigh damping 
 #rayleigh $alphaM $betaK $betaKinit $betaKcomm
 # ------------------------------
 # End of model generation
@@ -92,27 +100,21 @@ set betaKcomm  0.0;             # D = betaKcomm*KlastCommit
 # ------------------------------
 # create the system of equations
 system BandGeneral
-
 # create the DOF numberer
 numberer Plain
-
 # create the constraint handler
 constraints Plain
-
 # create the convergence test
 #test NormDispIncr 1.0e-8 25
 #test NormUnbalance 1.0e-8 25
 test EnergyIncr 1.0e-8 25
-
 # create the integration scheme
 integrator Newmark 0.5 0.25
 #integrator NewmarkExplicit 0.5
 #integrator AlphaOS 1.0
-
 # create the solution algorithm
 algorithm Newton
 #algorithm Linear -initial
-
 # create the analysis object 
 analysis Transient
 # ------------------------------
@@ -139,6 +141,7 @@ recorder Element -file Master_Elmt_daqDsp.out  -time -ele 1 daqDisp
 # ------------------------------
 # Finally perform the analysis
 # ------------------------------
+record
 # perform an eigenvalue analysis
 set pi [expr acos(-1.0)]
 set lambda [eigen -fullGenLapack 2]
@@ -164,7 +167,7 @@ set tTot [time {
 puts "\nElapsed Time = $tTot \n"
 # close the output file
 close $outFileID
-
+wipeExp
 wipe
 exit
 # --------------------------------

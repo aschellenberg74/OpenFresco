@@ -1,4 +1,4 @@
-# File: PortalFrame_Local.tcl
+# File: PortalFrame_LinAlg4Gravity.tcl
 # Units: [kip,in.]
 #
 # $Revision$
@@ -20,7 +20,7 @@
 # ------------------------------
 # Start of model generation
 # ------------------------------
-logFile "PortalFrame_Local.log"
+logFile "PortalFrame_LinAlg4Gravity.log"
 # create ModelBuilder (with two-dimensions and 3 DOF/node)
 model BasicBuilder -ndm 2 -ndf 3
 
@@ -119,12 +119,11 @@ if {$withGravity} {
     numberer Plain
     # Create the constraint handler
     constraints Plain
-    # Create the convergence test
-    test EnergyIncr 1.0e-6 10
     # Create the integration scheme
     integrator LoadControl 0.1
     # Create the solution algorithm
-    algorithm Newton
+    # structure should remain linear-elastic under gravity loads
+    algorithm Linear
     # Create the analysis object
     analysis Static
     # ------------------------------

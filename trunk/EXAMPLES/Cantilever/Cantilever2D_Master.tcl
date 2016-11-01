@@ -1,4 +1,4 @@
-# File: OneBayFrame_Master.tcl (use with OneBayFrame_Slave.tcl)
+# File: Cantilever2D_Master.tcl (use with Cantilever2D_Slave.tcl)
 # Units: [kip,in.]
 #
 # $Revision$
@@ -6,12 +6,12 @@
 # $URL$
 #
 # Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
-# Created: 08/08
+# Created: 09/07
 # Revision: A
 #
 # Purpose: this file contains the tcl input to perform
-# a hybrid simulation of a one bay frame with 
-# two experimental zero length elements.
+# a hybrid simulation of a simple cantilever column
+# with one experimental beamColumn element.
 # Since the simulation of the column is performed in an
 # other FE-software, the SimFEAdapter experimental control
 # is used to communicate with such software.
@@ -20,9 +20,9 @@
 # ------------------------------
 # Start of model generation
 # ------------------------------
-logFile "OneBayFrame_Master.log"
+logFile "Cantilever2D_Master.log"
 # create ModelBuilder (with two-dimensions and 2 DOF/node)
-model BasicBuilder -ndm 2 -ndf 2
+model BasicBuilder -ndm 2 -ndf 3
 
 # Load OpenFresco package
 # -----------------------
@@ -31,29 +31,14 @@ loadPackage OpenFresco
 
 # Define geometry for model
 # -------------------------
-set mass3 0.04
-set mass4 0.02
 # node $tag $xCrd $yCrd $mass
-node  1     0.0   0.00
-node  2   100.0   0.00
-node  3     0.0  50.00  -mass $mass3 $mass3
-node  4   100.0  50.00  -mass $mass4 $mass4
+node  1     0.0    0.0
+node  2     0.0   54.0  -mass 0.08 0.08 0.0
 
 # set the boundary conditions
-# fix $tag $DX $DY
-fix 1   1  1
-fix 2   1  1
-fix 3   0  1
-fix 4   0  1
-
-# Define materials
-# ----------------
-# uniaxialMaterial Steel02 $matTag $Fy $E $b $R0 $cR1 $cR2 $a1 $a2 $a3 $a4 
-#uniaxialMaterial Elastic 1 2.8
-uniaxialMaterial Steel02 1 1.5 2.8 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0
-#uniaxialMaterial Elastic 2 5.6
-uniaxialMaterial Steel02 2 3.0 5.6 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0 
-uniaxialMaterial Elastic 3 [expr 2.0*100.0/1.0]
+# fix $tag $DX $DY $RZ
+fix 1   1  1  1
+fix 2   0  0  0
 
 # Define control points
 # ---------------------
@@ -63,35 +48,28 @@ expControlPoint 2  1 disp  1 force
 
 # Define experimental control
 # ---------------------------
-# expControl SimUniaxialMaterials $tag $matTags
-expControl SimUniaxialMaterials 1 1
 # expControl SimFEAdapter $tag ipAddr $ipPort -trialCP $cpTags -outCP $cpTags
-expControl SimFEAdapter 2 "127.0.0.1" 44000 -trialCP 1 -outCP 2
+expControl SimFEAdapter 1 "127.0.0.1" 44000 -trialCP 1 -outCP 2
 
 # Define experimental setup
 # -------------------------
 # expSetup OneActuator $tag <-control $ctrlTag> $dir -sizeTrialOut $t $o <-trialDispFact $f> ...
-expSetup OneActuator 1 -control 1 1 -sizeTrialOut 1 1 -trialDispFact -1 -outDispFact -1 -outForceFact -1
-expSetup OneActuator 2 -control 2 1 -sizeTrialOut 1 1 -trialDispFact -1 -outDispFact -1 -outForceFact -1
+expSetup OneActuator 1 -control 1 2 -sizeTrialOut 3 3 -ctrlDispFact -1.0 -daqDispFact -1.0 -daqForceFact -1.0
 
 # Define experimental site
 # ------------------------
 # expSite LocalSite $tag $setupTag
 expSite LocalSite 1 1
-expSite LocalSite 2 2
 
-# Define experimental elements
-# ----------------------------
-# left and right columns
-# expElement twoNodeLink $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-orient <$x1 $x2 $x3> $y1 $y2 $y3> <-pDelta Mratios> <-iMod> <-mass $m>
-expElement twoNodeLink 1 1 3 -dir 2 -site 1 -initStif 2.8
-expElement twoNodeLink 2 2 4 -dir 2 -site 2 -initStif 5.6
+# Define coordinate transformation
+# --------------------------------
+# geomTransf Linear $transfTag
+geomTransf Linear 1
 
-# Define numerical elements
-# -------------------------
-# spring
-# element truss $eleTag $iNode $jNode $A $matTag
-element truss 3 3 4 1.0 3
+# Define experimental element
+# ---------------------------
+# expElement beamColumn $eleTag $iNode $jNode $transTag –site $siteTag –initStif $Kij ... <–iMod> <–rho $rho>
+expElement beamColumn 1 1 2 1 -site 1 -initStif 1213 0 0 0 11.2 -302.4 0 -302.4 10886.4
 
 # Define dynamic loads
 # --------------------
@@ -111,7 +89,7 @@ set betaKinit  0.0;             # D = beatKinit*Kinit
 set betaKcomm  0.0;             # D = betaKcomm*KlastCommit
 
 # set the Rayleigh damping 
-rayleigh $alphaM $betaK $betaKinit $betaKcomm
+#rayleigh $alphaM $betaK $betaKinit $betaKcomm
 # ------------------------------
 # End of model generation
 # ------------------------------
@@ -127,14 +105,16 @@ numberer Plain
 # create the constraint handler
 constraints Plain
 # create the convergence test
-test NormDispIncr 1.0e-12 10
+#test NormDispIncr 1.0e-8 25
+#test NormUnbalance 1.0e-8 25
+test EnergyIncr 1.0e-8 25
 # create the integration scheme
-#integrator Newmark 0.5 0.25
-integrator NewmarkExplicit 0.5
+integrator Newmark 0.5 0.25
+#integrator NewmarkExplicit 0.5
 #integrator AlphaOS 1.0
 # create the solution algorithm
-algorithm Linear
-#algorithm Newton
+algorithm Newton
+#algorithm Linear -initial
 # create the analysis object 
 analysis Transient
 # ------------------------------
@@ -146,13 +126,13 @@ analysis Transient
 # Start of recorder generation
 # ------------------------------
 # create the recorder objects
-recorder Node -file Master_Node_Dsp.out -time -node 3 4 -dof 1 disp
-recorder Node -file Master_Node_Vel.out -time -node 3 4 -dof 1 vel
-recorder Node -file Master_Node_Acc.out -time -node 3 4 -dof 1 accel
+recorder Node -file Master_Node_Dsp.out -time -node 2 -dof 1 2 3 disp
+recorder Node -file Master_Node_Vel.out -time -node 2 -dof 1 2 3 vel
+recorder Node -file Master_Node_Acc.out -time -node 2 -dof 1 2 3 accel
 
-recorder Element -file Master_Elmt_Frc.out     -time -ele 1 2 3 forces
-recorder Element -file Master_Elmt_ctrlDsp.out -time -ele 1 2   ctrlDisp
-recorder Element -file Master_Elmt_daqDsp.out  -time -ele 1 2   daqDisp
+recorder Element -file Master_Elmt_Frc.out     -time -ele 1 forces
+recorder Element -file Master_Elmt_ctrlDsp.out -time -ele 1 ctrlDisp
+recorder Element -file Master_Elmt_daqDsp.out  -time -ele 1 daqDisp
 # --------------------------------
 # End of recorder generation
 # --------------------------------
