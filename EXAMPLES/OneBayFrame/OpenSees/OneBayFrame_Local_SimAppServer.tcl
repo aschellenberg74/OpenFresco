@@ -74,6 +74,8 @@ expElement twoNodeLink 1 1 3 -dir 2 -site 1 -initStif 2.8
 
 # startSimAppSiteServer $siteTag $port <-ssl> <-udp>
 startSimAppSiteServer 1 8090 -udp;  # use with experimental element in FEA
+
+wipe
 exit
 # --------------------------------
 # End of analysis

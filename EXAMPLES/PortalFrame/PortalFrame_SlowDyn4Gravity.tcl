@@ -1,4 +1,4 @@
-# File: PortalFrame_Local.tcl
+# File: PortalFrame_SlowDyn4Gravity.tcl
 # Units: [kip,in.]
 #
 # $Revision$
@@ -20,7 +20,7 @@
 # ------------------------------
 # Start of model generation
 # ------------------------------
-logFile "PortalFrame_Local.log"
+logFile "PortalFrame_SlowDyn4Gravity.log"
 # create ModelBuilder (with two-dimensions and 3 DOF/node)
 model BasicBuilder -ndm 2 -ndf 3
 
@@ -120,13 +120,15 @@ if {$withGravity} {
     # Create the constraint handler
     constraints Plain
     # Create the convergence test
-    test EnergyIncr 1.0e-6 10
+    test FixedNumIter 10
     # Create the integration scheme
-    integrator LoadControl 0.1
+    integrator NewmarkHSFixedNumIter 0.5 0.25
+    #integrator AlphaOS 0.9
     # Create the solution algorithm
     algorithm Newton
-    # Create the analysis object
-    analysis Static
+    #algorithm Linear
+    # Create the analysis object 
+    analysis Transient
     # ------------------------------
     # End of analysis generation
     # ------------------------------
@@ -147,7 +149,7 @@ if {$withGravity} {
     # Perform the gravity analysis
     # ------------------------------
     # perform the gravity load analysis, requires 10 steps to reach the load level
-    if {[analyze 10] == 0} {
+    if {[analyze 1 1] == 0} {
         puts "\nGravity load analysis completed"
     } else {
         puts "\nGravity load analysis failed"

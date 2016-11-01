@@ -20,6 +20,7 @@
 # ------------------------------
 # Start of model generation
 # ------------------------------
+logFile "OneBayFrame_Local.log"
 # create ModelBuilder (with two-dimensions and 2 DOF/node)
 model BasicBuilder -ndm 2 -ndf 2
 
@@ -63,7 +64,7 @@ expControlPoint 2  1 disp 1 force
 # Define experimental control
 # ---------------------------
 # expControl MTSCsi $tag $configFileName $rampTime -trialCP $cpTags -outCP $cpTags <-ctrlFilters (5 $filterTag)> <-daqFilters (5 $filterTag)>
-expControl MTSCsi 1 "D:/Projects/MTS_CSI/OpenFresco/MtsCsi_Example/OneBayFrame/OpenFresco_mNEES.mtscs" 0.01 -trialCP 1 -outCP 2
+expControl MTSCsi 1 "C:/Users/Andreas/Documents/OpenFresco/SourceCode/trunk/EXAMPLES/OneBayFrame/TestMtsCsi/OpenFresco_mNEES.mtscs" 0.01 -trialCP 1 -outCP 2
 # expControl SimUniaxialMaterials $tag $matTags
 expControl SimUniaxialMaterials 2 2
 
@@ -158,6 +159,7 @@ recorder Element -file Elmt_daqDsp.out  -time -ele 1 2   daqDisp
 # ------------------------------
 # Finally perform the analysis
 # ------------------------------
+record
 # perform an eigenvalue analysis
 set pi [expr acos(-1.0)]
 set lambda [eigen -fullGenLapack 2]
@@ -183,7 +185,7 @@ set tTot [time {
 puts "\nElapsed Time = $tTot \n"
 # close the output file
 close $outFileID
-
+wipeExp
 wipe
 exit
 # --------------------------------

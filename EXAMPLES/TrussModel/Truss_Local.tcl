@@ -1,4 +1,4 @@
-# File: Truss_Local_Client.tcl (use with Truss_Local_SimAppServer.tcl)
+# File: Truss_Local.tcl
 # Units: [kip,in.]
 #
 # $Revision$
@@ -19,7 +19,7 @@
 # ------------------------------
 # Start of model generation
 # ------------------------------
-logFile "Truss_Local_Client.log"
+logFile "Truss_Local.log"
 # create ModelBuilder (with two-dimensions and 2 DOF/node)
 model BasicBuilder -ndm 2 -ndf 2
 
@@ -50,18 +50,46 @@ set L3 [expr sqrt(pow(168.0-72.0,2.0) + pow(96.0,2.0))]
 set kInit [expr $E*$A3/$L3]
 # uniaxialMaterial Elastic $matTag $E
 uniaxialMaterial Elastic 1 $E
+#uniaxialMaterial Elastic 2 $kInit
+uniaxialMaterial Steel01 2 50.0 $kInit 0.1
+
+# Define experimental control
+# ---------------------------
+# expControl SimUniaxialMaterials $tag $matTags
+expControl SimUniaxialMaterials 1 2
+
+# Define experimental setup
+# -------------------------
+# expSetup OneActuator $tag <-control $ctrlTag> $dir -sizeTrialOut $t $o <-trialDispFact $f> ...
+expSetup OneActuator 1 -control 1 1 -sizeTrialOut 1 1
+
+# Define experimental site
+# ------------------------
+# expSite LocalSite $tag $setupTag
+expSite LocalSite 1 1
+
+# Define experimental tangent stiffness
+# -------------------------------------
+# expTangentStiff Broyden $tag
+expTangentStiff Broyden 1
+# expTangentStiff BFGS $tag <-eps $value>
+#expTangentStiff BFGS 1
+# expTangentStiff Transpose $tag $numCols
+#expTangentStiff Transpose 1 1
 
 # Define numerical elements
 # -------------------------
 # element truss $eleTag $iNode $jNode $A $matTag
 element truss 1 1 4 10.0 1
-element truss 2 2 4 5.0 1
+element truss 2 2 4  5.0 1
+#element corotTruss 1 1 4 10.0 1
+#element corotTruss 2 2 4  5.0 1
 
-# Define experimental elements
-# ----------------------------
-# element genericClient $eleTag -node $Ndi -dof $dofNdi -dof $dofNdj ... -server $ipPort <$ipAddr> <-ssl> <-udp> <-dataSize $size>
-element genericClient 3 -node 3 4 -dof 1 2 -dof 1 2 -server 8090 -udp;  # use with SimAppElemServer
-#expElement truss 3 3 4 -server 8090 -udp -initStif $kInit;  # use with SimAppSiteServer
+# Define experimental element
+# ---------------------------
+# expElement truss $eleTag $iNode $jNode -site $siteTag -initStif $Kij <-tangStif tangStifTag> <-iMod> <-rho $rho> 
+expElement truss 3 3 4 -site 1 -initStif $kInit -tangStif 1
+#expElement corotTruss 3 3 4 -site 1 -initStif $kInit -tangStif 1
 
 # Define static loads
 # -------------------
@@ -84,12 +112,14 @@ system BandSPD
 numberer RCM
 # create the constraint handler
 constraints Plain
+# create the convergence test
+test EnergyIncr 1.0e-12 25 1
 # create the integration scheme
-integrator LoadControl 1.0
+integrator LoadControl 0.1
 # create the solution algorithm
-algorithm Linear
+algorithm Newton
 # create the analysis object 
-analysis Static 
+analysis Static
 # ------------------------------
 # End of analysis generation
 # ------------------------------
@@ -100,6 +130,7 @@ analysis Static
 # ------------------------------
 # create the recorder objects
 recorder Node -file Node_Dsp.out -time -node 4 -dof 1 2 disp
+recorder Element -file Elmt_tangStif.out -time -ele 3 tangStif stif
 # --------------------------------
 # End of recorder generation
 # ---------------------------------
@@ -110,7 +141,7 @@ recorder Node -file Node_Dsp.out -time -node 4 -dof 1 2 disp
 # ------------------------------
 record
 # perform the static analysis
-analyze 2
+analyze 20
 
 # print the current state at node 4 and at all elements
 print node 4

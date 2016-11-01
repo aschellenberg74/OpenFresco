@@ -20,6 +20,7 @@
 # ------------------------------
 # Start of model generation
 # ------------------------------
+logFile "OneBayFrame_Distr_Client.log"
 # create ModelBuilder (with two-dimensions and 2 DOF/node)
 model BasicBuilder -ndm 2 -ndf 2
 
@@ -152,6 +153,7 @@ recorder Element -file Elmt_daqDsp.out  -time -ele 1 2   daqDisp
 # ------------------------------
 # Finally perform the analysis
 # ------------------------------
+record
 # perform an eigenvalue analysis
 set pi [expr acos(-1.0)]
 set lambda [eigen -fullGenLapack 2]
@@ -177,7 +179,7 @@ set tTot [time {
 puts "\nElapsed Time = $tTot \n"
 # close the output file
 close $outFileID
-
+wipeExp
 wipe
 exit
 # --------------------------------

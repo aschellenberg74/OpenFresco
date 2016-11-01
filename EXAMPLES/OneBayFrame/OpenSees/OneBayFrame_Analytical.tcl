@@ -16,6 +16,7 @@
 # ------------------------------
 # Start of model generation
 # ------------------------------
+logFile "OneBayFrame_Analytical.log"
 # create ModelBuilder (with two-dimensions and 2 DOF/node)
 model BasicBuilder -ndm 2 -ndf 2
 
@@ -122,6 +123,7 @@ recorder Element -file Elmt_Frc.out  -time -ele 1 2 3 forces
 # ------------------------------
 # Finally perform the analysis
 # ------------------------------
+record
 # perform an eigenvalue analysis
 set pi [expr acos(-1.0)]
 set lambda [eigen -fullGenLapack 2]

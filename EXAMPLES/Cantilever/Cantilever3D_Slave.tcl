@@ -1,4 +1,5 @@
-# File: Cantilever_Slave.tcl (use with Cantilever_Master.tcl)
+# File: Cantilever3D_Slave.tcl (use with Cantilever3D_Master.tcl)
+# Units: [kip,in.]
 #
 # $Revision$
 # $Date$
@@ -11,7 +12,7 @@
 # Purpose: this file contains the tcl input to perform
 # a hybrid simulation of a simple cantilever column
 # with one experimental beamColumn element.
-# Either the actuator or adpater element is used to
+# Either the actuator or adapter element is used to
 # communicate with the main FE-software which is
 # coordinating and executing the direct integration
 # analysis.
@@ -20,22 +21,23 @@
 # ------------------------------
 # Start of model generation
 # ------------------------------
+logFile "Cantilever3D_Slave.log"
 # create ModelBuilder (with two-dimensions and 2 DOF/node)
-model BasicBuilder -ndm 2 -ndf 3
+model BasicBuilder -ndm 3 -ndf 6
 
 # Define geometry for model
 # -------------------------
 set mass2 0.04
-# node $tag $xCrd $yCrd
-node  1     0.0    0.0
-node  2     0.0   54.0   -mass $mass2 $mass2 0.0
-node  3   -10.0   54.0;  # for use with actuator element
+# node $tag $xCrd $yCrd $zCrd
+node  1     0.0   0.0    0.0
+node  2     0.0   0.0   54.0   -mass $mass2 $mass2 $mass2 0.0 0.0 0.0
+node  3   -10.0   0.0   54.0;  # for use with actuator element
 
 # set the boundary conditions
-# fix $tag $DX $DY $RZ
-fix 1   1  1  1
-fix 2   0  0  0
-fix 3   1  1  1;  # for use with actuator element
+# fix $tag $DX $DY $DZ $RX $RY $RZ
+fix 1   1  1  1  1  1  1
+fix 2   0  0  0  0  0  0
+fix 3   1  1  1  1  1  1;  # for use with actuator element
 
 # Define materials
 # ----------------
@@ -76,27 +78,21 @@ element adapter 2 -node 2 -dof 1 -stif 1E5 44000
 # ------------------------------
 # create the system of equations
 system BandGeneral
-
 # create the DOF numberer
 numberer Plain
-
 # create the constraint handler
 constraints Plain
-
 # create the convergence test
 test NormDispIncr 1.0e-8 25
 #test NormUnbalance 1.0e-8 25
 #test EnergyIncr 1.0e-8 25
-
 # create the integration scheme
 integrator LoadControl 1.0
 #integrator Newmark 0.5 0.25
 #integrator NewmarkExplicit 0.5
-
 # create the solution algorithm
 algorithm Newton
 #algorithm Linear
-
 # create the analysis object 
 analysis Static
 #analysis Transient
@@ -124,6 +120,7 @@ recorder Element -file Slave_Elmt_daqDsp.out  -time -ele   2 daqDisp
 # ------------------------------
 # Finally perform the analysis
 # ------------------------------
+record
 analyze 16000 0.02
 exit
 # --------------------------------

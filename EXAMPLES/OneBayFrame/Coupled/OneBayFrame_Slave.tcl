@@ -20,6 +20,7 @@
 # ------------------------------
 # Start of model generation
 # ------------------------------
+logFile "OneBayFrame_Slave.log"
 # create ModelBuilder (with two-dimensions and 2 DOF/node)
 model BasicBuilder -ndm 2 -ndf 2
 
@@ -129,6 +130,7 @@ recorder Element -file Slave_Elmt_daqDsp.out  -time -ele 1   daqDisp
 # ------------------------------
 # Finally perform the analysis
 # ------------------------------
+record
 analyze 16000 0.02
 exit
 # --------------------------------
