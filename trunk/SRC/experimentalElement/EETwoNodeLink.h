@@ -54,12 +54,14 @@ public:
     // constructors
     EETwoNodeLink(int tag, int dimension, int Nd1, int Nd2,
         const ID &direction, ExperimentalSite *site,
+        ExperimentalTangentStiff *tangStiff = 0,
         const Vector y = 0, const Vector x = 0, const Vector Mratio = 0,
         const Vector shearDistI = 0, bool iMod = false,
         int addRayleigh = 1, double mass = 0.0);
     EETwoNodeLink(int tag, int dimension, int Nd1, int Nd2,
         const ID &direction, int port, char *machineInetAddress = 0,
         int ssl = 0, int udp = 0, int dataSize = OF_Network_dataSize,
+        ExperimentalTangentStiff *tangStiff = 0,
         const Vector y = 0, const Vector x = 0, const Vector Mratio = 0,
         const Vector shearDistI = 0, bool iMod = false,
         int addRayleigh = 1, double mass = 0.0);
@@ -102,6 +104,7 @@ public:
     const Vector &getBasicDisp();
     const Vector &getBasicVel();
     const Vector &getBasicAccel();
+    const Vector &getBasicForce();
     
     // public methods for element output
     int sendSelf(int commitTag, Channel &theChannel);
@@ -122,7 +125,6 @@ private:
     void setTranLocalBasic();
     void addPDeltaForces(Vector &pLocal);
     void addPDeltaStiff(Matrix &kLocal);
-    void applyIMod();
     
     // private attributes - a copy for each object of the class
     int dimension;                  // 1, 2, or 3 dimensions
@@ -157,7 +159,7 @@ private:
     Vector *dbDaq;      // daq displacements in basic system
     Vector *vbDaq;      // daq velocities in basic system
     Vector *abDaq;      // daq accelerations in basic system
-    Vector *qDaq;       // daq forces in basic system
+    Vector *qbDaq;      // daq forces in basic system
     Vector *tDaq;       // daq time
     
     Vector dbCtrl;      // ctrl displacements in basic system
@@ -168,8 +170,13 @@ private:
     Matrix Tgl;         // transformation matrix from global to local system
     Matrix Tlb;         // transformation matrix from local to basic system
     
-    Matrix kbInit;      // stiffness matrix in basic system
+    Matrix kb;          // tangent stiffness matrix in basic system
+    Matrix kbInit;      // initial stiffness matrix in basic system
+    Matrix kbLast;      // tangent stiffness matrix in basic system at last update
+    
     Vector dbLast;      // displacements in basic system at last update
+    Vector dbDaqLast;   // daq disp in basic system at last update
+    Vector qbDaqLast;   // daq force in basic system at last update
     double tLast;       // time at last update
     
     Matrix *theMatrix;  // pointer to objects matrix (a class wide Matrix)
