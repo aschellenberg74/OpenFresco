@@ -41,6 +41,7 @@
 #include <EETwoNodeLink.h>
 
 extern ExperimentalSite *getExperimentalSite(int tag);
+extern ExperimentalTangentStiff *getExperimentalTangentStiff(int tag);
 
 
 static void printCommand(int argc, TCL_Char **argv)
@@ -63,14 +64,15 @@ int addEETwoNodeLink(ClientData clientData, Tcl_Interp *interp, int argc,
     if ((argc-eleArgStart) < 10)  {
         opserr << "WARNING insufficient arguments\n";
         printCommand(argc, argv);
-        opserr << "Want: expElement twoNodeLink eleTag iNode jNode -dir dirs -site siteTag -initStif Kij <-orient <x1 x2 x3> y1 y2 y3> <-pDelta Mratios> <-shearDist sDratios> <-iMod> <-noRayleigh> <-mass m>\n";
-        opserr << "  or: expElement twoNodeLink eleTag iNode jNode -dir dirs -server ipPort <ipAddr> <-ssl> <-udp> <-dataSize size> -initStif Kij <-orient <x1 x2 x3> y1 y2 y3> <-pDelta Mratios> <-shearDist sDratios> <-iMod> <-noRayleigh> <-mass m>\n";
+        opserr << "Want: expElement twoNodeLink eleTag iNode jNode -dir dirs -site siteTag -initStif Kij <-tangStif tangStifTag> <-orient <x1 x2 x3> y1 y2 y3> <-pDelta Mratios> <-shearDist sDratios> <-iMod> <-noRayleigh> <-mass m>\n";
+        opserr << "  or: expElement twoNodeLink eleTag iNode jNode -dir dirs -server ipPort <ipAddr> <-ssl> <-udp> <-dataSize size> -initStif Kij <-tangStif tangStifTag> <-orient <x1 x2 x3> y1 y2 y3> <-pDelta Mratios> <-shearDist sDratios> <-iMod> <-noRayleigh> <-mass m>\n";
         return TCL_ERROR;
     }
     
     // get the id and end nodes 
-    int tag, iNode, jNode, siteTag, numDir, dirID, ipPort, argi, i, j, k;
+    int tag, iNode, jNode, siteTag, tangStifTag, numDir, dirID, ipPort, argi, i, j, k;
     ExperimentalSite *theSite = 0;
+    ExperimentalTangentStiff *theTangStif = 0;
     char *ipAddr = 0;
     int ssl = 0, udp = 0;
     int dataSize = OF_Network_dataSize;
@@ -187,7 +189,24 @@ int addEETwoNodeLink(ClientData clientData, Tcl_Interp *interp, int argc,
         opserr << "expElement twoNodeLink element: " << tag << endln;
         return TCL_ERROR;
     }
+    
     // check for optional arguments
+    for (i = argi; i < argc; i++)  {
+        if (strcmp(argv[i], "-tangStif") == 0)  {
+            if (Tcl_GetInt(interp, argv[i+1], &tangStifTag) != TCL_OK)  {
+                opserr << "WARNING invalid tangStifTag\n";
+                opserr << "expElement twoNodeLink element: " << tag << endln;
+                return TCL_ERROR;
+            }
+            theTangStif = getExperimentalTangentStiff(tangStifTag);
+            if (theTangStif == 0)  {
+                opserr << "WARNING experimental tangent stiff not found\n";
+                opserr << "expTangStiff: " << tangStifTag << endln;
+                opserr << "expElement twoNodeLink element: " << tag << endln;
+                return TCL_ERROR;
+            }
+        }
+    }
     Vector x(0), y(0);
     for (i = argi; i < argc; i++)  {
         if (strcmp(argv[i],"-orient") == 0)  {
@@ -323,11 +342,12 @@ int addEETwoNodeLink(ClientData clientData, Tcl_Interp *interp, int argc,
     // now create the EETwoNodeLink
     if (theSite != 0)  {
         theExpElement = new EETwoNodeLink(tag, ndm, iNode, jNode, theDirIDs,
-            theSite, y, x, Mratio, shearDistI, iMod, doRayleigh, mass);
+            theSite, theTangStif, y, x, Mratio, shearDistI, iMod, doRayleigh,
+            mass);
     } else  {
         theExpElement = new EETwoNodeLink(tag, ndm, iNode, jNode, theDirIDs,
-            ipPort, ipAddr, ssl, udp, dataSize, y, x, Mratio, shearDistI,
-            iMod, doRayleigh, mass);
+            ipPort, ipAddr, ssl, udp, dataSize, theTangStif, y, x, Mratio,
+            shearDistI, iMod, doRayleigh, mass);
     }
     
     if (theExpElement == 0)  {

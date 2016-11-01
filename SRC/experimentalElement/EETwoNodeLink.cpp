@@ -63,19 +63,18 @@ Vector EETwoNodeLink::EETwoNodeLinkV12(12);
 // by each object and storing the tags of the end nodes.
 EETwoNodeLink::EETwoNodeLink(int tag, int dim, int Nd1, int Nd2,
     const ID &direction, ExperimentalSite *site,
-    const Vector _y, const Vector _x, const Vector Mr,
-    const Vector sdI, bool iM, int addRay, double m)
-    : ExperimentalElement(tag, ELE_TAG_EETwoNodeLink, site),
+    ExperimentalTangentStiff *tang, const Vector _y, const Vector _x,
+    const Vector Mr, const Vector sdI, bool iM, int addRay, double m)
+    : ExperimentalElement(tag, ELE_TAG_EETwoNodeLink, site, tang),
     dimension(dim), numDOF(0), connectedExternalNodes(2),
     numDir(direction.Size()), dir(0), trans(3,3), x(_x), y(_y),
-    Mratio(Mr), shearDistI(sdI), iMod(iM),
-    addRayleigh(addRay), mass(m), L(0.0),
-    db(0), vb(0), ab(0), t(0),
-    dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
-    dbCtrl(direction.Size()), vbCtrl(direction.Size()),
-    abCtrl(direction.Size()), dl(0), Tgl(0,0), Tlb(0,0),
-    kbInit(direction.Size(), direction.Size()),
-    dbLast(direction.Size()), tLast(0.0),
+    Mratio(Mr), shearDistI(sdI), iMod(iM), addRayleigh(addRay), mass(m),
+    L(0.0), db(0), vb(0), ab(0), t(0),
+    dbDaq(0), vbDaq(0), abDaq(0), qbDaq(0), tDaq(0),
+    dbCtrl(numDir), vbCtrl(numDir), abCtrl(numDir),
+    dl(0), Tgl(0,0), Tlb(0,0),
+    kb(numDir,numDir), kbInit(numDir,numDir), kbLast(numDir,numDir),
+    dbLast(numDir), dbDaqLast(numDir), qbDaqLast(numDir), tLast(0.0),
     theMatrix(0), theVector(0), theLoad(0),
     firstWarning(true)
 {
@@ -185,7 +184,7 @@ EETwoNodeLink::EETwoNodeLink(int tag, int dim, int Nd1, int Nd2,
     dbDaq = new Vector(numDir);
     vbDaq = new Vector(numDir);
     abDaq = new Vector(numDir);
-    qDaq  = new Vector(numDir);
+    qbDaq = new Vector(numDir);
     tDaq  = new Vector(1);
     
     // initialize additional vectors
@@ -193,6 +192,8 @@ EETwoNodeLink::EETwoNodeLink(int tag, int dim, int Nd1, int Nd2,
     vbCtrl.Zero();
     abCtrl.Zero();
     dbLast.Zero();
+    dbDaqLast.Zero();
+    qbDaqLast.Zero();
 }
 
 
@@ -200,21 +201,21 @@ EETwoNodeLink::EETwoNodeLink(int tag, int dim, int Nd1, int Nd2,
 // by each object and storing the tags of the end nodes.
 EETwoNodeLink::EETwoNodeLink(int tag, int dim, int Nd1, int Nd2,
     const ID &direction, int port, char *machineInetAddr,
-    int ssl, int udp, int dataSize,
+    int ssl, int udp, int dataSize, ExperimentalTangentStiff *tang,
     const Vector _y, const Vector _x, const Vector Mr,
     const Vector sdI, bool iM, int addRay, double m)
-    : ExperimentalElement(tag, ELE_TAG_EETwoNodeLink),
+    : ExperimentalElement(tag, ELE_TAG_EETwoNodeLink, NULL, tang),
     dimension(dim), numDOF(0), connectedExternalNodes(2),
     numDir(direction.Size()), dir(0), trans(3,3), x(_x), y(_y),
     Mratio(Mr), shearDistI(sdI), iMod(iM),
     addRayleigh(addRay), mass(m), L(0.0),
     theChannel(0), sData(0), sendData(0), rData(0), recvData(0),
     db(0), vb(0), ab(0), t(0),
-    dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
-    dbCtrl(direction.Size()), vbCtrl(direction.Size()),
-    abCtrl(direction.Size()), dl(0), Tgl(0,0), Tlb(0,0),
-    kbInit(direction.Size(), direction.Size()),
-    dbLast(direction.Size()), tLast(0.0),
+    dbDaq(0), vbDaq(0), abDaq(0), qbDaq(0), tDaq(0),
+    dbCtrl(numDir), vbCtrl(numDir), abCtrl(numDir),
+    dl(0), Tgl(0,0), Tlb(0,0),
+    kb(numDir,numDir), kbInit(numDir,numDir), kbLast(numDir,numDir),
+    dbLast(numDir), dbDaqLast(numDir), qbDaqLast(numDir), tLast(0.0),
     theMatrix(0), theVector(0), theLoad(0),
     firstWarning(true)
 {
@@ -374,7 +375,7 @@ EETwoNodeLink::EETwoNodeLink(int tag, int dim, int Nd1, int Nd2,
     id += numDir;
     abDaq = new Vector(&rData[id], numDir);
     id += numDir;
-    qDaq = new Vector(&rData[id], numDir);
+    qbDaq = new Vector(&rData[id], numDir);
     id += numDir;
     tDaq = new Vector(&rData[id], 1);
     recvData->Zero();
@@ -384,6 +385,8 @@ EETwoNodeLink::EETwoNodeLink(int tag, int dim, int Nd1, int Nd2,
     vbCtrl.Zero();
     abCtrl.Zero();
     dbLast.Zero();
+    dbDaqLast.Zero();
+    qbDaqLast.Zero();
 }
 
 
@@ -412,8 +415,8 @@ EETwoNodeLink::~EETwoNodeLink()
         delete vbDaq;
     if (abDaq != 0)
         delete abDaq;
-    if (qDaq != 0)
-        delete qDaq;
+    if (qbDaq != 0)
+        delete qbDaq;
     if (tDaq != 0)
         delete tDaq;
     
@@ -553,7 +556,7 @@ void EETwoNodeLink::setDomain(Domain *theDomain)
     }
     
     // set the initial stiffness matrix size
-    theInitStiff.resize(numDOF,numDOF);
+    theInitStiff.resize(numDOF, numDOF);
     theInitStiff.Zero();
     
     // set the local displacement vector size
@@ -619,6 +622,13 @@ int EETwoNodeLink::update()
 {
     int rValue = 0;
     
+    // save the last response parameters
+    tLast = (*t)(0);
+    dbLast = (*db);
+    dbDaqLast = (*dbDaq);
+    qbDaqLast = (*qbDaq);
+    kbLast = kb;
+    
     // get current time
     Domain *theDomain = this->getDomain();
     (*t)(0) = theDomain->getCurrentTime();
@@ -647,6 +657,7 @@ int EETwoNodeLink::update()
     vb->addMatrixVector(0.0, Tlb, vl, 1.0);
     ab->addMatrixVector(0.0, Tlb, al, 1.0);
     
+    // calculate incremental displacement command
     Vector dbDelta = (*db) - dbLast;
     // do not check time for right now because of transformation constraint
     // handler calling update at beginning of new step when applying load
@@ -662,10 +673,6 @@ int EETwoNodeLink::update()
         }
     }
     
-    // save the last displacements and time
-    dbLast = (*db);
-    tLast = (*t)(0);
-    
     return rValue;
 }
 
@@ -678,13 +685,13 @@ int EETwoNodeLink::setInitialStiff(const Matrix& kbinit)
             << this->getTag() << endln;
         return -1;
     }
-    kbInit = kbinit;
+    kb = kbInit = kbLast = kbinit;
     
     // zero the global matrix
     theInitStiff.Zero();
     
     // transform from basic to local system
-    Matrix klInit(numDOF,numDOF);
+    Matrix klInit(numDOF, numDOF);
     klInit.addMatrixTripleProduct(0.0, Tlb, kbInit, 1.0);
     
     // transform from local to global system
@@ -696,43 +703,62 @@ int EETwoNodeLink::setInitialStiff(const Matrix& kbinit)
 
 const Matrix& EETwoNodeLink::getTangentStiff()
 {
-    if (firstWarning == true)  {
-        opserr << "\nWARNING EETwoNodeLink::getTangentStiff() - "
-            << "Element: " << this->getTag() << endln
-            << "TangentStiff cannot be calculated." << endln
-            << "Return InitialStiff including GeometricStiff instead." 
-            << endln;
-        opserr << "Subsequent getTangentStiff warnings will be suppressed." 
-            << endln;
-        
-        firstWarning = false;
-    }
-    
     // zero the global matrix
     theMatrix->Zero();
     
-    // get daq resisting forces
-    if (theSite != 0)  {
-        (*qDaq) = theSite->getForce();
+    if (theTangStiff != 0)  {
+        // get current daq displacement and resisting force
+        this->getBasicDisp();
+        this->getBasicForce();
+        
+        // calculate incremental displacement and force vectors
+        Vector dbDaqIncr = (*dbDaq) - dbDaqLast;
+        Vector qbDaqIncr = (*qbDaq) - qbDaqLast;
+        
+        // get updated kb matrix
+        kb = theTangStiff->updateTangentStiff(&dbDaqIncr, (Vector*)0,
+            (Vector*)0, &qbDaqIncr, (Vector*)0, &kbInit, &kbLast);
+        
+        // apply optional initial stiffness modification
+        if (iMod == true)  {
+            // correct for displacement control errors using I-Modification
+            qbDaq->addMatrixVector(1.0, kbInit, (*dbDaq) - (*db), -1.0);
+        }
     }
     else  {
-        sData[0] = OF_RemoteTest_getForce;
-        theChannel->sendVector(0, 0, *sendData, 0);
-        theChannel->recvVector(0, 0, *recvData, 0);
+        if (firstWarning == true)  {
+            opserr << "\nWARNING EETwoNodeLink::getTangentStiff() - "
+                << "Element: " << this->getTag() << endln
+                << "TangentStiff cannot be calculated." << endln
+                << "Return InitialStiff including GeometricStiff instead." 
+                << endln;
+            opserr << "Subsequent getTangentStiff warnings will be suppressed." 
+                << endln;
+        
+            firstWarning = false;
+        }
+        
+        // get current daq resisting force
+        this->getBasicForce();
+        
+        // apply optional initial stiffness modification
+        if (iMod == true)  {
+            // get daq displacement
+            this->getBasicDisp();
+            
+            // correct for displacement control errors using I-Modification
+            qbDaq->addMatrixVector(1.0, kbInit, (*dbDaq) - (*db), -1.0);
+        }
     }
-    
-    // apply optional initial stiffness modification
-    if (iMod == true)
-        this->applyIMod();
     
     // use elastic force if force from test is zero
     for (int i=0; i<numDir; i++)  {
-        if ((*qDaq)(i) == 0.0)
-            (*qDaq)(i) = kbInit(i,i) * (*db)(i);
+        if ((*qbDaq)(i) == 0.0)
+            (*qbDaq)(i) = kbInit(i,i) * (*db)(i);
     }
     
     // transform from basic to local system
-    Matrix kl(numDOF,numDOF);
+    Matrix kl(numDOF, numDOF);
     kl.addMatrixTripleProduct(0.0, Tlb, kbInit, 1.0);
     
     // add geometric stiffness to local stiffness
@@ -800,7 +826,7 @@ int EETwoNodeLink::addInertiaLoadToUnbalance(const Vector &accel)
     // check for quick return
     if (mass == 0.0)  {
         return 0;
-    }    
+    }
     
     // get R * accel from the nodes
     const Vector &Raccel1 = theNodes[0]->getRV(accel);
@@ -830,34 +856,32 @@ const Vector& EETwoNodeLink::getResistingForce()
     // zero the global residual
     theVector->Zero();
     
-    // get daq resisting forces
-    if (theSite != 0)  {
-        (*qDaq) = theSite->getForce();
-    }
-    else  {
-        sData[0] = OF_RemoteTest_getForce;
-        theChannel->sendVector(0, 0, *sendData, 0);
-        theChannel->recvVector(0, 0, *recvData, 0);
-    }
+    // get current daq resisting force
+    this->getBasicForce();
     
     // apply optional initial stiffness modification
-    if (iMod == true)
-        this->applyIMod();
+    if (iMod == true)  {
+        // get current daq displacement
+        this->getBasicDisp();
+        
+        // correct for displacement control errors using I-Modification
+        qbDaq->addMatrixVector(1.0, kbInit, (*dbDaq) - (*db), -1.0);
+    }
     
     // use elastic force if force from test is zero
     for (int i=0; i<numDir; i++)  {
-        if ((*qDaq)(i) == 0.0)
-            (*qDaq)(i) = kbInit(i,i) * (*db)(i);
+        if ((*qbDaq)(i) == 0.0)
+            (*qbDaq)(i) = kbInit(i,i) * (*db)(i);
     }
     
-    // save corresponding ctrl displacements for recorder
+    // save corresponding ctrl values for recorder
     dbCtrl = (*db);
     vbCtrl = (*vb);
     abCtrl = (*ab);
     
     // determine resisting forces in local system
     Vector ql(numDOF);
-    ql.addMatrixTransposeVector(0.0, Tlb, *qDaq, 1.0);
+    ql.addMatrixTransposeVector(0.0, Tlb, *qbDaq, 1.0);
     
     // add P-Delta effects to local forces
     if (Mratio.Size() == 4)
@@ -876,7 +900,7 @@ const Vector& EETwoNodeLink::getResistingForce()
 const Vector& EETwoNodeLink::getResistingForceIncInertia()
 {
     // this already includes damping forces from specimen
-    *theVector = this->getResistingForce();
+    this->getResistingForce();
     
     // add the damping forces from rayleigh damping
     if (addRayleigh == 1)  {
@@ -961,6 +985,21 @@ const Vector& EETwoNodeLink::getBasicAccel()
 }
 
 
+const Vector& EETwoNodeLink::getBasicForce()
+{
+    if (theSite != 0)  {
+        (*qbDaq) = theSite->getForce();
+    }
+    else  {
+        sData[0] = OF_RemoteTest_getForce;
+        theChannel->sendVector(0, 0, *sendData, 0);
+        theChannel->recvVector(0, 0, *recvData, 0);
+    }
+    
+    return *qbDaq;
+}
+
+
 int EETwoNodeLink::sendSelf(int commitTag, Channel &theChannel)
 {
     // has not been implemented yet.....
@@ -1009,6 +1048,8 @@ void EETwoNodeLink::Print(OPS_Stream &s, int flag)
             << ", jNode: " << connectedExternalNodes(1) << endln;
         if (theSite != 0)
             s << "  ExperimentalSite: " << theSite->getTag() << endln;
+        if (theTangStiff != 0)
+            s << "  ExperimentalTangStiff: " << theTangStiff->getTag() << endln;
         s << "  Mratio: " << Mratio << "  shearDistI: " << shearDistI << endln;
         s << "  addRayleigh: " << addRayleigh << "  mass: " << mass << endln;
         // determine resisting forces in global system
@@ -1176,6 +1217,18 @@ Response* EETwoNodeLink::setResponse(const char **argv, int argc,
         theResponse = new ElementResponse(this, 11, Vector(numDir*2));
     }
     
+    // tangent stiffness output
+    else if (strcmp(argv[0],"tangStif") == 0 ||
+        strcmp(argv[0],"tangStiff") == 0 ||
+        strcmp(argv[0],"expTangStif") == 0 ||
+        strcmp(argv[0],"expTangStiff") == 0 ||
+        strcmp(argv[0],"expTangentStif") == 0 ||
+        strcmp(argv[0],"expTangentStiff") == 0)  {
+        if (theTangStiff != 0)  {
+            theResponse = theTangStiff->setResponse(&argv[1], argc-1, output);
+        }
+    }
+    
     output.endTag(); // ElementOutput
     
     return theResponse;
@@ -1193,15 +1246,15 @@ int EETwoNodeLink::getResponse(int responseID, Information &eleInfo)
     case 2:  // local forces
         theVector->Zero();
         // determine resisting forces in local system
-        theVector->addMatrixTransposeVector(0.0, Tlb, *qDaq, 1.0);
+        theVector->addMatrixTransposeVector(0.0, Tlb, *qbDaq, 1.0);
         // add P-Delta effects to local forces
         if (Mratio.Size() == 4)
             this->addPDeltaForces(*theVector);
         
         return eleInfo.setVector(*theVector);
         
-    case 3:  // basic forces
-        return eleInfo.setVector(*qDaq);
+    case 3:  // basic forces (qbDaq is already current)
+        return eleInfo.setVector(*qbDaq);
         
     case 4:  // ctrl local displacements
         return eleInfo.setVector(dl);
@@ -1226,8 +1279,8 @@ int EETwoNodeLink::getResponse(int responseID, Information &eleInfo)
         
     case 11:  // basic deformations and basic forces
         defoAndForce.Zero();
-        defoAndForce.Assemble(dbCtrl,0);
-        defoAndForce.Assemble(*qDaq,numDir);
+        defoAndForce.Assemble(dbCtrl, 0);
+        defoAndForce.Assemble(*qbDaq, numDir);
         
         return eleInfo.setVector(defoAndForce);
         
@@ -1329,7 +1382,7 @@ void EETwoNodeLink::setUp()
 void EETwoNodeLink::setTranGlobalLocal()
 {
     // resize transformation matrix and zero it
-    Tgl.resize(numDOF,numDOF);
+    Tgl.resize(numDOF, numDOF);
     Tgl.Zero();
     
     // switch on dimensionality of element
@@ -1380,7 +1433,7 @@ void EETwoNodeLink::setTranGlobalLocal()
 void EETwoNodeLink::setTranLocalBasic()
 {
     // resize transformation matrix and zero it
-    Tlb.resize(numDir,numDOF);
+    Tlb.resize(numDir, numDOF);
     Tlb.Zero();
     
     for (int i=0; i<numDir; i++)  {
@@ -1427,7 +1480,7 @@ void EETwoNodeLink::addPDeltaForces(Vector &pLocal)
         
         // get axial force and local disp differences
         if (dirID == 0)
-            N = (*qDaq)(i);
+            N = (*qbDaq)(i);
         else if (dirID == 1 && dimension > 1)
             deltal1 = dl(1+numDOF/2) - dl(1);
         else if (dirID == 2 && dimension > 2)
@@ -1516,7 +1569,7 @@ void EETwoNodeLink::addPDeltaStiff(Matrix &kLocal)
     // get axial force
     for (int i=0; i<numDir; i++)  {
         if ((*dir)(i) == 0)
-            N = (*qDaq)(i);
+            N = (*qbDaq)(i);
     }
     
     if (N != 0.0)  {
@@ -1605,21 +1658,4 @@ void EETwoNodeLink::addPDeltaStiff(Matrix &kLocal)
             }
         }
     }
-}
-
-
-void EETwoNodeLink::applyIMod()
-{    
-    // get daq displacements
-    if (theSite != 0)  {
-        (*dbDaq) = theSite->getDisp();
-    }
-    else  {
-        sData[0] = OF_RemoteTest_getDisp;
-        theChannel->sendVector(0, 0, *sendData, 0);
-        theChannel->recvVector(0, 0, *recvData, 0);
-    }
-    
-    // correct for displacement control errors using I-Modification
-    (*qDaq) -= kbInit*((*dbDaq) - (*db));
 }
