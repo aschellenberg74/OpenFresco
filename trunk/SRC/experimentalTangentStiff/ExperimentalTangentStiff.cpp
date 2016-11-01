@@ -41,8 +41,8 @@ ExperimentalTangentStiff::ExperimentalTangentStiff(int tag)
 
 
 ExperimentalTangentStiff::ExperimentalTangentStiff(
-    const ExperimentalTangentStiff& esf)
-    : TaggedObject(esf)
+    const ExperimentalTangentStiff& ets)
+    : TaggedObject(ets)
 {
     // does nothing
 }
@@ -79,5 +79,5 @@ int ExperimentalTangentStiff::getResponse(int responseID,
     Information &info)
 {
     // each subclass must implement its own response
-    return -1;
+    return OF_ReturnType_failed;
 }

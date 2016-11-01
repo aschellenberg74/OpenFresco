@@ -1157,6 +1157,18 @@ Response* EETrussCorot::setResponse(const char **argv, int argc,
         theResponse = new ElementResponse(this, 9, Vector(1));
     }
     
+    // tangent stiffness output
+    else if (strcmp(argv[0],"tangStif") == 0 ||
+        strcmp(argv[0],"tangStiff") == 0 ||
+        strcmp(argv[0],"expTangStif") == 0 ||
+        strcmp(argv[0],"expTangStiff") == 0 ||
+        strcmp(argv[0],"expTangentStif") == 0 ||
+        strcmp(argv[0],"expTangentStiff") == 0)  {
+        if (theTangStiff != 0)  {
+            theResponse = theTangStiff->setResponse(&argv[1], argc-1, output);
+        }
+    }
+    
     output.endTag(); // ElementOutput
     
     return theResponse;

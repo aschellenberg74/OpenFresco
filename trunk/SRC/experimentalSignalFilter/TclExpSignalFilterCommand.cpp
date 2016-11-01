@@ -128,12 +128,12 @@ int TclExpSignalFilterCommand(ClientData clientData, Tcl_Interp *interp,
         }
         if (Tcl_GetDouble(interp, argv[3], &avg) != TCL_OK)  {
             opserr << "WARNING invalid avg\n";
-            opserr << "ErrorSimRandomGauss signal filter: " << tag << endln;
+            opserr << "expSignalFilter ErrorSimRandomGauss " << tag << endln;
             return TCL_ERROR;
         }
         if (Tcl_GetDouble(interp, argv[4], &std) != TCL_OK)  {
             opserr << "WARNING invalid std\n";
-            opserr << "ErrorSimRandomGauss signal filter: " << tag << endln;
+            opserr << "expSignalFilter ErrorSimRandomGauss " << tag << endln;
             return TCL_ERROR;
         }
         
@@ -159,11 +159,11 @@ int TclExpSignalFilterCommand(ClientData clientData, Tcl_Interp *interp,
         }
         if (Tcl_GetDouble(interp, argv[3], &error) != TCL_OK)  {
             opserr << "WARNING invalid error\n";
-            opserr << "ErrorSimUndershoot signal filter: " << tag << endln;
+            opserr << "expSignalFilter ErrorSimUndershoot " << tag << endln;
             return TCL_ERROR;
         }
         
-        // parsing was successful, allocate the controller
+        // parsing was successful, allocate the signal filter
         theFilter = new ESFErrorSimUndershoot(tag, error);
     }
     
@@ -186,18 +186,18 @@ int TclExpSignalFilterCommand(ClientData clientData, Tcl_Interp *interp,
         argi++;
         if (Tcl_GetInt(interp, argv[argi], &ss) != TCL_OK)  {
             opserr << "WARNING invalid numSubspace\n";
-            opserr << "KrylovForceConverter signal filter: " << tag << endln;
+            opserr << "expSignalFilter KrylovForceConverter " << tag << endln;
             return TCL_ERROR;
         }
         argi++;
-        if (strcmp(argv[argi],"-initStiff") != 0)  {
-            opserr << "WARNING expecting -initStiff Kij\n";
+        if (strcmp(argv[argi],"-initStif") != 0)  {
+            opserr << "WARNING expecting -initStif Kij\n";
             opserr << "expSignalFilter KrylovForceConverter " << tag << endln;
             return TCL_ERROR;
         }
         argi++;
         
-        //Check size of stiffness matrix
+        // check size of stiffness matrix
         double numArg, dDim;
         int dim, iDim;
         numArg = argc - argi - 1;
@@ -211,7 +211,7 @@ int TclExpSignalFilterCommand(ClientData clientData, Tcl_Interp *interp,
             return TCL_ERROR;
         }
         
-        //Set the initial stiffness	
+        // set the initial stiffness
         Matrix theInitStif(dim,dim);
         double stif;
         int i, j;
@@ -219,14 +219,15 @@ int TclExpSignalFilterCommand(ClientData clientData, Tcl_Interp *interp,
             for (j=0; j<dim; j++)  {
                 if (Tcl_GetDouble(interp, argv[argi], &stif) != TCL_OK)  {
                     opserr << "WARNING invalid initial stiffness term\n";
-                    opserr << "expElement beamColumn element: " << tag << endln;
+                    opserr << "expSignalFilter KrylovForceConverter " << tag << endln;
                     return TCL_ERROR;
                 }
                 theInitStif(i,j) = stif;
                 argi++;
             }
         }
-        // parsed correctly, allocate the controller
+        
+        // parsing was successful, allocate the signal filter
         theFilter = new ESFKrylovForceConverter(tag, ss, theInitStif);
     }
     
@@ -236,27 +237,26 @@ int TclExpSignalFilterCommand(ClientData clientData, Tcl_Interp *interp,
             opserr << "WARNING invalid number of arguments\n";
             printCommand(argc,argv);
             opserr << "Want: expSignalFilter TangentForceConverter tag "
-                << "-initStiff Kij -tangentStiff tangStiffTag\n";
+                << "-initStif Kij -tangStif tangStifTag\n";
             return TCL_ERROR;
         }
         
-        int tag, tangStiffTag;
-        int argi =2;
-        ExperimentalTangentStiff *theTangStiff = 0;
+        int tag, tangStifTag, argi = 2;
+        ExperimentalTangentStiff *theTangStif = 0;
         
         if (Tcl_GetInt(interp, argv[argi], &tag) != TCL_OK)  {
             opserr << "WARNING invalid TangentForceConverter tag\n";
             return TCL_ERROR;
         }
         argi++;
-        if (strcmp(argv[argi],"-initStiff") != 0)  {
-            opserr << "WARNING expecting -initStiff Kij\n";
+        if (strcmp(argv[argi],"-initStif") != 0)  {
+            opserr << "WARNING expecting -initStif Kij\n";
             opserr << "expSignalFilter TangentForceConverter " << tag << endln;
             return TCL_ERROR;
         }
         argi++;
         
-        //Check size of stiffness matrix
+        // check size of stiffness matrix
         double numArg, dDim;
         int dim, iDim;
         numArg = argc - argi - 2;
@@ -270,7 +270,7 @@ int TclExpSignalFilterCommand(ClientData clientData, Tcl_Interp *interp,
             return TCL_ERROR;
         }
         
-        //Set the initial stiffness	
+        // set the initial stiffness
         Matrix theInitStif(dim,dim);
         double stif;
         int i, j;
@@ -278,27 +278,28 @@ int TclExpSignalFilterCommand(ClientData clientData, Tcl_Interp *interp,
             for (j=0; j<dim; j++)  {
                 if (Tcl_GetDouble(interp, argv[argi], &stif) != TCL_OK)  {
                     opserr << "WARNING invalid initial stiffness term\n";
-                    opserr << "expElement beamColumn element: " << tag << endln;
+                    opserr << "expSignalFilter TangentForceConverter " << tag << endln;
                     return TCL_ERROR;
                 }
                 theInitStif(i,j) = stif;
                 argi++;
             }
         }
-        if (strcmp(argv[argi],"-tangentStiff") != 0)  {
-            opserr << "WARNING expecting -tangentStiff tangStiffTag\n";
+        if (strcmp(argv[argi],"-tangStif") != 0)  {
+            opserr << "WARNING expecting -tangStif tangStifTag\n";
             opserr << "expSignalFilter TangentForceConverter " << tag << endln;
             return TCL_ERROR;
         }
         argi++;
-        if (Tcl_GetInt(interp, argv[argi], &tangStiffTag) != TCL_OK)  {
+        if (Tcl_GetInt(interp, argv[argi], &tangStifTag) != TCL_OK)  {
             opserr << "WARNING invalid tangentStiff Tag\n";
-            opserr << "TangentForceConverter signal filter: " << tag << endln;
+            opserr << "expSignalFilter TangentForceConverter " << tag << endln;
             return TCL_ERROR;
         }
-        theTangStiff = getExperimentalTangentStiff(tangStiffTag);
-        // Allocate the controller
-        theFilter = new ESFTangForceConverter(tag, theInitStif, theTangStiff);
+        theTangStif = getExperimentalTangentStiff(tangStifTag);
+        
+        // parsing was successful, allocate the signal filter
+        theFilter = new ESFTangForceConverter(tag, theInitStif, theTangStif);
     }
     
     // ----------------------------------------------------------------------------	
