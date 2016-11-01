@@ -50,12 +50,20 @@ ExperimentalElement::ExperimentalElement(int tag,
     ExperimentalSite *site,
     ExperimentalTangentStiff *tang)
     : Element(tag, classTag),
-    theSite(site), theTangStiff(tang),
+    theSite(site), theTangStiff(0),
     sizeCtrl(0), sizeDaq(0),
     theInitStiff(1,1),
     firstWarning(true)
 {
-    // does nothing
+    // get copy of experimental tangent stiffness
+    if (tang != 0)  {
+        theTangStiff = tang->getCopy();
+        if (theTangStiff == 0)  {
+            opserr << "ExperimentalElement::ExperimentalElement() - "
+                << "failed to copy experimental tangent stiffness.\n";
+            exit(OF_ReturnType_failed);
+        }
+    }
 }
 
 
@@ -75,7 +83,7 @@ ExperimentalElement::~ExperimentalElement()
 
 const Matrix& ExperimentalElement::getTangentStiff()
 {
-    if (firstWarning == true)  {
+    if (firstWarning == true && theTangStiff == 0)  {
         opserr << "\nWARNING ExperimentalElement::getTangentStiff() - "
             << "Element: " << this->getTag() << endln
             << "TangentStiff cannot be calculated. Return InitialStiff instead." 
@@ -139,7 +147,7 @@ int ExperimentalElement::revertToLastCommit()
         << "Can't revert to last commit. This is an experimental element."
         << endln;
     
-    return -1;
+    return OF_ReturnType_failed;
 }
 
 
@@ -150,5 +158,5 @@ int ExperimentalElement::revertToStart()
         << "Can't revert to start. This is an experimental element."
         << endln;
     
-    return -1;
+    return OF_ReturnType_failed;
 }

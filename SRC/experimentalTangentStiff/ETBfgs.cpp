@@ -135,13 +135,10 @@ Response* ETBfgs::setResponse(const char **argv,
     output.attr("tangStifType",this->getClassType());
     output.attr("tangStifTag",this->getTag());
     
-    // tangent stiffness
-    if (strcmp(argv[0],"kt") == 0 ||
-        strcmp(argv[0],"Kt") == 0 ||
-        strcmp(argv[0],"tangStif") == 0 ||
-        strcmp(argv[0],"tangStiff") == 0 ||
-        strcmp(argv[0],"tangentStif") == 0 ||
-        strcmp(argv[0],"tangentStiff") == 0)
+    // stiffness
+    if (strcmp(argv[0],"stif") == 0 ||
+        strcmp(argv[0],"stiff") == 0 ||
+        strcmp(argv[0],"stiffness") == 0)
     {
         output.tag("ResponseType","tangStif");
         theResponse = new ExpTangentStiffResponse(this, 1, Matrix(1,1));
@@ -155,7 +152,7 @@ int ETBfgs::getResponse(int responseID,
     Information &info)
 {
     switch (responseID)  {
-    case 1:  // tangent stiffness
+    case 1:  // stiffness
         if (theStiff != 0)
             return info.setMatrix(*theStiff);
         
