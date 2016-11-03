@@ -135,8 +135,8 @@ if {$withGravity} {
     # Start of recorder generation
     # ------------------------------
     # create a Recorder object for the nodal displacements at node 2
-    recorder Node -file Gravity_Dsp.out -time -node 3 4 -dof 1 2 3 disp
-    recorder Element -file Gravity_Frc.out -time -ele 1 2 3 force
+    recorder Node -file GravityLinAlg_Dsp.out -time -node 3 4 -dof 1 2 3 disp
+    recorder Element -file GravityLinAlg_Frc.out -time -ele 1 2 3 force
     # --------------------------------
     # End of recorder generation
     # --------------------------------

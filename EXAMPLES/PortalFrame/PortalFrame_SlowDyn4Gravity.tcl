@@ -98,13 +98,19 @@ element elasticBeamColumn 3 3 4 3.55 29000 22.1 1
 if {$withGravity} {
     # Define gravity loads
     # --------------------
-    # Create a Plain load pattern with a Linear TimeSeries
-    pattern Plain 1 "Linear" {
+    # Create a ramp time series
+    timeSeries Path 1 -time {0 1 10} -values {0 1 1} -factor 1.0 
+    
+    # Create a Plain load pattern
+    pattern Plain 1 1 -fact 1.0 {
         # Create nodal loads at nodes 2
         #    nd    FX          FY  MZ 
         load  3   0.0  [expr -$P] 0.0
         load  4   0.0  [expr -$P] 0.0
     }
+
+    # set large Rayleigh damping 
+    rayleigh 5.0 0.0 0.0 0.05
     # ------------------------------
     # End of model generation
     # ------------------------------
@@ -120,13 +126,11 @@ if {$withGravity} {
     # Create the constraint handler
     constraints Plain
     # Create the convergence test
-    test FixedNumIter 10
+    test FixedNumIter 5
     # Create the integration scheme
     integrator NewmarkHSFixedNumIter 0.5 0.25
-    #integrator AlphaOS 0.9
     # Create the solution algorithm
     algorithm Newton
-    #algorithm Linear
     # Create the analysis object 
     analysis Transient
     # ------------------------------
@@ -138,8 +142,8 @@ if {$withGravity} {
     # Start of recorder generation
     # ------------------------------
     # create a Recorder object for the nodal displacements at node 2
-    recorder Node -file Gravity_Dsp.out -time -node 3 4 -dof 1 2 3 disp
-    recorder Element -file Gravity_Frc.out -time -ele 1 2 3 force
+    recorder Node -file GravitySlowDyn_Dsp.out -time -node 3 4 -dof 1 2 3 disp
+    recorder Element -file GravitySlowDyn_Frc.out -time -ele 1 2 3 force
     # --------------------------------
     # End of recorder generation
     # --------------------------------
@@ -148,8 +152,8 @@ if {$withGravity} {
     # ------------------------------
     # Perform the gravity analysis
     # ------------------------------
-    # perform the gravity load analysis, requires 10 steps to reach the load level
-    if {[analyze 1 1] == 0} {
+    # perform the gravity load analysis, requires 200 steps to reach the load level
+    if {[analyze 200 0.01] == 0} {
         puts "\nGravity load analysis completed"
     } else {
         puts "\nGravity load analysis failed"
@@ -170,11 +174,11 @@ if {$withGravity} {
 # set time series to be passed to uniform excitation
 set dt 0.01
 set scale 1.2
-timeSeries Path 1 -filePath SACNF01.txt -dt $dt -factor [expr 386.1*$scale]
+timeSeries Path 2 -filePath SACNF01.txt -dt $dt -factor [expr 386.1*$scale]
 
 # create UniformExcitation load pattern
 # pattern UniformExcitation $tag $dir -accel $tsTag <-vel0 $vel0>
-pattern UniformExcitation 2 1 -accel 1
+pattern UniformExcitation 2 1 -accel 2
 
 # calculate the Rayleigh damping factors for nodes & elements
 set alphaM     1.2797;    # D = alphaM*M
