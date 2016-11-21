@@ -42,13 +42,13 @@ class ESNoTransformation : public ExperimentalSetup
 public:
     // constructors
     ESNoTransformation(int tag,
-		const ID &direction, int sizeT, int sizeO,
-		ExperimentalControl* control = 0);
+        const ID &DOF, int sizeT, int sizeO,
+        ExperimentalControl* control = 0);
     ESNoTransformation(const ESNoTransformation& es);
-	
+    
     // destructor
     virtual ~ESNoTransformation();
-	
+    
     // method to get class type
     const char *getClassType() const {return "ESNoTransformation";};
     
@@ -56,10 +56,10 @@ public:
     virtual int setup();
     
     virtual ExperimentalSetup *getCopy();
-	
+    
     // public methods for output
     void Print(OPS_Stream &s, int flag = 0);
-	
+    
 protected:
     // protected tranformation methods
     virtual int transfTrialDisp(const Vector* disp);
@@ -67,7 +67,7 @@ protected:
     virtual int transfTrialAccel(const Vector* accel);
     virtual int transfTrialForce(const Vector* force);
     virtual int transfTrialTime(const Vector* time);
-	
+    
     virtual int transfDaqDisp(Vector* disp);
     virtual int transfDaqVel(Vector* vel);
     virtual int transfDaqAccel(Vector* accel);
@@ -75,10 +75,10 @@ protected:
     virtual int transfDaqTime(Vector* time);
     
 private:
-    int numDir;     // number of directions
-    ID *direction;  // array of directions 0-5
-    int sizeT;      // trial size of disp, vel, accel, force
-    int sizeO;      // output size of disp, vel, accel, force
+    int numDOF;  // number of DOF
+    ID *DOF;     // array of DOF
+    int sizeT;   // trial size of disp, vel, accel, force
+    int sizeO;   // output size of disp, vel, accel, force
 };
 
 #endif
