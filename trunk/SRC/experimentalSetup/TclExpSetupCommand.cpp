@@ -128,11 +128,11 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp,
             opserr << "WARNING invalid number of arguments\n";
             printCommand(argc,argv);
             opserr << "Want: expSetup NoTransformation tag <-control ctrlTag> "
-                << "-dir dirs -sizeTrialOut t o\n";
+                << "-dof DOFs -sizeTrialOut t o\n";
             return TCL_ERROR;
         }
         
-        int ctrlTag, numDirs = 0, dirID, sizeTrial, sizeOut, i;
+        int ctrlTag, numDOF = 0, dofID, sizeTrial, sizeOut, i;
         
         argi = 2;
         if (Tcl_GetInt(interp, argv[argi], &tag) != TCL_OK)  {
@@ -156,32 +156,32 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp,
             }
             argi++;
         }
-        // now read the direction IDs
-        if (strcmp(argv[argi],"-dir") != 0)  {
-            opserr << "WARNING expecting -dir dirs\n";
+        // now read the DOF IDs
+        if (strcmp(argv[argi],"-dof") != 0 || strcmp(argv[argi],"-dir") != 0)  {
+            opserr << "WARNING expecting -dof DOFs\n";
             opserr << "expSetup NoTransformation " << tag << endln;
             return TCL_ERROR;
         }
         argi++;
-        while (argi+numDirs < argc &&
-            strcmp(argv[argi+numDirs],"-sizeTrialOut") != 0)  {
-            numDirs++;
+        while (argi+numDOF < argc &&
+            strcmp(argv[argi+numDOF],"-sizeTrialOut") != 0)  {
+            numDOF++;
         }
-        if (numDirs == 0)  {
-            opserr << "WARNING no dirs specified\n";
+        if (numDOF == 0)  {
+            opserr << "WARNING no DOFs specified\n";
             opserr << "expSetup NoTransformation " << tag << endln;
             return TCL_ERROR;
         }
-        // create an ID array to hold the direction IDs
-        ID theDirIDs(numDirs);
-        // read the dir identifiers
-        for (i=0; i<numDirs; i++)  {
-            if (Tcl_GetInt(interp, argv[argi], &dirID) != TCL_OK)  {
-                opserr << "WARNING invalid direction ID\n";
+        // create an ID array to hold the DOF IDs
+        ID theDOF_IDs(numDOF);
+        // read the DOF identifiers
+        for (i=0; i<numDOF; i++)  {
+            if (Tcl_GetInt(interp, argv[argi], &dofID) != TCL_OK)  {
+                opserr << "WARNING invalid DOF ID\n";
                 opserr << "expSetup NoTransformation " << tag << endln;
                 return TCL_ERROR;
             }
-            theDirIDs[i] = dirID - 1;
+            theDOF_IDs[i] = dofID - 1;
             argi++;
         }
         // now read the trial and out sizes
@@ -205,7 +205,7 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp,
         argi++;
         
         // parsing was successful, allocate the setup
-        theSetup = new ESNoTransformation(tag, theDirIDs, sizeTrial, sizeOut, theControl);
+        theSetup = new ESNoTransformation(tag, theDOF_IDs, sizeTrial, sizeOut, theControl);
     }
     
     // ----------------------------------------------------------------------------	

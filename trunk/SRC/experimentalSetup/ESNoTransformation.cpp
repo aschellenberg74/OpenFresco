@@ -33,52 +33,52 @@
 
 
 ESNoTransformation::ESNoTransformation(int tag,
-	const ID &dir, int sizet, int sizeo,
-	ExperimentalControl* control)
-	: ExperimentalSetup(tag, control),
-	direction(0), sizeT(sizet), sizeO(sizeo)
+    const ID &dof, int sizet, int sizeo,
+    ExperimentalControl* control)
+    : ExperimentalSetup(tag, control),
+    DOF(0), sizeT(sizet), sizeO(sizeo)
 {
-    // allocate memory for direction array
-    numDir = dir.Size();
-    direction = new ID(numDir);
-    if (direction == 0)  {
+    // allocate memory for DOF array
+    numDOF = dof.Size();
+    DOF = new ID(numDOF);
+    if (DOF == 0)  {
         opserr << "ESNoTransformation::ESNoTransformation()"
-            << " - failed to creat direction array\n";
+            << " - failed to create DOF array\n";
         exit(OF_ReturnType_failed);
     }
     
-    // initialize directions and check for valid values
-    (*direction) = dir;
-    for (int i=0; i<numDir; i++)  {
-        if ((*direction)(i) < 0 || (*direction)(i) >= sizeT ||
-            (*direction)(i) >= sizeO)  {
+    // initialize DOFs and check for valid values
+    (*DOF) = dof;
+    for (int i=0; i<numDOF; i++)  {
+        if ((*DOF)(i) < 0 || (*DOF)(i) >= sizeT ||
+            (*DOF)(i) >= sizeO)  {
             opserr << "ESNoTransformation::ESNoTransformation()"
-                << " - direction ID out of bound:"
-                << (*direction)(i) << endln;
+                << " - DOF ID out of bound:"
+                << (*DOF)(i) << endln;
             exit(OF_ReturnType_failed);
         }
     }
-
+    
     // call setup method
     this->setup();
 }
 
 
 ESNoTransformation::ESNoTransformation(const ESNoTransformation& es)
-	: ExperimentalSetup(es),
-    direction(0)
+    : ExperimentalSetup(es),
+    DOF(0)
 {
-    numDir = es.numDir;
-    direction = new ID(numDir);
-    if (!direction)  {
+    numDOF = es.numDOF;
+    DOF = new ID(numDOF);
+    if (!DOF)  {
         opserr << "ESNoTransformation::ESNoTransformation()"
-            << " - failed to creat direction array\n";
+            << " - failed to create DOF array\n";
         exit(OF_ReturnType_failed);
     }
-    *direction = *(es.direction);
+    *DOF = *(es.DOF);
     sizeT = es.sizeT;
     sizeO = es.sizeO;
-
+    
     // call setup method
     this->setup();
 }
@@ -88,8 +88,8 @@ ESNoTransformation::~ESNoTransformation()
 {
     // invoke the destructor on any objects created by the object
     // that the object still holds a pointer to
-    if (direction != 0 )
-        delete direction;
+    if (DOF != 0 )
+        delete DOF;
 }
 
 
@@ -106,126 +106,126 @@ int ESNoTransformation::setup()
     (*sizeOut)(OF_Resp_Time) = 1;
     
     this->setTrialOutSize();
-
+    
     // setup the ctrl/daq vectors
     sizeCtrl->Zero();
     sizeDaq->Zero();
     for (int i=0; i<OF_Resp_Time; i++)  {
-        (*sizeCtrl)(i) = numDir;
-        (*sizeDaq)(i) = numDir;
+        (*sizeCtrl)(i) = numDOF;
+        (*sizeDaq)(i) = numDOF;
     }
     (*sizeCtrl)(OF_Resp_Time) = 1;
     (*sizeDaq)(OF_Resp_Time) = 1;
     
     this->setCtrlDaqSize();
-
-	return OF_ReturnType_completed;
+    
+    return OF_ReturnType_completed;
 }
 
 
 ExperimentalSetup* ESNoTransformation::getCopy()
 {
-	ESNoTransformation *theCopy = new ESNoTransformation(*this);
-
-	return theCopy;
+    ESNoTransformation *theCopy = new ESNoTransformation(*this);
+    
+    return theCopy;
 }
 
 
 void ESNoTransformation::Print(OPS_Stream &s, int flag)
 {
-	s << "ExperimentalSetup: " << this->getTag(); 
-	s << " type: ESNoTransformation\n";
-    s << " dir: " << (*direction) << endln;
-	if (theControl != 0)  {
-		s << "\tExperimentalControl tag: " << theControl->getTag();
-		s << *theControl;
+    s << "ExperimentalSetup: " << this->getTag(); 
+    s << " type: ESNoTransformation\n";
+    s << " dof: " << (*DOF) << endln;
+    if (theControl != 0)  {
+        s << "\tExperimentalControl tag: " << theControl->getTag();
+        s << *theControl;
     }
 }
 
 
 int ESNoTransformation::transfTrialDisp(const Vector* disp)
-{  
-    for (int i=0; i<numDir; i++)
-        (*cDisp)(i) = (*disp)((*direction)(i));
+{
+    for (int i=0; i<numDOF; i++)
+        (*cDisp)(i) = (*disp)((*DOF)(i));
     
-	return OF_ReturnType_completed;
+    return OF_ReturnType_completed;
 }
 
 
 int ESNoTransformation::transfTrialVel(const Vector* vel)
-{  
-    for (int i=0; i<numDir; i++)
-        (*cVel)(i) = (*vel)((*direction)(i));
-
-	return OF_ReturnType_completed;
+{
+    for (int i=0; i<numDOF; i++)
+        (*cVel)(i) = (*vel)((*DOF)(i));
+    
+    return OF_ReturnType_completed;
 }
 
 
 int ESNoTransformation::transfTrialAccel(const Vector* accel)
-{  
-    for (int i=0; i<numDir; i++)
-        (*cAccel)(i) = (*accel)((*direction)(i));
-
-	return OF_ReturnType_completed;
+{
+    for (int i=0; i<numDOF; i++)
+        (*cAccel)(i) = (*accel)((*DOF)(i));
+    
+    return OF_ReturnType_completed;
 }
 
 
 int ESNoTransformation::transfTrialForce(const Vector* force)
-{  
-    for (int i=0; i<numDir; i++)
-        (*cForce)(i) = (*force)((*direction)(i));
-
-	return OF_ReturnType_completed;
+{
+    for (int i=0; i<numDOF; i++)
+        (*cForce)(i) = (*force)((*DOF)(i));
+    
+    return OF_ReturnType_completed;
 }
 
 
 int ESNoTransformation::transfTrialTime(const Vector* time)
 {
-	*cTime = *time;
-
-	return OF_ReturnType_completed;
+    *cTime = *time;
+    
+    return OF_ReturnType_completed;
 }
 
 
 int ESNoTransformation::transfDaqDisp(Vector* disp)
-{  
-    for (int i=0; i<numDir; i++)
-	    (*disp)((*direction)(i)) = (*dDisp)(i);
-
-	return OF_ReturnType_completed;
+{
+    for (int i=0; i<numDOF; i++)
+        (*disp)((*DOF)(i)) = (*dDisp)(i);
+    
+    return OF_ReturnType_completed;
 }
 
 
 int ESNoTransformation::transfDaqVel(Vector* vel)
-{  
-    for (int i=0; i<numDir; i++)
-	    (*vel)((*direction)(i)) = (*dVel)(i);
-
-	return OF_ReturnType_completed;
+{
+    for (int i=0; i<numDOF; i++)
+        (*vel)((*DOF)(i)) = (*dVel)(i);
+    
+    return OF_ReturnType_completed;
 }
 
 
 int ESNoTransformation::transfDaqAccel(Vector* accel)
-{  
-    for (int i=0; i<numDir; i++)
-	    (*accel)((*direction)(i)) = (*dAccel)(i);
-
-	return OF_ReturnType_completed;
+{
+    for (int i=0; i<numDOF; i++)
+        (*accel)((*DOF)(i)) = (*dAccel)(i);
+    
+    return OF_ReturnType_completed;
 }
 
 
 int ESNoTransformation::transfDaqForce(Vector* force)
-{  
-    for (int i=0; i<numDir; i++)
-	    (*force)((*direction)(i)) = (*dForce)(i);
-
-	return OF_ReturnType_completed;
+{
+    for (int i=0; i<numDOF; i++)
+        (*force)((*DOF)(i)) = (*dForce)(i);
+    
+    return OF_ReturnType_completed;
 }
 
 
 int ESNoTransformation::transfDaqTime(Vector* time)
-{  
-	*time = *dTime;
-
-	return OF_ReturnType_completed;
+{
+    *time = *dTime;
+    
+    return OF_ReturnType_completed;
 }
