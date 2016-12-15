@@ -734,9 +734,12 @@ int EEGeneric::recvSelf(int commitTag, Channel &theChannel,
 
 
 int EEGeneric::displaySelf(Renderer &theViewer,
-    int displayMode, float fact)
+    int displayMode, float fact, const char **modes, int numMode)
 {
     int rValue = 0, i, j;
+    
+    static Vector v1(3);
+    static Vector v2(3);
     
     if (numExternalNodes > 1)  {
         if (displayMode >= 0)  {
@@ -750,14 +753,12 @@ int EEGeneric::displaySelf(Renderer &theViewer,
                 int end1NumCrds = end1Crd.Size();
                 int end2NumCrds = end2Crd.Size();
                 
-                static Vector v1(3), v2(3);
-                
                 for (j=0; j<end1NumCrds; j++)
                     v1(j) = end1Crd(j) + end1Disp(j)*fact;
                 for (j=0; j<end2NumCrds; j++)
                     v2(j) = end2Crd(j) + end2Disp(j)*fact;
                 
-                rValue += theViewer.drawLine(v1, v2, 1.0, 1.0);
+                rValue += theViewer.drawLine(v1, v2, 1.0, 1.0, this->getTag(), 0);
             }
         } else  {
             int mode = displayMode * -1;
@@ -771,8 +772,6 @@ int EEGeneric::displaySelf(Renderer &theViewer,
                 int end1NumCrds = end1Crd.Size();
                 int end2NumCrds = end2Crd.Size();
                 
-                static Vector v1(3), v2(3);
-                
                 if (eigen1.noCols() >= mode)  {
                     for (j=0; j<end1NumCrds; j++)
                         v1(j) = end1Crd(j) + eigen1(j,mode-1)*fact;
@@ -785,7 +784,7 @@ int EEGeneric::displaySelf(Renderer &theViewer,
                         v2(j) = end2Crd(j);
                 }
                 
-                rValue += theViewer.drawLine(v1, v2, 1.0, 1.0);
+                rValue += theViewer.drawLine(v1, v2, 1.0, 1.0, this->getTag(), 0);
             }
         }
     }
