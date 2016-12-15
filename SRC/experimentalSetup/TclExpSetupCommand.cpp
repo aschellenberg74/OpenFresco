@@ -157,7 +157,7 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp,
             argi++;
         }
         // now read the DOF IDs
-        if (strcmp(argv[argi],"-dof") != 0 || strcmp(argv[argi],"-dir") != 0)  {
+        if (strcmp(argv[argi],"-dof") != 0 && strcmp(argv[argi],"-dir") != 0)  {
             opserr << "WARNING expecting -dof DOFs\n";
             opserr << "expSetup NoTransformation " << tag << endln;
             return TCL_ERROR;
