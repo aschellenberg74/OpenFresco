@@ -68,8 +68,8 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
 {
     // make sure there is a minimum number of arguments
     if (argc < 2)  {
-		opserr << "WARNING insufficient number of experimental recorder arguments\n";
-		opserr << "Want: expRecorder type <specific recorder args>\n";
+        opserr << "WARNING insufficient number of experimental recorder arguments\n";
+        opserr << "Want: expRecorder type <specific recorder args>\n";
         return TCL_ERROR;
     }
     
@@ -85,7 +85,7 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         ID *siteTags = 0;
         ExperimentalSite **theSites = 0;
         bool echoTime = false;
-        outputMode eMode = STANDARD_STREAM; 
+        outputMode eMode = STANDARD_STREAM;
         double deltaT = 0.0;
         int precision = 6;
         bool doScientific = false;
@@ -95,7 +95,7 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         int i, j, argi = 2;
         int flags = 0;
         int sizeData = 0;
-
+        
         while (flags == 0 && argi < argc)  {
             
             if (strcmp(argv[argi],"-site") == 0)  {
@@ -157,19 +157,19 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
                 for (i=start; i<=end; i++)
                     (*siteTags)[numSites++] = i;
                 argi += 3;
-            } 
+            }
             
-            else if ((strcmp(argv[argi],"-time") == 0) || (strcmp(argv[argi],"-load") == 0))  { 
+            else if ((strcmp(argv[argi],"-time") == 0) || (strcmp(argv[argi],"-load") == 0))  {
                 echoTime = true;
                 argi++;
-            } 
+            }
             
             else if ((strcmp(argv[argi],"-dT") == 0) || (strcmp(argv[argi],"-dt") == 0))  {
                 argi++;
                 if (Tcl_GetDouble(interp, argv[argi], &deltaT) != TCL_OK)
                     return TCL_ERROR;
                 argi++;
-            } 
+            }
             
             else if (strcmp(argv[argi],"-precision") == 0)  {
                 argi++;
@@ -210,7 +210,7 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
                 theSimulationInfo->addOutputFile(fileName,pwd);
                 eMode = XML_STREAM;
                 argi += 2;
-            }	    
+            }
             
             else if ((strcmp(argv[argi],"-binary") == 0))  {
                 fileName = argv[argi+1];
@@ -218,7 +218,7 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
                 theSimulationInfo->addOutputFile(fileName,pwd);
                 eMode = BINARY_STREAM;
                 argi += 2;
-            }	    
+            }
             
             else if ((strcmp(argv[argi],"-tcp") == 0) || (strcmp(argv[argi],"-TCP") == 0))  {
                 inetAddr = argv[argi+1];
@@ -226,7 +226,7 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
                     return TCL_ERROR;
                 eMode = TCP_STREAM;
                 argi += 3;
-            }	    
+            }
             
             else if (strcmp(argv[argi],"-database") == 0)  {
                 theRecorderDatabase = OPS_GetFEDatastore();
@@ -260,13 +260,13 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         if (eMode == DATA_STREAM && fileName != 0)  {
             theOutputStream = new DataFileStream(fileName, OVERWRITE, 2, 0, closeOnWrite, precision, doScientific);
         } else if (eMode == DATA_STREAM_CSV && fileName != 0)  {
-	        theOutputStream = new DataFileStream(fileName, OVERWRITE, 2, 1, closeOnWrite, precision, doScientific);
+            theOutputStream = new DataFileStream(fileName, OVERWRITE, 2, 1, closeOnWrite, precision, doScientific);
         } else if (eMode == XML_STREAM && fileName != 0)  {
             theOutputStream = new XmlFileStream(fileName);
         } else if (eMode == BINARY_STREAM && fileName != 0)  {
             theOutputStream = new BinaryFileStream(fileName);
         } else if (eMode == TCP_STREAM && inetAddr != 0)  {
-	        theOutputStream = new TCP_Stream(inetPort, inetAddr);
+            theOutputStream = new TCP_Stream(inetPort, inetAddr);
         } else if (eMode == DATABASE_STREAM && tableName != 0)  {
             theOutputStream = new DatabaseStream(OPS_GetFEDatastore(), tableName);
         } else
@@ -278,17 +278,17 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         // construct array of experimental sites
         theSites = new ExperimentalSite* [numSites];
         if (theSites == 0)  {
-		    opserr << "WARNING out of memory creating experimental site recorder\n";
-		    return TCL_ERROR;
-	    }
+            opserr << "WARNING out of memory creating experimental site recorder\n";
+            return TCL_ERROR;
+        }
         for (int i=0; i<numSites; i++)  {
             theSites[i] = getExperimentalSite((*siteTags)(i));
             if (theSites[i] == 0)  {
-		        opserr << "WARNING experimental site with tag "
+                opserr << "WARNING experimental site with tag "
                     << (*siteTags)(i) << " not found\n";
-		        return TCL_ERROR;
+                return TCL_ERROR;
             }
-	    }
+        }
         
         // now create the ExpSiteRecorder
         (*theRecorder) = new ExpSiteRecorder(numSites, theSites, data, sizeData, echoTime, *theOutputStream, deltaT);
@@ -305,7 +305,7 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         ID *setupTags = 0;
         ExperimentalSetup **theSetups = 0;
         bool echoTime = false;
-        outputMode eMode = STANDARD_STREAM; 
+        outputMode eMode = STANDARD_STREAM;
         double deltaT = 0.0;
         int precision = 6;
         bool doScientific = false;
@@ -315,7 +315,7 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         int i, j, argi = 2;
         int flags = 0;
         int sizeData = 0;
-
+        
         while (flags == 0 && argi < argc)  {
             
             if (strcmp(argv[argi],"-setup") == 0)  {
@@ -358,43 +358,43 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
                 if (Tcl_GetInt(interp, argv[argi+1], &start) != TCL_OK)  {
                     opserr << "WARNING expRecorder Setup -setupRange start end - invalid start " << argv[argi+1] << endln;
                     return TCL_ERROR;
-                }      
+                }
                 if (Tcl_GetInt(interp, argv[argi+2], &end) != TCL_OK)  {
                     opserr << "WARNING expRecorder Setup -setupRange start end - invalid end " << argv[argi+2] << endln;
                     return TCL_ERROR;
-                }      
+                }
                 if (start > end)  {
                     int swap = end;
                     end = start;
                     start = swap;
                 }
                 
-                setupTags = new ID(end-start);	  
+                setupTags = new ID(end-start);
                 if (setupTags == 0)  {
                     opserr << "WARNING expRecorder Setup -setupRange start end - out of memory\n";
                     return TCL_ERROR;
                 }
                 for (i=start; i<=end; i++)
-                    (*setupTags)[numSetups++] = i;	    
+                    (*setupTags)[numSetups++] = i;
                 argi += 3;
-            } 
+            }
             
-            else if ((strcmp(argv[argi],"-time") == 0) || (strcmp(argv[argi],"-load") == 0))  { 
+            else if ((strcmp(argv[argi],"-time") == 0) || (strcmp(argv[argi],"-load") == 0))  {
                 echoTime = true;
                 argi++;
-            } 
+            }
             
             else if ((strcmp(argv[argi],"-dT") == 0) || (strcmp(argv[argi],"-dt") == 0))  {
                 argi++;
-                if (Tcl_GetDouble(interp, argv[argi], &deltaT) != TCL_OK)	
-                    return TCL_ERROR;	
+                if (Tcl_GetDouble(interp, argv[argi], &deltaT) != TCL_OK)
+                    return TCL_ERROR;
                 argi++;
-            } 
+            }
             
             else if (strcmp(argv[argi],"-precision") == 0)  {
                 argi++;
-                if (Tcl_GetInt(interp, argv[argi], &precision) != TCL_OK)	
-                    return TCL_ERROR;		  
+                if (Tcl_GetInt(interp, argv[argi], &precision) != TCL_OK)
+                    return TCL_ERROR;
                 argi++;
             }
             
@@ -430,7 +430,7 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
                 theSimulationInfo->addOutputFile(fileName,pwd);
                 eMode = XML_STREAM;
                 argi += 2;
-            }	    
+            }
             
             else if ((strcmp(argv[argi],"-binary") == 0))  {
                 fileName = argv[argi+1];
@@ -438,7 +438,7 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
                 theSimulationInfo->addOutputFile(fileName,pwd);
                 eMode = BINARY_STREAM;
                 argi += 2;
-            }	    
+            }
             
             else if ((strcmp(argv[argi],"-tcp") == 0) || (strcmp(argv[argi],"-TCP") == 0))  {
                 inetAddr = argv[argi+1];
@@ -446,7 +446,7 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
                     return TCL_ERROR;
                 eMode = TCP_STREAM;
                 argi += 3;
-            }	    
+            }
             
             else if (strcmp(argv[argi],"-database") == 0)  {
                 theRecorderDatabase = OPS_GetFEDatastore();
@@ -461,7 +461,7 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
             }
             
             else  {
-                // first unknown string then is assumed to start 
+                // first unknown string then is assumed to start
                 // experimental setup response requests
                 sizeData = argc-argi;
                 flags = 1;
@@ -480,13 +480,13 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         if (eMode == DATA_STREAM && fileName != 0)  {
             theOutputStream = new DataFileStream(fileName, OVERWRITE, 2, 0, closeOnWrite, precision, doScientific);
         } else if (eMode == DATA_STREAM_CSV && fileName != 0)  {
-	        theOutputStream = new DataFileStream(fileName, OVERWRITE, 2, 1, closeOnWrite, precision, doScientific);
+            theOutputStream = new DataFileStream(fileName, OVERWRITE, 2, 1, closeOnWrite, precision, doScientific);
         } else if (eMode == XML_STREAM && fileName != 0)  {
             theOutputStream = new XmlFileStream(fileName);
         } else if (eMode == BINARY_STREAM && fileName != 0)  {
             theOutputStream = new BinaryFileStream(fileName);
         } else if (eMode == TCP_STREAM && inetAddr != 0)  {
-	        theOutputStream = new TCP_Stream(inetPort, inetAddr);
+            theOutputStream = new TCP_Stream(inetPort, inetAddr);
         } else if (eMode == DATABASE_STREAM && tableName != 0)  {
             theOutputStream = new DatabaseStream(OPS_GetFEDatastore(), tableName);
         } else
@@ -498,17 +498,17 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         // construct array of experimental setups
         theSetups = new ExperimentalSetup* [numSetups];
         if (theSetups == 0)  {
-		    opserr << "WARNING out of memory creating experimental setup recorder\n";
-		    return TCL_ERROR;
-	    }
+            opserr << "WARNING out of memory creating experimental setup recorder\n";
+            return TCL_ERROR;
+        }
         for (int i=0; i<numSetups; i++)  {
             theSetups[i] = getExperimentalSetup((*setupTags)(i));
             if (theSetups[i] == 0)  {
-		        opserr << "WARNING experimental setup with tag "
+                opserr << "WARNING experimental setup with tag "
                     << (*setupTags)(i) << " not found\n";
-		        return TCL_ERROR;
+                return TCL_ERROR;
             }
-	    }
+        }
         
         // now create the ExpSetupRecorder
         (*theRecorder) = new ExpSetupRecorder(numSetups, theSetups, data, sizeData, echoTime, *theOutputStream, deltaT);
@@ -525,7 +525,7 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         ID *controlTags = 0;
         ExperimentalControl **theControls = 0;
         bool echoTime = false;
-        outputMode eMode = STANDARD_STREAM; 
+        outputMode eMode = STANDARD_STREAM;
         double deltaT = 0.0;
         int precision = 6;
         bool doScientific = false;
@@ -535,7 +535,7 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         int i, j, argi = 2;
         int flags = 0;
         int sizeData = 0;
-
+        
         while (flags == 0 && argi < argc)  {
             
             if (strcmp(argv[argi],"-control") == 0)  {
@@ -578,43 +578,43 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
                 if (Tcl_GetInt(interp, argv[argi+1], &start) != TCL_OK)  {
                     opserr << "WARNING expRecorder Control -controlRange start end - invalid start " << argv[argi+1] << endln;
                     return TCL_ERROR;
-                }      
+                }
                 if (Tcl_GetInt(interp, argv[argi+2], &end) != TCL_OK)  {
                     opserr << "WARNING expRecorder Control -controlRange start end - invalid end " << argv[argi+2] << endln;
                     return TCL_ERROR;
-                }      
+                }
                 if (start > end)  {
                     int swap = end;
                     end = start;
                     start = swap;
                 }
                 
-                controlTags = new ID(end-start);	  
+                controlTags = new ID(end-start);
                 if (controlTags == 0)  {
                     opserr << "WARNING expRecorder Control -controlRange start end - out of memory\n";
                     return TCL_ERROR;
                 }
                 for (i=start; i<=end; i++)
-                    (*controlTags)[numControls++] = i;	    
+                    (*controlTags)[numControls++] = i;
                 argi += 3;
-            } 
+            }
             
-            else if ((strcmp(argv[argi],"-time") == 0) || (strcmp(argv[argi],"-load") == 0))  { 
+            else if ((strcmp(argv[argi],"-time") == 0) || (strcmp(argv[argi],"-load") == 0))  {
                 echoTime = true;
                 argi++;
-            } 
+            }
             
             else if ((strcmp(argv[argi],"-dT") == 0) || (strcmp(argv[argi],"-dt") == 0))  {
                 argi++;
-                if (Tcl_GetDouble(interp, argv[argi], &deltaT) != TCL_OK)	
-                    return TCL_ERROR;	
+                if (Tcl_GetDouble(interp, argv[argi], &deltaT) != TCL_OK)
+                    return TCL_ERROR;
                 argi++;
-            } 
+            }
             
             else if (strcmp(argv[argi],"-precision") == 0)  {
                 argi++;
-                if (Tcl_GetInt(interp, argv[argi], &precision) != TCL_OK)	
-                    return TCL_ERROR;		  
+                if (Tcl_GetInt(interp, argv[argi], &precision) != TCL_OK)
+                    return TCL_ERROR;
                 argi++;
             }
             
@@ -650,7 +650,7 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
                 theSimulationInfo->addOutputFile(fileName,pwd);
                 eMode = XML_STREAM;
                 argi += 2;
-            }	    
+            }
             
             else if ((strcmp(argv[argi],"-binary") == 0))  {
                 fileName = argv[argi+1];
@@ -658,7 +658,7 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
                 theSimulationInfo->addOutputFile(fileName,pwd);
                 eMode = BINARY_STREAM;
                 argi += 2;
-            }	    
+            }
             
             else if ((strcmp(argv[argi],"-tcp") == 0) || (strcmp(argv[argi],"-TCP") == 0))  {
                 inetAddr = argv[argi+1];
@@ -666,7 +666,7 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
                     return TCL_ERROR;
                 eMode = TCP_STREAM;
                 argi += 3;
-            }	    
+            }
             
             else if (strcmp(argv[argi],"-database") == 0)  {
                 theRecorderDatabase = OPS_GetFEDatastore();
@@ -681,7 +681,7 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
             }
             
             else  {
-                // first unknown string then is assumed to start 
+                // first unknown string then is assumed to start
                 // experimental control response requests
                 sizeData = argc-argi;
                 flags = 1;
@@ -700,13 +700,13 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         if (eMode == DATA_STREAM && fileName != 0)  {
             theOutputStream = new DataFileStream(fileName, OVERWRITE, 2, 0, closeOnWrite, precision, doScientific);
         } else if (eMode == DATA_STREAM_CSV && fileName != 0)  {
-	        theOutputStream = new DataFileStream(fileName, OVERWRITE, 2, 1, closeOnWrite, precision, doScientific);
+            theOutputStream = new DataFileStream(fileName, OVERWRITE, 2, 1, closeOnWrite, precision, doScientific);
         } else if (eMode == XML_STREAM && fileName != 0)  {
             theOutputStream = new XmlFileStream(fileName);
         } else if (eMode == BINARY_STREAM && fileName != 0)  {
             theOutputStream = new BinaryFileStream(fileName);
         } else if (eMode == TCP_STREAM && inetAddr != 0)  {
-	        theOutputStream = new TCP_Stream(inetPort, inetAddr);
+            theOutputStream = new TCP_Stream(inetPort, inetAddr);
         } else if (eMode == DATABASE_STREAM && tableName != 0)  {
             theOutputStream = new DatabaseStream(OPS_GetFEDatastore(), tableName);
         } else
@@ -718,17 +718,17 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         // construct array of experimental controls
         theControls = new ExperimentalControl* [numControls];
         if (theControls == 0)  {
-		    opserr << "WARNING out of memory creating experimental control recorder\n";
-		    return TCL_ERROR;
-	    }
+            opserr << "WARNING out of memory creating experimental control recorder\n";
+            return TCL_ERROR;
+        }
         for (int i=0; i<numControls; i++)  {
             theControls[i] = getExperimentalControl((*controlTags)(i));
             if (theControls[i] == 0)  {
-		        opserr << "WARNING experimental control with tag "
+                opserr << "WARNING experimental control with tag "
                     << (*controlTags)(i) << " not found\n";
-		        return TCL_ERROR;
+                return TCL_ERROR;
             }
-	    }
+        }
         
         // now create the ExpControlRecorder
         (*theRecorder) = new ExpControlRecorder(numControls, theControls, data, sizeData, echoTime, *theOutputStream, deltaT);
@@ -745,7 +745,7 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         ID *filterTags = 0;
         ExperimentalSignalFilter **theFilters = 0;
         bool echoTime = false;
-        outputMode eMode = STANDARD_STREAM; 
+        outputMode eMode = STANDARD_STREAM;
         double deltaT = 0.0;
         int precision = 6;
         bool doScientific = false;
@@ -755,7 +755,7 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         int i, j, argi = 2;
         int flags = 0;
         int sizeData = 0;
-
+        
         while (flags == 0 && argi < argc)  {
             
             if (strcmp(argv[argi],"-filter") == 0)  {
@@ -798,43 +798,43 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
                 if (Tcl_GetInt(interp, argv[argi+1], &start) != TCL_OK)  {
                     opserr << "WARNING expRecorder SignalFilter -filterRange start end - invalid start " << argv[argi+1] << endln;
                     return TCL_ERROR;
-                }      
+                }
                 if (Tcl_GetInt(interp, argv[argi+2], &end) != TCL_OK)  {
                     opserr << "WARNING expRecorder SignalFilter -filterRange start end - invalid end " << argv[argi+2] << endln;
                     return TCL_ERROR;
-                }      
+                }
                 if (start > end)  {
                     int swap = end;
                     end = start;
                     start = swap;
                 }
                 
-                filterTags = new ID(end-start);	  
+                filterTags = new ID(end-start);
                 if (filterTags == 0)  {
                     opserr << "WARNING expRecorder SignalFilter -filterRange start end - out of memory\n";
                     return TCL_ERROR;
                 }
                 for (i=start; i<=end; i++)
-                    (*filterTags)[numFilters++] = i;	    
+                    (*filterTags)[numFilters++] = i;
                 argi += 3;
-            } 
+            }
             
-            else if ((strcmp(argv[argi],"-time") == 0) || (strcmp(argv[argi],"-load") == 0))  { 
+            else if ((strcmp(argv[argi],"-time") == 0) || (strcmp(argv[argi],"-load") == 0))  {
                 echoTime = true;
                 argi++;
-            } 
+            }
             
             else if ((strcmp(argv[argi],"-dT") == 0) || (strcmp(argv[argi],"-dt") == 0))  {
                 argi++;
-                if (Tcl_GetDouble(interp, argv[argi], &deltaT) != TCL_OK)	
-                    return TCL_ERROR;	
+                if (Tcl_GetDouble(interp, argv[argi], &deltaT) != TCL_OK)
+                    return TCL_ERROR;
                 argi++;
-            } 
+            }
             
             else if (strcmp(argv[argi],"-precision") == 0)  {
                 argi++;
-                if (Tcl_GetInt(interp, argv[argi], &precision) != TCL_OK)	
-                    return TCL_ERROR;		  
+                if (Tcl_GetInt(interp, argv[argi], &precision) != TCL_OK)
+                    return TCL_ERROR;
                 argi++;
             }
             
@@ -870,7 +870,7 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
                 theSimulationInfo->addOutputFile(fileName,pwd);
                 eMode = XML_STREAM;
                 argi += 2;
-            }	    
+            }
             
             else if ((strcmp(argv[argi],"-binary") == 0))  {
                 fileName = argv[argi+1];
@@ -878,7 +878,7 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
                 theSimulationInfo->addOutputFile(fileName,pwd);
                 eMode = BINARY_STREAM;
                 argi += 2;
-            }	    
+            }
             
             else if ((strcmp(argv[argi],"-tcp") == 0) || (strcmp(argv[argi],"-TCP") == 0))  {
                 inetAddr = argv[argi+1];
@@ -886,7 +886,7 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
                     return TCL_ERROR;
                 eMode = TCP_STREAM;
                 argi += 3;
-            }	    
+            }
             
             else if (strcmp(argv[argi],"-database") == 0)  {
                 theRecorderDatabase = OPS_GetFEDatastore();
@@ -901,7 +901,7 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
             }
             
             else  {
-                // first unknown string then is assumed to start 
+                // first unknown string then is assumed to start
                 // experimental signal filter response requests
                 sizeData = argc-argi;
                 flags = 1;
@@ -920,13 +920,13 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         if (eMode == DATA_STREAM && fileName != 0)  {
             theOutputStream = new DataFileStream(fileName, OVERWRITE, 2, 0, closeOnWrite, precision, doScientific);
         } else if (eMode == DATA_STREAM_CSV && fileName != 0)  {
-	        theOutputStream = new DataFileStream(fileName, OVERWRITE, 2, 1, closeOnWrite, precision, doScientific);
+            theOutputStream = new DataFileStream(fileName, OVERWRITE, 2, 1, closeOnWrite, precision, doScientific);
         } else if (eMode == XML_STREAM && fileName != 0)  {
             theOutputStream = new XmlFileStream(fileName);
         } else if (eMode == BINARY_STREAM && fileName != 0)  {
             theOutputStream = new BinaryFileStream(fileName);
         } else if (eMode == TCP_STREAM && inetAddr != 0)  {
-	        theOutputStream = new TCP_Stream(inetPort, inetAddr);
+            theOutputStream = new TCP_Stream(inetPort, inetAddr);
         } else if (eMode == DATABASE_STREAM && tableName != 0)  {
             theOutputStream = new DatabaseStream(OPS_GetFEDatastore(), tableName);
         } else
@@ -938,17 +938,17 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         // construct array of experimental signal filters
         theFilters = new ExperimentalSignalFilter* [numFilters];
         if (theFilters == 0)  {
-		    opserr << "WARNING out of memory creating experimental signal filter recorder\n";
-		    return TCL_ERROR;
-	    }
+            opserr << "WARNING out of memory creating experimental signal filter recorder\n";
+            return TCL_ERROR;
+        }
         for (int i=0; i<numFilters; i++)  {
             theFilters[i] = getExperimentalSignalFilter((*filterTags)(i));
             if (theFilters[i] == 0)  {
-		        opserr << "WARNING experimental signal filter with tag "
+                opserr << "WARNING experimental signal filter with tag "
                     << (*filterTags)(i) << " not found\n";
-		        return TCL_ERROR;
+                return TCL_ERROR;
             }
-	    }
+        }
         
         // now create the ExpSignalFilterRecorder
         (*theRecorder) = new ExpSignalFilterRecorder(numFilters, theFilters, data, sizeData, echoTime, *theOutputStream, deltaT);
@@ -965,7 +965,7 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         ID *tangStifTags = 0;
         ExperimentalTangentStiff **theTangStiffs = 0;
         bool echoTime = false;
-        outputMode eMode = STANDARD_STREAM; 
+        outputMode eMode = STANDARD_STREAM;
         double deltaT = 0.0;
         int precision = 6;
         bool doScientific = false;
@@ -975,7 +975,7 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         int i, j, argi = 2;
         int flags = 0;
         int sizeData = 0;
-
+        
         while (flags == 0 && argi < argc)  {
             
             if (strcmp(argv[argi],"-tangStif") == 0)  {
@@ -1029,32 +1029,32 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
                     start = swap;
                 }
                 
-                tangStifTags = new ID(end-start);	  
+                tangStifTags = new ID(end-start);
                 if (tangStifTags == 0)  {
                     opserr << "WARNING expRecorder TangentStiff -tangStifRange start end - out of memory\n";
                     return TCL_ERROR;
                 }
                 for (i=start; i<=end; i++)
-                    (*tangStifTags)[numTangStif++] = i;	    
+                    (*tangStifTags)[numTangStif++] = i;
                 argi += 3;
-            } 
+            }
             
-            else if ((strcmp(argv[argi],"-time") == 0) || (strcmp(argv[argi],"-load") == 0))  { 
+            else if ((strcmp(argv[argi],"-time") == 0) || (strcmp(argv[argi],"-load") == 0))  {
                 echoTime = true;
                 argi++;
-            } 
+            }
             
             else if ((strcmp(argv[argi],"-dT") == 0) || (strcmp(argv[argi],"-dt") == 0))  {
                 argi++;
-                if (Tcl_GetDouble(interp, argv[argi], &deltaT) != TCL_OK)	
-                    return TCL_ERROR;	
+                if (Tcl_GetDouble(interp, argv[argi], &deltaT) != TCL_OK)
+                    return TCL_ERROR;
                 argi++;
-            } 
+            }
             
             else if (strcmp(argv[argi],"-precision") == 0)  {
                 argi++;
-                if (Tcl_GetInt(interp, argv[argi], &precision) != TCL_OK)	
-                    return TCL_ERROR;		  
+                if (Tcl_GetInt(interp, argv[argi], &precision) != TCL_OK)
+                    return TCL_ERROR;
                 argi++;
             }
             
@@ -1090,7 +1090,7 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
                 theSimulationInfo->addOutputFile(fileName,pwd);
                 eMode = XML_STREAM;
                 argi += 2;
-            }	    
+            }
             
             else if ((strcmp(argv[argi],"-binary") == 0))  {
                 fileName = argv[argi+1];
@@ -1098,7 +1098,7 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
                 theSimulationInfo->addOutputFile(fileName,pwd);
                 eMode = BINARY_STREAM;
                 argi += 2;
-            }	    
+            }
             
             else if ((strcmp(argv[argi],"-tcp") == 0) || (strcmp(argv[argi],"-TCP") == 0))  {
                 inetAddr = argv[argi+1];
@@ -1106,7 +1106,7 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
                     return TCL_ERROR;
                 eMode = TCP_STREAM;
                 argi += 3;
-            }	    
+            }
             
             else if (strcmp(argv[argi],"-database") == 0)  {
                 theRecorderDatabase = OPS_GetFEDatastore();
@@ -1121,7 +1121,7 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
             }
             
             else  {
-                // first unknown string then is assumed to start 
+                // first unknown string then is assumed to start
                 // experimental tangent stiffness response requests
                 sizeData = argc-argi;
                 flags = 1;
@@ -1140,13 +1140,13 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         if (eMode == DATA_STREAM && fileName != 0)  {
             theOutputStream = new DataFileStream(fileName, OVERWRITE, 2, 0, closeOnWrite, precision, doScientific);
         } else if (eMode == DATA_STREAM_CSV && fileName != 0)  {
-	        theOutputStream = new DataFileStream(fileName, OVERWRITE, 2, 1, closeOnWrite, precision, doScientific);
+            theOutputStream = new DataFileStream(fileName, OVERWRITE, 2, 1, closeOnWrite, precision, doScientific);
         } else if (eMode == XML_STREAM && fileName != 0)  {
             theOutputStream = new XmlFileStream(fileName);
         } else if (eMode == BINARY_STREAM && fileName != 0)  {
             theOutputStream = new BinaryFileStream(fileName);
         } else if (eMode == TCP_STREAM && inetAddr != 0)  {
-	        theOutputStream = new TCP_Stream(inetPort, inetAddr);
+            theOutputStream = new TCP_Stream(inetPort, inetAddr);
         } else if (eMode == DATABASE_STREAM && tableName != 0)  {
             theOutputStream = new DatabaseStream(OPS_GetFEDatastore(), tableName);
         } else
@@ -1158,17 +1158,17 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         // construct array of experimental tangent stiffnesses
         theTangStiffs = new ExperimentalTangentStiff* [numTangStif];
         if (theTangStiffs == 0)  {
-		    opserr << "WARNING out of memory creating experimental tangent stiffness recorder\n";
-		    return TCL_ERROR;
-	    }
+            opserr << "WARNING out of memory creating experimental tangent stiffness recorder\n";
+            return TCL_ERROR;
+        }
         for (int i=0; i<numTangStif; i++)  {
             theTangStiffs[i] = getExperimentalTangentStiff((*tangStifTags)(i));
             if (theTangStiffs[i] == 0)  {
-		        opserr << "WARNING experimental tangent stiffness with tag "
+                opserr << "WARNING experimental tangent stiffness with tag "
                     << (*tangStifTags)(i) << " not found\n";
-		        return TCL_ERROR;
+                return TCL_ERROR;
             }
-	    }
+        }
         
         // now create the ExpTangentStiffRecorder
         (*theRecorder) = new ExpTangentStiffRecorder(numTangStif, theTangStiffs, data, sizeData, echoTime, *theOutputStream, deltaT);
@@ -1184,7 +1184,7 @@ int TclCreateExpRecorder(ClientData clientData, Tcl_Interp *interp, int argc,
         opserr << "WARNING no recorder exists ";
         opserr << "for recorder of type:" << argv[1];
         return TCL_ERROR;
-    }    
+    }
     
     // check we instantiated a recorder .. if not ran out of memory
     if ((*theRecorder) == 0)  {
@@ -1219,6 +1219,54 @@ int TclAddExpRecorder(ClientData clientData, Tcl_Interp *interp,
         
         int recorderTag = theRecorder->getTag();
         sprintf(interp->result,"%d",recorderTag);
+    }
+    
+    return TCL_OK;
+}
+
+
+int TclRemoveExpRecorder(ClientData clientData, Tcl_Interp *interp,
+    int argc, TCL_Char **argv, Domain *theDomain)
+{
+    ExperimentalSite *theSite = getExperimentalSiteFirst();
+    if (theSite == 0)  {
+        opserr << "WARNING failed to get first experimental site\n";
+        return TCL_ERROR;
+    }
+    
+    if (strcmp(argv[1],"recorder") == 0)  {
+        int tag;
+        if (Tcl_GetInt(interp, argv[2], &tag) != TCL_OK)  {
+            opserr << "WARNING removeExp recorder tag? failed to read tag: " << argv[2] << endln;
+            return TCL_ERROR;
+        }
+        if ((theSite->removeRecorder(tag)) < 0)  {
+            opserr << "WARNING could not remove expRecorder with tag " << argv[2] << endln;
+            return TCL_ERROR;
+        }
+    }
+    else if (strcmp(argv[1],"recorders") == 0)  {
+        if ((theSite->removeRecorders()) < 0)  {
+            opserr << "WARNING could not remove expRecorders\n";
+            return TCL_ERROR;
+        }
+    }
+    
+    return TCL_OK;
+}
+
+
+int TclExpRecord(ClientData clientData, Tcl_Interp *interp,
+    int argc, TCL_Char **argv, Domain *theDomain)
+{
+    ExperimentalSite *theSite = getExperimentalSiteFirst();
+    if (theSite == 0)  {
+        opserr << "WARNING failed to get first experimental site\n";
+        return TCL_ERROR;
+    }
+    if ((theSite->record()) < 0)  {
+        opserr << "WARNING could not record\n";
+        return TCL_ERROR;
     }
     
     return TCL_OK;

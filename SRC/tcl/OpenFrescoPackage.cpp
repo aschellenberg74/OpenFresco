@@ -127,6 +127,10 @@ int openFresco_addExperimentalElement(ClientData clientData,
 // experimental recorder commands
 extern int TclAddExpRecorder(ClientData clientData, Tcl_Interp *interp,
     int argc, TCL_Char **argv, Domain *theDomain);
+extern int TclRemoveExpRecorder(ClientData clientData, Tcl_Interp *interp,
+    int argc, TCL_Char **argv, Domain *theDomain);
+extern int TclExpRecord(ClientData clientData, Tcl_Interp *interp,
+    int argc, TCL_Char **argv, Domain *theDomain);
 
 int openFresco_addExperimentalRecorder(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
@@ -213,8 +217,33 @@ int openFresco_wipeModel(ClientData clientData,
     clearExperimentalSetups(interp);
     clearExperimentalSites(interp);
     clearExperimentalTangentStiffs(interp);
+    
+    return TCL_OK;
+}
 
-    return TCL_OK;  
+
+int openFresco_removeComp(ClientData clientData,
+    Tcl_Interp *interp, int argc, TCL_Char **argv)
+{
+    // make sure there is a minimum number of arguments
+    if (argc < 2)  {
+        opserr << "WARNING insufficient number of remove component arguments\n";
+        opserr << "Want: removeExp type <specific args>\n";
+        return TCL_ERROR;
+    }
+    
+    if (strcmp(argv[1],"recorder") == 0 || strcmp(argv[1],"recorders") == 0)  {
+        return TclRemoveExpRecorder(clientData, interp, argc, argv, theDomain);
+    }
+    
+    return TCL_OK;
+}
+
+
+int openFresco_record(ClientData clientData,
+    Tcl_Interp *interp, int argc, TCL_Char **argv)
+{
+    return TclExpRecord(clientData, interp, argc, argv, theDomain);
 }
 
 
@@ -288,7 +317,13 @@ OpenFresco(ClientData clientData, Tcl_Interp *interp, int argc,
         (ClientData)NULL, NULL);
     
     Tcl_CreateCommand(interp, "wipeExp", openFresco_wipeModel,
-        (ClientData)NULL, NULL); 
+        (ClientData)NULL, NULL);
+    
+    Tcl_CreateCommand(interp, "removeExp", openFresco_removeComp,
+        (ClientData)NULL, NULL);
+    
+    Tcl_CreateCommand(interp, "recordExp", openFresco_record,
+        (ClientData)NULL, NULL);
     
     return TCL_OK;
 }

@@ -133,13 +133,13 @@ int main(int argc, char **argv)
     */
     
 #ifndef TCL_LOCAL_APPINIT
-#define TCL_LOCAL_APPINIT Tcl_AppInit    
+#define TCL_LOCAL_APPINIT Tcl_AppInit
 #endif
     
     /* fmk - comment out the following block to get to compile 
     extern "C" int TCL_LOCAL_APPINIT _ANSI_ARGS_((Tcl_Interp *interp));
     fmk - end commented block */
-
+    
     /*
     * The following #if block allows you to change how Tcl finds the startup
     * script, prime the library or encoding paths, fiddle with the argv,
@@ -245,6 +245,10 @@ int openFresco_addExperimentalElement(ClientData clientData,
 // experimental recorder commands
 extern int TclAddExpRecorder(ClientData clientData, Tcl_Interp *interp,
     int argc, TCL_Char **argv, Domain *theDomain);
+extern int TclRemoveExpRecorder(ClientData clientData, Tcl_Interp *interp,
+    int argc, TCL_Char **argv, Domain *theDomain);
+extern int TclExpRecord(ClientData clientData, Tcl_Interp *interp,
+    int argc, TCL_Char **argv, Domain *theDomain);
 
 int openFresco_addExperimentalRecorder(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
@@ -341,8 +345,33 @@ int openFresco_wipeModel(ClientData clientData,
     clearExperimentalSetups(interp);
     clearExperimentalSites(interp);
     clearExperimentalTangentStiffs(interp);
+    
+    return TCL_OK;
+}
 
-    return TCL_OK;  
+
+int openFresco_removeComp(ClientData clientData,
+    Tcl_Interp *interp, int argc, TCL_Char **argv)
+{
+    // make sure there is a minimum number of arguments
+    if (argc < 2)  {
+        opserr << "WARNING insufficient number of remove component arguments\n";
+        opserr << "Want: removeExp type <specific args>\n";
+        return TCL_ERROR;
+    }
+    
+    if (strcmp(argv[1],"recorder") == 0 || strcmp(argv[1],"recorders") == 0)  {
+        return TclRemoveExpRecorder(clientData, interp, argc, argv, theDomain);
+    }
+    
+    return TCL_OK;
+}
+
+
+int openFresco_record(ClientData clientData,
+    Tcl_Interp *interp, int argc, TCL_Char **argv)
+{
+    return TclExpRecord(clientData, interp, argc, argv, theDomain);
 }
 
 
@@ -359,7 +388,7 @@ int specifyModelBuilder(ClientData clientData, Tcl_Interp *interp,
         opserr << "WARNING need to specify a model type, valid types:\n";
         opserr << "\tBasicBuilder\n";
         return TCL_ERROR;
-    }    
+    }
     
     // invoke the destructor on the old builder
     if (theModelBuilder != 0)  {
@@ -383,26 +412,26 @@ int specifyModelBuilder(ClientData clientData, Tcl_Interp *interp,
         int argPos = 2;
         while (argPos < argc)  {
             if (strcmp(argv[argPos],"-ndm") == 0 ||
-                strcmp(argv[argPos],"-NDM") == 0)  {	
+                strcmp(argv[argPos],"-NDM") == 0)  {
                 argPos++;
                 if (argPos < argc)  {
                     if (Tcl_GetInt(interp, argv[argPos], &ndm) != TCL_OK)  {
                         opserr << "WARNING error reading ndm: " << argv[argPos];
                         opserr << "\nmodel modelBuilderType -ndm ndm? <-ndf ndf?>\n";
                         return TCL_ERROR;
-                    }	  
+                    }
                     argPos++;
                 }
             }
             else if (strcmp(argv[argPos],"-ndf") == 0 ||
-                strcmp(argv[argPos],"-NDF") == 0)  {	
+                strcmp(argv[argPos],"-NDF") == 0)  {
                 argPos++;
                 if (argPos < argc)  {
                     if (Tcl_GetInt(interp, argv[argPos], &ndf) != TCL_OK)  {
                         opserr << "WARNING error reading ndf: " << argv[argPos];
                         opserr << "\nmodel modelBuilderType -ndm ndm? <-ndf ndf?>\n";
                         return TCL_ERROR;
-                    }	  
+                    }
                     argPos++;
                 }
             }
@@ -419,7 +448,7 @@ int specifyModelBuilder(ClientData clientData, Tcl_Interp *interp,
         
         // check for ndf, if not assume one
         if (ndf == 0)  {
-            if (ndm == 1) 
+            if (ndm == 1)
                 ndf = 1;
             else if (ndm == 2)
                 ndf = 3;
@@ -438,7 +467,7 @@ int specifyModelBuilder(ClientData clientData, Tcl_Interp *interp,
             opserr << "WARNING ran out of memory in creating BasicBuilder model\n";
             return TCL_ERROR;
         }
-
+        
         // set pointers
         OPS_ResetInput(clientData, interp, 0, argc, argv, theDomain, theModelBuilder);
     }
@@ -535,18 +564,18 @@ int getLibraryFunction(const char *libName, const char *funcName,
 const char *getInterpPWD(Tcl_Interp *interp)
 {
     static char *pwd = 0;
-
+    
     if (pwd != 0)
         delete [] pwd;
-
+    
     Tcl_DString buf;
     const char *objPWD = Tcl_GetCwd(interp, &buf);
-
+    
     pwd = new char[strlen(objPWD)+1];
     strcpy(pwd, objPWD);
-
+    
     Tcl_DStringFree(&buf);
-
+    
     return pwd;
 }
 
@@ -611,7 +640,7 @@ int Tcl_AppInit(Tcl_Interp *interp)
     *
     * where "Mod" is the name of the module.
     */
-
+    
     /*
     * Call Tcl_CreateCommand for application-specific commands, if
     * they weren't already created by the init procedures called above.
@@ -663,21 +692,27 @@ int Tcl_AppInit(Tcl_Interp *interp)
     Tcl_CreateCommand(interp, "startSimAppElemServer", openFresco_startSimAppElemServer,
         (ClientData)NULL, NULL);
     
-    Tcl_CreateCommand(interp, "wipe", openFresco_wipeModel,
-        (ClientData)NULL, NULL); 
+    Tcl_CreateCommand(interp, "wipeExp", openFresco_wipeModel,
+        (ClientData)NULL, NULL);
+    
+    Tcl_CreateCommand(interp, "removeExp", openFresco_removeComp,
+        (ClientData)NULL, NULL);
+    
+    Tcl_CreateCommand(interp, "recordExp", openFresco_record,
+        (ClientData)NULL, NULL);
     
     Tcl_CreateCommand(interp, "model", specifyModelBuilder,
         (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);
     
     Tcl_CreateCommand(interp, "rayleigh", rayleighDamping,
-        (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);       
+        (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);
     
     Tcl_CreateCommand(interp, "setElementRayleighDampingFactors", setElementRayleighDampingFactors,
-        (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);       
-
+        (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);
+    
     /* OpenSees commands
     Tcl_CreateCommand(interp, "recorder", addRecorder,
-	    (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);*/
+        (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);*/
     
     /*
     * Specify a user-specific startup file to invoke if the application
