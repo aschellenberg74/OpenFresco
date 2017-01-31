@@ -77,7 +77,7 @@ int addEETruss(ClientData clientData, Tcl_Interp *interp,  int argc,
     bool iMod = false;
     int doRayleigh = 1;
     double rho = 0.0;
-    int cMass = 0;
+    bool cMass = false;
     
     if (Tcl_GetInt(interp, argv[1+eleArgStart], &tag) != TCL_OK)  {
         opserr << "WARNING invalid expElement truss eleTag\n";
@@ -183,7 +183,7 @@ int addEETruss(ClientData clientData, Tcl_Interp *interp,  int argc,
     }
     for (i = 6+eleArgStart; i < argc; i++)  {
         if (strcmp(argv[i], "-cMass") == 0)  {
-            cMass = 1;
+            cMass = true;
         }
     }
     

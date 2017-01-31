@@ -59,12 +59,12 @@ Vector EEBeamColumn2d::theVector(6);
 EEBeamColumn2d::EEBeamColumn2d(int tag, int Nd1, int Nd2,
     CrdTransf &coordTransf,
     ExperimentalSite *site,
-    bool iM, int addRay, double r)
+    bool iM, int addRay, double r, bool cm)
     : ExperimentalElement(tag, ELE_TAG_EEBeamColumn2d, site),
     connectedExternalNodes(2), theCoordTransf(0),
-    iMod(iM), addRayleigh(addRay), rho(r), L(0.0), theLoad(6),
-    db(0), vb(0), ab(0), t(0),
-    dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
+    iMod(iM), addRayleigh(addRay), rho(r), cMass(cm), L(0.0),
+    theLoad(6), db(0), vb(0), ab(0), t(0),
+    dbDaq(0), vbDaq(0), abDaq(0), qbDaq(0), tDaq(0),
     dbCtrl(3), vbCtrl(3), abCtrl(3),
     kbInit(3,3), dbLast(3), tLast(0.0),
     firstWarning(true)
@@ -111,7 +111,7 @@ EEBeamColumn2d::EEBeamColumn2d(int tag, int Nd1, int Nd2,
     dbDaq = new Vector(3);
     vbDaq = new Vector(3);
     abDaq = new Vector(3);
-    qDaq  = new Vector(3);
+    qbDaq = new Vector(3);
     tDaq  = new Vector(1);
     
     // set the initial stiffness matrix size
@@ -142,13 +142,14 @@ EEBeamColumn2d::EEBeamColumn2d(int tag, int Nd1, int Nd2,
 EEBeamColumn2d::EEBeamColumn2d(int tag, int Nd1, int Nd2,
     CrdTransf &coordTransf,
     int port, char *machineInetAddr, int ssl, int udp,
-    int dataSize, bool iM, int addRay, double r)
+    int dataSize, bool iM, int addRay, double r, bool cm)
     : ExperimentalElement(tag, ELE_TAG_EEBeamColumn2d),
     connectedExternalNodes(2), theCoordTransf(0),
-    iMod(iM), addRayleigh(addRay), rho(r), L(0.0), theLoad(6),
-    theChannel(0), sData(0), sendData(0), rData(0), recvData(0),
+    iMod(iM), addRayleigh(addRay), rho(r), cMass(cm),
+    L(0.0), theLoad(6), theChannel(0),
+    sData(0), sendData(0), rData(0), recvData(0),
     db(0), vb(0), ab(0), t(0),
-    dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
+    dbDaq(0), vbDaq(0), abDaq(0), qbDaq(0), tDaq(0),
     dbCtrl(3), vbCtrl(3), abCtrl(3),
     kbInit(3,3), dbLast(3), tLast(0.0),
     firstWarning(true)
@@ -245,7 +246,7 @@ EEBeamColumn2d::EEBeamColumn2d(int tag, int Nd1, int Nd2,
     id += 3;
     abDaq = new Vector(&rData[id], 3);
     id += 3;
-    qDaq = new Vector(&rData[id], 3);
+    qbDaq = new Vector(&rData[id], 3);
     id += 3;
     tDaq = new Vector(&rData[id], 1);
     recvData->Zero();
@@ -296,8 +297,8 @@ EEBeamColumn2d::~EEBeamColumn2d()
         delete vbDaq;
     if (abDaq != 0)
         delete abDaq;
-    if (qDaq != 0)
-        delete qDaq;
+    if (qbDaq != 0)
+        delete qbDaq;
     if (tDaq != 0)
         delete tDaq;
     
@@ -545,15 +546,8 @@ const Matrix& EEBeamColumn2d::getTangentStiff()
         firstWarning = false;
     }
     
-    // get daq resisting forces
-    if (theSite != 0)  {
-        (*qDaq) = theSite->getForce();
-    }
-    else  {
-        sData[0] = OF_RemoteTest_getForce;
-        theChannel->sendVector(0, 0, *sendData, 0);
-        theChannel->recvVector(0, 0, *recvData, 0);
-    }
+    // get current daq resisting force
+    this->getBasicForce();
     
     // get chord rotation from basic sys A to B
     double alpha = atan2((*db)[1],L+(*db)[0]);
@@ -563,23 +557,23 @@ const Matrix& EEBeamColumn2d::getTangentStiff()
         this->applyIMod();
     
     // use elastic axial force if axial force from test is zero
-    if (fabs((*qDaq)[0]) < 1.0E-12)  {
+    if (fabs((*qbDaq)[0]) < 1.0E-12)  {
         double qA0 = kbInit(0,0)*(sqrt(pow(L+(*db)[0],2)+pow((*db)[1],2))-L);
-        (*qDaq)[0] = cos(alpha)*qA0;
-        (*qDaq)[1] += sin(alpha)*qA0;
+        (*qbDaq)[0] = cos(alpha)*qA0;
+        (*qbDaq)[1] += sin(alpha)*qA0;
     }
     
     /* transform forces from basic sys B to basic sys A (linear)
     static Vector qA(3);
-    qA(0) = (*qDaq)[0];
-    qA(1) = -L*(*qDaq)[1] - (*qDaq)[2];
-    qA(2) = (*qDaq)[2];*/
+    qA(0) = (*qbDaq)[0];
+    qA(1) = -L*(*qbDaq)[1] - (*qbDaq)[2];
+    qA(2) = (*qbDaq)[2];*/
     
     // transform forces from basic sys B to basic sys A (nonlinear)
     static Vector qA(3);
-    qA(0) = cos(alpha)*(*qDaq)[0] + sin(alpha)*(*qDaq)[1];
-    qA(1) = (*db)[1]*(*qDaq)[0] - (L+(*db)[0])*(*qDaq)[1] - (*qDaq)[2];
-    qA(2) = (*qDaq)[2];
+    qA(0) = cos(alpha)*(*qbDaq)[0] + sin(alpha)*(*qbDaq)[1];
+    qA(1) = (*db)[1]*(*qbDaq)[0] - (L+(*db)[0])*(*qbDaq)[1] - (*qbDaq)[2];
+    qA(2) = (*qbDaq)[2];
     
     // add fixed end forces
     for (int i=0; i<3; i++)  {
@@ -605,9 +599,8 @@ const Matrix& EEBeamColumn2d::getDamp()
     theMatrix.Zero();
     
     // call base class to setup Rayleigh damping
-    if (addRayleigh == 1)  {
+    if (addRayleigh == 1)
         theMatrix = this->Element::getDamp();
-    }
     
     return theMatrix;
 }
@@ -620,11 +613,32 @@ const Matrix& EEBeamColumn2d::getMass()
     
     // form mass matrix
     if (L != 0.0 && rho != 0.0)  {
-        double m = 0.5*rho*L;
-        theMatrix(0,0) = m;
-        theMatrix(1,1) = m;	
-        theMatrix(3,3) = m;
-        theMatrix(4,4) = m;
+        if (cMass == false)  {
+            // lumped mass matrix
+            double m = 0.5*rho*L;
+            theMatrix(0,0) = m;
+            theMatrix(1,1) = m;	
+            theMatrix(3,3) = m;
+            theMatrix(4,4) = m;
+        } else  {
+            // consistent mass matrix
+            static Matrix ml(6,6);
+            double m = rho*L/420.0;
+            ml(0,0) = ml(3,3) = m*140.0;
+            ml(0,3) = ml(3,0) = m*70.0;
+            
+            ml(1,1) = ml(4,4) = m*156.0;
+            ml(1,4) = ml(4,1) = m*54.0;
+            ml(2,2) = ml(5,5) = m*4.0*L*L;
+            ml(2,5) = ml(5,2) = -m*3.0*L*L;
+            ml(1,2) = ml(2,1) = m*22.0*L;
+            ml(4,5) = ml(5,4) = -ml(1,2);
+            ml(1,5) = ml(5,1) = -m*13.0*L;
+            ml(2,4) = ml(4,2) = -ml(1,5);
+            
+            // transform local mass matrix to global system
+            theMatrix = theCoordTransf->getGlobalMatrixFromLocal(ml);
+        }
     }
     
     return theMatrix; 
@@ -710,9 +724,8 @@ int EEBeamColumn2d::addLoad(ElementalLoad *theEleLoad, double loadFactor)
 int EEBeamColumn2d::addInertiaLoadToUnbalance(const Vector &accel)
 {
     // check for quick return
-    if (L == 0.0 || rho == 0.0)  {
-        return 0;
-    }    
+    if (L == 0.0 || rho == 0.0)
+        return 0; 
     
     // get R * accel from the nodes
     const Vector &Raccel1 = theNodes[0]->getRV(accel);
@@ -725,12 +738,22 @@ int EEBeamColumn2d::addInertiaLoadToUnbalance(const Vector &accel)
     }
     
     // want to add ( - fact * M R * accel ) to unbalance
-    // take advantage of lumped mass matrix
-    double m = 0.5*rho*L;
-    theLoad(0) -= m * Raccel1(0);
-    theLoad(1) -= m * Raccel1(1);
-    theLoad(3) -= m * Raccel2(0);
-    theLoad(4) -= m * Raccel2(1);
+    if (cMass == false)  {
+        // take advantage of lumped mass matrix
+        double m = 0.5*rho*L;
+        theLoad(0) -= m * Raccel1(0);
+        theLoad(1) -= m * Raccel1(1);
+        theLoad(3) -= m * Raccel2(0);
+        theLoad(4) -= m * Raccel2(1);
+    } else  {
+        // use matrix vector multip. for consistent mass matrix
+        static Vector Raccel(6);
+        for (int i=0; i<3; i++)  {
+            Raccel(i)   = Raccel1(i);
+            Raccel(i+3) = Raccel2(i);
+        }
+        theLoad.addMatrixVector(1.0, this->getMass(), Raccel, -1.0);
+    }
     
     return 0;
 }
@@ -744,15 +767,8 @@ const Vector& EEBeamColumn2d::getResistingForce()
     // zero the global residual
     theVector.Zero();
     
-    // get daq resisting forces
-    if (theSite != 0)  {
-        (*qDaq) = theSite->getForce();
-    }
-    else  {
-        sData[0] = OF_RemoteTest_getForce;
-        theChannel->sendVector(0, 0, *sendData, 0);
-        theChannel->recvVector(0, 0, *recvData, 0);
-    }
+    // get current daq resisting force
+    this->getBasicForce();
     
     // get chord rotation from basic sys A to B
     double alpha = atan2((*db)[1],L+(*db)[0]);
@@ -762,10 +778,10 @@ const Vector& EEBeamColumn2d::getResistingForce()
         this->applyIMod();
     
     // use elastic axial force if axial force from test is zero
-    if (fabs((*qDaq)[0]) < 1.0E-12)  {
+    if (fabs((*qbDaq)[0]) < 1.0E-12)  {
         double qA0 = kbInit(0,0)*(sqrt(pow(L+(*db)[0],2)+pow((*db)[1],2))-L);
-        (*qDaq)[0] = cos(alpha)*qA0;
-        (*qDaq)[1] += sin(alpha)*qA0;
+        (*qbDaq)[0] = cos(alpha)*qA0;
+        (*qbDaq)[1] += sin(alpha)*qA0;
     }
     
     // save corresponding ctrl response for recorder
@@ -775,15 +791,15 @@ const Vector& EEBeamColumn2d::getResistingForce()
     
     /* transform forces from basic sys B to basic sys A (linear)
     static Vector qA(3);
-    qA(0) = (*qDaq)[0];
-    qA(1) = -L*(*qDaq)[1] - (*qDaq)[2];
-    qA(2) = (*qDaq)[2];*/
+    qA(0) = (*qbDaq)[0];
+    qA(1) = -L*(*qbDaq)[1] - (*qbDaq)[2];
+    qA(2) = (*qbDaq)[2];*/
     
     // transform forces from basic sys B to basic sys A (nonlinear)
     static Vector qA(3);
-    qA(0) = cos(alpha)*(*qDaq)[0] + sin(alpha)*(*qDaq)[1];
-    qA(1) = (*db)[1]*(*qDaq)[0] - (L+(*db)[0])*(*qDaq)[1] - (*qDaq)[2];
-    qA(2) = (*qDaq)[2];
+    qA(0) = cos(alpha)*(*qbDaq)[0] + sin(alpha)*(*qbDaq)[1];
+    qA(1) = (*db)[1]*(*qbDaq)[0] - (L+(*db)[0])*(*qbDaq)[1] - (*qbDaq)[2];
+    qA(2) = (*qbDaq)[2];
     
     // add fixed end forces
     for (int i=0; i<3; i++)  {
@@ -806,24 +822,37 @@ const Vector& EEBeamColumn2d::getResistingForce()
 const Vector& EEBeamColumn2d::getResistingForceIncInertia()
 {
     // this already includes damping forces from specimen
-    theVector = this->getResistingForce();
+    this->getResistingForce();
     
-    // add the damping forces from rayleigh damping
+    // add the damping forces from Rayleigh damping
     if (addRayleigh == 1)  {
         if (alphaM != 0.0 || betaK != 0.0 || betaK0 != 0.0 || betaKc != 0.0)
             theVector.addVector(1.0, this->getRayleighDampingForces(), 1.0);
     }
     
+    // check for quick return
+    if (L == 0.0 || rho == 0.0)
+        return theVector;
+    
     // add inertia forces from element mass
-    if (L != 0.0 && rho != 0.0)  {
-        const Vector &accel1 = theNodes[0]->getTrialAccel();
-        const Vector &accel2 = theNodes[1]->getTrialAccel();
-        
+    const Vector &accel1 = theNodes[0]->getTrialAccel();
+    const Vector &accel2 = theNodes[1]->getTrialAccel();
+    
+    if (cMass == false)  {
+        // take advantage of lumped mass matrix
         double m = 0.5*rho*L;
         theVector(0) += m * accel1(0);
         theVector(1) += m * accel1(1);
         theVector(3) += m * accel2(0);
         theVector(4) += m * accel2(1);
+    } else  {
+        // use matrix vector multip. for consistent mass matrix
+        static Vector accel(6);
+        for (int i=0; i<3; i++)  {
+            accel(i)   = accel1(i);
+            accel(i+3) = accel2(i);
+        }
+        theVector.addMatrixVector(1.0, this->getMass(), accel, 1.0);
     }
     
     return theVector;
@@ -887,6 +916,21 @@ const Vector& EEBeamColumn2d::getBasicAccel()
     }
     
     return *abDaq;
+}
+
+
+const Vector& EEBeamColumn2d::getBasicForce()
+{
+    if (theSite != 0)  {
+        (*qbDaq) = theSite->getForce();
+    }
+    else  {
+        sData[0] = OF_RemoteTest_getForce;
+        theChannel->sendVector(0, 0, *sendData, 0);
+        theChannel->recvVector(0, 0, *recvData, 0);
+    }
+    
+    return *qbDaq;
 }
 
 
@@ -957,8 +1001,10 @@ void EEBeamColumn2d::Print(OPS_Stream &s, int flag)
         s << "  CoordTransf: " << theCoordTransf->getTag() << endln;
         if (theSite != 0)
             s << "  ExperimentalSite: " << theSite->getTag() << endln;
-        s << "  addRayleigh: " << addRayleigh;
-        s << "  mass per unit length: " << rho << endln;
+        s << "  iMod: " << iMod;
+        s << ", addRayleigh: " << addRayleigh << endln;
+        s << "  mass per unit length: " << rho;
+        s << ", cMass: " << cMass << endln;
         // determine resisting forces in global system
         s << "  resisting force: " << this->getResistingForce() << endln;
     } else if (flag == 1)  {
@@ -1117,15 +1163,15 @@ int EEBeamColumn2d::getResponse(int responseID, Information &eleInfo)
         
     case 2:  // local forces
         /* transform forces from basic sys B to basic sys A (linear)
-        qA(0) = (*qDaq)[0];
-        qA(1) = -L*(*qDaq)[1] - (*qDaq)[2];
-        qA(2) = (*qDaq)[2];*/
+        qA(0) = (*qbDaq)[0];
+        qA(1) = -L*(*qbDaq)[1] - (*qbDaq)[2];
+        qA(2) = (*qbDaq)[2];*/
         
         // transform forces from basic sys B to basic sys A (nonlinear)
         alpha = atan2((*db)[1],L+(*db)[0]);
-        qA(0) = cos(alpha)*(*qDaq)[0] + sin(alpha)*(*qDaq)[1];
-        qA(1) = (*db)[1]*(*qDaq)[0] - (L+(*db)[0])*(*qDaq)[1] - (*qDaq)[2];
-        qA(2) = (*qDaq)[2];
+        qA(0) = cos(alpha)*(*qbDaq)[0] + sin(alpha)*(*qbDaq)[1];
+        qA(1) = (*db)[1]*(*qbDaq)[0] - (L+(*db)[0])*(*qbDaq)[1] - (*qbDaq)[2];
+        qA(2) = (*qbDaq)[2];
         
         // Axial
         theVector(0) = -qA(0) + pA0[0];
@@ -1139,8 +1185,8 @@ int EEBeamColumn2d::getResponse(int responseID, Information &eleInfo)
         
         return eleInfo.setVector(theVector);
         
-    case 3:  // forces in basic system B
-        return eleInfo.setVector(*qDaq);
+    case 3:  // forces in basic system B (already current)
+        return eleInfo.setVector(*qbDaq);
         
     case 4:  // ctrl displacements in basic system B
         return eleInfo.setVector(dbCtrl);
@@ -1168,26 +1214,19 @@ int EEBeamColumn2d::getResponse(int responseID, Information &eleInfo)
 
 void EEBeamColumn2d::applyIMod()
 {
-    // get daq displacements
-    if (theSite != 0)  {
-        (*dbDaq) = theSite->getDisp();
-    }
-    else  {
-        sData[0] = OF_RemoteTest_getDisp;
-        theChannel->sendVector(0, 0, *sendData, 0);
-        theChannel->recvVector(0, 0, *recvData, 0);
-    }
+    // get current daq displacement
+    this->getBasicDisp();
     
     // correct for displacement control errors using I-Modification
     if ((*dbDaq)[0] != 0.0)  {
-        (*qDaq)[0] -= kbInit(0,0)*((*dbDaq)[0] - (*db)[0]);
+        (*qbDaq)[0] -= kbInit(0,0)*((*dbDaq)[0] - (*db)[0]);
     }
     if ((*dbDaq)[1] != 0.0)  {
-        (*qDaq)[1] -= kbInit(1,1)*((*dbDaq)[1] - (*db)[1]);
-        (*qDaq)[2] -= kbInit(2,1)*((*dbDaq)[1] - (*db)[1]);
+        (*qbDaq)[1] -= kbInit(1,1)*((*dbDaq)[1] - (*db)[1]);
+        (*qbDaq)[2] -= kbInit(2,1)*((*dbDaq)[1] - (*db)[1]);
     }
     if ((*dbDaq)[2] != 0.0)  {
-        (*qDaq)[1] -= kbInit(1,2)*((*dbDaq)[2] - (*db)[2]);
-        (*qDaq)[2] -= kbInit(2,2)*((*dbDaq)[2] - (*db)[2]);
+        (*qbDaq)[1] -= kbInit(1,2)*((*dbDaq)[2] - (*db)[2]);
+        (*qbDaq)[2] -= kbInit(2,2)*((*dbDaq)[2] - (*db)[2]);
     }
 }
