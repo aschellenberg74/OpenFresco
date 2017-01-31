@@ -51,13 +51,13 @@ public:
         ExperimentalSite *site,
         ExperimentalTangentStiff *tangStiff = 0,
         bool iMod = false, int addRayleigh = 1,
-        double rho = 0.0, int cMass = 0);
+        double rho = 0.0, bool cMass = false);
     EETrussCorot(int tag, int dimension, int Nd1, int Nd2,
         int port, char *machineInetAddress = 0,
         int ssl = 0, int udp = 0, int dataSize = OF_Network_dataSize,
         ExperimentalTangentStiff *tangStiff = 0,
         bool iMod = false, int addRayleigh = 1,
-        double rho = 0.0, int cMass = 0);
+        double rho = 0.0, bool cMass = false);
     
     // destructor
     ~EETrussCorot();
@@ -122,7 +122,7 @@ private:
     bool iMod;          // I-Modification flag
     int addRayleigh;    // flag to add Rayleigh damping
     double rho;         // rho: mass per unit length
-    int cMass;          // consistent mass flag
+    bool cMass;         // consistent mass flag
     double L;           // undeformed element length
     double Ln;          // current element length
     double d21[3];      // current displacement offsets in basic system

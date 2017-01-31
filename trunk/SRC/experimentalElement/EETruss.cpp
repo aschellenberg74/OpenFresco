@@ -62,7 +62,7 @@ Vector EETruss::EETrussV12(12);
 // by each object and storing the tags of the end nodes.
 EETruss::EETruss(int tag, int dim, int Nd1, int Nd2,
     ExperimentalSite *site, ExperimentalTangentStiff *tang,
-    bool iM, int addRay, double r, int cm)
+    bool iM, int addRay, double r, bool cm)
     : ExperimentalElement(tag, ELE_TAG_EETruss, site, tang),
     numDIM(dim), numDOF(0), connectedExternalNodes(2),
     iMod(iM), addRayleigh(addRay), rho(r), cMass(cm), L(0.0),
@@ -138,7 +138,7 @@ EETruss::EETruss(int tag, int dim, int Nd1, int Nd2,
 EETruss::EETruss(int tag, int dim, int Nd1, int Nd2,
     int port, char *machineInetAddr, int ssl, int udp,
     int dataSize, ExperimentalTangentStiff *tang,
-    bool iM, int addRay, double r, int cm)
+    bool iM, int addRay, double r, bool cm)
     : ExperimentalElement(tag, ELE_TAG_EETruss, NULL, tang),
     numDIM(dim), numDOF(0), connectedExternalNodes(2),
     iMod(iM), addRayleigh(addRay), rho(r), cMass(cm), L(0.0),
@@ -626,9 +626,8 @@ const Matrix& EETruss::getDamp()
     theMatrix->Zero();
     
     // call base class to setup Rayleigh damping
-    if (addRayleigh == 1)  {
+    if (addRayleigh == 1)
         (*theMatrix) = this->Element::getDamp();
-    }
     
     return *theMatrix;
 }
@@ -642,15 +641,15 @@ const Matrix& EETruss::getMass()
     
     // form mass matrix
     if (L != 0.0 && rho != 0.0)  {
-        // lumped mass matrix
-        if (cMass == 0) {
+        if (cMass == false) {
+            // lumped mass matrix
             double m = 0.5*rho*L;
             for (int i=0; i<numDIM; i++)  {
                 (*theMatrix)(i,i) = m;
                 (*theMatrix)(i+numDOF2,i+numDOF2) = m;
             }
-        // consistent mass matrix
         } else  {
+            // consistent mass matrix
             double m = rho*L/6.0;
             for (int i=0; i<numDIM; i++)  {
                 (*theMatrix)(i,i) = 2.0*m;
@@ -684,9 +683,8 @@ int EETruss::addLoad(ElementalLoad *theLoad, double loadFactor)
 int EETruss::addInertiaLoadToUnbalance(const Vector &accel)
 {
     // check for a quick return
-    if (L == 0.0 || rho == 0.0)  {
+    if (L == 0.0 || rho == 0.0)
         return 0;
-    }
     
     // get R * accel from the nodes
     const Vector &Raccel1 = theNodes[0]->getRV(accel);
@@ -700,15 +698,15 @@ int EETruss::addInertiaLoadToUnbalance(const Vector &accel)
     }
     
     // want to add ( - fact * M R * accel ) to unbalance
-    // lumped mass matrix
-    if (cMass == 0)  {
+    if (cMass == false)  {
+        // lumped mass matrix
         double m = 0.5*rho*L;
         for (int i=0; i<numDIM; i++) {
             (*theLoad)(i) -= m*Raccel1(i);
             (*theLoad)(i+nodalDOF) -= m*Raccel2(i);
         }
-    // consistent mass matrix
     } else  {
+        // consistent mass matrix
         double m = rho*L/6.0;
         for (int i=0; i<numDIM; i++) {
             (*theLoad)(i) -= 2.0*m*Raccel1(i) + m*Raccel2(i);
@@ -767,26 +765,28 @@ const Vector& EETruss::getResistingForceIncInertia()
             theVector->addVector(1.0, this->getRayleighDampingForces(), 1.0);
     }
     
+    // check for quick return
+    if (L == 0.0 || rho == 0.0)
+        return *theVector;
+    
     // add inertia forces from element mass
-    if (L != 0.0 && rho != 0.0)  {
-        const Vector &accel1 = theNodes[0]->getTrialAccel();
-        const Vector &accel2 = theNodes[1]->getTrialAccel();
-        int numDOF2 = numDOF/2;
-        
+    const Vector &accel1 = theNodes[0]->getTrialAccel();
+    const Vector &accel2 = theNodes[1]->getTrialAccel();
+    int numDOF2 = numDOF/2;
+    
+    if (cMass == false)  {
         // lumped mass matrix
-        if (cMass == 0)  {
-            double m = 0.5*rho*L;
-            for (int i=0; i<numDIM; i++) {
-                (*theVector)(i) += m * accel1(i);
-                (*theVector)(i+numDOF2) += m * accel2(i);
-            }
+        double m = 0.5*rho*L;
+        for (int i=0; i<numDIM; i++) {
+            (*theVector)(i) += m * accel1(i);
+            (*theVector)(i+numDOF2) += m * accel2(i);
+        }
+    } else  {
         // consistent mass matrix
-        } else  {
-            double m = rho*L/6.0;
-            for (int i=0; i<numDIM; i++) {
-                (*theVector)(i) += 2.0*m*accel1(i) + m*accel2(i);
-                (*theVector)(i+numDOF2) += m*accel1(i) + 2.0*m*accel2(i);
-            }
+        double m = rho*L/6.0;
+        for (int i=0; i<numDIM; i++) {
+            (*theVector)(i) += 2.0*m*accel1(i) + m*accel2(i);
+            (*theVector)(i+numDOF2) += m*accel1(i) + 2.0*m*accel2(i);
         }
     }
     
@@ -937,8 +937,9 @@ void EETruss::Print(OPS_Stream &s, int flag)
             s << "  ExperimentalSite: " << theSite->getTag() << endln;
         if (theTangStiff != 0)
             s << "  ExperimentalTangStiff: " << theTangStiff->getTag() << endln;
-        s << "  addRayleigh: " << addRayleigh;
-        s << ", mass/length: " << rho;
+        s << "  iMod: " << iMod;
+        s << ", addRayleigh: " << addRayleigh << endln;
+        s << "  mass/length: " << rho;
         s << ", cMass: " << cMass << endln;
         // determine resisting forces in global system
         s << "  resisting force: " << this->getResistingForce() << endln;

@@ -59,12 +59,12 @@ Vector EEBeamColumn3d::theVector(12);
 EEBeamColumn3d::EEBeamColumn3d(int tag, int Nd1, int Nd2,
     CrdTransf &coordTransf,
     ExperimentalSite *site,
-    bool iM, int addRay, double r)
+    bool iM, int addRay, double r, bool cm)
     : ExperimentalElement(tag, ELE_TAG_EEBeamColumn3d, site),
     connectedExternalNodes(2), theCoordTransf(0),
-    iMod(iM), addRayleigh(addRay), rho(r), L(0.0), theLoad(12),
-    db(0), vb(0), ab(0), t(0),
-    dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
+    iMod(iM), addRayleigh(addRay), rho(r), cMass(cm), L(0.0),
+    theLoad(12), db(0), vb(0), ab(0), t(0),
+    dbDaq(0), vbDaq(0), abDaq(0), qbDaq(0), tDaq(0),
     dbCtrl(6), vbCtrl(6), abCtrl(6),
     kbInit(6,6), dbLast(6), tLast(0.0),
     firstWarning(true)
@@ -111,7 +111,7 @@ EEBeamColumn3d::EEBeamColumn3d(int tag, int Nd1, int Nd2,
     dbDaq = new Vector(6);
     vbDaq = new Vector(6);
     abDaq = new Vector(6);
-    qDaq  = new Vector(6);
+    qbDaq = new Vector(6);
     tDaq  = new Vector(1);
     
     // set the initial stiffness matrix size
@@ -142,13 +142,14 @@ EEBeamColumn3d::EEBeamColumn3d(int tag, int Nd1, int Nd2,
 EEBeamColumn3d::EEBeamColumn3d(int tag, int Nd1, int Nd2,
     CrdTransf &coordTransf,
     int port, char *machineInetAddr, int ssl, int udp,
-    int dataSize, bool iM, int addRay, double r)
+    int dataSize, bool iM, int addRay, double r, bool cm)
     : ExperimentalElement(tag, ELE_TAG_EEBeamColumn3d),
     connectedExternalNodes(2), theCoordTransf(0),
-    iMod(iM), addRayleigh(addRay), rho(r), L(0.0), theLoad(12),
-    theChannel(0), sData(0), sendData(0), rData(0), recvData(0),
+    iMod(iM), addRayleigh(addRay), rho(r), cMass(cm),
+    L(0.0), theLoad(12), theChannel(0),
+    sData(0), sendData(0), rData(0), recvData(0),
     db(0), vb(0), ab(0), t(0),
-    dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
+    dbDaq(0), vbDaq(0), abDaq(0), qbDaq(0), tDaq(0),
     dbCtrl(6), vbCtrl(6), abCtrl(6),
     kbInit(6,6), dbLast(6), tLast(0.0),
     firstWarning(true)
@@ -245,7 +246,7 @@ EEBeamColumn3d::EEBeamColumn3d(int tag, int Nd1, int Nd2,
     id += 6;
     abDaq = new Vector(&rData[id], 6);
     id += 6;
-    qDaq = new Vector(&rData[id], 6);
+    qbDaq = new Vector(&rData[id], 6);
     id += 6;
     tDaq = new Vector(&rData[id], 1);
     recvData->Zero();
@@ -296,8 +297,8 @@ EEBeamColumn3d::~EEBeamColumn3d()
         delete vbDaq;
     if (abDaq != 0)
         delete abDaq;
-    if (qDaq != 0)
-        delete qDaq;
+    if (qbDaq != 0)
+        delete qbDaq;
     if (tDaq != 0)
         delete tDaq;
     
@@ -574,35 +575,28 @@ const Matrix& EEBeamColumn3d::getTangentStiff()
         firstWarning = false;
     }
     
-    // get daq resisting forces
-    if (theSite != 0)  {
-        (*qDaq) = theSite->getForce();
-    }
-    else  {
-        sData[0] = OF_RemoteTest_getForce;
-        theChannel->sendVector(0, 0, *sendData, 0);
-        theChannel->recvVector(0, 0, *recvData, 0);
-    }
+    // get current daq resisting force
+    this->getBasicForce();
     
     // apply optional initial stiffness modification
     if (iMod == true)
         this->applyIMod();
     
     // use elastic axial force if axial force from test is zero
-    if (fabs((*qDaq)[0]) < 1.0E-12)
-        (*qDaq)[0] = kbInit(0,0)*(*db)[0];
+    if (fabs((*qbDaq)[0]) < 1.0E-12)
+        (*qbDaq)[0] = kbInit(0,0)*(*db)[0];
     // use elastic torsion if torsion from test is zero
-    if (fabs((*qDaq)[5]) < 1.0E-12)
-        (*qDaq)[5] = kbInit(5,5)*(*db)[5];
+    if (fabs((*qbDaq)[5]) < 1.0E-12)
+        (*qbDaq)[5] = kbInit(5,5)*(*db)[5];
     
     // transform forces from basic sys B to basic sys A (linear)
     static Vector qA(6);
-    qA(0) = (*qDaq)[0];
-    qA(1) = -L*(*qDaq)[1] - (*qDaq)[2];
-    qA(2) = (*qDaq)[2];
-    qA(3) = L*(*qDaq)[3] - (*qDaq)[4];
-    qA(4) = (*qDaq)[4];
-    qA(5) = (*qDaq)[5];
+    qA(0) = (*qbDaq)[0];
+    qA(1) = -L*(*qbDaq)[1] - (*qbDaq)[2];
+    qA(2) = (*qbDaq)[2];
+    qA(3) = L*(*qbDaq)[3] - (*qbDaq)[4];
+    qA(4) = (*qbDaq)[4];
+    qA(5) = (*qbDaq)[5];
     
     /* transform forces from basic sys B to basic sys A (nonlinear)
     static Vector qA(6);
@@ -642,9 +636,8 @@ const Matrix& EEBeamColumn3d::getDamp()
     theMatrix.Zero();
     
     // call base class to setup Rayleigh damping
-    if (addRayleigh == 1)  {
+    if (addRayleigh == 1)
         theMatrix = this->Element::getDamp();
-    }
     
     return theMatrix;
 }
@@ -657,16 +650,48 @@ const Matrix& EEBeamColumn3d::getMass()
     
     // form mass matrix
     if (L != 0.0 && rho != 0.0)  {
-        double m = 0.5*rho*L;
-        theMatrix(0,0) = m;
-        theMatrix(1,1) = m;
-        theMatrix(2,2) = m;
-        theMatrix(6,6) = m;
-        theMatrix(7,7) = m;
-        theMatrix(8,8) = m;
+        if (cMass == false)  {
+            // lumped mass matrix
+            double m = 0.5*rho*L;
+            theMatrix(0,0) = m;
+            theMatrix(1,1) = m;
+            theMatrix(2,2) = m;
+            theMatrix(6,6) = m;
+            theMatrix(7,7) = m;
+            theMatrix(8,8) = m;
+        } else  {
+            // consistent mass matrix
+            static Matrix ml(12,12);
+            double m = rho*L/420.0;
+            ml(0,0) = ml(6,6) = m*140.0;
+            ml(0,6) = ml(6,0) = m*70.0;
+            //ml(3,3) = ml(9,9) = m*(Jx/A)*140.0;  // CURRENTLY NO TORSIONAL MASS 
+            //ml(3,9) = ml(9,3) = m*(Jx/A)*70.0;   // CURRENTLY NO TORSIONAL MASS 
+            
+            ml(2,2) = ml(8,8) = m*156.0;
+            ml(2,8) = ml(8,2) = m*54.0;
+            ml(4,4) = ml(10,10) = m*4.0*L*L;
+            ml(4,10) = ml(10,4) = -m*3.0*L*L;
+            ml(2,4) = ml(4,2) = -m*22.0*L;
+            ml(8,10) = ml(10,8) = -ml(2,4);
+            ml(2,10) = ml(10,2) = m*13.0*L;
+            ml(4,8) = ml(8,4) = -ml(2,10);
+            
+            ml(1,1) = ml(7,7) = m*156.0;
+            ml(1,7) = ml(7,1) = m*54.0;
+            ml(5,5) = ml(11,11) = m*4.0*L*L;
+            ml(5,11) = ml(11,5) = -m*3.0*L*L;
+            ml(1,5) = ml(5,1) = m*22.0*L;
+            ml(7,11) = ml(11,7) = -ml(1,5);
+            ml(1,11) = ml(11,1) = -m*13.0*L;
+            ml(5,7) = ml(7,5) = -ml(1,11);
+            
+            // transform local mass matrix to global system
+            theMatrix = theCoordTransf->getGlobalMatrixFromLocal(ml);
+        }
     }
     
-    return theMatrix; 
+    return theMatrix;
 }
 
 
@@ -758,7 +783,7 @@ int EEBeamColumn3d::addLoad(ElementalLoad *theEleLoad, double loadFactor)
             << this->getTag() << endln;
         return -1;
     }
-
+    
     return 0;
 }
 
@@ -766,9 +791,8 @@ int EEBeamColumn3d::addLoad(ElementalLoad *theEleLoad, double loadFactor)
 int EEBeamColumn3d::addInertiaLoadToUnbalance(const Vector &accel)
 {
     // check for quick return
-    if (L == 0.0 || rho == 0.0)  {
+    if (L == 0.0 || rho == 0.0)
         return 0;
-    }
     
     // get R * accel from the nodes
     const Vector &Raccel1 = theNodes[0]->getRV(accel);
@@ -781,14 +805,24 @@ int EEBeamColumn3d::addInertiaLoadToUnbalance(const Vector &accel)
     }
     
     // want to add ( - fact * M R * accel ) to unbalance
-    // take advantage of lumped mass matrix
-    double m = 0.5*rho*L;
-    theLoad(0) -= m * Raccel1(0);
-    theLoad(1) -= m * Raccel1(1);
-    theLoad(2) -= m * Raccel1(2);
-    theLoad(6) -= m * Raccel2(0);
-    theLoad(7) -= m * Raccel2(1);
-    theLoad(8) -= m * Raccel2(2);
+    if (cMass == false)  {
+        // take advantage of lumped mass matrix
+        double m = 0.5*rho*L;
+        theLoad(0) -= m * Raccel1(0);
+        theLoad(1) -= m * Raccel1(1);
+        theLoad(2) -= m * Raccel1(2);
+        theLoad(6) -= m * Raccel2(0);
+        theLoad(7) -= m * Raccel2(1);
+        theLoad(8) -= m * Raccel2(2);
+    } else  {
+        // use matrix vector multip. for consistent mass matrix
+        static Vector Raccel(12);
+        for (int i=0; i<6; i++)  {
+            Raccel(i)   = Raccel1(i);
+            Raccel(i+6) = Raccel2(i);
+        }
+        theLoad.addMatrixVector(1.0, this->getMass(), Raccel, -1.0);
+    }
     
     return 0;
 }
@@ -802,26 +836,19 @@ const Vector& EEBeamColumn3d::getResistingForce()
     // zero the global residual
     theVector.Zero();
     
-    // get daq resisting forces
-    if (theSite != 0)  {
-        (*qDaq) = theSite->getForce();
-    }
-    else  {
-        sData[0] = OF_RemoteTest_getForce;
-        theChannel->sendVector(0, 0, *sendData, 0);
-        theChannel->recvVector(0, 0, *recvData, 0);
-    }
+    // get current daq resisting force
+    this->getBasicForce();
     
     // apply optional initial stiffness modification
     if (iMod == true)
         this->applyIMod();
     
     // use elastic axial force if axial force from test is zero
-    if (fabs((*qDaq)[0]) < 1.0E-12)
-        (*qDaq)[0] = kbInit(0,0)*(*db)[0];
+    if (fabs((*qbDaq)[0]) < 1.0E-12)
+        (*qbDaq)[0] = kbInit(0,0)*(*db)[0];
     // use elastic torsion if torsion from test is zero
-    if (fabs((*qDaq)[5]) < 1.0E-12)
-        (*qDaq)[5] = kbInit(5,5)*(*db)[5];
+    if (fabs((*qbDaq)[5]) < 1.0E-12)
+        (*qbDaq)[5] = kbInit(5,5)*(*db)[5];
     
     // save corresponding ctrl displacements for recorder
     dbCtrl = (*db);
@@ -830,12 +857,12 @@ const Vector& EEBeamColumn3d::getResistingForce()
     
     // transform forces from basic sys B to basic sys A (linear)
     static Vector qA(6);
-    qA(0) = (*qDaq)[0];
-    qA(1) = -L*(*qDaq)[1] - (*qDaq)[2];
-    qA(2) = (*qDaq)[2];
-    qA(3) = L*(*qDaq)[3] - (*qDaq)[4];
-    qA(4) = (*qDaq)[4];
-    qA(5) = (*qDaq)[5];
+    qA(0) = (*qbDaq)[0];
+    qA(1) = -L*(*qbDaq)[1] - (*qbDaq)[2];
+    qA(2) = (*qbDaq)[2];
+    qA(3) = L*(*qbDaq)[3] - (*qbDaq)[4];
+    qA(4) = (*qbDaq)[4];
+    qA(5) = (*qbDaq)[5];
     
     /* transform forces from basic sys B to basic sys A (nonlinear)
     static Vector qA(6);
@@ -867,19 +894,24 @@ const Vector& EEBeamColumn3d::getResistingForce()
 const Vector& EEBeamColumn3d::getResistingForceIncInertia()
 {
     // this already includes damping forces from specimen
-    theVector = this->getResistingForce();
+    this->getResistingForce();
     
-    // add the damping forces from rayleigh damping
+    // add the damping forces from Rayleigh damping
     if (addRayleigh == 1)  {
         if (alphaM != 0.0 || betaK != 0.0 || betaK0 != 0.0 || betaKc != 0.0)
             theVector.addVector(1.0, this->getRayleighDampingForces(), 1.0);
     }
     
+    // check for quick return
+    if (L == 0.0 || rho == 0.0)
+        return theVector;
+    
     // add inertia forces from element mass
-    if (L != 0.0 && rho != 0.0)  {
-        const Vector &accel1 = theNodes[0]->getTrialAccel();
-        const Vector &accel2 = theNodes[1]->getTrialAccel();
-        
+    const Vector &accel1 = theNodes[0]->getTrialAccel();
+    const Vector &accel2 = theNodes[1]->getTrialAccel();
+    
+    if (cMass == false)  {
+        // take advantage of lumped mass matrix
         double m = 0.5*rho*L;
         theVector(0) += m * accel1(0);
         theVector(1) += m * accel1(1);
@@ -887,6 +919,14 @@ const Vector& EEBeamColumn3d::getResistingForceIncInertia()
         theVector(6) += m * accel2(0);
         theVector(7) += m * accel2(1);
         theVector(8) += m * accel2(2);
+    } else  {
+        // use matrix vector multip. for consistent mass matrix
+        static Vector accel(12);
+        for (int i=0; i<6; i++)  {
+            accel(i)   = accel1(i);
+            accel(i+6) = accel2(i);
+        }
+        theVector.addMatrixVector(1.0, this->getMass(), accel, 1.0);
     }
     
     return theVector;
@@ -950,6 +990,21 @@ const Vector& EEBeamColumn3d::getBasicAccel()
     }
     
     return *abDaq;
+}
+
+
+const Vector& EEBeamColumn3d::getBasicForce()
+{
+    if (theSite != 0)  {
+        (*qbDaq) = theSite->getForce();
+    }
+    else  {
+        sData[0] = OF_RemoteTest_getForce;
+        theChannel->sendVector(0, 0, *sendData, 0);
+        theChannel->recvVector(0, 0, *recvData, 0);
+    }
+    
+    return *qbDaq;
 }
 
 
@@ -1020,8 +1075,10 @@ void EEBeamColumn3d::Print(OPS_Stream &s, int flag)
         s << "  CoordTransf: " << theCoordTransf->getTag() << endln;
         if (theSite != 0)
             s << "  ExperimentalSite: " << theSite->getTag() << endln;
-        s << "  addRayleigh: " << addRayleigh;
-        s << "  mass per unit length: " << rho << endln;
+        s << "  iMod: " << iMod;
+        s << ", addRayleigh: " << addRayleigh << endln;
+        s << "  mass per unit length: " << rho;
+        s << ", cMass: " << cMass << endln;
         // determine resisting forces in global system
         s << "  resisting force: " << this->getResistingForce() << endln;
     } else if (flag == 1)  {
@@ -1212,12 +1269,12 @@ int EEBeamColumn3d::getResponse(int responseID, Information &eleInfo)
         
     case 2:  // local forces
         // transform forces from basic sys B to basic sys A (linear)
-        qA(0) = (*qDaq)[0];
-        qA(1) = -L*(*qDaq)[1] - (*qDaq)[2];
-        qA(2) = (*qDaq)[2];
-        qA(3) = L*(*qDaq)[3] - (*qDaq)[4];
-        qA(4) = (*qDaq)[4];
-        qA(5) = (*qDaq)[5];
+        qA(0) = (*qbDaq)[0];
+        qA(1) = -L*(*qbDaq)[1] - (*qbDaq)[2];
+        qA(2) = (*qbDaq)[2];
+        qA(3) = L*(*qbDaq)[3] - (*qbDaq)[4];
+        qA(4) = (*qbDaq)[4];
+        qA(5) = (*qbDaq)[5];
         
         /* transform forces from basic sys B to basic sys A (nonlinear)
         qA(0) = 
@@ -1248,8 +1305,8 @@ int EEBeamColumn3d::getResponse(int responseID, Information &eleInfo)
         
         return eleInfo.setVector(theVector);
         
-    case 3:  // forces in basic system B
-        return eleInfo.setVector(*qDaq);
+    case 3:  // forces in basic system B (already current)
+        return eleInfo.setVector(*qbDaq);
         
     case 4:  // ctrl displacements in basic system B
         return eleInfo.setVector(dbCtrl);
@@ -1277,37 +1334,30 @@ int EEBeamColumn3d::getResponse(int responseID, Information &eleInfo)
 
 void EEBeamColumn3d::applyIMod()
 {
-    // get daq displacements
-    if (theSite != 0)  {
-        (*dbDaq) = theSite->getDisp();
-    }
-    else  {
-        sData[0] = OF_RemoteTest_getDisp;
-        theChannel->sendVector(0, 0, *sendData, 0);
-        theChannel->recvVector(0, 0, *recvData, 0);
-    }
+    // get current daq displacement
+    this->getBasicDisp();
     
     // correct for displacement control errors using I-Modification
     if ((*dbDaq)[0] != 0.0)  {
-        (*qDaq)[0] -= kbInit(0,0)*((*dbDaq)[0] - (*db)[0]);
+        (*qbDaq)[0] -= kbInit(0,0)*((*dbDaq)[0] - (*db)[0]);
     }
     if ((*dbDaq)[1] != 0.0)  {
-        (*qDaq)[1] -= kbInit(1,1)*((*dbDaq)[1] - (*db)[1]);
-        (*qDaq)[2] -= kbInit(2,1)*((*dbDaq)[1] - (*db)[1]);
+        (*qbDaq)[1] -= kbInit(1,1)*((*dbDaq)[1] - (*db)[1]);
+        (*qbDaq)[2] -= kbInit(2,1)*((*dbDaq)[1] - (*db)[1]);
     }
     if ((*dbDaq)[2] != 0.0)  {
-        (*qDaq)[1] -= kbInit(1,2)*((*dbDaq)[2] - (*db)[2]);
-        (*qDaq)[2] -= kbInit(2,2)*((*dbDaq)[2] - (*db)[2]);
+        (*qbDaq)[1] -= kbInit(1,2)*((*dbDaq)[2] - (*db)[2]);
+        (*qbDaq)[2] -= kbInit(2,2)*((*dbDaq)[2] - (*db)[2]);
     }
     if ((*dbDaq)[3] != 0.0)  {
-        (*qDaq)[3] -= kbInit(3,3)*((*dbDaq)[3] - (*db)[3]);
-        (*qDaq)[4] -= kbInit(4,3)*((*dbDaq)[3] - (*db)[3]);
+        (*qbDaq)[3] -= kbInit(3,3)*((*dbDaq)[3] - (*db)[3]);
+        (*qbDaq)[4] -= kbInit(4,3)*((*dbDaq)[3] - (*db)[3]);
     }
     if ((*dbDaq)[4] != 0.0)  {
-        (*qDaq)[3] -= kbInit(3,4)*((*dbDaq)[4] - (*db)[4]);
-        (*qDaq)[4] -= kbInit(4,4)*((*dbDaq)[4] - (*db)[4]);
+        (*qbDaq)[3] -= kbInit(3,4)*((*dbDaq)[4] - (*db)[4]);
+        (*qbDaq)[4] -= kbInit(4,4)*((*dbDaq)[4] - (*db)[4]);
     }
     if ((*dbDaq)[5] != 0.0)  {
-        (*qDaq)[5] -= kbInit(5,5)*((*dbDaq)[5] - (*db)[5]);
+        (*qbDaq)[5] -= kbInit(5,5)*((*dbDaq)[5] - (*db)[5]);
     }
 }

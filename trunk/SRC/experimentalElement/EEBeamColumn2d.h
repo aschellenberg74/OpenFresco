@@ -49,12 +49,15 @@ public:
     EEBeamColumn2d(int tag, int Nd1, int Nd2,
         CrdTransf &coordTransf,
         ExperimentalSite *site,
-        bool iMod = false, int addRayleigh = 1, double rho = 0.0);
+        bool iMod = false, int addRayleigh = 1,
+        double rho = 0.0, bool cMass = false);
     EEBeamColumn2d(int tag, int Nd1, int Nd2,
         CrdTransf &coordTransf,
         int port, char *machineInetAddress = 0,
-        int ssl = 0, int udp = 0, int dataSize = OF_Network_dataSize,
-        bool iMod = false, int addRayleigh = 1, double rho = 0.0);
+        int ssl = 0, int udp = 0,
+        int dataSize = OF_Network_dataSize,
+        bool iMod = false, int addRayleigh = 1,
+        double rho = 0.0, bool cMass = false);
     
     // destructor
     ~EEBeamColumn2d();
@@ -94,6 +97,7 @@ public:
     const Vector &getBasicDisp();
     const Vector &getBasicVel();
     const Vector &getBasicAccel();
+    const Vector &getBasicForce();
     
     // public methods for element output
     int sendSelf(int commitTag, Channel &theChannel);
@@ -119,6 +123,7 @@ private:
     bool iMod;          // I-Modification flag
     int addRayleigh;    // flag to add Rayleigh damping
     double rho;         // rho: mass per unit length
+    bool cMass;         // consistent mass flag
     double L;           // undeformed element length
     
     static Matrix theMatrix;  // a class wide Matrix
@@ -139,7 +144,7 @@ private:
     Vector *dbDaq;      // daq displacements in basic system B
     Vector *vbDaq;      // daq velocities in basic system B
     Vector *abDaq;      // daq accelerations in basic system B
-    Vector *qDaq;       // daq forces in basic system B
+    Vector *qbDaq;      // daq forces in basic system B
     Vector *tDaq;       // daq time
     
     Vector dbCtrl;      // ctrl displacements in basic system B
