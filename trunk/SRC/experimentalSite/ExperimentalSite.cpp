@@ -306,11 +306,11 @@ int ExperimentalSite::commitState(Vector* time)
     if (tTime != 0)  {
         for (int i=0; i<numRecorders; i++)
             if (theRecorders[i] != 0)
-                theRecorders[i]->record(commitTag, (*tTime)(0));
+                rValue += theRecorders[i]->record(commitTag, (*tTime)(0));
     } else  {
         for (int i=0; i<numRecorders; i++)
             if (theRecorders[i] != 0)
-                theRecorders[i]->record(commitTag, commitTag);
+                rValue += theRecorders[i]->record(commitTag, commitTag);
     }
     
     return rValue;
@@ -550,6 +550,28 @@ int ExperimentalSite::removeRecorder(int tag)
     }
     
     return -1;
+}
+
+
+int ExperimentalSite::record()
+{
+    int rValue = 0;
+    
+    // update the commitTag
+    commitTag++;
+    
+    // invoke record on all recorders
+    if (tTime != 0)  {
+        for (int i=0; i<numRecorders; i++)
+            if (theRecorders[i] != 0)
+                rValue += theRecorders[i]->record(commitTag, (*tTime)(0));
+    } else  {
+        for (int i=0; i<numRecorders; i++)
+            if (theRecorders[i] != 0)
+                rValue += theRecorders[i]->record(commitTag, commitTag);
+    }
+    
+    return rValue;
 }
 
 

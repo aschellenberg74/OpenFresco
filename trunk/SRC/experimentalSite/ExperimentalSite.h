@@ -109,17 +109,18 @@ public:
     virtual int addRecorder(Recorder &theRecorder);    	
     virtual int removeRecorders();
     virtual int removeRecorder(int tag);
-
+    virtual int record();
+    
     virtual ID getTrialSize();
     virtual ID getOutSize();
     virtual ID getCtrlSize();
     virtual ID getDaqSize();
-
+    
     virtual int getTrialSize(int rType);
     virtual int getOutSize(int rType);
     virtual int getCtrlSize(int rType);
     virtual int getDaqSize(int rType);
-        
+    
 protected:
     // pointer of ExperimentalSetup
     ExperimentalSetup* theSetup;
