@@ -62,8 +62,8 @@ EEBeamColumn3d::EEBeamColumn3d(int tag, int Nd1, int Nd2,
     bool iM, int addRay, double r, bool cm)
     : ExperimentalElement(tag, ELE_TAG_EEBeamColumn3d, site),
     connectedExternalNodes(2), theCoordTransf(0),
-    iMod(iM), addRayleigh(addRay), rho(r), cMass(cm), L(0.0),
-    theLoad(12), db(0), vb(0), ab(0), t(0),
+    iMod(iM), addRayleigh(addRay), rho(r), cMass(cm),
+    nlGeo(0), L(0.0), theLoad(12), db(0), vb(0), ab(0), t(0),
     dbDaq(0), vbDaq(0), abDaq(0), qbDaq(0), tDaq(0),
     dbCtrl(6), vbCtrl(6), abCtrl(6),
     kbInit(6,6), dbLast(6), tLast(0.0),
@@ -125,6 +125,19 @@ EEBeamColumn3d::EEBeamColumn3d(int tag, int Nd1, int Nd2,
         exit(-1);
     }
     
+    // get coordinate transformation type and save flag
+    if (strncmp(theCoordTransf->getClassType(),"Linear",6) == 0)
+        nlGeo = 0;
+    else if (strncmp(theCoordTransf->getClassType(),"PDelta",6) == 0)
+        nlGeo = 1;
+    else if (strncmp(theCoordTransf->getClassType(),"Corot",5) == 0)  {
+        nlGeo = 0;
+        opserr << "\nWARNING EEBeamColumn3d::EEBeamColumn3d()"
+            << " - Element: " << this->getTag() << endln
+            << "Corotational transformation from basic sys A to B not "
+            << "implemented yet. Using Linear transformation instead.\n";
+    }
+    
     // initialize additional vectors
     dbCtrl.Zero();
     vbCtrl.Zero();
@@ -146,7 +159,7 @@ EEBeamColumn3d::EEBeamColumn3d(int tag, int Nd1, int Nd2,
     : ExperimentalElement(tag, ELE_TAG_EEBeamColumn3d),
     connectedExternalNodes(2), theCoordTransf(0),
     iMod(iM), addRayleigh(addRay), rho(r), cMass(cm),
-    L(0.0), theLoad(12), theChannel(0),
+    nlGeo(0), L(0.0), theLoad(12), theChannel(0),
     sData(0), sendData(0), rData(0), recvData(0),
     db(0), vb(0), ab(0), t(0),
     dbDaq(0), vbDaq(0), abDaq(0), qbDaq(0), tDaq(0),
@@ -260,6 +273,19 @@ EEBeamColumn3d::EEBeamColumn3d(int tag, int Nd1, int Nd2,
         opserr << "EEBeamColumn3d::EEBeamColumn3d() - "
             << "failed to get copy of the coordinate transformation\n";
         exit(-1);
+    }
+    
+    // get coordinate transformation type and save flag
+    if (strncmp(theCoordTransf->getClassType(),"Linear",6) == 0)
+        nlGeo = 0;
+    else if (strncmp(theCoordTransf->getClassType(),"PDelta",6) == 0)
+        nlGeo = 1;
+    else if (strncmp(theCoordTransf->getClassType(),"Corot",5) == 0)  {
+        nlGeo = 0;
+        opserr << "\nWARNING EEBeamColumn3d::EEBeamColumn3d()"
+            << " - Element: " << this->getTag() << endln
+            << "Corotational transformation from basic sys A to B not "
+            << "implemented yet. Using Linear transformation instead.\n";
     }
     
     // initialize additional vectors
@@ -466,45 +492,47 @@ int EEBeamColumn3d::update()
     //const Vector &abA = theCoordTransf->getBasicTrialAccel();  // not implemented yet
     Vector vbA(6), abA(6);
     
-    // transform displacements from basic sys A to basic sys B (linear)
-    (*db)[0] = dbA(0);
-    (*db)[1] = -L*dbA(1);
-    (*db)[2] = -dbA(1)+dbA(2);
-    (*db)[3] = L*dbA(3);
-    (*db)[4] = -dbA(3)+dbA(4);
-    (*db)[5] = dbA(5);
-    (*vb)[0] = vbA(0);
-    (*vb)[1] = -L*vbA(1);
-    (*vb)[2] = -vbA(1)+vbA(2);
-    (*vb)[3] = L*vbA(3);
-    (*vb)[4] = -vbA(3)+vbA(4);
-    (*vb)[5] = vbA(5);
-    (*ab)[0] = abA(0);
-    (*ab)[1] = -L*abA(1);
-    (*ab)[2] = -abA(1)+abA(2);
-    (*ab)[3] = L*abA(3);
-    (*ab)[4] = -abA(3)+abA(4);
-    (*ab)[5] = abA(5);
-    
-    /* transform displacements from basic sys A to basic sys B (nonlinear)
-    (*db)[0] = 
-    (*db)[1] = 
-    (*db)[2] = 
-    (*db)[3] = 
-    (*db)[4] = 
-    (*db)[5] = 
-    (*vb)[0] = 
-    (*vb)[1] = 
-    (*vb)[2] = 
-    (*vb)[3] = 
-    (*vb)[4] = 
-    (*vb)[5] = 
-    (*ab)[0] = 
-    (*ab)[1] = 
-    (*ab)[2] = 
-    (*ab)[3] = 
-    (*ab)[4] = 
-    (*ab)[5] = */
+    if (nlGeo == 0 || nlGeo == 1)  {
+        // transform displacements from basic sys A to basic sys B (linear)
+        (*db)[0] = dbA(0);
+        (*db)[1] = -L*dbA(1);
+        (*db)[2] = -dbA(1)+dbA(2);
+        (*db)[3] = L*dbA(3);
+        (*db)[4] = -dbA(3)+dbA(4);
+        (*db)[5] = dbA(5);
+        (*vb)[0] = vbA(0);
+        (*vb)[1] = -L*vbA(1);
+        (*vb)[2] = -vbA(1)+vbA(2);
+        (*vb)[3] = L*vbA(3);
+        (*vb)[4] = -vbA(3)+vbA(4);
+        (*vb)[5] = vbA(5);
+        (*ab)[0] = abA(0);
+        (*ab)[1] = -L*abA(1);
+        (*ab)[2] = -abA(1)+abA(2);
+        (*ab)[3] = L*abA(3);
+        (*ab)[4] = -abA(3)+abA(4);
+        (*ab)[5] = abA(5);
+    } else if (nlGeo == 2)  {
+        /* transform displacements from basic sys A to basic sys B (nonlinear)
+        (*db)[0] = 
+        (*db)[1] = 
+        (*db)[2] = 
+        (*db)[3] = 
+        (*db)[4] = 
+        (*db)[5] = 
+        (*vb)[0] = 
+        (*vb)[1] = 
+        (*vb)[2] = 
+        (*vb)[3] = 
+        (*vb)[4] = 
+        (*vb)[5] = 
+        (*ab)[0] = 
+        (*ab)[1] = 
+        (*ab)[2] = 
+        (*ab)[3] = 
+        (*ab)[4] = 
+        (*ab)[5] = */
+    }
     
     Vector dbDelta = (*db) - dbLast;
     // do not check time for right now because of transformation constraint
@@ -589,28 +617,28 @@ const Matrix& EEBeamColumn3d::getTangentStiff()
     if (fabs((*qbDaq)[5]) < 1.0E-12)
         (*qbDaq)[5] = kbInit(5,5)*(*db)[5];
     
-    // transform forces from basic sys B to basic sys A (linear)
     static Vector qA(6);
-    qA(0) = (*qbDaq)[0];
-    qA(1) = -L*(*qbDaq)[1] - (*qbDaq)[2];
-    qA(2) = (*qbDaq)[2];
-    qA(3) = L*(*qbDaq)[3] - (*qbDaq)[4];
-    qA(4) = (*qbDaq)[4];
-    qA(5) = (*qbDaq)[5];
-    
-    /* transform forces from basic sys B to basic sys A (nonlinear)
-    static Vector qA(6);
-    qA(0) = 
-    qA(1) = 
-    qA(2) = 
-    qA(3) = 
-    qA(4) = 
-    qA(5) = */
+    if (nlGeo == 0 || nlGeo == 1)  {
+        // transform forces from basic sys B to basic sys A (linear)
+        qA(0) = (*qbDaq)[0];
+        qA(1) = -L*(*qbDaq)[1] - (*qbDaq)[2];
+        qA(2) = (*qbDaq)[2];
+        qA(3) = L*(*qbDaq)[3] - (*qbDaq)[4];
+        qA(4) = (*qbDaq)[4];
+        qA(5) = (*qbDaq)[5];
+    } else if (nlGeo == 2)  {
+        /* transform forces from basic sys B to basic sys A (nonlinear)
+        qA(0) = 
+        qA(1) = 
+        qA(2) = 
+        qA(3) = 
+        qA(4) = 
+        qA(5) = */
+    }
     
     // add initial forces
-    for (int i=0; i<6; i++)  {
+    for (int i=0; i<6; i++)
         qA(i) += qA0[i];
-    }
     
     // transform stiffness from basic sys B to basic sys A
     static Matrix kbAInit(6,6);
@@ -855,28 +883,29 @@ const Vector& EEBeamColumn3d::getResistingForce()
     vbCtrl = (*vb);
     abCtrl = (*ab);
     
-    // transform forces from basic sys B to basic sys A (linear)
     static Vector qA(6);
-    qA(0) = (*qbDaq)[0];
-    qA(1) = -L*(*qbDaq)[1] - (*qbDaq)[2];
-    qA(2) = (*qbDaq)[2];
-    qA(3) = L*(*qbDaq)[3] - (*qbDaq)[4];
-    qA(4) = (*qbDaq)[4];
-    qA(5) = (*qbDaq)[5];
-    
+    if (nlGeo == 0 || nlGeo == 1)  {
+        // transform forces from basic sys B to basic sys A (linear)
+        qA(0) = (*qbDaq)[0];
+        qA(1) = -L*(*qbDaq)[1] - (*qbDaq)[2];
+        qA(2) = (*qbDaq)[2];
+        qA(3) = L*(*qbDaq)[3] - (*qbDaq)[4];
+        qA(4) = (*qbDaq)[4];
+        qA(5) = (*qbDaq)[5];
+    } else if (nlGeo == 2)  {
     /* transform forces from basic sys B to basic sys A (nonlinear)
-    static Vector qA(6);
-    qA(0) = 
-    qA(1) = 
-    qA(2) = 
-    qA(3) = 
-    qA(4) = 
-    qA(5) = */
+        static Vector qA(6);
+        qA(0) = 
+        qA(1) = 
+        qA(2) = 
+        qA(3) = 
+        qA(4) = 
+        qA(5) = */
+    }
     
     // add initial forces
-    for (int i=0; i<6; i++)  {
+    for (int i=0; i<6; i++)
         qA(i) += qA0[i];
-    }
     
     // Vector for reactions in basic system A
     Vector pA0Vec(pA0, 6);

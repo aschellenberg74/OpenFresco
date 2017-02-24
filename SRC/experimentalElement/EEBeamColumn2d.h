@@ -124,6 +124,7 @@ private:
     int addRayleigh;    // flag to add Rayleigh damping
     double rho;         // rho: mass per unit length
     bool cMass;         // consistent mass flag
+    int nlGeo;          // nonlinear geometry flag
     double L;           // undeformed element length
     
     static Matrix theMatrix;  // a class wide Matrix
