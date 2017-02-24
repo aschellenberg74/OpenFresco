@@ -127,6 +127,7 @@ for i=1:length(fileNames)
     end
 end
 rmpath(pathOPSlib);
+savepath;
 fprintf(1,'Finished updating OpenSees 32-bit LIB files in OpenFresco.\n\n');
 fprintf(1,'Removed OpenSees 32-bit LIB folders from path.\n\n');
 
@@ -195,6 +196,7 @@ for i=1:length(fileNames)
     end
 end
 rmpath(pathOPSlib);
+savepath;
 fprintf(1,'Finished updating OpenSees 64-bit LIB files in OpenFresco.\n\n');
 fprintf(1,'Removed OpenSees 64-bit LIB folders from path.\n\n');
 

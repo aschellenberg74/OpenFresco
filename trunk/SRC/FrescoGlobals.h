@@ -35,7 +35,7 @@
 //
 // Description: This file contains the global values in Fresco
 
-#define OPF_VERSION "2.7.0 (Build 419)"
+#define OPF_VERSION "2.7.0 (Build 420)"
 
 #ifndef _WIN64
 #define WIN_ARCH "32-Bit"
