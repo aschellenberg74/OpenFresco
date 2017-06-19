@@ -64,7 +64,7 @@ expSite ActorSite 2 -setup 1 8091
 # startLabServer $siteTag
 startLabServer  2
 
-wipe
+wipeExp
 exit
 # --------------------------------
 # End of analysis
