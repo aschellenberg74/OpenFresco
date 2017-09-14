@@ -227,7 +227,6 @@ int TclStartSimAppSiteServer(ClientData clientData,
             break;
         case OF_RemoteTest_DIE:
             exitYet = true;
-            delete theExperimentalSite;
             break;
         default:
             opserr << "WARNING SimAppSiteServer invalid action "
