@@ -620,6 +620,12 @@
     <ClCompile Include="..\..\..\SRC\openseesCore\EigenSolver.cpp">
       <Filter>openseesCore</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\CrdTransf.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\SectionForceDeformation.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\SRC\utility\ExpControlSP.h">
@@ -1214,6 +1220,9 @@
       <Filter>openseesCore</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\SRC\openseesCore\PlainMap.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\SectionForceDeformation.h">
       <Filter>openseesCore</Filter>
     </ClInclude>
   </ItemGroup>

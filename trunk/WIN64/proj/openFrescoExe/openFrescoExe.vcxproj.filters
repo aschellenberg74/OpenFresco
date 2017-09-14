@@ -627,6 +627,12 @@
     <ClCompile Include="..\..\..\SRC\openseesCore\EigenSolver.cpp">
       <Filter>openseesCore</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\CrdTransf.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\SectionForceDeformation.cpp">
+      <Filter>openseesCore</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\SRC\utility\ExpControlSP.h">
@@ -1229,16 +1235,12 @@
     <ClInclude Include="..\..\..\SRC\openseesCore\PlainMap.h">
       <Filter>openseesCore</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="OpenFresco.ico">
-      <Filter>Resource Files</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="openFrescoExe.rc">
-      <Filter>Resource Files</Filter>
-    </ResourceCompile>
+    <ClInclude Include="..\..\..\SRC\openseesCore\SectionForceDeformation.h">
+      <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="resource1.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuildStep Include="..\..\..\SRC\experimentalControl\ECSCRAMNet.h">
@@ -1247,5 +1249,15 @@
     <CustomBuildStep Include="..\..\..\SRC\experimentalControl\ECSimDomain.h">
       <Filter>experimentalControl</Filter>
     </CustomBuildStep>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="OpenFresco.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="openFrescoExe.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>
