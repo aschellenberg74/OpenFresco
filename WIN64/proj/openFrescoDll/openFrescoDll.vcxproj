@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -22,24 +22,29 @@
     <ProjectGuid>{41D52F86-31CD-4DCF-8F58-BEC7C09D48E7}</ProjectGuid>
     <RootNamespace>OpenFresco</RootNamespace>
     <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -248,6 +253,7 @@
     <ClCompile Include="..\..\..\SRC\openseesCore\BinaryFileStream.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\Channel.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\ConstraintHandler.cpp" />
+    <ClCompile Include="..\..\..\SRC\openseesCore\CrdTransf.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\DataFileStream.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\DOF_Group.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\DOF_GrpIter.cpp" />
@@ -300,6 +306,7 @@
     <ClCompile Include="..\..\..\SRC\openseesCore\Recorder.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\Renderer.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\Response.cpp" />
+    <ClCompile Include="..\..\..\SRC\openseesCore\SectionForceDeformation.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\SimulationInformation.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\SingleDomAllSP_Iter.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\SingleDomEleIter.cpp" />
@@ -506,6 +513,7 @@
     <ClInclude Include="..\..\..\SRC\openseesCore\Recorder.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\Renderer.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\Response.h" />
+    <ClInclude Include="..\..\..\SRC\openseesCore\SectionForceDeformation.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\SimulationInformation.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\SingleDomAllSP_Iter.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\SingleDomEleIter.h" />
