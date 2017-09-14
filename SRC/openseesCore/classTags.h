@@ -103,7 +103,8 @@
 #define TSERIES_TAG_PulseSeries       9
 #define TSERIES_TAG_TriangleSeries       10
 #define TSERIES_TAG_PeerMotion       11
-#define TSERIES_TAG_PeerNGAMotion       11
+#define TSERIES_TAG_PeerNGAMotion       12
+#define TSERIES_TAG_PathTimeSeriesThermal  13  //L.Jiang [ SIF ]
 
 #define PARAMETER_TAG_Parameter			   1
 #define PARAMETER_TAG_MaterialStageParameter       2
@@ -202,7 +203,11 @@
 #define MAT_TAG_BilinearOilDamper               89
 #define MAT_TAG_ConcreteCM                      90
 #define MAT_TAG_SteelMPF                        91
-
+#define MAT_TAG_ElasticMaterialThermal          92   //L.Jiang [SIF]
+#define MAT_TAG_SteelECThermal			93   //L.Jiang [SIF]
+#define MAT_TAG_StainlessECThermal              94   //L.Jiang [SIF]
+#define MAT_TAG_ConcreteECThermal		95   //L.Jiang [SIF]
+#define MAT_TAG_BoucWenOriginal                 96
 
 #define MAT_TAG_PySimple1                    205
 #define MAT_TAG_TzSimple1                    206
@@ -213,6 +218,7 @@
 #define MAT_TAG_TzSimple2                    211
 #define MAT_TAG_QzSimple2                    212
 #define MAT_TAG_SteelBRB                     213
+#define MAT_TAG_PySimple3                    214
 
 
 
@@ -288,6 +294,11 @@
 #define SEC_TAG_ElasticWarpingShear2d           28
 #define SEC_TAG_DoubleMembranePlateFiberSection 29
 #define SEC_TAG_NDFiberSectionWarping2d         30
+#define SEC_TAG_Elliptical2                     31
+#define SEC_TAG_FiberSection3dThermal           32   // L.Jiang[SIF]
+#define SEC_TAG_FiberSectionGJThermal           33   // L.Jiang[SIF]
+#define SEC_TAG_MembranePlateFiberSectionThermal 34  // L.Jiang[SIF]
+#define SEC_TAG_LayeredShellFiberSectionThermal 35     //L.Jiang[SIF]
 
 #define SEC_TAG_McftSection2dfiber 7601
 
@@ -339,6 +350,11 @@
 #define ND_TAG_Faria1998PlaneStress2d               50
 #define ND_TAG_Faria1998               51
 #define ND_TAG_Faria1998ThreeDimensional               52
+#define ND_TAG_CPlaneStress   53
+#define ND_TAG_CPlaneStrain   54
+#define ND_TAG_CPlaneStress2d   55
+#define ND_TAG_CThreeDimensional   55
+
 
 #define ND_TAG_FluidSolidPorousMaterial        100
 #define ND_TAG_PressureDependMultiYield		101
@@ -404,6 +420,8 @@
 #define ND_TAG_StressDensityModel             14018
 #define ND_TAG_StressDensityModel2D           14019
 #define ND_TAG_StressDensityModel3D           14020
+// PM4Sand material  L.Chen
+#define ND_TAG_PM4Sand                        14021
 
 // MultiaxialCyclicPlasticity, add by Gang Wang
 #define ND_TAG_MultiaxialCyclicPlasticity             10031
@@ -414,6 +432,15 @@
 #define ND_TAG_ConcreteMcftNonLinear5 7601
 #define ND_TAG_ConcreteMcftNonLinear7 7602
 
+#define ND_TAG_ElasticIsotropicThermal	      7000   //L.Jiang[SIF]
+#define ND_TAG_ElasticIsotropic3DThermal      7001   //L.Jiang[SIF]
+#define ND_TAG_J2ThreeDimensionalThermal      7002   //L.Jiang[SIF]
+#define ND_TAG_DruckerPragerThermal	      7003   //L.Jiang[SIF]
+#define ND_TAG_DruckerPrager3DThermal         7004   //L.Jiang[SIF]
+#define ND_TAG_PlasticDamageConcrete3dThermal 7005   //L.Jiang[SIF]
+#define ND_TAG_PlateFiberMaterialThermal      7006   //L.Jiang[SIF]
+#define ND_TAG_PlateRebarMaterialThermal      7007   //L.Jiang[SIF]
+#define ND_TAG_PlateFromPlaneStressMaterialThermal 7008   //L.Jiang[SIF]
 
 
 
@@ -473,7 +500,10 @@
 #define LOAD_TAG_SelfWeight              10 // C.McGann, U.W.
 #define LOAD_TAG_Beam2dThermalAction      11
 #define LOAD_TAG_Beam2dPartialUniformLoad 12
-
+#define LOAD_TAG_Beam3dThermalAction      13 // L.Jiang [ SIF ]
+#define LOAD_TAG_ShellThermalAction       14 // L.Jiang [ SIF ]
+#define LOAD_TAG_NodalThermalAction       15 //L.Jiang [ SIF ]
+#define LOAD_TAG_ThermalActionWrapper     16 //L.Jiang [ SIF ]
 
 
 #define MAT_TAG_IsotropicLinElastic         1001
@@ -653,6 +683,15 @@
 #define ELE_TAG_PFEMElement2DFIC          164
 #define ELE_TAG_ElastomericBearingBoucWenMod3d 165
 #define ELE_TAG_FPBearingPTV              166
+#define ELE_TAG_ShellDKGT                 167
+#define ELE_TAG_ShellNLDKGT               168
+#define ELE_TAG_CatenaryCable             169
+#define ELE_TAG_DispBeamColumn3dThermal   170  // L.Jiang [SIF]
+#define ELE_TAG_ForceBeamColumn2dThermal  171  //L.Jiang [SIF]
+#define ELE_TAG_ForceBeamColumn3dThermal  172  //L.Jiang [SIF] //Still testing
+#define ELE_TAG_ShellMITC4Thermal         173   //L.Jiang [SIF]
+#define ELE_TAG_ShellNLDKGQThermal        174   //L.Jiang [SIF]
+#define ELE_TAG_ShellANDeS                175   //L.Jiang [SIF]
 
 #define FRN_TAG_Coulomb            1
 #define FRN_TAG_VelDependent       2
@@ -834,6 +873,7 @@
 #define INTEGRATOR_TAGS_PFEMIntegrator                  52
 #define INTEGRATOR_TAGS_KRAlphaExplicit                 53
 #define INTEGRATOR_TAGS_KRAlphaExplicit_TP              54
+#define INTEGRATOR_TAGS_ExplicitDifference              55
 
 #define LinSOE_TAGS_FullGenLinSOE		1
 #define LinSOE_TAGS_BandGenLinSOE		2
