@@ -21,6 +21,8 @@
 # Start of model generation
 # ------------------------------
 logFile "OneBayFrame_Distr_Client.log"
+defaultUnits -force kip -length in -time sec -temp F
+
 # create ModelBuilder (with two-dimensions and 2 DOF/node)
 model BasicBuilder -ndm 2 -ndf 2
 
