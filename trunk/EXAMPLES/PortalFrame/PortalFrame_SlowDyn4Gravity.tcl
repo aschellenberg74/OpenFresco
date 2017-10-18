@@ -21,6 +21,8 @@
 # Start of model generation
 # ------------------------------
 logFile "PortalFrame_SlowDyn4Gravity.log"
+defaultUnits -force kip -length in -time sec -temp F
+
 # create ModelBuilder (with two-dimensions and 3 DOF/node)
 model BasicBuilder -ndm 2 -ndf 3
 
@@ -144,6 +146,11 @@ if {$withGravity} {
     # create a Recorder object for the nodal displacements at node 2
     recorder Node -file GravitySlowDyn_Dsp.out -time -node 3 4 -dof 1 2 3 disp
     recorder Element -file GravitySlowDyn_Frc.out -time -ele 1 2 3 force
+    recorder Element -file GravitySlowDyn_Elmt_ctrlDsp.out -time -ele 1 2   ctrlDisp
+    recorder Element -file GravitySlowDyn_Elmt_daqDsp.out  -time -ele 1 2   daqDisp
+    expRecorder Control -file GravitySlowDyn_Ctrl_ctrlDsp.out -time -control 1 2 ctrlDisp
+    expRecorder Control -file GravitySlowDyn_Ctrl_daqDsp.out  -time -control 1 2 daqDisp
+    expRecorder Control -file GravitySlowDyn_Ctrl_daqFrc.out  -time -control 1 2 daqForce
     # --------------------------------
     # End of recorder generation
     # --------------------------------
@@ -153,6 +160,7 @@ if {$withGravity} {
     # Perform the gravity analysis
     # ------------------------------
     # perform the gravity load analysis, requires 200 steps to reach the load level
+    record
     if {[analyze 200 0.01] == 0} {
         puts "\nGravity load analysis completed"
     } else {
@@ -167,6 +175,7 @@ if {$withGravity} {
     # Set the gravity loads to be constant & reset the time in the domain
     loadConst -time 0.0
     remove recorders
+    removeExp recorders
 }
 
 # Define dynamic loads
@@ -230,6 +239,8 @@ recorder Node -file Node_Acc.out -time -node     3 4 -dof 1 2 3 accel
 recorder Node -file Node_Rxn.out -time -node 1 2 3 4 -dof 1 2 3 reactionIncludingInertia
 
 recorder Element -file Elmt_glbFrc.out  -time -ele 1 2 3 forces
+recorder Element -file Elmt_ctrlDsp.out -time -ele 1 2   ctrlDisp
+recorder Element -file Elmt_daqDsp.out  -time -ele 1 2   daqDisp
 expRecorder Control -file Control_ctrlDsp.out -time -control 1 2 ctrlDisp
 expRecorder Control -file Control_daqDsp.out  -time -control 1 2 daqDisp
 expRecorder Control -file Control_daqFrc.out  -time -control 1 2 daqForce

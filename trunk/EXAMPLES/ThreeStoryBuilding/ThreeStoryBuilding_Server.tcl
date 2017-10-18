@@ -1,4 +1,5 @@
 # File: ThreeStoryBuilding_Server.tcl (use with ThreeStoryBuilding_Client.tcl)
+# Units: [kip,in.]
 #
 # $Revision$
 # $Date$
@@ -18,6 +19,9 @@
 # ------------------------------
 # Start of model generation
 # ------------------------------
+logFile "ThreeStoryBuilding_Server.log"
+defaultUnits -force kip -length in -time sec -temp F
+
 # create ModelBuilder (with two-dimensions and 2 DOF/node)
 model BasicBuilder -ndm 2 -ndf 2
 
@@ -571,13 +575,13 @@ element truss     303 235 236 20.1 1
 
 # Define control points
 # ---------------------
-# expControlPoint tag nodeTag dir resp <-fact f> <-lim l u> ...
-expControlPoint 1  79  ux disp
-expControlPoint 2 157  ux disp
-expControlPoint 3 235  ux disp
-expControlPoint 4  79  ux disp ux force
-expControlPoint 5 157  ux disp ux force
-expControlPoint 6 235  ux disp ux force
+# expControlPoint $cpTag <-node $nodeTag> $dof $rspType <-fact $f> <-lim $l $u> <-isRel> ...
+expControlPoint 1  -node  79  ux disp
+expControlPoint 2  -node 157  ux disp
+expControlPoint 3  -node 235  ux disp
+expControlPoint 4  -node  79  ux disp  ux force
+expControlPoint 5  -node 157  ux disp  ux force
+expControlPoint 6  -node 235  ux disp  ux force
 
 # Define experimental control
 # ---------------------------
@@ -634,6 +638,8 @@ expRecorder Site -file Server_Node_Acc.out -time -site 1 trialAccel
 # ------------------------------
 # startLabServer $siteTag
 startLabServer  1
+
+wipeExp
 exit
 # --------------------------------
 # End of analysis

@@ -1,4 +1,5 @@
 # File: LShapedColumn_Server1a.tcl (use with LShapedColumn_Client1.tcl)
+# Units: [kip,in.]
 #
 # $Revision$
 # $Date$
@@ -19,6 +20,9 @@
 # ------------------------------
 # Start of model generation
 # ------------------------------
+logFile "LShapedColumn_Server1a.log"
+defaultUnits -force kip -length in -time sec -temp F
+
 # create ModelBuilder (with two-dimensions and 2 DOF/node)
 model BasicBuilder -ndm 2 -ndf 3
 
@@ -90,6 +94,8 @@ expSite ActorSite 1 -setup 1 8090
 # ------------------------------
 # startLabServer $siteTag
 startLabServer  1
+
+wipeExp
 exit
 # --------------------------------
 # End of analysis

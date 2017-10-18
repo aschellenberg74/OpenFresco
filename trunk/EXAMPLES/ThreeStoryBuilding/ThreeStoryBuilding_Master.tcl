@@ -1,4 +1,5 @@
 # File: ThreeStoryBuilding_Master.tcl (use with ThreeStoryBuilding_Slave.tcl)
+# Units: [kip,in.]
 #
 # $Revision$
 # $Date$
@@ -19,6 +20,9 @@
 # ------------------------------
 # Start of model generation
 # ------------------------------
+logFile "ThreeStoryBuilding_Master.log"
+defaultUnits -force kip -length in -time sec -temp F
+
 # create ModelBuilder (with two-dimensions and 2 DOF/node)
 model BasicBuilder -ndm 2 -ndf 3
 
@@ -112,15 +116,21 @@ equalDOF 4  20  1
 # uniaxialMaterial Elastic $tag $E
 uniaxialMaterial Elastic  1  29000
 
+# Define control points
+# ---------------------
+# expControlPoint $cpTag <-node $nodeTag> $dof $rspType <-fact $f> <-lim $l $u> <-isRel> ...
+expControlPoint 1  1 disp 2 disp 3 disp
+expControlPoint 2  1 disp 2 disp 3 disp  1 force 2 force 3 force 
+
 # Define experimental control
 # ---------------------------
-# expControl SimFEAdapter $tag ipAddr $ipPort
-expControl SimFEAdapter 1 "127.0.0.1" 44000
+# expControl SimFEAdapter $tag ipAddr $ipPort -trialCP $cpTags -outCP $cpTags
+expControl SimFEAdapter 1 "127.0.0.1" 44000 -trialCP 1 -outCP 2
 
 # Define experimental setup
 # -------------------------
-# expSetup NoTransformation $tag <–control $ctrlTag> –dir $dirs … -sizeTrialOut t o <–ctrlDispFact $f> ...
-expSetup NoTransformation 1 -control 1 -dir 1 2 3 -sizeTrialOut 3 3
+# expSetup NoTransformation $tag <–control $ctrlTag> –dof $DOFs … -sizeTrialOut t o <–ctrlDispFact $f> ...
+expSetup NoTransformation 1 -control 1 -dof 1 2 3 -sizeTrialOut 3 3
 
 # Define experimental site
 # ------------------------
@@ -217,6 +227,7 @@ integrator Newmark 0.5 0.25
 #integrator AlphaOS 1.0
 # create the solution algorithm
 algorithm Newton
+#algorithm Linear
 # create the analysis object 
 analysis Transient
 # ------------------------------
@@ -264,7 +275,7 @@ set tTot [time {
 puts "\nElapsed Time = $tTot \n"
 # close the output file
 close $outFileID
-
+wipeExp
 wipe
 exit
 # --------------------------------

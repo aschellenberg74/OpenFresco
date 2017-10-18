@@ -1,5 +1,6 @@
 # File: LShapedColumn_Client1.tcl
 # (use with LShapedColumn_Server1a.tcl or LShapedColumn_Server1b.tcl)
+# Units: [kip,in.]
 #
 # $Revision$
 # $Date$
@@ -20,6 +21,9 @@
 # ------------------------------
 # Start of model generation
 # ------------------------------
+logFile "LShapedColumn_Client1.log"
+defaultUnits -force kip -length in -time sec -temp F
+
 # create ModelBuilder (with two-dimensions and 2 DOF/node)
 model BasicBuilder -ndm 2 -ndf 3
 
@@ -159,7 +163,7 @@ set tTot [time {
 puts "\nElapsed Time = $tTot \n"
 # close the output file
 close $outFileID
-
+wipeExp
 wipe
 exit
 # --------------------------------

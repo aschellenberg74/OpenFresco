@@ -1,4 +1,5 @@
 # File: ThreeStoryBuilding_Slave.tcl (use with ThreeStoryBuilding_Master.tcl)
+# Units: [kip,in.]
 #
 # $Revision$
 # $Date$
@@ -18,6 +19,9 @@
 # ------------------------------
 # Start of model generation
 # ------------------------------
+logFile "ThreeStoryBuilding_Slave.log"
+defaultUnits -force kip -length in -time sec -temp F
+
 # create ModelBuilder (with two-dimensions and 2 DOF/node)
 model BasicBuilder -ndm 2 -ndf 2
 
@@ -573,24 +577,18 @@ element  adapter 1000  -node 79  157  235  -dof 1  -dof 1  -dof 1  -stif +1.0000
 # ------------------------------
 # create the system of equations
 system BandGeneral
-
 # create the DOF numberer
 numberer Plain
-
 # create the constraint handler
 constraints Transformation
-
 # create the convergence test
 test NormDispIncr 1.0e-12 25
 #test NormUnbalance 1.0e-12 25
 #test EnergyIncr 1.0e-12 25
-
 # create the integration scheme
 integrator LoadControl 1.0
-
 # create the solution algorithm
 algorithm Newton
-
 # create the analysis object 
 analysis Static
 # ------------------------------
@@ -613,6 +611,7 @@ recorder Node -file Slave_Node_Acc.out -time -node 79 157 235 -dof 1 2 3 accel
 # ------------------------------
 # Finally perform the analysis
 # ------------------------------
+record
 analyze 25000
 exit
 # --------------------------------
