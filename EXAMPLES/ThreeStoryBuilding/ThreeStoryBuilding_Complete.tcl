@@ -1,4 +1,5 @@
 # File: ThreeStoryBuilding_Complete.tcl
+# Units: [kip,in.]
 #
 # $Revision$
 # $Date$
@@ -15,6 +16,9 @@
 # -----------------------------------
 # Start of model generation for wall
 # -----------------------------------
+logFile "ThreeStoryBuilding_Complete.log"
+defaultUnits -force kip -length in -time sec -temp F
+
 # create ModelBuilder (with two-dimensions and 2 DOF/node)
 model BasicBuilder -ndm 2 -ndf 2
 
@@ -739,6 +743,7 @@ integrator Newmark 0.5 0.25
 #integrator AlphaOS 1.0
 # create the solution algorithm
 algorithm Newton
+#algorithm Linear
 # create the analysis object 
 analysis Transient
 # ------------------------------

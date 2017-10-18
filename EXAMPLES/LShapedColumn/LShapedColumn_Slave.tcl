@@ -1,4 +1,5 @@
 # File: LShapedColumn_Slave.tcl (use with LShapedColumn_Master.tcl)
+# Units: [kip,in.]
 #
 # $Revision$
 # $Date$
@@ -19,6 +20,9 @@
 # ------------------------------
 # Start of model generation
 # ------------------------------
+logFile "LShapedColumn_Slave.log"
+defaultUnits -force kip -length in -time sec -temp F
+
 # create ModelBuilder (with two-dimensions and 2 DOF/node)
 model BasicBuilder -ndm 2 -ndf 3
 
@@ -111,6 +115,7 @@ recorder Element -file Slave_Elmt_daqDsp.out  -time -ele   2 daqDisp
 # ------------------------------
 # Finally perform the analysis
 # ------------------------------
+record
 analyze 160000
 exit
 # --------------------------------

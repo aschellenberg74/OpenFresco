@@ -21,6 +21,8 @@
 # Start of model generation
 # ------------------------------
 logFile "Cantilever3D_Master.log"
+defaultUnits -force kip -length in -time sec -temp F
+
 # create ModelBuilder (with two-dimensions and 2 DOF/node)
 model BasicBuilder -ndm 3 -ndf 6
 

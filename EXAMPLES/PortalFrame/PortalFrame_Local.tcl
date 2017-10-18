@@ -21,6 +21,8 @@
 # Start of model generation
 # ------------------------------
 logFile "PortalFrame_Local.log"
+defaultUnits -force kip -length in -time sec -temp F
+
 # create ModelBuilder (with two-dimensions and 3 DOF/node)
 model BasicBuilder -ndm 2 -ndf 3
 
@@ -136,8 +138,13 @@ if {$withGravity} {
     # Start of recorder generation
     # ------------------------------
     # create a Recorder object for the nodal displacements at node 2
-    recorder Node -file Gravity_Dsp.out -time -node 3 4 -dof 1 2 3 disp
-    recorder Element -file Gravity_Frc.out -time -ele 1 2 3 force
+    recorder Node -file Gravity_Node_Dsp.out -time -node 3 4 -dof 1 2 3 disp
+    recorder Element -file Gravity_Elmt_glbFrc.out  -time -ele 1 2 3 force
+    recorder Element -file Gravity_Elmt_ctrlDsp.out -time -ele 1 2   ctrlDisp
+    recorder Element -file Gravity_Elmt_daqDsp.out  -time -ele 1 2   daqDisp
+    expRecorder Control -file Gravity_Ctrl_ctrlDsp.out -time -control 1 2 ctrlDisp
+    expRecorder Control -file Gravity_Ctrl_daqDsp.out  -time -control 1 2 daqDisp
+    expRecorder Control -file Gravity_Ctrl_daqFrc.out  -time -control 1 2 daqForce
     # --------------------------------
     # End of recorder generation
     # --------------------------------
@@ -147,6 +154,7 @@ if {$withGravity} {
     # Perform the gravity analysis
     # ------------------------------
     # perform the gravity load analysis, requires 10 steps to reach the load level
+    record
     if {[analyze 10] == 0} {
         puts "\nGravity load analysis completed"
     } else {
@@ -161,6 +169,7 @@ if {$withGravity} {
     # Set the gravity loads to be constant & reset the time in the domain
     loadConst -time 0.0
     remove recorders
+    removeExp recorders
 }
 
 # Define dynamic loads
@@ -224,9 +233,11 @@ recorder Node -file Node_Acc.out -time -node     3 4 -dof 1 2 3 accel
 recorder Node -file Node_Rxn.out -time -node 1 2 3 4 -dof 1 2 3 reactionIncludingInertia
 
 recorder Element -file Elmt_glbFrc.out  -time -ele 1 2 3 forces
-expRecorder Control -file Control_ctrlDsp.out -time -control 1 2 ctrlDisp
-expRecorder Control -file Control_daqDsp.out  -time -control 1 2 daqDisp
-expRecorder Control -file Control_daqFrc.out  -time -control 1 2 daqForce
+recorder Element -file Elmt_ctrlDsp.out -time -ele 1 2   ctrlDisp
+recorder Element -file Elmt_daqDsp.out  -time -ele 1 2   daqDisp
+expRecorder Control -file Ctrl_ctrlDsp.out -time -control 1 2 ctrlDisp
+expRecorder Control -file Ctrl_daqDsp.out  -time -control 1 2 daqDisp
+expRecorder Control -file Ctrl_daqFrc.out  -time -control 1 2 daqForce
 # --------------------------------
 # End of recorder generation
 # --------------------------------
