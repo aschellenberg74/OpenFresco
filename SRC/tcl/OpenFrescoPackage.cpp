@@ -247,6 +247,18 @@ int openFresco_record(ClientData clientData,
 }
 
 
+int openFresco_version(ClientData clientData,
+    Tcl_Interp *interp, int argc, TCL_Char **argv)
+{
+    char buffer[20];
+    
+    sprintf(buffer, "%s", OPF_VERSION);
+    Tcl_SetResult(interp, buffer, TCL_VOLATILE);
+    
+    return TCL_OK;
+}
+
+
 // This is a package initialization procedure, which is called
 // by Tcl when this package is to be added to an interpreter.
 extern "C" DllExport int
@@ -275,55 +287,58 @@ OpenFresco(ClientData clientData, Tcl_Interp *interp, int argc,
     fprintf(stderr,"\t                       All Rights Reserved                      \n\n\n");    
     
     Tcl_CreateCommand(interp, "expControlPoint", openFresco_addExperimentalCP,
-        (ClientData)NULL, NULL);
+        (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
     
     Tcl_CreateCommand(interp, "expSignalFilter", openFresco_addExperimentalSignalFilter,
-        (ClientData)NULL, NULL);
+        (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
     
     Tcl_CreateCommand(interp, "expControl", openFresco_addExperimentalControl,
-        (ClientData)NULL, NULL);
+        (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
     
     Tcl_CreateCommand(interp, "expSetup", openFresco_addExperimentalSetup,
-        (ClientData)NULL, NULL);
+        (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
     
     Tcl_CreateCommand(interp, "expSite", openFresco_addExperimentalSite,
-        (ClientData)NULL, NULL);
+        (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
     
     Tcl_CreateCommand(interp, "expTangentStiff", openFresco_addExperimentalTangentStiff,
-        (ClientData)NULL, NULL);
+        (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
     
     Tcl_CreateCommand(interp, "expElement", openFresco_addExperimentalElement,
-        (ClientData)NULL, NULL);
+        (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
     
     Tcl_CreateCommand(interp, "expRecorder", openFresco_addExperimentalRecorder,
-        (ClientData)NULL, NULL);
+        (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
     
     Tcl_CreateCommand(interp, "startLabServer", openFresco_startLabServer,
-        (ClientData)NULL, NULL);
+        (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
     
     Tcl_CreateCommand(interp, "setupLabServer", openFresco_setupLabServer,
-        (ClientData)NULL, NULL);
+        (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
     
     Tcl_CreateCommand(interp, "stepLabServer", openFresco_stepLabServer,
-        (ClientData)NULL, NULL);
+        (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
     
     Tcl_CreateCommand(interp, "stopLabServer", openFresco_stopLabServer,
-        (ClientData)NULL, NULL);
+        (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
     
     Tcl_CreateCommand(interp, "startSimAppSiteServer", openFresco_startSimAppSiteServer,
-        (ClientData)NULL, NULL);
+        (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
     
     Tcl_CreateCommand(interp, "startSimAppElemServer", openFresco_startSimAppElemServer,
-        (ClientData)NULL, NULL);
+        (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
     
     Tcl_CreateCommand(interp, "wipeExp", openFresco_wipeModel,
-        (ClientData)NULL, NULL);
+        (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
     
     Tcl_CreateCommand(interp, "removeExp", openFresco_removeComp,
-        (ClientData)NULL, NULL);
+        (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
     
     Tcl_CreateCommand(interp, "recordExp", openFresco_record,
-        (ClientData)NULL, NULL);
+        (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
+    
+    Tcl_CreateCommand(interp, "packageVersion", openFresco_version,
+        (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
     
     return TCL_OK;
 }

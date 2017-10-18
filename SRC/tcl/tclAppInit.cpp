@@ -327,6 +327,38 @@ int addRecorder(ClientData clientData,
 }*/
 
 
+extern int OPS_ResetInput(ClientData clientData, Tcl_Interp *interp, int cArg,
+    int mArg, TCL_Char **argv, Domain *theDomain, TclModelBuilder *theBuilder);
+
+
+const char *getInterpPWD(Tcl_Interp *interp)
+{
+    static char *pwd = 0;
+    
+    if (pwd != 0)
+        delete[] pwd;
+    
+    Tcl_DString buf;
+    const char *objPWD = Tcl_GetCwd(interp, &buf);
+    
+    pwd = new char[strlen(objPWD) + 1];
+    strcpy(pwd, objPWD);
+    
+    Tcl_DStringFree(&buf);
+    
+    return pwd;
+}
+
+
+int getLibraryFunction(const char *libName, const char *funcName,
+    void **libHandle, void **funcHandle)
+{
+    opserr << "getLibraryFunction() called - FATAL!\n";
+    
+    return -1;
+}
+
+
 // wipe entire model command
 int openFresco_wipeModel(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
@@ -373,10 +405,6 @@ int openFresco_record(ClientData clientData,
 {
     return TclExpRecord(clientData, interp, argc, argv, theDomain);
 }
-
-
-extern int OPS_ResetInput(ClientData clientData, Tcl_Interp *interp, int cArg,
-    int mArg, TCL_Char **argv, Domain *theDomain, TclModelBuilder *theBuilder);
 
 
 // model builder command
@@ -553,30 +581,326 @@ int setElementRayleighDampingFactors(ClientData clientData, Tcl_Interp *interp, 
 }
 
 
-int getLibraryFunction(const char *libName, const char *funcName,
-    void **libHandle, void **funcHandle)
+int openFresco_logFile(ClientData clientData,
+    Tcl_Interp *interp, int argc, TCL_Char **argv)
 {
-    opserr << "getLibraryFunction() called - FATAL!\n";
-    return -1;
+    if (argc < 2) {
+        opserr << "WARNING logFile fileName - no filename supplied\n";
+        return TCL_ERROR;
+    }
+    openMode mode = OVERWRITE;
+    bool echo = true;
+    
+    int cArg = 2;
+    while (cArg < argc) {
+        if (strcmp(argv[cArg], "-append") == 0)
+            mode = APPEND;
+        if (strcmp(argv[cArg], "-noEcho") == 0)
+            echo = false;
+        cArg++;
+    }
+    
+    if (opserr.setFile(argv[1], mode, echo) < 0)
+        opserr << "WARNING logFile " << argv[1] << " failed to set the file\n";
+    
+    const char *pwd = getInterpPWD(interp);
+    simulationInfo.addOutputFile(argv[1], pwd);
+    
+    return TCL_OK;
 }
 
 
-const char *getInterpPWD(Tcl_Interp *interp)
+int openFresco_defaultUnits(ClientData clientData,
+    Tcl_Interp *interp, int argc, TCL_Char **argv)
 {
-    static char *pwd = 0;
+    if (argc < 9) {
+        opserr << "WARNING missing a unit type\n";
+        opserr << "Want: defaultUnits -force type -length type -time type -temperature type\n";
+        return TCL_ERROR;
+    }
     
-    if (pwd != 0)
-        delete [] pwd;
+    const char *force = 0;
+    const char *length = 0;
+    const char *time = 0;
+    const char *temperature = 0;
     
-    Tcl_DString buf;
-    const char *objPWD = Tcl_GetCwd(interp, &buf);
+    int count = 1;
+    while (count < 9) {
+        if ((strcmp(argv[count], "-force") == 0) || (strcmp(argv[count], "-Force") == 0)
+            || (strcmp(argv[count], "-FORCE") == 0)) {
+            force = argv[count + 1];
+        }
+        else if ((strcmp(argv[count], "-length") == 0) || (strcmp(argv[count], "-Length") == 0)
+            || (strcmp(argv[count], "-LENGTH") == 0)) {
+            length = argv[count + 1];
+        }
+        else if ((strcmp(argv[count], "-time") == 0) || (strcmp(argv[count], "-Time") == 0)
+            || (strcmp(argv[count], "-TIME") == 0)) {
+            time = argv[count + 1];
+        }
+        else if ((strcmp(argv[count], "-temperature") == 0) || (strcmp(argv[count], "-Temperature") == 0)
+            || (strcmp(argv[count], "-TEMPERATURE") == 0) || (strcmp(argv[count], "-temp") == 0)
+            || (strcmp(argv[count], "-Temp") == 0) || (strcmp(argv[count], "-TEMP") == 0)) {
+            temperature = argv[count + 1];
+        }
+        else {
+            opserr << "WARNING unrecognized unit: " << argv[count] << endln;
+            opserr << "Want: defaultUnits -force type -length type -time type -temperature type\n";
+            return TCL_ERROR;
+        }
+        count += 2;
+    }
     
-    pwd = new char[strlen(objPWD)+1];
-    strcpy(pwd, objPWD);
+    if (length == 0 || force == 0 || time == 0 || temperature == 0) {
+        opserr << "WARNING missing a unit type\n";
+        opserr << "Want: defaultUnits -force type -length type -time type -temperature type\n";
+        return TCL_ERROR;
+    }
     
-    Tcl_DStringFree(&buf);
+    double lb, kip, n, kn, mn, kgf, tonf;
+    double in, ft, mm, cm, m;
+    double sec, msec;
+    double F, C;
     
-    return pwd;
+    if ((strcmp(force, "lb") == 0) || (strcmp(force, "lbs") == 0)) {
+        lb = 1.0;
+    }
+    else if ((strcmp(force, "kip") == 0) || (strcmp(force, "kips") == 0)) {
+        lb = 0.001;
+    }
+    else if ((strcmp(force, "N") == 0)) {
+        lb = 4.4482216152605;
+    }
+    else if ((strcmp(force, "kN") == 0) || (strcmp(force, "KN") == 0) || (strcmp(force, "kn") == 0)) {
+        lb = 0.0044482216152605;
+    }
+    else if ((strcmp(force, "mN") == 0) || (strcmp(force, "MN") == 0) || (strcmp(force, "mn") == 0)) {
+        lb = 0.0000044482216152605;
+    }
+    else if ((strcmp(force, "kgf") == 0)) {
+        lb = 9.80665*4.4482216152605;
+    }
+    else if ((strcmp(force, "tonf") == 0)) {
+        lb = 9.80665 / 1000.0*4.4482216152605;
+    }
+    else {
+        lb = 1.0;
+        opserr << "WARNING unknown force type\n";
+        opserr << "Valid options: lb, kip, N, kN, MN, kgf, tonf\n";
+        return TCL_ERROR;
+    }
+    
+    if ((strcmp(length, "in") == 0) || (strcmp(length, "inch") == 0)) {
+        in = 1.0;
+    }
+    else if ((strcmp(length, "ft") == 0) || (strcmp(length, "feet") == 0)) {
+        in = 1.0 / 12.0;
+    }
+    else if ((strcmp(length, "mm") == 0)) {
+        in = 25.4;
+    }
+    else if ((strcmp(length, "cm") == 0)) {
+        in = 2.54;
+    }
+    else if ((strcmp(length, "m") == 0)) {
+        in = 0.0254;
+    }
+    else {
+        in = 1.0;
+        opserr << "WARNING unknown length type\n";
+        opserr << "Valid options: in, ft, mm, cm, m\n";
+        return TCL_ERROR;
+    }
+    
+    if ((strcmp(time, "sec") == 0) || (strcmp(time, "Sec") == 0)) {
+        sec = 1.0;
+    }
+    else if ((strcmp(time, "msec") == 0) || (strcmp(time, "mSec") == 0)) {
+        sec = 1000.0;
+    }
+    else {
+        sec = 1.0;
+        opserr << "WARNING unknown time type\n";
+        opserr << "Valid options: sec, msec\n";
+        return TCL_ERROR;
+    }
+    
+    if ((strcmp(temperature, "F") == 0) || (strcmp(temperature, "degF") == 0)) {
+        F = 1.0;
+    }
+    else if ((strcmp(temperature, "C") == 0) || (strcmp(temperature, "degC") == 0)) {
+        F = 9.0 / 5.0 + 32.0;
+    }
+    else {
+        F = 1.0;
+        opserr << "WARNING unknown temperature type\n";
+        opserr << "Valid options: F, C\n";
+        return TCL_ERROR;
+    }
+    
+    kip = lb / 0.001;
+    n = lb / 4.4482216152605;
+    kn = lb / 0.0044482216152605;
+    mn = lb / 0.0000044482216152605;
+    kgf = lb / (9.80665*4.4482216152605);
+    tonf = lb / (9.80665 / 1000.0*4.4482216152605);
+    
+    ft = in * 12.0;
+    mm = in / 25.44;
+    cm = in / 2.54;
+    m = in / 0.0254;
+    
+    msec = sec * 0.001;
+    
+    C = (F - 32.0)*5.0 / 9.0;
+    
+    char buffer[50];
+    
+    sprintf(buffer, "set lb %.18e", lb);   Tcl_Eval(interp, buffer);
+    sprintf(buffer, "set lbf %.18e", lb);   Tcl_Eval(interp, buffer);
+    sprintf(buffer, "set kip %.18e", kip);   Tcl_Eval(interp, buffer);
+    sprintf(buffer, "set N %.18e", n);   Tcl_Eval(interp, buffer);
+    sprintf(buffer, "set kN %.18e", kn);   Tcl_Eval(interp, buffer);
+    sprintf(buffer, "set Newton %.18e", n);   Tcl_Eval(interp, buffer);
+    sprintf(buffer, "set kNewton %.18e", kn);   Tcl_Eval(interp, buffer);
+    sprintf(buffer, "set MN %.18e", mn);   Tcl_Eval(interp, buffer);
+    sprintf(buffer, "set kgf %.18e", kgf);   Tcl_Eval(interp, buffer);
+    sprintf(buffer, "set tonf %.18e", tonf);   Tcl_Eval(interp, buffer);
+    
+    sprintf(buffer, "set in %.18e", in);   Tcl_Eval(interp, buffer);
+    sprintf(buffer, "set inch %.18e", in);   Tcl_Eval(interp, buffer);
+    sprintf(buffer, "set ft %.18e", ft);   Tcl_Eval(interp, buffer);
+    sprintf(buffer, "set mm %.18e", mm);   Tcl_Eval(interp, buffer);
+    sprintf(buffer, "set cm %.18e", cm);   Tcl_Eval(interp, buffer);
+    sprintf(buffer, "set m  %.18e", m);   Tcl_Eval(interp, buffer);
+    sprintf(buffer, "set meter  %.18e", m);   Tcl_Eval(interp, buffer);
+    
+    sprintf(buffer, "set sec %.18e", sec);   Tcl_Eval(interp, buffer);
+    sprintf(buffer, "set msec %.18e", msec);   Tcl_Eval(interp, buffer);
+    
+    sprintf(buffer, "set F %.18e", F);   Tcl_Eval(interp, buffer);
+    sprintf(buffer, "set degF %.18e", F);   Tcl_Eval(interp, buffer);
+    sprintf(buffer, "set C %.18e", C);   Tcl_Eval(interp, buffer);
+    sprintf(buffer, "set degC %.18e", C);   Tcl_Eval(interp, buffer);
+    
+    double g = 32.174049*ft / (sec*sec);
+    sprintf(buffer, "set g %.18e", g);   Tcl_Eval(interp, buffer);
+    sprintf(buffer, "set kg %.18e", n*sec*sec / m);   Tcl_Eval(interp, buffer);
+    sprintf(buffer, "set Mg %.18e", 1e3*n*sec*sec / m);   Tcl_Eval(interp, buffer);
+    sprintf(buffer, "set slug %.18e", lb*sec*sec / ft);   Tcl_Eval(interp, buffer);
+    sprintf(buffer, "set Pa %.18e", n / (m*m));   Tcl_Eval(interp, buffer);
+    sprintf(buffer, "set kPa %.18e", 1e3*n / (m*m));   Tcl_Eval(interp, buffer);
+    sprintf(buffer, "set MPa %.18e", 1e6*n / (m*m));   Tcl_Eval(interp, buffer);
+    sprintf(buffer, "set psi %.18e", lb / (in*in));   Tcl_Eval(interp, buffer);
+    sprintf(buffer, "set ksi %.18e", kip / (in*in));   Tcl_Eval(interp, buffer);
+    sprintf(buffer, "set psf %.18e", lb / (ft*ft));   Tcl_Eval(interp, buffer);
+    sprintf(buffer, "set ksf %.18e", kip / (ft*ft));   Tcl_Eval(interp, buffer);
+    sprintf(buffer, "set pcf %.18e", lb / (ft*ft*ft));   Tcl_Eval(interp, buffer);
+    sprintf(buffer, "set in2 %.18e", in*in);   Tcl_Eval(interp, buffer);
+    sprintf(buffer, "set ft2 %.18e", ft*ft);   Tcl_Eval(interp, buffer);
+    sprintf(buffer, "set mm2 %.18e", mm*mm);   Tcl_Eval(interp, buffer);
+    sprintf(buffer, "set cm2 %.18e", cm*cm);   Tcl_Eval(interp, buffer);
+    sprintf(buffer, "set m2 %.18e", m*m);   Tcl_Eval(interp, buffer);
+    sprintf(buffer, "set in4 %.18e", in*in*in*in);   Tcl_Eval(interp, buffer);
+    sprintf(buffer, "set ft4 %.18e", ft*ft*ft*ft);   Tcl_Eval(interp, buffer);
+    sprintf(buffer, "set mm4 %.18e", mm*mm*mm*mm);   Tcl_Eval(interp, buffer);
+    sprintf(buffer, "set cm4 %.18e", cm*cm*cm*cm);   Tcl_Eval(interp, buffer);
+    sprintf(buffer, "set m4 %.18e", m*m*m*m);   Tcl_Eval(interp, buffer);
+    sprintf(buffer, "set pi %.18e", 2.0*asin(1.0));   Tcl_Eval(interp, buffer);
+    sprintf(buffer, "set PI %.18e", 2.0*asin(1.0));   Tcl_Eval(interp, buffer);
+    
+    int res = simulationInfo.setForceUnit(force);
+    res += simulationInfo.setLengthUnit(length);
+    res += simulationInfo.setTimeUnit(time);
+    res += simulationInfo.setTemperatureUnit(temperature);
+    
+    return TCL_OK;
+}
+
+
+int openFresco_metaData(ClientData clientData,
+    Tcl_Interp *interp, int argc, TCL_Char **argv)
+{
+    if (argc < 2)
+        return -1;
+    
+    int count = 1;
+    while (count < argc) {
+        if ((strcmp(argv[count], "-title") == 0) || (strcmp(argv[count], "-Title") == 0)
+            || (strcmp(argv[count], "-TITLE") == 0)) {
+            if (count + 1 < argc) {
+                simulationInfo.setTitle(argv[count + 1]);
+                count += 2;
+            }
+        }
+        else if ((strcmp(argv[count], "-contact") == 0) || (strcmp(argv[count], "-Contact") == 0)
+            || (strcmp(argv[count], "-CONTACT") == 0)) {
+            if (count + 1 < argc) {
+                simulationInfo.setContact(argv[count + 1]);
+                count += 2;
+            }
+        }
+        else if ((strcmp(argv[count], "-description") == 0) || (strcmp(argv[count], "-Description") == 0)
+            || (strcmp(argv[count], "-DESCRIPTION") == 0)) {
+            if (count + 1 < argc) {
+                simulationInfo.setDescription(argv[count + 1]);
+                count += 2;
+            }
+        }
+        else if ((strcmp(argv[count], "-modelType") == 0) || (strcmp(argv[count], "-ModelType") == 0)
+            || (strcmp(argv[count], "-MODELTYPE") == 0)) {
+            if (count + 1 < argc) {
+                simulationInfo.addModelType(argv[count + 1]);
+                count += 2;
+            }
+        }
+        else if ((strcmp(argv[count], "-analysisType") == 0) || (strcmp(argv[count], "-AnalysisType") == 0)
+            || (strcmp(argv[count], "-ANALYSISTYPE") == 0)) {
+            if (count + 1 < argc) {
+                simulationInfo.addAnalysisType(argv[count + 1]);
+                count += 2;
+            }
+        }
+        else if ((strcmp(argv[count], "-elementType") == 0) || (strcmp(argv[count], "-ElementType") == 0)
+            || (strcmp(argv[count], "-ELEMENTTYPE") == 0)) {
+            if (count + 1 < argc) {
+                simulationInfo.addElementType(argv[count + 1]);
+                count += 2;
+            }
+        }
+        else if ((strcmp(argv[count], "-materialType") == 0) || (strcmp(argv[count], "-MaterialType") == 0)
+            || (strcmp(argv[count], "-MATERIALTYPE") == 0)) {
+            if (count + 1 < argc) {
+                simulationInfo.addMaterialType(argv[count + 1]);
+                count += 2;
+            }
+        }
+        else if ((strcmp(argv[count], "-loadingType") == 0) || (strcmp(argv[count], "-LoadingType") == 0)
+            || (strcmp(argv[count], "-LOADINGTYPE") == 0)) {
+            if (count + 1 < argc) {
+                simulationInfo.addLoadingType(argv[count + 1]);
+                count += 2;
+            }
+        }
+        else {
+            opserr << "WARNING unknown arg type: " << argv[count] << endln;
+            count++;
+        }
+    }
+    
+    return TCL_OK;
+}
+
+
+int openFresco_version(ClientData clientData,
+    Tcl_Interp *interp, int argc, TCL_Char **argv)
+{
+    char buffer[20];
+    
+    sprintf(buffer, "%s", OPF_VERSION);
+    Tcl_SetResult(interp, buffer, TCL_VOLATILE);
+    
+    return TCL_OK;
 }
 
 
@@ -651,68 +975,80 @@ int Tcl_AppInit(Tcl_Interp *interp)
     
     // OpenFresco commands
     Tcl_CreateCommand(interp, "expControlPoint", openFresco_addExperimentalCP,
-        (ClientData)NULL, NULL);
+        (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
     
     Tcl_CreateCommand(interp, "expSignalFilter", openFresco_addExperimentalSignalFilter,
-        (ClientData)NULL, NULL);
+        (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
     
     Tcl_CreateCommand(interp, "expControl", openFresco_addExperimentalControl,
-        (ClientData)NULL, NULL);
+        (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
     
     Tcl_CreateCommand(interp, "expSetup", openFresco_addExperimentalSetup,
-        (ClientData)NULL, NULL);
+        (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
     
     Tcl_CreateCommand(interp, "expSite", openFresco_addExperimentalSite,
-        (ClientData)NULL, NULL);
+        (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
     
     Tcl_CreateCommand(interp, "expTangentStiff", openFresco_addExperimentalTangentStiff,
-        (ClientData)NULL, NULL);
+        (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
     
     Tcl_CreateCommand(interp, "expElement", openFresco_addExperimentalElement,
-        (ClientData)NULL, NULL);
+        (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
     
     Tcl_CreateCommand(interp, "expRecorder", openFresco_addExperimentalRecorder,
-        (ClientData)NULL, NULL);
+        (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
     
     Tcl_CreateCommand(interp, "startLabServer", openFresco_startLabServer,
-        (ClientData)NULL, NULL);
+        (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
     
     Tcl_CreateCommand(interp, "setupLabServer", openFresco_setupLabServer,
-        (ClientData)NULL, NULL);
+        (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
     
     Tcl_CreateCommand(interp, "stepLabServer", openFresco_stepLabServer,
-        (ClientData)NULL, NULL);
+        (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
     
     Tcl_CreateCommand(interp, "stopLabServer", openFresco_stopLabServer,
-        (ClientData)NULL, NULL);
+        (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
     
     Tcl_CreateCommand(interp, "startSimAppSiteServer", openFresco_startSimAppSiteServer,
-        (ClientData)NULL, NULL);
+        (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
     
     Tcl_CreateCommand(interp, "startSimAppElemServer", openFresco_startSimAppElemServer,
-        (ClientData)NULL, NULL);
+        (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
     
     Tcl_CreateCommand(interp, "wipeExp", openFresco_wipeModel,
-        (ClientData)NULL, NULL);
+        (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
     
     Tcl_CreateCommand(interp, "removeExp", openFresco_removeComp,
-        (ClientData)NULL, NULL);
+        (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
     
     Tcl_CreateCommand(interp, "recordExp", openFresco_record,
-        (ClientData)NULL, NULL);
+        (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
     
     Tcl_CreateCommand(interp, "model", specifyModelBuilder,
-        (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);
+        (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
     
     Tcl_CreateCommand(interp, "rayleigh", rayleighDamping,
-        (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);
+        (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
     
     Tcl_CreateCommand(interp, "setElementRayleighDampingFactors", setElementRayleighDampingFactors,
-        (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);
+        (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
+    
+    Tcl_CreateCommand(interp, "logFile", openFresco_logFile,
+        (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
+    
+    Tcl_CreateCommand(interp, "defaultUnits", openFresco_defaultUnits,
+        (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
+    
+    Tcl_CreateCommand(interp, "metaData", openFresco_metaData,
+        (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
+    
+    Tcl_CreateCommand(interp, "version", openFresco_version,
+        (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
     
     /* OpenSees commands
     Tcl_CreateCommand(interp, "recorder", addRecorder,
-        (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);*/
+        (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);*/
     
     /*
     * Specify a user-specific startup file to invoke if the application
