@@ -36,14 +36,17 @@ extern "C" {
 }
 
 
-ECSCRAMNet::ECSCRAMNet(int tag, int memoffset, int numdof)
+ECSCRAMNet::ECSCRAMNet(int tag, int memoffset, int numdof,
+    unsigned short nodeid, int reltrial)
     : ExperimentalControl(tag),
-    memOffset(memoffset), numDOF(numdof),
+    memOffset(memoffset), numDOF(numdof), nodeID(nodeid),
     memPtrBASE(0), memPtrOPF(0),
     newTarget(0), switchPC(0), atTarget(0),
     ctrlDisp(0), ctrlVel(0), ctrlAccel(0), ctrlForce(0), ctrlTime(0),
     daqDisp(0), daqVel(0), daqAccel(0), daqForce(0), daqTime(0),
-    trialDispOffset(numdof), getOffset(1)
+    trialDispOffset(numdof), trialForceOffset(numdof),
+    useRelativeTrial(reltrial), gotRelativeTrial(!reltrial),
+    flag(0)
 {
 #ifdef _WIN32
     // map the SCRAMNet control status registers (CSRs)
@@ -80,8 +83,8 @@ ECSCRAMNet::ECSCRAMNet(int tag, int memoffset, int numdof)
     }
 #endif
     
-    // set OpenFresco nodeID (MTS controller = node1, xPCtarget = node2)
-    unsigned short nodeID = 3;
+    // set OpenFresco nodeID
+    // typically: MTS controller = node1, xPCtarget = node2
     scr_csr_write(SCR_CSR3, nodeID);
     
     // set the transaction mode for memory access to Longword (32-bit)
@@ -151,7 +154,9 @@ ECSCRAMNet::ECSCRAMNet(const ECSCRAMNet &ec)
     newTarget(0), switchPC(0), atTarget(0),
     ctrlDisp(0), ctrlVel(0), ctrlAccel(0), ctrlForce(0), ctrlTime(0),
     daqDisp(0), daqVel(0), daqAccel(0), daqForce(0), daqTime(0),
-    trialDispOffset(ec.numDOF), getOffset(1)
+    trialDispOffset(ec.numDOF), trialForceOffset(ec.numDOF),
+    useRelativeTrial(0), gotRelativeTrial(1),
+    flag(0)
 {
     memPtrBASE = ec.memPtrBASE;
     memPtrOPF  = ec.memPtrOPF;
@@ -170,6 +175,9 @@ ECSCRAMNet::ECSCRAMNet(const ECSCRAMNet &ec)
     daqAccel = ec.daqAccel;
     daqForce = ec.daqForce;
     daqTime  = ec.daqTime;
+    
+    useRelativeTrial = ec.useRelativeTrial;
+    gotRelativeTrial = ec.gotRelativeTrial;
 }
 
 
@@ -315,12 +323,18 @@ int ECSCRAMNet::setTrialResponse(
 {
     int i, rValue = 0;
     
-    if (getOffset == 1)  {
+    // get initial trial signal offsets
+    if (gotRelativeTrial == 0)  {
         if (disp != 0)  {
             for (i=0; i<(*sizeCtrl)(OF_Resp_Disp); i++)
                 trialDispOffset(i) = -(*disp)(i);
         }
-        getOffset = 0;
+        if (force != 0)  {
+            for (i=0; i<(*sizeCtrl)(OF_Resp_Force); i++)
+                trialForceOffset(i) = -(*force)(i);
+        }
+        // set flag that relative trial signal has been obtained
+        gotRelativeTrial = 1;
     }
     
     if (disp != 0)  {
@@ -329,7 +343,7 @@ int ECSCRAMNet::setTrialResponse(
                 ctrlDisp[i] = float((*disp)(i) + trialDispOffset(i));
         } else  {
             for (i=0; i<(*sizeCtrl)(OF_Resp_Disp); i++)
-                ctrlDisp[i] = float(theCtrlFilters[OF_Resp_Disp]->filtering(ctrlDisp[i] + trialDispOffset(i)));
+                ctrlDisp[i] = float(theCtrlFilters[OF_Resp_Disp]->filtering((*disp)(i) + trialDispOffset(i)));
         }
     }
     if (vel != 0)  {
@@ -339,7 +353,7 @@ int ECSCRAMNet::setTrialResponse(
         }
         else  {
             for (i=0; i<(*sizeCtrl)(OF_Resp_Vel); i++)
-                ctrlVel[i] = float(theCtrlFilters[OF_Resp_Vel]->filtering(ctrlVel[i]));
+                ctrlVel[i] = float(theCtrlFilters[OF_Resp_Vel]->filtering((*vel)(i)));
         }
     }
     if (accel != 0)  {
@@ -348,16 +362,16 @@ int ECSCRAMNet::setTrialResponse(
                 ctrlAccel[i] = float((*accel)(i));
         } else  {
             for (i=0; i<(*sizeCtrl)(OF_Resp_Accel); i++)
-                ctrlAccel[i] = float(theCtrlFilters[OF_Resp_Accel]->filtering(ctrlAccel[i]));
+                ctrlAccel[i] = float(theCtrlFilters[OF_Resp_Accel]->filtering((*accel)(i)));
         }
     }
     if (force != 0)  {
         if (theCtrlFilters[OF_Resp_Force] == 0)  {
             for (i=0; i<(*sizeCtrl)(OF_Resp_Force); i++)
-                ctrlForce[i] = float((*force)(i));
+                ctrlForce[i] = float((*force)(i) + trialForceOffset(i));
         } else  {
             for (i=0; i<(*sizeCtrl)(OF_Resp_Force); i++)
-                ctrlForce[i] = float(theCtrlFilters[OF_Resp_Force]->filtering(ctrlForce[i]));
+                ctrlForce[i] = float(theCtrlFilters[OF_Resp_Force]->filtering((*force)(i) + trialForceOffset(i)));
         }
     }
     if (time != 0)  {
@@ -366,7 +380,7 @@ int ECSCRAMNet::setTrialResponse(
                 ctrlTime[i] = float((*time)(i));
         } else  {
             for (i=0; i<(*sizeCtrl)(OF_Resp_Time); i++)
-                ctrlTime[i] = float(theCtrlFilters[OF_Resp_Time]->filtering(ctrlTime[i]));
+                ctrlTime[i] = float(theCtrlFilters[OF_Resp_Time]->filtering((*time)(i)));
         }
     }
     
@@ -383,9 +397,10 @@ int ECSCRAMNet::getDaqResponse(
     Vector* force,
     Vector* time)
 {
-    this->acquire();
+    int i, rValue = 0;
     
-    int i;
+    rValue = this->acquire();
+    
     if (disp != 0)  {
         if (theDaqFilters[OF_Resp_Disp] == 0)  {
             for (i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)
@@ -432,7 +447,7 @@ int ECSCRAMNet::getDaqResponse(
         }
     }
     
-    return OF_ReturnType_completed;
+    return rValue;
 }
 
 
@@ -607,43 +622,63 @@ int ECSCRAMNet::getResponse(int responseID, Information &info)
     
     switch (responseID)  {
     case 1:  // ctrl displacements
-        resp.setData((double*)ctrlDisp,(*sizeCtrl)(OF_Resp_Disp));
+        resp.resize((*sizeCtrl)(OF_Resp_Disp));
+        for (int i=0; i<(*sizeCtrl)(OF_Resp_Disp); i++)
+            resp(i) = ctrlDisp[i];
         return info.setVector(resp);
         
     case 2:  // ctrl velocities
-        resp.setData((double*)ctrlVel,(*sizeCtrl)(OF_Resp_Vel));
+        resp.resize((*sizeCtrl)(OF_Resp_Vel));
+        for (int i=0; i<(*sizeCtrl)(OF_Resp_Vel); i++)
+            resp(i) = ctrlVel[i];
         return info.setVector(resp);
         
     case 3:  // ctrl accelerations
-        resp.setData((double*)ctrlAccel,(*sizeCtrl)(OF_Resp_Accel));
+        resp.resize((*sizeCtrl)(OF_Resp_Accel));
+        for (int i=0; i<(*sizeCtrl)(OF_Resp_Accel); i++)
+            resp(i) = ctrlAccel[i];
         return info.setVector(resp);
         
     case 4:  // ctrl forces
-        resp.setData((double*)ctrlForce,(*sizeCtrl)(OF_Resp_Force));
+        resp.resize((*sizeCtrl)(OF_Resp_Force));
+        for (int i=0; i<(*sizeCtrl)(OF_Resp_Force); i++)
+            resp(i) = ctrlForce[i];
         return info.setVector(resp);
         
     case 5:  // ctrl times
-        resp.setData((double*)ctrlTime,(*sizeCtrl)(OF_Resp_Time));
+        resp.resize((*sizeCtrl)(OF_Resp_Time));
+        for (int i=0; i<(*sizeCtrl)(OF_Resp_Time); i++)
+            resp(i) = ctrlTime[i];
         return info.setVector(resp);
         
     case 6:  // daq displacements
-        resp.setData((double*)daqDisp,(*sizeDaq)(OF_Resp_Disp));
+        resp.resize((*sizeDaq)(OF_Resp_Disp));
+        for (int i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)
+            resp(i) = daqDisp[i];
         return info.setVector(resp);
         
     case 7:  // daq velocities
-        resp.setData((double*)daqVel,(*sizeDaq)(OF_Resp_Vel));
+        resp.resize((*sizeDaq)(OF_Resp_Vel));
+        for (int i=0; i<(*sizeDaq)(OF_Resp_Vel); i++)
+            resp(i) = daqVel[i];
         return info.setVector(resp);
         
     case 8:  // daq accelerations
-        resp.setData((double*)daqAccel,(*sizeDaq)(OF_Resp_Accel));
+        resp.resize((*sizeDaq)(OF_Resp_Accel));
+        for (int i=0; i<(*sizeDaq)(OF_Resp_Accel); i++)
+            resp(i) = daqAccel[i];
         return info.setVector(resp);
         
     case 9:  // daq forces
-        resp.setData((double*)daqForce,(*sizeDaq)(OF_Resp_Force));
+        resp.resize((*sizeDaq)(OF_Resp_Force));
+        for (int i=0; i<(*sizeDaq)(OF_Resp_Force); i++)
+            resp(i) = daqForce[i];
         return info.setVector(resp);
         
     case 10:  // daq times
-        resp.setData((double*)daqTime,(*sizeDaq)(OF_Resp_Time));
+        resp.resize((*sizeDaq)(OF_Resp_Time));
+        for (int i=0; i<(*sizeDaq)(OF_Resp_Time); i++)
+            resp(i) = daqTime[i];
         return info.setVector(resp);
         
     default:
@@ -657,8 +692,13 @@ void ECSCRAMNet::Print(OPS_Stream &s, int flag)
     s << "****************************************************************\n";
     s << "* ExperimentalControl: " << this->getTag() << endln; 
     s << "*   type: ECSCRAMNet\n";
+    s << "*   nodeID: " << nodeID << endln;
     s << "*   memOffset: " << memOffset << endln;
     s << "*   numDOF: " << numDOF << endln;
+    if (useRelativeTrial == 0)
+        s << "*   useRelativeTrial: no\n";
+    else
+        s << "*   useRelativeTrial: yes\n";
     s << "*   ctrlFilters:";
     for (int i=0; i<OF_Resp_All; i++)  {
         if (theCtrlFilters[i] != 0)
@@ -673,9 +713,7 @@ void ECSCRAMNet::Print(OPS_Stream &s, int flag)
         else
             s << " 0";
     }
-    s << endln;
-    s << "****************************************************************\n";
-    s << endln;
+    s << "\n****************************************************************\n\n";
 }
 
 
@@ -713,6 +751,8 @@ int ECSCRAMNet::acquire()
         // read atTarget flag
         flag = atTarget[0];
     }
+    // read atTarget flag one more time
+    flag = atTarget[0];
     
     return OF_ReturnType_completed;
 }
