@@ -40,7 +40,9 @@ class ECSCRAMNet : public ExperimentalControl
 {
 public:
     // constructors
-    ECSCRAMNet(int tag, int memOffset, int numDOF);
+    ECSCRAMNet(int tag, int memOffset, int numDOF,
+        unsigned short nodeID = 3,
+        int useRelativeTrial = 0);
     ECSCRAMNet(const ECSCRAMNet &ec);
     
     // destructor
@@ -84,19 +86,20 @@ protected:
     virtual int acquire();
 
 private:
-    const int memOffset;            // memory offset in bytes from SCRAMNet base address
-    const int numDOF;               // number of degrees-of-freedom in control system
+    const int memOffset;    // memory offset in bytes from SCRAMNet base address
+    const int numDOF;       // number of degrees-of-freedom in control system
+    unsigned short nodeID;  // OpenFresco SCRAMNet node ID
     
-    const int *memPtrBASE;          // pointer to SCRAMNet base memory address
-    float *memPtrOPF;               // pointer to OpenFresco base memory address
+    const int *memPtrBASE;  // pointer to SCRAMNet base memory address
+    float *memPtrOPF;       // pointer to OpenFresco base memory address
     
-    int *newTarget, *switchPC, *atTarget;
-    float *ctrlDisp, *ctrlVel, *ctrlAccel, *ctrlForce, *ctrlTime;
-    float *daqDisp, *daqVel, *daqAccel, *daqForce, *daqTime;
-    Vector trialDispOffset;
+    int *newTarget, *switchPC, *atTarget;                          // communication flags
+    float *ctrlDisp, *ctrlVel, *ctrlAccel, *ctrlForce, *ctrlTime;  // control signal arrays
+    float *daqDisp, *daqVel, *daqAccel, *daqForce, *daqTime;       // daq signal arrays
+    Vector trialDispOffset, trialForceOffset;                      // trial signal offsets
+    int useRelativeTrial, gotRelativeTrial;                        // relative trial signal flags
     
-    int flag;                       // flag to check states of Simulink model
-    int getOffset;                  // flag to get initial trial dsip offset
+    int flag;  // flag to check states of Simulink model
 };
 
 #endif

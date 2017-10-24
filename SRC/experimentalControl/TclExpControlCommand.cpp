@@ -368,6 +368,7 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
         char *ipAddr;
         int i, cpTag, ipPort = 44000;
         int numTrialCPs = 0, numOutCPs = 0;
+        int useRelativeTrial = 0;
         
         argi = 2;
         if (Tcl_GetInt(interp, argv[argi], &tag) != TCL_OK)  {
@@ -430,7 +431,11 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
         argi++;
         while (argi+numOutCPs < argc &&
             strcmp(argv[argi+numOutCPs],"-ctrlFilters") != 0 &&
-            strcmp(argv[argi+numOutCPs],"-daqFilters") != 0)  {
+            strcmp(argv[argi+numOutCPs],"-daqFilters") != 0 &&
+            strcmp(argv[argi+numOutCPs],"-relTrial") != 0 &&
+            strcmp(argv[argi+numOutCPs],"-relativeTrial") != 0 &&
+            strcmp(argv[argi+numOutCPs],"-useRelTrial") != 0 &&
+            strcmp(argv[argi+numOutCPs],"-useRelativeTrial") != 0)  {
                 numOutCPs++;
         }
         if (numOutCPs == 0)  {
@@ -461,10 +466,19 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
             }
             argi++;
         }
+        // check for relative trial flag
+        for (i=argi; i<argc; i++)  {
+            if (strcmp(argv[i], "-relTrial") == 0 ||
+                strcmp(argv[i], "-relativeTrial") == 0 ||
+                strcmp(argv[i], "-useRelTrial") == 0 ||
+                strcmp(argv[i], "-useRelativeTrial") == 0)  {
+                    useRelativeTrial = 1;
+            }
+        }
         
         // parsing was successful, allocate the control
         theControl = new ECSimFEAdapter(tag, numTrialCPs, trialCPs,
-            numOutCPs, outCPs, ipAddr, ipPort);
+            numOutCPs, outCPs, ipAddr, ipPort, useRelativeTrial);
     }
     
     // ----------------------------------------------------------------------------	
@@ -691,7 +705,7 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
         if (argc < 9)  {
             opserr << "WARNING invalid number of arguments\n";
             printCommand(argc,argv);
-            opserr << "Want: expControl MTSCsi tag configFileName rampTime -trialCP cpTags -outCP cpTags "
+            opserr << "Want: expControl MTSCsi tag configFileName rampTime <-useRelTrial> -trialCP cpTags -outCP cpTags"
                 << "<-ctrlFilters (5 filterTag)> <-daqFilters (5 filterTag)>\n";
             return TCL_ERROR;
         }
@@ -700,6 +714,7 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
         double rampTime;
         int i, cpTag;
         int numTrialCPs = 0, numOutCPs = 0;
+        int useRelativeTrial = 0;
         
         argi = 2;
         if (Tcl_GetInt(interp, argv[argi], &tag) != TCL_OK)  {
@@ -762,7 +777,11 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
         argi++;
         while (argi+numOutCPs < argc &&
             strcmp(argv[argi+numOutCPs],"-ctrlFilters") != 0 &&
-            strcmp(argv[argi+numOutCPs],"-daqFilters") != 0)  {
+            strcmp(argv[argi+numOutCPs],"-daqFilters") != 0 &&
+            strcmp(argv[argi+numOutCPs],"-relTrial") != 0 &&
+            strcmp(argv[argi+numOutCPs],"-relativeTrial") != 0 &&
+            strcmp(argv[argi+numOutCPs],"-useRelTrial") != 0 &&
+            strcmp(argv[argi+numOutCPs],"-useRelativeTrial") != 0)  {
                 numOutCPs++;
         }
         if (numOutCPs == 0)  {
@@ -793,10 +812,19 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
             }
             argi++;
         }
+        // check for relative trial flag
+        for (i=argi; i<argc; i++)  {
+            if (strcmp(argv[i], "-relTrial") == 0 ||
+                strcmp(argv[i], "-relativeTrial") == 0 ||
+                strcmp(argv[i], "-useRelTrial") == 0 ||
+                strcmp(argv[i], "-useRelativeTrial") == 0)  {
+                    useRelativeTrial = 1;
+            }
+        }
         
         // parsing was successful, allocate the control
         theControl = new ECMtsCsi(tag, numTrialCPs, trialCPs,
-            numOutCPs, outCPs, cfgFile, rampTime);
+            numOutCPs, outCPs, cfgFile, rampTime, useRelativeTrial);
     }
 
     /* ----------------------------------------------------------------------------	
@@ -1072,12 +1100,14 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
         if (argc < 5)  {
             opserr << "WARNING invalid number of arguments\n";
             printCommand(argc,argv);
-            opserr << "Want: expControl SCRAMNet tag memOffset numActCh "
+            opserr << "Want: expControl SCRAMNet tag memOffset numDOF <-useRelTrial> <-nodeID id>"
                 << "<-ctrlFilters (5 filterTag)> <-daqFilters (5 filterTag)>\n";
             return TCL_ERROR;
         }
         
-        int memOffset, numActCh;
+        int i, memOffset, numDOF;
+        int nodeID = 3;
+        int useRelativeTrial = 0;
         
         argi = 2;
         if (Tcl_GetInt(interp, argv[argi], &tag) != TCL_OK)  {
@@ -1091,15 +1121,36 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
             return TCL_ERROR;
         }
         argi++;
-        if (Tcl_GetInt(interp, argv[argi], &numActCh) != TCL_OK)  {
-            opserr << "WARNING invalid numActCh\n";
+        if (Tcl_GetInt(interp, argv[argi], &numDOF) != TCL_OK)  {
+            opserr << "WARNING invalid numDOF\n";
             opserr << "expControl SCRAMNet " << tag << endln;
             return TCL_ERROR;
         }
         argi++;
-        
+        // check for nodeID
+        for (i = argi; i<argc; i++) {
+            if (strcmp(argv[i], "-nodeID") == 0) {
+                argi++;
+                if (Tcl_GetInt(interp, argv[argi], &nodeID) != TCL_OK) {
+                    opserr << "WARNING invalid nodeID\n";
+                    opserr << "expControl SCRAMNet " << tag << endln;
+                    return TCL_ERROR;
+                }
+            }
+        }
+        argi++;
+        // check for relative trial flag
+        for (i=argi; i<argc; i++)  {
+            if (strcmp(argv[i], "-relTrial") == 0 ||
+                strcmp(argv[i], "-relativeTrial") == 0 ||
+                strcmp(argv[i], "-useRelTrial") == 0 ||
+                strcmp(argv[i], "-useRelativeTrial") == 0)  {
+                    useRelativeTrial = 1;
+            }
+        }
+
         // parsing was successful, allocate the control
-        theControl = new ECSCRAMNet(tag, memOffset, numActCh);
+        theControl = new ECSCRAMNet(tag, memOffset, numDOF, nodeID, useRelativeTrial);
     }
     
     // ----------------------------------------------------------------------------	
@@ -1107,12 +1158,14 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
         if (argc < 5)  {
             opserr << "WARNING invalid number of arguments\n";
             printCommand(argc,argv);
-            opserr << "Want: expControl SCRAMNetGT tag memOffset numActCh "
+            opserr << "Want: expControl SCRAMNetGT tag memOffset numDOF <-useRelTrial> <-nodeID id>"
                 << "<-ctrlFilters (5 filterTag)> <-daqFilters (5 filterTag)>\n";
             return TCL_ERROR;
         }
         
-        int memOffset, numActCh;
+        int i, memOffset, numDOF;
+        int nodeID = 3;
+        int useRelativeTrial = 0;
         
         argi = 2;
         if (Tcl_GetInt(interp, argv[argi], &tag) != TCL_OK)  {
@@ -1126,15 +1179,36 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
             return TCL_ERROR;
         }
         argi++;
-        if (Tcl_GetInt(interp, argv[argi], &numActCh) != TCL_OK)  {
-            opserr << "WARNING invalid numActCh\n";
+        if (Tcl_GetInt(interp, argv[argi], &numDOF) != TCL_OK)  {
+            opserr << "WARNING invalid numDOF\n";
             opserr << "expControl SCRAMNetGT " << tag << endln;
             return TCL_ERROR;
         }
         argi++;
+        // check for nodeID
+        for (i = argi; i<argc; i++) {
+            if (strcmp(argv[i], "-nodeID") == 0) {
+                argi++;
+                if (Tcl_GetInt(interp, argv[argi], &nodeID) != TCL_OK) {
+                    opserr << "WARNING invalid nodeID\n";
+                    opserr << "expControl SCRAMNetGT " << tag << endln;
+                    return TCL_ERROR;
+                }
+            }
+        }
+        argi++;
+        // check for relative trial flag
+        for (i=argi; i<argc; i++)  {
+            if (strcmp(argv[i], "-relTrial") == 0 ||
+                strcmp(argv[i], "-relativeTrial") == 0 ||
+                strcmp(argv[i], "-useRelTrial") == 0 ||
+                strcmp(argv[i], "-useRelativeTrial") == 0)  {
+                    useRelativeTrial = 1;
+            }
+        }
         
         // parsing was successful, allocate the control
-        theControl = new ECSCRAMNetGT(tag, memOffset, numActCh);
+        theControl = new ECSCRAMNetGT(tag, memOffset, numDOF, nodeID, useRelativeTrial);
     }
 #endif
     
