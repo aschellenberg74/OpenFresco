@@ -169,7 +169,7 @@ ECSCRAMNetGT::ECSCRAMNetGT(int tag, int memoffset, int numdof,
 
 ECSCRAMNetGT::ECSCRAMNetGT(const ECSCRAMNetGT &ec)
     : ExperimentalControl(ec),
-    memOffset(ec.memOffset), numDOF(ec.numDOF),
+    memOffset(ec.memOffset), numDOF(ec.numDOF), nodeID(ec.nodeID),
     memPtrBASE(0), memPtrOPF(0),
     newTarget(0), switchPC(0), atTarget(0),
     ctrlDisp(0), ctrlVel(0), ctrlAccel(0), ctrlForce(0), ctrlTime(0),
@@ -707,7 +707,7 @@ void ECSCRAMNetGT::Print(OPS_Stream &s, int flag)
     s << "****************************************************************\n";
     s << "* ExperimentalControl: " << this->getTag() << endln; 
     s << "*   type: ECSCRAMNetGT\n";
-    s << "*   nodeID: " << nodeID << endln;
+    s << "*   nodeID: " << int(nodeID) << endln;
     s << "*   memOffset: " << memOffset << endln;
     s << "*   numDOF: " << numDOF << endln;
     if (useRelativeTrial == 0)
