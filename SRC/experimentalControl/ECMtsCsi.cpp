@@ -472,6 +472,7 @@ int ECMtsCsi::setTrialResponse(
                 if (ctrlSigOffset(k) != 0)
                     ctrlSignal[k] += ctrlSigOffset(k);
                 
+                // increment counter
                 k++;
             }
         
