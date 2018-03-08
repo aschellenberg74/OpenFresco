@@ -12,7 +12,7 @@
 ** and redistribution, and for a DISCLAIMER OF ALL WARRANTIES.        **
 **                                                                    **
 ** Developed by:                                                      **
-**   Andreas Schellenberg (andreas.schellenberg@gmx.net)              **
+**   Andreas Schellenberg (andreas.schellenberg@gmail.com)            **
 **   Yoshikazu Takahashi (yos@catfish.dpri.kyoto-u.ac.jp)             **
 **   Gregory L. Fenves (fenves@berkeley.edu)                          **
 **   Stephen A. Mahin (mahin@berkeley.edu)                            **
@@ -46,7 +46,8 @@ public:
     ECSimFEAdapter(int tag,
         int nTrialCPs, ExperimentalCP **trialCPs,
         int nOutCPs, ExperimentalCP **outCPs,
-        char *ipAddress, int ipPort = 44000);
+        char *ipAddress, int ipPort = 44000,
+        int useRelativeTrial = 0);
     ECSimFEAdapter(const ECSimFEAdapter &ec);
     
     // destructor
@@ -104,8 +105,10 @@ private:
     double *rData;              // receive data array
     Vector *recvData;           // receive vector
     
-    int numCtrlSignals, numDaqSignals;
-    Vector *ctrlSignal, *daqSignal;
+    int numCtrlSignals, numDaqSignals;       // number of signals
+    Vector *ctrlSignal, *daqSignal;          // control and daq signals
+    Vector trialSigOffset;                   // trial signal offsets
+    int useRelativeTrial, gotRelativeTrial;  // relative trial signal flags
 };
 
 #endif

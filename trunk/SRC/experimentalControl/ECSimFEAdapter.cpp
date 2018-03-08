@@ -12,7 +12,7 @@
 ** and redistribution, and for a DISCLAIMER OF ALL WARRANTIES.        **
 **                                                                    **
 ** Developed by:                                                      **
-**   Andreas Schellenberg (andreas.schellenberg@gmx.net)              **
+**   Andreas Schellenberg (andreas.schellenberg@gmail.com)            **
 **   Yoshikazu Takahashi (yos@catfish.dpri.kyoto-u.ac.jp)             **
 **   Gregory L. Fenves (fenves@berkeley.edu)                          **
 **   Stephen A. Mahin (mahin@berkeley.edu)                            **
@@ -38,11 +38,12 @@
 
 
 ECSimFEAdapter::ECSimFEAdapter(int tag, int nTrialCPs, ExperimentalCP **trialcps,
-    int nOutCPs, ExperimentalCP **outcps, char *ipaddress, int ipport)
+    int nOutCPs, ExperimentalCP **outcps, char *ipaddress, int ipport, int reltrial)
     : ECSimulation(tag), numTrialCPs(nTrialCPs), numOutCPs(nOutCPs),
     ipAddress(ipaddress), ipPort(ipport), dataSize(OF_Network_dataSize),
     theChannel(0), sData(0), sendData(0), rData(0), recvData(0),
-    numCtrlSignals(0), numDaqSignals(0), ctrlSignal(0), daqSignal(0)
+    numCtrlSignals(0), numDaqSignals(0), ctrlSignal(0), daqSignal(0),
+    trialSigOffset(0), useRelativeTrial(reltrial), gotRelativeTrial(!reltrial)
 {
     // get trial and output control points
     if (trialcps == 0 || outcps == 0)  {
@@ -89,13 +90,18 @@ ECSimFEAdapter::ECSimFEAdapter(int tag, int nTrialCPs, ExperimentalCP **trialcps
     rData = new double [dataSize];
     recvData = new Vector(rData, dataSize);
     recvData->Zero();
+    
+    // resize trial signal offset vector
+    trialSigOffset.resize(numCtrlSignals);
+    trialSigOffset.Zero();
 }
 
 
 ECSimFEAdapter::ECSimFEAdapter(const ECSimFEAdapter &ec)
     : ECSimulation(ec), dataSize(OF_Network_dataSize),
     theChannel(0), sData(0), sendData(0), rData(0), recvData(0),
-    numCtrlSignals(0), numDaqSignals(0), ctrlSignal(0), daqSignal(0)
+    numCtrlSignals(0), numDaqSignals(0), ctrlSignal(0), daqSignal(0),
+    trialSigOffset(0), useRelativeTrial(0), gotRelativeTrial(1)
 {
     // use the existing channel which is set up
     numTrialCPs = ec.numTrialCPs;
@@ -111,6 +117,9 @@ ECSimFEAdapter::ECSimFEAdapter(const ECSimFEAdapter &ec)
     dataSize   = ec.dataSize;
     theChannel = ec.theChannel;
     
+    useRelativeTrial = ec.useRelativeTrial;
+    gotRelativeTrial = ec.gotRelativeTrial;
+    
     // allocate memory for the send vectors
     sData = new double [dataSize];
     sendData = new Vector(sData, dataSize);
@@ -120,6 +129,10 @@ ECSimFEAdapter::ECSimFEAdapter(const ECSimFEAdapter &ec)
     rData = new double [dataSize];
     recvData = new Vector(rData, dataSize);
     recvData->Zero();
+    
+    // resize trial signal offset vector
+    trialSigOffset.resize(numCtrlSignals);
+    trialSigOffset.Zero();
 }
 
 
@@ -293,27 +306,36 @@ int ECSimFEAdapter::setTrialResponse(
         // loop through all the trial control point dofs
         for (int j=0; j<numSignals; j++)  {
             // assemble the control signal array
-            if (rsp(j) == OF_Resp_Disp  &&  disp != 0)  {
+            if (rsp(j) == OF_Resp_Disp  &&  disp != 0)
                 (*ctrlSignal)(k) = (*disp)(dof(j));
-            }
-            else if (rsp(j) == OF_Resp_Force  &&  force != 0)  {
+            else if (rsp(j) == OF_Resp_Force  &&  force != 0)
                 (*ctrlSignal)(k) = (*force)(dof(j));
-            }
-            else if (rsp(j) == OF_Resp_Time  &&  time != 0)  {
+            else if (rsp(j) == OF_Resp_Time  &&  time != 0)
                 (*ctrlSignal)(k) = (*time)(dof(j));
-            }
-            else if (rsp(j) == OF_Resp_Vel  &&  vel != 0)  {
+            else if (rsp(j) == OF_Resp_Vel  &&  vel != 0)
                 (*ctrlSignal)(k) = (*vel)(dof(j));
-            }
-            else if (rsp(j) == OF_Resp_Accel  &&  accel != 0)  {
+            else if (rsp(j) == OF_Resp_Accel  &&  accel != 0)
                 (*ctrlSignal)(k) = (*accel)(dof(j));
-            }
-            // filter control signal if the filter exists
+            
+            // get initial trial signal offsets
+            if (gotRelativeTrial == 0  &&  ctrlSignal[k] != 0)
+                trialSigOffset(k) = -(*ctrlSignal)(k);
+            
+            // apply trial signal offsets if they are not zero
+            if (trialSigOffset(k) != 0)
+                (*ctrlSignal)(k) += trialSigOffset(k);
+            
+            // filter control signals if any filters exist
             if (theCtrlFilters[rsp(j)] != 0)
                 (*ctrlSignal)(k) = theCtrlFilters[rsp(j)]->filtering((*ctrlSignal)(k));
+            
+            // increment counter
             k++;
         }
     }
+    
+    // set flag that relative trial signal has been obtained
+    gotRelativeTrial = 1;
     
     // send control signal array to controller
     k += this->control();
@@ -322,7 +344,8 @@ int ECSimFEAdapter::setTrialResponse(
 }
 
 
-int ECSimFEAdapter::getDaqResponse(Vector* disp,
+int ECSimFEAdapter::getDaqResponse(
+    Vector* disp,
     Vector* vel,
     Vector* accel,
     Vector* force,
@@ -341,25 +364,23 @@ int ECSimFEAdapter::getDaqResponse(Vector* disp,
         
         // loop through all the output control point dofs
         for (int j=0; j<numSignals; j++)  {
-            // filter daq signal if the filter exists
+            // filter daq signals if any filters exist
             if (theDaqFilters[rsp(j)] != 0)
                 (*daqSignal)(k) = theDaqFilters[rsp(j)]->filtering((*daqSignal)(k));
+            
             // populate the daq response vectors
-            if (rsp(j) == OF_Resp_Disp  &&  disp != 0)  {
+            if (rsp(j) == OF_Resp_Disp  &&  disp != 0)
                 (*disp)(dof(j)) = (*daqSignal)(k);
-            }
-            else if (rsp(j) == OF_Resp_Force  &&  force != 0)  {
+            else if (rsp(j) == OF_Resp_Force  &&  force != 0)
                 (*force)(dof(j)) = (*daqSignal)(k);
-            }
-            else if (rsp(j) == OF_Resp_Time  &&  time != 0)  {
+            else if (rsp(j) == OF_Resp_Time  &&  time != 0)
                 (*time)(dof(j)) = (*daqSignal)(k);
-            }
-            else if (rsp(j) == OF_Resp_Vel  &&  vel != 0)  {
+            else if (rsp(j) == OF_Resp_Vel  &&  vel != 0)
                 (*vel)(dof(j)) = (*daqSignal)(k);
-            }
-            else if (rsp(j) == OF_Resp_Accel  &&  accel != 0)  {
+            else if (rsp(j) == OF_Resp_Accel  &&  accel != 0)
                 (*accel)(dof(j)) = (*daqSignal)(k);
-            }
+            
+            // increment counter
             k++;
         }
     }
@@ -432,7 +453,7 @@ int ECSimFEAdapter::getResponse(int responseID, Information &info)
         return info.setVector(*daqSignal);
         
     default:
-        return -1;
+        return OF_ReturnType_failed;
     }
 }
 
@@ -443,20 +464,24 @@ void ECSimFEAdapter::Print(OPS_Stream &s, int flag)
     s << "* ExperimentalControl: " << this->getTag() << endln; 
     s << "*   type: ECSimFEAdapter\n";
     s << "*   ipAddress: " << ipAddress << ", ipPort: " << ipPort << endln;
-    s << "*   trialCPs:";
+    s << "*   trialCP tag(s):";
     for (int i=0; i<numTrialCPs; i++)
         s << " " << trialCPs[i]->getTag();
-    s << "\n*   outCPs:";
+    s << "\n*   outCP tag(s):";
     for (int i=0; i<numOutCPs; i++)
         s << " " << outCPs[i]->getTag();
-    s << "\n*   ctrlFilters:";
+    if (useRelativeTrial == 0)
+        s << "\n*   useRelativeTrial: no";
+    else
+        s << "\n*   useRelativeTrial: yes";
+    s << "\n*   ctrlFilter tags:";
     for (int i=0; i<OF_Resp_All; i++)  {
         if (theCtrlFilters[i] != 0)
             s << " " << theCtrlFilters[i]->getTag();
         else
             s << " 0";
     }
-    s << "\n*   daqFilters:";
+    s << "\n*   daqFilter tags:";
     for (int i=0; i<OF_Resp_All; i++)  {
         if (theDaqFilters[i] != 0)
             s << " " << theDaqFilters[i]->getTag();
