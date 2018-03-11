@@ -1,54 +1,54 @@
-function data = plotOutputSTS(fileName,actID)
-%PLOTOUTPUTSTS to plot the MTS-STS output from a hybrid simulation
-% data = plotOutputSTS(fileName,actID)
+function data = plotOutput469D(fileName,dofID)
+%PLOTOUTPUT469D to plot the MTS-469D output from a hybrid shake table test
+% data = plotOutput469D(fileName,actID)
 %
 % data     : data structure
 % fileName : .bin file to be loaded
-% actID    : id of actuator to plot (optional)
+% dofID    : id of DOF to plot (optional)
 %
 % Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
-% Created: 04/05
+% Created: 05/15
 %
 % $Revision$
 % $Date$
 % $URL$
 
+% check for file extension
+if isempty(strfind(fileName,'.bin'))
+    fileName = [fileName,'.bin'];
+end
+
 % load the file
 % [data,deltaT,desc,units,fileInfo,fileDate,header,isText] = loadbin(fileName);
-[data,deltaT,desc,~,~,~,~,~] = loadbin(fileName);
-time = deltaT*(0:size(data,1)-1)';
+[data,deltaT,desc] = loadbin(fileName);
+npts = size(data,1);
+time = deltaT*(0:npts-1)';
+desc = cellstr(desc)
 
 if nargin<2
-    actID = 1;
+    dofID = 1;
 end
+dofStr = {'Long','Lat','Vert','Roll','Pitch','Yaw'};
 
-dataID = [];
 displCmdID = [];
-displScrID = [];
 displFbkID = [];
+accelCmdID = [];
+accelFbkID = [];
 forceFbkID = [];
-for i=1:length(actID)
-    dataID = [dataID,find(str2num(desc(:,5))' == actID(i))]; %#ok<ST2NM>
-end
-for i=1:length(dataID)
-    if strcmp(desc(dataID(i),7:15),'Displ cmd')
-        displCmdID = [displCmdID,dataID(i)];
-    end
-    if strcmp(desc(dataID(i),7:15),'Displ scr')
-        displScrID = [displScrID,dataID(i)];
-    end
-    if strcmp(desc(dataID(i),7:15),'Displ fbk')
-        displFbkID = [displFbkID,dataID(i)];
-    end
-    if strcmp(desc(dataID(i),7:15),'Force fbk')
-        forceFbkID = [forceFbkID,dataID(i)];
-    end
+for i=1:length(dofID)
+    id = ~cellfun(@isempty,strfind(desc,dofStr{dofID(i)}));
+    displCmdID(end+1) = find(~cellfun(@isempty,strfind(desc,'Displ ref')) & id);
+    displFbkID(end+1) = find(~cellfun(@isempty,strfind(desc,'Displ fbk')) & id);
+    accelCmdID(end+1) = find(~cellfun(@isempty,strfind(desc,'Accel ref')) & id);
+    accelFbkID(end+1) = find(~cellfun(@isempty,strfind(desc,'Accel fbk')) & id);
+    forceFbkID(end+1) = find(~cellfun(@isempty,strfind(desc,'Force fbk')) & id);
 end
 
 % extract data vectors
 displCmd = data(:,displCmdID);
-displScr = data(:,displScrID);
 displFbk = data(:,displFbkID);
+accelCmd = data(:,accelCmdID);
+accelFbk = data(:,accelFbkID);
 forceFbk = data(:,forceFbkID);
 
 % remove initial offset
@@ -65,19 +65,30 @@ SS = get(0,'screensize');
 %==========================================================================
 % command and measured displacements
 CreateWindow('cen',0.80*SS(4)/3*4,0.80*SS(4));
-plot(time,displCmd,'-b');
-hold('on');
 plot(time,displFbk,'-r');
+hold('on');
+plot(time,displCmd,'-b');
 grid('on');
 xlabel('Time [sec]');
 ylabel('Displacement [in.]');
-title(['Displacements from STS: Actuator ',num2str(actID)]);
-legend('commDsp','measDsp');
+title(['Displacements from 469D: DOF ',dofStr{dofID}]);
+legend('measDsp','commDsp');
+%==========================================================================
+% command and measured accelerations
+CreateWindow('cen',0.80*SS(4)/3*4,0.80*SS(4));
+plot(time,accelFbk,'-r');
+hold('on');
+plot(time,accelCmd,'-b');
+grid('on');
+xlabel('Time [sec]');
+ylabel('Acceleration [in./sec^2]');
+title(['Accelerations from 469D: DOF ',dofStr{dofID}]);
+legend('measAcc','commAcc');
 %==========================================================================
 % fft of error between command and measured displacements
 CreateWindow('cen',0.80*SS(4)/3*4,0.80*SS(4));
 error = displFbk - displCmd;
-getFFT(error,deltaT,['Error between measured and command displacement: Actuator ',num2str(actID)]);
+getFFT(error,deltaT,['Error between measured and command displacement: DOF ',dofStr{dofID}]);
 set(gca,'YScale','log');
 %==========================================================================
 % command vs. measured displacements
@@ -87,7 +98,7 @@ hold('on');
 grid('on');
 xlabel('Command Displacement [in.]');
 ylabel('Measured Displacement [in.]');
-title(['Displacements from STS: Actuator ',num2str(actID)]);
+title(['Displacements from 469D: DOF ',dofStr{dofID}]);
 %==========================================================================
 % Mercan (2007) tracking indicator
 CreateWindow('cen',0.80*SS(4)/3*4,0.80*SS(4));
@@ -100,20 +111,22 @@ hold('on');
 grid('on');
 xlabel('Time [sec]');
 ylabel('Tracking Indicator [in^2]');
-title(['Tracking Indicator from STS: Actuator ',num2str(actID)]);
+title(['Tracking Indicator from 469D: DOF ',dofStr{dofID}]);
 %==========================================================================
 % fft of measured forces
 CreateWindow('cen',0.80*SS(4)/3*4,0.80*SS(4));
-getFFT(forceFbk,deltaT,['Measured force: Actuator ',num2str(actID)]);
+getFFT(forceFbk,deltaT,['Measured force: DOF ',dofStr{dofID}]);
 set(gca,'YScale','log');
 %==========================================================================
 % hysteresis loop
+mass = [86.8 86.8 86.8 0.0 0.0 0.0];
 CreateWindow('cen',0.80*SS(4)/3*4,0.80*SS(4));
-plot(displFbk,forceFbk,'-b','LineWidth',1.0);
+%plot(displFbk,-forceFbk,'-b','LineWidth',1.0);
+plot(displFbk,-forceFbk+repmat(mass(dofID),npts,1).*accelFbk,'-r','LineWidth',1.0);
 hold('on');
 set(gca,'Box','on');
 grid('on');
 xlabel('Measured Displacement [in.]');
 ylabel('Measured Force [kip]');
-title(['Hysteresis Loop from STS: Actuator ',num2str(actID)]);
+title(['Hysteresis Loop from 469D: DOF ',dofStr{dofID}]);
 %==========================================================================

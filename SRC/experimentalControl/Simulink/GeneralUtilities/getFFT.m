@@ -8,16 +8,20 @@ function [f,MX] = getFFT(data,dt,figTitle)
 % dt       : sampling time [sec]
 % figTitle : figure title (optional - if provided results will be plotted)
 %
-% written by Tony Yang (yangtony2004@gmail.com) 08/2003
-% modified by Andreas Schellenberg (andreas.schellenberg@gmx.net) 04/2005
+% Written: Tony Yang (yangtony2004@gmail.com) 08/2003
+% Modified: Andreas Schellenberg (andreas.schellenberg@gmail.com) 04/2005
+%
+% $Revision$
+% $Date$
+% $URL$
 
 Fs = 1/dt;            	% sampling frequency
 Fn = Fs/2;             	% Nyquist frequency
 npts = size(data,1);  	% number of points
 t = dt*(0:npts-1)';     % time vector
 
-% next highest power of 2 greater than or equal to length(x):
-NFFT = 2.^(ceil(log(npts)/log(2)));
+% next highest power of 2 greater than or equal to length(x)
+NFFT = 2.^nextpow2(npts);
 
 % take fft, padding with zeros, length(FFTX)==NFFT
 FFTX = fft(data,NFFT);
@@ -33,12 +37,12 @@ MX = MX*2;
 % account for endpoint uniqueness
 MX(1,:) = MX(1,:)./2;
 % we know NFFT is even
-MX(size(MX,1),:) = MX(size(MX,1),:)./2;  
+MX(size(MX,1),:) = MX(size(MX,1),:)./2;
 % scale the FFT so that it is not a function of the length of data
-MX = MX/npts;                  
+MX = MX/npts;
 
 % frequency vector
-f = 2*Fn/NFFT*(0:NumUniquePts-1)'; 
+f = 2*Fn/NFFT*(0:NumUniquePts-1)';
 
 % plot the results
 if (nargin==3)

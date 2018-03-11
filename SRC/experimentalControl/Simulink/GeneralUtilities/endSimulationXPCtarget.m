@@ -7,27 +7,32 @@ function data = endSimulationXPCtarget(outputFile)
 %     .values   : array with data values
 % outputFile : output file the data is saved to
 %
-% implemented by Andreas Schellenberg 11/2004
+% Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
+% Created: 11/04
+%
+% $Revision$
+% $Date$
+% $URL$
 
 close all;
 clc;
 
 % connect to target and stop model
 try %#ok<TRYNC>
-    tg = xpc;
+    tg = slrt;
     tg.stop;
 end
 
 % get the variables saved on the target
-data = getXPCtargetVar({'targSig','commSig','measSig', ...
+data = getSLRTtargetVar({'targSig','commSig','measSig', ...
     'state','count','flag','measDsp','measFrc'}, ...
-    '192.168.2.20','22222');
+    tg);
 
 % save data structure to file
 save(outputFile,'data');
 
 % disconnect from target
-close(xpc);
+close(slrt);
 
 % plot output
 plotOutputXPCtarget(outputFile);

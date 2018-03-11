@@ -140,7 +140,7 @@ try
     targID = targID(tID);
     
     targSigAT = interp1(time(targID),targSig(targID,:),time);
-    measDspAT = interp1(time(targID),measSig(targID,:),time); 
+    measDspAT = interp1(time(targID),measSig(targID,:),time);
     error = measDspAT(:,dofID) - targSigAT(:,dofID);
     timeShift = getTimeShift(time,targSigAT(:,dofID),time,measDspAT(:,dofID));
     plot(time(id:end),targSigAT(id:end,dofID),'-b','LineWidth',1.0);

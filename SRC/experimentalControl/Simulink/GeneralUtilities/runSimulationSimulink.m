@@ -1,7 +1,11 @@
-% Script to run Hybrid Simulation interacting with Simulink
+% RUNSIMULATIONSIMULINK script to run Hybrid Simulation interacting with Simulink
 %
-% Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+% Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 % Created: 11/04
+%
+% $Revision$
+% $Date$
+% $URL$
 
 close all;
 
@@ -30,7 +34,7 @@ HybridControlSimulink('init',type,appName,ctrlDsp(1,:),ctrlVel(1,:),ctrlAcc(1,:)
 % send control displacements and obtain resisting forces
 fprintf('running......\n\n');
 for i=1:length(ctrlDsp)
-   HybridControlSimulink('control',type,appName,ctrlDsp(i,:),ctrlVel(i,:),ctrlAcc(i,:));
-   [measDsp(i,:),measFrc(i,:)] = HybridControlSimulink('acquire',type,appName);
+    HybridControlSimulink('control',type,appName,ctrlDsp(i,:),ctrlVel(i,:),ctrlAcc(i,:));
+    [measDsp(i,:),measFrc(i,:)] = HybridControlSimulink('acquire',type,appName);
 end
 fprintf('done\n\n');

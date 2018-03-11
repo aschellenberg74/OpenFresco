@@ -1,7 +1,11 @@
 %PLOTOUTPUTSIMULINK to plot the Simulink output from a hybrid simulation
 %
-% Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+% Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 % Created: 04/05
+%
+% $Revision$
+% $Date$
+% $URL$
 
 % save workspace
 save(outputFile);

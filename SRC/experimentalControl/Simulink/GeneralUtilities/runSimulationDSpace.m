@@ -1,7 +1,11 @@
 %RUNSIMULATIONDSPACE script to run Hybrid Simulation interacting with dSpace board
 %
-% Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+% Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 % Created: 11/04
+%
+% $Revision$
+% $Date$
+% $URL$
 
 clear;
 close all;
@@ -29,8 +33,8 @@ HybridControlDSpace('init',type,boardName,targDsp(1,:),targVel(1,:),targAcc(1,:)
 
 % send target displacements and obtain resisting forces
 for i=1:length(targDsp)
-   HybridControlDSpace('execute',type,boardName,targDsp(i,:),targVel(i,:),targAcc(i,:));
-   [measDsp(i,:),measFrc(i,:)] = HybridControlDSpace('acquire',type,boardName);
+    HybridControlDSpace('execute',type,boardName,targDsp(i,:),targVel(i,:),targAcc(i,:));
+    [measDsp(i,:),measFrc(i,:)] = HybridControlDSpace('acquire',type,boardName);
 end
 
 % stop the rtp application

@@ -17,49 +17,53 @@ function savebin(fileName, x, deltaT, desc, units, fileInfo, header, asText)
 %	asText   :  Write the file as text instead of binary (optional).
 %
 %	See also "loadbin".
-
-%	Brad Thoen 10-Jul-00.
-%	Copyright (c) 2000 by MTS Systems Corporation.
+%
+% Written: Brad Thoen 10-Jul-00.
+% Copyright (c) 2000 by MTS Systems Corporation.
+%
+% $Revision$
+% $Date$
+% $URL$
 
 % input argument checking
 if ~exist('fileName')
-	error('File name is a mandatory input to savebin.')
+    error('File name is a mandatory input to savebin.')
 end
 if ~exist('x')
-	error('Data is a mandatory input to savebin.')
+    error('Data is a mandatory input to savebin.')
 end
 if ~exist('deltaT')
-	deltaT = [];
+    deltaT = [];
 end
 if ~exist('desc')
-	desc = [];
+    desc = [];
 end
 if ~exist('units')
-	units = [];
+    units = [];
 end
 if ~exist('fileInfo')
-	fileInfo = [];
+    fileInfo = [];
 end
 if ~exist('header')
-	header = [];
+    header = [];
 end
 if ~exist('asText')
-	asText = [];
+    asText = [];
 end
 if isempty(deltaT)
-	deltaT = 1.0;
+    deltaT = 1.0;
 end
 if isempty(desc)
-	desc = '';
+    desc = '';
 end
 if isempty(units)
-	units = '';
+    units = '';
 end
 if isempty(desc)
-	fileInfo = ' ';
+    fileInfo = ' ';
 end
 if isempty(asText)
-	asText = 0;
+    asText = 0;
 end
 channelPoints = size(x, 1);
 channels = size(x, 2);
@@ -67,7 +71,7 @@ channels = size(x, 2);
 % open file
 [f, message] = fopen(fileName, 'w');
 if f < 3
-	error(message)
+    error(message)
 end
 newhdr = [];
 
@@ -80,19 +84,19 @@ newhdr = addHeaderRecord(newhdr, key, 'TIME_SERIES');
 key    = 'FILE_DATE';
 time   = clock;
 if time(4) < 10
-	str = [date, ' ', '0', int2str(time(4)), ':'];
+    str = [date, ' ', '0', int2str(time(4)), ':'];
 else
-	str = [date, ' ', int2str(time(4)), ':'];
+    str = [date, ' ', int2str(time(4)), ':'];
 end
 if time(5) < 10
-	str = [str, '0', int2str(time(5)), ':'];
+    str = [str, '0', int2str(time(5)), ':'];
 else
-	str = [str, int2str(time(5)), ':'];
+    str = [str, int2str(time(5)), ':'];
 end
 if time(6) < 10
-	str = [str, '0', int2str(time(6))];
+    str = [str, '0', int2str(time(6))];
 else
-	str = [str, int2str(time(6))];
+    str = [str, int2str(time(6))];
 end
 header = removeHeaderRecord(header, key);
 newhdr = addHeaderRecord(newhdr, key, str);
@@ -114,26 +118,26 @@ newhdr = addHeaderRecord(newhdr, key, int2str(channels));
 
 % assemble channel descriptor and units header records
 for i = 1:channels
-
-	% write channel descriptor header record
-	key = ['DESC.CHAN_', int2str(i)];
-	if size(desc, 1) >= i
-		str = desc(i, :);
-	else
-		str = ' ';
-	end
-	header = removeHeaderRecord(header, key);
-	newhdr = addHeaderRecord(newhdr, key, str);
-
-	% write channel units header record
-	key = ['UNITS.CHAN_', int2str(i)];
-	if size(units, 1) >= i
-		str = units(i, :);
-	else
-		str = ' ';
-	end
-	header = removeHeaderRecord(header, key);
-	newhdr = addHeaderRecord(newhdr, key, str);
+    
+    % write channel descriptor header record
+    key = ['DESC.CHAN_', int2str(i)];
+    if size(desc, 1) >= i
+        str = desc(i, :);
+    else
+        str = ' ';
+    end
+    header = removeHeaderRecord(header, key);
+    newhdr = addHeaderRecord(newhdr, key, str);
+    
+    % write channel units header record
+    key = ['UNITS.CHAN_', int2str(i)];
+    if size(units, 1) >= i
+        str = units(i, :);
+    else
+        str = ' ';
+    end
+    header = removeHeaderRecord(header, key);
+    newhdr = addHeaderRecord(newhdr, key, str);
 end
 
 % assemble extended header
@@ -141,47 +145,47 @@ key    = 'EXTENDED_HEADER_RECORDS';
 header = removeHeaderRecord(header, key);
 nxrecs = size(header, 1) / 2;
 if (nxrecs)
-	% modify file type header record
-	value  = 'TIME_SERIES_WITH_EXTENDED_HEADER';
-	newhdr(1,33:33+length(value)-1) = value;
-
-	% assemble number of extended header records
-	newhdr = addHeaderRecord(newhdr, key, int2str(nxrecs));
-
-	% assemble extended header records
-	for i = 1:nxrecs
-		key    = header(2*i-1,:);
-		value  = header(2*i,:);
-		newhdr = addHeaderRecord(newhdr, key, value);
-	end
+    % modify file type header record
+    value  = 'TIME_SERIES_WITH_EXTENDED_HEADER';
+    newhdr(1,33:33+length(value)-1) = value;
+    
+    % assemble number of extended header records
+    newhdr = addHeaderRecord(newhdr, key, int2str(nxrecs));
+    
+    % assemble extended header records
+    for i = 1:nxrecs
+        key    = header(2*i-1,:);
+        value  = header(2*i,:);
+        newhdr = addHeaderRecord(newhdr, key, value);
+    end
 end
 
 % write header
 if asText
-	for i = 1:size(newhdr, 1)
-		fprintf(f, '%s\n', deblank(newhdr(i,:)));
-	end
+    for i = 1:size(newhdr, 1)
+        fprintf(f, '%s\n', deblank(newhdr(i,:)));
+    end
 else
-	fprintf(f, '%s', newhdr');
+    fprintf(f, '%s', newhdr');
 end
 
 % write data
 if channelPoints
-	if asText
-		formatStr = '';
-		for i = 1:channels-1
-			formatStr = [formatStr, '%f\t'];
-		end
-		formatStr = [formatStr, '%f\n'];
-		fprintf(f, formatStr, x(1:channelPoints, :)');
-	else
-		% multiplex channel data
-		filePoints = channels * channelPoints;
-		for i = 1:channels
-			data(i:channels:filePoints) = x(:,i);
-		end
-		fwrite(f, data, 'float32');
-	end
+    if asText
+        formatStr = '';
+        for i = 1:channels-1
+            formatStr = [formatStr, '%f\t'];
+        end
+        formatStr = [formatStr, '%f\n'];
+        fprintf(f, formatStr, x(1:channelPoints, :)');
+    else
+        % multiplex channel data
+        filePoints = channels * channelPoints;
+        for i = 1:channels
+            data(i:channels:filePoints) = x(:,i);
+        end
+        fwrite(f, data, 'float32');
+    end
 end
 
 % close file
@@ -189,21 +193,21 @@ fclose(f);
 
 
 function newHeader = addHeaderRecord(header, key, value)
-	value  = deblank(value);
-	record = blanks(128);
-	record(1:1+length(key)-1) = key;
-	record(33:33+length(value)-1) = value;
-	newHeader = [header; record];
+value  = deblank(value);
+record = blanks(128);
+record(1:1+length(key)-1) = key;
+record(33:33+length(value)-1) = value;
+newHeader = [header; record];
 
 
 function newHeader = removeHeaderRecord(header, key)
-	newHeader = header;
-	rows  = size(header, 1);
-	chars = size(header, 2);
-	len   = min(length(key), chars);
-	for i = 1:2:rows-1
-		if strcmp(char(header(i,1:len)), key)
-			newHeader = header([1:i-1,i+2:rows],:);
-			break;
-		end
-	end
+newHeader = header;
+rows  = size(header, 1);
+chars = size(header, 2);
+len   = min(length(key), chars);
+for i = 1:2:rows-1
+    if strcmp(char(header(i,1:len)), key)
+        newHeader = header([1:i-1,i+2:rows],:);
+        break;
+    end
+end
