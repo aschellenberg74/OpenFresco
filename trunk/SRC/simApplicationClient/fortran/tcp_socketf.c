@@ -19,8 +19,8 @@
 **                                                                    **
 ** ****************************************************************** */
 
-/* $Revision$
-/* $Date$
+/* $Revision: 314 $
+/* $Date: 2011-05-22 14:17:07 -0700 (Sun, 22 May 2011) $
 /* $Source: $
 
 /* Written: Yuli Huang (yulee@berkeley.edu)
@@ -80,15 +80,15 @@
 #define CHLEN(id) , const int id ## _len
 #endif
 
-/* Functions defined in socket.c */
-void setupconnectionserver(unsigned int *port, int *socketID);
-void setupconnectionclient(unsigned int *other_Port, const char other_InetAddr[], int *lengthInet, int *socketID);
-void closeconnection(int *socketID, int *ierr);
-void senddata(int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr);
-void sendnbdata(int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr);
-void recvdata(int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr);
-void recvnbdata(int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr);
-void getsocketid(unsigned int *port, const char machineInetAddr[], int *lengthInet, int *socketID);
+/* Functions defined in tcp_socket.c */
+void tcp_setupconnectionserver(unsigned int *port, int *socketID);
+void tcp_setupconnectionclient(unsigned int *other_Port, const char other_InetAddr[], int *lengthInet, int *socketID);
+void tcp_closeconnection(int *socketID, int *ierr);
+void tcp_senddata(int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr);
+void tcp_sendnbdata(int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr);
+void tcp_recvdata(int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr);
+void tcp_recvnbdata(int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr);
+void tcp_getsocketid(unsigned int *port, const char machineInetAddr[], int *lengthInet, int *socketID);
 
 #ifdef  __cplusplus
 extern "C" {
@@ -96,35 +96,35 @@ extern "C" {
 
 /* Prototypes for the Fortran interfaces */
 void FORT_CALL setupconnectionserver_ (unsigned int *port, int *socketID) {
-    setupconnectionserver(port, socketID);
+    tcp_setupconnectionserver(port, socketID);
 }
 
 void FORT_CALL setupconnectionclient_ (unsigned int *other_Port, CHNAME(other_InetAddr), int *lengthInet, int *socketID CHLEN(other_InetAddr)) {
-    setupconnectionclient (other_Port, other_InetAddr, lengthInet, socketID);
+    tcp_setupconnectionclient (other_Port, other_InetAddr, lengthInet, socketID);
 }
 
 void FORT_CALL closeconnection_ (int *socketID, int *ierr) {
-    closeconnection(socketID, ierr);
+    tcp_closeconnection(socketID, ierr);
 }
 
 void FORT_CALL senddata_ (int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr) {
-    senddata(socketID, dataTypeSize, data, lenData, ierr);
+    tcp_senddata(socketID, dataTypeSize, data, lenData, ierr);
 }
 
 void FORT_CALL sendnbdata_ (int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr) {
-    sendnbdata(socketID, dataTypeSize, data, lenData, ierr);
+    tcp_sendnbdata(socketID, dataTypeSize, data, lenData, ierr);
 }
 
 void FORT_CALL recvdata_ (int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr) {
-    recvdata(socketID, dataTypeSize, data, lenData, ierr);
+    tcp_recvdata(socketID, dataTypeSize, data, lenData, ierr);
 }
 
 void FORT_CALL recvnbdata_ (int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr) {
-    recvnbdata(socketID, dataTypeSize, data, lenData, ierr);
+    tcp_recvnbdata(socketID, dataTypeSize, data, lenData, ierr);
 }
 
 void FORT_CALL getsocketid_ (unsigned int *port, CHNAME(machineInetAddr), int *lengthInet, int *socketID CHLEN(machineInetAddr)) {
-	  getsocketid(port, machineInetAddr, lengthInet, socketID);
+    tcp_getsocketid(port, machineInetAddr, lengthInet, socketID);
 }
 
 #ifdef  __cplusplus

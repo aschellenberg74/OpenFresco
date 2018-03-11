@@ -12,7 +12,7 @@
 ** and redistribution, and for a DISCLAIMER OF ALL WARRANTIES.        **
 **                                                                    **
 ** Developed by:                                                      **
-**   Andreas Schellenberg (andreas.schellenberg@gmx.net)              **
+**   Andreas Schellenberg (andreas.schellenberg@gmail.com)            **
 **   Yoshikazu Takahashi (yos@catfish.dpri.kyoto-u.ac.jp)             **
 **   Gregory L. Fenves (fenves@berkeley.edu)                          **
 **   Stephen A. Mahin (mahin@berkeley.edu)                            **
@@ -109,7 +109,7 @@ void CALL_CONV cleanupsockets()
 *
 * return: int *socketID - negative number if failed to setup connection
 */
-void CALL_CONV setupconnectionserver(unsigned int *port, int *socketID)
+void CALL_CONV udp_setupconnectionserver(unsigned int *port, int *socketID)
 {
     union {
         struct sockaddr    addr;
@@ -203,7 +203,7 @@ void CALL_CONV setupconnectionserver(unsigned int *port, int *socketID)
 *
 * return: int *socketID - negative number if failed to setup connection
 */
-void CALL_CONV setupconnectionclient(unsigned int *other_Port,
+void CALL_CONV udp_setupconnectionclient(unsigned int *other_Port,
     const char other_InetAddr[], int *lengthInet, int *socketID)
 {
     union {
@@ -318,7 +318,7 @@ void CALL_CONV setupconnectionclient(unsigned int *other_Port,
 *
 * return: int *ierr - 0 if successfull, negative number if not
 */
-void CALL_CONV closeconnection(int *socketID, int *ierr)
+void CALL_CONV udp_closeconnection(int *socketID, int *ierr)
 {
     SocketConnection *theSocket = theSockets;
     *ierr = 0;
@@ -353,7 +353,7 @@ void CALL_CONV closeconnection(int *socketID, int *ierr)
 *        
 * return: int *ierr - 0 if successfull, negative number if not
 */
-void CALL_CONV senddata(int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr)
+void CALL_CONV udp_senddata(int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr)
 {
     SocketConnection *theSocket = theSockets;
     socket_type sockfd;
@@ -420,7 +420,7 @@ void CALL_CONV senddata(int *socketID, int *dataTypeSize, char data[], int *lenD
 *        
 * return: int *ierr - 0 if successfull, negative number if not
 */
-void CALL_CONV sendnbdata(int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr)
+void CALL_CONV udp_sendnbdata(int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr)
 {
     SocketConnection *theSocket = theSockets;
     socket_type sockfd;
@@ -495,7 +495,7 @@ void CALL_CONV sendnbdata(int *socketID, int *dataTypeSize, char data[], int *le
 *        
 * return: int *ierr - 0 if successfull, negative number if not
 */
-void CALL_CONV recvdata(int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr)
+void CALL_CONV udp_recvdata(int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr)
 {
     SocketConnection *theSocket = theSockets;
     socket_type sockfd;
@@ -562,7 +562,7 @@ void CALL_CONV recvdata(int *socketID, int *dataTypeSize, char data[], int *lenD
 *        
 * return: int *ierr - 0 if successfull, negative number if not
 */
-void CALL_CONV recvnbdata(int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr)
+void CALL_CONV udp_recvnbdata(int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr)
 {
     SocketConnection *theSocket = theSockets;
     socket_type sockfd;
@@ -636,7 +636,7 @@ void CALL_CONV recvnbdata(int *socketID, int *dataTypeSize, char data[], int *le
 *
 * return: int *socketID - negative number if failed to get open connection
 */
-void CALL_CONV getsocketid(unsigned int *port, const char machineInetAddr[], int *lengthInet, int *socketID)
+void CALL_CONV udp_getsocketid(unsigned int *port, const char machineInetAddr[], int *lengthInet, int *socketID)
 {
     SocketConnection *theSocket = theSockets;
     
