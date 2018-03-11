@@ -1,26 +1,34 @@
 %INITIALIZESIMULATION to initialize the parameters needed to build the Simulink model
 %
-% implemented by Andreas Schellenberg (andreas.schellenberg@gmail.com) 11/2004
+% created by Andreas Schellenberg (andreas.schellenberg@gmail.com) 01/2014
 %
-% $Revision$
-% $Date$
-% $URL$
+% $Revision: $
+% $Date: $
+% $URL: $
 
 clear;
 close all;
 clc;
 
+%%%%%%%%%% HYBRID CONTROLLER PARAMETERS %%%%%%%%%%
+
 % set number of degrees-of-freedom
-HybridCtrlParameters.nDOF = 2;
+HybridCtrlParameters.nDOF = 4;
+%dofID = [1];
 
 % set time steps
-HybridCtrlParameters.dtInt = 0.01;           % integration time step (sec)
-HybridCtrlParameters.dtSim = 0.05;           % simulation time step (sec)
-HybridCtrlParameters.dtCon = 1/1000;         % controller time step (sec)
-HybridCtrlParameters.delay(1) = 0/1000;      % delay compensation DOF 1 (sec)
-HybridCtrlParameters.delay(2) = 0/1000;      % delay compensation DOF 2 (sec)
+HybridCtrlParameters.upFact   = 5;          % upsample factor
+HybridCtrlParameters.dtInt    = 10/2048;    % integration time step (sec)
+HybridCtrlParameters.dtSim    = 10/2048;    % simulation time step (sec)
+HybridCtrlParameters.dtCon    = 1/2048;     % controller time step (sec)
+HybridCtrlParameters.delay    = zeros(1,HybridCtrlParameters.nDOF);
+%HybridCtrlParameters.delay(1) = 0/2048;     % delay compensation DOF 1 (sec)
+%HybridCtrlParameters.delay(2) = 0/2048;     % delay compensation DOF 2 (sec)
+%HybridCtrlParameters.delay(3) = 0/2048;     % delay compensation DOF 3 (sec)
 
-% calculate max number of substeps
+% update controller time step
+HybridCtrlParameters.dtCon = HybridCtrlParameters.dtCon/HybridCtrlParameters.upFact;
+% calculate number of substeps
 HybridCtrlParameters.N = round(HybridCtrlParameters.dtSim/HybridCtrlParameters.dtCon);
 % update simulation time step
 HybridCtrlParameters.dtSim = HybridCtrlParameters.N*HybridCtrlParameters.dtCon;
@@ -47,14 +55,6 @@ HybridCtrlParameters.delay = HybridCtrlParameters.iDelay*HybridCtrlParameters.dt
 % calculate testing rate
 HybridCtrlParameters.rate = HybridCtrlParameters.dtSim/HybridCtrlParameters.dtInt;
 
-% signal magnitude and rate limits
-HybridCtrlParameters.magnLim = [30.0 21.0];
-HybridCtrlParameters.rateLim = [100.0 100.0];
-
 disp('Model Properties:');
 disp('=================');
 disp(HybridCtrlParameters);
-
-% initialization of tunable parameters
-newTarget  = int32(0);
-targSignal = zeros(1,HybridCtrlParameters.nDOF);

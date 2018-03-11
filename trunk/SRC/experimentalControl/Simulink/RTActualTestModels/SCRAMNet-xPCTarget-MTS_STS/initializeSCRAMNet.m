@@ -1,50 +1,11 @@
-%INITIALIZESIMULATION to initialize the parameters needed to build the Simulink model
+%INITIALIZESCRAMNET to initialize the parameters needed for SCRAMNet
 %
-% created by MTS
-% modified by Andreas Schellenberg (andreas.schellenberg@gmx.net) 11/2004
-
-clear;
-close all;
-clc;
-
-%%%%%%%%%% HYBRID CONTROLLER PARAMETERS %%%%%%%%%%
-
-% set time steps
-HybridCtrlParameters.dtInt = 0.005;          % integration time step (sec)
-HybridCtrlParameters.dtSim = 0.005;          % simulation time step (sec)
-HybridCtrlParameters.dtCon = 1/1024;         % controller time step (sec)
-HybridCtrlParameters.delay = 0.0;            % delay due to undershoot (sec)
-
-% calculate max number of substeps
-HybridCtrlParameters.N = round(HybridCtrlParameters.dtSim/HybridCtrlParameters.dtCon);
-% update simulation time step
-HybridCtrlParameters.dtSim = HybridCtrlParameters.N*HybridCtrlParameters.dtCon;
-
-% calculate number of delay steps
-HybridCtrlParameters.iDelay = round(HybridCtrlParameters.delay./HybridCtrlParameters.dtCon);
-
-% check that finite state machine does not deadlock
-delayRatio = HybridCtrlParameters.iDelay/HybridCtrlParameters.N;
-if (delayRatio>0.6 && delayRatio<0.8)
-    warndlg(['The delay compensation exceeds 60% of the simulation time step.', ...
-        'Please consider increasing the simulation time step in order to avoid oscillations.'], ...
-        'WARNING');
-elseif (delayRatio>=0.8)
-    errordlg(['The delay compensation exceeds 80% of the simulation time step.', ...
-        'The simulation time step must be increased in order to avoid deadlock.'], ...
-        'ERROR');
-    return
-end
-
-% update delay time
-HybridCtrlParameters.delay = HybridCtrlParameters.iDelay*HybridCtrlParameters.dtCon;
-
-% calculate testing rate
-HybridCtrlParameters.Rate = HybridCtrlParameters.dtSim/HybridCtrlParameters.dtInt;
-
-disp('Model Properties:');
-disp('=================');
-disp(HybridCtrlParameters);
+% created by Brad Thoen (MTS)
+% modified by Andreas Schellenberg (andreas.schellenberg@gmail.com) 11/2004
+%
+% $Revision: $
+% $Date: $
+% $URL: $
 
 %%%%%%%%%% SIGNAL COUNTS %%%%%%%%%%
 
@@ -58,9 +19,16 @@ nEncCmd = 2;                                         % number of encoders comman
 nUDPOut = 1+7*nAct+nAdcU+nDucU+nEncU+nDinp+nEncCmd;  % no. of outputs from simulink bridge
 nUDPInp = 1+6*nAct+nAdcU+nDucU+nEncU+nDinp+nEncCmd;  % no. of inputs to simulink bridge
 
-%%%%%%%%%% SAMPLE PERIOD %%%%%%%%%%
+%%%%%%%%%% SAMPLE PERIODS %%%%%%%%%%
 
-samplePeriod = 1/1024;
+controlPeriod = 1/1024;  % controller sample period (sec)
+samplePeriod  = controlPeriod/HybridCtrlParameters.upFact;
+
+%%%%%%%%%% SCRAMNET PARTITIONS %%%%%%%%%%
+
+syncNode = 1;	% synchronization node: MTS STS
+xpcNode	 = 2;	% xPC-Target node
+opfNode  = 3;   % OpenFresco node
 
 
 %%%%%%%%%% START MTS (STS) %%%%%%%%%%
@@ -68,42 +36,42 @@ samplePeriod = 1/1024;
 %%%%%%%%%% outputs to scramnet %%%%%%%%%%
 
 % master span
-baseAddress	         = 0;
+baseAddress = 0;
 partition(1).Address = ['0x', dec2hex(baseAddress*4)];
-partition(1).Type	   = 'single';
-partition(1).Size	   = '1';
+partition(1).Type = 'single';
+partition(1).Size = '1';
 
 % control modes
-partition(2).Type	= 'uint32';
-partition(2).Size	= num2str(nAct);
+partition(2).Type = 'uint32';
+partition(2).Size = num2str(nAct);
 
 % displ commands
-partition(3).Type	= 'single';
-partition(3).Size	= num2str(nAct);
+partition(3).Type = 'single';
+partition(3).Size = num2str(nAct);
 
 % force commands
-partition(4).Type	= 'single';
-partition(4).Size	= num2str(nAct);
+partition(4).Type = 'single';
+partition(4).Size = num2str(nAct);
 
 % displ feedbacks (used only in realtime simulation mode)
-partition(5).Type	= 'single';
-partition(5).Size	= num2str(nAct);
+partition(5).Type = 'single';
+partition(5).Size = num2str(nAct);
 
 % force feedbacks (used only in realtime simulation mode)
-partition(6).Type	= 'single';
-partition(6).Size	= num2str(nAct);
+partition(6).Type = 'single';
+partition(6).Size = num2str(nAct);
 
 % deltaP feedbacks (used only in realtime simulation mode)
-partition(7).Type	= 'single';
-partition(7).Size	= num2str(nAct);
+partition(7).Type = 'single';
+partition(7).Size = num2str(nAct);
 
 % user ADCs (used only in realtime simulation mode)
 partition(8).Type = 'single';
-partition(8).Size	= num2str(nAdcU);
+partition(8).Size = num2str(nAdcU);
 
 % user DUCs (used only in realtime simulation mode)
-partition(9).Type	= 'single';
-partition(9).Size	= num2str(nDucU);
+partition(9).Type = 'single';
+partition(9).Size = num2str(nDucU);
 
 % user ENCs (used only in realtime simulation mode)
 partition(10).Type = 'single';
@@ -170,9 +138,9 @@ partition(24).Size = num2str(nEncCmd);
 % nEncCmd inputs from scramnet
 partition(25).Type = 'single';
 partition(25).Size = num2str(nEncCmd);
-irqPartition       = 25;
+irqPartition = 25;
 
-% blank space
+% blank space (up to 1024)
 partition(26).Type = 'uint32';
 partition(26).Size = '862';
 
@@ -190,61 +158,59 @@ partition(27).Size = '94231';
 
 %%%%%%%%%% START OPENFRESCO %%%%%%%%%%
 
-%%%%%%%%%% flags from/to scramnet %%%%%%%%%%
+%%%%%%%%%% inputs from OpenFresco %%%%%%%%%%
 
 % newTarget (from)
-partition(28).Type = 'uint32';
+partition(28).Type = 'int32';
 partition(28).Size = '1';
 
-% switchPC (to)
-partition(29).Type = 'uint32';
-partition(29).Size = '1';
+% disp commands (from)
+partition(29).Type = 'single';
+partition(29).Size = num2str(nAct);
 
-% atTarget (to)
-partition(30).Type = 'uint32';
-partition(30).Size = '1';
+% vel commands (from)
+partition(30).Type = 'single';
+partition(30).Size = num2str(nAct);
 
-%%%%%%%%%% inputs from scramnet %%%%%%%%%%
-
-% disp commands
+% accel commands (from)
 partition(31).Type = 'single';
 partition(31).Size = num2str(nAct);
 
-% vel commands
+% force commands (from)
 partition(32).Type = 'single';
 partition(32).Size = num2str(nAct);
 
-% accel commands
+% time commands (from)
 partition(33).Type = 'single';
 partition(33).Size = num2str(nAct);
 
-% force commands
-partition(34).Type = 'single';
-partition(34).Size = num2str(nAct);
+%%%%%%%%%% outputs to OpenFresco %%%%%%%%%%
 
-% time commands
-partition(35).Type = 'single';
-partition(35).Size = num2str(nAct);
+% switchPC (to)
+partition(34).Type = 'int32';
+partition(34).Size = '1';
 
-%%%%%%%%%% outputs to scramnet %%%%%%%%%%
+% atTarget (to)
+partition(35).Type = 'int32';
+partition(35).Size = '1';
 
-% disp feedbacks
+% disp feedbacks (to)
 partition(36).Type = 'single';
 partition(36).Size = num2str(nAct);
 
-% vel feedbacks
+% vel feedbacks (to)
 partition(37).Type = 'single';
 partition(37).Size = num2str(nAct);
 
-% accel feedbacks
+% accel feedbacks (to)
 partition(38).Type = 'single';
 partition(38).Size = num2str(nAct);
 
-% force feedbacks
+% force feedbacks (to)
 partition(39).Type = 'single';
 partition(39).Size = num2str(nAct);
 
-% time feedbacks
+% time feedbacks (to)
 partition(40).Type = 'single';
 partition(40).Size = num2str(nAct);
 
@@ -263,7 +229,7 @@ node.Interface.Interrupts.NetworkInterrupt           = 'on';
 % NOTE:  Use the modified completepartitionstruct() that
 %        allows discontiguous partitions--- the original one
 %        provide by Mathworks packs them together.
-node.Interface.NodeID                      = '0';
+node.Interface.NodeID                      = num2str(xpcNode);
 node.Interface.Timeout.NumOfNodesInRing    = '10';
 node.Interface.Timeout.TotalCableLengthInM = '50';
 bub = completepartitionstruct(partition);

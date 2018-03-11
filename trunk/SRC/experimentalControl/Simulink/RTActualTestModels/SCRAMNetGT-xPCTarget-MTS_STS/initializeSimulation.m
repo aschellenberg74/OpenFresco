@@ -1,22 +1,25 @@
 %INITIALIZESIMULATION to initialize the parameters needed to build the Simulink model
 %
-% implemented by Andreas Schellenberg (andreas.schellenberg@gmail.com) 11/2004
+% created by Brad Thoen (MTS)
+% modified by Andreas Schellenberg (andreas.schellenberg@gmail.com) 01/2014
 %
-% $Revision$
-% $Date$
-% $URL$
+% $Revision: $
+% $Date: $
+% $URL: $
 
 clear;
 close all;
 clc;
 
+%%%%%%%%%% HYBRID CONTROLLER PARAMETERS %%%%%%%%%%
+
 % set number of degrees-of-freedom
-HybridCtrlParameters.nDOF = 2;
+nDOF = 2;
 
 % set time steps
-HybridCtrlParameters.dtInt = 0.01;           % integration time step (sec)
-HybridCtrlParameters.dtSim = 0.05;           % simulation time step (sec)
-HybridCtrlParameters.dtCon = 1/1000;         % controller time step (sec)
+HybridCtrlParameters.dtInt = 10/2048;        % integration time step (sec)
+HybridCtrlParameters.dtSim = 10/2048;        % simulation time step (sec)
+HybridCtrlParameters.dtCon = 1/2048;         % controller time step (sec)
 HybridCtrlParameters.delay(1) = 0/1000;      % delay compensation DOF 1 (sec)
 HybridCtrlParameters.delay(2) = 0/1000;      % delay compensation DOF 2 (sec)
 
@@ -47,14 +50,22 @@ HybridCtrlParameters.delay = HybridCtrlParameters.iDelay*HybridCtrlParameters.dt
 % calculate testing rate
 HybridCtrlParameters.rate = HybridCtrlParameters.dtSim/HybridCtrlParameters.dtInt;
 
-% signal magnitude and rate limits
-HybridCtrlParameters.magnLim = [30.0 21.0];
-HybridCtrlParameters.rateLim = [100.0 100.0];
-
 disp('Model Properties:');
 disp('=================');
 disp(HybridCtrlParameters);
 
-% initialization of tunable parameters
-newTarget  = int32(0);
-targSignal = zeros(1,HybridCtrlParameters.nDOF);
+%%%%%%%%%% SIGNAL COUNTS %%%%%%%%%%
+
+nAct	= 12;                               % number of actuators
+nAcc	= 11;                               % number of accelerometers
+nTbl	= 6;                                % number of table degree-of-freedom
+nAdcU	= 40;                               % number of user a/d channels
+nDucU	= 4;								% number of user duc's
+nUDPInp	= 1+nTbl+2*nAct+nAcc+nAdcU+nDucU;	% no. of outputs from simulink bridge
+nUDPOut = 1+6*nTbl+nAct+nAdcU+nDucU;		% no. of inputs to simulink bridge
+
+%%%%%%%%%% SAMPLE PERIOD %%%%%%%%%%
+
+controlPeriod	= 1/2048;		% controller sample period (sec)
+upsampleFactor	= 4;			% plant upsample factor
+dnsampleFactor	= 4;			% plant downsample factor

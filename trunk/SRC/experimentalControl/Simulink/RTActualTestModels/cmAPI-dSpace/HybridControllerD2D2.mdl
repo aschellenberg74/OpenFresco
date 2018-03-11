@@ -7,7 +7,7 @@ Model {
     NumRootInports	    0
     NumRootOutports	    0
     ParameterArgumentNames  ""
-    ComputedModelVersion    "1.787"
+    ComputedModelVersion    "1.795"
     NumModelReferences	    0
     NumTestPointedSignals   0
   }
@@ -37,9 +37,9 @@ Model {
   ModifiedByFormat	  "%<Auto>"
   LastModifiedBy	  "Andreas"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Wed Oct 08 09:19:55 2014"
-  RTWModifiedTimeStamp	  334660670
-  ModelVersionFormat	  "1.%<AutoIncrement:787>"
+  LastModifiedDate	  "Wed Oct 15 20:40:27 2014"
+  RTWModifiedTimeStamp	  335306399
+  ModelVersionFormat	  "1.%<AutoIncrement:795>"
   ConfigurationManager	  "None"
   SampleTimeColors	  off
   SampleTimeAnnotations	  off
@@ -1013,6 +1013,18 @@ Model {
       SaturateOnIntegerOverflow	off
     }
     Block {
+      BlockType		      ForEach
+      IndexMode		      "Zero-based"
+      IterationIndexDataType  "int32"
+      ShowIterationIndex      off
+      StateHandling	      "Separate states for each iteration"
+      StateReset	      "held"
+      ShowResetFlag	      off
+      NeedActiveIterationSignal	off
+      ShowActiveIterationCount off
+      ShowActiveIterationFlag off
+    }
+    Block {
       BlockType		      Gain
       Gain		      "1"
       Multiplication	      "Element-wise(K.*u)"
@@ -1218,7 +1230,7 @@ Model {
     ShowPageBoundaries	    off
     ZoomFactor		    "100"
     ReportName		    "simulink-default.rpt"
-    SIDHighWatermark	    "2267"
+    SIDHighWatermark	    "2330"
     Block {
       BlockType		      Reference
       Name		      "DS1104ADC_C5"
@@ -2182,11 +2194,12 @@ Model {
       MaskIconRotate	      "none"
       MaskPortRotate	      "default"
       MaskIconUnits	      "autoscale"
-      MaskValueString	      "nDOF|HybridCtrlParameters.dtInt|HybridCtrlParameters.dtSim|HybridCtrlParameters.dtCon|Hyb"
-      "ridCtrlParameters.N|HybridCtrlParameters.iDelay|HybridCtrlParameters.magnLim|HybridCtrlParameters.rateLim"
+      MaskValueString	      "HybridCtrlParameters.nDOF|HybridCtrlParameters.dtInt|HybridCtrlParameters.dtSim|HybridCtr"
+      "lParameters.dtCon|HybridCtrlParameters.N|HybridCtrlParameters.iDelay|HybridCtrlParameters.magnLim|HybridCtrlPara"
+      "meters.rateLim"
       System {
 	Name			"dSpace HC"
-	Location		[10, 82, 784, 491]
+	Location		[10, 82, 724, 491]
 	Open			off
 	ModelBrowserVisibility	off
 	ModelBrowserWidth	200
@@ -2253,35 +2266,11 @@ Model {
 	  }
 	}
 	Block {
-	  BlockType		  Gain
-	  Name			  "Gain1"
-	  SID			  "20"
-	  Position		  [100, 344, 130, 376]
-	  ZOrder		  -5
-	  ShowName		  off
-	}
-	Block {
-	  BlockType		  Gain
-	  Name			  "Gain2"
-	  SID			  "2161"
-	  Position		  [590, 79, 620, 111]
-	  ZOrder		  -7
-	  ShowName		  off
-	}
-	Block {
-	  BlockType		  Gain
-	  Name			  "Gain4"
-	  SID			  "22"
-	  Position		  [100, 304, 130, 336]
-	  ZOrder		  -7
-	  ShowName		  off
-	}
-	Block {
 	  BlockType		  DiscreteFir
 	  Name			  "MovingAverage Filter"
 	  SID			  "2231"
 	  Ports			  [1, 1]
-	  Position		  [270, 303, 355, 337]
+	  Position		  [230, 303, 315, 337]
 	  ZOrder		  -5
 	  ShowName		  off
 	  Coefficients		  "1/numSample*ones(1,numSample)"
@@ -2307,7 +2296,7 @@ Model {
 	  Name			  "MovingAverage Filter1"
 	  SID			  "2267"
 	  Ports			  [1, 1]
-	  Position		  [270, 343, 355, 377]
+	  Position		  [230, 343, 315, 377]
 	  ZOrder		  -5
 	  ShowName		  off
 	  Coefficients		  "1/numSample*ones(1,numSample)"
@@ -2333,7 +2322,7 @@ Model {
 	  Name			  "Offset"
 	  SID			  "2230"
 	  Ports			  [1, 1]
-	  Position		  [170, 304, 225, 336]
+	  Position		  [115, 304, 170, 336]
 	  ShowName		  off
 	  MinAlgLoopOccurrences	  off
 	  PropExecContextOutsideSubsystem off
@@ -2359,7 +2348,7 @@ Model {
 	  MaskIconRotate	  "none"
 	  MaskPortRotate	  "default"
 	  MaskIconUnits		  "autoscale"
-	  MaskValueString	  "nDOF|-1|dtCon"
+	  MaskValueString	  "nDOF|1024|dtCon"
 	  System {
 	    Name		    "Offset"
 	    Location		    [725, 381, 1251, 667]
@@ -2641,7 +2630,7 @@ Model {
 	  Name			  "Offset1"
 	  SID			  "2249"
 	  Ports			  [1, 1]
-	  Position		  [170, 344, 225, 376]
+	  Position		  [115, 344, 170, 376]
 	  ShowName		  off
 	  MinAlgLoopOccurrences	  off
 	  PropExecContextOutsideSubsystem off
@@ -2667,7 +2656,7 @@ Model {
 	  MaskIconRotate	  "none"
 	  MaskPortRotate	  "default"
 	  MaskIconUnits		  "autoscale"
-	  MaskValueString	  "nDOF|-1|dtCon"
+	  MaskValueString	  "nDOF|1024|dtCon"
 	  System {
 	    Name		    "Offset1"
 	    Location		    [725, 381, 1251, 667]
@@ -3195,7 +3184,7 @@ Model {
 	  MaskHideContents	  off
 	  System {
 	    Name		    "SubSystem0"
-	    Location		    [21, 69, 801, 659]
+	    Location		    [21, 82, 801, 672]
 	    Open		    off
 	    ModelBrowserVisibility  off
 	    ModelBrowserWidth	    200
@@ -3267,7 +3256,7 @@ Model {
 	      MaskHideContents	      off
 	      System {
 		Name			"If Action\nSubsystem0"
-		Location		[16, 52, 796, 642]
+		Location		[16, 82, 796, 672]
 		Open			off
 		ModelBrowserVisibility	off
 		ModelBrowserWidth	200
@@ -3314,7 +3303,7 @@ Model {
 		  Position		  [55, 190, 85, 220]
 		  ZOrder		  -4
 		  Value			  "0"
-		  OutDataTypeStr	  "uint32"
+		  OutDataTypeStr	  "int32"
 		  SampleTime		  "dtCon"
 		}
 		Block {
@@ -3323,7 +3312,7 @@ Model {
 		  SID			  "69"
 		  Position		  [55, 100, 85, 130]
 		  ZOrder		  -5
-		  OutDataTypeStr	  "uint32"
+		  OutDataTypeStr	  "int32"
 		  SampleTime		  "dtCon"
 		}
 		Line {
@@ -3395,7 +3384,7 @@ Model {
 		  Position		  [55, 100, 85, 130]
 		  ZOrder		  -3
 		  Value			  "0"
-		  OutDataTypeStr	  "uint32"
+		  OutDataTypeStr	  "int32"
 		  SampleTime		  "dtCon"
 		}
 		Line {
@@ -3432,7 +3421,7 @@ Model {
 	      SID		      "76"
 	      Position		      [305, 31, 360, 49]
 	      ZOrder		      -8
-	      OutDataTypeStr	      "uint32"
+	      OutDataTypeStr	      "int32"
 	    }
 	    Block {
 	      BlockType		      Outport
@@ -3502,10 +3491,10 @@ Model {
 	Block {
 	  BlockType		  SubSystem
 	  Name			  "SubSystem1"
-	  SID			  "78"
+	  SID			  "2268"
 	  Ports			  [3, 1]
 	  Position		  [415, 256, 550, 384]
-	  ZOrder		  -12
+	  ZOrder		  5
 	  ShowName		  off
 	  MinAlgLoopOccurrences	  off
 	  PropExecContextOutsideSubsystem off
@@ -3517,13 +3506,12 @@ Model {
 	  Port {
 	    PortNumber		    1
 	    Name		    "measSignal"
-	    RTWStorageClass	    "ExportedGlobal"
-	    RTWStorageTypeQualifier "volatile"
+	    RTWStorageClass	    "Auto"
 	    DataLoggingNameMode	    "SignalName"
 	  }
 	  System {
 	    Name		    "SubSystem1"
-	    Location		    [-8, 82, 1368, 862]
+	    Location		    [16, 82, 1089, 808]
 	    Open		    off
 	    ModelBrowserVisibility  off
 	    ModelBrowserWidth	    200
@@ -3539,16 +3527,16 @@ Model {
 	    Block {
 	      BlockType		      Inport
 	      Name		      "counter"
-	      SID		      "79"
-	      Position		      [70, 28, 100, 42]
+	      SID		      "2269"
+	      Position		      [25, 28, 55, 42]
 	      ZOrder		      -1
 	      IconDisplay	      "Port number"
 	    }
 	    Block {
 	      BlockType		      Inport
 	      Name		      "measDsp"
-	      SID		      "80"
-	      Position		      [70, 228, 100, 242]
+	      SID		      "2270"
+	      Position		      [25, 218, 55, 232]
 	      ZOrder		      -2
 	      Port		      "2"
 	      IconDisplay	      "Port number"
@@ -3556,238 +3544,630 @@ Model {
 	    Block {
 	      BlockType		      Inport
 	      Name		      "measFrc"
-	      SID		      "81"
-	      Position		      [70, 373, 100, 387]
+	      SID		      "2271"
+	      Position		      [25, 253, 55, 267]
 	      ZOrder		      -3
 	      Port		      "3"
 	      IconDisplay	      "Port number"
 	    }
 	    Block {
-	      BlockType		      Demux
-	      Name		      "Demux1"
-	      SID		      "1754"
-	      Ports		      [1, 2]
-	      Position		      [135, 313, 140, 442]
-	      ZOrder		      16
+	      BlockType		      Constant
+	      Name		      "Constant"
+	      SID		      "2272"
+	      Position		      [85, 175, 130, 205]
+	      ZOrder		      -5
 	      ShowName		      off
-	      Outputs		      "2"
-	      DisplayOption	      "bar"
+	      Value		      "iDelay"
 	    }
 	    Block {
-	      BlockType		      Demux
-	      Name		      "Demux2"
-	      SID		      "1753"
-	      Ports		      [1, 2]
-	      Position		      [135, 168, 140, 297]
-	      ZOrder		      15
-	      ShowName		      off
-	      Outputs		      "2"
-	      DisplayOption	      "bar"
+	      BlockType		      SubSystem
+	      Name		      "For Each Subsystem"
+	      SID		      "2273"
+	      Ports		      [4, 1]
+	      Position		      [165, 132, 370, 283]
+	      ZOrder		      -9
+	      TreatAsAtomicUnit	      on
+	      MinAlgLoopOccurrences   off
+	      PropExecContextOutsideSubsystem off
+	      RTWSystemCode	      "Auto"
+	      FunctionWithSeparateData off
+	      Opaque		      off
+	      RequestExecContextInheritance off
+	      MaskHideContents	      off
+	      System {
+		Name			"For Each Subsystem"
+		Location		[16, 82, 1089, 808]
+		Open			off
+		ModelBrowserVisibility	off
+		ModelBrowserWidth	200
+		ScreenColor		"white"
+		PaperOrientation	"landscape"
+		PaperPositionMode	"auto"
+		PaperType		"usletter"
+		PaperUnits		"inches"
+		TiledPaperMargins	[0.500000, 0.500000, 0.500000, 0.500000]
+		TiledPageScale		1
+		ShowPageBoundaries	off
+		ZoomFactor		"100"
+		Block {
+		  BlockType		  Inport
+		  Name			  "i"
+		  SID			  "2274"
+		  Position		  [35, 98, 65, 112]
+		  ZOrder		  -1
+		  IconDisplay		  "Port number"
+		  Partition		  "off"
+		}
+		Block {
+		  BlockType		  Inport
+		  Name			  "iDelay"
+		  SID			  "2275"
+		  Position		  [35, 143, 65, 157]
+		  ZOrder		  -1
+		  Port			  "2"
+		  IconDisplay		  "Port number"
+		  Partition		  "on"
+		  PartitionDimension	  "1"
+		  PartitionWidth	  "1"
+		}
+		Block {
+		  BlockType		  Inport
+		  Name			  "measDsp"
+		  SID			  "2276"
+		  Position		  [35, 188, 65, 202]
+		  ZOrder		  -1
+		  Port			  "3"
+		  IconDisplay		  "Port number"
+		  Partition		  "on"
+		  PartitionDimension	  "1"
+		  PartitionWidth	  "1"
+		}
+		Block {
+		  BlockType		  Inport
+		  Name			  "measFrc"
+		  SID			  "2277"
+		  Position		  [35, 233, 65, 247]
+		  ZOrder		  -1
+		  Port			  "4"
+		  IconDisplay		  "Port number"
+		  Partition		  "on"
+		  PartitionDimension	  "1"
+		  PartitionWidth	  "1"
+		}
+		Block {
+		  BlockType		  ForEach
+		  Name			  "For Each"
+		  SID			  "2278"
+		  Ports			  []
+		  Position		  [35, 25, 89, 56]
+		  ZOrder		  -2
+		  DisableCoverage	  on
+		  IndexMode		  "One-based"
+		}
+		Block {
+		  BlockType		  Mux
+		  Name			  "Mux"
+		  SID			  "2279"
+		  Ports			  [2, 1]
+		  Position		  [315, 171, 320, 264]
+		  ZOrder		  -16
+		  ShowName		  off
+		  Inputs		  "2"
+		  DisplayOption		  "bar"
+		}
+		Block {
+		  BlockType		  SubSystem
+		  Name			  "SubSystem"
+		  SID			  "2280"
+		  Ports			  [2, 2, 0, 1]
+		  Position		  [120, 171, 260, 264]
+		  ZOrder		  -4
+		  ShowName		  off
+		  TreatAsAtomicUnit	  on
+		  MinAlgLoopOccurrences	  off
+		  PropExecContextOutsideSubsystem off
+		  RTWSystemCode		  "Auto"
+		  FunctionWithSeparateData off
+		  Opaque		  off
+		  RequestExecContextInheritance	off
+		  MaskHideContents	  off
+		  System {
+		    Name		    "SubSystem"
+		    Location		    [16, 82, 431, 457]
+		    Open		    off
+		    ModelBrowserVisibility  off
+		    ModelBrowserWidth	    200
+		    ScreenColor		    "white"
+		    PaperOrientation	    "landscape"
+		    PaperPositionMode	    "auto"
+		    PaperType		    "usletter"
+		    PaperUnits		    "inches"
+		    TiledPaperMargins	    [0.500000, 0.500000, 0.500000, 0.500000]
+		    TiledPageScale	    1
+		    ShowPageBoundaries	    off
+		    ZoomFactor		    "100"
+		    Block {
+		    BlockType		    Inport
+		    Name		    "measDsp In"
+		    SID			    "2281"
+		    Position		    [75, 78, 105, 92]
+		    ZOrder		    -1
+		    IconDisplay		    "Port number"
+		    }
+		    Block {
+		    BlockType		    Inport
+		    Name		    "measFrc In"
+		    SID			    "2282"
+		    Position		    [75, 128, 105, 142]
+		    ZOrder		    -2
+		    Port		    "2"
+		    IconDisplay		    "Port number"
+		    }
+		    Block {
+		    BlockType		    TriggerPort
+		    Name		    "Trigger"
+		    SID			    "2283"
+		    Ports		    []
+		    Position		    [155, 25, 175, 45]
+		    ZOrder		    -3
+		    StatesWhenEnabling	    "held"
+		    }
+		    Block {
+		    BlockType		    Outport
+		    Name		    "measDsp Out"
+		    SID			    "2284"
+		    Position		    [230, 78, 260, 92]
+		    ZOrder		    -6
+		    IconDisplay		    "Port number"
+		    InitialOutput	    "[0]"
+		    }
+		    Block {
+		    BlockType		    Outport
+		    Name		    "measFrc Out"
+		    SID			    "2285"
+		    Position		    [230, 128, 260, 142]
+		    ZOrder		    -7
+		    Port		    "2"
+		    IconDisplay		    "Port number"
+		    InitialOutput	    "[0]"
+		    }
+		    Line {
+		    SrcBlock		    "measFrc In"
+		    SrcPort		    1
+		    DstBlock		    "measFrc Out"
+		    DstPort		    1
+		    }
+		    Line {
+		    SrcBlock		    "measDsp In"
+		    SrcPort		    1
+		    DstBlock		    "measDsp Out"
+		    DstPort		    1
+		    }
+		  }
+		}
+		Block {
+		  BlockType		  SubSystem
+		  Name			  "Subsystem"
+		  SID			  "2286"
+		  Ports			  [2, 1]
+		  Position		  [120, 96, 160, 134]
+		  ZOrder		  -5
+		  ShowName		  off
+		  MinAlgLoopOccurrences	  off
+		  PropExecContextOutsideSubsystem off
+		  RTWSystemCode		  "Auto"
+		  FunctionWithSeparateData off
+		  Opaque		  off
+		  RequestExecContextInheritance	off
+		  MaskHideContents	  off
+		  System {
+		    Name		    "Subsystem"
+		    Location		    [16, 52, 1089, 778]
+		    Open		    off
+		    ModelBrowserVisibility  off
+		    ModelBrowserWidth	    200
+		    ScreenColor		    "white"
+		    PaperOrientation	    "landscape"
+		    PaperPositionMode	    "auto"
+		    PaperType		    "usletter"
+		    PaperUnits		    "inches"
+		    TiledPaperMargins	    [0.500000, 0.500000, 0.500000, 0.500000]
+		    TiledPageScale	    1
+		    ShowPageBoundaries	    off
+		    ZoomFactor		    "100"
+		    Block {
+		    BlockType		    Inport
+		    Name		    "i"
+		    SID			    "2287"
+		    Position		    [30, 123, 60, 137]
+		    ZOrder		    -1
+		    IconDisplay		    "Port number"
+		    }
+		    Block {
+		    BlockType		    Inport
+		    Name		    "iDelay"
+		    SID			    "2288"
+		    Position		    [30, 188, 60, 202]
+		    ZOrder		    -1
+		    Port		    "2"
+		    IconDisplay		    "Port number"
+		    }
+		    Block {
+		    BlockType		    Sum
+		    Name		    "Add"
+		    SID			    "2289"
+		    Ports		    [2, 1]
+		    Position		    [420, 112, 450, 143]
+		    ZOrder		    -2
+		    InputSameDT		    off
+		    OutDataTypeStr	    "Inherit: Inherit via internal rule"
+		    SaturateOnIntegerOverflow off
+		    }
+		    Block {
+		    BlockType		    Constant
+		    Name		    "Constant1"
+		    SID			    "2290"
+		    Position		    [30, 50, 60, 80]
+		    ZOrder		    -4
+		    ShowName		    off
+		    Value		    "N"
+		    }
+		    Block {
+		    BlockType		    If
+		    Name		    "If"
+		    SID			    "2291"
+		    Ports		    [1, 2]
+		    Position		    [175, 111, 275, 149]
+		    ZOrder		    -5
+		    IfExpression	    "u1 == 0"
+		    }
+		    Block {
+		    BlockType		    SubSystem
+		    Name		    "If Action\nSubsystem1"
+		    SID			    "2292"
+		    Ports		    [2, 1, 0, 0, 0, 0, 0, 1]
+		    Position		    [295, 57, 365, 93]
+		    ZOrder		    -6
+		    NamePlacement	    "alternate"
+		    LibraryVersion	    "1.216"
+		    TreatAsAtomicUnit	    on
+		    MinAlgLoopOccurrences   off
+		    PropExecContextOutsideSubsystem off
+		    RTWSystemCode	    "Auto"
+		    FunctionWithSeparateData off
+		    Opaque		    off
+		    RequestExecContextInheritance off
+		    MaskHideContents	    off
+		    System {
+		    Name		    "If Action\nSubsystem1"
+		    Location		    [509, 123, 892, 693]
+		    Open		    off
+		    ModelBrowserVisibility  off
+		    ModelBrowserWidth	    200
+		    ScreenColor		    "white"
+		    PaperOrientation	    "landscape"
+		    PaperPositionMode	    "auto"
+		    PaperType		    "usletter"
+		    PaperUnits		    "inches"
+		    TiledPaperMargins	    [0.500000, 0.500000, 0.500000, 0.500000]
+		    TiledPageScale	    1
+		    ShowPageBoundaries	    off
+		    ZoomFactor		    "100"
+		    Block {
+		    BlockType		    Inport
+		    Name		    "In1"
+		    SID			    "2293"
+		    Position		    [20, 63, 50, 77]
+		    ZOrder		    -1
+		    IconDisplay		    "Port number"
+		    }
+		    Block {
+		    BlockType		    Inport
+		    Name		    "In2"
+		    SID			    "2294"
+		    Position		    [20, 108, 50, 122]
+		    ZOrder		    -2
+		    Port		    "2"
+		    IconDisplay		    "Port number"
+		    }
+		    Block {
+		    BlockType		    ActionPort
+		    Name		    "Action Port"
+		    SID			    "2295"
+		    Position		    [115, 15, 174, 43]
+		    ZOrder		    -3
+		    }
+		    Block {
+		    BlockType		    RelationalOperator
+		    Name		    "Relational\nOperator"
+		    SID			    "2296"
+		    Ports		    [2, 1]
+		    Position		    [125, 77, 155, 108]
+		    ZOrder		    -4
+		    Operator		    "=="
+		    InputSameDT		    off
+		    OutDataTypeStr	    "boolean"
+		    }
+		    Block {
+		    BlockType		    Outport
+		    Name		    "Out1"
+		    SID			    "2297"
+		    Position		    [220, 88, 250, 102]
+		    ZOrder		    -5
+		    IconDisplay		    "Port number"
+		    }
+		    Line {
+		    SrcBlock		    "Relational\nOperator"
+		    SrcPort		    1
+		    DstBlock		    "Out1"
+		    DstPort		    1
+		    }
+		    Line {
+		    SrcBlock		    "In1"
+		    SrcPort		    1
+		    Points		    [25, 0; 0, 15]
+		    DstBlock		    "Relational\nOperator"
+		    DstPort		    1
+		    }
+		    Line {
+		    SrcBlock		    "In2"
+		    SrcPort		    1
+		    Points		    [25, 0; 0, -15]
+		    DstBlock		    "Relational\nOperator"
+		    DstPort		    2
+		    }
+		    }
+		    }
+		    Block {
+		    BlockType		    SubSystem
+		    Name		    "If Action\nSubsystem2"
+		    SID			    "2298"
+		    Ports		    [2, 1, 0, 0, 0, 0, 0, 1]
+		    Position		    [295, 167, 365, 203]
+		    ZOrder		    -7
+		    LibraryVersion	    "1.216"
+		    TreatAsAtomicUnit	    on
+		    MinAlgLoopOccurrences   off
+		    PropExecContextOutsideSubsystem off
+		    RTWSystemCode	    "Auto"
+		    FunctionWithSeparateData off
+		    Opaque		    off
+		    RequestExecContextInheritance off
+		    MaskHideContents	    off
+		    System {
+		    Name		    "If Action\nSubsystem2"
+		    Location		    [509, 142, 892, 693]
+		    Open		    off
+		    ModelBrowserVisibility  off
+		    ModelBrowserWidth	    200
+		    ScreenColor		    "white"
+		    PaperOrientation	    "landscape"
+		    PaperPositionMode	    "auto"
+		    PaperType		    "usletter"
+		    PaperUnits		    "inches"
+		    TiledPaperMargins	    [0.500000, 0.500000, 0.500000, 0.500000]
+		    TiledPageScale	    1
+		    ShowPageBoundaries	    off
+		    ZoomFactor		    "100"
+		    Block {
+		    BlockType		    Inport
+		    Name		    "In1"
+		    SID			    "2299"
+		    Position		    [20, 63, 50, 77]
+		    ZOrder		    -1
+		    IconDisplay		    "Port number"
+		    }
+		    Block {
+		    BlockType		    Inport
+		    Name		    "In2"
+		    SID			    "2300"
+		    Position		    [20, 108, 50, 122]
+		    ZOrder		    -2
+		    Port		    "2"
+		    IconDisplay		    "Port number"
+		    }
+		    Block {
+		    BlockType		    ActionPort
+		    Name		    "Action Port"
+		    SID			    "2301"
+		    Position		    [115, 15, 174, 43]
+		    ZOrder		    -3
+		    }
+		    Block {
+		    BlockType		    RelationalOperator
+		    Name		    "Relational\nOperator"
+		    SID			    "2302"
+		    Ports		    [2, 1]
+		    Position		    [125, 77, 155, 108]
+		    ZOrder		    -4
+		    Operator		    "=="
+		    InputSameDT		    off
+		    OutDataTypeStr	    "boolean"
+		    }
+		    Block {
+		    BlockType		    Outport
+		    Name		    "Out1"
+		    SID			    "2303"
+		    Position		    [220, 88, 250, 102]
+		    ZOrder		    -5
+		    IconDisplay		    "Port number"
+		    }
+		    Line {
+		    SrcBlock		    "Relational\nOperator"
+		    SrcPort		    1
+		    DstBlock		    "Out1"
+		    DstPort		    1
+		    }
+		    Line {
+		    SrcBlock		    "In1"
+		    SrcPort		    1
+		    Points		    [25, 0; 0, 15]
+		    DstBlock		    "Relational\nOperator"
+		    DstPort		    1
+		    }
+		    Line {
+		    SrcBlock		    "In2"
+		    SrcPort		    1
+		    Points		    [25, 0; 0, -15]
+		    DstBlock		    "Relational\nOperator"
+		    DstPort		    2
+		    }
+		    }
+		    }
+		    Block {
+		    BlockType		    Outport
+		    Name		    "trig"
+		    SID			    "2304"
+		    Position		    [475, 123, 505, 137]
+		    ZOrder		    -8
+		    IconDisplay		    "Port number"
+		    }
+		    Line {
+		    SrcBlock		    "iDelay"
+		    SrcPort		    1
+		    Points		    [65, 0]
+		    Branch {
+		    Points		    [0, -65]
+		    DstBlock		    "If"
+		    DstPort		    1
+		    }
+		    Branch {
+		    DstBlock		    "If Action\nSubsystem2"
+		    DstPort		    2
+		    }
+		    }
+		    Line {
+		    SrcBlock		    "If"
+		    SrcPort		    1
+		    Points		    [50, 0]
+		    DstBlock		    "If Action\nSubsystem1"
+		    DstPort		    ifaction
+		    }
+		    Line {
+		    SrcBlock		    "If"
+		    SrcPort		    2
+		    Points		    [50, 0]
+		    DstBlock		    "If Action\nSubsystem2"
+		    DstPort		    ifaction
+		    }
+		    Line {
+		    SrcBlock		    "If Action\nSubsystem1"
+		    SrcPort		    1
+		    Points		    [15, 0; 0, 45]
+		    DstBlock		    "Add"
+		    DstPort		    1
+		    }
+		    Line {
+		    SrcBlock		    "If Action\nSubsystem2"
+		    SrcPort		    1
+		    Points		    [15, 0; 0, -50]
+		    DstBlock		    "Add"
+		    DstPort		    2
+		    }
+		    Line {
+		    SrcBlock		    "Add"
+		    SrcPort		    1
+		    DstBlock		    "trig"
+		    DstPort		    1
+		    }
+		    Line {
+		    SrcBlock		    "i"
+		    SrcPort		    1
+		    Points		    [20, 0]
+		    Branch {
+		    Points		    [0, -45]
+		    DstBlock		    "If Action\nSubsystem1"
+		    DstPort		    2
+		    }
+		    Branch {
+		    Points		    [0, 45]
+		    DstBlock		    "If Action\nSubsystem2"
+		    DstPort		    1
+		    }
+		    }
+		    Line {
+		    SrcBlock		    "Constant1"
+		    SrcPort		    1
+		    DstBlock		    "If Action\nSubsystem1"
+		    DstPort		    1
+		    }
+		  }
+		}
+		Block {
+		  BlockType		  Outport
+		  Name			  "measSig"
+		  SID			  "2305"
+		  Position		  [375, 213, 405, 227]
+		  ZOrder		  -3
+		  IconDisplay		  "Port number"
+		  ConcatenationDimension  "1"
+		}
+		Line {
+		  SrcBlock		  "Subsystem"
+		  SrcPort		  1
+		  Points		  [25, 0]
+		  DstBlock		  "SubSystem"
+		  DstPort		  trigger
+		}
+		Line {
+		  SrcBlock		  "measDsp"
+		  SrcPort		  1
+		  DstBlock		  "SubSystem"
+		  DstPort		  1
+		}
+		Line {
+		  SrcBlock		  "measFrc"
+		  SrcPort		  1
+		  DstBlock		  "SubSystem"
+		  DstPort		  2
+		}
+		Line {
+		  SrcBlock		  "SubSystem"
+		  SrcPort		  1
+		  DstBlock		  "Mux"
+		  DstPort		  1
+		}
+		Line {
+		  SrcBlock		  "SubSystem"
+		  SrcPort		  2
+		  DstBlock		  "Mux"
+		  DstPort		  2
+		}
+		Line {
+		  SrcBlock		  "Mux"
+		  SrcPort		  1
+		  DstBlock		  "measSig"
+		  DstPort		  1
+		}
+		Line {
+		  SrcBlock		  "iDelay"
+		  SrcPort		  1
+		  Points		  [35, 0]
+		  DstBlock		  "Subsystem"
+		  DstPort		  2
+		}
+		Line {
+		  SrcBlock		  "i"
+		  SrcPort		  1
+		  DstBlock		  "Subsystem"
+		  DstPort		  1
+		}
+	      }
 	    }
 	    Block {
 	      BlockType		      Gain
 	      Name		      "Gain4"
-	      SID		      "1193"
-	      Position		      [580, 289, 610, 321]
+	      SID		      "2306"
+	      Position		      [405, 194, 435, 226]
 	      ZOrder		      9
 	      ShowName		      off
 	    }
 	    Block {
-	      BlockType		      Mux
-	      Name		      "Mux2"
-	      SID		      "1682"
-	      Ports		      [4, 1]
-	      Position		      [545, 169, 550, 441]
-	      ZOrder		      11
-	      ShowName		      off
-	      DisplayOption	      "bar"
-	    }
-	    Block {
-	      BlockType		      SubSystem
-	      Name		      "SubSystem"
-	      SID		      "83"
-	      Ports		      [2, 2, 0, 1]
-	      Position		      [300, 176, 440, 269]
-	      ZOrder		      -4
-	      ShowName		      off
-	      TreatAsAtomicUnit	      on
-	      MinAlgLoopOccurrences   off
-	      PropExecContextOutsideSubsystem off
-	      RTWSystemCode	      "Auto"
-	      FunctionWithSeparateData off
-	      Opaque		      off
-	      RequestExecContextInheritance off
-	      MaskHideContents	      off
-	      System {
-		Name			"SubSystem"
-		Location		[-8, 0, 1604, 886]
-		Open			off
-		ModelBrowserVisibility	off
-		ModelBrowserWidth	200
-		ScreenColor		"white"
-		PaperOrientation	"landscape"
-		PaperPositionMode	"auto"
-		PaperType		"usletter"
-		PaperUnits		"inches"
-		TiledPaperMargins	[0.500000, 0.500000, 0.500000, 0.500000]
-		TiledPageScale		1
-		ShowPageBoundaries	off
-		ZoomFactor		"100"
-		Block {
-		  BlockType		  Inport
-		  Name			  "measDsp In"
-		  SID			  "84"
-		  Position		  [75, 78, 105, 92]
-		  ZOrder		  -1
-		  IconDisplay		  "Port number"
-		}
-		Block {
-		  BlockType		  Inport
-		  Name			  "measFrc In"
-		  SID			  "85"
-		  Position		  [75, 128, 105, 142]
-		  ZOrder		  -2
-		  Port			  "2"
-		  IconDisplay		  "Port number"
-		}
-		Block {
-		  BlockType		  TriggerPort
-		  Name			  "Trigger"
-		  SID			  "86"
-		  Ports			  []
-		  Position		  [155, 25, 175, 45]
-		  ZOrder		  -3
-		  StatesWhenEnabling	  "held"
-		}
-		Block {
-		  BlockType		  Outport
-		  Name			  "measDsp Out"
-		  SID			  "89"
-		  Position		  [230, 78, 260, 92]
-		  ZOrder		  -6
-		  IconDisplay		  "Port number"
-		  InitialOutput		  "[0]"
-		}
-		Block {
-		  BlockType		  Outport
-		  Name			  "measFrc Out"
-		  SID			  "90"
-		  Position		  [230, 128, 260, 142]
-		  ZOrder		  -7
-		  Port			  "2"
-		  IconDisplay		  "Port number"
-		  InitialOutput		  "[0]"
-		}
-		Line {
-		  SrcBlock		  "measFrc In"
-		  SrcPort		  1
-		  DstBlock		  "measFrc Out"
-		  DstPort		  1
-		}
-		Line {
-		  SrcBlock		  "measDsp In"
-		  SrcPort		  1
-		  DstBlock		  "measDsp Out"
-		  DstPort		  1
-		}
-	      }
-	    }
-	    Block {
-	      BlockType		      SubSystem
-	      Name		      "SubSystem1"
-	      SID		      "1113"
-	      Ports		      [2, 2, 0, 1]
-	      Position		      [300, 341, 440, 434]
-	      ZOrder		      4
-	      ShowName		      off
-	      TreatAsAtomicUnit	      on
-	      MinAlgLoopOccurrences   off
-	      PropExecContextOutsideSubsystem off
-	      RTWSystemCode	      "Auto"
-	      FunctionWithSeparateData off
-	      Opaque		      off
-	      RequestExecContextInheritance off
-	      MaskHideContents	      off
-	      System {
-		Name			"SubSystem1"
-		Location		[-8, -8, 1608, 878]
-		Open			off
-		ModelBrowserVisibility	off
-		ModelBrowserWidth	200
-		ScreenColor		"white"
-		PaperOrientation	"landscape"
-		PaperPositionMode	"auto"
-		PaperType		"usletter"
-		PaperUnits		"inches"
-		TiledPaperMargins	[0.500000, 0.500000, 0.500000, 0.500000]
-		TiledPageScale		1
-		ShowPageBoundaries	off
-		ZoomFactor		"100"
-		Block {
-		  BlockType		  Inport
-		  Name			  "measDsp In"
-		  SID			  "1114"
-		  Position		  [75, 78, 105, 92]
-		  ZOrder		  -1
-		  IconDisplay		  "Port number"
-		}
-		Block {
-		  BlockType		  Inport
-		  Name			  "measFrc In"
-		  SID			  "1115"
-		  Position		  [75, 128, 105, 142]
-		  ZOrder		  -2
-		  Port			  "2"
-		  IconDisplay		  "Port number"
-		}
-		Block {
-		  BlockType		  TriggerPort
-		  Name			  "Trigger"
-		  SID			  "1116"
-		  Ports			  []
-		  Position		  [155, 25, 175, 45]
-		  ZOrder		  -3
-		  StatesWhenEnabling	  "held"
-		}
-		Block {
-		  BlockType		  Outport
-		  Name			  "measDsp Out"
-		  SID			  "1119"
-		  Position		  [230, 78, 260, 92]
-		  ZOrder		  -6
-		  IconDisplay		  "Port number"
-		  InitialOutput		  "[0]"
-		}
-		Block {
-		  BlockType		  Outport
-		  Name			  "measFrc Out"
-		  SID			  "1120"
-		  Position		  [230, 128, 260, 142]
-		  ZOrder		  -7
-		  Port			  "2"
-		  IconDisplay		  "Port number"
-		  InitialOutput		  "[0]"
-		}
-		Line {
-		  SrcBlock		  "measFrc In"
-		  SrcPort		  1
-		  DstBlock		  "measFrc Out"
-		  DstPort		  1
-		}
-		Line {
-		  SrcBlock		  "measDsp In"
-		  SrcPort		  1
-		  DstBlock		  "measDsp Out"
-		  DstPort		  1
-		}
-	      }
-	    }
-	    Block {
 	      BlockType		      SubSystem
 	      Name		      "SubSystem2"
-	      SID		      "1140"
+	      SID		      "2307"
 	      Ports		      [0, 0, 0, 1]
-	      Position		      [300, 61, 440, 104]
+	      Position		      [195, 61, 335, 104]
 	      ZOrder		      6
 	      ShowName		      off
 	      TreatAsAtomicUnit	      on
@@ -3800,7 +4180,7 @@ Model {
 	      MaskHideContents	      off
 	      System {
 		Name			"SubSystem2"
-		Location		[-8, 0, 1604, 886]
+		Location		[16, 82, 413, 454]
 		Open			off
 		ModelBrowserVisibility	off
 		ModelBrowserWidth	200
@@ -3816,7 +4196,7 @@ Model {
 		Block {
 		  BlockType		  TriggerPort
 		  Name			  "Trigger"
-		  SID			  "1143"
+		  SID			  "2308"
 		  Ports			  []
 		  Position		  [155, 25, 175, 45]
 		  ZOrder		  -3
@@ -3825,7 +4205,7 @@ Model {
 		Block {
 		  BlockType		  DataStoreWrite
 		  Name			  "Data Store\nWrite"
-		  SID			  "1144"
+		  SID			  "2309"
 		  Ports			  [1]
 		  Position		  [230, 80, 260, 110]
 		  ZOrder		  -4
@@ -3834,10 +4214,10 @@ Model {
 		Block {
 		  BlockType		  Constant
 		  Name			  "atTargetFlag"
-		  SID			  "1145"
+		  SID			  "2310"
 		  Position		  [75, 80, 105, 110]
 		  ZOrder		  -5
-		  OutDataTypeStr	  "uint32"
+		  OutDataTypeStr	  "int32"
 		  SampleTime		  "-1"
 		}
 		Line {
@@ -3850,710 +4230,10 @@ Model {
 	    }
 	    Block {
 	      BlockType		      SubSystem
-	      Name		      "Subsystem"
-	      SID		      "105"
-	      Ports		      [1, 1]
-	      Position		      [300, 131, 340, 169]
-	      ZOrder		      -5
-	      ShowName		      off
-	      MinAlgLoopOccurrences   off
-	      PropExecContextOutsideSubsystem off
-	      RTWSystemCode	      "Auto"
-	      FunctionWithSeparateData off
-	      Opaque		      off
-	      RequestExecContextInheritance off
-	      MaskHideContents	      off
-	      System {
-		Name			"Subsystem"
-		Location		[-8, 0, 1604, 886]
-		Open			off
-		ModelBrowserVisibility	off
-		ModelBrowserWidth	200
-		ScreenColor		"white"
-		PaperOrientation	"landscape"
-		PaperPositionMode	"auto"
-		PaperType		"usletter"
-		PaperUnits		"inches"
-		TiledPaperMargins	[0.500000, 0.500000, 0.500000, 0.500000]
-		TiledPageScale		1
-		ShowPageBoundaries	off
-		ZoomFactor		"100"
-		Block {
-		  BlockType		  Inport
-		  Name			  "i"
-		  SID			  "106"
-		  Position		  [30, 123, 60, 137]
-		  ZOrder		  -1
-		  IconDisplay		  "Port number"
-		}
-		Block {
-		  BlockType		  Sum
-		  Name			  "Add"
-		  SID			  "107"
-		  Ports			  [2, 1]
-		  Position		  [420, 112, 450, 143]
-		  ZOrder		  -2
-		  InputSameDT		  off
-		  OutDataTypeStr	  "Inherit: Inherit via internal rule"
-		  SaturateOnIntegerOverflow off
-		}
-		Block {
-		  BlockType		  Constant
-		  Name			  "Constant"
-		  SID			  "108"
-		  Position		  [105, 114, 145, 146]
-		  ZOrder		  -3
-		  ShowName		  off
-		  Value			  "iDelay(1)"
-		}
-		Block {
-		  BlockType		  Constant
-		  Name			  "Constant1"
-		  SID			  "109"
-		  Position		  [30, 50, 60, 80]
-		  ZOrder		  -4
-		  ShowName		  off
-		  Value			  "N"
-		}
-		Block {
-		  BlockType		  If
-		  Name			  "If"
-		  SID			  "110"
-		  Ports			  [1, 2]
-		  Position		  [175, 111, 275, 149]
-		  ZOrder		  -5
-		  IfExpression		  "u1 == 0"
-		}
-		Block {
-		  BlockType		  SubSystem
-		  Name			  "If Action\nSubsystem1"
-		  SID			  "111"
-		  Ports			  [2, 1, 0, 0, 0, 0, 0, 1]
-		  Position		  [295, 57, 365, 93]
-		  ZOrder		  -6
-		  NamePlacement		  "alternate"
-		  LibraryVersion	  "1.216"
-		  TreatAsAtomicUnit	  on
-		  MinAlgLoopOccurrences	  off
-		  PropExecContextOutsideSubsystem off
-		  RTWSystemCode		  "Auto"
-		  FunctionWithSeparateData off
-		  Opaque		  off
-		  RequestExecContextInheritance	off
-		  MaskHideContents	  off
-		  System {
-		    Name		    "If Action\nSubsystem1"
-		    Location		    [539, 235, 866, 621]
-		    Open		    off
-		    ModelBrowserVisibility  off
-		    ModelBrowserWidth	    200
-		    ScreenColor		    "white"
-		    PaperOrientation	    "landscape"
-		    PaperPositionMode	    "auto"
-		    PaperType		    "usletter"
-		    PaperUnits		    "inches"
-		    TiledPaperMargins	    [0.500000, 0.500000, 0.500000, 0.500000]
-		    TiledPageScale	    1
-		    ShowPageBoundaries	    off
-		    ZoomFactor		    "100"
-		    Block {
-		    BlockType		    Inport
-		    Name		    "In1"
-		    SID			    "112"
-		    Position		    [20, 63, 50, 77]
-		    ZOrder		    -1
-		    IconDisplay		    "Port number"
-		    }
-		    Block {
-		    BlockType		    Inport
-		    Name		    "In2"
-		    SID			    "113"
-		    Position		    [20, 108, 50, 122]
-		    ZOrder		    -2
-		    Port		    "2"
-		    IconDisplay		    "Port number"
-		    }
-		    Block {
-		    BlockType		    ActionPort
-		    Name		    "Action Port"
-		    SID			    "114"
-		    Position		    [115, 15, 174, 43]
-		    ZOrder		    -3
-		    ActionType		    "then"
-		    }
-		    Block {
-		    BlockType		    RelationalOperator
-		    Name		    "Relational\nOperator"
-		    SID			    "115"
-		    Ports		    [2, 1]
-		    Position		    [125, 77, 155, 108]
-		    ZOrder		    -4
-		    Operator		    "=="
-		    InputSameDT		    off
-		    OutDataTypeStr	    "boolean"
-		    }
-		    Block {
-		    BlockType		    Outport
-		    Name		    "Out1"
-		    SID			    "116"
-		    Position		    [220, 88, 250, 102]
-		    ZOrder		    -5
-		    IconDisplay		    "Port number"
-		    }
-		    Line {
-		    SrcBlock		    "Relational\nOperator"
-		    SrcPort		    1
-		    DstBlock		    "Out1"
-		    DstPort		    1
-		    }
-		    Line {
-		    SrcBlock		    "In1"
-		    SrcPort		    1
-		    Points		    [25, 0; 0, 15]
-		    DstBlock		    "Relational\nOperator"
-		    DstPort		    1
-		    }
-		    Line {
-		    SrcBlock		    "In2"
-		    SrcPort		    1
-		    Points		    [25, 0; 0, -15]
-		    DstBlock		    "Relational\nOperator"
-		    DstPort		    2
-		    }
-		  }
-		}
-		Block {
-		  BlockType		  SubSystem
-		  Name			  "If Action\nSubsystem2"
-		  SID			  "117"
-		  Ports			  [2, 1, 0, 0, 0, 0, 0, 1]
-		  Position		  [295, 167, 365, 203]
-		  ZOrder		  -7
-		  LibraryVersion	  "1.216"
-		  TreatAsAtomicUnit	  on
-		  MinAlgLoopOccurrences	  off
-		  PropExecContextOutsideSubsystem off
-		  RTWSystemCode		  "Auto"
-		  FunctionWithSeparateData off
-		  Opaque		  off
-		  RequestExecContextInheritance	off
-		  MaskHideContents	  off
-		  System {
-		    Name		    "If Action\nSubsystem2"
-		    Location		    [539, 254, 866, 621]
-		    Open		    off
-		    ModelBrowserVisibility  off
-		    ModelBrowserWidth	    200
-		    ScreenColor		    "white"
-		    PaperOrientation	    "landscape"
-		    PaperPositionMode	    "auto"
-		    PaperType		    "usletter"
-		    PaperUnits		    "inches"
-		    TiledPaperMargins	    [0.500000, 0.500000, 0.500000, 0.500000]
-		    TiledPageScale	    1
-		    ShowPageBoundaries	    off
-		    ZoomFactor		    "100"
-		    Block {
-		    BlockType		    Inport
-		    Name		    "In1"
-		    SID			    "118"
-		    Position		    [20, 63, 50, 77]
-		    ZOrder		    -1
-		    IconDisplay		    "Port number"
-		    }
-		    Block {
-		    BlockType		    Inport
-		    Name		    "In2"
-		    SID			    "119"
-		    Position		    [20, 108, 50, 122]
-		    ZOrder		    -2
-		    Port		    "2"
-		    IconDisplay		    "Port number"
-		    }
-		    Block {
-		    BlockType		    ActionPort
-		    Name		    "Action Port"
-		    SID			    "120"
-		    Position		    [115, 15, 174, 43]
-		    ZOrder		    -3
-		    ActionType		    "else"
-		    }
-		    Block {
-		    BlockType		    RelationalOperator
-		    Name		    "Relational\nOperator"
-		    SID			    "121"
-		    Ports		    [2, 1]
-		    Position		    [125, 77, 155, 108]
-		    ZOrder		    -4
-		    Operator		    "=="
-		    InputSameDT		    off
-		    OutDataTypeStr	    "boolean"
-		    }
-		    Block {
-		    BlockType		    Outport
-		    Name		    "Out1"
-		    SID			    "122"
-		    Position		    [220, 88, 250, 102]
-		    ZOrder		    -5
-		    IconDisplay		    "Port number"
-		    }
-		    Line {
-		    SrcBlock		    "Relational\nOperator"
-		    SrcPort		    1
-		    DstBlock		    "Out1"
-		    DstPort		    1
-		    }
-		    Line {
-		    SrcBlock		    "In1"
-		    SrcPort		    1
-		    Points		    [25, 0; 0, 15]
-		    DstBlock		    "Relational\nOperator"
-		    DstPort		    1
-		    }
-		    Line {
-		    SrcBlock		    "In2"
-		    SrcPort		    1
-		    Points		    [25, 0; 0, -15]
-		    DstBlock		    "Relational\nOperator"
-		    DstPort		    2
-		    }
-		  }
-		}
-		Block {
-		  BlockType		  Outport
-		  Name			  "trig"
-		  SID			  "123"
-		  Position		  [475, 123, 505, 137]
-		  ZOrder		  -8
-		  IconDisplay		  "Port number"
-		}
-		Line {
-		  SrcBlock		  "Constant"
-		  SrcPort		  1
-		  Points		  [5, 0]
-		  Branch {
-		    DstBlock		    "If"
-		    DstPort		    1
-		  }
-		  Branch {
-		    Points		    [0, 65]
-		    DstBlock		    "If Action\nSubsystem2"
-		    DstPort		    2
-		  }
-		}
-		Line {
-		  SrcBlock		  "If"
-		  SrcPort		  1
-		  Points		  [50, 0]
-		  DstBlock		  "If Action\nSubsystem1"
-		  DstPort		  ifaction
-		}
-		Line {
-		  SrcBlock		  "If"
-		  SrcPort		  2
-		  Points		  [50, 0]
-		  DstBlock		  "If Action\nSubsystem2"
-		  DstPort		  ifaction
-		}
-		Line {
-		  SrcBlock		  "If Action\nSubsystem1"
-		  SrcPort		  1
-		  Points		  [15, 0; 0, 45]
-		  DstBlock		  "Add"
-		  DstPort		  1
-		}
-		Line {
-		  SrcBlock		  "If Action\nSubsystem2"
-		  SrcPort		  1
-		  Points		  [15, 0; 0, -50]
-		  DstBlock		  "Add"
-		  DstPort		  2
-		}
-		Line {
-		  SrcBlock		  "Add"
-		  SrcPort		  1
-		  DstBlock		  "trig"
-		  DstPort		  1
-		}
-		Line {
-		  SrcBlock		  "i"
-		  SrcPort		  1
-		  Points		  [20, 0]
-		  Branch {
-		    Points		    [0, -45]
-		    DstBlock		    "If Action\nSubsystem1"
-		    DstPort		    2
-		  }
-		  Branch {
-		    Points		    [0, 45]
-		    DstBlock		    "If Action\nSubsystem2"
-		    DstPort		    1
-		  }
-		}
-		Line {
-		  SrcBlock		  "Constant1"
-		  SrcPort		  1
-		  DstBlock		  "If Action\nSubsystem1"
-		  DstPort		  1
-		}
-	      }
-	    }
-	    Block {
-	      BlockType		      SubSystem
-	      Name		      "Subsystem1"
-	      SID		      "1121"
-	      Ports		      [1, 1]
-	      Position		      [300, 296, 340, 334]
-	      ZOrder		      3
-	      ShowName		      off
-	      MinAlgLoopOccurrences   off
-	      PropExecContextOutsideSubsystem off
-	      RTWSystemCode	      "Auto"
-	      FunctionWithSeparateData off
-	      Opaque		      off
-	      RequestExecContextInheritance off
-	      MaskHideContents	      off
-	      System {
-		Name			"Subsystem1"
-		Location		[-8, -8, 1608, 878]
-		Open			off
-		ModelBrowserVisibility	off
-		ModelBrowserWidth	200
-		ScreenColor		"white"
-		PaperOrientation	"landscape"
-		PaperPositionMode	"auto"
-		PaperType		"usletter"
-		PaperUnits		"inches"
-		TiledPaperMargins	[0.500000, 0.500000, 0.500000, 0.500000]
-		TiledPageScale		1
-		ShowPageBoundaries	off
-		ZoomFactor		"100"
-		Block {
-		  BlockType		  Inport
-		  Name			  "i"
-		  SID			  "1122"
-		  Position		  [30, 123, 60, 137]
-		  ZOrder		  -1
-		  IconDisplay		  "Port number"
-		}
-		Block {
-		  BlockType		  Sum
-		  Name			  "Add"
-		  SID			  "1123"
-		  Ports			  [2, 1]
-		  Position		  [420, 112, 450, 143]
-		  ZOrder		  -2
-		  InputSameDT		  off
-		  OutDataTypeStr	  "Inherit: Inherit via internal rule"
-		  SaturateOnIntegerOverflow off
-		}
-		Block {
-		  BlockType		  Constant
-		  Name			  "Constant"
-		  SID			  "1124"
-		  Position		  [105, 114, 145, 146]
-		  ZOrder		  -3
-		  ShowName		  off
-		  Value			  "iDelay(2)"
-		}
-		Block {
-		  BlockType		  Constant
-		  Name			  "Constant1"
-		  SID			  "1125"
-		  Position		  [30, 50, 60, 80]
-		  ZOrder		  -4
-		  ShowName		  off
-		  Value			  "N"
-		}
-		Block {
-		  BlockType		  If
-		  Name			  "If"
-		  SID			  "1126"
-		  Ports			  [1, 2]
-		  Position		  [175, 111, 275, 149]
-		  ZOrder		  -5
-		  IfExpression		  "u1 == 0"
-		}
-		Block {
-		  BlockType		  SubSystem
-		  Name			  "If Action\nSubsystem1"
-		  SID			  "1127"
-		  Ports			  [2, 1, 0, 0, 0, 0, 0, 1]
-		  Position		  [295, 57, 365, 93]
-		  ZOrder		  -6
-		  NamePlacement		  "alternate"
-		  LibraryVersion	  "1.216"
-		  TreatAsAtomicUnit	  on
-		  MinAlgLoopOccurrences	  off
-		  PropExecContextOutsideSubsystem off
-		  RTWSystemCode		  "Auto"
-		  FunctionWithSeparateData off
-		  Opaque		  off
-		  RequestExecContextInheritance	off
-		  MaskHideContents	  off
-		  System {
-		    Name		    "If Action\nSubsystem1"
-		    Location		    [539, 235, 866, 621]
-		    Open		    off
-		    ModelBrowserVisibility  off
-		    ModelBrowserWidth	    200
-		    ScreenColor		    "white"
-		    PaperOrientation	    "landscape"
-		    PaperPositionMode	    "auto"
-		    PaperType		    "usletter"
-		    PaperUnits		    "inches"
-		    TiledPaperMargins	    [0.500000, 0.500000, 0.500000, 0.500000]
-		    TiledPageScale	    1
-		    ShowPageBoundaries	    off
-		    ZoomFactor		    "100"
-		    Block {
-		    BlockType		    Inport
-		    Name		    "In1"
-		    SID			    "1128"
-		    Position		    [20, 63, 50, 77]
-		    ZOrder		    -1
-		    IconDisplay		    "Port number"
-		    }
-		    Block {
-		    BlockType		    Inport
-		    Name		    "In2"
-		    SID			    "1129"
-		    Position		    [20, 108, 50, 122]
-		    ZOrder		    -2
-		    Port		    "2"
-		    IconDisplay		    "Port number"
-		    }
-		    Block {
-		    BlockType		    ActionPort
-		    Name		    "Action Port"
-		    SID			    "1130"
-		    Position		    [115, 15, 174, 43]
-		    ZOrder		    -3
-		    ActionType		    "then"
-		    }
-		    Block {
-		    BlockType		    RelationalOperator
-		    Name		    "Relational\nOperator"
-		    SID			    "1131"
-		    Ports		    [2, 1]
-		    Position		    [125, 77, 155, 108]
-		    ZOrder		    -4
-		    Operator		    "=="
-		    InputSameDT		    off
-		    OutDataTypeStr	    "boolean"
-		    }
-		    Block {
-		    BlockType		    Outport
-		    Name		    "Out1"
-		    SID			    "1132"
-		    Position		    [220, 88, 250, 102]
-		    ZOrder		    -5
-		    IconDisplay		    "Port number"
-		    }
-		    Line {
-		    SrcBlock		    "Relational\nOperator"
-		    SrcPort		    1
-		    DstBlock		    "Out1"
-		    DstPort		    1
-		    }
-		    Line {
-		    SrcBlock		    "In1"
-		    SrcPort		    1
-		    Points		    [25, 0; 0, 15]
-		    DstBlock		    "Relational\nOperator"
-		    DstPort		    1
-		    }
-		    Line {
-		    SrcBlock		    "In2"
-		    SrcPort		    1
-		    Points		    [25, 0; 0, -15]
-		    DstBlock		    "Relational\nOperator"
-		    DstPort		    2
-		    }
-		  }
-		}
-		Block {
-		  BlockType		  SubSystem
-		  Name			  "If Action\nSubsystem2"
-		  SID			  "1133"
-		  Ports			  [2, 1, 0, 0, 0, 0, 0, 1]
-		  Position		  [295, 167, 365, 203]
-		  ZOrder		  -7
-		  LibraryVersion	  "1.216"
-		  TreatAsAtomicUnit	  on
-		  MinAlgLoopOccurrences	  off
-		  PropExecContextOutsideSubsystem off
-		  RTWSystemCode		  "Auto"
-		  FunctionWithSeparateData off
-		  Opaque		  off
-		  RequestExecContextInheritance	off
-		  MaskHideContents	  off
-		  System {
-		    Name		    "If Action\nSubsystem2"
-		    Location		    [539, 254, 866, 621]
-		    Open		    off
-		    ModelBrowserVisibility  off
-		    ModelBrowserWidth	    200
-		    ScreenColor		    "white"
-		    PaperOrientation	    "landscape"
-		    PaperPositionMode	    "auto"
-		    PaperType		    "usletter"
-		    PaperUnits		    "inches"
-		    TiledPaperMargins	    [0.500000, 0.500000, 0.500000, 0.500000]
-		    TiledPageScale	    1
-		    ShowPageBoundaries	    off
-		    ZoomFactor		    "100"
-		    Block {
-		    BlockType		    Inport
-		    Name		    "In1"
-		    SID			    "1134"
-		    Position		    [20, 63, 50, 77]
-		    ZOrder		    -1
-		    IconDisplay		    "Port number"
-		    }
-		    Block {
-		    BlockType		    Inport
-		    Name		    "In2"
-		    SID			    "1135"
-		    Position		    [20, 108, 50, 122]
-		    ZOrder		    -2
-		    Port		    "2"
-		    IconDisplay		    "Port number"
-		    }
-		    Block {
-		    BlockType		    ActionPort
-		    Name		    "Action Port"
-		    SID			    "1136"
-		    Position		    [115, 15, 174, 43]
-		    ZOrder		    -3
-		    ActionType		    "else"
-		    }
-		    Block {
-		    BlockType		    RelationalOperator
-		    Name		    "Relational\nOperator"
-		    SID			    "1137"
-		    Ports		    [2, 1]
-		    Position		    [125, 77, 155, 108]
-		    ZOrder		    -4
-		    Operator		    "=="
-		    InputSameDT		    off
-		    OutDataTypeStr	    "boolean"
-		    }
-		    Block {
-		    BlockType		    Outport
-		    Name		    "Out1"
-		    SID			    "1138"
-		    Position		    [220, 88, 250, 102]
-		    ZOrder		    -5
-		    IconDisplay		    "Port number"
-		    }
-		    Line {
-		    SrcBlock		    "Relational\nOperator"
-		    SrcPort		    1
-		    DstBlock		    "Out1"
-		    DstPort		    1
-		    }
-		    Line {
-		    SrcBlock		    "In1"
-		    SrcPort		    1
-		    Points		    [25, 0; 0, 15]
-		    DstBlock		    "Relational\nOperator"
-		    DstPort		    1
-		    }
-		    Line {
-		    SrcBlock		    "In2"
-		    SrcPort		    1
-		    Points		    [25, 0; 0, -15]
-		    DstBlock		    "Relational\nOperator"
-		    DstPort		    2
-		    }
-		  }
-		}
-		Block {
-		  BlockType		  Outport
-		  Name			  "trig"
-		  SID			  "1139"
-		  Position		  [475, 123, 505, 137]
-		  ZOrder		  -8
-		  IconDisplay		  "Port number"
-		}
-		Line {
-		  SrcBlock		  "Constant"
-		  SrcPort		  1
-		  Points		  [5, 0]
-		  Branch {
-		    DstBlock		    "If"
-		    DstPort		    1
-		  }
-		  Branch {
-		    Points		    [0, 65]
-		    DstBlock		    "If Action\nSubsystem2"
-		    DstPort		    2
-		  }
-		}
-		Line {
-		  SrcBlock		  "If"
-		  SrcPort		  1
-		  Points		  [50, 0]
-		  DstBlock		  "If Action\nSubsystem1"
-		  DstPort		  ifaction
-		}
-		Line {
-		  SrcBlock		  "If"
-		  SrcPort		  2
-		  Points		  [50, 0]
-		  DstBlock		  "If Action\nSubsystem2"
-		  DstPort		  ifaction
-		}
-		Line {
-		  SrcBlock		  "If Action\nSubsystem1"
-		  SrcPort		  1
-		  Points		  [15, 0; 0, 45]
-		  DstBlock		  "Add"
-		  DstPort		  1
-		}
-		Line {
-		  SrcBlock		  "If Action\nSubsystem2"
-		  SrcPort		  1
-		  Points		  [15, 0; 0, -50]
-		  DstBlock		  "Add"
-		  DstPort		  2
-		}
-		Line {
-		  SrcBlock		  "Add"
-		  SrcPort		  1
-		  DstBlock		  "trig"
-		  DstPort		  1
-		}
-		Line {
-		  SrcBlock		  "i"
-		  SrcPort		  1
-		  Points		  [20, 0]
-		  Branch {
-		    Points		    [0, -45]
-		    DstBlock		    "If Action\nSubsystem1"
-		    DstPort		    2
-		  }
-		  Branch {
-		    Points		    [0, 45]
-		    DstBlock		    "If Action\nSubsystem2"
-		    DstPort		    1
-		  }
-		}
-		Line {
-		  SrcBlock		  "Constant1"
-		  SrcPort		  1
-		  DstBlock		  "If Action\nSubsystem1"
-		  DstPort		  1
-		}
-	      }
-	    }
-	    Block {
-	      BlockType		      SubSystem
 	      Name		      "Subsystem2"
-	      SID		      "1148"
+	      SID		      "2311"
 	      Ports		      [1, 1]
-	      Position		      [300, 16, 340, 54]
+	      Position		      [195, 16, 235, 54]
 	      ZOrder		      5
 	      ShowName		      off
 	      MinAlgLoopOccurrences   off
@@ -4565,7 +4245,7 @@ Model {
 	      MaskHideContents	      off
 	      System {
 		Name			"Subsystem2"
-		Location		[259, 84, 1871, 970]
+		Location		[229, 82, 1809, 871]
 		Open			off
 		ModelBrowserVisibility	off
 		ModelBrowserWidth	200
@@ -4581,7 +4261,7 @@ Model {
 		Block {
 		  BlockType		  Inport
 		  Name			  "i"
-		  SID			  "1149"
+		  SID			  "2312"
 		  Position		  [30, 123, 60, 137]
 		  ZOrder		  -1
 		  IconDisplay		  "Port number"
@@ -4589,7 +4269,7 @@ Model {
 		Block {
 		  BlockType		  Sum
 		  Name			  "Add"
-		  SID			  "1150"
+		  SID			  "2313"
 		  Ports			  [2, 1]
 		  Position		  [420, 112, 450, 143]
 		  ZOrder		  -2
@@ -4600,7 +4280,7 @@ Model {
 		Block {
 		  BlockType		  Constant
 		  Name			  "Constant"
-		  SID			  "1151"
+		  SID			  "2314"
 		  Position		  [105, 114, 145, 146]
 		  ZOrder		  -3
 		  ShowName		  off
@@ -4609,7 +4289,7 @@ Model {
 		Block {
 		  BlockType		  Constant
 		  Name			  "Constant1"
-		  SID			  "1152"
+		  SID			  "2315"
 		  Position		  [30, 50, 60, 80]
 		  ZOrder		  -4
 		  ShowName		  off
@@ -4618,7 +4298,7 @@ Model {
 		Block {
 		  BlockType		  If
 		  Name			  "If"
-		  SID			  "1153"
+		  SID			  "2316"
 		  Ports			  [1, 2]
 		  Position		  [175, 111, 275, 149]
 		  ZOrder		  -5
@@ -4627,7 +4307,7 @@ Model {
 		Block {
 		  BlockType		  SubSystem
 		  Name			  "If Action\nSubsystem1"
-		  SID			  "1154"
+		  SID			  "2317"
 		  Ports			  [2, 1, 0, 0, 0, 0, 0, 1]
 		  Position		  [295, 57, 365, 93]
 		  ZOrder		  -6
@@ -4643,7 +4323,7 @@ Model {
 		  MaskHideContents	  off
 		  System {
 		    Name		    "If Action\nSubsystem1"
-		    Location		    [539, 235, 866, 621]
+		    Location		    [509, 123, 892, 693]
 		    Open		    off
 		    ModelBrowserVisibility  off
 		    ModelBrowserWidth	    200
@@ -4659,7 +4339,7 @@ Model {
 		    Block {
 		    BlockType		    Inport
 		    Name		    "In1"
-		    SID			    "1155"
+		    SID			    "2318"
 		    Position		    [20, 63, 50, 77]
 		    ZOrder		    -1
 		    IconDisplay		    "Port number"
@@ -4667,7 +4347,7 @@ Model {
 		    Block {
 		    BlockType		    Inport
 		    Name		    "In2"
-		    SID			    "1156"
+		    SID			    "2319"
 		    Position		    [20, 108, 50, 122]
 		    ZOrder		    -2
 		    Port		    "2"
@@ -4676,15 +4356,14 @@ Model {
 		    Block {
 		    BlockType		    ActionPort
 		    Name		    "Action Port"
-		    SID			    "1157"
+		    SID			    "2320"
 		    Position		    [115, 15, 174, 43]
 		    ZOrder		    -3
-		    ActionType		    "then"
 		    }
 		    Block {
 		    BlockType		    RelationalOperator
 		    Name		    "Relational\nOperator"
-		    SID			    "1158"
+		    SID			    "2321"
 		    Ports		    [2, 1]
 		    Position		    [125, 77, 155, 108]
 		    ZOrder		    -4
@@ -4695,7 +4374,7 @@ Model {
 		    Block {
 		    BlockType		    Outport
 		    Name		    "Out1"
-		    SID			    "1159"
+		    SID			    "2322"
 		    Position		    [220, 88, 250, 102]
 		    ZOrder		    -5
 		    IconDisplay		    "Port number"
@@ -4725,7 +4404,7 @@ Model {
 		Block {
 		  BlockType		  SubSystem
 		  Name			  "If Action\nSubsystem2"
-		  SID			  "1160"
+		  SID			  "2323"
 		  Ports			  [2, 1, 0, 0, 0, 0, 0, 1]
 		  Position		  [295, 167, 365, 203]
 		  ZOrder		  -7
@@ -4740,7 +4419,7 @@ Model {
 		  MaskHideContents	  off
 		  System {
 		    Name		    "If Action\nSubsystem2"
-		    Location		    [539, 254, 866, 621]
+		    Location		    [509, 142, 892, 693]
 		    Open		    off
 		    ModelBrowserVisibility  off
 		    ModelBrowserWidth	    200
@@ -4756,7 +4435,7 @@ Model {
 		    Block {
 		    BlockType		    Inport
 		    Name		    "In1"
-		    SID			    "1161"
+		    SID			    "2324"
 		    Position		    [20, 63, 50, 77]
 		    ZOrder		    -1
 		    IconDisplay		    "Port number"
@@ -4764,7 +4443,7 @@ Model {
 		    Block {
 		    BlockType		    Inport
 		    Name		    "In2"
-		    SID			    "1162"
+		    SID			    "2325"
 		    Position		    [20, 108, 50, 122]
 		    ZOrder		    -2
 		    Port		    "2"
@@ -4773,15 +4452,14 @@ Model {
 		    Block {
 		    BlockType		    ActionPort
 		    Name		    "Action Port"
-		    SID			    "1163"
+		    SID			    "2326"
 		    Position		    [115, 15, 174, 43]
 		    ZOrder		    -3
-		    ActionType		    "else"
 		    }
 		    Block {
 		    BlockType		    RelationalOperator
 		    Name		    "Relational\nOperator"
-		    SID			    "1164"
+		    SID			    "2327"
 		    Ports		    [2, 1]
 		    Position		    [125, 77, 155, 108]
 		    ZOrder		    -4
@@ -4792,7 +4470,7 @@ Model {
 		    Block {
 		    BlockType		    Outport
 		    Name		    "Out1"
-		    SID			    "1165"
+		    SID			    "2328"
 		    Position		    [220, 88, 250, 102]
 		    ZOrder		    -5
 		    IconDisplay		    "Port number"
@@ -4822,7 +4500,7 @@ Model {
 		Block {
 		  BlockType		  Outport
 		  Name			  "trig"
-		  SID			  "1166"
+		  SID			  "2329"
 		  Position		  [475, 123, 505, 137]
 		  ZOrder		  -8
 		  IconDisplay		  "Port number"
@@ -4901,24 +4579,10 @@ Model {
 	    Block {
 	      BlockType		      Outport
 	      Name		      "measSignal"
-	      SID		      "91"
-	      Position		      [655, 298, 685, 312]
+	      SID		      "2330"
+	      Position		      [475, 203, 505, 217]
 	      ZOrder		      -6
 	      IconDisplay	      "Port number"
-	    }
-	    Line {
-	      SrcBlock		      "Subsystem"
-	      SrcPort		      1
-	      Points		      [25, 0]
-	      DstBlock		      "SubSystem"
-	      DstPort		      trigger
-	    }
-	    Line {
-	      SrcBlock		      "Subsystem1"
-	      SrcPort		      1
-	      Points		      [25, 0]
-	      DstBlock		      "SubSystem1"
-	      DstPort		      trigger
 	    }
 	    Line {
 	      SrcBlock		      "Subsystem2"
@@ -4928,35 +4592,16 @@ Model {
 	      DstPort		      trigger
 	    }
 	    Line {
-	      SrcBlock		      "Mux2"
-	      SrcPort		      1
-	      DstBlock		      "Gain4"
-	      DstPort		      1
-	    }
-	    Line {
-	      SrcBlock		      "SubSystem"
-	      SrcPort		      1
-	      DstBlock		      "Mux2"
-	      DstPort		      1
-	    }
-	    Line {
 	      SrcBlock		      "counter"
 	      SrcPort		      1
-	      Points		      [156, 0]
-	      Branch {
-		Points			[0, 115]
-		Branch {
-		  DstBlock		  "Subsystem"
-		  DstPort		  1
-		}
-		Branch {
-		  Points		  [0, 165]
-		  DstBlock		  "Subsystem1"
-		  DstPort		  1
-		}
-	      }
+	      Points		      [45, 0]
 	      Branch {
 		DstBlock		"Subsystem2"
+		DstPort			1
+	      }
+	      Branch {
+		Points			[0, 120]
+		DstBlock		"For Each Subsystem"
 		DstPort			1
 	      }
 	    }
@@ -4967,62 +4612,28 @@ Model {
 	      DstPort		      1
 	    }
 	    Line {
-	      SrcBlock		      "SubSystem"
-	      SrcPort		      2
-	      Points		      [44, 0; 0, 25]
-	      DstBlock		      "Mux2"
-	      DstPort		      2
-	    }
-	    Line {
-	      SrcBlock		      "SubSystem1"
+	      SrcBlock		      "Constant"
 	      SrcPort		      1
-	      Points		      [45, 0; 0, -25]
-	      DstBlock		      "Mux2"
-	      DstPort		      3
-	    }
-	    Line {
-	      SrcBlock		      "SubSystem1"
-	      SrcPort		      2
-	      DstBlock		      "Mux2"
-	      DstPort		      4
+	      DstBlock		      "For Each Subsystem"
+	      DstPort		      2
 	    }
 	    Line {
 	      SrcBlock		      "measDsp"
 	      SrcPort		      1
-	      DstBlock		      "Demux2"
-	      DstPort		      1
+	      DstBlock		      "For Each Subsystem"
+	      DstPort		      3
 	    }
 	    Line {
 	      SrcBlock		      "measFrc"
 	      SrcPort		      1
-	      DstBlock		      "Demux1"
-	      DstPort		      1
+	      DstBlock		      "For Each Subsystem"
+	      DstPort		      4
 	    }
 	    Line {
-	      SrcBlock		      "Demux2"
+	      SrcBlock		      "For Each Subsystem"
 	      SrcPort		      1
-	      DstBlock		      "SubSystem"
+	      DstBlock		      "Gain4"
 	      DstPort		      1
-	    }
-	    Line {
-	      SrcBlock		      "Demux2"
-	      SrcPort		      2
-	      Points		      [34, 0; 0, 100]
-	      DstBlock		      "SubSystem1"
-	      DstPort		      1
-	    }
-	    Line {
-	      SrcBlock		      "Demux1"
-	      SrcPort		      1
-	      Points		      [77, 0; 0, -100]
-	      DstBlock		      "SubSystem"
-	      DstPort		      2
-	    }
-	    Line {
-	      SrcBlock		      "Demux1"
-	      SrcPort		      2
-	      DstBlock		      "SubSystem1"
-	      DstPort		      2
 	    }
 	  }
 	}
@@ -5419,7 +5030,7 @@ Model {
 	  BlockType		  Terminator
 	  Name			  "Terminator1"
 	  SID			  "93"
-	  Position		  [675, 310, 695, 330]
+	  Position		  [645, 310, 665, 330]
 	  ZOrder		  -15
 	  ShowName		  off
 	}
@@ -5427,7 +5038,7 @@ Model {
 	  BlockType		  Terminator
 	  Name			  "Terminator2"
 	  SID			  "2131"
-	  Position		  [675, 120, 695, 140]
+	  Position		  [645, 120, 665, 140]
 	  ZOrder		  -15
 	  ShowName		  off
 	}
@@ -5435,7 +5046,7 @@ Model {
 	  BlockType		  Terminator
 	  Name			  "Terminator3"
 	  SID			  "95"
-	  Position		  [675, 190, 695, 210]
+	  Position		  [645, 190, 665, 210]
 	  ZOrder		  -17
 	  ShowName		  off
 	}
@@ -5459,7 +5070,7 @@ Model {
 	  BlockType		  Terminator
 	  Name			  "Terminator6"
 	  SID			  "2132"
-	  Position		  [675, 155, 695, 175]
+	  Position		  [645, 155, 665, 175]
 	  ZOrder		  -15
 	  ShowName		  off
 	}
@@ -5482,7 +5093,7 @@ Model {
 	  Position		  [25, 194, 90, 226]
 	  ZOrder		  -21
 	  Value			  "newTarget"
-	  OutDataTypeStr	  "uint32"
+	  OutDataTypeStr	  "int32"
 	  SampleTime		  "dtCon"
 	}
 	Block {
@@ -5508,7 +5119,7 @@ Model {
 	  Position		  [25, 15, 57, 45]
 	  ZOrder		  -22
 	  DataStoreName		  "sFlag"
-	  OutDataTypeStr	  "uint32"
+	  OutDataTypeStr	  "int32"
 	  SignalType		  "real"
 	}
 	Block {
@@ -5518,7 +5129,7 @@ Model {
 	  Position		  [80, 15, 112, 45]
 	  ZOrder		  -23
 	  DataStoreName		  "tFlag"
-	  OutDataTypeStr	  "uint32"
+	  OutDataTypeStr	  "int32"
 	  SignalType		  "real"
 	}
 	Block {
@@ -5528,26 +5139,27 @@ Model {
 	  Position		  [25, 109, 90, 141]
 	  ZOrder		  -24
 	  Value			  "targSignal"
+	  OutDataTypeStr	  "double"
 	  SampleTime		  "dtCon"
 	}
 	Block {
 	  BlockType		  Outport
-	  Name			  "dspOut"
+	  Name			  "sigOut"
 	  SID			  "104"
-	  Position		  [670, 88, 700, 102]
+	  Position		  [640, 88, 670, 102]
 	  ZOrder		  -26
 	  IconDisplay		  "Port number"
 	}
 	Line {
 	  SrcBlock		  "frcIn"
 	  SrcPort		  1
-	  DstBlock		  "Gain1"
+	  DstBlock		  "Offset1"
 	  DstPort		  1
 	}
 	Line {
 	  SrcBlock		  "dspIn"
 	  SrcPort		  1
-	  DstBlock		  "Gain4"
+	  DstBlock		  "Offset"
 	  DstPort		  1
 	}
 	Line {
@@ -5576,12 +5188,6 @@ Model {
 	  DstPort		  1
 	}
 	Line {
-	  SrcBlock		  "Gain4"
-	  SrcPort		  1
-	  DstBlock		  "Offset"
-	  DstPort		  1
-	}
-	Line {
 	  SrcBlock		  "newTarget"
 	  SrcPort		  1
 	  DstBlock		  "SubSystem0"
@@ -5601,22 +5207,16 @@ Model {
 	}
 	Line {
 	  Name			  "comSignal"
-	  Labels		  [-1, 0]
+	  Labels		  [1, 1]
 	  SrcBlock		  "rateLimit"
 	  SrcPort		  1
-	  DstBlock		  "Gain2"
+	  DstBlock		  "sigOut"
 	  DstPort		  1
 	}
 	Line {
 	  SrcBlock		  "Predictor-Corrector"
 	  SrcPort		  1
 	  DstBlock		  "Subsystem1"
-	  DstPort		  1
-	}
-	Line {
-	  SrcBlock		  "Gain2"
-	  SrcPort		  1
-	  DstBlock		  "dspOut"
 	  DstPort		  1
 	}
 	Line {
@@ -5685,12 +5285,6 @@ Model {
 	  SrcBlock		  "Offset"
 	  SrcPort		  1
 	  DstBlock		  "MovingAverage Filter"
-	  DstPort		  1
-	}
-	Line {
-	  SrcBlock		  "Gain1"
-	  SrcPort		  1
-	  DstBlock		  "Offset1"
 	  DstPort		  1
 	}
 	Line {
@@ -6157,9 +5751,9 @@ Stateflow {
   }
   state {
     id			    3
-    labelString		    "Predict\nen: state = 1;\nen: setCurSig(comD,i/N);\nen: diSD = 1;\nen: i = 1; iSD = 0;\nen: predi"
-    "ctD3(comD,i/N);\nen: predictV2(comV,i/N); predictA2(comA,i/N);\ndu: i++;\ndu: predictD3(comD,i/N);\ndu: predictV2("
-    "comV,i/N); predictA2(comA,i/N);"
+    labelString		    "Predict\nen: state = 1;\nen: setCurSig(comD,1.0);\nen: i = 1; iSD = 0; diSD = 1;\nen: predictD3("
+    "comD,i/N);\nen: predictV2(comV,i/N); predictA2(comA,i/N);\ndu: i++;\ndu: predictD3(comD,i/N);\ndu: predictV2(comV,"
+    "i/N); predictA2(comA,i/N);"
     position		    [643.9157 88.7733 256.7595 190.3778]
     fontSize		    12
     chart		    2
@@ -6171,8 +5765,8 @@ Stateflow {
   }
   state {
     id			    4
-    labelString		    "Initialize\nen: i = 1; iSD = 0;\nen: diSD = 1;\nen: initData(nDOF,dtCon,dtSim,dtInt);\nen: zeroS"
-    "ig(comD);\nen: zeroSig(comV);\nen: zeroSig(comA);"
+    labelString		    "Initialize\nen: i = 0; iSD = 0; diSD = 1;\nen: initData(nDOF,dtCon,dtSim,dtInt);\nen: zeroSig(co"
+    "mD);\nen: zeroSig(comV);\nen: zeroSig(comA);"
     position		    [39.1095 135.9289 209.3458 112.8749]
     fontSize		    12
     chart		    2
@@ -6290,12 +5884,10 @@ Stateflow {
     }
     midPoint		    [278.2729 163.148]
     chart		    2
-    linkNode		    [6 9 12]
+    linkNode		    [6 9 11]
     dataLimits		    [248.455 316.091 160.743 165.543]
     subviewer		    2
     drawStyle		    SMART
-    slide {
-    }
     executionOrder	    1
     ssIdNumber		    9
   }
@@ -6314,7 +5906,7 @@ Stateflow {
     }
     midPoint		    [653.191 305.388]
     chart		    2
-    linkNode		    [6 12 13]
+    linkNode		    [6 10 12]
     dataLimits		    [575.872 665.915 279.151 316.804]
     subviewer		    2
     drawStyle		    SMART
@@ -6341,7 +5933,7 @@ Stateflow {
     }
     midPoint		    [720.014 309.718]
     chart		    2
-    linkNode		    [6 10 11]
+    linkNode		    [6 11 13]
     dataLimits		    [717.619 722.419 279.151 348.285]
     subviewer		    2
     drawStyle		    SMART
@@ -6363,7 +5955,7 @@ Stateflow {
     }
     midPoint		    [537.0452 317.9196]
     chart		    2
-    linkNode		    [6 11 14]
+    linkNode		    [6 12 14]
     dataLimits		    [534.647 539.447 279.554 348.285]
     subviewer		    2
     drawStyle		    SMART
@@ -6421,13 +6013,13 @@ Stateflow {
     machine		    1
     props {
       type {
-	primitive		SF_UINT32_TYPE
+	primitive		SF_INT32_TYPE
 	fixpt {
 	  scalingMode		  SF_FIXPT_BINARY_POINT
 	}
       }
     }
-    dataType		    "uint32"
+    dataType		    "int32"
   }
   data {
     id			    17
@@ -6501,14 +6093,14 @@ Stateflow {
     machine		    1
     props {
       type {
-	primitive		SF_UINT32_TYPE
+	primitive		SF_INT32_TYPE
 	fixpt {
 	  scalingMode		  SF_FIXPT_BINARY_POINT
 	}
       }
       frame		      SF_FRAME_NO
     }
-    dataType		    "uint32"
+    dataType		    "int32"
   }
   data {
     id			    21
@@ -6538,13 +6130,13 @@ Stateflow {
     machine		    1
     props {
       type {
-	primitive		SF_UINT32_TYPE
+	primitive		SF_INT32_TYPE
 	fixpt {
 	  scalingMode		  SF_FIXPT_BINARY_POINT
 	}
       }
     }
-    dataType		    "uint32"
+    dataType		    "int32"
   }
   data {
     id			    23
@@ -6558,13 +6150,13 @@ Stateflow {
     props {
       initialValue	      "1"
       type {
-	primitive		SF_UINT32_TYPE
+	primitive		SF_INT32_TYPE
 	fixpt {
 	  scalingMode		  SF_FIXPT_BINARY_POINT
 	}
       }
     }
-    dataType		    "uint32"
+    dataType		    "int32"
   }
   data {
     id			    24

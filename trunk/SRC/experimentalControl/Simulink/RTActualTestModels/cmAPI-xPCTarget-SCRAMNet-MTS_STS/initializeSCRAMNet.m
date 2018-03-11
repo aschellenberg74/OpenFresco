@@ -1,73 +1,33 @@
-%INITIALIZESIMULATION to initialize the parameters needed to build the Simulink model
+%INITIALIZESCRAMNET to initialize the parameters needed for SCRAMNet
 %
-% created by MTS
+% created by Brad Thoen (MTS)
 % modified by Andreas Schellenberg (andreas.schellenberg@gmail.com) 11/2004
 %
-% $Revision$
-% $Date$
-% $URL$
-
-clear;
-close all;
-clc;
-
-%%%%%%%%%% HYBRID CONTROLLER PARAMETERS %%%%%%%%%%
-
-% set number of degrees-of-freedom
-nDOF = 2;
-
-% set time steps
-HybridCtrlParameters.dtInt = 0.01;           % integration time step (sec)
-HybridCtrlParameters.dtSim = 0.05;           % simulation time step (sec)
-HybridCtrlParameters.dtCon = 1/1024;         % controller time step (sec)
-HybridCtrlParameters.delay(1) = 0/1000;      % delay compensation DOF 1 (sec)
-HybridCtrlParameters.delay(2) = 0/1000;      % delay compensation DOF 2 (sec)
-
-% calculate max number of substeps
-HybridCtrlParameters.N = round(HybridCtrlParameters.dtSim/HybridCtrlParameters.dtCon);
-% update simulation time step
-HybridCtrlParameters.dtSim = HybridCtrlParameters.N*HybridCtrlParameters.dtCon;
-
-% calculate number of delay steps
-HybridCtrlParameters.iDelay = round(HybridCtrlParameters.delay./HybridCtrlParameters.dtCon);
-
-% check that finite state machine does not deadlock
-delayRatio = max(HybridCtrlParameters.iDelay)/HybridCtrlParameters.N;
-if (delayRatio>0.6 && delayRatio<0.8)
-    warndlg(['The delay compensation exceeds 60% of the simulation time step.', ...
-        'Please consider increasing the simulation time step in order to avoid oscillations.'], ...
-        'WARNING');
-elseif (delayRatio>=0.8)
-    errordlg(['The delay compensation exceeds 80% of the simulation time step.', ...
-        'The simulation time step must be increased in order to avoid deadlock.'], ...
-        'ERROR');
-    return
-end
-
-% update delay time
-HybridCtrlParameters.delay = HybridCtrlParameters.iDelay*HybridCtrlParameters.dtCon;
-
-% calculate testing rate
-HybridCtrlParameters.Rate = HybridCtrlParameters.dtSim/HybridCtrlParameters.dtInt;
-
-disp('Model Properties:');
-disp('=================');
-disp(HybridCtrlParameters);
+% $Revision: 373 $
+% $Date: 2014-10-09 01:56:20 -0700 (Thu, 09 Oct 2014) $
+% $URL: svn://openfresco.berkeley.edu/usr/local/svn/OpenFresco/trunk/SRC/experimentalControl/Simulink/RTActualTestModels/cmAPI-xPCTarget-STS/initializeSimulation.m $
 
 %%%%%%%%%% SIGNAL COUNTS %%%%%%%%%%
 
-nAct    = 8;                                  % number of actuators
-nAdcU   = 12;                                 % number of user a/d channels
-nDucU   = 8;                                  % number of user ducs
-nEncU   = 2;                                  % number of user encoders
-nDinp   = 4;                                  % no. of digital inputs written to scramnet
-nDout   = 4;                                  % no. of digital outputs driven by scramnet
-nUDPOut = 1+7*nAct+nAdcU+nDucU+nEncU+nDinp;   % no. of outputs from simulink bridge
-nUDPInp = 1+6*nAct+nAdcU+nDucU+nEncU+nDinp;   % no. of inputs to simulink bridge
+nAct    = 8;                                         % number of actuators
+nAdcU   = 12;                                        % number of user a/d channels
+nDucU   = 8;                                         % number of user ducs
+nEncU   = 2;                                         % number of user encoders
+nDinp   = 4;                                         % no. of digital inputs written to scramnet
+nDout   = 4;                                         % no. of digital outputs driven by scramnet
+nEncCmd = 2;                                         % number of encoders commands
+nUDPOut = 1+7*nAct+nAdcU+nDucU+nEncU+nDinp+nEncCmd;  % no. of outputs from simulink bridge
+nUDPInp = 1+6*nAct+nAdcU+nDucU+nEncU+nDinp+nEncCmd;  % no. of inputs to simulink bridge
 
-%%%%%%%%%% SAMPLE PERIOD %%%%%%%%%%
+%%%%%%%%%% SAMPLE PERIODS %%%%%%%%%%
 
-samplePeriod = 1/1024;
+controlPeriod = 1/1024;  % controller sample period (sec)
+samplePeriod  = controlPeriod/HybridCtrlParameters.upFact;
+
+%%%%%%%%%% SCRAMNET PARTITIONS %%%%%%%%%%
+
+syncNode = 1;   % synchronization node: MTS STS
+xpcNode  = 2;   % xPC-Target node
 
 
 %%%%%%%%%% START MTS (STS) %%%%%%%%%%
@@ -75,10 +35,10 @@ samplePeriod = 1/1024;
 %%%%%%%%%% outputs to scramnet %%%%%%%%%%
 
 % master span
-baseAddress	         = 0;
+baseAddress = 0;
 partition(1).Address = ['0x', dec2hex(baseAddress*4)];
-partition(1).Type    = 'single';
-partition(1).Size    = '1';
+partition(1).Type = 'single';
+partition(1).Size = '1';
 
 % control modes
 partition(2).Type = 'uint32';
@@ -165,15 +125,23 @@ partition(21).Size = num2str(nDucU);
 % user ENCs
 partition(22).Type = 'single';
 partition(22).Size = num2str(nEncU);
-irqPartition       = 22;
 
 % digital inputs from controller
 partition(23).Type = 'uint32';
 partition(23).Size = num2str(nDinp);
 
-% blank space
-partition(24).Type = 'uint32';
-partition(24).Size = '866';
+% nEncCmd outputs to scramnet
+partition(24).Type = 'single';
+partition(24).Size = num2str(nEncCmd);
+
+% nEncCmd inputs from scramnet
+partition(25).Type = 'single';
+partition(25).Size = num2str(nEncCmd);
+irqPartition = 25;
+
+% blank space (up to 1024)
+partition(26).Type = 'uint32';
+partition(26).Size = '862';
 
 %%%%%%%%%% END MTS (STS) %%%%%%%%%%
 
@@ -190,7 +158,7 @@ node.Interface.Interrupts.NetworkInterrupt           = 'on';
 % NOTE:  Use the modified completepartitionstruct() that
 %        allows discontiguous partitions--- the original one
 %        provide by Mathworks packs them together.
-node.Interface.NodeID                      = '0';
+node.Interface.NodeID                      = num2str(xpcNode);
 node.Interface.Timeout.NumOfNodesInRing    = '10';
 node.Interface.Timeout.TotalCableLengthInM = '50';
 bub = completepartitionstruct(partition);

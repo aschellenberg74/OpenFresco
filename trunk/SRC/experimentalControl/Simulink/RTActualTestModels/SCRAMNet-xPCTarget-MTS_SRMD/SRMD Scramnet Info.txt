@@ -1,0 +1,57 @@
+UC-Berkeley Scramnet Information    28-Sep-15
+
+
+MEMORY ALLOCATION:
+
+Notes:
+1) The first 1024 words of scramnet memory are reserved
+   for MTS use.
+2) All signals are single precision floating point (32 bits)
+   unless otherwise noted.
+3) Signals designated as integer are 32 bits.
+
+
+Loc	Src	Description
+
+1	XPC	Long Reference
+2	XPC	Lat Reference
+3	XPC	Vert Reference
+4	XPC	Roll Reference
+5	XPC	Pitch Reference
+6	XPC	Yaw Reference
+7	XPC	Compression Reference
+8	XPC	User scramnet inputs
+...
+8+NSCRU-1	(NSCRU = 8)
+
+
+64	SRMD	User scramnet outputs
+...
+64+NSCOU-1	(NSCOU = 48)
+
+
+SCRAMNET PARAMETERS:
+	
+	Scramnet ring node number:	1
+	
+	Max number of scramnet nodes:	10
+
+	Control register values
+		CSR	value
+		0	0x8103
+		1	0x8000
+		2	0xC040
+		3	0x0100
+		4	0x5554
+		5	0x0055
+		6	0x8103
+		7	0x0000
+		8	0xB881
+		9	0x0029
+		10	0x0001
+		11	0x0000
+		12	0x0000
+		13	0x0131
+		14	0x3F80
+		15	0x0000
+
