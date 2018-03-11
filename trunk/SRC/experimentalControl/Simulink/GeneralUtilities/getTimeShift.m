@@ -21,16 +21,16 @@ if (nargin < 5)
 end
 
 % get time steps
-dt1 = t1(2) - t1(1);
-dt2 = t2(2) - t2(1);
+dt1 = mean(diff(t1));
+dt2 = mean(diff(t2));
 
 % interpolate signal with longer dt
 if (dt2<=dt1)
-   y1 = interp1(t1,y1,t2);
-   id = ~isnan(y1);
+    y1 = interp1(t1,y1,t2);
+    id = ~isnan(y1);
 elseif (dt2>dt1)
-   y2 = interp1(t2,y2,t1);
-   id = ~isnan(y2);
+    y2 = interp1(t2,y2,t1);
+    id = ~isnan(y2);
 end
 dt = min([dt1,dt2]);
 y1 = y1(id);
@@ -50,4 +50,3 @@ for i=1:nshifts
 end
 [~,id] = min(err);
 timeShiftRMS = (id-nshifts)*dt;
-

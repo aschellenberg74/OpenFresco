@@ -1,5 +1,5 @@
 function figh = CreateWindow(position,Width,Height,figtitle)
-%CREATEWINDOW to create new window with given dimensions     
+%CREATEWINDOW to create new window with given dimensions
 % figh = CreateWindow(position,Width,Height,figtitle)
 %
 % figh     : figure handle
@@ -13,8 +13,12 @@ function figh = CreateWindow(position,Width,Height,figtitle)
 % Height   : window height in pixels (optional)
 % figtitle : title of window (optional)
 %
-% Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+% Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 % Created: 04/05
+%
+% $Revision$
+% $Date$
+% $URL$
 
 % get the screen size
 SS = get(0,'screensize');
@@ -32,22 +36,22 @@ end
 
 % get the display position
 switch position
-   case 'cen'
-      Position = [(SS(3)-Width)/2, (SS(4)-Height)/2, Width, Height];
-   case 'ulc'
-      Position = [1, SS(4)-Height, Width, Height];
-   case 'llc'
-      Position = [1, 1, Width, Height];
-   case 'urc'
-      Position = [SS(3)-Width, SS(4)-Height, Width, Height];
-   case 'lrc'
-      Position = [SS(3)-Width, 1, Width, Height];
+    case 'cen'
+        Position = [(SS(3)-Width)/2, (SS(4)-Height)/2, Width, Height];
+    case 'ulc'
+        Position = [1, SS(4)-Height, Width, Height];
+    case 'llc'
+        Position = [1, 1, Width, Height];
+    case 'urc'
+        Position = [SS(3)-Width, SS(4)-Height, Width, Height];
+    case 'lrc'
+        Position = [SS(3)-Width, 1, Width, Height];
 end
 
 % create figure handle
-figh = figure('Units','pixel','Position',Position);      
+figh = figure('Units','pixel','Position',Position);
 
 if (nargin==4)
-   set(figh,'NumberTitle','off', ...
-      'Name',figtitle);
+    set(figh,'NumberTitle','off', ...
+        'Name',figtitle);
 end

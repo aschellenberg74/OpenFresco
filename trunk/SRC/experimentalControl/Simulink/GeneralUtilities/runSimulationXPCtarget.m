@@ -5,8 +5,12 @@ function runSimulationXPCtarget(appName,outputFile)
 % appName    : name of application to run
 % outputFile : output file the data is saved to
 %
-% Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+% Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 % Created: 11/04
+%
+% $Revision$
+% $Date$
+% $URL$
 
 close all;
 clc;
@@ -53,20 +57,20 @@ targAcc(:,3) = SineSeries(time,tStart,tFinish,T,0,4*pi^2/T^2*amp3);
 
 % initialization
 if ismember(appName,{'HybridControllerPoly1','HybridControllerPoly2','HybridControllerPoly3',...
-      'HybridControllerD1D1','HybridControllerD2D1','HybridControllerD3D1'})
-   type = 'Dsp';
+        'HybridControllerD1D1','HybridControllerD2D1','HybridControllerD3D1'})
+    type = 'Dsp';
 elseif ismember(appName,'HybridControllerDV')
-   type = 'DspVel';
+    type = 'DspVel';
 elseif ismember(appName,'HybridControllerDVA')
-   type = 'DspVelAcc';
+    type = 'DspVelAcc';
 end
 %appName = 'HybridControllerPoly1';
 HybridControlxPCtarget('init',3,6,type,appName,targDsp(1,:),targVel(1,:),targAcc(1,:));
 
 % send target displacements and obtain resisting forces
 for i=1:length(targDsp)
-   HybridControlxPCtarget('execute',3,6,type,appName,targDsp(i,:),targVel(i,:),targAcc(i,:));
-   [measDsp(i,:),measFrc(i,:)] = HybridControlxPCtarget('acquire',3,6,type,appName);
+    HybridControlxPCtarget('execute',3,6,type,appName,targDsp(i,:),targVel(i,:),targAcc(i,:));
+    [measDsp(i,:),measFrc(i,:)] = HybridControlxPCtarget('acquire',3,6,type,appName);
 end
 
 % stop xPCtarget model
