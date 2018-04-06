@@ -1,9 +1,10 @@
 include ../../Makefile.def
 
-OBJS = ExpSiteRecorder.o \
+OBJS = \
+       ExpControlRecorder.o \
        ExpSetupRecorder.o \
-       ExpControlRecorder.o\
        ExpSignalFilterRecorder.o \
+       ExpSiteRecorder.o \
        ExpTangentStiffRecorder.o
 
 all:         $(OBJS)

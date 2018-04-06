@@ -1,12 +1,13 @@
 include ../../Makefile.def
 
-OBJS  = ExperimentalControl.o \
-        ECSimulation.o \
-        ECSimUniaxialMaterials.o \
+OBJS  = \
+        ECGenericTCP.o \
         ECSimDomain.o \
         ECSimFEAdapter.o \
         ECSimSimulink.o \
-        ECGenericTCP.o
+        ECSimulation.o \
+        ECSimUniaxialMaterials.o \
+        ExperimentalControl.o
 
 all:         $(OBJS)
 

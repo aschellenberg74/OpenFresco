@@ -1,7 +1,8 @@
 include ../../Makefile.def
 
-OBJS  = ExperimentalCP.o \
-        ExpControlSP.o
+OBJS  = \
+        ExpControlSP.o \
+        ExperimentalCP.o
 
 all:         $(OBJS)
 
@@ -9,8 +10,8 @@ tcl: TclExpCPCommand.o
 
 test:  test.o
 	$(LINKER) $(LINKFLAGS) test.o \
-	../utility/ExperimentalCP.o \
-	../utility/ExpControlSP.o
+	ExpControlSP.o \
+	ExperimentalCP.o \
 	$(FE_LIBRARY) $(MACHINE_LINKLIBS) \
 		-lm \
 		$(ARPACK_LIBRARY) \

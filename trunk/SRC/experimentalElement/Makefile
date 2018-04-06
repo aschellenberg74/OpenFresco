@@ -1,6 +1,6 @@
 include ../../Makefile.def
 
-OBJS  = ExperimentalElement.o \
+OBJS  = \
         EEBeamColumn2d.o \
         EEBeamColumn3d.o \
         EEBearing2d.o \
@@ -9,19 +9,18 @@ OBJS  = ExperimentalElement.o \
         EEInvertedVBrace2d.o \
         EETruss.o \
         EETrussCorot.o \
-        EETwoNodeLink.o
+        EETwoNodeLink.o \
+        ExperimentalElement.o
 
 all:         $(OBJS)
 
-tcl: 	TclEEBeamColumnCommand.o \
-    TclEEBearingCommand.o \
-	TclEEGenericCommand.o \
-	TclEEInvertedVBraceCommand.o \
-	TclEETrussCommand.o \
-	TclEETwoNodeLinkCommand.o \
-	TclExpElementCommands.o 
-
-
+tcl:  TclEEBeamColumnCommand.o \
+      TclEEBearingCommand.o \
+	  TclEEGenericCommand.o \
+	  TclEEInvertedVBraceCommand.o \
+	  TclEETrussCommand.o \
+	  TclEETwoNodeLinkCommand.o \
+	  TclExpElementCommands.o 
 
 # Miscellaneous
 tidy:	

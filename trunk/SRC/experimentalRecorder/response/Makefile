@@ -1,9 +1,10 @@
 include ../../../Makefile.def
 
-OBJS = ExpSiteResponse.o \
-       ExpSetupResponse.o \
+OBJS = \
        ExpControlResponse.o \
+       ExpSetupResponse.o \
        ExpSignalFilterResponse.o \
+       ExpSiteResponse.o \
        ExpTangentStiffResponse.o
 
 all:         $(OBJS)

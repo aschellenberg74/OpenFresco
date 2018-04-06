@@ -1,6 +1,10 @@
 include ../../Makefile.def
 
-OBJS = ExperimentalTangentStiff.o ETBroyden.o ETBfgs.o ETTranspose.o
+OBJS  = \
+		ETBfgs.o \
+		ETBroyden.o \
+		ETTranspose.o \
+        ExperimentalTangentStiff.o
 
 all:         $(OBJS)
 
