@@ -1,50 +1,60 @@
 
 include ../Makefile.def
 
-EXPERIMENTALTEST_OBJS = $(OPENFRESCO)/utility/ExperimentalCP.o \
-	   $(OPENFRESCO)/utility/ExpControlSP.o \
-	   $(OPENFRESCO)/experimentalElement/ExperimentalElement.o \
-	   $(OPENFRESCO)/experimentalElement/EETruss.o \
-	   $(OPENFRESCO)/experimentalElement/EETrussCorot.o \
-	   $(OPENFRESCO)/experimentalElement/EEBeamColumn2d.o \
-	   $(OPENFRESCO)/experimentalElement/EEBeamColumn3d.o \
-	   $(OPENFRESCO)/experimentalElement/EEInvertedVBrace2d.o \
-	   $(OPENFRESCO)/experimentalElement/EETwoNodeLink.o \
-	   $(OPENFRESCO)/experimentalElement/EEGeneric.o \
-       $(OPENFRESCO)/experimentalElement/EEBearing.o \
-	   $(OPENFRESCO)/experimentalSite/ExperimentalSite.o \
-	   $(OPENFRESCO)/experimentalSite/LocalExpSite.o \
-	   $(OPENFRESCO)/experimentalSite/ShadowExpSite.o \
-	   $(OPENFRESCO)/experimentalSite/ActorExpSite.o \
-	   $(OPENFRESCO)/experimentalSetup/ExperimentalSetup.o \
-	   $(OPENFRESCO)/experimentalSetup/ESNoTransformation.o \
-	   $(OPENFRESCO)/experimentalSetup/ESAggregator.o \
-	   $(OPENFRESCO)/experimentalSetup/ESOneActuator.o \
-	   $(OPENFRESCO)/experimentalSetup/ESTwoActuators2d.o \
-	   $(OPENFRESCO)/experimentalSetup/ESThreeActuators2d.o \
-	   $(OPENFRESCO)/experimentalSetup/ESThreeActuatorsJntOff2d.o \
-	   $(OPENFRESCO)/experimentalSetup/ESInvertedVBrace2d.o \
-	   $(OPENFRESCO)/experimentalSetup/ESInvertedVBraceJntOff2d.o \
-	   $(OPENFRESCO)/experimentalSetup/ESFourActuators3d.o \
-	   $(OPENFRESCO)/experimentalControl/ExperimentalControl.o \
-	   $(OPENFRESCO)/experimentalControl/ECSimulation.o \
-	   $(OPENFRESCO)/experimentalControl/ECSimUniaxialMaterials.o \
+EXPERIMENTALTEST_OBJS = \
+       $(OPENFRESCO)/experimentalControl/ECGenericTCP.o \
 	   $(OPENFRESCO)/experimentalControl/ECSimDomain.o \
 	   $(OPENFRESCO)/experimentalControl/ECSimFEAdapter.o \
 	   $(OPENFRESCO)/experimentalControl/ECSimSimulink.o \
-       $(OPENFRESCO)/experimentalControl/ECGenericTCP.o \
-	   $(OPENFRESCO)/experimentalSignalFilter/ExperimentalSignalFilter.o \
-	   $(OPENFRESCO)/experimentalSignalFilter/ESFErrorSimRandomGauss.o \
-	   $(OPENFRESCO)/experimentalSignalFilter/ESFErrorSimulation.o \
-	   $(OPENFRESCO)/experimentalSignalFilter/ESFErrorSimUndershoot.o \
+	   $(OPENFRESCO)/experimentalControl/ECSimulation.o \
+	   $(OPENFRESCO)/experimentalControl/ECSimUniaxialMaterials.o \
+	   $(OPENFRESCO)/experimentalControl/ExperimentalControl.o \
+	   $(OPENFRESCO)/experimentalControlPoint/ExpControlSP.o \
+	   $(OPENFRESCO)/experimentalControlPoint/ExperimentalCP.o \
+	   $(OPENFRESCO)/experimentalElement/EEBeamColumn2d.o \
+	   $(OPENFRESCO)/experimentalElement/EEBeamColumn3d.o \
+       $(OPENFRESCO)/experimentalElement/EEBearing2d.o \
+       $(OPENFRESCO)/experimentalElement/EEBearing3d.o \
+	   $(OPENFRESCO)/experimentalElement/EEGeneric.o \
+	   $(OPENFRESCO)/experimentalElement/EEInvertedVBrace2d.o \
+	   $(OPENFRESCO)/experimentalElement/EETruss.o \
+	   $(OPENFRESCO)/experimentalElement/EETrussCorot.o \
+	   $(OPENFRESCO)/experimentalElement/EETwoNodeLink.o \
+	   $(OPENFRESCO)/experimentalElement/ExperimentalElement.o \
 	   $(OPENFRESCO)/experimentalRecorder/ExpControlRecorder.o \
 	   $(OPENFRESCO)/experimentalRecorder/ExpSetupRecorder.o \
 	   $(OPENFRESCO)/experimentalRecorder/ExpSignalFilterRecorder.o \
 	   $(OPENFRESCO)/experimentalRecorder/ExpSiteRecorder.o \
+	   $(OPENFRESCO)/experimentalRecorder/ExpTangentStiffRecorder.o \
 	   $(OPENFRESCO)/experimentalRecorder/response/ExpControlResponse.o \
 	   $(OPENFRESCO)/experimentalRecorder/response/ExpSetupResponse.o \
 	   $(OPENFRESCO)/experimentalRecorder/response/ExpSignalFilterResponse.o \
-	   $(OPENFRESCO)/experimentalRecorder/response/ExpSiteResponse.o
+	   $(OPENFRESCO)/experimentalRecorder/response/ExpSiteResponse.o \
+	   $(OPENFRESCO)/experimentalRecorder/response/ExpTangentStiffResponse.o \
+	   $(OPENFRESCO)/experimentalSetup/ESAggregator.o \
+	   $(OPENFRESCO)/experimentalSetup/ESFourActuators3d.o \
+	   $(OPENFRESCO)/experimentalSetup/ESInvertedVBrace2d.o \
+	   $(OPENFRESCO)/experimentalSetup/ESInvertedVBraceJntOff2d.o \
+	   $(OPENFRESCO)/experimentalSetup/ESNoTransformation.o \
+	   $(OPENFRESCO)/experimentalSetup/ESOneActuator.o \
+	   $(OPENFRESCO)/experimentalSetup/ESThreeActuators2d.o \
+	   $(OPENFRESCO)/experimentalSetup/ESThreeActuatorsJntOff2d.o \
+	   $(OPENFRESCO)/experimentalSetup/ESTwoActuators2d.o \
+	   $(OPENFRESCO)/experimentalSetup/ExperimentalSetup.o \
+	   $(OPENFRESCO)/experimentalSignalFilter/ESFErrorSimRandomGauss.o \
+	   $(OPENFRESCO)/experimentalSignalFilter/ESFErrorSimulation.o \
+	   $(OPENFRESCO)/experimentalSignalFilter/ESFErrorSimUndershoot.o \
+	   $(OPENFRESCO)/experimentalSignalFilter/ESFKrylovForceConverter.o \
+	   $(OPENFRESCO)/experimentalSignalFilter/ESFTangForceConverter.o \
+	   $(OPENFRESCO)/experimentalSignalFilter/ExperimentalSignalFilter.o \
+	   $(OPENFRESCO)/experimentalSite/ActorExpSite.o \
+	   $(OPENFRESCO)/experimentalSite/ExperimentalSite.o \
+	   $(OPENFRESCO)/experimentalSite/LocalExpSite.o \
+	   $(OPENFRESCO)/experimentalSite/ShadowExpSite.o \
+	   $(OPENFRESCO)/experimentalTangentStiff/ETBfgs.o \
+	   $(OPENFRESCO)/experimentalTangentStiff/ETBroyden.o \
+	   $(OPENFRESCO)/experimentalTangentStiff/ETTranspose.o \
+	   $(OPENFRESCO)/experimentalTangentStiff/ExperimentalTangentStiff.o \
        $(OPENFRESCO)/openseesCore/Analysis.o \
        $(OPENFRESCO)/openseesCore/AnalysisModel.o \
        $(OPENFRESCO)/openseesCore/ArrayOfTaggedObjects.o \
@@ -156,14 +166,15 @@ EXPERIMENTALTEST_OBJS = $(OPENFRESCO)/utility/ExperimentalCP.o \
 
 # Compilation control
 all: FrescoGlobals.h
-	@$(CD) $(OPENFRESCO)/utility; $(MAKE);
-	@$(CD) $(OPENFRESCO)/experimentalSetup; $(MAKE);
-	@$(CD) $(OPENFRESCO)/experimentalSite; $(MAKE);
 	@$(CD) $(OPENFRESCO)/experimentalControl; $(MAKE);
+	@$(CD) $(OPENFRESCO)/experimentalControlPoint; $(MAKE);
 	@$(CD) $(OPENFRESCO)/experimentalElement; $(MAKE);
-	@$(CD) $(OPENFRESCO)/experimentalSignalFilter; $(MAKE);
 	@$(CD) $(OPENFRESCO)/experimentalRecorder; $(MAKE);
 	@$(CD) $(OPENFRESCO)/experimentalRecorder/response; $(MAKE);
+	@$(CD) $(OPENFRESCO)/experimentalSetup; $(MAKE);
+	@$(CD) $(OPENFRESCO)/experimentalSignalFilter; $(MAKE);
+	@$(CD) $(OPENFRESCO)/experimentalSite; $(MAKE);
+	@$(CD) $(OPENFRESCO)/experimentalTangentStiff; $(MAKE);
     @$(CD) $(OPENFRESCO)/openseesCore; $(MAKE);
     @$(CD) $(OPENFRESCO)/openseesExtra; $(MAKE);
 	$(AR) $(ARFLAGS) $(OPENFRESCO_LIBRARY) $(EXPERIMENTALTEST_OBJS)
@@ -176,14 +187,15 @@ clean: tidy
 	@$(RM) $(RMFLAGS) Makefile.bak $(OBJS) *.o *~ #*# core
 
 spotless: clean
-	@$(CD) $(OPENFRESCO)/utility; $(MAKE) wipe;
-	@$(CD) $(OPENFRESCO)/experimentalSite; $(MAKE) wipe;
-	@$(CD) $(OPENFRESCO)/experimentalSetup; $(MAKE) wipe;
 	@$(CD) $(OPENFRESCO)/experimentalControl; $(MAKE) wipe;
+	@$(CD) $(OPENFRESCO)/experimentalControlPoint; $(MAKE) wipe;
 	@$(CD) $(OPENFRESCO)/experimentalElement; $(MAKE) wipe;
-	@$(CD) $(OPENFRESCO)/experimentalSignalFilter; $(MAKE) wipe;
 	@$(CD) $(OPENFRESCO)/experimentalRecorder; $(MAKE) wipe;
 	@$(CD) $(OPENFRESCO)/experimentalRecorder/response; $(MAKE) wipe;
+	@$(CD) $(OPENFRESCO)/experimentalSetup; $(MAKE) wipe;
+	@$(CD) $(OPENFRESCO)/experimentalSignalFilter; $(MAKE) wipe;
+	@$(CD) $(OPENFRESCO)/experimentalSite; $(MAKE) wipe;
+	@$(CD) $(OPENFRESCO)/experimentalTangentStiff; $(MAKE) wipe;
 	@$(CD) $(OPENFRESCO)/openseesCore; $(MAKE) wipe;
 	@$(CD) $(OPENFRESCO)/openseesExtra; $(MAKE) wipe;
 

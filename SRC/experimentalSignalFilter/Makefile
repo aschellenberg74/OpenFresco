@@ -1,8 +1,12 @@
 include ../../Makefile.def
 
-OBJS = ExperimentalSignalFilter.o ESFErrorSimulation.o \
-       ESFErrorSimUndershoot.o ESFErrorSimRandomGauss.o \
-	   ESFKrylovForceConverter.o ESFTangForceConverter.o
+OBJS = \
+	   ESFErrorSimRandomGauss.o \
+	   ESFErrorSimulation.o \
+       ESFErrorSimUndershoot.o \
+	   ESFKrylovForceConverter.o \
+	   ESFTangForceConverter.o \
+       ExperimentalSignalFilter.o
 
 all:         $(OBJS)
 
