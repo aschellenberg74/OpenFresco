@@ -1204,22 +1204,32 @@ int TclAddExpRecorder(ClientData clientData, Tcl_Interp *interp,
     
     TclCreateExpRecorder(clientData, interp, argc, argv, theDomain, &theRecorder);
     
-    if (theRecorder != 0)  {
-        ExperimentalSite *theSite = getExperimentalSiteFirst();
-        if (theSite == 0)  {
-            opserr << "WARNING failed to get first experimental site\n";
-            delete theRecorder;
-            return TCL_ERROR;
-        }
-        if ((theSite->addRecorder(*theRecorder)) < 0)  {
-            opserr << "WARNING could not add to experimental site - expRecorder " << argv[1] << endln;
-            delete theRecorder;
-            return TCL_ERROR;
-        }
-        
-        int recorderTag = theRecorder->getTag();
-        sprintf(interp->result,"%d",recorderTag);
+    if (theRecorder == 0)  {
+        char buffer[] = "-1";
+        Tcl_SetResult(interp, buffer, TCL_VOLATILE);
+        return TCL_ERROR;
     }
+    
+    ExperimentalSite *theSite = getExperimentalSiteFirst();
+    if (theSite == 0)  {
+        opserr << "WARNING failed to get first experimental site\n";
+        delete theRecorder;
+        char buffer[] = "-1";
+        Tcl_SetResult(interp, buffer, TCL_VOLATILE);
+        return TCL_ERROR;
+    }
+    if ((theSite->addRecorder(*theRecorder)) < 0)  {
+        opserr << "WARNING could not add to experimental site - expRecorder " << argv[1] << endln;
+        delete theRecorder;
+        char buffer[] = "-1";
+        Tcl_SetResult(interp, buffer, TCL_VOLATILE);
+        return TCL_ERROR;
+    }
+    
+    int recorderTag = theRecorder->getTag();
+    char buffer[30];
+    sprintf(buffer, "%d", recorderTag);
+    Tcl_SetResult(interp, buffer, TCL_VOLATILE);
     
     return TCL_OK;
 }
