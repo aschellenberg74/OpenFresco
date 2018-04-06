@@ -29,7 +29,7 @@
 //
 // Description: This file contains the implementation of the eeTruss.
 // eeTruss is an experimental truss element defined by two nodes.
-// The element communicates with an OpenFresco site through a tcp/ip
+// The element communicates with an OpenFresco site through a udp
 // connection.
 
 #include <stdlib.h>
@@ -40,10 +40,10 @@
 int socketID;
 int dataSize = 256;
 
-void tcp_setupconnectionclient(unsigned int *port, const char inetAddr[], int *lengthInet, int *socketID);
-void tcp_senddata(const int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr);
-void tcp_recvdata(const int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr);
-void tcp_closeconnection(int *socketID, int *ierr);
+void udp_setupconnectionclient(unsigned int *port, const char inetAddr[], int *lengthInet, int *socketID);
+void udp_senddata(const int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr);
+void udp_recvdata(const int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr);
+void udp_closeconnection(int *socketID, int *ierr);
 
 int eeTruss(double *d,
             double *ul,
@@ -100,7 +100,7 @@ int eeTruss(double *d,
         // setup the connection
         port = (int)d[1];
         sizeMachineInet = 9+1;
-        tcp_setupconnectionclient(&port, "127.0.0.1", &sizeMachineInet, &socketID);
+        udp_setupconnectionclient(&port, "127.0.0.1", &sizeMachineInet, &socketID);
         if (socketID < 0)
             return -1;
         
@@ -123,7 +123,7 @@ int eeTruss(double *d,
         gMsg = (char *)iData;
         dataTypeSize = sizeof(int);
         nleft = 11;
-        tcp_senddata(&socketID, &dataTypeSize, gMsg, &nleft, &ierr);
+        udp_senddata(&socketID, &dataTypeSize, gMsg, &nleft, &ierr);
     }
     // ==============================================================
     // check element for errors
@@ -178,7 +178,7 @@ int eeTruss(double *d,
         gMsg = (char *)sData;
         dataTypeSize = sizeof(double);
         nleft = dataSize;
-        tcp_senddata(&socketID, &dataTypeSize, gMsg, &nleft, &ierr);
+        udp_senddata(&socketID, &dataTypeSize, gMsg, &nleft, &ierr);
         
         // add stiffness portion to matrix
         if (isw == 3) {
@@ -199,11 +199,11 @@ int eeTruss(double *d,
         
         gMsg = (char *)sData;
         nleft = dataSize;
-        tcp_senddata(&socketID, &dataTypeSize, gMsg, &nleft, &ierr);
+        udp_senddata(&socketID, &dataTypeSize, gMsg, &nleft, &ierr);
         
         gMsg = (char *)rData;
         nleft = dataSize;
-        tcp_recvdata(&socketID, &dataTypeSize, gMsg, &nleft, &ierr);
+        udp_recvdata(&socketID, &dataTypeSize, gMsg, &nleft, &ierr);
         
         for (i=0; i<ndm; i++) {
             r[i] = -cosX[i]*rData[0];
@@ -249,9 +249,9 @@ int eeTruss(double *d,
         gMsg = (char *)sData;
         dataTypeSize = sizeof(double);
         nleft = dataSize;
-        tcp_senddata(&socketID, &dataTypeSize, gMsg, &nleft, &ierr);
+        udp_senddata(&socketID, &dataTypeSize, gMsg, &nleft, &ierr);
         
-        tcp_closeconnection(&socketID, &ierr);
+        udp_closeconnection(&socketID, &ierr);
         
         // clean up allocated memory
         free(sData);

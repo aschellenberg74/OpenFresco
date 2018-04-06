@@ -30,7 +30,7 @@
 // Description: This file contains the class definition for genericClient.
 // genericClient is a generic element defined by any number of nodes and 
 // the degrees of freedom at those nodes. The element communicates with 
-// an OpenFresco element trough a tcp/ip connection.
+// an OpenFresco element through a udp connection.
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -40,10 +40,10 @@
 int socketID;
 int dataSize = 256;
 
-void tcp_setupconnectionclient(unsigned int *port, const char inetAddr[], int *lengthInet, int *socketID);
-void tcp_senddata(const int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr);
-void tcp_recvdata(const int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr);
-void tcp_closeconnection(int *socketID, int *ierr);
+void udp_setupconnectionclient(unsigned int *port, const char inetAddr[], int *lengthInet, int *socketID);
+void udp_senddata(const int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr);
+void udp_recvdata(const int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr);
+void udp_closeconnection(int *socketID, int *ierr);
 
 int genericClient(double *d,
                   double *ul,
@@ -98,7 +98,7 @@ int genericClient(double *d,
         // setup the connection
         port = (int)d[1];
         sizeMachineInet = 9+1;
-        tcp_setupconnectionclient(&port, "127.0.0.1", &sizeMachineInet, &socketID);
+        udp_setupconnectionclient(&port, "127.0.0.1", &sizeMachineInet, &socketID);
         if (socketID < 0)
             return -1;
         
@@ -121,7 +121,7 @@ int genericClient(double *d,
         gMsg = (char *)iData;
         dataTypeSize = sizeof(int);
         nleft = 11;
-        tcp_senddata(&socketID, &dataTypeSize, gMsg, &nleft, &ierr);
+        udp_senddata(&socketID, &dataTypeSize, gMsg, &nleft, &ierr);
     }
     // ==============================================================
     // check element for errors
@@ -144,7 +144,7 @@ int genericClient(double *d,
         gMsg = (char *)sData;
         dataTypeSize = sizeof(double);
         nleft = dataSize;
-        tcp_senddata(&socketID, &dataTypeSize, gMsg, &nleft, &ierr);
+        udp_senddata(&socketID, &dataTypeSize, gMsg, &nleft, &ierr);
         
         // add stiffness portion to matrix
         if (isw == 3) {
@@ -153,11 +153,11 @@ int genericClient(double *d,
             gMsg = (char *)sData;
             dataTypeSize = sizeof(double);
             nleft = dataSize;
-            tcp_senddata(&socketID, &dataTypeSize, gMsg, &nleft, &ierr);
+            udp_senddata(&socketID, &dataTypeSize, gMsg, &nleft, &ierr);
             
             gMsg = (char *)rData;
             nleft = dataSize;
-            tcp_recvdata(&socketID, &dataTypeSize, gMsg, &nleft, &ierr);
+            udp_recvdata(&socketID, &dataTypeSize, gMsg, &nleft, &ierr);
             
             for (i=0; i<nst*nst; i++) {
                 s[i] = rData[i];
@@ -169,11 +169,11 @@ int genericClient(double *d,
         
         gMsg = (char *)sData;
         nleft = dataSize;
-        tcp_senddata(&socketID, &dataTypeSize, gMsg, &nleft, &ierr);
+        udp_senddata(&socketID, &dataTypeSize, gMsg, &nleft, &ierr);
         
         gMsg = (char *)rData;
         nleft = dataSize;
-        tcp_recvdata(&socketID, &dataTypeSize, gMsg, &nleft, &ierr);
+        udp_recvdata(&socketID, &dataTypeSize, gMsg, &nleft, &ierr);
         
         for (i=0; i<nst; i++) {
             r[i] = rData[i];
@@ -195,11 +195,11 @@ int genericClient(double *d,
         gMsg = (char *)sData;
         dataTypeSize = sizeof(double);
         nleft = dataSize;
-        tcp_senddata(&socketID, &dataTypeSize, gMsg, &nleft, &ierr);
+        udp_senddata(&socketID, &dataTypeSize, gMsg, &nleft, &ierr);
         
         gMsg = (char *)rData;
         nleft = dataSize;
-        tcp_recvdata(&socketID, &dataTypeSize, gMsg, &nleft, &ierr);
+        udp_recvdata(&socketID, &dataTypeSize, gMsg, &nleft, &ierr);
         
         for (i=0; i<nst*nst; i++) {
             s[i] = rData[i];
@@ -226,9 +226,9 @@ int genericClient(double *d,
         gMsg = (char *)sData;
         dataTypeSize = sizeof(double);
         nleft = dataSize;
-        tcp_senddata(&socketID, &dataTypeSize, gMsg, &nleft, &ierr);
+        udp_senddata(&socketID, &dataTypeSize, gMsg, &nleft, &ierr);
         
-        tcp_closeconnection(&socketID, &ierr);
+        udp_closeconnection(&socketID, &ierr);
         
         // clean up allocated memory
         free(sData);
@@ -251,7 +251,7 @@ int main(int argc, char **argv) {
     double disp[4];
     double vel[4];
     double accel[4];
-    double s[4][4];
+    double s[16];  // 4x4 stiffness matrix
     double r[4];
     
     int  nodeNum[2];
@@ -271,22 +271,22 @@ int main(int argc, char **argv) {
     fprintf(stderr,"\nDISP:\n");
     
     disp[0] = 0.0; disp[1] = 0.0; disp[2] = 1.06017; disp[3] = -0.355778;
-    for (i=0; i<4; i++) {
+    for (i=0; i<nst; i++) {
         vel[i] = 0.0;
         accel[i] = 0.0;
-        for (j=0; j<4; j++)
-            s[i][j] = 0.0;
+        for (j=0; j<nst; j++)
+            s[i*nst+j] = 0.0;
         r[i] = 0.0;
         fprintf(stderr,"%f %f %f\n",disp[i],vel[i],accel[i]);
     }
     fprintf(stderr,"\n");
     
     genericClient(d,disp,vel,accel,coord,nodeNum,temp,s,r,ndf,ndm,nst,3);
-    for (i=0; i<4; i++) {
+    for (i=0; i<nst; i++) {
         fprintf(stderr,"%f %f %f\n",disp[i],vel[i],accel[i]);
     }
     fprintf(stderr,"\nFORCES:\n");
-    for (j=0; j<4; j++)
+    for (j=0; j<nst; j++)
         fprintf(stderr,"%f ",r[j]);
     fprintf(stderr,"\n");
     
