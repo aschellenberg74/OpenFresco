@@ -52,8 +52,8 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\src;..\..\..\src\experimentalControl;..\..\..\src\experimentalControl\dSpace;..\..\..\src\experimentalControl\MTSCsi;..\..\..\src\experimentalControl\NIEseries;..\..\..\src\experimentalControl\SCRAMNet;..\..\..\src\experimentalControl\SCRAMNetGT;..\..\..\src\experimentalControl\xPCtarget;..\..\..\src\experimentalElement;..\..\..\src\experimentalRecorder;..\..\..\src\experimentalRecorder\response;..\..\..\src\experimentalSetup;..\..\..\src\experimentalSignalFilter;..\..\..\src\experimentalSite;..\..\..\src\experimentalTangentStiff;..\..\..\src\openseesCore;..\..\..\src\openseesExtra;..\..\..\src\utility;C:\Program Files\Tcl;C:\Program Files\Tcl\include;C:\Program Files\OpenSSL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_TCL85;_WIN32;WIN32;PLATFORM_WIN;_DEBUG;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\..\src;..\..\..\src\experimentalControl;..\..\..\src\experimentalControl\dSpace;..\..\..\src\experimentalControl\MTSCsi;..\..\..\src\experimentalControl\NIEseries;..\..\..\src\experimentalControl\SCRAMNet;..\..\..\src\experimentalControl\SCRAMNetGT;..\..\..\src\experimentalControl\xPCtarget;..\..\..\src\experimentalControlPoint;..\..\..\src\experimentalElement;..\..\..\src\experimentalRecorder;..\..\..\src\experimentalRecorder\response;..\..\..\src\experimentalSetup;..\..\..\src\experimentalSignalFilter;..\..\..\src\experimentalSite;..\..\..\src\experimentalTangentStiff;..\..\..\src\openseesCore;..\..\..\src\openseesExtra;..\..\..\src\utility;C:\Program Files (x86)\Tcl;C:\Program Files (x86)\Tcl\include;C:\Program Files (x86)\OpenSSL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_TCL85;_WIN32;WIN32;PLATFORM_WIN;_DEBUG;_CRT_SECURE_NO_DEPRECATE;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -67,9 +67,9 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions> /FORCE:MULTIPLE /FIXED:NO %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>blas.lib;clib32.lib;ifconsol.lib;lapack.lib;libcrypto32MTd.lib;libifcoremt.lib;libmmt.lib;libssl32MTd.lib;MtsCsiCom.lib;pnpscrd.lib;scgtapi.lib;tcl85.lib;tk85.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>blas.lib;clib32.lib;ifconsol.lib;lapack.lib;libcrypto32MTd.lib;libifcoremt.lib;libmmt.lib;libssl32MTd.lib;MtsCsiCom.lib;pnpscrd.lib;scgtapi.lib;tcl86t.lib;tk86t.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)OpenFresco.dll</OutputFile>
-      <AdditionalLibraryDirectories>..\..\..\src\experimentalControl\dSpace;..\..\..\src\experimentalControl\MTSCsi;..\..\..\src\experimentalControl\NIEseries;..\..\..\src\experimentalControl\SCRAMNet\lib32;..\..\..\src\experimentalControl\SCRAMNetGT\lib32;..\..\..\win32\lib;..\..\..\win32\lib\debug;C:\Program Files\Tcl\lib;C:\Program Files\OpenSSL\lib\VC;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\src\experimentalControl\dSpace;..\..\..\src\experimentalControl\MTSCsi;..\..\..\src\experimentalControl\NIEseries;..\..\..\src\experimentalControl\SCRAMNet\lib32;..\..\..\src\experimentalControl\SCRAMNetGT\lib32;..\..\..\win32\lib;..\..\..\win32\lib\debug;C:\Program Files (x86)\Tcl\lib;C:\Program Files (x86)\OpenSSL\lib\VC;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>libcmt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -90,8 +90,8 @@
       <InlineFunctionExpansion>Default</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>false</OmitFramePointers>
-      <AdditionalIncludeDirectories>..\..\..\src;..\..\..\src\experimentalControl;..\..\..\src\experimentalControl\dSpace;..\..\..\src\experimentalControl\MTSCsi;..\..\..\src\experimentalControl\NIEseries;..\..\..\src\experimentalControl\SCRAMNet;..\..\..\src\experimentalControl\SCRAMNetGT;..\..\..\src\experimentalControl\xPCtarget;..\..\..\src\experimentalElement;..\..\..\src\experimentalRecorder;..\..\..\src\experimentalRecorder\response;..\..\..\src\experimentalSetup;..\..\..\src\experimentalSignalFilter;..\..\..\src\experimentalSite;..\..\..\src\experimentalTangentStiff;..\..\..\src\openseesCore;..\..\..\src\openseesExtra;..\..\..\src\utility;C:\Program Files\Tcl;C:\Program Files\Tcl\include;C:\Program Files\OpenSSL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_TCL85;_WIN32;WIN32;PLATFORM_WIN;NDEBUG;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\..\src;..\..\..\src\experimentalControl;..\..\..\src\experimentalControl\dSpace;..\..\..\src\experimentalControl\MTSCsi;..\..\..\src\experimentalControl\NIEseries;..\..\..\src\experimentalControl\SCRAMNet;..\..\..\src\experimentalControl\SCRAMNetGT;..\..\..\src\experimentalControl\xPCtarget;..\..\..\src\experimentalControlPoint;..\..\..\src\experimentalElement;..\..\..\src\experimentalRecorder;..\..\..\src\experimentalRecorder\response;..\..\..\src\experimentalSetup;..\..\..\src\experimentalSignalFilter;..\..\..\src\experimentalSite;..\..\..\src\experimentalTangentStiff;..\..\..\src\openseesCore;..\..\..\src\openseesExtra;..\..\..\src\utility;C:\Program Files (x86)\Tcl;C:\Program Files (x86)\Tcl\include;C:\Program Files (x86)\OpenSSL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_TCL85;_WIN32;WIN32;PLATFORM_WIN;NDEBUG;_CRT_SECURE_NO_DEPRECATE;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -106,9 +106,9 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions> /FORCE:MULTIPLE /FIXED:NO %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>blas.lib;clib32.lib;ifconsol.lib;lapack.lib;libcrypto32MT.lib;libifcoremt.lib;libmmt.lib;libssl32MT.lib;MtsCsiCom.lib;pnpscr.lib;scgtapi.lib;tcl85.lib;tk85.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>blas.lib;clib32.lib;ifconsol.lib;lapack.lib;libcrypto32MT.lib;libifcoremt.lib;libmmt.lib;libssl32MT.lib;MtsCsiCom.lib;pnpscr.lib;scgtapi.lib;tcl86t.lib;tk86t.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)OpenFresco.dll</OutputFile>
-      <AdditionalLibraryDirectories>..\..\..\src\experimentalControl\dSpace;..\..\..\src\experimentalControl\MTSCsi;..\..\..\src\experimentalControl\NIEseries;..\..\..\src\experimentalControl\SCRAMNet\lib32;..\..\..\src\experimentalControl\SCRAMNetGT\lib32;..\..\..\win32\lib;..\..\..\win32\lib\release;C:\Program Files\Tcl\lib;C:\Program Files\OpenSSL\lib\VC;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\src\experimentalControl\dSpace;..\..\..\src\experimentalControl\MTSCsi;..\..\..\src\experimentalControl\NIEseries;..\..\..\src\experimentalControl\SCRAMNet\lib32;..\..\..\src\experimentalControl\SCRAMNetGT\lib32;..\..\..\win32\lib;..\..\..\win32\lib\release;C:\Program Files (x86)\Tcl\lib;C:\Program Files (x86)\OpenSSL\lib\VC;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
@@ -126,6 +126,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\SRC\experimentalControlPoint\ExpControlSP.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalControlPoint\ExperimentalCP.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalControlPoint\TclExpCPCommand.cpp" />
     <ClCompile Include="..\..\..\SRC\experimentalControl\ECGenericTCP.cpp" />
     <ClCompile Include="..\..\..\SRC\experimentalControl\ECSCRAMNetGT.cpp" />
     <ClCompile Include="..\..\..\SRC\experimentalElement\EEBearing2d.cpp" />
@@ -232,9 +235,6 @@
     <ClCompile Include="..\..\..\SRC\tcl\TclLabServerCommands.cpp" />
     <ClCompile Include="..\..\..\SRC\tcl\TclSimAppElemServerCommands.cpp" />
     <ClCompile Include="..\..\..\SRC\tcl\TclSimAppSiteServerCommands.cpp" />
-    <ClCompile Include="..\..\..\SRC\utility\ExpControlSP.cpp" />
-    <ClCompile Include="..\..\..\SRC\utility\ExperimentalCP.cpp" />
-    <ClCompile Include="..\..\..\SRC\utility\TclExpCPCommand.cpp" />
     <ClCompile Include="..\..\..\src\experimentalControl\xPCtarget\xpcinitfree.c" />
     <ClCompile Include="..\..\..\src\experimentalControl\ECdSpace.cpp" />
     <ClCompile Include="..\..\..\SRC\experimentalControl\ECLabVIEW.cpp" />
@@ -321,6 +321,8 @@
     <ClCompile Include="..\..\..\SRC\openseesExtra\XmlFileStream.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\SRC\experimentalControlPoint\ExpControlSP.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalControlPoint\ExperimentalCP.h" />
     <ClInclude Include="..\..\..\SRC\experimentalControl\ECGenericTCP.h" />
     <ClInclude Include="..\..\..\SRC\experimentalControl\ECSCRAMNetGT.h" />
     <ClInclude Include="..\..\..\SRC\experimentalElement\EEBearing2d.h" />
@@ -442,8 +444,6 @@
     <ClInclude Include="..\..\..\SRC\openseesExtra\NewtonLineSearch.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\packages.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\RegulaFalsiLineSearch.h" />
-    <ClInclude Include="..\..\..\SRC\utility\ExpControlSP.h" />
-    <ClInclude Include="..\..\..\SRC\utility\ExperimentalCP.h" />
     <ClInclude Include="..\..\..\src\FrescoGlobals.h" />
     <ClInclude Include="..\..\..\src\experimentalControl\ECdSpace.h" />
     <ClInclude Include="..\..\..\SRC\experimentalControl\ECLabVIEW.h" />
