@@ -34,12 +34,12 @@
 #include <string.h>
 
 // functions defined in socket.c
-void setupconnectionserver(unsigned int *port, int *socketID);
-void setupconnectionclient(unsigned int *port, const char machineInetAddr[], int *lengthInet, int *socketID);
-void closeconnection(int *socketID, int *ierr);
-void senddata(const int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr);
-void recvdata(const int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr);
-void getsocketid(unsigned int *port, const char machineInetAddr[], int *lengthInet, int *socketID);
+void tcp_setupconnectionserver(unsigned int *port, int *socketID);
+void tcp_setupconnectionclient(unsigned int *port, const char machineInetAddr[], int *lengthInet, int *socketID);
+void tcp_closeconnection(int *socketID, int *ierr);
+void tcp_senddata(const int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr);
+void tcp_recvdata(const int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr);
+void tcp_getsocketid(unsigned int *port, const char machineInetAddr[], int *lengthInet, int *socketID);
 
 // the gateway function
 void mexFunction(int nlhs, mxArray *plhs[],
@@ -96,7 +96,7 @@ void mexFunction(int nlhs, mxArray *plhs[],
             mexErrMsgTxt("TCPSocket::mexFunction - WARNING data type is not supported.\n");
         }
         
-        senddata(&socketID, &dataTypeSize, gMsg, &nleft, &ierr);
+        tcp_senddata(&socketID, &dataTypeSize, gMsg, &nleft, &ierr);
 
         plhs[0] = mxCreateDoubleScalar(ierr);
     }
@@ -146,7 +146,7 @@ void mexFunction(int nlhs, mxArray *plhs[],
             }
         }
         
-        recvdata(&socketID, &dataTypeSize, gMsg, &nleft, &ierr);
+        tcp_recvdata(&socketID, &dataTypeSize, gMsg, &nleft, &ierr);
     }
     else if (strcmp(action,"openConnection") == 0)  {
         
@@ -154,13 +154,13 @@ void mexFunction(int nlhs, mxArray *plhs[],
         
         if (nrhs==2)  {
             ipPort = (int)mxGetScalar(prhs[1]);
-            setupconnectionserver(&ipPort, &socketID);
+            tcp_setupconnectionserver(&ipPort, &socketID);
         }
         else if (nrhs==3)  {
             ipAddr = mxArrayToString(prhs[1]);
             sizeAddr = (int)mxGetN(prhs[1]) + 1;
             ipPort = (int)mxGetScalar(prhs[2]);
-            setupconnectionclient(&ipPort, ipAddr, &sizeAddr, &socketID);
+            tcp_setupconnectionclient(&ipPort, ipAddr, &sizeAddr, &socketID);
             mxFree(ipAddr);
         }
         else  {
@@ -173,7 +173,7 @@ void mexFunction(int nlhs, mxArray *plhs[],
 
         socketID = (int)mxGetScalar(prhs[1]);
 
-        closeconnection(&socketID, &ierr);
+        tcp_closeconnection(&socketID, &ierr);
 
         plhs[0] = mxCreateDoubleScalar(ierr);
     }
@@ -185,7 +185,7 @@ void mexFunction(int nlhs, mxArray *plhs[],
         ipAddr = mxArrayToString(prhs[2]);
         sizeAddr = (int)mxGetN(prhs[2]) + 1;
 
-        getsocketid(&ipPort, ipAddr, &sizeAddr, &socketID);
+        tcp_getsocketid(&ipPort, ipAddr, &sizeAddr, &socketID);
 
         plhs[0] = mxCreateDoubleScalar(socketID);
 
