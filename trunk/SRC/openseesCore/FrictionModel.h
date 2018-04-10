@@ -20,7 +20,7 @@
 
 // $Revision: 4952 $
 // $Date: 2012-08-08 22:56:05 -0700 (Wed, 08 Aug 2012) $
-// $URL: svn://peera.berkeley.edu/usr/local/svn/OpenSees/trunk/SRC/element/frictionBearing/frictionModel/FrictionModel.h $
+// $URL: svn://opensees.berkeley.edu/usr/local/svn/OpenSees/trunk/SRC/element/frictionBearing/frictionModel/FrictionModel.h $
 
 #ifndef FrictionModel_h
 #define FrictionModel_h
