@@ -102,7 +102,7 @@ void CALL_CONV cleanupsockets()
 
 
 /*
-* setupconnectionserver() - function to setup a connection from server
+* tcp_setupconnectionserver() - function to setup a connection from server
 *
 * input: unsigned int *port - the port number
 *
@@ -204,7 +204,7 @@ void CALL_CONV tcp_setupconnectionserver(unsigned int *port, int *socketID)
 
 
 /*
-* setupconnectionclient() - function to setup a connection from client
+* tcp_setupconnectionclient() - function to setup a connection from client
 *
 * input: unsigned int *other_Port - the port number
 *        const char *other_InetAddr - the machine inet address
@@ -317,7 +317,7 @@ void CALL_CONV tcp_setupconnectionclient(unsigned int *other_Port,
 
 
 /*
-* closeconnection() - function to terminate a connection
+* tcp_closeconnection() - function to terminate a connection
 *
 * input: int *socketID - socket identifier
 *
@@ -349,7 +349,7 @@ void CALL_CONV tcp_closeconnection(int *socketID, int *ierr)
 
 
 /*
-* senddata() - function to send data in blocking mode
+* tcp_senddata() - function to send data in blocking mode
 *
 * input: int *socketID - socket identifier
 *        int *dataTypeSize - size of data type
@@ -406,7 +406,7 @@ void CALL_CONV tcp_senddata(int *socketID, int *dataTypeSize, char data[], int *
 
 
 /*
-* sendnbdata() - function to send data in nonblocking mode
+* tcp_sendnbdata() - function to send data in nonblocking mode
 *
 * input: int *socketID - socket identifier
 *        int *dataTypeSize - size of data type
@@ -467,7 +467,7 @@ void CALL_CONV tcp_sendnbdata(int *socketID, int *dataTypeSize, char data[], int
 
 
 /*
-* recvdata() - function to receive data in blocking mode
+* tcp_recvdata() - function to receive data in blocking mode
 *
 * input: int *socketID - socket identifier
 *        int *dataTypeSize - size of data type
@@ -524,7 +524,7 @@ void CALL_CONV tcp_recvdata(int *socketID, int *dataTypeSize, char data[], int *
 
 
 /*
-* recvnbdata() - function to receive data in nonblocking mode
+* tcp_recvnbdata() - function to receive data in nonblocking mode
 *
 * input: int *socketID - socket identifier
 *        int *dataTypeSize - size of data type
@@ -585,7 +585,7 @@ void CALL_CONV tcp_recvnbdata(int *socketID, int *dataTypeSize, char data[], int
 
 
 /*
-* getsocketid() - function to find an open connection
+* tcp_getsocketid() - function to find an open connection
 *
 * input: unsigned int *port - the port number
 *        char *machineInetAddr - the machine inet address
