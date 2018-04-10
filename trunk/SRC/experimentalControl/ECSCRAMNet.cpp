@@ -238,8 +238,7 @@ int ECSCRAMNet::setup()
     int c = getchar();
     if (c == 'c')  {
         getchar();
-        scr_reg_mm(UNMAP);
-        scr_mem_mm(UNMAP);
+        this->~ECSCRAMNet();
         exit(OF_ReturnType_failed);
     }
     
@@ -268,8 +267,7 @@ int ECSCRAMNet::setup()
         c = getchar();
         if (c == 'c')  {
             getchar();
-            scr_reg_mm(UNMAP);
-            scr_mem_mm(UNMAP);
+            this->~ECSCRAMNet();
             exit(OF_ReturnType_failed);
         } else if (c == 'r')  {
             getchar();
@@ -302,8 +300,7 @@ int ECSCRAMNet::setSize(ID sizeT, ID sizeO)
         sizeO(OF_Resp_Time) > numDOF)  {
         opserr << "ECSCRAMNet::setSize() - wrong sizeTrial/Out\n"; 
         opserr << "see User Manual.\n";
-        scr_reg_mm(UNMAP);
-        scr_mem_mm(UNMAP);
+        this->~ECSCRAMNet();
         exit(OF_ReturnType_failed);
     }
     
