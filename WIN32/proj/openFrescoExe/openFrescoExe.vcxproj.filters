@@ -46,17 +46,11 @@
     <Filter Include="experimentalTangentStiff">
       <UniqueIdentifier>{c70044a2-f598-4c40-a8b4-96f577aeb80a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="experimentalControlPoint">
+      <UniqueIdentifier>{195a5ffd-1f6e-448a-8346-964fa77e258d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\SRC\utility\ExpControlSP.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\SRC\utility\ExperimentalCP.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\SRC\utility\TclExpCPCommand.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\SRC\experimentalControl\xPCtarget\xpcinitfree.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -639,14 +633,17 @@
     <ClCompile Include="..\..\..\SRC\openseesCore\SectionForceDeformation.cpp">
       <Filter>openseesCore</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalControlPoint\ExpControlSP.cpp">
+      <Filter>experimentalControlPoint</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalControlPoint\ExperimentalCP.cpp">
+      <Filter>experimentalControlPoint</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalControlPoint\TclExpCPCommand.cpp">
+      <Filter>experimentalControlPoint</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\SRC\utility\ExpControlSP.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\SRC\utility\ExperimentalCP.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\SRC\FrescoGlobals.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1246,6 +1243,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\SRC\openseesCore\SectionForceDeformation.h">
       <Filter>openseesCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalControlPoint\ExpControlSP.h">
+      <Filter>experimentalControlPoint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalControlPoint\ExperimentalCP.h">
+      <Filter>experimentalControlPoint</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
