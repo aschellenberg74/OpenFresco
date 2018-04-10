@@ -253,8 +253,7 @@ int ECSCRAMNetGT::setup()
     int c = getchar();
     if (c == 'c')  {
         getchar();
-        scgtUnmapMem(&gtHandle);
-        scgtClose(&gtHandle);
+        this->~ECSCRAMNetGT();
         exit(OF_ReturnType_failed);
     }
     
@@ -283,8 +282,7 @@ int ECSCRAMNetGT::setup()
         c = getchar();
         if (c == 'c')  {
             getchar();
-            scgtUnmapMem(&gtHandle);
-            scgtClose(&gtHandle);
+            this->~ECSCRAMNetGT();
             exit(OF_ReturnType_failed);
         } else if (c == 'r')  {
             getchar();
@@ -317,8 +315,7 @@ int ECSCRAMNetGT::setSize(ID sizeT, ID sizeO)
         sizeO(OF_Resp_Time) > numDOF)  {
         opserr << "ECSCRAMNetGT::setSize() - wrong sizeTrial/Out\n"; 
         opserr << "see User Manual.\n";
-        scgtUnmapMem(&gtHandle);
-        scgtClose(&gtHandle);
+        this->~ECSCRAMNetGT();
         exit(OF_ReturnType_failed);
     }
     
