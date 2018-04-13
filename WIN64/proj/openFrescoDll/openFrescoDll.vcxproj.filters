@@ -1228,4 +1228,9 @@
       <Filter>experimentalControl</Filter>
     </CustomBuildStep>
   </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="openFrescoDll.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
 </Project>
