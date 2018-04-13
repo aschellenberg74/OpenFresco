@@ -1,16 +1,23 @@
 /* File:     xpcinitfree.c
  * Abstract: This file contains functions for loading and unloading the
  *           functions provided by the xPC Target C API.
- * $Revision$ $Date$
  */
-/* Copyright 1996-2006 The MathWorks, Inc. */
+/* Copyright 1996-2010 The MathWorks, Inc. */
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
 #define EXPORT /**/
 #define NOMANGLE /**/
+
+
+#ifdef _WIN64
+#define XPCAPICALLCONV __fastcall
+#else
 #define XPCAPICALLCONV __stdcall
+#endif
+
+#define XPCAPIDLL "xpcapi.dll"
 
 #undef XPCAPIFUNC
 #define XPCAPIFUNC(type, fun) NOMANGLE EXPORT type (XPCAPICALLCONV *##fun)
@@ -28,10 +35,10 @@ static HMODULE dllHandle;
 
 int xPCInitAPI(void) {
     /* Call GetModuleHandle first in case xpcapi.dll is already loaded */
-    if ((dllHandle = GetModuleHandle("xpcapi.dll")) == NULL)
+    if ((dllHandle = GetModuleHandleA(XPCAPIDLL)) == NULL)
         /* If the dll is not already loaded (dllHandle == NULL), *
          * call LoadLibrary to load it.                          */
-        if ((dllHandle = LoadLibrary("xpcapi.dll")) == NULL) {
+        if ((dllHandle = LoadLibraryA(XPCAPIDLL)) == NULL) {
             return -1;
         }
     return (xPCResolveAPI(dllHandle));
@@ -487,6 +494,9 @@ int xPCResolveAPI(HMODULE dllHandle) {
     if ((xPCSetTargetScopeUpdate = (void *)
          GetProcAddress(dllHandle, "xPCSetTargetScopeUpdate")) == NULL)
         return -1;
+    if ((xPCFSReNameFile = (void *)
+         GetProcAddress(dllHandle, "xPCFSReNameFile")) == NULL)
+        return -1;
 
     GETFCNPTR(xPCFSScSetFilename);
     GETFCNPTR(xPCFSScGetFilename);
@@ -494,6 +504,10 @@ int xPCResolveAPI(HMODULE dllHandle) {
     GETFCNPTR(xPCFSScGetWriteMode);
     GETFCNPTR(xPCFSScSetWriteSize);
     GETFCNPTR(xPCFSScGetWriteSize);
+    GETFCNPTR(xPCFSScSetDynamicMode);
+    GETFCNPTR(xPCFSScGetDynamicMode);
+    GETFCNPTR(xPCFSScSetMaxWriteFileSize);
+    GETFCNPTR(xPCFSScGetMaxWriteFileSize);
     return 0;
 }
 
@@ -633,6 +647,8 @@ void xPCFreeAPI(void) {
     xPCFSScGetWriteMode =        NULL;
     xPCFSScSetWriteSize =        NULL;
     xPCFSScGetWriteSize =        NULL;
+    xPCFSScSetDynamicMode=       NULL;
+    xPCFSScGetDynamicMode=       NULL;
     xPCReadXML =                 NULL;
     xPCFSDiskInfo =              NULL;
     xPCFSDirItems =              NULL;
@@ -652,6 +668,9 @@ void xPCFreeAPI(void) {
     xPCGetXMLSize=               NULL;
     xPCIsTargetScope=            NULL;
     xPCSetTargetScopeUpdate=     NULL;
+    xPCFSReNameFile=             NULL;
+    xPCFSScSetMaxWriteFileSize=  NULL;
+    xPCFSScGetMaxWriteFileSize=  NULL;
     return;
 }
 

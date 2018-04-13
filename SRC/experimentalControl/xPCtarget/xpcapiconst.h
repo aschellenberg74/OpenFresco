@@ -1,8 +1,7 @@
 /* File:     xpcapiconst.h
- * Abstract: Constants defined for use in the xPC Target C API.
- * $Revision$ $Date$
+ * Abstract: Constants defined for use in the Simulink Real-Time C API.
  */
-/* Copyright 2000-2006 The MathWorks, Inc. */
+/* Copyright 2000-2016 The MathWorks, Inc. */
 
 #ifndef _XPCAPICONST_H_
 #define _XPCAPICONST_H_
@@ -137,6 +136,11 @@ typedef enum ErrorValues_tag {
     ESTATELOGDISABLED    =  66,
     EOUTPUTLOGDISABLED   =  67,
 
+    ESCFINVALIDFNAME     =  68,
+    ESCFISNOTAUTO        =  69,
+    ESCFNUMISNOTMULT     =  70,
+
+
     ELOADAPPFIRST        = 101,
     EUNLOADAPPFIRST      = 102,
 
@@ -144,11 +148,13 @@ typedef enum ErrorValues_tag {
     EINVNUMPARAMS        = 152,
 
     EINVFILENAME         = 201,
-
+    EMAXPATHALLOWED      = 202,
     EFILEREAD            = 211,
     EFILEWRITE           = 212,
     EFILERENAME          = 213,
 
+    EINVALIDOP           = 220,
+    EINVALIDARG          = 221,
 
     EINVXPCVERSION       = 801,
     EINVINSTANDALONE     = 802,

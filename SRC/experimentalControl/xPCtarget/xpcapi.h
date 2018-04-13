@@ -1,8 +1,7 @@
 /* File:     xpcapi.h
  * Abstract: Definitions for the xPC Target C API
- * $Revision$ $Date$
  */
-/* Copyright 1996-2006 The MathWorks, Inc. */
+/* Copyright 1996-2016 The MathWorks, Inc. */
 
 #ifndef __XPCAPI_H__
 #define __XPCAPI_H__
@@ -12,8 +11,14 @@
 #endif
 
 #ifndef XPCAPICALLCONV
+#ifdef _WIN64
+#define XPCAPICALLCONV __fastcall
+#else
 #define XPCAPICALLCONV __stdcall
 #endif
+#endif
+
+
 
 #ifndef NOMANGLE
 #define NOMANGLE /**/
@@ -104,6 +109,7 @@ typedef struct {
     unsigned int  FileChains;
     unsigned int  FreeChains;
     unsigned int  LargestFreeChain;
+    unsigned int  DriveType;
 } diskinfo;
 
 typedef struct {
@@ -225,6 +231,7 @@ XPCAPIFUNC(char *, xPCGetSignalLabel)(int port, int sigIdx, char *sigLabel);
 XPCAPIFUNC(int, xPCGetParamIdx)(int port, const char *block,
                                 const char *parameter);
 XPCAPIFUNC(void, xPCGetParamName)(int port, int parIdx, char *block, char *param);
+XPCAPIFUNC(void, xPCGetParamSourceName)(int port, int amiIdx, int parIdx, char *block, char *param);
 XPCAPIFUNC(void, xPCGetParamType)(int port, int parIdx, char *paramType);
 XPCAPIFUNC(char *, xPCGetSignalName)(int port, int sigIdx, char *sigName);
 XPCAPIFUNC(int, xPCTgScGetGrid)(int port, int scNum);
@@ -251,19 +258,19 @@ XPCAPIFUNC(void, xPCDeRegisterTarget)(int port);
 XPCAPIFUNC(const char *, xPCGetAPIVersion)(void);
 XPCAPIFUNC(void, xPCGetTargetVersion)(int port, char *ver);
 XPCAPIFUNC(int, xPCTargetPing)(int port);
-XPCAPIFUNC(void, xPCFSReadFile)(int port, int fileHandle, int start,
-                               int numsamples, unsigned char *data);
-XPCAPIFUNC(int, xPCFSRead)(int port, int fileHandle, int start,
-                           int numsamples, unsigned char *data);
+XPCAPIFUNC(void, xPCFSReadFile)(int port, int fileHandle, unsigned int start,
+                               unsigned int numsamples, unsigned char *data);
+XPCAPIFUNC(unsigned int, xPCFSRead)(int port, int fileHandle, unsigned int start,
+                           unsigned int numsamples, unsigned char *data);
 XPCAPIFUNC(void, xPCFSWriteFile)(int port, int fileHandle, int numbytes,
                                  const unsigned char *data);
 XPCAPIFUNC(void, xPCFSBufferInfo)(int port, char *data);
-XPCAPIFUNC(int, xPCFSGetFileSize)(int port, int fileHandle);
+XPCAPIFUNC(unsigned int, xPCFSGetFileSize)(int port, int fileHandle);
 XPCAPIFUNC(int, xPCFSOpenFile)(int port, const char *filename,
                                const char *attrib);
 XPCAPIFUNC(void, xPCFSCloseFile)(int port, int fileHandle);
 XPCAPIFUNC(void, xPCFSGetPWD)(int port, char *data);
-XPCAPIFUNC(void, xPCFTPGet)(int port, int fileHandle, int numbytes, char *filename);
+XPCAPIFUNC(void, xPCFTPGet)(int port, int fileHandle, unsigned int numbytes, char *filename);
 XPCAPIFUNC(void, xPCFTPPut)(int port, int fileHandle, char *filename);
 XPCAPIFUNC(void, xPCFSRemoveFile)(int port, char *filename);
 XPCAPIFUNC(void, xPCFSCD)(int port, char *filename);
@@ -290,6 +297,7 @@ XPCAPIFUNC(void, xPCFSScSetWriteSize)(int port, int scopeId,
 XPCAPIFUNC(unsigned int, xPCFSScGetWriteSize)(int port, int scopeId);
 XPCAPIFUNC(void, xPCReadXML)(int port, int numbytes, unsigned char *data);
 XPCAPIFUNC(diskinfo, xPCFSDiskInfo)(int port, const char *driveLetter);
+//XPCAPIFUNC(diskinfo, xPCFSBasicDiskInfo)(int port, const char *driveLetter);
 XPCAPIFUNC(const char *, xPCFSFileTable)(int port, char *tableBuffer);
 XPCAPIFUNC(void, xPCFSDirItems)(int port, const char *path, dirStruct *dirs, int numDirItems);
 XPCAPIFUNC(int, xPCFSDirStructSize)(int port, const char *path);
@@ -307,6 +315,19 @@ XPCAPIFUNC(void,  xPCSetDefaultStopTime)(int port);
 XPCAPIFUNC(int ,  xPCGetXMLSize)(int port);
 XPCAPIFUNC(int ,  xPCIsTargetScope)(int port);
 XPCAPIFUNC(void , xPCSetTargetScopeUpdate)(int port,int value);
+XPCAPIFUNC(void, xPCFSReNameFile)(int port, const char *fsName, const char *newName);
+XPCAPIFUNC(void, xPCFSScSetDynamicMode)(int port, int scopeId, int onoff);
+XPCAPIFUNC(int, xPCFSScGetDynamicMode)(int port, int scopeId);
+XPCAPIFUNC(void, xPCFSScSetMaxWriteFileSize)(int port, int scopeId,
+                                     unsigned int maxWriteFileSize);
+XPCAPIFUNC(unsigned int, xPCFSScGetMaxWriteFileSize)(int port, int scopeId);
+XPCAPIFUNC(int, xPCGetParamsCount) (int port);
+XPCAPIFUNC(void,xPCGetParameterMap)(int port, const char *blockName,const char *paramName, int* mapinfo);                                   
+XPCAPIFUNC(int, xPCGetParameterRecLength)(int port, int* mapinfo);
+XPCAPIFUNC(char *,xPCGetParameterXMLInfo)(int port, int* mapinfo, char *xmlRec);
+XPCAPIFUNC(void,xPCGetParameterStructureMember)(int port, int* mapinfo, char* membername, double *values);
+XPCAPIFUNC(void, xPCGetParameterValue) (int port, int* mapinfo, int offset, char* membername, char* cPartName, double *values);
+XPCAPIFUNC(void, xPCSetParameterValue)(int port, int* mapinfo, int offset, char* membername, char *cPartName, int size, const double *paramValue);
 /* --------------------------------------------------- */
 
 int  xPCInitAPI(void);
