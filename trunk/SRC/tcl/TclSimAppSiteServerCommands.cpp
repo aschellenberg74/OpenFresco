@@ -38,6 +38,7 @@
 #include <ExperimentalSite.h>
 
 extern ExperimentalSite *getExperimentalSite(int tag);
+extern int removeExperimentalSite(int tag);
 
 
 int TclStartSimAppSiteServer(ClientData clientData,
@@ -226,6 +227,8 @@ int TclStartSimAppSiteServer(ClientData clientData,
             theChannel->sendVector(0, 0, *sendData, 0);
             break;
         case OF_RemoteTest_DIE:
+            //removeExperimentalSite(siteTag);
+            //theExperimentalSite = 0;
             exitYet = true;
             break;
         default:

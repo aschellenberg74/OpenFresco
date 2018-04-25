@@ -23,7 +23,7 @@
 // $Date$
 // $URL$
 
-// Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 09/06
 // Revision: A
 //
@@ -70,7 +70,7 @@ extern ExperimentalSite *getExperimentalSite(int tag)
     }
     
     TaggedObject *mc = theExperimentalSites->getComponentPtr(tag);
-    if (mc == 0) 
+    if (mc == 0)
         return 0;
     
     // otherwise we do a cast and return
@@ -100,11 +100,19 @@ extern ExperimentalSite *getExperimentalSiteFirst()
 }
 
 
+extern int removeExperimentalSite(int tag)
+{
+    if (theExperimentalSites != 0)
+        theExperimentalSites->removeComponent(tag);
+    
+    return 0;
+}
+
+
 extern int clearExperimentalSites(Tcl_Interp *interp)
 {
-    if (theExperimentalSites != 0) {
+    if (theExperimentalSites != 0)
         theExperimentalSites->clearAll(false);
-    }
     
     return 0;
 }
@@ -114,9 +122,9 @@ static void printCommand(int argc, TCL_Char **argv)
 {
     opserr << "Input command: ";
     for (int i=0; i<argc; i++)
-		opserr << argv[i] << " ";
+        opserr << argv[i] << " ";
     opserr << endln;
-} 
+}
 
 
 int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp,
@@ -127,42 +135,42 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp,
     
     // make sure there is a minimum number of arguments
     if (argc < 3)  {
-		opserr << "WARNING insufficient number of experimental site arguments\n";
-		opserr << "Want: expSite type tag <specific experimental site args>\n";
-		return TCL_ERROR;
-    }    
-	
+        opserr << "WARNING insufficient number of experimental site arguments\n";
+        opserr << "Want: expSite type tag <specific experimental site args>\n";
+        return TCL_ERROR;
+    }
+    
     // ----------------------------------------------------------------------------	
     if (strcmp(argv[1],"LocalSite") == 0)  {
-		if (argc != 4)  {
-			opserr << "WARNING invalid number of arguments\n";
-			printCommand(argc,argv);
-			opserr << "Want: expSite LocalSite tag setupTag\n";
-			return TCL_ERROR;
-		}    
-		
-		int tag, setupTag;
+        if (argc != 4)  {
+            opserr << "WARNING invalid number of arguments\n";
+            printCommand(argc,argv);
+            opserr << "Want: expSite LocalSite tag setupTag\n";
+            return TCL_ERROR;
+        }
+        
+        int tag, setupTag;
         ExperimentalSite *theSite = 0;
-		
-		if (Tcl_GetInt(interp, argv[2], &tag) != TCL_OK)  {
-			opserr << "WARNING invalid expSite LocalSite tag\n";
-			return TCL_ERROR;		
-		}
-		if (Tcl_GetInt(interp, argv[3], &setupTag) != TCL_OK)  {
-			opserr << "WARNING invalid setupTag\n";
-			opserr << "expSite LocalSite " << tag << endln;
-			return TCL_ERROR;	
-		}
-		ExperimentalSetup *theSetup = getExperimentalSetup(setupTag);
-		if (theSetup == 0)  {
-			opserr << "WARNING experimental setup not found\n";
-			opserr << "expSetup: " << setupTag << endln;
-			opserr << "expSite LocalSite " << tag << endln;
-			return TCL_ERROR;
-		}
-		
-		// parsing was successful, allocate the site
-		theSite = new LocalExpSite(tag, theSetup);
+        
+        if (Tcl_GetInt(interp, argv[2], &tag) != TCL_OK)  {
+            opserr << "WARNING invalid expSite LocalSite tag\n";
+            return TCL_ERROR;
+        }
+        if (Tcl_GetInt(interp, argv[3], &setupTag) != TCL_OK)  {
+            opserr << "WARNING invalid setupTag\n";
+            opserr << "expSite LocalSite " << tag << endln;
+            return TCL_ERROR;
+        }
+        ExperimentalSetup *theSetup = getExperimentalSetup(setupTag);
+        if (theSetup == 0)  {
+            opserr << "WARNING experimental setup not found\n";
+            opserr << "expSetup: " << setupTag << endln;
+            opserr << "expSite LocalSite " << tag << endln;
+            return TCL_ERROR;
+        }
+        
+        // parsing was successful, allocate the site
+        theSite = new LocalExpSite(tag, theSetup);
         
         if (theSite == 0)  {
             opserr << "WARNING could not create experimental site " << argv[1] << endln;
@@ -175,29 +183,29 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp,
             return TCL_ERROR;
         }
     }
-	
+    
     // ----------------------------------------------------------------------------	
     else if (strcmp(argv[1],"ShadowSite") == 0 || strcmp(argv[1],"RemoteSite") == 0)  {
-		if (5 > argc && argc > 9)  {
-			opserr << "WARNING invalid number of arguments\n";
-			printCommand(argc,argv);
-			opserr << "Want: expSite ShadowSite tag <-setup setupTag> ipAddr ipPort <-udp> <-ssl> <-dataSize size>\n";
-			return TCL_ERROR;
-		}
-		
-		int tag, setupTag, ipPort, argi;
-		char *ipAddr;
+        if (5 > argc && argc > 9)  {
+            opserr << "WARNING invalid number of arguments\n";
+            printCommand(argc,argv);
+            opserr << "Want: expSite ShadowSite tag <-setup setupTag> ipAddr ipPort <-udp> <-ssl> <-dataSize size>\n";
+            return TCL_ERROR;
+        }
+        
+        int tag, setupTag, ipPort, argi;
+        char *ipAddr;
         int ssl = 0, udp = 0;
         int noDelay = 0;
         int dataSize = OF_Network_dataSize;
         ExperimentalSetup *theSetup = 0;
         Channel *theChannel = 0;
         ShadowExpSite *theSite = 0;
-		
-		if (Tcl_GetInt(interp, argv[2], &tag) != TCL_OK)  {
-			opserr << "WARNING invalid expSite ShadowSite tag\n";
-			return TCL_ERROR;		
-		}
+        
+        if (Tcl_GetInt(interp, argv[2], &tag) != TCL_OK)  {
+            opserr << "WARNING invalid expSite ShadowSite tag\n";
+            return TCL_ERROR;
+        }
         argi = 3;
         // get the experimental setup if provided
         if (strcmp(argv[argi], "-setup") == 0)  {
@@ -205,7 +213,7 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp,
             if (Tcl_GetInt(interp, argv[argi], &setupTag) != TCL_OK)  {
                 opserr << "WARNING invalid setupTag\n";
                 opserr << "expSite ShadowSite " << tag << endln;
-                return TCL_ERROR;	
+                return TCL_ERROR;
             }
             theSetup = getExperimentalSetup(setupTag);
             if (theSetup == 0)  {
@@ -223,7 +231,7 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp,
         if (Tcl_GetInt(interp, argv[argi], &ipPort) != TCL_OK)  {
             opserr << "WARNING invalid ShadowSite ipPort\n";
             opserr << "expSite ShadowSite " << tag << endln;
-            return TCL_ERROR;		
+            return TCL_ERROR;
         }
         argi++;
         // check for optional arguments
@@ -238,18 +246,18 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp,
                 noDelay = 1;
             }
             else if (strcmp(argv[i], "-dataSize") == 0)  {
-		        if (Tcl_GetInt(interp, argv[i+1], &dataSize) != TCL_OK)  {
-			        opserr << "WARNING invalid ShadowSite dataSize\n";
+                if (Tcl_GetInt(interp, argv[i+1], &dataSize) != TCL_OK)  {
+                    opserr << "WARNING invalid ShadowSite dataSize\n";
                     opserr << "expSite ShadowSite " << tag << endln;
-			        return TCL_ERROR;		
-		        }
+                    return TCL_ERROR;
+                }
             }
         }
         
         // setup the connection
         if (ssl)  {
             theChannel = new TCP_SocketSSL(ipPort,ipAddr,true,noDelay);
-            if (!theChannel) {
+            if (!theChannel)  {
                 opserr << "WARNING could not create SSL channel\n";
                 opserr << "expSite ShadowSite " << tag << endln;
                 return TCL_ERROR;
@@ -257,7 +265,7 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp,
         }
         else if (udp)  {
             theChannel = new UDP_Socket(ipPort,ipAddr,true);
-            if (!theChannel) {
+            if (!theChannel)  {
                 opserr << "WARNING could not create UDP channel\n";
                 opserr << "expSite ShadowSite " << tag << endln;
                 return TCL_ERROR;
@@ -265,7 +273,7 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp,
         }
         else  {
             theChannel = new TCP_Socket(ipPort,ipAddr,true,noDelay);
-            if (!theChannel) {
+            if (!theChannel)  {
                 opserr << "WARNING could not create TCP channel\n";
                 opserr << "expSite ShadowSite " << tag << endln;
                 return TCL_ERROR;
@@ -293,36 +301,36 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp,
         if (ipAddr != 0)
             delete [] ipAddr;
     }
-	
+    
     // ----------------------------------------------------------------------------	
     else if (strcmp(argv[1],"ActorSite") == 0)  {
-		if (6 > argc || argc > 8)  {
-			opserr << "WARNING invalid number of arguments\n";
-			printCommand(argc,argv);
-			opserr << "Want: expSite ActorSite tag -setup setupTag ipPort <-udp> <-ssl>\n"
+        if (6 > argc || argc > 8)  {
+            opserr << "WARNING invalid number of arguments\n";
+            printCommand(argc,argv);
+            opserr << "Want: expSite ActorSite tag -setup setupTag ipPort <-udp> <-ssl>\n"
                 << "  or: expSite ActorSite tag -control ctrlTag ipPort <-udp> <-ssl>\n";
-			return TCL_ERROR;
-		}    
-		
-		int tag, setupTag, ctrlTag, ipPort, argi;
+            return TCL_ERROR;
+        }
+        
+        int tag, setupTag, ctrlTag, ipPort, argi;
         int ssl = 0, udp = 0;
         int noDelay = 0;
         ExperimentalSetup *theSetup = 0;
         ExperimentalControl *theControl = 0;
         Channel *theChannel = 0;
         ActorExpSite *theSite = 0;
-		
-		if (Tcl_GetInt(interp, argv[2], &tag) != TCL_OK)  {
-			opserr << "WARNING invalid expSite ActorSite tag\n";
-			return TCL_ERROR;		
-		}
+        
+        if (Tcl_GetInt(interp, argv[2], &tag) != TCL_OK)  {
+            opserr << "WARNING invalid expSite ActorSite tag\n";
+            return TCL_ERROR;
+        }
         argi = 3;
         if (strcmp(argv[argi], "-setup") == 0)  {
             argi++;
             if (Tcl_GetInt(interp, argv[argi], &setupTag) != TCL_OK)  {
                 opserr << "WARNING invalid setupTag\n";
                 opserr << "expSite ActorSite " << tag << endln;
-                return TCL_ERROR;	
+                return TCL_ERROR;
             }
             theSetup = getExperimentalSetup(setupTag);
             if (theSetup == 0)  {
@@ -338,7 +346,7 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp,
             if (Tcl_GetInt(interp, argv[argi], &ctrlTag) != TCL_OK)  {
                 opserr << "WARNING invalid ctrlTag\n";
                 opserr << "expSite ActorSite " << tag << endln;
-                return TCL_ERROR;	
+                return TCL_ERROR;
             }
             theControl = getExperimentalControl(ctrlTag);
             if (theControl == 0)  {
@@ -352,7 +360,7 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp,
         if (Tcl_GetInt(interp, argv[argi], &ipPort) != TCL_OK)  {
             opserr << "WARNING invalid ActorSite ipPort\n";
             opserr << "expSite ActorSite " << tag << endln;
-            return TCL_ERROR;		
+            return TCL_ERROR;
         }
         argi++;
         // check for optional arguments
@@ -420,7 +428,7 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp,
             return TCL_ERROR;
         }
     }
-
+    
     // ----------------------------------------------------------------------------	
     else  {
         // experimental site type not recognized
@@ -429,5 +437,36 @@ int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp,
         return TCL_ERROR;
     }
     
-	return TCL_OK;
+    return TCL_OK;
+}
+
+
+int TclRemoveExpSite(ClientData clientData, Tcl_Interp *interp,
+    int argc, TCL_Char **argv)
+{
+    if (strcmp(argv[1], "site") == 0)  {
+        if (argc != 3)  {
+            opserr << "WARNING invalid number of arguments\n";
+            printCommand(argc, argv);
+            opserr << "Want: removeExp site tag\n";
+            return TCL_ERROR;
+        }
+        int tag;
+        if (Tcl_GetInt(interp, argv[2], &tag) != TCL_OK)  {
+            opserr << "WARNING invalid removeExp site tag\n";
+            return TCL_ERROR;
+        }
+        if (removeExperimentalSite(tag) < 0)  {
+            opserr << "WARNING could not remove expSite with tag " << argv[2] << endln;
+            return TCL_ERROR;
+        }
+    }
+    else if (strcmp(argv[1], "sites") == 0)  {
+        if (clearExperimentalSites(interp) < 0)  {
+            opserr << "WARNING could not remove expSites\n";
+            return TCL_ERROR;
+        }
+    }
+    
+    return TCL_OK;
 }

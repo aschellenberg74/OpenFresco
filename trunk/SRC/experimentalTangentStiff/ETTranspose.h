@@ -31,8 +31,8 @@
 // Revision: A
 //
 // Description: This file contains the class definition for 
-// ETTranspose.  This class uses the measured displacement vector and 
-// resisting for vector to compute the new stiffness matrix.  It uses 
+// ETTranspose. This class uses the measured displacement vector and 
+// resisting force vector to compute the new stiffness matrix. It uses 
 // the BFGS method used by Thewalt and later by Igarashi 
 // (Igarashi 1993 p. 10)
 

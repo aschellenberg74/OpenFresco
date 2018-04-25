@@ -1236,7 +1236,7 @@ int TclAddExpRecorder(ClientData clientData, Tcl_Interp *interp,
 
 
 int TclRemoveExpRecorder(ClientData clientData, Tcl_Interp *interp,
-    int argc, TCL_Char **argv, Domain *theDomain)
+    int argc, TCL_Char **argv)
 {
     ExperimentalSite *theSite = getExperimentalSiteFirst();
     if (theSite == 0)  {
@@ -1245,9 +1245,14 @@ int TclRemoveExpRecorder(ClientData clientData, Tcl_Interp *interp,
     }
     
     if (strcmp(argv[1],"recorder") == 0)  {
+        if (argc != 3)  {
+            opserr << "WARNING invalid number of arguments\n";
+            opserr << "Want: removeExp recorder tag\n";
+            return TCL_ERROR;
+        }
         int tag;
         if (Tcl_GetInt(interp, argv[2], &tag) != TCL_OK)  {
-            opserr << "WARNING removeExp recorder tag? failed to read tag: " << argv[2] << endln;
+            opserr << "WARNING invalid removeExp recorder tag\n";
             return TCL_ERROR;
         }
         if ((theSite->removeRecorder(tag)) < 0)  {
@@ -1267,7 +1272,7 @@ int TclRemoveExpRecorder(ClientData clientData, Tcl_Interp *interp,
 
 
 int TclExpRecord(ClientData clientData, Tcl_Interp *interp,
-    int argc, TCL_Char **argv, Domain *theDomain)
+    int argc, TCL_Char **argv)
 {
     ExperimentalSite *theSite = getExperimentalSiteFirst();
     if (theSite == 0)  {

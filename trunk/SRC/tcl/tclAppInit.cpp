@@ -169,66 +169,78 @@ extern ExperimentalSite *getExperimentalSite(int tag);
 // experimental control point commands
 extern int TclExpCPCommand(ClientData clientData, Tcl_Interp *interp,
     int argc, TCL_Char **argv, Domain *theDomain);
+extern int TclRemoveExpCP(ClientData clientData, Tcl_Interp *interp,
+    int argc, TCL_Char **argv);
 extern int clearExperimentalCPs(Tcl_Interp *interp);
 
 int openFresco_addExperimentalCP(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
-{ 
+{
     return TclExpCPCommand(clientData, interp, argc, argv, theDomain);
 }
 
 // experimental signal filter commands
 extern int TclExpSignalFilterCommand(ClientData clientData, Tcl_Interp *interp,
     int argc, TCL_Char **argv, Domain *theDomain);
+extern int TclRemoveExpSignalFilter(ClientData clientData, Tcl_Interp *interp,
+    int argc, TCL_Char **argv);
 extern int clearExperimentalSignalFilters(Tcl_Interp *interp);
 
 int openFresco_addExperimentalSignalFilter(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
-{ 
+{
     return TclExpSignalFilterCommand(clientData, interp, argc, argv, theDomain);
 }
 
 // experimental control commands
 extern int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
     int argc, TCL_Char **argv, Domain *theDomain);
+extern int TclRemoveExpControl(ClientData clientData, Tcl_Interp *interp,
+    int argc, TCL_Char **argv);
 extern int clearExperimentalControls(Tcl_Interp *interp);
 
 int openFresco_addExperimentalControl(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
-{ 
+{
     return TclExpControlCommand(clientData, interp, argc, argv, theDomain);
 }
 
 // experimental setup commands
 extern int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp,
     int argc, TCL_Char **argv, Domain *theDomain);
+extern int TclRemoveExpSetup(ClientData clientData, Tcl_Interp *interp,
+    int argc, TCL_Char **argv);
 extern int clearExperimentalSetups(Tcl_Interp *interp);
 
 int openFresco_addExperimentalSetup(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
-{ 
+{
     return TclExpSetupCommand(clientData, interp, argc, argv, theDomain);
 }
 
 // experimental site commands
 extern int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp,
     int argc, TCL_Char **argv, Domain *theDomain);
+extern int TclRemoveExpSite(ClientData clientData, Tcl_Interp *interp,
+    int argc, TCL_Char **argv);
 extern int clearExperimentalSites(Tcl_Interp *interp);
 
 int openFresco_addExperimentalSite(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
-{ 
+{
     return TclExpSiteCommand(clientData, interp, argc, argv, theDomain);
 }
 
 // experimental tangent stiffness commands
 extern int TclExpTangentStiffCommand(ClientData clientData, Tcl_Interp *interp,
     int argc, TCL_Char **argv, Domain *theDomain);
+extern int TclRemoveExpTangentStiff(ClientData clientData, Tcl_Interp *interp,
+    int argc, TCL_Char **argv);
 extern int clearExperimentalTangentStiffs(Tcl_Interp *interp);
 
 int openFresco_addExperimentalTangentStiff(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
-{ 
+{
     return TclExpTangentStiffCommand(clientData, interp, argc, argv, theDomain);
 }
 
@@ -238,7 +250,7 @@ extern int TclExpElementCommand(ClientData clientData, Tcl_Interp *interp,
 
 int openFresco_addExperimentalElement(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
-{ 
+{
     return TclExpElementCommand(clientData, interp, argc, argv, theDomain);
 }
 
@@ -246,9 +258,9 @@ int openFresco_addExperimentalElement(ClientData clientData,
 extern int TclAddExpRecorder(ClientData clientData, Tcl_Interp *interp,
     int argc, TCL_Char **argv, Domain *theDomain);
 extern int TclRemoveExpRecorder(ClientData clientData, Tcl_Interp *interp,
-    int argc, TCL_Char **argv, Domain *theDomain);
+    int argc, TCL_Char **argv);
 extern int TclExpRecord(ClientData clientData, Tcl_Interp *interp,
-    int argc, TCL_Char **argv, Domain *theDomain);
+    int argc, TCL_Char **argv);
 
 int openFresco_addExperimentalRecorder(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
@@ -392,8 +404,32 @@ int openFresco_removeComp(ClientData clientData,
         return TCL_ERROR;
     }
     
-    if (strcmp(argv[1],"recorder") == 0 || strcmp(argv[1],"recorders") == 0)  {
-        return TclRemoveExpRecorder(clientData, interp, argc, argv, theDomain);
+    if (strcmp(argv[1], "controlPoint") == 0 || strcmp(argv[1], "controlPoints") == 0)  {
+        return TclRemoveExpCP(clientData, interp, argc, argv);
+    }
+    
+    else if (strcmp(argv[1], "signalFilter") == 0 || strcmp(argv[1], "signalFilters") == 0)  {
+        return TclRemoveExpSignalFilter(clientData, interp, argc, argv);
+    }
+    
+    else if (strcmp(argv[1], "control") == 0 || strcmp(argv[1], "controls") == 0)  {
+        return TclRemoveExpControl(clientData, interp, argc, argv);
+    }
+    
+    else if (strcmp(argv[1], "setup") == 0 || strcmp(argv[1], "setups") == 0)  {
+        return TclRemoveExpSetup(clientData, interp, argc, argv);
+    }
+    
+    else if (strcmp(argv[1], "site") == 0 || strcmp(argv[1], "sites") == 0)  {
+        return TclRemoveExpSite(clientData, interp, argc, argv);
+    }
+    
+    else if (strcmp(argv[1], "tangentStiff") == 0 || strcmp(argv[1], "tangentStiffs") == 0)  {
+        return TclRemoveExpTangentStiff(clientData, interp, argc, argv);
+    }
+    
+    else if (strcmp(argv[1], "recorder") == 0 || strcmp(argv[1], "recorders") == 0)  {
+        return TclRemoveExpRecorder(clientData, interp, argc, argv);
     }
     
     return TCL_OK;
@@ -403,7 +439,7 @@ int openFresco_removeComp(ClientData clientData,
 int openFresco_record(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
 {
-    return TclExpRecord(clientData, interp, argc, argv, theDomain);
+    return TclExpRecord(clientData, interp, argc, argv);
 }
 
 
@@ -424,7 +460,7 @@ int specifyModelBuilder(ClientData clientData, Tcl_Interp *interp,
         theModelBuilder = 0;
     }
     
-    // check argv[1] for type of ModelBuilder and create the object 
+    // check argv[1] for type of ModelBuilder and create the object
     if (strcmp(argv[1],"basic") == 0 ||
         strcmp(argv[1],"basicBuilder") == 0 ||
         strcmp(argv[1],"BasicBuilder") == 0)  {
@@ -584,7 +620,7 @@ int setElementRayleighDampingFactors(ClientData clientData, Tcl_Interp *interp, 
 int openFresco_logFile(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
 {
-    if (argc < 2) {
+    if (argc < 2)  {
         opserr << "WARNING logFile fileName - no filename supplied\n";
         return TCL_ERROR;
     }
@@ -592,7 +628,7 @@ int openFresco_logFile(ClientData clientData,
     bool echo = true;
     
     int cArg = 2;
-    while (cArg < argc) {
+    while (cArg < argc)  {
         if (strcmp(argv[cArg], "-append") == 0)
             mode = APPEND;
         if (strcmp(argv[cArg], "-noEcho") == 0)
@@ -613,7 +649,7 @@ int openFresco_logFile(ClientData clientData,
 int openFresco_defaultUnits(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
 {
-    if (argc < 9) {
+    if (argc < 9)  {
         opserr << "WARNING missing a unit type\n";
         opserr << "Want: defaultUnits -force type -length type -time type -temperature type\n";
         return TCL_ERROR;
@@ -625,25 +661,25 @@ int openFresco_defaultUnits(ClientData clientData,
     const char *temperature = 0;
     
     int count = 1;
-    while (count < 9) {
+    while (count < 9)  {
         if ((strcmp(argv[count], "-force") == 0) || (strcmp(argv[count], "-Force") == 0)
-            || (strcmp(argv[count], "-FORCE") == 0)) {
+            || (strcmp(argv[count], "-FORCE") == 0))  {
             force = argv[count + 1];
         }
         else if ((strcmp(argv[count], "-length") == 0) || (strcmp(argv[count], "-Length") == 0)
-            || (strcmp(argv[count], "-LENGTH") == 0)) {
+            || (strcmp(argv[count], "-LENGTH") == 0))  {
             length = argv[count + 1];
         }
         else if ((strcmp(argv[count], "-time") == 0) || (strcmp(argv[count], "-Time") == 0)
-            || (strcmp(argv[count], "-TIME") == 0)) {
+            || (strcmp(argv[count], "-TIME") == 0))  {
             time = argv[count + 1];
         }
         else if ((strcmp(argv[count], "-temperature") == 0) || (strcmp(argv[count], "-Temperature") == 0)
             || (strcmp(argv[count], "-TEMPERATURE") == 0) || (strcmp(argv[count], "-temp") == 0)
-            || (strcmp(argv[count], "-Temp") == 0) || (strcmp(argv[count], "-TEMP") == 0)) {
+            || (strcmp(argv[count], "-Temp") == 0) || (strcmp(argv[count], "-TEMP") == 0))  {
             temperature = argv[count + 1];
         }
-        else {
+        else  {
             opserr << "WARNING unrecognized unit: " << argv[count] << endln;
             opserr << "Want: defaultUnits -force type -length type -time type -temperature type\n";
             return TCL_ERROR;
@@ -651,7 +687,7 @@ int openFresco_defaultUnits(ClientData clientData,
         count += 2;
     }
     
-    if (length == 0 || force == 0 || time == 0 || temperature == 0) {
+    if (length == 0 || force == 0 || time == 0 || temperature == 0)  {
         opserr << "WARNING missing a unit type\n";
         opserr << "Want: defaultUnits -force type -length type -time type -temperature type\n";
         return TCL_ERROR;
@@ -662,76 +698,76 @@ int openFresco_defaultUnits(ClientData clientData,
     double sec, msec;
     double F, C;
     
-    if ((strcmp(force, "lb") == 0) || (strcmp(force, "lbs") == 0)) {
+    if ((strcmp(force, "lb") == 0) || (strcmp(force, "lbs") == 0))  {
         lb = 1.0;
     }
-    else if ((strcmp(force, "kip") == 0) || (strcmp(force, "kips") == 0)) {
+    else if ((strcmp(force, "kip") == 0) || (strcmp(force, "kips") == 0))  {
         lb = 0.001;
     }
-    else if ((strcmp(force, "N") == 0)) {
+    else if ((strcmp(force, "N") == 0))  {
         lb = 4.4482216152605;
     }
-    else if ((strcmp(force, "kN") == 0) || (strcmp(force, "KN") == 0) || (strcmp(force, "kn") == 0)) {
+    else if ((strcmp(force, "kN") == 0) || (strcmp(force, "KN") == 0) || (strcmp(force, "kn") == 0))  {
         lb = 0.0044482216152605;
     }
-    else if ((strcmp(force, "mN") == 0) || (strcmp(force, "MN") == 0) || (strcmp(force, "mn") == 0)) {
+    else if ((strcmp(force, "mN") == 0) || (strcmp(force, "MN") == 0) || (strcmp(force, "mn") == 0))  {
         lb = 0.0000044482216152605;
     }
-    else if ((strcmp(force, "kgf") == 0)) {
+    else if ((strcmp(force, "kgf") == 0))  {
         lb = 9.80665*4.4482216152605;
     }
-    else if ((strcmp(force, "tonf") == 0)) {
+    else if ((strcmp(force, "tonf") == 0))  {
         lb = 9.80665 / 1000.0*4.4482216152605;
     }
-    else {
+    else  {
         lb = 1.0;
         opserr << "WARNING unknown force type\n";
         opserr << "Valid options: lb, kip, N, kN, MN, kgf, tonf\n";
         return TCL_ERROR;
     }
     
-    if ((strcmp(length, "in") == 0) || (strcmp(length, "inch") == 0)) {
+    if ((strcmp(length, "in") == 0) || (strcmp(length, "inch") == 0))  {
         in = 1.0;
     }
-    else if ((strcmp(length, "ft") == 0) || (strcmp(length, "feet") == 0)) {
+    else if ((strcmp(length, "ft") == 0) || (strcmp(length, "feet") == 0))  {
         in = 1.0 / 12.0;
     }
-    else if ((strcmp(length, "mm") == 0)) {
+    else if ((strcmp(length, "mm") == 0))  {
         in = 25.4;
     }
-    else if ((strcmp(length, "cm") == 0)) {
+    else if ((strcmp(length, "cm") == 0))  {
         in = 2.54;
     }
-    else if ((strcmp(length, "m") == 0)) {
+    else if ((strcmp(length, "m") == 0))  {
         in = 0.0254;
     }
-    else {
+    else  {
         in = 1.0;
         opserr << "WARNING unknown length type\n";
         opserr << "Valid options: in, ft, mm, cm, m\n";
         return TCL_ERROR;
     }
     
-    if ((strcmp(time, "sec") == 0) || (strcmp(time, "Sec") == 0)) {
+    if ((strcmp(time, "sec") == 0) || (strcmp(time, "Sec") == 0))  {
         sec = 1.0;
     }
-    else if ((strcmp(time, "msec") == 0) || (strcmp(time, "mSec") == 0)) {
+    else if ((strcmp(time, "msec") == 0) || (strcmp(time, "mSec") == 0))  {
         sec = 1000.0;
     }
-    else {
+    else  {
         sec = 1.0;
         opserr << "WARNING unknown time type\n";
         opserr << "Valid options: sec, msec\n";
         return TCL_ERROR;
     }
     
-    if ((strcmp(temperature, "F") == 0) || (strcmp(temperature, "degF") == 0)) {
+    if ((strcmp(temperature, "F") == 0) || (strcmp(temperature, "degF") == 0))  {
         F = 1.0;
     }
-    else if ((strcmp(temperature, "C") == 0) || (strcmp(temperature, "degC") == 0)) {
+    else if ((strcmp(temperature, "C") == 0) || (strcmp(temperature, "degC") == 0))  {
         F = 9.0 / 5.0 + 32.0;
     }
-    else {
+    else  {
         F = 1.0;
         opserr << "WARNING unknown temperature type\n";
         opserr << "Valid options: F, C\n";
@@ -825,64 +861,64 @@ int openFresco_metaData(ClientData clientData,
         return -1;
     
     int count = 1;
-    while (count < argc) {
+    while (count < argc)  {
         if ((strcmp(argv[count], "-title") == 0) || (strcmp(argv[count], "-Title") == 0)
-            || (strcmp(argv[count], "-TITLE") == 0)) {
-            if (count + 1 < argc) {
+            || (strcmp(argv[count], "-TITLE") == 0))  {
+            if (count + 1 < argc)  {
                 simulationInfo.setTitle(argv[count + 1]);
                 count += 2;
             }
         }
         else if ((strcmp(argv[count], "-contact") == 0) || (strcmp(argv[count], "-Contact") == 0)
-            || (strcmp(argv[count], "-CONTACT") == 0)) {
-            if (count + 1 < argc) {
+            || (strcmp(argv[count], "-CONTACT") == 0))  {
+            if (count + 1 < argc)  {
                 simulationInfo.setContact(argv[count + 1]);
                 count += 2;
             }
         }
         else if ((strcmp(argv[count], "-description") == 0) || (strcmp(argv[count], "-Description") == 0)
-            || (strcmp(argv[count], "-DESCRIPTION") == 0)) {
-            if (count + 1 < argc) {
+            || (strcmp(argv[count], "-DESCRIPTION") == 0))  {
+            if (count + 1 < argc)  {
                 simulationInfo.setDescription(argv[count + 1]);
                 count += 2;
             }
         }
         else if ((strcmp(argv[count], "-modelType") == 0) || (strcmp(argv[count], "-ModelType") == 0)
-            || (strcmp(argv[count], "-MODELTYPE") == 0)) {
-            if (count + 1 < argc) {
+            || (strcmp(argv[count], "-MODELTYPE") == 0))  {
+            if (count + 1 < argc)  {
                 simulationInfo.addModelType(argv[count + 1]);
                 count += 2;
             }
         }
         else if ((strcmp(argv[count], "-analysisType") == 0) || (strcmp(argv[count], "-AnalysisType") == 0)
-            || (strcmp(argv[count], "-ANALYSISTYPE") == 0)) {
-            if (count + 1 < argc) {
+            || (strcmp(argv[count], "-ANALYSISTYPE") == 0))  {
+            if (count + 1 < argc)  {
                 simulationInfo.addAnalysisType(argv[count + 1]);
                 count += 2;
             }
         }
         else if ((strcmp(argv[count], "-elementType") == 0) || (strcmp(argv[count], "-ElementType") == 0)
-            || (strcmp(argv[count], "-ELEMENTTYPE") == 0)) {
-            if (count + 1 < argc) {
+            || (strcmp(argv[count], "-ELEMENTTYPE") == 0))  {
+            if (count + 1 < argc)  {
                 simulationInfo.addElementType(argv[count + 1]);
                 count += 2;
             }
         }
         else if ((strcmp(argv[count], "-materialType") == 0) || (strcmp(argv[count], "-MaterialType") == 0)
-            || (strcmp(argv[count], "-MATERIALTYPE") == 0)) {
-            if (count + 1 < argc) {
+            || (strcmp(argv[count], "-MATERIALTYPE") == 0))  {
+            if (count + 1 < argc)  {
                 simulationInfo.addMaterialType(argv[count + 1]);
                 count += 2;
             }
         }
         else if ((strcmp(argv[count], "-loadingType") == 0) || (strcmp(argv[count], "-LoadingType") == 0)
-            || (strcmp(argv[count], "-LOADINGTYPE") == 0)) {
-            if (count + 1 < argc) {
+            || (strcmp(argv[count], "-LOADINGTYPE") == 0))  {
+            if (count + 1 < argc)  {
                 simulationInfo.addLoadingType(argv[count + 1]);
                 count += 2;
             }
         }
-        else {
+        else  {
             opserr << "WARNING unknown arg type: " << argv[count] << endln;
             count++;
         }

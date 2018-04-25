@@ -51,6 +51,8 @@ Domain *theDomain = 0;
 // experimental control point commands
 extern int TclExpCPCommand(ClientData clientData, Tcl_Interp *interp,
     int argc, TCL_Char **argv, Domain *theDomain);
+extern int TclRemoveExpCP(ClientData clientData, Tcl_Interp *interp,
+    int argc, TCL_Char **argv);
 extern int clearExperimentalCPs(Tcl_Interp *interp);
 
 int openFresco_addExperimentalCP(ClientData clientData,
@@ -62,6 +64,8 @@ int openFresco_addExperimentalCP(ClientData clientData,
 // experimental signal filter commands
 extern int TclExpSignalFilterCommand(ClientData clientData, Tcl_Interp *interp,
     int argc, TCL_Char **argv, Domain *theDomain);
+extern int TclRemoveExpSignalFilter(ClientData clientData, Tcl_Interp *interp,
+    int argc, TCL_Char **argv);
 extern int clearExperimentalSignalFilters(Tcl_Interp *interp);
 
 int openFresco_addExperimentalSignalFilter(ClientData clientData,
@@ -73,6 +77,8 @@ int openFresco_addExperimentalSignalFilter(ClientData clientData,
 // experimental control commands
 extern int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
     int argc, TCL_Char **argv, Domain *theDomain);
+extern int TclRemoveExpControl(ClientData clientData, Tcl_Interp *interp,
+    int argc, TCL_Char **argv);
 extern int clearExperimentalControls(Tcl_Interp *interp);
 
 int openFresco_addExperimentalControl(ClientData clientData,
@@ -84,6 +90,8 @@ int openFresco_addExperimentalControl(ClientData clientData,
 // experimental setup commands
 extern int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp,
     int argc, TCL_Char **argv, Domain *theDomain);
+extern int TclRemoveExpSetup(ClientData clientData, Tcl_Interp *interp,
+    int argc, TCL_Char **argv);
 extern int clearExperimentalSetups(Tcl_Interp *interp);
 
 int openFresco_addExperimentalSetup(ClientData clientData,
@@ -95,6 +103,8 @@ int openFresco_addExperimentalSetup(ClientData clientData,
 // experimental site commands
 extern int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp,
     int argc, TCL_Char **argv, Domain *theDomain);
+extern int TclRemoveExpSite(ClientData clientData, Tcl_Interp *interp,
+    int argc, TCL_Char **argv);
 extern int clearExperimentalSites(Tcl_Interp *interp);
 
 int openFresco_addExperimentalSite(ClientData clientData,
@@ -106,6 +116,8 @@ int openFresco_addExperimentalSite(ClientData clientData,
 // experimental tangent stiffness commands
 extern int TclExpTangentStiffCommand(ClientData clientData, Tcl_Interp *interp,
     int argc, TCL_Char **argv, Domain *theDomain);
+extern int TclRemoveExpTangentStiff(ClientData clientData, Tcl_Interp *interp,
+    int argc, TCL_Char **argv);
 extern int clearExperimentalTangentStiffs(Tcl_Interp *interp);
 
 int openFresco_addExperimentalTangentStiff(ClientData clientData,
@@ -128,9 +140,9 @@ int openFresco_addExperimentalElement(ClientData clientData,
 extern int TclAddExpRecorder(ClientData clientData, Tcl_Interp *interp,
     int argc, TCL_Char **argv, Domain *theDomain);
 extern int TclRemoveExpRecorder(ClientData clientData, Tcl_Interp *interp,
-    int argc, TCL_Char **argv, Domain *theDomain);
+    int argc, TCL_Char **argv);
 extern int TclExpRecord(ClientData clientData, Tcl_Interp *interp,
-    int argc, TCL_Char **argv, Domain *theDomain);
+    int argc, TCL_Char **argv);
 
 int openFresco_addExperimentalRecorder(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
@@ -227,13 +239,44 @@ int openFresco_removeComp(ClientData clientData,
 {
     // make sure there is a minimum number of arguments
     if (argc < 2)  {
-        opserr << "WARNING insufficient number of remove component arguments\n";
+        opserr << "WARNING insufficient number of removeExp component arguments\n";
         opserr << "Want: removeExp type <specific args>\n";
         return TCL_ERROR;
     }
     
-    if (strcmp(argv[1],"recorder") == 0 || strcmp(argv[1],"recorders") == 0)  {
-        return TclRemoveExpRecorder(clientData, interp, argc, argv, theDomain);
+    if (strcmp(argv[1], "controlPoint") == 0 || strcmp(argv[1], "controlPoints") == 0)  {
+        return TclRemoveExpCP(clientData, interp, argc, argv);
+    }
+    
+    else if (strcmp(argv[1], "signalFilter") == 0 || strcmp(argv[1], "signalFilters") == 0)  {
+        return TclRemoveExpSignalFilter(clientData, interp, argc, argv);
+    }
+    
+    else if (strcmp(argv[1], "control") == 0 || strcmp(argv[1], "controls") == 0)  {
+        return TclRemoveExpControl(clientData, interp, argc, argv);
+    }
+    
+    else if (strcmp(argv[1], "setup") == 0 || strcmp(argv[1], "setups") == 0)  {
+        return TclRemoveExpSetup(clientData, interp, argc, argv);
+    }
+    
+    else if (strcmp(argv[1], "site") == 0 || strcmp(argv[1], "sites") == 0)  {
+        return TclRemoveExpSite(clientData, interp, argc, argv);
+    }
+    
+    else if (strcmp(argv[1], "tangentStiff") == 0 || strcmp(argv[1], "tangentStiffs") == 0)  {
+        return TclRemoveExpTangentStiff(clientData, interp, argc, argv);
+    }
+    
+    else if (strcmp(argv[1],"recorder") == 0 || strcmp(argv[1],"recorders") == 0)  {
+        return TclRemoveExpRecorder(clientData, interp, argc, argv);
+    }
+    
+    else {
+        // experimental control type not recognized
+        opserr << "WARNING unknown removeExp type: "
+            << argv[1] << ": check the manual\n";
+        return TCL_ERROR;
     }
     
     return TCL_OK;
@@ -243,7 +286,7 @@ int openFresco_removeComp(ClientData clientData,
 int openFresco_record(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
 {
-    return TclExpRecord(clientData, interp, argc, argv, theDomain);
+    return TclExpRecord(clientData, interp, argc, argv);
 }
 
 
@@ -269,13 +312,13 @@ OpenFresco(ClientData clientData, Tcl_Interp *interp, int argc,
     
     theDomain = thedomain;
     
-    if (Tcl_InitStubs(interp, TCL_VERSION, 1) == NULL) {
+    if (Tcl_InitStubs(interp, TCL_VERSION, 1) == NULL)  {
         return TCL_ERROR;
     }
     
     // add the package to list of available packages
     code = Tcl_PkgProvide(interp, "OpenFresco", OPF_VERSION);
-    if (code != TCL_OK) {
+    if (code != TCL_OK)  {
         return code;
     }
     

@@ -47,7 +47,7 @@ int addExperimentalTangentStiff(ExperimentalTangentStiff &theTangentStiff)
     bool result = theExperimentalTangentStiffs->addComponent(&theTangentStiff);
     if (result == true)
         return 0;
-    else {
+    else  {
         opserr << "addExperimentalTangentStiff() - "
             << "failed to add experimental tangent stiff: " << theTangentStiff;
         return -1;
@@ -57,7 +57,7 @@ int addExperimentalTangentStiff(ExperimentalTangentStiff &theTangentStiff)
 
 extern ExperimentalTangentStiff *getExperimentalTangentStiff(int tag)
 {
-    if (theExperimentalTangentStiffs == 0) {
+    if (theExperimentalTangentStiffs == 0)  {
         opserr << "getExperimentalTangentStiff() - "
             << "failed to get experimental tangent stiff: " << tag << endln
             << "no experimental tangent stiff objects have been defined\n";
@@ -65,7 +65,7 @@ extern ExperimentalTangentStiff *getExperimentalTangentStiff(int tag)
     }
     
     TaggedObject *mc = theExperimentalTangentStiffs->getComponentPtr(tag);
-    if (mc == 0) 
+    if (mc == 0)
         return 0;
     
     // otherwise we do a cast and return
@@ -75,11 +75,19 @@ extern ExperimentalTangentStiff *getExperimentalTangentStiff(int tag)
 }
 
 
+extern int removeExperimentalTangentStiff(int tag)
+{
+    if (theExperimentalTangentStiffs != 0)
+        theExperimentalTangentStiffs->removeComponent(tag);
+    
+    return 0;
+}
+
+
 extern int clearExperimentalTangentStiffs(Tcl_Interp *interp)
 {
-    if (theExperimentalTangentStiffs != 0) {
+    if (theExperimentalTangentStiffs != 0)
         theExperimentalTangentStiffs->clearAll(false);
-    }
     
     return 0;
 }
@@ -91,7 +99,7 @@ static void printCommand(int argc, TCL_Char **argv)
     for (int i=0; i<argc; i++)
         opserr << argv[i] << " ";
     opserr << endln;
-} 
+}
 
 
 int TclExpTangentStiffCommand(ClientData clientData, Tcl_Interp *interp,
@@ -117,13 +125,13 @@ int TclExpTangentStiffCommand(ClientData clientData, Tcl_Interp *interp,
             printCommand(argc,argv);
             opserr << "Want: expTangentStiff Broyden tag\n";
             return TCL_ERROR;
-        }    
+        }
         
         int tag;
         
         if (Tcl_GetInt(interp, argv[2], &tag) != TCL_OK)  {
             opserr << "WARNING invalid ETBroyden tag\n";
-            return TCL_ERROR;		
+            return TCL_ERROR;
         }
         
         // parsing was successful, allocate the tangent stiff
@@ -137,27 +145,27 @@ int TclExpTangentStiffCommand(ClientData clientData, Tcl_Interp *interp,
             printCommand(argc,argv);
             opserr << "Want: expTangentStiff BFGS tag <-eps value>\n";
             return TCL_ERROR;
-        }    
+        }
         
         int tag;
         double eps;
         
         if (Tcl_GetInt(interp, argv[2], &tag) != TCL_OK)  {
             opserr << "WARNING invalid expTangentStiff BFGS tag\n";
-            return TCL_ERROR;		
+            return TCL_ERROR;
         }
         
         if (argc > 3) {
-            if (strcmp(argv[3],"-eps") == 0) {
+            if (strcmp(argv[3],"-eps") == 0)  {
                 if (Tcl_GetDouble(interp, argv[4], &eps) != TCL_OK)  {
                     opserr << "WARNING invalid epsilon value\n";
                     opserr << "expTangentStiff BFGS " << tag << endln;
-                    return TCL_ERROR;	
+                    return TCL_ERROR;
                 }
                 // parsing was successful, allocate the tangent stiff
                 theTangentStiff = new ETBfgs(tag, eps);
             }
-        } else {
+        } else  {
             // parsing was successful, allocate the tangent stiff
             theTangentStiff = new ETBfgs(tag);
         }
@@ -176,12 +184,12 @@ int TclExpTangentStiffCommand(ClientData clientData, Tcl_Interp *interp,
         
         if (Tcl_GetInt(interp, argv[2], &tag) != TCL_OK)  {
             opserr << "WARNING invalid expTangentStiff tag\n";
-            return TCL_ERROR;		
+            return TCL_ERROR;
         }
         if (Tcl_GetInt(interp, argv[3], &numCols) != TCL_OK)  {
             opserr << "WARNING invalid number of columns value\n";
             opserr << "expTangentStiff Transpose " << tag << endln;
-            return TCL_ERROR;	
+            return TCL_ERROR;
         }
         
         // parsing was successful, allocate the tangent stiff
@@ -205,6 +213,37 @@ int TclExpTangentStiffCommand(ClientData clientData, Tcl_Interp *interp,
     if (addExperimentalTangentStiff(*theTangentStiff) < 0)  {
         delete theTangentStiff; // invoke the destructor, otherwise mem leak
         return TCL_ERROR;
+    }
+    
+    return TCL_OK;
+}
+
+
+int TclRemoveExpTangentStiff(ClientData clientData, Tcl_Interp *interp,
+    int argc, TCL_Char **argv)
+{
+    if (strcmp(argv[1], "tangentStiff") == 0)  {
+        if (argc != 3)  {
+            opserr << "WARNING invalid number of arguments\n";
+            printCommand(argc, argv);
+            opserr << "Want: removeExp tangentStiff tag\n";
+            return TCL_ERROR;
+        }
+        int tag;
+        if (Tcl_GetInt(interp, argv[2], &tag) != TCL_OK)  {
+            opserr << "WARNING invalid removeExp tangentStiff tag\n";
+            return TCL_ERROR;
+        }
+        if (removeExperimentalTangentStiff(tag) < 0)  {
+            opserr << "WARNING could not remove expTangentStiff with tag " << argv[2] << endln;
+            return TCL_ERROR;
+        }
+    }
+    else if (strcmp(argv[1], "tangentStiffs") == 0)  {
+        if (clearExperimentalTangentStiffs(interp) < 0)  {
+            opserr << "WARNING could not remove expTangentStiffs\n";
+            return TCL_ERROR;
+        }
     }
     
     return TCL_OK;

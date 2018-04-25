@@ -48,7 +48,7 @@ int addExperimentalSignalFilter(ExperimentalSignalFilter &theFilter)
     bool result = theExperimentalSignalFilters->addComponent(&theFilter);
     if (result == true)
         return 0;
-    else {
+    else  {
         opserr << "addExperimentalSignalFilter() - "
             << "failed to add experimental signal filter: " << theFilter;
         return -1;
@@ -58,7 +58,7 @@ int addExperimentalSignalFilter(ExperimentalSignalFilter &theFilter)
 
 extern ExperimentalSignalFilter *getExperimentalSignalFilter(int tag)
 {
-    if (theExperimentalSignalFilters == 0) {
+    if (theExperimentalSignalFilters == 0)  {
         opserr << "getExperimentalSignalFilter() - "
             << "failed to get experimental signal filter: " << tag << endln
             << "no experimental signal filter objects have been defined\n";
@@ -66,7 +66,7 @@ extern ExperimentalSignalFilter *getExperimentalSignalFilter(int tag)
     }
     
     TaggedObject *mc = theExperimentalSignalFilters->getComponentPtr(tag);
-    if (mc == 0) 
+    if (mc == 0)
         return 0;
     
     // otherwise we do a cast and return
@@ -75,11 +75,19 @@ extern ExperimentalSignalFilter *getExperimentalSignalFilter(int tag)
 }
 
 
+extern int removeExperimentalSignalFilter(int tag)
+{
+    if (theExperimentalSignalFilters != 0)
+        theExperimentalSignalFilters->removeComponent(tag);
+    
+    return 0;
+}
+
+
 extern int clearExperimentalSignalFilters(Tcl_Interp *interp)
 {
-    if (theExperimentalSignalFilters != 0) {
+    if (theExperimentalSignalFilters != 0)
         theExperimentalSignalFilters->clearAll(false);
-    }
     
     return 0;
 }
@@ -148,7 +156,7 @@ int TclExpSignalFilterCommand(ClientData clientData, Tcl_Interp *interp,
             printCommand(argc,argv);
             opserr << "Want: expSignalFilter ErrorSimUndershoot tag error\n";
             return TCL_ERROR;
-        }    
+        }
         
         int tag;
         double error;
@@ -175,7 +183,7 @@ int TclExpSignalFilterCommand(ClientData clientData, Tcl_Interp *interp,
             opserr << "Want: expSignalFilter KrylovForceConverter"
                 << "tag numSubspace -initStif Kij\n";
             return TCL_ERROR;
-        }    
+        }
         
         int tag, ss, argi = 2;
         
@@ -319,6 +327,37 @@ int TclExpSignalFilterCommand(ClientData clientData, Tcl_Interp *interp,
     if (addExperimentalSignalFilter(*theFilter) < 0)  {
         delete theFilter; // invoke the destructor, otherwise mem leak
         return TCL_ERROR;
+    }
+    
+    return TCL_OK;
+}
+
+
+int TclRemoveExpSignalFilter(ClientData clientData, Tcl_Interp *interp,
+    int argc, TCL_Char **argv)
+{
+    if (strcmp(argv[1], "signalFilter") == 0)  {
+        if (argc != 3)  {
+            opserr << "WARNING invalid number of arguments\n";
+            printCommand(argc, argv);
+            opserr << "Want: removeExp signalFilter tag\n";
+            return TCL_ERROR;
+        }
+        int tag;
+        if (Tcl_GetInt(interp, argv[2], &tag) != TCL_OK)  {
+            opserr << "WARNING invalid removeExp signalFilter tag\n";
+            return TCL_ERROR;
+        }
+        if (removeExperimentalSignalFilter(tag) < 0)  {
+            opserr << "WARNING could not remove expSignalFilter with tag " << argv[2] << endln;
+            return TCL_ERROR;
+        }
+    }
+    else if (strcmp(argv[1], "signalFilters") == 0)  {
+        if (clearExperimentalSignalFilters(interp) < 0)  {
+            opserr << "WARNING could not remove expSignalFilters\n";
+            return TCL_ERROR;
+        }
     }
     
     return TCL_OK;
