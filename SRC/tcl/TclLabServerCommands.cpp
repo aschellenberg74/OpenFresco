@@ -36,6 +36,7 @@
 #include <ActorExpSite.h>
 
 extern ExperimentalSite *getExperimentalSite(int tag);
+extern int removeExperimentalSite(int tag);
 
 
 int TclStartLabServer(ClientData clientData,
@@ -65,7 +66,9 @@ int TclStartLabServer(ClientData clientData,
         opserr << "unable to start expSite: " << siteTag << endln;
         return TCL_ERROR;
     }
-    delete theExperimentalSite;
+    //removeExperimentalSite(siteTag);
+    //theExperimentalSite = 0;
+    //delete theExperimentalSite;
     
     return TCL_OK;
 }

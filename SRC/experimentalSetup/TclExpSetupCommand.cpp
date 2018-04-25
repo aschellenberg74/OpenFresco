@@ -66,7 +66,7 @@ int addExperimentalSetup(ExperimentalSetup &theSetup)
 
 extern ExperimentalSetup *getExperimentalSetup(int tag)
 {
-    if (theExperimentalSetups == 0) {
+    if (theExperimentalSetups == 0)  {
         opserr << "getExperimentalSetup() - "
             << "failed to get experimental setup: " << tag << endln
             << "no experimental setup objects have been defined\n";
@@ -74,7 +74,7 @@ extern ExperimentalSetup *getExperimentalSetup(int tag)
     }
     
     TaggedObject *mc = theExperimentalSetups->getComponentPtr(tag);
-    if (mc == 0) 
+    if (mc == 0)
         return 0;
     
     // otherwise we do a cast and return
@@ -83,11 +83,19 @@ extern ExperimentalSetup *getExperimentalSetup(int tag)
 }
 
 
+extern int removeExperimentalSetup(int tag)
+{
+    if (theExperimentalSetups != 0)
+        theExperimentalSetups->removeComponent(tag);
+    
+    return 0;
+}
+
+
 extern int clearExperimentalSetups(Tcl_Interp *interp)
 {
-    if (theExperimentalSetups != 0) {
+    if (theExperimentalSetups != 0)
         theExperimentalSetups->clearAll(false);
-    }
     
     return 0;
 }
@@ -1828,6 +1836,37 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp,
     if (addExperimentalSetup(*theSetup) < 0)  {
         delete theSetup; // invoke the destructor, otherwise mem leak
         return TCL_ERROR;
+    }
+    
+    return TCL_OK;
+}
+
+
+int TclRemoveExpSetup(ClientData clientData, Tcl_Interp *interp,
+    int argc, TCL_Char **argv)
+{
+    if (strcmp(argv[1], "setup") == 0)  {
+        if (argc != 3)  {
+            opserr << "WARNING invalid number of arguments\n";
+            printCommand(argc, argv);
+            opserr << "Want: removeExp setup tag\n";
+            return TCL_ERROR;
+        }
+        int tag;
+        if (Tcl_GetInt(interp, argv[2], &tag) != TCL_OK)  {
+            opserr << "WARNING invalid removeExp setup tag\n";
+            return TCL_ERROR;
+        }
+        if (removeExperimentalSetup(tag) < 0)  {
+            opserr << "WARNING could not remove expSetup with tag " << argv[2] << endln;
+            return TCL_ERROR;
+        }
+    }
+    else if (strcmp(argv[1], "setups") == 0)  {
+        if (clearExperimentalSetups(interp) < 0)  {
+            opserr << "WARNING could not remove expSetups\n";
+            return TCL_ERROR;
+        }
     }
     
     return TCL_OK;

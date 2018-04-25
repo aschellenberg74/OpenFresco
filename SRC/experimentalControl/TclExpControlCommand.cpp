@@ -23,7 +23,7 @@
 // $Date$
 // $URL$
 
-// Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 09/06
 // Revision: A
 //
@@ -67,7 +67,7 @@ int addExperimentalControl(ExperimentalControl &theControl)
     bool result = theExperimentalControls->addComponent(&theControl);
     if (result == true)
         return 0;
-    else {
+    else  {
         opserr << "addExperimentalControl() - "
             << "failed to add experimental control: " << theControl;
         return -1;
@@ -77,7 +77,7 @@ int addExperimentalControl(ExperimentalControl &theControl)
 
 extern ExperimentalControl *getExperimentalControl(int tag)
 {
-    if (theExperimentalControls == 0) {
+    if (theExperimentalControls == 0)  {
         opserr << "getExperimentalControl() - "
             << "failed to get experimental control: " << tag << endln
             << "no experimental control objects have been defined\n";
@@ -85,7 +85,7 @@ extern ExperimentalControl *getExperimentalControl(int tag)
     }
     
     TaggedObject *mc = theExperimentalControls->getComponentPtr(tag);
-    if (mc == 0) 
+    if (mc == 0)
         return 0;
     
     // otherwise we do a cast and return
@@ -94,11 +94,19 @@ extern ExperimentalControl *getExperimentalControl(int tag)
 }
 
 
+extern int removeExperimentalControl(int tag)
+{
+    if (theExperimentalControls != 0)
+        theExperimentalControls->removeComponent(tag);
+    
+    return 0;
+}
+
+
 extern int clearExperimentalControls(Tcl_Interp *interp)
 {
-    if (theExperimentalControls != 0) {
+    if (theExperimentalControls != 0)
         theExperimentalControls->clearAll(false);
-    }
     
     return 0;
 }
@@ -172,7 +180,7 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
             if (Tcl_GetInt(interp, argv[argi], &matTag) != TCL_OK)  {
                 opserr << "WARNING invalid matTag\n";
                 opserr << "expControl SimUniaxialMaterials " << tag << endln;
-                return TCL_ERROR;	
+                return TCL_ERROR;
             }
             theSpecimen[i] = OPS_GetUniaxialMaterial(matTag);
             if (theSpecimen[i] == 0)  {
@@ -513,7 +521,7 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
         // parsing was successful, allocate the control
         theControl = new ECSimSimulink(tag, ipAddr, ipPort);
     }
-
+    
     // ----------------------------------------------------------------------------	
     else if (strcmp(argv[1],"GenericTCP") == 0)  {
         if (argc < 17)  {
@@ -826,7 +834,7 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
         theControl = new ECMtsCsi(tag, numTrialCPs, trialCPs,
             numOutCPs, outCPs, cfgFile, rampTime, useRelativeTrial);
     }
-
+    
     /* ----------------------------------------------------------------------------	
     else if (strcmp(argv[1],"NIEseries") == 0)  {
         if (argc < 4)  {
@@ -856,7 +864,7 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
         theControl = new ECNIEseries(tag, device);
     }*/
 #endif
-
+    
 #if defined _WIN32 || defined _WIN64
     // ----------------------------------------------------------------------------	
     else if (strcmp(argv[1],"xPCtarget") == 0)  {
@@ -1148,7 +1156,7 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
                     useRelativeTrial = 1;
             }
         }
-
+        
         // parsing was successful, allocate the control
         theControl = new ECSCRAMNet(tag, memOffset, numDOF, nodeID, useRelativeTrial);
     }
@@ -1278,6 +1286,37 @@ int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
     if (addExperimentalControl(*theControl) < 0)  {
         delete theControl; // invoke the destructor, otherwise mem leak
         return TCL_ERROR;
+    }
+    
+    return TCL_OK;
+}
+
+
+int TclRemoveExpControl(ClientData clientData, Tcl_Interp *interp,
+    int argc, TCL_Char **argv)
+{
+    if (strcmp(argv[1], "control") == 0)  {
+        if (argc != 3)  {
+            opserr << "WARNING invalid number of arguments\n";
+            printCommand(argc, argv);
+            opserr << "Want: removeExp control tag\n";
+            return TCL_ERROR;
+        }
+        int tag;
+        if (Tcl_GetInt(interp, argv[2], &tag) != TCL_OK)  {
+            opserr << "WARNING invalid removeExp control tag\n";
+            return TCL_ERROR;
+        }
+        if (removeExperimentalControl(tag) < 0)  {
+            opserr << "WARNING could not remove expControl with tag " << argv[2] << endln;
+            return TCL_ERROR;
+        }
+    }
+    else if (strcmp(argv[1], "controls") == 0)  {
+        if (clearExperimentalControls(interp) < 0)  {
+            opserr << "WARNING could not remove expControls\n";
+            return TCL_ERROR;
+        }
     }
     
     return TCL_OK;

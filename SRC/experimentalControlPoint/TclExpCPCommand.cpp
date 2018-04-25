@@ -47,7 +47,7 @@ int addExperimentalCP(ExperimentalCP &theCP)
     bool result = theExperimentalCPs->addComponent(&theCP);
     if (result == true)
         return 0;
-    else {
+    else  {
         opserr << "addExperimentalCP() - "
             << "failed to add experimental control point: " << theCP;
         return -1;
@@ -57,7 +57,7 @@ int addExperimentalCP(ExperimentalCP &theCP)
 
 extern ExperimentalCP *getExperimentalCP(int tag)
 {
-    if (theExperimentalCPs == 0) {
+    if (theExperimentalCPs == 0)  {
         opserr << "getExperimentalCP() - "
             << "failed to get experimental control point: " << tag << endln
             << "no experimental control point objects have been defined\n";
@@ -65,7 +65,7 @@ extern ExperimentalCP *getExperimentalCP(int tag)
     }
     
     TaggedObject *mc = theExperimentalCPs->getComponentPtr(tag);
-    if (mc == 0) 
+    if (mc == 0)
         return 0;
     
     // otherwise we do a cast and return
@@ -74,11 +74,19 @@ extern ExperimentalCP *getExperimentalCP(int tag)
 }
 
 
+extern int removeExperimentalCP(int tag)
+{
+    if (theExperimentalCPs != 0)
+        theExperimentalCPs->removeComponent(tag);
+    
+    return 0;
+}
+
+
 extern int clearExperimentalCPs(Tcl_Interp *interp)
 {
-    if (theExperimentalCPs != 0) {
+    if (theExperimentalCPs != 0)
         theExperimentalCPs->clearAll(false);
-    }
     
     return 0;
 }
@@ -380,6 +388,37 @@ int TclExpCPCommand(ClientData clientData, Tcl_Interp *interp,
     if (addExperimentalCP(*theCP) < 0)  {
         delete theCP; // invoke the destructor, otherwise mem leak
         return TCL_ERROR;
+    }
+    
+    return TCL_OK;
+}
+
+
+int TclRemoveExpCP(ClientData clientData, Tcl_Interp *interp,
+    int argc, TCL_Char **argv)
+{
+    if (strcmp(argv[1], "controlPoint") == 0)  {
+        if (argc != 3)  {
+            opserr << "WARNING invalid number of arguments\n";
+            printCommand(argc, argv);
+            opserr << "Want: removeExp controlPoint tag\n";
+            return TCL_ERROR;
+        }
+        int tag;
+        if (Tcl_GetInt(interp, argv[2], &tag) != TCL_OK)  {
+            opserr << "WARNING invalid removeExp controlPoint tag\n";
+            return TCL_ERROR;
+        }
+        if (removeExperimentalCP(tag) < 0)  {
+            opserr << "WARNING could not remove expControlPoint with tag " << argv[2] << endln;
+            return TCL_ERROR;
+        }
+    }
+    else if (strcmp(argv[1], "controlPoints") == 0)  {
+        if (clearExperimentalCPs(interp) < 0)  {
+            opserr << "WARNING could not remove expControlPoints\n";
+            return TCL_ERROR;
+        }
     }
     
     return TCL_OK;
