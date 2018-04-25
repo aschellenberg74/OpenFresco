@@ -1,6 +1,6 @@
-function [data,errorMsg] = getXPCtargetVar(fileName,ipAddress,ipPort)
+function [data,errorMsg] = getXPCtargetVar(fileName,ipAddress,ipPort,drive)
 %GETXPCTARGETVAR to retrieve the variables from the xPC-Target disk
-% [data,errorMsg] = getXPCtargetVar(fileName,ipAddress,ipPort)
+% [data,errorMsg] = getXPCtargetVar(fileName,ipAddress,ipPort,drive)
 %
 % data      : output structure with following fields
 %     .fileName : names of retrieved files
@@ -9,6 +9,7 @@ function [data,errorMsg] = getXPCtargetVar(fileName,ipAddress,ipPort)
 % fileName  : cell array with file names to retrieve
 % ipAddress : IP-Address of xPC-Target
 % ipPort    : IP-Port of xPC-Target
+% drive     : disk drive on target from which to retrieve variables
 %
 % Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 % Created: 04/05
@@ -20,6 +21,11 @@ function [data,errorMsg] = getXPCtargetVar(fileName,ipAddress,ipPort)
 % initialize waitbar
 wbHandle = waitbar(0,'Retrieving variables from the xPC-Target disk ......');
 
+% select disk drive
+if (nargin < 4)
+    drive = 'C:';
+end
+
 % initialize target access
 if (nargin < 3)
     ftp = xpctarget.ftp('TCPIP','192.168.2.20','22222');
@@ -29,7 +35,6 @@ else
     fs  = xpctarget.fs('TCPIP',ipAddress,ipPort);
 end
 
-drive = 'C:';
 errorMsg = 0;
 numVar = length(fileName);
 for i=1:numVar

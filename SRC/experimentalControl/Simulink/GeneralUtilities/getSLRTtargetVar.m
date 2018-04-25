@@ -1,6 +1,6 @@
-function [data,errorMsg] = getSLRTtargetVar(fileName,tg)
+function [data,errorMsg] = getSLRTtargetVar(fileName,tg,drive)
 %GETSLRTTARGETVAR to retrieve the variables from the SLRT-Target disk
-% [data,errorMsg] = getSLRTtargetVar(fileName,ipAddress,ipPort)
+% [data,errorMsg] = getSLRTtargetVar(fileName,tg,drive)
 %
 % data     : output structure with following fields
 %     .fileName : names of retrieved files
@@ -8,6 +8,7 @@ function [data,errorMsg] = getSLRTtargetVar(fileName,tg)
 % errorMsg : error message
 % fileName : cell array with file names to retrieve
 % tg       : Simulink real-time target object
+% drive    : disk drive on target from which to retrieve variables
 %
 % Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 % Created: 01/18
@@ -19,13 +20,17 @@ function [data,errorMsg] = getSLRTtargetVar(fileName,tg)
 % initialize waitbar
 wbHandle = waitbar(0,'Retrieving variables from the SLRT-Target disk ......');
 
+% select disk drive
+if (nargin < 3)
+    drive = 'C:';
+end
+
 % initialize target access through target file system object
 if (nargin < 2)
     tg = SimulinkRealTime.target('TargetPC1');
 end
 fs = SimulinkRealTime.fileSystem(tg);
 
-drive = 'E:';
 errorMsg = 0;
 numVar = length(fileName);
 for i=1:numVar
