@@ -23,11 +23,12 @@
 // $Date$
 // $URL$
 
-// Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 09/06
 // Revision: A
 //
-// Description: This file contains the implementation of ESNoTransformation.
+// Description: This file contains the implementation of the
+// ESNoTransformation class.
 
 #include "ESNoTransformation.h"
 
@@ -70,7 +71,7 @@ ESNoTransformation::ESNoTransformation(const ESNoTransformation& es)
 {
     numDOF = es.numDOF;
     DOF = new ID(numDOF);
-    if (!DOF)  {
+    if (DOF == 0)  {
         opserr << "ESNoTransformation::ESNoTransformation()"
             << " - failed to create DOF array\n";
         exit(OF_ReturnType_failed);

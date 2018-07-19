@@ -623,6 +623,9 @@
     <ClCompile Include="..\..\..\SRC\experimentalControlPoint\TclExpCPCommand.cpp">
       <Filter>experimentalControlPoint</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalSetup\ESThreeActuators.cpp">
+      <Filter>experimentalSetup</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\FrescoGlobals.h">
@@ -1218,6 +1221,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\SRC\experimentalControlPoint\ExperimentalCP.h">
       <Filter>experimentalControlPoint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalSetup\ESThreeActuators.h">
+      <Filter>experimentalSetup</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

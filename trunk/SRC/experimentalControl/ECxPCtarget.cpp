@@ -39,10 +39,12 @@
 
 ECxPCtarget::ECxPCtarget(int tag, int nTrialCPs, ExperimentalCP **trialcps,
     int nOutCPs, ExperimentalCP **outcps, char *ipaddress, char *ipport,
-    char *appFile, int timeout)
+    char *appFile, int _timeout, int reltrial)
     : ExperimentalControl(tag), numTrialCPs(nTrialCPs), numOutCPs(nOutCPs),
-    ipAddress(ipaddress), ipPort(ipport), timeOut(timeout),
+    ipAddress(ipaddress), ipPort(ipport), timeout(_timeout),
     numCtrlSignals(0), numDaqSignals(0), ctrlSignal(0), daqSignal(0),
+    ctrlSigOffset(0), daqSigOffset(0), trialSigOffset(0),
+    useRelativeTrial(reltrial), gotRelativeTrial(!reltrial),
     newTargetId(0), switchPCId(0), atTargetId(0),
     ctrlSignalId(0), daqSignalId(0)
 {
@@ -55,11 +57,34 @@ ECxPCtarget::ECxPCtarget(int tag, int nTrialCPs, ExperimentalCP **trialcps,
     trialCPs = trialcps;
     outCPs = outcps;
     
-    // get total number of control and daq signals
-    for (int i=0; i<numTrialCPs; i++)
-        numCtrlSignals += trialCPs[i]->getNumSignal();
-    for (int i=0; i<numOutCPs; i++)
-        numDaqSignals += outCPs[i]->getNumSignal();
+    // get total number of control and daq signals and
+    // check if any signals use relative reference
+    int ctrlIsRelative = 0;
+    for (int i=0; i<numTrialCPs; i++)  {
+        int numSignals = trialCPs[i]->getNumSignal();
+        numCtrlSignals += numSignals;
+        
+        int j = 0;
+        ID isRel = trialCPs[i]->getSigRefType();
+        while (!ctrlIsRelative && j < numSignals)
+            ctrlIsRelative = isRel(j++);
+    }
+    int daqIsRelative = 0;
+    for (int i=0; i<numOutCPs; i++)  {
+        int numSignals = outCPs[i]->getNumSignal();
+        numDaqSignals += numSignals;
+        
+        int j = 0;
+        ID isRel = outCPs[i]->getSigRefType();
+        while (!daqIsRelative && j < numSignals)
+            daqIsRelative = isRel(j++);
+    }
+    
+    // resize offsets if any signals use relative reference
+    if (ctrlIsRelative)
+        ctrlSigOffset.resize(numCtrlSignals);
+    if (daqIsRelative)
+        daqSigOffset.resize(numDaqSignals);
     
     // split appFile into file name and path
     char *pos = strrchr(appFile, '/');
@@ -93,7 +118,7 @@ ECxPCtarget::ECxPCtarget(int tag, int nTrialCPs, ExperimentalCP **trialcps,
     }
     
     // set timeout value between host and target PC
-    xPCSetLoadTimeOut(port, timeOut);
+    xPCSetLoadTimeOut(port, timeout);
     if (xPCGetLastError())  {
         xPCErrorMsg(xPCGetLastError(), errMsg);
         opserr << "ECxPCtarget::ECxPCtarget()"
@@ -176,6 +201,8 @@ ECxPCtarget::ECxPCtarget(int tag, int nTrialCPs, ExperimentalCP **trialcps,
 ECxPCtarget::ECxPCtarget(const ECxPCtarget &ec)
     : ExperimentalControl(ec),
     numCtrlSignals(0), numDaqSignals(0), ctrlSignal(0), daqSignal(0),
+    ctrlSigOffset(0), daqSigOffset(0), trialSigOffset(0),
+    useRelativeTrial(0), gotRelativeTrial(1),
     newTargetId(0), switchPCId(0), atTargetId(0),
     ctrlSignalId(0), daqSignalId(0)
 {
@@ -185,7 +212,7 @@ ECxPCtarget::ECxPCtarget(const ECxPCtarget &ec)
     outCPs      = ec.outCPs;
     ipAddress   = ec.ipAddress;
     ipPort      = ec.ipPort;
-    timeOut     = ec.timeOut;
+    timeout     = ec.timeout;
     
     strcpy(appName,ec.appName);
     strcpy(appPath,ec.appPath);
@@ -193,6 +220,11 @@ ECxPCtarget::ECxPCtarget(const ECxPCtarget &ec)
     
     numCtrlSignals = ec.numCtrlSignals;
     numDaqSignals  = ec.numDaqSignals;
+    useRelativeTrial = ec.useRelativeTrial;
+    gotRelativeTrial = ec.gotRelativeTrial;
+    
+    ctrlSigOffset  = ec.ctrlSigOffset;
+    daqSigOffset   = ec.daqSigOffset;
 }
 
 
@@ -277,6 +309,16 @@ int ECxPCtarget::setup()
         daqSignal[i] = 0.0;
         daqSignalId[i] = 0;
     }
+    
+    // resize ctrl and daq signal offset vectors
+    ctrlSigOffset.resize(numCtrlSignals);
+    ctrlSigOffset.Zero();
+    daqSigOffset.resize(numDaqSignals);
+    daqSigOffset.Zero();
+    
+    // resize trial signal offset vector
+    trialSigOffset.resize(numCtrlSignals);
+    trialSigOffset.Zero();
     
     // get addresses of the controlled variables on the xPC Target
     newTargetId = xPCGetParamIdx(port, "xPC HC/newTarget", "Value");

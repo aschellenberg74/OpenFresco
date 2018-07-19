@@ -240,6 +240,7 @@
     <ClCompile Include="..\..\..\SRC\experimentalElement\TclEEBearingCommand.cpp" />
     <ClCompile Include="..\..\..\SRC\experimentalRecorder\ExpTangentStiffRecorder.cpp" />
     <ClCompile Include="..\..\..\SRC\experimentalRecorder\response\ExpTangentStiffResponse.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalSetup\ESThreeActuators.cpp" />
     <ClCompile Include="..\..\..\SRC\experimentalSignalFilter\ESFKrylovForceConverter.cpp" />
     <ClCompile Include="..\..\..\SRC\experimentalSignalFilter\ESFTangForceConverter.cpp" />
     <ClCompile Include="..\..\..\SRC\experimentalTangentStiff\ETBfgs.cpp" />
@@ -431,6 +432,7 @@
     <ClInclude Include="..\..\..\SRC\experimentalElement\EEBearing3d.h" />
     <ClInclude Include="..\..\..\SRC\experimentalRecorder\ExpTangentStiffRecorder.h" />
     <ClInclude Include="..\..\..\SRC\experimentalRecorder\response\ExpTangentStiffResponse.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalSetup\ESThreeActuators.h" />
     <ClInclude Include="..\..\..\SRC\experimentalSignalFilter\ESFKrylovForceConverter.h" />
     <ClInclude Include="..\..\..\SRC\experimentalSignalFilter\ESFTangForceConverter.h" />
     <ClInclude Include="..\..\..\SRC\experimentalTangentStiff\ETBfgs.h" />
