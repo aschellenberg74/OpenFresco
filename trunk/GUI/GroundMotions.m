@@ -53,23 +53,23 @@ switch action
             % -------------------------------------------------------------
             case 'Ground Motions'
                 handles.GM.loadType = 'Ground Motions';
-                set(handles.GroundMotions(19),'Value',1,'CData',handles.Store.GM1);
-                set(handles.GroundMotions(20),'Value',0,'CData',handles.Store.IC0);
-                set(handles.GroundMotions([2:9 28]),'Visible','on');
-                set(handles.GroundMotions(21:27),'Visible','off');
-                set(get(handles.GroundMotions(7), 'Children'), 'Visible', 'on');
-                set(get(handles.GroundMotions(8), 'Children'), 'Visible', 'on');
-                set(get(handles.GroundMotions(9), 'Children'), 'Visible', 'on');
-                set(get(handles.GroundMotions(15), 'Children'), 'Visible', 'on');
-                set(get(handles.GroundMotions(16), 'Children'), 'Visible', 'on');
-                set(get(handles.GroundMotions(17), 'Children'), 'Visible', 'on');
-                set(get(handles.GroundMotions(26), 'Children'), 'Visible', 'off');
+                set(handles.GroundMotions(17),'Value',1,'CData',handles.Store.GM1);
+                set(handles.GroundMotions(18),'Value',0,'CData',handles.Store.IC0);
+                set(handles.GroundMotions([2:8 26]),'Visible','on');
+                set(handles.GroundMotions(19:25),'Visible','off');
+                set(get(handles.GroundMotions(6),'Children'),'Visible','on');
+                set(get(handles.GroundMotions(7),'Children'),'Visible','on');
+                set(get(handles.GroundMotions(8),'Children'),'Visible','on');
+                set(get(handles.GroundMotions(13),'Children'),'Visible','on');
+                set(get(handles.GroundMotions(14),'Children'),'Visible','on');
+                set(get(handles.GroundMotions(15),'Children'),'Visible','on');
+                set(get(handles.GroundMotions(24),'Children'),'Visible','off');
                 if strcmp(handles.Model.Type,'2 DOF B')
-                    set(handles.GroundMotions(10:17),'Visible','on');
+                    set(handles.GroundMotions(9:15),'Visible','on');
                     set(handles.GroundMotions(2),'Position',[0.12 0.64 0.35 0.33]);
-                    set(handles.GroundMotions(7),'Position',[0.12 0.47 0.35 0.15]);
-                    set(handles.GroundMotions(8),'Position',[0.12 0.25 0.35 0.15]);
-                    set(handles.GroundMotions(9),'Position',[0.12 0.08 0.35 0.15]);
+                    set(handles.GroundMotions(6),'Position',[0.12 0.47 0.35 0.15]);
+                    set(handles.GroundMotions(7),'Position',[0.12 0.25 0.35 0.15]);
+                    set(handles.GroundMotions(8),'Position',[0.12 0.08 0.35 0.15]);
                     set(findobj('Tag','GMhelp'),'Position',[0.85 0.65 0.083 0.132]);
                     set(findobj('Tag','Scalehelp'),'Position',[0.85 0.35 0.083 0.132]);
                 end
@@ -83,31 +83,31 @@ switch action
                 handles.GM.loadType = 'Initial Conditions';
                 handles.GM.dtAnalysis = 0.005;
                 set(handles.Analysis(3),'String',num2str(handles.GM.dtAnalysis));
-                set(handles.GroundMotions(19),'Value',0,'CData',handles.Store.GM0);
-                set(handles.GroundMotions(20),'Value',1,'CData',handles.Store.IC1);
-                set(handles.GroundMotions(2:17),'Visible','off');
-                set(handles.GroundMotions(21:27),'Visible','on');
+                set(handles.GroundMotions(17),'Value',0,'CData',handles.Store.GM0);
+                set(handles.GroundMotions(18),'Value',1,'CData',handles.Store.IC1);
+                set(handles.GroundMotions(2:15),'Visible','off');
+                set(handles.GroundMotions(19:25),'Visible','on');
                 
                 if ~isfield(handles.GM, 'initialDisp') || isempty(handles.GM.initialDisp)
                     if strcmp(handles.Model.Type, '1 DOF')
-                        set(handles.GroundMotions(23),'String','Enter displacement here');
+                        set(handles.GroundMotions(21),'String','Enter displacement here');
                     else
-                        set(handles.GroundMotions(23),'String','[U1 U2]');
+                        set(handles.GroundMotions(21),'String','[U1 U2]');
                     end
                 end
                 if ~isfield(handles.GM, 'rampTime') || isempty(handles.GM.rampTime)
-                    set(handles.GroundMotions(24),'String','');
+                    set(handles.GroundMotions(22),'String','');
                 end
                 if ~isfield(handles.GM, 'vibTime') || isempty(handles.GM.vibTime)
-                    set(handles.GroundMotions(25),'String','');
+                    set(handles.GroundMotions(23),'String','');
                 end
-                set(get(handles.GroundMotions(7), 'Children'), 'Visible', 'off');
-                set(get(handles.GroundMotions(8), 'Children'), 'Visible', 'off');
-                set(get(handles.GroundMotions(9), 'Children'), 'Visible', 'off');
-                set(get(handles.GroundMotions(15), 'Children'), 'Visible', 'off');
-                set(get(handles.GroundMotions(16), 'Children'), 'Visible', 'off');
-                set(get(handles.GroundMotions(17), 'Children'), 'Visible', 'off');
-                set(get(handles.GroundMotions(26), 'Children'), 'Visible', 'on');
+                set(get(handles.GroundMotions(6),'Children'),'Visible','off');
+                set(get(handles.GroundMotions(7),'Children'),'Visible','off');
+                set(get(handles.GroundMotions(8),'Children'),'Visible','off');
+                set(get(handles.GroundMotions(13),'Children'),'Visible','off');
+                set(get(handles.GroundMotions(14),'Children'),'Visible','off');
+                set(get(handles.GroundMotions(15),'Children'),'Visible','off');
+                set(get(handles.GroundMotions(24),'Children'),'Visible','on');
             % -------------------------------------------------------------
         end
     % =====================================================================
@@ -119,7 +119,7 @@ switch action
         % check that damping has been selected
         elseif isempty(handles.Model.Zeta)
             msgbox(sprintf('Must specify damping values before\nloading ground motion!'),'Error','error');
-            set(handles.GroundMotions([3 11]),'String','...');
+            set(handles.GroundMotions([3 10]),'String','...');
             return
         else
             filepath = fullfile(pathname, filename);
@@ -133,19 +133,19 @@ switch action
                         'String',filepath,...
                         'TooltipString',filepath);
                     
-                    [dt databaseType] = ReadWriteTHFile('readDT',filepath);
-                    [t ag] = ReadWriteTHFile('readTHF',filepath);
+                    [dt,databaseType] = ReadWriteTHFile('readDT',filepath);
+                    [t,ag] = ReadWriteTHFile('readTHF',filepath);
                     handles.GM.databaseType{1} = databaseType;
                     handles.GM.dt(1) = dt;
                     handles.GM.t{1} = t;
                     handles.GM.ag{1} = ag;
-                    set(handles.GroundMotions(28),'String',num2str(dt));
+                    set(handles.GroundMotions(26),'String',num2str(dt));
                     if strcmp(databaseType,'UNKNOWN')
-                        set(handles.GroundMotions(28),'Style','edit','BackgroundColor',[1 1 1]);
+                        set(handles.GroundMotions(26),'Style','edit','BackgroundColor',[1 1 1]);
                         handles.GM.t{1} = dt*t;
                         handles.GM.AmpFact(1) = 1.0;
                     else
-                        set(handles.GroundMotions(28),'Style','text','BackgroundColor',[0.941176 0.941176 0.941176]);
+                        set(handles.GroundMotions(26),'Style','text','BackgroundColor',[0.941176 0.941176 0.941176]);
                         handles.GM.AmpFact(1) = 32.174*12;
                     end
                     set(handles.GroundMotions(4),'String',handles.GM.AmpFact(1));
@@ -159,9 +159,9 @@ switch action
                     
                     % calculate spectral response quantities and plot
                     handles.GM.Spectra{1} = ResponseSpectraElastic(handles.GM.scaleag{1},handles.GM.scaledt(1),m,handles.Model.Zeta,minT,maxT,numTvalues);
-                    plot(handles.GroundMotions(7), handles.GM.scalet{1}, handles.GM.scaleag{1});
-                    plot(handles.GroundMotions(8), handles.GM.Spectra{1}.T, handles.GM.Spectra{1}.psdAcc);
-                    plot(handles.GroundMotions(9), handles.GM.Spectra{1}.T, handles.GM.Spectra{1}.dsp);
+                    plot(handles.GroundMotions(6), handles.GM.scalet{1}, handles.GM.scaleag{1});
+                    plot(handles.GroundMotions(7), handles.GM.Spectra{1}.T, handles.GM.Spectra{1}.psdAcc);
+                    plot(handles.GroundMotions(8), handles.GM.Spectra{1}.T, handles.GM.Spectra{1}.dsp);
                     
                     % store analysis dt
                     handles.GM.dtAnalysis = min(handles.GM.scaledt);
@@ -170,26 +170,26 @@ switch action
                 % ---------------------------------------------------------
                 case 'Direction 2'
                     handles.GM.store.filepath{2} = filepath;
-                    set(handles.GroundMotions(11),...
+                    set(handles.GroundMotions(10),...
                         'String',filepath,...
                         'TooltipString',filepath);
                     
-                    [dt databaseType] = ReadWriteTHFile('readDT',filepath);
-                    [t ag] = ReadWriteTHFile('readTHF',filepath);
+                    [dt,databaseType] = ReadWriteTHFile('readDT',filepath);
+                    [t,ag] = ReadWriteTHFile('readTHF',filepath);
                     handles.GM.databaseType{2} = databaseType;
                     handles.GM.dt(2) = dt;
                     handles.GM.t{2} = t;
                     handles.GM.ag{2} = ag;
-                    set(handles.GroundMotions(29),'String',num2str(dt));
+                    set(handles.GroundMotions(27),'String',num2str(dt));
                     if strcmp(databaseType,'UNKNOWN')
-                        set(handles.GroundMotions(29),'Style','edit','BackgroundColor',[1 1 1]);
+                        set(handles.GroundMotions(27),'Style','edit','BackgroundColor',[1 1 1]);
                         handles.GM.t{2} = dt*t;
                         handles.GM.AmpFact(2) = 1.0;
                     else
-                        set(handles.GroundMotions(29),'Style','text','BackgroundColor',[0.941176 0.941176 0.941176]);
+                        set(handles.GroundMotions(27),'Style','text','BackgroundColor',[0.941176 0.941176 0.941176]);
                         handles.GM.AmpFact(2) = 32.174*12;
                     end
-                    set(handles.GroundMotions(12),'String',handles.GM.AmpFact(2));
+                    set(handles.GroundMotions(11),'String',handles.GM.AmpFact(2));
                     
                     % calculate scaled values
                     handles.GM.scaledt(2) = handles.GM.dt(2);
@@ -200,9 +200,9 @@ switch action
                     
                     % calculate spectral response quantities and plot
                     handles.GM.Spectra{2} = ResponseSpectraElastic(handles.GM.scaleag{2},handles.GM.scaledt(2),m,handles.Model.Zeta,minT,maxT,numTvalues);
-                    plot(handles.GroundMotions(15), handles.GM.scalet{2}, handles.GM.scaleag{2});
-                    plot(handles.GroundMotions(16), handles.GM.Spectra{2}.T, handles.GM.Spectra{2}.psdAcc);
-                    plot(handles.GroundMotions(17), handles.GM.Spectra{2}.T, handles.GM.Spectra{2}.dsp);
+                    plot(handles.GroundMotions(13), handles.GM.scalet{2}, handles.GM.scaleag{2});
+                    plot(handles.GroundMotions(14), handles.GM.Spectra{2}.T, handles.GM.Spectra{2}.psdAcc);
+                    plot(handles.GroundMotions(15), handles.GM.Spectra{2}.T, handles.GM.Spectra{2}.dsp);
                     
                     % store analysis dt
                     handles.GM.dtAnalysis = min(handles.GM.scaledt);
@@ -218,7 +218,7 @@ switch action
             % check that damping has been selected
             if isempty(handles.Model.Zeta)
                 msgbox(sprintf('Must specify damping values before\nloading ground motion!'),'Error','error');
-                set(handles.GroundMotions([3 11]),'String','...');
+                set(handles.GroundMotions([3 10]),'String','...');
                 return
             end
             % switch based on which direction is chosen
@@ -230,18 +230,18 @@ switch action
                         'String',filepath,...
                         'TooltipString',filepath);
                     
-                    [dt databaseType] = ReadWriteTHFile('readDT',filepath);
-                    [t ag] = ReadWriteTHFile('readTHF',filepath);
+                    [dt,databaseType] = ReadWriteTHFile('readDT',filepath);
+                    [t,ag] = ReadWriteTHFile('readTHF',filepath);
                     handles.GM.databaseType = databaseType;
                     handles.GM.dt(1) = dt;
                     handles.GM.t{1} = t;
                     handles.GM.ag{1} = ag;
-                    set(handles.GroundMotions(28),'String',num2str(dt));
+                    set(handles.GroundMotions(26),'String',num2str(dt));
                     if strcmp(databaseType,'UNKNOWN')
-                        set(handles.GroundMotions(28),'Style','edit','BackgroundColor',[1 1 1]);
+                        set(handles.GroundMotions(26),'Style','edit','BackgroundColor',[1 1 1]);
                         handles.GM.t{1} = dt*t;
                     else
-                        set(handles.GroundMotions(28),'Style','text','BackgroundColor',[0.941176 0.941176 0.941176]);
+                        set(handles.GroundMotions(26),'Style','text','BackgroundColor',[0.941176 0.941176 0.941176]);
                     end
                     
                     % calculate scaled values
@@ -257,29 +257,29 @@ switch action
                     
                     % calculate spectral response quantities and plot
                     handles.GM.Spectra{1} = ResponseSpectraElastic(handles.GM.scaleag{1},handles.GM.scaledt(1),m,handles.Model.Zeta,minT,maxT,numTvalues);
-                    plot(handles.GroundMotions(7), handles.GM.scalet{1}, handles.GM.scaleag{1});
-                    plot(handles.GroundMotions(8), handles.GM.Spectra{1}.T, handles.GM.Spectra{1}.psdAcc);
-                    plot(handles.GroundMotions(9), handles.GM.Spectra{1}.T, handles.GM.Spectra{1}.dsp);
+                    plot(handles.GroundMotions(6), handles.GM.scalet{1}, handles.GM.scaleag{1});
+                    plot(handles.GroundMotions(7), handles.GM.Spectra{1}.T, handles.GM.Spectra{1}.psdAcc);
+                    plot(handles.GroundMotions(8), handles.GM.Spectra{1}.T, handles.GM.Spectra{1}.dsp);
                     guidata(gcbf, handles);
                 % ---------------------------------------------------------
                 case 'Direction 2'
                     handles.GM.store.filepath{2} = filepath;
-                    set(handles.GroundMotions(11),...
+                    set(handles.GroundMotions(10),...
                         'String',filepath,...
                         'TooltipString',filepath);
                     
-                    [dt databaseType] = ReadWriteTHFile('readDT',filepath);
-                    [t ag] = ReadWriteTHFile('readTHF',filepath);
+                    [dt,databaseType] = ReadWriteTHFile('readDT',filepath);
+                    [t,ag] = ReadWriteTHFile('readTHF',filepath);
                     handles.GM.databaseType{2} = databaseType;
                     handles.GM.dt(2) = dt;
                     handles.GM.t{2} = t;
                     handles.GM.ag{2} = ag;
-                    set(handles.GroundMotions(29),'String',num2str(dt));
+                    set(handles.GroundMotions(27),'String',num2str(dt));
                     if strcmp(databaseType,'Unknown')
-                        set(handles.GroundMotions(29),'Style','edit','BackgroundColor',[1 1 1]);
+                        set(handles.GroundMotions(27),'Style','edit','BackgroundColor',[1 1 1]);
                         handles.GM.t{2} = dt*t;
                     else
-                        set(handles.GroundMotions(29),'Style','text','BackgroundColor',[0.941176 0.941176 0.941176]);
+                        set(handles.GroundMotions(27),'Style','text','BackgroundColor',[0.941176 0.941176 0.941176]);
                     end
                     
                     % calculate scaled values
@@ -295,9 +295,9 @@ switch action
                     
                     % calculate spectral response quantities and plot
                     handles.GM.Spectra{2} = ResponseSpectraElastic(handles.GM.scaleag{2},handles.GM.scaledt(2),m,handles.Model.Zeta,minT,maxT,numTvalues);
-                    plot(handles.GroundMotions(15), handles.GM.scalet{2}, handles.GM.scaleag{2});
-                    plot(handles.GroundMotions(16), handles.GM.Spectra{2}.T, handles.GM.Spectra{2}.psdAcc);
-                    plot(handles.GroundMotions(17), handles.GM.Spectra{2}.T, handles.GM.Spectra{2}.dsp);
+                    plot(handles.GroundMotions(13), handles.GM.scalet{2}, handles.GM.scaleag{2});
+                    plot(handles.GroundMotions(14), handles.GM.Spectra{2}.T, handles.GM.Spectra{2}.psdAcc);
+                    plot(handles.GroundMotions(15), handles.GM.Spectra{2}.T, handles.GM.Spectra{2}.dsp);
                     guidata(gcbf, handles);
                 % ---------------------------------------------------------
             end
@@ -315,7 +315,7 @@ switch action
                 % adjust dt for GM 1
                 if str2num(get(gcbo,'String')) <= 0
                     msgbox('Time step must be positive!','Error','error');
-                    set(handles.GroundMotions(28),'String',num2str(handles.GM.dt(1)));
+                    set(handles.GroundMotions(26),'String',num2str(handles.GM.dt(1)));
                     return
                 end
                 handles.GM.dt(1) = str2num(get(gcbo,'String'));
@@ -333,9 +333,9 @@ switch action
                 
                 % calculate spectral response quantities and plot
                 handles.GM.Spectra{1} = ResponseSpectraElastic(handles.GM.scaleag{1},handles.GM.scaledt(1),m,handles.Model.Zeta,minT,maxT,numTvalues);
-                plot(handles.GroundMotions(7), handles.GM.scalet{1}, handles.GM.scaleag{1});
-                plot(handles.GroundMotions(8), handles.GM.Spectra{1}.T, handles.GM.Spectra{1}.psdAcc);
-                plot(handles.GroundMotions(9), handles.GM.Spectra{1}.T, handles.GM.Spectra{1}.dsp);
+                plot(handles.GroundMotions(6), handles.GM.scalet{1}, handles.GM.scaleag{1});
+                plot(handles.GroundMotions(7), handles.GM.Spectra{1}.T, handles.GM.Spectra{1}.psdAcc);
+                plot(handles.GroundMotions(8), handles.GM.Spectra{1}.T, handles.GM.Spectra{1}.dsp);
                 
                 % store analysis dt
                 handles.GM.dtAnalysis = min(handles.GM.dt);
@@ -346,7 +346,7 @@ switch action
                 % adjust dt for GM 2
                 if str2num(get(gcbo,'String')) <= 0
                     msgbox('Time step must be positive!','Error','error');
-                    set(handles.GroundMotions(29),'String',num2str(handles.GM.dt(1)));
+                    set(handles.GroundMotions(27),'String',num2str(handles.GM.dt(1)));
                     return
                 end
                 handles.GM.dt(2) = str2num(get(gcbo,'String'));
@@ -364,9 +364,9 @@ switch action
                 
                 % calculate spectral response quantities and plot
                 handles.GM.Spectra{2} = ResponseSpectraElastic(handles.GM.scaleag{2},handles.GM.scaledt(2),m,handles.Model.Zeta,minT,maxT,numTvalues);
-                plot(handles.GroundMotions(15), handles.GM.scalet{2}, handles.GM.scaleag{2});
-                plot(handles.GroundMotions(16), handles.GM.Spectra{2}.T, handles.GM.Spectra{2}.psdAcc);
-                plot(handles.GroundMotions(17), handles.GM.Spectra{2}.T, handles.GM.Spectra{2}.dsp);
+                plot(handles.GroundMotions(13), handles.GM.scalet{2}, handles.GM.scaleag{2});
+                plot(handles.GroundMotions(14), handles.GM.Spectra{2}.T, handles.GM.Spectra{2}.psdAcc);
+                plot(handles.GroundMotions(15), handles.GM.Spectra{2}.T, handles.GM.Spectra{2}.dsp);
                 
                 % store analysis dt
                 handles.GM.dtAnalysis = min(handles.GM.dt);
@@ -399,9 +399,9 @@ switch action
                 handles.GM.scaledg{1} = handles.GM.scaledt(1)*cumtrapz(handles.GM.scalevg{1});
                 % calculate spectral response quantities and plot
                 handles.GM.Spectra{1} = ResponseSpectraElastic(handles.GM.scaleag{1},handles.GM.scaledt(1),m,handles.Model.Zeta,minT,maxT,numTvalues);
-                plot(handles.GroundMotions(7), handles.GM.scalet{1}, handles.GM.scaleag{1});
-                plot(handles.GroundMotions(8), handles.GM.Spectra{1}.T, handles.GM.Spectra{1}.psdAcc);
-                plot(handles.GroundMotions(9), handles.GM.Spectra{1}.T, handles.GM.Spectra{1}.dsp);
+                plot(handles.GroundMotions(6), handles.GM.scalet{1}, handles.GM.scaleag{1});
+                plot(handles.GroundMotions(7), handles.GM.Spectra{1}.T, handles.GM.Spectra{1}.psdAcc);
+                plot(handles.GroundMotions(8), handles.GM.Spectra{1}.T, handles.GM.Spectra{1}.dsp);
                 guidata(gcbf, handles);
             % -------------------------------------------------------------
             case 'edit_time1'
@@ -415,9 +415,9 @@ switch action
                 set(handles.Analysis(3),'String',num2str(handles.GM.dtAnalysis));
                 % calculate spectral response quantities and plot
                 handles.GM.Spectra{1} = ResponseSpectraElastic(handles.GM.scaleag{1},handles.GM.scaledt(1),m,handles.Model.Zeta,minT,maxT,numTvalues);
-                plot(handles.GroundMotions(7), handles.GM.scalet{1}, handles.GM.scaleag{1});
-                plot(handles.GroundMotions(8), handles.GM.Spectra{1}.T, handles.GM.Spectra{1}.psdAcc);
-                plot(handles.GroundMotions(9), handles.GM.Spectra{1}.T, handles.GM.Spectra{1}.dsp);
+                plot(handles.GroundMotions(6), handles.GM.scalet{1}, handles.GM.scaleag{1});
+                plot(handles.GroundMotions(7), handles.GM.Spectra{1}.T, handles.GM.Spectra{1}.psdAcc);
+                plot(handles.GroundMotions(8), handles.GM.Spectra{1}.T, handles.GM.Spectra{1}.dsp);
                 guidata(gcbf, handles);
             % -------------------------------------------------------------
             case 'edit_amp2'
@@ -428,9 +428,9 @@ switch action
                 handles.GM.scaledg{2} = handles.GM.scaledt(2)*cumtrapz(handles.GM.scalevg{2});
                 % calculate spectral response quantities and plot
                 handles.GM.Spectra{2} = ResponseSpectraElastic(handles.GM.scaleag{2},handles.GM.scaledt(2),m,handles.Model.Zeta,minT,maxT,numTvalues);
-                plot(handles.GroundMotions(15), handles.GM.scalet{2}, handles.GM.scaleag{2});
-                plot(handles.GroundMotions(16), handles.GM.Spectra{2}.T, handles.GM.Spectra{2}.psdAcc);
-                plot(handles.GroundMotions(17), handles.GM.Spectra{2}.T, handles.GM.Spectra{2}.dsp);
+                plot(handles.GroundMotions(13), handles.GM.scalet{2}, handles.GM.scaleag{2});
+                plot(handles.GroundMotions(14), handles.GM.Spectra{2}.T, handles.GM.Spectra{2}.psdAcc);
+                plot(handles.GroundMotions(15), handles.GM.Spectra{2}.T, handles.GM.Spectra{2}.dsp);
                 guidata(gcbf, handles);
             % -------------------------------------------------------------
             case 'edit_time2'
@@ -444,9 +444,9 @@ switch action
                 set(handles.Analysis(3),'String',num2str(handles.GM.dtAnalysis));
                 % calculate spectral response quantities and plot
                 handles.GM.Spectra{2} = ResponseSpectraElastic(handles.GM.scaleag{2},handles.GM.scaledt(2),m,handles.Model.Zeta,minT,maxT,numTvalues);
-                plot(handles.GroundMotions(15), handles.GM.scalet{2}, handles.GM.scaleag{2});
-                plot(handles.GroundMotions(16), handles.GM.Spectra{2}.T, handles.GM.Spectra{2}.psdAcc);
-                plot(handles.GroundMotions(17), handles.GM.Spectra{2}.T, handles.GM.Spectra{2}.dsp);
+                plot(handles.GroundMotions(13), handles.GM.scalet{2}, handles.GM.scaleag{2});
+                plot(handles.GroundMotions(14), handles.GM.Spectra{2}.T, handles.GM.Spectra{2}.psdAcc);
+                plot(handles.GroundMotions(15), handles.GM.Spectra{2}.T, handles.GM.Spectra{2}.dsp);
                 guidata(gcbf, handles);
             % -------------------------------------------------------------
         end
@@ -459,25 +459,25 @@ switch action
             % -------------------------------------------------------------
             case 'Choose Mode...'
                 if strcmp(handles.Model.Type, '1 DOF')
-                    set(handles.GroundMotions(23),'String','Enter displacement here');
+                    set(handles.GroundMotions(21),'String','Enter displacement here');
                 else
-                    set(handles.GroundMotions(23),'String','[U1 U2]');
+                    set(handles.GroundMotions(21),'String','[U1 U2]');
                 end
                 handles.GM.initialDisp = [];
             % -------------------------------------------------------------
             case 'Mode 1'
-                set(handles.GroundMotions(23),'String',num2str(handles.Model.Modes(:,1)'));
+                set(handles.GroundMotions(21),'String',num2str(handles.Model.Modes(:,1)'));
                 handles.GM.initialDisp = handles.Model.Modes(:,1)';
             % -------------------------------------------------------------
             case 'Mode 2'
-                set(handles.GroundMotions(23),'String',num2str(handles.Model.Modes(:,2)'));
+                set(handles.GroundMotions(21),'String',num2str(handles.Model.Modes(:,2)'));
                 handles.GM.initialDisp = handles.Model.Modes(:,2)';
             % -------------------------------------------------------------
             case 'User Defined'
                 if strcmp(handles.Model.Type, '1 DOF')
-                    set(handles.GroundMotions(23),'String','Enter displacement here');
+                    set(handles.GroundMotions(21),'String','Enter displacement here');
                 else
-                    set(handles.GroundMotions(23),'String','[U1 U2]');
+                    set(handles.GroundMotions(21),'String','[U1 U2]');
                 end
                 handles.GM.initialDisp = [];
             % -------------------------------------------------------------

@@ -1,1 +1,3 @@
-1.1
+OpenFresco Express 1.2
+$Revision: 391 $
+$Date: 2015-12-10 17:48:13 -0700 (Sun, 10 Sep 2017) $

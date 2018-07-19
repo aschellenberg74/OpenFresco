@@ -42,17 +42,17 @@ switch action
         dt = 1;
         fin = fopen(fileIN,'r');
         txtLine = fgetl(fin);
-        if ~isempty(strfind(txtLine,'PEER'))
+        if contains(txtLine,'PEER')
             while ~feof(fin)
                 txtLine = fgetl(fin);
                 if ~isempty(txtLine) && ~isequal(txtLine,-1)
-                    if ~isempty(strfind(txtLine,'DT='))
+                    if contains(txtLine,'DT=')
                         % PEER STRONG MOTION DATABASE RECORD
                         token = textscan(txtLine,'%q');
                         dt = cell2mat(textscan(token{1}{4},'%f'));
                         databaseType = 'PEER';
                         break;
-                    elseif ~isempty(strfind(txtLine,'NPTS, DT'))
+                    elseif contains(txtLine,'NPTS, DT')
                         % PEER NGA STRONG MOTION DATABASE RECORD
                         token = textscan(txtLine,'%q');
                         dt = cell2mat(textscan(token{1}{2},'%f'));
@@ -84,11 +84,11 @@ switch action
                 if ~isempty(numLine)
                     n = length(numLine);
                     ag(end+1:end+n) = numLine';
-                elseif ~isempty(strfind(txtLine,'DT='))
+                elseif contains(txtLine,'DT=')
                     % PEER STRONG MOTION DATABASE RECORD
                     token = textscan(txtLine,'%q');
                     dt = cell2mat(textscan(token{1}{4},'%f'));
-                elseif ~isempty(strfind(txtLine,'NPTS, DT'))
+                elseif contains(txtLine,'NPTS, DT')
                     % PEER NGA STRONG MOTION DATABASE RECORD
                     token = textscan(txtLine,'%q');
                     dt = cell2mat(textscan(token{1}{2},'%f'));

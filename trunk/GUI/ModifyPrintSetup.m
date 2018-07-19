@@ -82,7 +82,8 @@ function ModifyPrintSetup(hFig,varargin)
 % $URL$
 
 % open the print preview window to initialize data
-hPre = printpreview(hFig);
+% hPre = printpreview(hFig);  % no longer working with >= R2014b
+printpreview(hFig);
 
 % retrieve the hidden print setup options
 figOpts = getprinttemplate(hFig);
@@ -96,4 +97,4 @@ end
 setprinttemplate(hFig,figOpts);
 
 % close the preview window
-delete(hPre);
+%delete(hPre);

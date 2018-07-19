@@ -26,7 +26,7 @@
 % $URL$
 
 % clean start
-clear all; close all; clc;
+clear; close all; clc;
 
 % get path to OPF directory
 pathOPF = pwd;

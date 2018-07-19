@@ -32,12 +32,12 @@ function Analysis(action,varargin)
 % initialization tasks
 handles = guidata(findobj('Tag','OpenFrescoExpress'));
 
-% store which button is pressed
-analysis_option = get(gcbo,'Tag');
-
 switch action
     % =====================================================================
     case 'choose option'
+        
+        % get which button was pressed
+        analysis_option = handles.Analysis(6).SelectedObject.Tag;
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         if ~strcmp(handles.ExpSite.Type,'Actor')  % Local or Shadow Site
@@ -194,10 +194,12 @@ switch action
                             % now run OpenSees/OpenFresco in console
                             errorCode = RunOpenFresco(pathOPF,fullfile(DIR,'OPFE_Analysis.tcl'),1);
                             if (errorCode == 0)
-                                clear functions;
+                                clear functions; %#ok<CLFUNC>
                                 if strcmp(handles.GM.integrator,'NewmarkExplicit')
+                                    fprintf(1,'Using "Explicit Newmark" integrator\n');
                                     handles.Response = Integrator_NewmarkExplicit(handles.Model,handles.GM,[],handles.Analysis);
                                 elseif strcmp(handles.GM.integrator,'AlphaOS')
+                                    fprintf(1,'Using "Alpha OS" integrator\n');
                                     handles.Response = Integrator_AlphaOS(handles.Model,handles.GM,[],handles.Analysis);
                                 end
                             end
@@ -230,7 +232,7 @@ switch action
                             set(handles.Sidebar(5),'CData',handles.Store.Pause0b);
                             set(handles.Sidebar(6),'CData',handles.Store.Stop0b);
                             figure(findobj('Tag','ErrMon'));
-                            if ~isempty(findobj('Tag','StructOutDOF2'));
+                            if ~isempty(findobj('Tag','StructOutDOF2'))
                                 figure(findobj('Tag','StructOutDOF2'));
                             end
                             figure(findobj('Tag','StructOutDOF1'));
@@ -526,6 +528,16 @@ switch action
             end
         end
     % =====================================================================
+    case 'show tcl file'
+        % display report summarizing inputs
+        DIR = which('OPFE_Version.txt');
+        DIR = fileparts(DIR);
+        if exist(fullfile(DIR,'OPFE_Analysis.tcl'),'file')
+            GUI_Output(fullfile(DIR,'OPFE_Analysis.tcl'),'TCL File Content',fullfile(DIR,'OPFE_Analysis.tcl'));
+        else
+            msgbox(sprintf('No .tcl file found!\nPlease write .tcl first.'),'Error','error')
+        end
+    % =====================================================================
     case 'generate report'
         % display report summarizing inputs
         Report;
@@ -575,14 +587,13 @@ switch action
         set(handles.Structure,'Visible','on');
         set(handles.Structure(handles.Model.StructActive),'Visible','on');
         set(handles.Structure(handles.Model.StructInactive),'Visible','off');
-        set(handles.Structure([10 18 26]),'Visible','off');
         set(handles.GroundMotions,'Visible','off');
-        set(get(handles.GroundMotions(7), 'Children'), 'Visible', 'off');
-        set(get(handles.GroundMotions(8), 'Children'), 'Visible', 'off');
-        set(get(handles.GroundMotions(9), 'Children'), 'Visible', 'off');
-        set(get(handles.GroundMotions(15), 'Children'), 'Visible', 'off');
-        set(get(handles.GroundMotions(16), 'Children'), 'Visible', 'off');
-        set(get(handles.GroundMotions(17), 'Children'), 'Visible', 'off');
+        set(get(handles.GroundMotions(6),'Children'),'Visible','off');
+        set(get(handles.GroundMotions(7),'Children'),'Visible','off');
+        set(get(handles.GroundMotions(8),'Children'),'Visible','off');
+        set(get(handles.GroundMotions(13),'Children'),'Visible','off');
+        set(get(handles.GroundMotions(14),'Children'),'Visible','off');
+        set(get(handles.GroundMotions(15),'Children'),'Visible','off');
         set(handles.ESI,'Visible','off');
         set(handles.ES,'Visible','off');
         set(handles.EC,'Visible','off');
@@ -594,8 +605,26 @@ switch action
         % update handles structure
         guidata(findobj('Tag','OpenFrescoExpress'),handles);
     % =====================================================================
+    case 'set integrator'
+        h = gcbo;
+        for i=1:length(handles.Analysis(16).Children)
+            handles.Analysis(16).Children(i).Checked = 'off';
+        end
+        % select integrator
+        if strcmp(h.Text,'Explicit Newmark')
+            handles.GM.integrator = 'NewmarkExplicit';
+        elseif strcmp(h.Text,'Alpha OS')
+            handles.GM.integrator = 'AlphaOS';
+        else
+            handles.GM.integrator = 'NewmarkExplicit';
+        end
+        h.Checked = 'on';
+        % update handles structure
+        guidata(findobj('Tag','OpenFrescoExpress'),handles);
+    % =====================================================================
     case 'dtAnalysis'
-        input_val = str2num(get(gcbo,'String')); %#ok<ST2NM>
+        h = gcbo;
+        input_val = str2num(h.String); %#ok<ST2NM>
         if input_val > handles.Model.Maxdt
             msgbox(['Time step too large! Must be less than ' num2str(handles.Model.Maxdt)],'Error','error');
             set(handles.Analysis(3),'String',handles.GM.dtAnalysis);
@@ -606,7 +635,8 @@ switch action
         guidata(findobj('Tag','OpenFrescoExpress'),handles);
     % =====================================================================
     case 'animate'
-        answer = get(gcbo,'String');
+        h = gcbo;
+        answer = h.SelectedObject.String;
         if strcmp(answer,'Yes')
             handles.Store.Animate = 1;
         else

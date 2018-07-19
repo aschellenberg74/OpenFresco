@@ -38,15 +38,20 @@ if error
     return
 end
 
+% get OpenFresco Express version
+fid = fopen('OPFE_Version.txt');
+version = fgetl(fid);
+verNum = textscan(version,'%*s%*s%q');
+fclose(fid);
+
 % get the path and open file for writing
 DIR = which('OPFE_Version.txt');
 DIR = fileparts(DIR);
 FID = fopen(fullfile(DIR,'OPFE_Analysis.tcl'),'w');
-ver = fgetl(fopen('OPFE_Version.txt'));
 
 % print header
 fprintf(FID,'#==========================================================================\n');
-fprintf(FID,'# OpenFresco Express v%s                             %s\n',ver,datestr(now));
+fprintf(FID,'# OpenFresco Express v%s                             %s\n',verNum{1}{1},datestr(now));
 fprintf(FID,'#==========================================================================\n');
 fprintf(FID,'# File   : OPFE_Analysis.tcl\n');
 fprintf(FID,'# Purpose: Tcl script file for use with OpenFresco Express\n\n');
@@ -237,10 +242,12 @@ switch handles.Model.Type
         switch handles.ExpSite.Type
             case {'Local','Shadow'}
                 fprintf(FID,'# startSimAppSiteServer $siteTag $port <-udp> <-ssl>\n');
-                fprintf(FID,'startSimAppSiteServer 1 7777\nexit\n');
+                fprintf(FID,'startSimAppSiteServer 1 7777\n');
+                fprintf(FID,'wipeExp\nwipe\nexit\n');
             case 'Actor'
                 fprintf(FID,'# startLabServer $siteTag\n');
-                fprintf(FID,'startLabServer 1\nexit\n');
+                fprintf(FID,'startLabServer 1\n');
+                fprintf(FID,'wipeExp\nwipe\nexit\n');
         end
         fprintf(FID,'# ------------------------------\n# End of analysis\n# ------------------------------\n');
         
@@ -462,10 +469,12 @@ switch handles.Model.Type
         switch handles.ExpSite.Type
             case {'Local','Shadow'}
                 fprintf(FID,'# startSimAppSiteServer $siteTag $port <-udp> <-ssl>\n');
-                fprintf(FID,'startSimAppSiteServer 1 7777\nexit\n');
+                fprintf(FID,'startSimAppSiteServer 1 7777\n');
+                fprintf(FID,'wipeExp\nwipe\nexit\n');
             case 'Actor'
                 fprintf(FID,'# startLabServer $siteTag\n');
-                fprintf(FID,'startLabServer 1\nexit\n');
+                fprintf(FID,'startLabServer 1\n');
+                fprintf(FID,'wipeExp\nwipe\nexit\n');
         end
         fprintf(FID,'# ------------------------------\n# End of analysis\n# ------------------------------\n');
         
@@ -670,10 +679,12 @@ switch handles.Model.Type
         switch handles.ExpSite.Type
             case {'Local','Shadow'}
                 fprintf(FID,'# startSimAppSiteServer $siteTag $port <-udp> <-ssl>\n');
-                fprintf(FID,'startSimAppSiteServer 1 7777\nexit\n');
+                fprintf(FID,'startSimAppSiteServer 1 7777\n');
+                fprintf(FID,'wipeExp\nwipe\nexit\n');
             case 'Actor'
                 fprintf(FID,'# startLabServer $siteTag\n');
-                fprintf(FID,'startLabServer 1\nexit\n');
+                fprintf(FID,'startLabServer 1\n');
+                fprintf(FID,'wipeExp\nwipe\nexit\n');
         end
         fprintf(FID,'# ------------------------------\n# End of analysis\n# ------------------------------\n');
         
