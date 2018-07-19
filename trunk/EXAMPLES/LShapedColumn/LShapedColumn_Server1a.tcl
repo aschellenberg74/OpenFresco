@@ -66,19 +66,19 @@ element nonlinearBeamColumn 1 1 2 5 1 1
 
 # Define control points
 # ---------------------
-# expControlPoint tag nodeTag dir resp <-fact f> <-lim l u> ...
-expControlPoint 1 2  ux disp uy disp rz disp
-expControlPoint 2 2  ux disp ux force uy disp uy force rz disp rz force
+# expControlPoint $tag <-node $nodeTag> $dof $rspType <-fact $f> <-lim $l $u> <-isRel> ...
+expControlPoint 1 -node 2  ux disp  uy disp  rz disp
+expControlPoint 2 -node 2  ux disp  ux force  uy disp  uy force  rz disp  rz force
 
 # Define experimental control
 # ---------------------------
-# expControl SimDomain $tag -trialCP cpTags -outCP cpTags
+# expControl SimDomain $tag -trialCP $cpTags -outCP $cpTags
 expControl SimDomain  1  -trialCP 1  -outCP 2
 
 # Define experimental setup
 # -------------------------
-# expSetup NoTransformation $tag <–control $ctrlTag> –dir $dirs -sizeTrialOut $t $o <–trialDispFact $f> ...
-expSetup NoTransformation 1 -control 1 -dir 2 1 3 -sizeTrialOut 3 3 -trialDispFact 1 -1 1 -outDispFact 1 -1 1 -outForceFact 1 -1 1
+# expSetup NoTransformation $tag <–control $ctrlTag> –dof $DOFs -sizeTrialOut $t $o <–trialDispFact $f> ...
+expSetup NoTransformation 1 -control 1 -dof 2 1 3 -sizeTrialOut 3 3 -trialDispFact 1 -1 1 -outDispFact 1 -1 1 -outForceFact 1 -1 1
 
 # Define experimental site
 # ------------------------
