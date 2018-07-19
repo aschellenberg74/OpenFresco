@@ -22,7 +22,7 @@ HybridCtrlParameters.dtInt    = 20/1024;    % integration time step (sec)
 HybridCtrlParameters.dtSim    = 20/1024;    % simulation time step (sec)
 HybridCtrlParameters.dtCon    = 1/1024;     % controller time step (sec)
 HybridCtrlParameters.delay    = zeros(1,HybridCtrlParameters.nDOF);
-HybridCtrlParameters.delay(1) = 0.0;        % delay compensation DOF 1 (sec)
+%HybridCtrlParameters.delay(1) = 0.0;        % delay compensation DOF 1 (sec)
 
 % update controller time step
 HybridCtrlParameters.dtCon = HybridCtrlParameters.dtCon/HybridCtrlParameters.upFact;
@@ -178,24 +178,18 @@ yieldDisplB = 0.1;      % in
 frictionC   = 0;        % kip
 yieldDisplC = 0.1;      % in
 
-% fixture & specimen parameters (dynamic short actuator)
+% fixture parameters (dynamic short actuator)
 staticForceA = 0;       % kip
-springA      = 2.8;     % kip/in
-yieldFrcA    = 2.0;     % kip
 damperA      = 0;       % kip/in/s
 massA        = 4.2;     % kip
 
-% fixture & specimen parameters (dynamic long actuator)
+% fixture parameters (dynamic long actuator)
 staticForceB = 0;       % kip
-springB      = 2.8;     % kip/in
-yieldFrcB    = 2.0;     % kip
 damperB      = 0;       % kip/in/s
 massB        = 2.5;     % kip
 
-% fixture & specimen parameters (static actuator)
+% fixture parameters (static actuator)
 staticForceC = 0;       % kip
-springC      = 2.8;     % kip/in
-yieldFrcC    = 2.0;     % kip
 damperC      = 0;       % kip/in/s
 massC        = 2.5;     % kip
 

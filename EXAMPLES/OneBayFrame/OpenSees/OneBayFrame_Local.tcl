@@ -85,6 +85,9 @@ expSetup OneActuator 2 -control 2 1 -sizeTrialOut 1 1
 expSite LocalSite 1 1
 expSite LocalSite 2 2
 
+removeExp site 1
+
+
 # Define experimental tangent stiffness
 # -------------------------------------
 # expTangentStiff Broyden $tag
@@ -100,6 +103,8 @@ expTangentStiff Broyden 1
 # expElement twoNodeLink $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-tangStif tangStifTag> <-orient <$x1 $x2 $x3> $y1 $y2 $y3> <-pDelta Mratios> <-iMod> <-mass $m>
 expElement twoNodeLink 1 1 3 -dir 2 -site 1 -initStif 2.8 -tangStif 1
 expElement twoNodeLink 2 2 4 -dir 2 -site 2 -initStif 5.6
+
+
 
 # Define numerical elements
 # -------------------------

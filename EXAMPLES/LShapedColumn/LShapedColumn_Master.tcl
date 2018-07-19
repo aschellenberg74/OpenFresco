@@ -45,10 +45,16 @@ node  3    36.0   54.0  -mass $mass3 $mass3 0.1
 # fix $tag $DX $DY $RZ
 fix 1   1  1  1
 
+# Define control points
+# ---------------------
+# expControlPoint $tag <-node $nodeTag> $dof $rspType <-fact $f> <-lim $l $u> <-isRel> ...
+expControlPoint 1 1 disp 2 disp 3 disp
+expControlPoint 2 1 disp 2 disp 3 disp 1 force 2 force 3 force
+
 # Define experimental control
 # ---------------------------
-# expControl SimFEAdapter $tag ipAddr $ipPort
-expControl SimFEAdapter 1 "127.0.0.1" 44000
+# expControl SimFEAdapter $tag ipAddr $ipPort -trialCP $cpTags -outCP $cpTags
+expControl SimFEAdapter 1 "127.0.0.1" 44000 -trialCP 1 -outCP 2
 
 # Define experimental setup
 # -------------------------

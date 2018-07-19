@@ -52,22 +52,22 @@ element adapter 2 -node 3 -dof 1 -stif 1E12 44000
 # Define dynamic loads
 # --------------------
 # set time series to be passed to uniform excitation
-set dt 0.02
-set scale 1.0
-timeSeries Path 1 -filePath elcentro.txt -dt $dt -factor [expr 386.1*$scale]
+#set dt 0.02
+#set scale 1.0
+#timeSeries Path 1 -filePath elcentro.txt -dt $dt -factor [expr 386.1*$scale]
 
 # create UniformExcitation load pattern
 # pattern UniformExcitation $tag $dir -accel $tsTag <-vel0 $vel0>
-pattern UniformExcitation 1 1 -accel 1
+#pattern UniformExcitation 1 1 -accel 1
 
 # calculate the Rayleigh damping factors for nodes & elements
-set alphaM     1.010017396536;  # D = alphaM*M
-set betaK      0.0;             # D = betaK*Kcurrent
-set betaKinit  0.0;             # D = beatKinit*Kinit
-set betaKcomm  0.0;             # D = betaKcomm*KlastCommit
+#set alphaM     1.010017396536;  # D = alphaM*M
+#set betaK      0.0;             # D = betaK*Kcurrent
+#set betaKinit  0.0;             # D = beatKinit*Kinit
+#set betaKcomm  0.0;             # D = betaKcomm*KlastCommit
 
 # set the Rayleigh damping 
-rayleigh $alphaM $betaK $betaKinit $betaKcomm
+#rayleigh $alphaM $betaK $betaKinit $betaKcomm
 # ------------------------------
 # End of model generation
 # ------------------------------

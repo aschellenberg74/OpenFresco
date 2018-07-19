@@ -71,21 +71,23 @@ element elasticBeamColumn 3 2 4 2260 29000 5068 1
 
 # Define control points
 # ---------------------
-# expControlPoint tag nodeTag dir resp <-fact f> <-lim l u> ...
-expControlPoint 1 3  ux disp uy disp
-expControlPoint 2 4  uy disp
-expControlPoint 3 3  ux disp ux force uy disp uy force
-expControlPoint 4 4  uy disp uy force
+# expControlPoint $tag <-node $nodeTag> $dof $rspType <-fact $f> <-lim $l $u> <-isRel> ...
+expControlPoint 1 -node 3  ux disp  uy disp
+expControlPoint 2 -node 4  uy disp
+expControlPoint 3 -node 3  ux disp  ux force  uy disp  uy force
+expControlPoint 4 -node 4  uy disp  uy force
 
 # Define experimental control
 # ---------------------------
-# expControl SimDomain $tag -trialCP cpTags -outCP cpTags
+# expControl SimDomain $tag -trialCP $cpTags -outCP $cpTags
 expControl SimDomain  1  -trialCP 1 2  -outCP 3 4
 
 # Define experimental setup
 # -------------------------
-# expSetup ThreeActuators $tag <–control $ctrlTag> $La1 $La2 $La3 $L1 $L2 <–nlGeom> <–posAct1 $pos> <–phiLocX $phi> <-trialDispFact $f> ...
-expSetup ThreeActuators 1 -control 1 54.0 54.0 54.0 36.0 36.0 -phiLocX 90.0
+# expSetup ThreeActuators2d $tag <–control $ctrlTag> $La1 $La2 $La3 $L1 $L2 <–nlGeom> <–posAct1 $pos> <–phiLocX $phi> <-trialDispFact $f> ...
+#expSetup ThreeActuators2d 1 -control 1 54.0 54.0 54.0 36.0 36.0 -phiLocX 90.0
+# expSetup ThreeActuators $tag <–control $ctrlTag> $dofH $dofV $dofR $sizeTrial $sizeOut $La1 $La2 $La3 $L1 $L2 <–nlGeom> <–posAct1 $pos> <-trialDispFact $f> ...
+expSetup ThreeActuators 1 -control 1 2 1 3 3 3 54.0 54.0 54.0 36.0 36.0 -trialDispFact 1 -1 1 -outDispFact 1 -1 1 -outForceFact 1 -1 1
 
 # Define experimental site
 # ------------------------

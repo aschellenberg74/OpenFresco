@@ -167,7 +167,7 @@ foreach lambda $lambda {
 set outFileID [open output/elapsedTime.txt w]
 # perform the transient analysis
 set tTot [time {
-    for {set i 1} {$i < 1600} {incr i} {
+    for {set i 1} {$i < 2048} {incr i} {
         set t [time {analyze  1  [expr 20.0/1024.0]}]
         puts $outFileID $t
         #puts "step $i"
