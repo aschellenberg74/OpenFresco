@@ -12,7 +12,7 @@
 ** and redistribution, and for a DISCLAIMER OF ALL WARRANTIES.        **
 **                                                                    **
 ** Developed by:                                                      **
-**   Andreas Schellenberg (andreas.schellenberg@gmx.net)              **
+**   Andreas Schellenberg (andreas.schellenberg@gmail.com)            **
 **   Yoshikazu Takahashi (yos@catfish.dpri.kyoto-u.ac.jp)             **
 **   Gregory L. Fenves (fenves@berkeley.edu)                          **
 **   Stephen A. Mahin (mahin@berkeley.edu)                            **
@@ -23,7 +23,8 @@
 ** $Date:$
 ** $Source:$
 
-** Written: Andreas Schellenberg
+** Written: Andreas Schellenberg (andreas.schellenberg@gmail.com) &
+            Shawn Gao (shawn.gao@mts.com)
 ** Created: 12/10
 ** Revision: A
 
@@ -33,22 +34,21 @@
 ** a tcp/ip connection.
 
       subroutine UserElem (elId, matId, keyMtx, lumpm, nDim, nNodes,
-     *                     Nodes, nIntPnts, nUsrDof, kEStress, 
-     *                     keyAnsMat, keySym, nKeyOpt, KeyOpt,
-     *                     temper, temperB, tRef, kTherm, 
-     *                     nPress, Press, kPress, nReal, RealConst, 
-     *                     nSaveVars, saveVars, xRef, xCur, 
-     *                     TotValDofs, IncValDofs, ItrValDofs,
-     *                     VelValDofs, AccValDofs,
-     *                     kfstps, nlgeom, nrkey, outkey, elPrint, iott,
-     *                     keyHisUpd, ldstep, isubst, ieqitr, timval, 
-     *                     keyEleErr, keyEleCnv,
-     *                     eStiff, eMass, eDamp, eSStiff,
-     *                     fExt, fInt, elVol, elMass, elCG, 
-     *                     nRsltBsc, RsltBsc, nRsltVar, RsltVar, 
-     *                     nElEng, elEnergy) 
-     *                     
-
+     &                     Nodes, nIntPnts, nUsrDof, kEStress, 
+     &                     keyAnsMat, keySym, nKeyOpt, KeyOpt,
+     &                     temper, temperB, tRef, kTherm, 
+     &                     nPress, Press, kPress, nReal, RealConst, 
+     &                     nSaveVars, saveVars, xRef, xCur, 
+     &                     TotValDofs, IncValDofs, ItrValDofs,
+     &                     VelValDofs, AccValDofs,
+     &                     kfstps, nlgeom, nrkey, outkey, elPrint, iott,
+     &                     keyHisUpd, ldstep, isubst, ieqitr, timval, 
+     &                     keyEleErr, keyEleCnv,
+     &                     eStiff, eMass, eDamp, eSStiff,
+     &                     fExt, fInt, elVol, elMass, elCG, 
+     &                     nRsltBsc, RsltBsc, nRsltVar, RsltVar, 
+     &                     nElEng, elEnergy) 
+     &
 c******************************************************************************
 c
 c     elId      (int,sc,in)        element number
@@ -197,7 +197,7 @@ c     eDamp (dp,ar(nUsrDof,nUsrDof),inout) damping matrix           keyMtx(3)=1
 c     eSStiff(dp,ar(nUsrDof,nUsrDof),inout)stress stiffness matrix  keyMtx(4)=1
 c     fExt      (dp,ar(nUsrDof),out)       applied f vector         keyMtx(5)=1
 c     fInt      (dp,ar(nUsrDof),out)       internal force vector    keyMtx(6)=1
-
+c
 c     elVol     (dp,sc,out)        element volume
 c     elMass    (dp,sc,out)        element mass
 c     elCG      (dp,ar(3),out)     element centroid coordinates in current
@@ -237,81 +237,86 @@ c
 c******************************************************************************
 c
 #include "impcom.inc"
-#include "locknm.inc"
 c
-      integer          elId, matId, keyMtx(10), lumpm, nDim, nNodes,
-     *                 Nodes(nNodes), nIntPnts, nUsrDof, kEStress, 
-     *                 keyAnsMat, keySym, nKeyOpt, KeyOpt(nKeyOpt),
-     *                 kTherm, nPress, kPress, nReal, nSaveVars, 
-     *                 kfstps, nlgeom, nrkey, outkey, 
-     *                 elPrint, iott, keyHisUpd, 
-     *                 ldstep, isubst, ieqitr, keyEleErr, keyEleCnv,
-     *                 nRsltBsc, nRsltVar, nElEng
+      INTEGER          elId, matId, keyMtx(10), lumpm, nDim, nNodes,
+     &                 Nodes(nNodes), nIntPnts, nUsrDof, kEStress, 
+     &                 keyAnsMat, keySym, nKeyOpt, KeyOpt(nKeyOpt),
+     &                 kTherm, nPress, kPress, nReal, nSaveVars, 
+     &                 kfstps, nlgeom, nrkey, outkey, 
+     &                 elPrint, iott, keyHisUpd, 
+     &                 ldstep, isubst, ieqitr, keyEleErr, keyEleCnv,
+     &                 nRsltBsc, nRsltVar, nElEng
       
-      double precision temper(nNodes), temperB(nNodes), tRef,
-     *                 Press(nPress), RealConst(nReal),
-     *                 saveVars(nSaveVars),
-     *                 xRef(nDim,nNodes), xCur(nDim,nNodes),
-     *                 TotValDofs(nUsrDof), IncValDofs(nUsrDof),
-     *                 ItrValDofs(nUsrDof), VelValDofs(nUsrDof),
-     *                 AccValDofs(nUsrDof),      timval,
-     *                 eStiff(nUsrDof,nUsrDof), eMass(nUsrDof,nUsrDof),
-     *                 eDamp(nUsrDof,nUsrDof), eSStiff(nUsrDof,nUsrDof),
-     *                 fExt(nUsrDof), fInt(nUsrDof), 
-     *                 elVol, elMass, elCG(3),
-     *                 RsltBsc(nRsltBsc), RsltVar(nRsltVar), 
-     *                 elEnergy(nElEng)
+      DOUBLE PRECISION temper(nNodes), temperB(nNodes), tRef,
+     &                 Press(nPress), RealConst(nReal),
+     &                 saveVars(nSaveVars),
+     &                 xRef(nDim,nNodes), xCur(nDim,nNodes),
+     &                 TotValDofs(nUsrDof), IncValDofs(nUsrDof),
+     &                 ItrValDofs(nUsrDof), VelValDofs(nUsrDof),
+     &                 AccValDofs(nUsrDof),      timval,
+     &                 eStiff(nUsrDof,nUsrDof), eMass(nUsrDof,nUsrDof),
+     &                 eDamp(nUsrDof,nUsrDof), eSStiff(nUsrDof,nUsrDof),
+     &                 fExt(nUsrDof), fInt(nUsrDof), 
+     &                 elVol, elMass, elCG(3),
+     &                 RsltBsc(nRsltBsc), RsltVar(nRsltVar), 
+     &                 elEnergy(nElEng)
       
-      external         vzero, erhandler
+#include "locknm.inc"
+
+      EXTERNAL         vzero, erhandler
 
 c     local variables
-      integer*4 dataSize
-      parameter (dataSize = 256)
+      INTEGER*4 dataSize
+      PARAMETER (dataSize = 256)
       
-      integer*4 sizeInt, sizeDouble
-      parameter (sizeInt = 4, sizeDouble = 8)
+      INTEGER*4 sizeInt, sizeDouble
+      PARAMETER (sizeInt = 4, sizeDouble = 8)
       
-      integer*4 port
-      integer*4 sizeMachineInet
-      integer*4 socketID
-      integer*4 stat
+      INTEGER*4 port
+      INTEGER*4 sizeMachineInet
+      INTEGER*4 socketID
+      INTEGER*4 stat
       
-      integer*4 iData(11)
-      real*8    sData(dataSize)
-      real*8    rData(dataSize)
+      INTEGER*4 iData(11)
+      REAL*8    sData(dataSize)
+      REAL*8    rData(dataSize)
       
-      write(*,*) 'Before init save var'
+      INTEGER i, j, k
+      DOUBLE PRECISION dperr(1)
+      
 c     initialize user saved variables
-      if (kfstps .eq. 1) then
-         if (nSaveVars .lt. 1) then
-            write(*,*) 'ERROR - need at least 1 user saved variable'
-c            call erhandler ('UserElem', 1000, 3, 'Need at least 1
-c     *                       user saved variable.',dperr(1),
-c     *                       ' ')
-         endif
+      IF (kfstps .EQ. 1) THEN
+         IF (nSaveVars .LT. 1) THEN
+            WRITE(*,*) 'ERROR - need at least 1 user saved variable'
+            CALL erhandler('UserElem', 1000, 3, 
+     &                     'Need at least 1 user saved variable.', 
+     &                     dperr(1), ' ')
+         ENDIF
          saveVars(1) = 0.0
-      endif
+      ENDIF
       
 c     extract socketID
       socketID = int(saveVars(1))
-      write(*,*) 'Before init socket'
+
 c     setup connection with SimAppElemServer
-      if (socketID .eq. 0) then
+      if (socketID .EQ. 0) THEN
          
 c        get port number and initialize connection
          port = int(RealConst(1))
          sizeMachineInet = 9+1
-         write(*,*) 'port = ',port
-         call setupconnectionclient(port,
-     *                              '127.0.0.1'//char(0),
-     *                              sizeMachineInet,
-     *                              socketID)
-         if (socketID .le. 0) then
-            write(*,*) 'ERROR - failed to setup connection'
-c            call erhandler ('UserElem', 1000, 3, 'failed to
-c     *                       setup connection.',dperr(1),
-c     *                       ' ')
-         endif
+         WRITE(*,*) 'port = ',port
+         CALL setupconnectionclient(port,
+     &                              '127.0.0.1'//char(0),
+     &                              sizeMachineInet,
+     &                              socketID)
+         IF (socketID .GT. 0) THEN
+            WRITE(*,*) 'Connection successfully setup.'         
+         ELSE
+            WRITE(*,*) 'ERROR - failed to setup connection'
+            CALL erhandler('UserElem', 1100, 3, 
+     &                     'failed to setup connection.', 
+     &                     dperr(1), ' ')
+         ENDIF
          saveVars(1) = socketID
          
 c        set the data size for the experimental element
@@ -338,90 +343,90 @@ c        sizeDaq(time)
 c        dataSize
          iData(11) = dataSize
          
-         call senddata(socketID, sizeInt,
-     *                 iData, 11, stat)
-      endif
+         CALL senddata(socketID, sizeInt,
+     &                 iData, 11, stat)
+      ENDIF
       
 c     commit state (update history variables)
-      if (keyHisUpd .eq. 1) then
+      IF (keyHisUpd .EQ. 1) THEN
          sData(1) = 5
-         call senddata(socketID, sizeDouble,
-     *                 sData, dataSize, stat)
-      endif
+         CALL senddata(socketID, sizeDouble,
+     &                 sData, dataSize, stat)
+      ENDIF
       
 c     create internal force vector
-      if (keyMtx(6) .eq. 1) then
+      IF (keyMtx(6) .EQ. 1) THEN
 c        send trial response to experimental element
          sData(1) = 3
-         do i = 1, nUsrDof
+         DO i = 1, nUsrDof
             sData(1+i) = TotValDofs(i)
             sData(1+nUsrDof+i) = VelValDofs(i)
             sData(1+2*nUsrDof+i) = AccValDofs(i)
-         enddo
+         ENDDO
          sData(1+3*nUsrDof+1) = timval
          
-         call senddata(socketID, sizeDouble,
-     *                 sData, dataSize, stat)
+         CALL senddata(socketID, sizeDouble,
+     &                 sData, dataSize, stat)
          
 c        get measured resisting forces
          sData(1) = 10
-         call senddata(socketID, sizeDouble,
-     *                 sData, dataSize, stat)
+         CALL senddata(socketID, sizeDouble,
+     &                 sData, dataSize, stat)
          
-         call recvdata(socketID, sizeDouble,
-     *                 rData, dataSize, stat)
+         CALL recvdata(socketID, sizeDouble,
+     &                 rData, dataSize, stat)
          
 c        zero vector first then assign values
-         call vzero(fInt(1),nUsrDof)
-         do i = 1, nUsrDof
+         CALL vzero(fInt(1), nUsrDof)
+         DO i = 1, nUsrDof
             fInt(i) = rData(i)
-         enddo
-      endif
+         ENDDO
+      ENDIF
       
 c     create stiffness matrix
-      if (keyMtx(1) .eq. 1) then
+      IF (keyMtx(1) .EQ. 1) THEN
 c        get tangent stiffness matrix
          sData(1) = 13
-         call senddata(socketID, sizeDouble,
-     *                 sData, dataSize, stat)
+         CALL senddata(socketID, sizeDouble,
+     &                 sData, dataSize, stat)
          
-         call recvdata(socketID, sizeDouble,
-     *                 rData, dataSize, stat)
+         CALL recvdata(socketID, sizeDouble,
+     &                 rData, dataSize, stat)
          
 c        zero matrix first then assign values
-         call vzero(eStiff(1,1),nUsrDof*nUsrDof)
+         CALL vzero(eStiff(1,1), nUsrDof*nUsrDof)
          k = 1
-         do i = 1, nUsrDof
-            do j = 1, nUsrDof
+         DO i = 1, nUsrDof
+            DO j = 1, nUsrDof
                eStiff(i,j) = rData(k)
                k = k + 1
-            enddo 
-         enddo
-      endif
+            ENDDO 
+         ENDDO
+      ENDIF
       
 c     create mass matrix
-      if (keyMtx(2) .eq. 1) then
+      IF (keyMtx(2) .EQ. 1) THEN
 c        get mass matrix
          sData(1) = 15
-         call senddata(socketID, sizeDouble,
-     *                 sData, dataSize, stat)
+         CALL senddata(socketID, sizeDouble,
+     &                 sData, dataSize, stat)
          
-         call recvdata(socketID, sizeDouble,
-     *                 rData, dataSize, stat)
+         CALL recvdata(socketID, sizeDouble,
+     &                 rData, dataSize, stat)
          
 c        zero matrix first then assign values
-         call vzero(eMass(1,1),nUsrDof*nUsrDof)
+         CALL vzero(eMass(1,1), nUsrDof*nUsrDof)
          k = 1
-         do i = 1, nUsrDof
-            do j = 1, nUsrDof
+         DO i = 1, nUsrDof
+            DO j = 1, nUsrDof
                eMass(i,j) = rData(k)
-               if (i .eq. j .and. eMass(i,j) .le. 0.0) then
+               IF (i .EQ. j .AND. eMass(i,j) .LE. 0.0) THEN
                   eMass(i,j) = 1E-12
-               endif
+               ENDIF
                k = k + 1
-            enddo
-         enddo
-      endif
+            ENDDO
+         ENDDO
+      ENDIF
       
-      return
-      end
+      RETURN
+      END
