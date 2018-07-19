@@ -67,7 +67,7 @@ f_StructAnim = figure('Visible','on', ...
 imagesc(imread(which('BlueGradient.png')));
 set(gca,'Visible','off','Position',[0,0,1,1]);
 orient(f_StructAnim,'landscape');
-ModifyPrintSetup(f_StructAnim,'PrintUI',0);
+%ModifyPrintSetup(f_StructAnim,'PrintUI',0);
 
 % toolbar
 File(1) = uimenu('Position',1,'Label','File');

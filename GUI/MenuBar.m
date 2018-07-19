@@ -32,7 +32,7 @@ function MenuBar(action,varargin)
 switch action
     % =====================================================================
     case 'load'
-        [file path] = uigetfile('*.mat');
+        [file,path] = uigetfile('*.mat');
         % break from function if load file is canceled
         if file == 0
             return
@@ -40,7 +40,7 @@ switch action
             % load saved Model, GM, ExpSite and ExpControl into handles
             file = fullfile(path,file);
             saveData = [];
-            load(file);
+            load(file); %#ok<LOAD>
             handles = guidata(gcf);
             handles.Model = saveData.Model;
             handles.GM = saveData.GM;
@@ -95,34 +95,35 @@ switch action
             active_color = [0 0 0];
             inactive_color = [0.6 0.6 0.6];
             panelDefault = [0.941176 0.941176 0.941176];
-            dof1_children = [get(handles.Structure(6),'Children')' get(handles.Structure(8),'Children')'];
-            dof2_children = [get(handles.Structure(14),'Children')' get(handles.Structure(16),'Children')'];
-            dof3_children = [get(handles.Structure(22),'Children')' get(handles.Structure(24),'Children')'];
+            dof1_children = get(handles.Structure(8),'Children')';
+            dof2_children = get(handles.Structure(15),'Children')';
+            dof3_children = get(handles.Structure(24),'Children')';
             
             set(handles.EC(32),'String',handles.ExpControl.store.CPOptions(2:end));
             set(handles.EC(33),'String',handles.ExpControl.store.CPOptions(2:end));
             
-            switch handles.Model.Type;
+            switch handles.Model.Type
                 % ---------------------------------------------------------
                 case '1 DOF'
                     % initialize structure page and adjust button and field colors
-                    set(handles.Structure(3),'CData',handles.Store.Model1A1);
-                    set(handles.Structure(4),'CData',handles.Store.Model2A0);
-                    set(handles.Structure(5),'CData',handles.Store.Model2B0);
-                    set(handles.Structure(7),'BackgroundColor',[1 1 1],'Style','edit');
-                    set(handles.Structure(9),'BackgroundColor',[1 1 1],'Style','edit');
+                    set(handles.Structure(4),'CData',handles.Store.Model1A1);
+                    set(handles.Structure(5),'CData',handles.Store.Model2A0);
+                    set(handles.Structure(6),'CData',handles.Store.Model2B0);
+                    
+                    set(handles.Structure(9:10),'BackgroundColor',[1 1 1],'Style','edit');
                     set(handles.Structure(12),'BackgroundColor',[1 1 1]);
                     set(handles.Structure(13),'BackgroundColor',[1 1 1],'Style','edit');
-                    set(handles.Structure(15),'BackgroundColor',panelDefault,'Style','text');
-                    set(handles.Structure(17),'BackgroundColor',panelDefault,'Style','text');
-                    set(handles.Structure(19),'BackgroundColor',panelDefault,'Style','text','String','Period');
-                    set(handles.Structure(20),'BackgroundColor',panelDefault);
-                    set(handles.Structure(21),'BackgroundColor',panelDefault,'Style','text','String','zeta');
-                    set(handles.Structure(23),'BackgroundColor',panelDefault,'Style','text');
-                    set(handles.Structure(25),'BackgroundColor',panelDefault,'Style','text');
-                    set(handles.Structure(27),'BackgroundColor',panelDefault,'Style','text','String','Period');
-                    set(handles.Structure(28),'BackgroundColor',panelDefault);
-                    set(handles.Structure(29),'BackgroundColor',panelDefault,'Style','text','String','zeta');
+                    
+                    set(handles.Structure(16:19),'BackgroundColor',panelDefault,'Style','text');
+                    set(handles.Structure(20),'BackgroundColor',panelDefault,'Style','text','String','Period');
+                    set(handles.Structure(21),'BackgroundColor',panelDefault);
+                    set(handles.Structure(22),'BackgroundColor',panelDefault,'Style','text','String','zeta');
+                    
+                    set(handles.Structure(25:28),'BackgroundColor',panelDefault,'Style','text');
+                    set(handles.Structure(29),'BackgroundColor',panelDefault,'Style','text','String','Period');
+                    set(handles.Structure(30),'BackgroundColor',panelDefault);
+                    set(handles.Structure(31),'BackgroundColor',panelDefault,'Style','text','String','zeta');
+                    
                     set(dof1_children,'ForegroundColor',active_color);
                     set(dof2_children,'ForegroundColor',inactive_color);
                     set(dof3_children,'ForegroundColor',inactive_color);
@@ -131,9 +132,9 @@ switch action
                     set(findobj('Tag','help2B'),'CData',handles.Store.Question0);
                     
                     % remove unnecessary plots
+                    cla(handles.GroundMotions(13));
+                    cla(handles.GroundMotions(14));
                     cla(handles.GroundMotions(15));
-                    cla(handles.GroundMotions(16));
-                    cla(handles.GroundMotions(17));
                     
                     % update Structure
                     set(handles.Structure(3),'Value',1);
@@ -282,8 +283,8 @@ switch action
                             set(handles.EC(2),'Value',0);
                             set(handles.EC(3),'Value',0);
                             set(handles.EC(4),'Value',1);
-                            if isfield(handles.ExpControl.RealControl,'Controller');
-                                switch handles.ExpControl.RealControl.Controller;
+                            if isfield(handles.ExpControl.RealControl,'Controller')
+                                switch handles.ExpControl.RealControl.Controller
                                     case 'LabVIEW'
                                         set(handles.EC(27),'Value',2);
                                         handles.ExpControl.store.RealActive = (25:33);
@@ -567,8 +568,8 @@ switch action
                             set(handles.EC(2),'Value',0);
                             set(handles.EC(3),'Value',0);
                             set(handles.EC(4),'Value',1);
-                            if isfield(handles.ExpControl.RealControl,'Controller');
-                                switch handles.ExpControl.RealControl.Controller;
+                            if isfield(handles.ExpControl.RealControl,'Controller')
+                                switch handles.ExpControl.RealControl.Controller
                                     case 'LabVIEW'
                                         set(handles.EC(27),'Value',2);
                                         handles.ExpControl.store.RealActive = (25:33);
@@ -859,8 +860,8 @@ switch action
                             set(handles.EC(2),'Value',0);
                             set(handles.EC(3),'Value',0);
                             set(handles.EC(4),'Value',1);
-                            if isfield(handles.ExpControl.RealControl,'Controller');
-                                switch handles.ExpControl.RealControl.Controller;
+                            if isfield(handles.ExpControl.RealControl,'Controller')
+                                switch handles.ExpControl.RealControl.Controller
                                     case 'LabVIEW'
                                         set(handles.EC(27),'Value',2);
                                         handles.ExpControl.store.RealActive = (25:33);

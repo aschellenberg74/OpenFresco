@@ -35,7 +35,7 @@ function Structure(action,varargin)
 handles = guidata(gcbf);
 
 % identify chosen DOF
-DOF_selection = get(get(handles.Structure(2), 'SelectedObject'),'Tag');
+DOF_selection = get(get(handles.Structure(3), 'SelectedObject'),'Tag');
 handles.Model.Type = DOF_selection;
 
 switch action
@@ -46,9 +46,9 @@ switch action
         active_color = [0 0 0];
         inactive_color = [0.6 0.6 0.6];
         panelDefault = [0.941176 0.941176 0.941176];
-        dof1_children = [get(handles.Structure(6),'Children')' get(handles.Structure(8),'Children')'];
-        dof2_children = [get(handles.Structure(14),'Children')' get(handles.Structure(16),'Children')'];
-        dof3_children = [get(handles.Structure(22),'Children')' get(handles.Structure(24),'Children')'];
+        dof1_children = get(handles.Structure(8),'Children')';
+        dof2_children = get(handles.Structure(15),'Children')';
+        dof3_children = get(handles.Structure(24),'Children')';
         
         % reset values
         handles.Model.M = [];
@@ -62,33 +62,32 @@ switch action
         %=======
         if slider <= 0.3
             % initialize structure page and adjust button and field colors
-            set(handles.Structure(30),'Value',0);
+            set(handles.Structure(2),'Value',0);
             structTag = findobj('Tag','1 DOF');
-            set(handles.Structure(2),'SelectedObject',structTag(2));
-            set(handles.Structure([3 6:13]),'Visible','on');
-            set(handles.Structure([4 14:21]),'Visible','off');
-            set(handles.Structure([5 22:29]),'Visible','off');
-            set(handles.Structure([10 18 26]),'Visible','off');
+            set(handles.Structure(3),'SelectedObject',structTag(2));
+            set(handles.Structure([4 7:13]),'Visible','on');
+            set(handles.Structure([5 6 14:31]),'Visible','off');
             
-            handles.Model.StructActive = [3 6:13];
-            handles.Model.StructInactive = [4 5 14:29 31:34];
-            set(handles.Structure(3),'CData',handles.Store.Model1A1);
-            set(handles.Structure(4),'CData',handles.Store.Model2A0);
-            set(handles.Structure(5),'CData',handles.Store.Model2B0);
-            set(handles.Structure(7),'BackgroundColor',[1 1 1],'Style','edit','String','');
-            set(handles.Structure(9),'BackgroundColor',[1 1 1],'Style','edit','String','');
+            handles.Model.StructActive = [4 7:13];
+            handles.Model.StructInactive = [5 6 15:31];
+            set(handles.Structure(4),'CData',handles.Store.Model1A1);
+            set(handles.Structure(5),'CData',handles.Store.Model2A0);
+            set(handles.Structure(6),'CData',handles.Store.Model2B0);
+            
+            set(handles.Structure(9:10),'BackgroundColor',[1 1 1],'Style','edit','String','');
             set(handles.Structure(12),'BackgroundColor',[1 1 1]);
             set(handles.Structure(13),'BackgroundColor',[1 1 1],'Style','edit');
-            set(handles.Structure(15),'BackgroundColor',panelDefault,'Style','text');
-            set(handles.Structure(17),'BackgroundColor',panelDefault,'Style','text');
-            set(handles.Structure(19),'BackgroundColor',panelDefault,'Style','text','String','Period');
-            set(handles.Structure(20),'BackgroundColor',panelDefault);
-            set(handles.Structure(21),'BackgroundColor',panelDefault,'Style','text','String','zeta');
-            set(handles.Structure(23),'BackgroundColor',panelDefault,'Style','text');
-            set(handles.Structure(25),'BackgroundColor',panelDefault,'Style','text');
-            set(handles.Structure(27),'BackgroundColor',panelDefault,'Style','text','String','Period');
-            set(handles.Structure(28),'BackgroundColor',panelDefault);
-            set(handles.Structure(29),'BackgroundColor',panelDefault,'Style','text','String','zeta');
+            
+            set(handles.Structure(16:19),'BackgroundColor',panelDefault,'Style','text');
+            set(handles.Structure(20),'BackgroundColor',panelDefault,'Style','text','String','Period');
+            set(handles.Structure(21),'BackgroundColor',panelDefault);
+            set(handles.Structure(22),'BackgroundColor',panelDefault,'Style','text','String','zeta');
+            
+            set(handles.Structure(25:28),'BackgroundColor',panelDefault,'Style','text');
+            set(handles.Structure(29),'BackgroundColor',panelDefault,'Style','text','String','Period');
+            set(handles.Structure(30),'BackgroundColor',panelDefault);
+            set(handles.Structure(31),'BackgroundColor',panelDefault,'Style','text','String','zeta');
+            
             set(dof1_children,'ForegroundColor',active_color);
             set(dof2_children,'ForegroundColor',inactive_color);
             set(dof3_children,'ForegroundColor',inactive_color);
@@ -97,9 +96,9 @@ switch action
             set(findobj('Tag','help2B'),'CData',handles.Store.Question0);
             
             % remove unnecessary plots
+            cla(handles.GroundMotions(13));
+            cla(handles.GroundMotions(14));
             cla(handles.GroundMotions(15));
-            cla(handles.GroundMotions(16));
-            cla(handles.GroundMotions(17));
             
             % set DOF/CP options
             set(handles.EC(6),'String',{'Choose DOF...','DOF 1'},'Value',1);
@@ -125,8 +124,8 @@ switch action
             
             % update model and ground motion parameters
             handles.Model.Type = '1 DOF';
-            handles.Model.Mass_field = 7;
-            handles.Model.Stiffness_field = 9;
+            handles.Model.Mass_field = 9;
+            handles.Model.Stiffness_field = 10;
             handles.Model.Period_field = 11;
             handles.Model.Damping_field = 13;
             set(handles.ES(3),'Value',1);
@@ -183,35 +182,32 @@ switch action
         %=========
         elseif slider <= 0.6
             % initialize structure page and adjust button and field colors
-            set(handles.Structure(30),'Value',0.5);
+            set(handles.Structure(2),'Value',0.5);
             structTag = findobj('Tag','2 DOF A');
-            set(handles.Structure(2),'SelectedObject',structTag(2));
-            set(handles.Structure([3 6:13]),'Visible','off');
-            set(handles.Structure([4 14:21 31 32]),'Visible','on');
-            set(handles.Structure([5 22:29 33 34]),'Visible','off');
-            set(handles.Structure([10 18 26]),'Visible','off');
+            set(handles.Structure(3),'SelectedObject',structTag(2));
+            set(handles.Structure([4 6 7:13 23:31]),'Visible','off');
+            set(handles.Structure([5 14:22]),'Visible','on');
             
-            handles.Model.StructActive = [4 14:21 31 32];
-            handles.Model.StructInactive = [3 5 6:13 22:29 33 34];
-            set(handles.Structure(3),'CData',handles.Store.Model1A0);
-            set(handles.Structure(4),'CData',handles.Store.Model2A1);
-            set(handles.Structure(5),'CData',handles.Store.Model2B0);
-            set(handles.Structure(7),'BackgroundColor',panelDefault,'Style','text');
-            set(handles.Structure(9),'BackgroundColor',panelDefault,'Style','text');
+            handles.Model.StructActive = [5 14:22];
+            handles.Model.StructInactive = [4 6 7:13 23:31];
+            set(handles.Structure(4),'CData',handles.Store.Model1A0);
+            set(handles.Structure(5),'CData',handles.Store.Model2A1);
+            set(handles.Structure(6),'CData',handles.Store.Model2B0);
+            
+            set(handles.Structure(9:10),'BackgroundColor',panelDefault,'Style','text');
             set(handles.Structure(11),'BackgroundColor',panelDefault,'Style','text','String','Period');
             set(handles.Structure(12),'BackgroundColor',panelDefault);
             set(handles.Structure(13),'BackgroundColor',panelDefault,'Style','text','String','zeta');
-            set(handles.Structure(15),'BackgroundColor',[1 1 1],'Style','edit','String','');
-            set(handles.Structure(31),'BackgroundColor',[1 1 1],'Style','edit','String','');
-            set(handles.Structure(17),'BackgroundColor',[1 1 1],'Style','edit','String','');
-            set(handles.Structure(32),'BackgroundColor',[1 1 1],'Style','edit','String','');
-            set(handles.Structure(20),'BackgroundColor',[1 1 1]);
-            set(handles.Structure(21),'BackgroundColor',[1 1 1],'Style','edit');
-            set(handles.Structure(23),'BackgroundColor',panelDefault,'Style','text');
-            set(handles.Structure(25),'BackgroundColor',panelDefault,'Style','text');
-            set(handles.Structure(27),'BackgroundColor',panelDefault,'Style','text','String','Period');
-            set(handles.Structure(28),'BackgroundColor',panelDefault);
-            set(handles.Structure(29),'BackgroundColor',panelDefault,'Style','text','String','zeta');
+            
+            set(handles.Structure(16:19),'BackgroundColor',[1 1 1],'Style','edit','String','');
+            set(handles.Structure(21),'BackgroundColor',[1 1 1]);
+            set(handles.Structure(22),'BackgroundColor',[1 1 1],'Style','edit');
+            
+            set(handles.Structure(25:28),'BackgroundColor',panelDefault,'Style','text');
+            set(handles.Structure(29),'BackgroundColor',panelDefault,'Style','text','String','Period');
+            set(handles.Structure(30),'BackgroundColor',panelDefault);
+            set(handles.Structure(31),'BackgroundColor',panelDefault,'Style','text','String','zeta');
+            
             set(dof1_children,'ForegroundColor',inactive_color);
             set(dof2_children,'ForegroundColor',active_color);
             set(dof3_children,'ForegroundColor',inactive_color);
@@ -220,9 +216,9 @@ switch action
             set(findobj('Tag','help2B'),'CData',handles.Store.Question0);
             
             % remove unnecessary plots
+            cla(handles.GroundMotions(13));
+            cla(handles.GroundMotions(14));
             cla(handles.GroundMotions(15));
-            cla(handles.GroundMotions(16));
-            cla(handles.GroundMotions(17));
             
             % set DOF/CP options
             set(handles.EC(6),'String',{'Choose Story...','Story 1','Story 2'},'Value',1);
@@ -249,10 +245,10 @@ switch action
             
             % update model and ground motion parameters
             handles.Model.Type = '2 DOF A';
-            handles.Model.Mass_field = 15;
-            handles.Model.Stiffness_field = 17;
-            handles.Model.Period_field = 19;
-            handles.Model.Damping_field = 21;
+            handles.Model.Mass_field = 16;
+            handles.Model.Stiffness_field = 18;
+            handles.Model.Period_field = 20;
+            handles.Model.Damping_field = 22;
             set(handles.ES(4),'Value',1);
             handles.Model.ndf = 2;
             handles.Model.b = [1;1];
@@ -334,34 +330,32 @@ switch action
         else
             % initialize structure page and adjust button and field colors
             structTag = findobj('Tag','2 DOF B');
-            set(handles.Structure(30),'Value',1);
-            set(handles.Structure(2),'SelectedObject',structTag(2));
-            set(handles.Structure([3 6:13]),'Visible','off');
-            set(handles.Structure([4 14:21 31 32]),'Visible','off');
-            set(handles.Structure([5 22:29 33 34]),'Visible','on');
-            set(handles.Structure([10 18 26]),'Visible','off');
+            set(handles.Structure(2),'Value',1);
+            set(handles.Structure(3),'SelectedObject',structTag(2));
+            set(handles.Structure([4 5 7:22]),'Visible','off');
+            set(handles.Structure([6 23:31]),'Visible','on');
             
-            handles.Model.StructActive = [5 22:29 33 34];
-            handles.Model.StructInactive = [3 4 6:21 31 32];
-            set(handles.Structure(3),'CData',handles.Store.Model1A0);
-            set(handles.Structure(4),'CData',handles.Store.Model2A0);
-            set(handles.Structure(5),'CData',handles.Store.Model2B1);
-            set(handles.Structure(7),'BackgroundColor',panelDefault,'Style','text');
-            set(handles.Structure(9),'BackgroundColor',panelDefault,'Style','text');
+            handles.Model.StructActive = [6 23:31];
+            handles.Model.StructInactive = [4 5 7:22];
+            set(handles.Structure(4),'CData',handles.Store.Model1A0);
+            set(handles.Structure(5),'CData',handles.Store.Model2A0);
+            set(handles.Structure(6),'CData',handles.Store.Model2B1);
+            
+            set(handles.Structure(9:10),'BackgroundColor',panelDefault,'Style','text');
             set(handles.Structure(11),'BackgroundColor',panelDefault,'Style','text','String','Period');
             set(handles.Structure(12),'BackgroundColor',panelDefault);
             set(handles.Structure(13),'BackgroundColor',panelDefault,'Style','text','String','zeta');
-            set(handles.Structure(15),'BackgroundColor',panelDefault,'Style','text');
-            set(handles.Structure(17),'BackgroundColor',panelDefault,'Style','text');
-            set(handles.Structure(19),'BackgroundColor',panelDefault,'Style','text','String','Period');
-            set(handles.Structure(20),'BackgroundColor',panelDefault);
-            set(handles.Structure(21),'BackgroundColor',panelDefault,'Style','text','String','zeta');
-            set(handles.Structure(23),'BackgroundColor',[1 1 1],'Style','edit','String','');
-            set(handles.Structure(33),'BackgroundColor',[1 1 1],'Style','edit','String','');
-            set(handles.Structure(25),'BackgroundColor',[1 1 1],'Style','edit','String','');
-            set(handles.Structure(34),'BackgroundColor',[1 1 1],'Style','edit','String','');
-            set(handles.Structure(28),'BackgroundColor',[1 1 1]);
-            set(handles.Structure(29),'BackgroundColor',[1 1 1],'Style','edit');
+            
+            set(handles.Structure(16:19),'BackgroundColor',panelDefault,'Style','text');
+            set(handles.Structure(18),'BackgroundColor',panelDefault,'Style','text');
+            set(handles.Structure(20),'BackgroundColor',panelDefault,'Style','text','String','Period');
+            set(handles.Structure(21),'BackgroundColor',panelDefault);
+            set(handles.Structure(22),'BackgroundColor',panelDefault,'Style','text','String','zeta');
+            
+            set(handles.Structure(25:28),'BackgroundColor',[1 1 1],'Style','edit','String','');
+            set(handles.Structure(30),'BackgroundColor',[1 1 1]);
+            set(handles.Structure(31),'BackgroundColor',[1 1 1],'Style','edit');
+            
             set(dof1_children,'ForegroundColor',inactive_color);
             set(dof2_children,'ForegroundColor',inactive_color);
             set(dof3_children,'ForegroundColor',active_color);
@@ -394,10 +388,10 @@ switch action
             
             % update model and ground motion parameters
             handles.Model.Type = '2 DOF B';
-            handles.Model.Mass_field = 23;
-            handles.Model.Stiffness_field = 25;
-            handles.Model.Period_field = 27;
-            handles.Model.Damping_field = 29;
+            handles.Model.Mass_field = 25;
+            handles.Model.Stiffness_field = 27;
+            handles.Model.Period_field = 29;
+            handles.Model.Damping_field = 31;
             set(handles.ES(5),'Value',1);
             handles.Model.ndf = 2;
             handles.Model.b = [1 0; 0 1];
@@ -471,37 +465,38 @@ switch action
         active_color = [0 0 0];
         inactive_color = [0.6 0.6 0.6];
         panelDefault = [0.941176 0.941176 0.941176];
-        dof1_children = [get(handles.Structure(6),'Children')' get(handles.Structure(8),'Children')'];
-        dof2_children = [get(handles.Structure(14),'Children')' get(handles.Structure(16),'Children')'];
-        dof3_children = [get(handles.Structure(22),'Children')' get(handles.Structure(24),'Children')'];
+        dof1_children = get(handles.Structure(8),'Children')';
+        dof2_children = get(handles.Structure(15),'Children')';
+        dof3_children = get(handles.Structure(24),'Children')';
         
         % reset Values
         handles.Model.M = [];
         handles.Model.K = [];
         handles.Model.Zeta = [];
-        switch DOF_selection;
+        switch DOF_selection
             % -------------------------------------------------------------
             case '1 DOF'
-                handles.Model.StructActive = [3 6:13];
-                handles.Model.StructInactive = [4 5 14:29 31:34];
+                handles.Model.StructActive = [4 7:13];
+                handles.Model.StructInactive = [5 6 14:31];
                 % adjust colors to emphasize active/inactive fields
-                set(handles.Structure(3),'CData',handles.Store.Model1A1);
-                set(handles.Structure(4),'CData',handles.Store.Model2A0);
-                set(handles.Structure(5),'CData',handles.Store.Model2B0);
-                set(handles.Structure(7),'BackgroundColor',[1 1 1],'Style','edit');
-                set(handles.Structure(9),'BackgroundColor',[1 1 1],'Style','edit');
+                set(handles.Structure(4),'CData',handles.Store.Model1A1);
+                set(handles.Structure(5),'CData',handles.Store.Model2A0);
+                set(handles.Structure(6),'CData',handles.Store.Model2B0);
+                
+                set(handles.Structure(9:10),'BackgroundColor',[1 1 1],'Style','edit');
                 set(handles.Structure(12),'BackgroundColor',[1 1 1]);
                 set(handles.Structure(13),'BackgroundColor',[1 1 1],'Style','edit');
-                set(handles.Structure(15),'BackgroundColor',panelDefault,'Style');
-                set(handles.Structure(17),'BackgroundColor',panelDefault,'Style');
-                set(handles.Structure(19),'BackgroundColor',panelDefault,'Style','text','String','Period');
-                set(handles.Structure(20),'BackgroundColor',panelDefault);
-                set(handles.Structure(21),'BackgroundColor',panelDefault,'Style','text','String','zeta');
-                set(handles.Structure(23),'BackgroundColor',panelDefault,'Style');
-                set(handles.Structure(25),'BackgroundColor',panelDefault,'Style');
-                set(handles.Structure(27),'BackgroundColor',panelDefault,'Style','text','String','Period');
-                set(handles.Structure(28),'BackgroundColor',panelDefault);
-                set(handles.Structure(29),'BackgroundColor',panelDefault,'Style','text','String','zeta');
+                
+                set(handles.Structure(16:19),'BackgroundColor',panelDefault,'Style');
+                set(handles.Structure(20),'BackgroundColor',panelDefault,'Style','text','String','Period');
+                set(handles.Structure(21),'BackgroundColor',panelDefault);
+                set(handles.Structure(22),'BackgroundColor',panelDefault,'Style','text','String','zeta');
+                
+                set(handles.Structure(25:28),'BackgroundColor',panelDefault,'Style');
+                set(handles.Structure(29),'BackgroundColor',panelDefault,'Style','text','String','Period');
+                set(handles.Structure(30),'BackgroundColor',panelDefault);
+                set(handles.Structure(31),'BackgroundColor',panelDefault,'Style','text','String','zeta');
+                
                 set(dof1_children,'ForegroundColor',active_color);
                 set(dof2_children,'ForegroundColor',inactive_color);
                 set(dof3_children,'ForegroundColor',inactive_color);
@@ -539,8 +534,8 @@ switch action
                 
                 % update model and ground motion parameters
                 handles.Model.Type = DOF_selection;
-                handles.Model.Mass_field = 7;
-                handles.Model.Stiffness_field = 9;
+                handles.Model.Mass_field = 9;
+                handles.Model.Stiffness_field = 10;
                 handles.Model.Period_field = 11;
                 handles.Model.Damping_field = 13;
                 set(handles.ES(3),'Value',1);
@@ -593,28 +588,27 @@ switch action
                 set(handles.EC(33),'String',handles.ExpControl.store.CPOptions(2:end));
             % -------------------------------------------------------------
             case '2 DOF A'
-                handles.Model.StructActive = [4 14:21 31 32];
-                handles.Model.StructInactive = [3 5 6:13 22:29 33 34];
+                handles.Model.StructActive = [5 14:22];
+                handles.Model.StructInactive = [4 6 7:13 23:31];
                 % adjust colors to emphasize active/inactive fields
-                set(handles.Structure(3),'CData',handles.Store.Model1A0);
-                set(handles.Structure(4),'CData',handles.Store.Model2A1);
-                set(handles.Structure(5),'CData',handles.Store.Model2B0);
-                set(handles.Structure(7),'BackgroundColor',panelDefault,'Style','text','String','Enter mass here');
-                set(handles.Structure(9),'BackgroundColor',panelDefault,'Style','text','String','Enter stiffness here');
+                set(handles.Structure(4),'CData',handles.Store.Model1A0);
+                set(handles.Structure(5),'CData',handles.Store.Model2A1);
+                set(handles.Structure(6),'CData',handles.Store.Model2B0);
+                
+                set(handles.Structure(9:10),'BackgroundColor',panelDefault,'Style','text','String','Enter mass here');
                 set(handles.Structure(11),'BackgroundColor',panelDefault,'Style','text','String','Period');
                 set(handles.Structure(12),'BackgroundColor',panelDefault);
                 set(handles.Structure(13),'BackgroundColor',panelDefault,'Style','text','String','zeta');
-                set(handles.Structure(15),'BackgroundColor',[1 1 1],'Style','edit');
-                set(handles.Structure(31),'BackgroundColor',[1 1 1],'Style','edit');
-                set(handles.Structure(17),'BackgroundColor',[1 1 1],'Style','edit');
-                set(handles.Structure(32),'BackgroundColor',[1 1 1],'Style','edit');
-                set(handles.Structure(20),'BackgroundColor',[1 1 1]);
-                set(handles.Structure(21),'BackgroundColor',[1 1 1],'Style','edit');
-                set(handles.Structure(23),'BackgroundColor',panelDefault,'Style','text');
-                set(handles.Structure(25),'BackgroundColor',panelDefault,'Style','text');
-                set(handles.Structure(27),'BackgroundColor',panelDefault,'Style','text','String','Period');
-                set(handles.Structure(28),'BackgroundColor',panelDefault);
-                set(handles.Structure(29),'BackgroundColor',panelDefault,'Style','text','String','zeta');
+                
+                set(handles.Structure(16:19),'BackgroundColor',[1 1 1],'Style','edit');
+                set(handles.Structure(21),'BackgroundColor',[1 1 1]);
+                set(handles.Structure(22),'BackgroundColor',[1 1 1],'Style','edit');
+                
+                set(handles.Structure(25:28),'BackgroundColor',panelDefault,'Style','text');
+                set(handles.Structure(29),'BackgroundColor',panelDefault,'Style','text','String','Period');
+                set(handles.Structure(30),'BackgroundColor',panelDefault);
+                set(handles.Structure(31),'BackgroundColor',panelDefault,'Style','text','String','zeta');
+                
                 set(dof1_children,'ForegroundColor',inactive_color);
                 set(dof2_children,'ForegroundColor',active_color);
                 set(dof3_children,'ForegroundColor',inactive_color);
@@ -653,10 +647,10 @@ switch action
                 
                 % update model and ground motion parameters
                 handles.Model.Type = DOF_selection;
-                handles.Model.Mass_field = 15;
-                handles.Model.Stiffness_field = 17;
-                handles.Model.Period_field = 19;
-                handles.Model.Damping_field = 21;
+                handles.Model.Mass_field = 16;
+                handles.Model.Stiffness_field = 18;
+                handles.Model.Period_field = 20;
+                handles.Model.Damping_field = 22;
                 set(handles.ES(4),'Value',1);
                 handles.Model.ndf = 2;
                 handles.Model.b = [1;1];
@@ -733,29 +727,28 @@ switch action
                 set(handles.EC(33),'String',handles.ExpControl.store.CPOptions(2:end));
             % -------------------------------------------------------------
             case '2 DOF B'
-                handles.Model.StructActive = [5 22:29 33 34];
-                handles.Model.StructInactive = [3 4 6:21 31 32];
+                handles.Model.StructActive = [6 23:31];
+                handles.Model.StructInactive = [4 5 7:22];
                 
                 % adjust colors to emphasize active/inactive fields
-                set(handles.Structure(3),'CData',handles.Store.Model1A0);
-                set(handles.Structure(4),'CData',handles.Store.Model2A0);
-                set(handles.Structure(5),'CData',handles.Store.Model2B1);
-                set(handles.Structure(7),'BackgroundColor',panelDefault,'Style','text','String','Enter mass here');
-                set(handles.Structure(9),'BackgroundColor',panelDefault,'Style','text','String','Enter stiffness here');
+                set(handles.Structure(4),'CData',handles.Store.Model1A0);
+                set(handles.Structure(5),'CData',handles.Store.Model2A0);
+                set(handles.Structure(6),'CData',handles.Store.Model2B1);
+                
+                set(handles.Structure(9:10),'BackgroundColor',panelDefault,'Style','text','String','Enter mass here');
                 set(handles.Structure(11),'BackgroundColor',panelDefault,'Style','text','String','Period');
                 set(handles.Structure(12),'BackgroundColor',panelDefault);
                 set(handles.Structure(13),'BackgroundColor',panelDefault,'Style','text','String','zeta');
-                set(handles.Structure(15),'BackgroundColor',panelDefault,'Style','text');
-                set(handles.Structure(17),'BackgroundColor',panelDefault,'Style','text');
-                set(handles.Structure(19),'BackgroundColor',panelDefault,'Style','text','String','Period');
-                set(handles.Structure(20),'BackgroundColor',panelDefault);
-                set(handles.Structure(21),'BackgroundColor',panelDefault,'Style','text','String','zeta');
-                set(handles.Structure(23),'BackgroundColor',[1 1 1],'Style','edit');
-                set(handles.Structure(33),'BackgroundColor',[1 1 1],'Style','edit');
-                set(handles.Structure(25),'BackgroundColor',[1 1 1],'Style','edit');
-                set(handles.Structure(34),'BackgroundColor',[1 1 1],'Style','edit');
-                set(handles.Structure(28),'BackgroundColor',[1 1 1]);
-                set(handles.Structure(29),'BackgroundColor',[1 1 1],'Style','edit');
+                
+                set(handles.Structure(16:19),'BackgroundColor',panelDefault,'Style','text');
+                set(handles.Structure(20),'BackgroundColor',panelDefault,'Style','text','String','Period');
+                set(handles.Structure(21),'BackgroundColor',panelDefault);
+                set(handles.Structure(22),'BackgroundColor',panelDefault,'Style','text','String','zeta');
+                
+                set(handles.Structure(25:28),'BackgroundColor',[1 1 1],'Style','edit');
+                set(handles.Structure(30),'BackgroundColor',[1 1 1]);
+                set(handles.Structure(31),'BackgroundColor',[1 1 1],'Style','edit');
+                
                 set(dof1_children,'ForegroundColor',inactive_color);
                 set(dof2_children,'ForegroundColor',inactive_color);
                 set(dof3_children,'ForegroundColor',active_color);
@@ -788,10 +781,10 @@ switch action
                 
                 % update model and ground motion parameters
                 handles.Model.Type = DOF_selection;
-                handles.Model.Mass_field = 23;
-                handles.Model.Stiffness_field = 25;
-                handles.Model.Period_field = 27;
-                handles.Model.Damping_field = 29;
+                handles.Model.Mass_field = 25;
+                handles.Model.Stiffness_field = 27;
+                handles.Model.Period_field = 29;
+                handles.Model.Damping_field = 31;
                 set(handles.ES(5),'Value',1);
                 handles.Model.ndf = 2;
                 handles.Model.b = [1 0; 0 1];
@@ -901,7 +894,7 @@ switch action
                 if length(handles.Model.M) ~= 2 || handles.Model.M(1,1) == 0
                     return
                 else
-                    [Phi OmegaSq] = eig(handles.Model.K,handles.Model.M);
+                    [Phi,OmegaSq] = eig(handles.Model.K,handles.Model.M);
                     if Phi(1,1) ~= 0
                         Mode1 = Phi(:,1)./Phi(1,1);
                     else
@@ -948,10 +941,10 @@ switch action
                 case 'k2A'
                     if isempty(handles.Model.K)
                         msgbox('Please enter k1 first','Error','error');
-                        set(handles.Structure(32),'String','');
+                        set(handles.Structure(19),'String','');
                         return
                     else
-                        handles.Model.K(1,1) = str2num(get(handles.Structure(17),'String')) + input_val;
+                        handles.Model.K(1,1) = str2num(get(handles.Structure(18),'String')) + input_val;
                     end
                     handles.Model.K(1,2) = -input_val;
                     handles.Model.K(2,1) = -input_val;
@@ -982,7 +975,7 @@ switch action
                 if length(handles.Model.K) ~= 2 || handles.Model.K(1,1) == 0
                     return
                 else
-                    [Phi OmegaSq] = eig(handles.Model.K,handles.Model.M);
+                    [Phi,OmegaSq] = eig(handles.Model.K,handles.Model.M);
                     if Phi(1,1) ~= 0
                         Mode1 = Phi(:,1)./Phi(1,1);
                     else
@@ -1011,7 +1004,7 @@ switch action
         % return if mass or stiffness are not specified
         if ~isfield(handles.Model,'T')
             msgbox('Must specify model mass and stiffness first!','Error','error');
-            set(handles.Structure([12 20 28]),'Value',1);
+            set(handles.Structure([12 21 30]),'Value',1);
             return
         end
         damp_type = get(gcbo,'Value');
@@ -1039,12 +1032,12 @@ switch action
         % return if mass,stiffness or damping type are not specified
         if ~isfield(handles.Model,'T')
             msgbox('Must specify model mass and stiffness first!','Error','error');
-            set(handles.Structure([13 21 29]),'String','zeta');
+            set(handles.Structure([13 22 31]),'String','zeta');
             return
         end
         if ~isfield(handles.Model,'DampType')
             msgbox('Must choose damping type!','Error','error');
-            set(handles.Structure([13 21 29]),'String','zeta');
+            set(handles.Structure([13 22 31]),'String','zeta');
             return
         end
         input_val = str2num(get(handles.Structure(handles.Model.Damping_field),'String'));

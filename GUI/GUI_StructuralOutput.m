@@ -66,7 +66,7 @@ f_StructOut1 = figure('Name','Structural Output',...
     'Color',[0.3 0.5 0.7],...
     'Position',[SS(3)*0.12,SS(4)*0.05,SS(3)*0.87,SS(4)*0.87]);
 orient(f_StructOut1,'landscape');
-ModifyPrintSetup(f_StructOut1,'PrintUI',0);
+%ModifyPrintSetup(f_StructOut1,'PrintUI',0);
 
 % toolbar
 File(1) = uimenu('Position',1,'Label','File');
@@ -179,7 +179,7 @@ if ~strcmp(handles.Model.Type, '1 DOF')
         'Color',[0.3 0.5 0.7],...
         'Position',[SS(3)*0.12,SS(4)*0.05,SS(3)*0.87,SS(4)*0.87]);
     orient(f_StructOut2,'landscape');
-    ModifyPrintSetup(f_StructOut2,'PrintUI',0);
+    %ModifyPrintSetup(f_StructOut2,'PrintUI',0);
     
     % toolbar
     File(1) = uimenu('Position',1,'Label','File');

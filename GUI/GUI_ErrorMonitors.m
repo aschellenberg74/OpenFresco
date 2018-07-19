@@ -62,7 +62,7 @@ f_ErrorMon = figure('Name','Error Monitors',...
     'Color',[0.3 0.5 0.7],...
     'Position',[SS(3)*0.12,SS(4)*0.05,SS(3)*0.87,SS(4)*0.87]);
 orient(f_ErrorMon,'landscape');
-ModifyPrintSetup(f_ErrorMon,'PrintUI',0);
+%ModifyPrintSetup(f_ErrorMon,'PrintUI',0);
 
 % =========================================================================
 % 1-DOF Case

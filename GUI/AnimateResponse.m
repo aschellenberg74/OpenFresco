@@ -77,7 +77,7 @@ switch Type
         set(handles.Plots.EM1trackplot,'Xdata',t,'YData',TI(1,:));
         
         % animate structure
-        if findobj('Tag','StructAnim')
+        if ~isempty(findobj('Tag','StructAnim'))
             set(handles.Plots.StructAnim, ...
                 'Vertices',[0.0 0.0; U(1,end) 10.0], ...
                 'FaceVertexCData',[0; abs(U(1,end))]);
@@ -137,7 +137,7 @@ switch Type
         set(handles.Plots.EM2trackplot,'Xdata',t,'YData',TI(2,:));
         
         % animate structure
-        if findobj('Tag','StructAnim')
+        if ~isempty(findobj('Tag','StructAnim'))
             set(handles.Plots.StructAnim, ...
                 'Vertices',[0.0 0.0; U(1,end) 5.0; U(2,end) 10.0], ...
                 'FaceVertexCData',[0; abs(U(:,end))]);
@@ -197,7 +197,7 @@ switch Type
         set(handles.Plots.EM2trackplot,'Xdata',t,'YData',TI(2,:));
         
         % animate structure
-        if findobj('Tag','StructAnim')
+        if ~isempty(findobj('Tag','StructAnim'))
             set(handles.Plots.StructAnim, ...
                 'Vertices',[0.0 0.0 0.0; U(1,end) U(2,end) 10.0], ...
                 'FaceVertexCData',[0; norm(U(:,end))]);

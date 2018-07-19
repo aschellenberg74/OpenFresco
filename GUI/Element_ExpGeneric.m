@@ -53,6 +53,11 @@ ipAddr = ElmData.ipAddr;         % ip-address of simAppSiteServer
 ipPort = ElmData.ipPort;         % ip-port of simAppSiteServer
 id     = ElmData.id;             % id of global element DOFs
 ndf    = length(id);             % number of degrees of freedom
+if isfield(ElmData,'socketType')
+    socketType = ElmData.socketType;  % socket type (tcp, udp)
+else
+    socketType = 'tcp';
+end
 if isfield(ElmData,'dataSize')
     dataSize = ElmData.dataSize;  % size of send and receive vectors
 else
@@ -65,46 +70,90 @@ sData = zeros(1,dataSize);
 switch action
     % ======================================================================
     case 'initialize'
-        if (length(socketID)<tag || socketID(tag)<=0)
-            numTrials = 0;
-            socketID(tag) = -1;
-            while (numTrials<10 && socketID(tag)<0)
-                try %#ok<TRYNC>
-                    socketID(tag) = TCPSocket('openConnection',ipAddr,ipPort);
-                    pause(1.0);
-                    numTrials = numTrials+1;
-                    if (numTrials==10)
-                        continueTrial = questdlg(sprintf('The program cannot establish a connection to OpenFresco.\nContinue trying to connect?'),'Continue?','Yes','No','Yes');
-                        if strcmp(continueTrial,'Yes')
-                            numTrials = 0;
+        if strcmp(socketType,'tcp')
+            if (length(socketID)<tag || socketID(tag)<=0)
+                numTrials = 0;
+                socketID(tag) = -1;
+                while (numTrials<60 && socketID(tag)<0)
+                    try %#ok<TRYNC>
+                        socketID(tag) = TCPSocket('openConnection',ipAddr,ipPort);
+                        pause(1.0);
+                        numTrials = numTrials+1;
+                        if (numTrials==60)
+                            continueTrial = questdlg(sprintf('The program cannot establish a connection to OpenFresco.\nContinue trying to connect?'),'Continue?','Yes','No','Yes');
+                            if strcmp(continueTrial,'Yes')
+                                numTrials = 0;
+                            end
                         end
                     end
                 end
+                if (socketID(tag)<0)
+                    error('TCPSocket:openConnection',['Unable to setup connection to ',...
+                        ipAddr,' : ',num2str(ipPort)]);
+                end
+                
+                % set the data size for the experimental site
+                dataSizes = int32([ndf ndf ndf 0 0, ndf ndf 0 ndf 0, dataSize]);
+                TCPSocket('sendData',socketID(tag),dataSizes,11);
+                
+                dispT(:,tag) = zeros(ndf,1);
+                velT(:,tag) = zeros(ndf,1);
+                
+                % send trial response to experimental site
+                sData(1) = 3;
+                sData(2:ndf+1) = dispT(:,tag)';
+                sData(ndf+2:2*ndf+1) = velT(:,tag)';
+                TCPSocket('sendData',socketID(tag),sData,dataSize);
             end
-            if (socketID(tag)<0)
-                error('TCPSocket:openConnection',['Unable to setup connection to ',...
-                    ipAddr,' : ',num2str(ipPort)]);
-            end
             
-            % set the data size for the experimental site
-            dataSizes = int32([ndf ndf ndf 0 0, ndf ndf 0 ndf 0, dataSize]);
-            TCPSocket('sendData',socketID(tag),dataSizes,11);
-            
-            dispT(:,tag) = zeros(ndf,1);
-            velT(:,tag) = zeros(ndf,1);
-            
-            % send trial response to experimental site
-            sData(1) = 3;
-            sData(2:ndf+1) = dispT(:,tag)';
-            sData(ndf+2:2*ndf+1) = velT(:,tag)';
+            % get measured response
+            sData(1) = 6;
             TCPSocket('sendData',socketID(tag),sData,dataSize);
+            rData = TCPSocket('recvData',socketID(tag),dataSize);
+            getDaq = 0;
+            
+        elseif strcmp(socketType,'udp')
+            if (length(socketID)<tag || socketID(tag)<=0)
+                numTrials = 0;
+                socketID(tag) = -1;
+                while (numTrials<60 && socketID(tag)<0)
+                    try %#ok<TRYNC>
+                        socketID(tag) = UDPSocket('openConnection',ipAddr,ipPort);
+                        pause(1.0);
+                        numTrials = numTrials+1;
+                        if (numTrials==60)
+                            continueTrial = questdlg(sprintf('The program cannot establish a connection to OpenFresco.\nContinue trying to connect?'),'Continue?','Yes','No','Yes');
+                            if strcmp(continueTrial,'Yes')
+                                numTrials = 0;
+                            end
+                        end
+                    end
+                end
+                if (socketID(tag)<0)
+                    error('UDPSocket:openConnection',['Unable to setup connection to ',...
+                        ipAddr,' : ',num2str(ipPort)]);
+                end
+                
+                % set the data size for the experimental site
+                dataSizes = int32([ndf ndf ndf 0 0, ndf ndf 0 ndf 0, dataSize]);
+                UDPSocket('sendData',socketID(tag),dataSizes,11);
+                
+                dispT(:,tag) = zeros(ndf,1);
+                velT(:,tag) = zeros(ndf,1);
+                
+                % send trial response to experimental site
+                sData(1) = 3;
+                sData(2:ndf+1) = dispT(:,tag)';
+                sData(ndf+2:2*ndf+1) = velT(:,tag)';
+                UDPSocket('sendData',socketID(tag),sData,dataSize);
+            end
+            
+            % get measured response
+            sData(1) = 6;
+            UDPSocket('sendData',socketID(tag),sData,dataSize);
+            rData = UDPSocket('recvData',socketID(tag),dataSize);
+            getDaq = 0;
         end
-        
-        % get measured response
-        sData(1) = 6;
-        TCPSocket('sendData',socketID(tag),sData,dataSize);
-        rData = TCPSocket('recvData',socketID(tag),dataSize);
-        getDaq = 0;
         
         varargout = {rData(1:ndf)',rData(ndf+1:2*ndf)',rData(2*ndf+1:3*ndf)'};
     % ======================================================================
@@ -116,7 +165,11 @@ switch action
         sData(1) = 3;
         sData(2:ndf+1) = dispT(:,tag)';
         sData(ndf+2:2*ndf+1) = velT(:,tag)';
-        TCPSocket('sendData',socketID(tag),sData,dataSize);
+        if strcmp(socketType,'tcp')
+            TCPSocket('sendData',socketID(tag),sData,dataSize);
+        elseif strcmp(socketType,'udp')
+            UDPSocket('sendData',socketID(tag),sData,dataSize);
+        end
         getDaq = 1;
         
         varargout = {0};
@@ -125,8 +178,13 @@ switch action
         % get measured response
         if getDaq
             sData(1) = 6;
-            TCPSocket('sendData',socketID(tag),sData,dataSize);
-            rData = TCPSocket('recvData',socketID(tag),dataSize);
+            if strcmp(socketType,'tcp')
+                TCPSocket('sendData',socketID(tag),sData,dataSize);
+                rData = TCPSocket('recvData',socketID(tag),dataSize);
+            elseif strcmp(socketType,'udp')
+                UDPSocket('sendData',socketID(tag),sData,dataSize);
+                rData = UDPSocket('recvData',socketID(tag),dataSize);
+            end
             getDaq = 0;
         end
         
@@ -136,8 +194,13 @@ switch action
         % get measured displacements
         if getDaq
             sData(1) = 6;
-            TCPSocket('sendData',socketID(tag),sData,dataSize);
-            rData = TCPSocket('recvData',socketID(tag),dataSize);
+            if strcmp(socketType,'tcp')
+                TCPSocket('sendData',socketID(tag),sData,dataSize);
+                rData = TCPSocket('recvData',socketID(tag),dataSize);
+            elseif strcmp(socketType,'udp')
+                UDPSocket('sendData',socketID(tag),sData,dataSize);
+                rData = UDPSocket('recvData',socketID(tag),dataSize);
+            end
             getDaq = 0;
         end
         
@@ -147,8 +210,13 @@ switch action
         % get measured velocities
         if getDaq
             sData(1) = 6;
-            TCPSocket('sendData',socketID(tag),sData,dataSize);
-            rData = TCPSocket('recvData',socketID(tag),dataSize);
+            if strcmp(socketType,'tcp')
+                TCPSocket('sendData',socketID(tag),sData,dataSize);
+                rData = TCPSocket('recvData',socketID(tag),dataSize);
+            elseif strcmp(socketType,'udp')
+                UDPSocket('sendData',socketID(tag),sData,dataSize);
+                rData = UDPSocket('recvData',socketID(tag),dataSize);
+            end
             getDaq = 0;
         end
         
@@ -158,8 +226,13 @@ switch action
         % get measured resisting forces
         if getDaq
             sData(1) = 6;
-            TCPSocket('sendData',socketID(tag),sData,dataSize);
-            rData = TCPSocket('recvData',socketID(tag),dataSize);
+            if strcmp(socketType,'tcp')
+                TCPSocket('sendData',socketID(tag),sData,dataSize);
+                rData = TCPSocket('recvData',socketID(tag),dataSize);
+            elseif strcmp(socketType,'udp')
+                UDPSocket('sendData',socketID(tag),sData,dataSize);
+                rData = UDPSocket('recvData',socketID(tag),dataSize);
+            end
             getDaq = 0;
         end
         
@@ -173,15 +246,24 @@ switch action
     % ======================================================================
     case 'commitState'
         sData(1) = 5;
-        TCPSocket('sendData',socketID(tag),sData,dataSize);
+        if strcmp(socketType,'tcp')
+            TCPSocket('sendData',socketID(tag),sData,dataSize);
+        elseif strcmp(socketType,'udp')
+            UDPSocket('sendData',socketID(tag),sData,dataSize);
+        end
         
         varargout = {0};
     % ======================================================================
     case 'disconnect'
         if (socketID(tag)>0)
             sData(1) = 99;
-            TCPSocket('sendData',socketID(tag),sData,dataSize);
-            TCPSocket('closeConnection',socketID(tag));
+            if strcmp(socketType,'tcp')
+                TCPSocket('sendData',socketID(tag),sData,dataSize);
+                TCPSocket('closeConnection',socketID(tag));
+            elseif strcmp(socketType,'udp')
+                UDPSocket('sendData',socketID(tag),sData,dataSize);
+                UDPSocket('closeConnection',socketID(tag));
+            end
             socketID(tag) = -1;
         end
         

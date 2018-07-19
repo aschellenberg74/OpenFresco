@@ -876,7 +876,7 @@ switch action
             end
         end
         % store selected node if 2 DOF A type
-        if strcmp(handles.Model.Type, '2 DOF A');
+        if strcmp(handles.Model.Type, '2 DOF A')
             nn = get(handles.EC(57),'Value');
             if nn == 1
                 msgbox(sprintf('Please choose a node'),'Error','error');

@@ -51,7 +51,7 @@ hFig = figure('Name',['Display ',upper(action)],...
     'Color',[0.3 0.5 0.7],...
     'Position',[0.277*SS(3) 0.215*SS(4) 0.55*SS(3) 0.5*SS(4)]);
 orient(hFig,'landscape');
-ModifyPrintSetup(hFig,'PrintUI',0);
+%ModifyPrintSetup(hFig,'PrintUI',0);
 
 % toolbar
 File(1) = uimenu('Position',1,'Label','File');
