@@ -11,7 +11,8 @@ sample_rate = 1/sample;      % sampling rate of RTHS [Hz]
 tl = 1.0;                    % duration of moving window [sec]
 Nl = floor(tl*sample_rate);
 SN = 16;                     % skipping number
-Threshold = 0.01;            % [in.] - threshold value for triggering ATS compensator 
+Threshold = [0.01,0.01,0.01,0.002,0.002];     % [in.,in.,in.,deg,deg] - threshold value for triggering ATS compensator 
+Threshold = Threshold(dofID);
 
 %Par = [1 0.04 0.0008];       % initial a0, a1, a2 values
 % Par values can be obtained from predefined displacement tests. However,
@@ -33,8 +34,13 @@ if (HybridCtrlParameters.nDOF >= 2)
 end
 if (HybridCtrlParameters.nDOF >= 3)
     Par(1,3) = 1;
-    Par(2,3) = 0.025;
+    Par(2,3) = 0.030;
     Par(3,3) = 0.5*Par(2,3)^2;
+end
+if (HybridCtrlParameters.nDOF >= 4)
+    Par(1,4) = 1;
+    Par(2,4) = 0.030;
+    Par(3,4) = 0.5*Par(2,4)^2;
 end
 
 P_range = [0.7 1.30;
@@ -54,8 +60,8 @@ dt = 1/sample_rate;
 sys = tf(b,a);
 zsys = c2d(sys,dt);
 ztag = get(zsys);
-Znum = ztag.num{1};
-Zden = ztag.den{1};
+Znum = ztag.Numerator{1};
+Zden = ztag.Denominator{1};
 
 % Butterworth filter for forces
 Filter_order_Frc = 4;
@@ -65,8 +71,8 @@ dt = 1/sample_rate;
 sys_Frc = tf(b_Frc,a_Frc);
 zsys_Frc = c2d(sys_Frc,dt);
 ztag_Frc = get(zsys_Frc);
-Znum_Frc = ztag_Frc.num{1};
-Zden_Frc = ztag_Frc.den{1};
+Znum_Frc = ztag_Frc.Numerator{1};
+Zden_Frc = ztag_Frc.Denominator{1};
 
 % % Butterworth filter for disp command
 % Filter_order_Cmd = 4;
@@ -76,6 +82,6 @@ Zden_Frc = ztag_Frc.den{1};
 % sys_Cmd = tf(b_Cmd,a_Cmd);
 % zsys_Cmd = c2d(sys_Cmd,dt);
 % ztag_Cmd = get(zsys_Cmd);
-% Znum_Cmd = ztag_Cmd.num{1};
-% Zden_Cmd = ztag_Cmd.den{1};
+% Znum_Cmd = ztag_Cmd.Numerator{1};
+% Zden_Cmd = ztag_Cmd.Denominator{1};
 

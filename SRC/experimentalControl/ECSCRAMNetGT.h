@@ -19,10 +19,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 #ifndef ECSCRAMNetGT_h
 #define ECSCRAMNetGT_h
 

@@ -1,11 +1,6 @@
 %INITIALIZESIMULATION to initialize the parameters needed to build the Simulink model
 %
-% created by Brad Thoen (MTS)
-% modified by Andreas Schellenberg (andreas.schellenberg@gmail.com) 01/2014
-%
-% $Revision: $
-% $Date: $
-% $URL: $
+% created by Andreas Schellenberg (andreas.schellenberg@gmail.com) 01/2014
 
 clear;
 close all;
@@ -14,16 +9,21 @@ clc;
 %%%%%%%%%% HYBRID CONTROLLER PARAMETERS %%%%%%%%%%
 
 % set number of degrees-of-freedom
-nDOF = 2;
+dofID = [1];
+HybridCtrlParameters.nDOF = length(dofID);
 
 % set time steps
-HybridCtrlParameters.dtInt = 10/2048;        % integration time step (sec)
-HybridCtrlParameters.dtSim = 10/2048;        % simulation time step (sec)
-HybridCtrlParameters.dtCon = 1/2048;         % controller time step (sec)
-HybridCtrlParameters.delay(1) = 0/1000;      % delay compensation DOF 1 (sec)
-HybridCtrlParameters.delay(2) = 0/1000;      % delay compensation DOF 2 (sec)
+HybridCtrlParameters.upFact   = 5;          % upsample factor
+HybridCtrlParameters.dtInt    = 10/2048;    % integration time step [sec]
+HybridCtrlParameters.dtSim    = 10/2048;    % simulation time step [sec]
+HybridCtrlParameters.dtCon    = 1/2048;     % controller time step [sec]
+HybridCtrlParameters.delay    = zeros(1,HybridCtrlParameters.nDOF);
+%HybridCtrlParameters.delay(1) = 0/2048;     % delay compensation DOF 1 [sec]
+%HybridCtrlParameters.delay(2) = 0/2048;     % delay compensation DOF 2 [sec]
 
-% calculate max number of substeps
+% update controller time step
+HybridCtrlParameters.dtCon = HybridCtrlParameters.dtCon/HybridCtrlParameters.upFact;
+% calculate number of substeps
 HybridCtrlParameters.N = round(HybridCtrlParameters.dtSim/HybridCtrlParameters.dtCon);
 % update simulation time step
 HybridCtrlParameters.dtSim = HybridCtrlParameters.N*HybridCtrlParameters.dtCon;
@@ -53,19 +53,3 @@ HybridCtrlParameters.rate = HybridCtrlParameters.dtSim/HybridCtrlParameters.dtIn
 disp('Model Properties:');
 disp('=================');
 disp(HybridCtrlParameters);
-
-%%%%%%%%%% SIGNAL COUNTS %%%%%%%%%%
-
-nAct	= 12;                               % number of actuators
-nAcc	= 11;                               % number of accelerometers
-nTbl	= 6;                                % number of table degree-of-freedom
-nAdcU	= 40;                               % number of user a/d channels
-nDucU	= 4;								% number of user duc's
-nUDPInp	= 1+nTbl+2*nAct+nAcc+nAdcU+nDucU;	% no. of outputs from simulink bridge
-nUDPOut = 1+6*nTbl+nAct+nAdcU+nDucU;		% no. of inputs to simulink bridge
-
-%%%%%%%%%% SAMPLE PERIOD %%%%%%%%%%
-
-controlPeriod	= 1/2048;		% controller sample period (sec)
-upsampleFactor	= 4;			% plant upsample factor
-dnsampleFactor	= 4;			% plant downsample factor

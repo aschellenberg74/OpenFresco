@@ -1,10 +1,6 @@
 %INITIALIZESIMULATION to initialize the parameters needed to build the Simulink model
 %
 % created by Andreas Schellenberg (andreas.schellenberg@gmail.com) 11/2004
-%
-% $Revision$
-% $Date$
-% $URL$
 
 clear;
 close all;
@@ -13,16 +9,17 @@ clc;
 %%%%%%%%%% HYBRID CONTROLLER PARAMETERS %%%%%%%%%%
 
 % set number of degrees-of-freedom
-HybridCtrlParameters.nDOF = 1;
+dofID = [1];
+HybridCtrlParameters.nDOF = length(dofID);
 
 % set time steps
 HybridCtrlParameters.upFact   = 4;          % upsample factor
-HybridCtrlParameters.dtInt    = 0.02;       % integration time step (sec)
-HybridCtrlParameters.dtSim    = 0.02;       % simulation time step (sec)
-HybridCtrlParameters.dtCon    = 1/1024;     % controller time step (sec)
+HybridCtrlParameters.dtInt    = 0.02;       % integration time step [sec]
+HybridCtrlParameters.dtSim    = 0.02;       % simulation time step [sec]
+HybridCtrlParameters.dtCon    = 1/1024;     % controller time step [sec]
 HybridCtrlParameters.delay    = zeros(1,HybridCtrlParameters.nDOF);
-%HybridCtrlParameters.delay(1) = 0/1024;     % delay compensation DOF 1 (sec)
-%HybridCtrlParameters.delay(2) = 0/1024;     % delay compensation DOF 2 (sec)
+%HybridCtrlParameters.delay(1) = 0/1024;     % delay compensation DOF 1 [sec]
+%HybridCtrlParameters.delay(2) = 0/1024;     % delay compensation DOF 2 [sec]
 
 % update controller time step
 HybridCtrlParameters.dtCon = HybridCtrlParameters.dtCon/HybridCtrlParameters.upFact;

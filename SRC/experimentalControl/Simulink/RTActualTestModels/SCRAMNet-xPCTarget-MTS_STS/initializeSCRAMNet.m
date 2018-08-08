@@ -2,10 +2,6 @@
 %
 % created by Brad Thoen (MTS)
 % modified by Andreas Schellenberg (andreas.schellenberg@gmail.com) 11/2004
-%
-% $Revision: $
-% $Date: $
-% $URL: $
 
 %%%%%%%%%% SIGNAL COUNTS %%%%%%%%%%
 
@@ -21,13 +17,13 @@ nUDPInp = 1+6*nAct+nAdcU+nDucU+nEncU+nDinp+nEncCmd;  % no. of inputs to simulink
 
 %%%%%%%%%% SAMPLE PERIODS %%%%%%%%%%
 
-controlPeriod = 1/1024;  % controller sample period (sec)
+controlPeriod = 1/1024;  % controller sample period [sec]
 samplePeriod  = controlPeriod/HybridCtrlParameters.upFact;
 
 %%%%%%%%%% SCRAMNET PARTITIONS %%%%%%%%%%
 
-syncNode = 1;	% synchronization node: MTS STS
-xpcNode	 = 2;	% xPC-Target node
+syncNode = 1;   % synchronization node: MTS STS
+xpcNode	 = 2;   % xPC-Target node
 opfNode  = 3;   % OpenFresco node
 
 
@@ -238,7 +234,7 @@ node            = completenodestruct(node);
 
 % display interrupt longword location
 irqAddr = node.Partitions(irqPartition).Internal.Address / 4 ...
-		+ node.Partitions(irqPartition).Internal.Sizes(1) - 1;
+        + node.Partitions(irqPartition).Internal.Sizes(1) - 1;
 
 disp('SCRAMNet Interrupt Longword Location:');
 disp('=====================================');

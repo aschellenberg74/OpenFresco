@@ -2,30 +2,26 @@
 %
 % created by Brad Thoen (MTS)
 % modified by Andreas Schellenberg (andreas.schellenberg@gmail.com) 01/2014
-%
-% $Revision: $
-% $Date: $
-% $URL: $
 
 %%%%%%%%%% SIGNAL COUNTS %%%%%%%%%%
 
-nAct	= 12;                               % number of actuators
-nAcc	= 11;                               % number of accelerometers
-nTbl	= 6;                                % number of table degree-of-freedom
-nAdcU	= 40;                               % number of user a/d channels
-nDucU	= 4;								% number of user duc's
-nUDPInp	= 1+nTbl+2*nAct+nAcc+nAdcU+nDucU;	% no. of outputs from simulink bridge
-nUDPOut = 1+6*nTbl+nAct+nAdcU+nDucU;		% no. of inputs to simulink bridge
+nAct    = 12;                               % number of actuators
+nAcc    = 11;                               % number of accelerometers
+nTbl    = 6;                                % number of table degree-of-freedom
+nAdcU   = 40;                               % number of user a/d channels
+nDucU   = 4;                                % number of user duc's
+nUDPInp = 1+nTbl+2*nAct+nAcc+nAdcU+nDucU;   % no. of outputs from simulink bridge
+nUDPOut = 1+6*nTbl+nAct+nAdcU+nDucU;        % no. of inputs to simulink bridge
 
 %%%%%%%%%% SAMPLE PERIODS %%%%%%%%%%
 
-controlPeriod = 1/2048;		% controller sample period (sec)
+controlPeriod = 1/2048;  % controller sample period [sec]
 samplePeriod  = controlPeriod/HybridCtrlParameters.upFact;
 
 %%%%%%%%%% SCRAMNET PARTITIONS %%%%%%%%%%
 
-syncNode = 1;	% synchronization node: MTS 469D
-xpcNode	 = 2;	% xPC-Target node
+syncNode = 1;   % synchronization node: MTS 469D
+xpcNode	 = 2;   % xPC-Target node
 opfNode  = 3;   % OpenFresco node
 
 
@@ -181,11 +177,11 @@ opfpartition(13).Size = num2str(nTbl);
 
 mask = sprintf('0x%8.8X', bitshift(1, syncNode));
 node = scgtnodestruct([]);
-node.Interface.NodeID								   = num2str(xpcNode);
+node.Interface.NodeID                                  = num2str(xpcNode);
 node.Interface.Interrupts.ChangeBroadcastInterruptMask = 'yes';
 node.Interface.Interrupts.BroadcastInterruptMask       = mask;
-outpartition	= scgtpartitionstruct(outpartition);
-inppartition	= scgtpartitionstruct(inppartition);
-opfpartition	= scgtpartitionstruct(opfpartition);
-node.Partitions	= [outpartition inppartition opfpartition];
+outpartition    = scgtpartitionstruct(outpartition);
+inppartition    = scgtpartitionstruct(inppartition);
+opfpartition    = scgtpartitionstruct(opfpartition);
+node.Partitions = [outpartition inppartition opfpartition];
 node            = scgtnodestruct(node);

@@ -19,10 +19,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 // Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 08/13
 // Revision: A
@@ -80,7 +76,7 @@ ECSCRAMNetGT::ECSCRAMNetGT(int tag, int memoffset, int numdof,
     rValue = scgtSetState(&gtHandle, SCGT_NODE_ID, nodeID);
     if (rValue != SCGT_SUCCESS)  {
         opserr << "ECSCRAMNetGT::ECSCRAMNetGT() - scgtSetState():"
-            << " could not change nodeID to 3.\n";
+            << " could not change nodeID to #" << nodeID << ".\n";
         exit(rValue);
     }
     
