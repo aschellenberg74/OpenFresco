@@ -22,10 +22,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 #ifndef FrescoGlobals_h
 #define FrescoGlobals_h
 
@@ -33,9 +29,9 @@
 // Created: 09/06
 // Revision: A
 //
-// Description: This file contains the global values in Fresco
+// Description: This file contains the global values in OpenFresco
 
-#define OPF_VERSION "2.7.0 (Build 420)"
+#define OPF_VERSION "2.7.1 (Build 180801)"
 
 #ifndef _WIN64
 #define WIN_ARCH "32-Bit"

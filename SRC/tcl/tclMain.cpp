@@ -33,10 +33,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 // Modified: Frank McKenna & Andreas Schellenberg
 // Created: 10/06
 // Revision: A
@@ -176,9 +172,9 @@ void tclMain(int argc, char **argv, Tcl_AppInitProc * appInitProc)
     /* beginning of modifications for OpenFresco */
     fprintf(stderr,"\n\n");
     fprintf(stderr,"\t OpenFresco -- Open Framework for Experimental Setup and Control\n");
-    fprintf(stderr,"\t                 Version %s %s                   \n\n",OPF_VERSION,WIN_ARCH);
+    fprintf(stderr,"\t               Version %s %s              \n\n",OPF_VERSION,WIN_ARCH);
     fprintf(stderr,"\t Copyright (c) 2006 The Regents of the University of California \n");
-    fprintf(stderr,"\t                       All Rights Reserved                      \n\n\n");    
+    fprintf(stderr,"\t                       All Rights Reserved                      \n\n\n");
 
 
     Tcl_FindExecutable(argv[0]);
