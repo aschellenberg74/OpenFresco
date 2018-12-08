@@ -18,8 +18,8 @@
 **                                                                    **
 ** ****************************************************************** */
                                                                         
-// $Revision$
-// $Date$
+// $Revision: 1.2 $
+// $Date: 2001-07-26 00:56:05 $
 // $Source: /usr/local/cvs/OpenSees/SRC/renderer/ColorMap.h,v $
                                                                         
                                                                         

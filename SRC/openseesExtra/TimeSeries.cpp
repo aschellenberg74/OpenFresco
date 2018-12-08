@@ -18,8 +18,8 @@
 **                                                                    **
 ** ****************************************************************** */
                                                                         
-// $Revision$
-// $Date$
+// $Revision: 1.5 $
+// $Date: 2010-02-16 18:57:05 $
 // $Source: /usr/local/cvs/OpenSees/SRC/domain/pattern/TimeSeries.cpp,v $
                                                                         
                                                                         
@@ -45,7 +45,12 @@ bool OPS_addTimeSeries(TimeSeries *newComponent) {
 }
 
 bool OPS_removeTimeSeries(int tag) {
-  return (theTimeSeriesObjects.removeComponent(tag) != 0);
+    TaggedObject* obj = theTimeSeriesObjects.removeComponent(tag);
+    if (obj != 0) {
+	delete obj;
+	return true;
+    }
+    return false;
 }
 
 TimeSeries *OPS_getTimeSeries(int tag) {

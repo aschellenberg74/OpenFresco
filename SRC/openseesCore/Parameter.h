@@ -18,8 +18,8 @@
 **                                                                    **
 ** ****************************************************************** */
                                                                         
-// $Revision$
-// $Date$
+// $Revision: 1.7 $
+// $Date: 2008-08-26 15:38:37 $
 // $Source: /usr/local/cvs/OpenSees/SRC/domain/component/Parameter.h,v $
 
 #ifndef Parameter_h

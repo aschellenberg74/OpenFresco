@@ -2,10 +2,6 @@
 # (use with OneBayFrame_Distr_Client.tcl & OneBayFrame_Distr_SimAppServer.tcl)
 # Units: [kip,in.]
 #
-# $Revision$
-# $Date$
-# $URL$
-#
 # Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 # Created: 11/06
 # Revision: A
@@ -65,7 +61,7 @@ expSite ActorSite 1 -setup 1 8091
 # startLabServer $siteTag
 startLabServer  1
 
-wipe
+wipeExp
 exit
 # --------------------------------
 # End of analysis

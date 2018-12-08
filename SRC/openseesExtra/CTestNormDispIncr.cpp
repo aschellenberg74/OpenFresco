@@ -18,8 +18,8 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
+// $Revision: 1.8 $
+// $Date: 2006-01-10 18:13:19 $
 // $Source: /usr/local/cvs/OpenSees/SRC/convergenceTest/CTestNormDispIncr.cpp,v $
 
 

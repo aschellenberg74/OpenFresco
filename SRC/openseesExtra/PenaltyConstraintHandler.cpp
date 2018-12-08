@@ -18,8 +18,8 @@
 **                                                                    **
 ** ****************************************************************** */
                                                                         
-// $Revision$
-// $Date$
+// $Revision: 1.6 $
+// $Date: 2005-11-29 22:04:40 $
 // $Source: /usr/local/cvs/OpenSees/SRC/analysis/handler/PenaltyConstraintHandler.cpp,v $
                                                                         
                                                                         
@@ -102,7 +102,7 @@ PenaltyConstraintHandler::handle(const ID *nodesLast)
     while ((spPtr = theSPs()) != 0)
       numSPs++;
     
-    // initialse the DOF_Groups and add them to the AnalysisModel.
+    // initialise the DOF_Groups and add them to the AnalysisModel.
     //    : must of course set the initial IDs
     NodeIter &theNod = theDomain->getNodes();
     Node *nodPtr;

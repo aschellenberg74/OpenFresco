@@ -18,8 +18,8 @@
 **                                                                    **
 ** ****************************************************************** */
                                                                         
-// $Revision$
-// $Date$
+// $Revision: 1.1.1.1 $
+// $Date: 2000-09-15 08:23:30 $
 // $Source: /usr/local/cvs/OpenSees/SRC/tagged/storage/MapOfTaggedObjectsIter.cpp,v $
                                                                         
                                                                         

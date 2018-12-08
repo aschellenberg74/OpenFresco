@@ -18,8 +18,8 @@
 **                                                                    **
 ** ****************************************************************** */
                                                                         
-// $Revision$
-// $Date$
+// $Revision: 1.4 $
+// $Date: 2010-04-23 22:47:42 $
 // $Source: /usr/local/cvs/OpenSees/SRC/recorder/Recorder.cpp,v $
                                                                         
 

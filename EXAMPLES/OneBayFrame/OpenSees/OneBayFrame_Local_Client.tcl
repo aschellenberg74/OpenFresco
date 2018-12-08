@@ -1,10 +1,6 @@
 # File: OneBayFrame_Local_Client.tcl (use with OneBayFrame_Local_SimAppServer.tcl)
 # Units: [kip,in.]
 #
-# $Revision$
-# $Date$
-# $URL$
-#
 # Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 # Created: 11/06
 # Revision: A

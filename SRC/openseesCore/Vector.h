@@ -18,8 +18,8 @@
 **                                                                    **
 ** ****************************************************************** */
                                                                         
-// $Revision$
-// $Date$
+// $Revision: 1.12 $
+// $Date: 2008-06-13 22:24:48 $
 // $Source: /usr/local/cvs/OpenSees/SRC/matrix/Vector.h,v $
 
 // Written: fmk 

@@ -18,8 +18,8 @@
 **                                                                    **
 ** ****************************************************************** */
                                                                         
-// $Revision$
-// $Date$
+// $Revision: 1.61 $
+// $Date: 2010-09-16 00:07:11 $
 // $Source: /usr/local/cvs/OpenSees/SRC/domain/domain/Domain.cpp,v $
                                                                         
 // Written: fmk 
@@ -375,6 +375,9 @@ Domain::~Domain()
 
   if (theEigenvalues != 0)
     delete theEigenvalues;
+
+  if (theLoadPatternIter != 0)
+      delete theLoadPatternIter;
 
   if (theModalDampingFactors != 0)
     delete theModalDampingFactors;

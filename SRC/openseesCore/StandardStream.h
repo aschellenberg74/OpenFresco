@@ -18,8 +18,8 @@
 **                                                                    **
 ** ****************************************************************** */
                                                                         
-// $Revision$
-// $Date$
+// $Revision: 1.3 $
+// $Date: 2006-08-03 23:24:56 $
 // $Source: /usr/local/cvs/OpenSees/SRC/handler/StandardStream.h,v $
 
 #ifndef _StandardStream

@@ -22,10 +22,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 // Written: Yoshi (yos@catfish.dpri.kyoto-u.ac.jp)
 // Created: 09/06
 // Revision: A
@@ -69,8 +65,9 @@ ExperimentalElement::ExperimentalElement(int tag,
 
 ExperimentalElement::~ExperimentalElement()
 {
-    if (theSite != 0)
-        delete theSite;
+    // theSite is not a copy, so do not clean it up here
+    //if (theSite != 0)
+    //    delete theSite;
     if (theTangStiff != 0)
         delete theTangStiff;
     

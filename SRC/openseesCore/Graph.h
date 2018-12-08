@@ -18,8 +18,8 @@
 **                                                                    **
 ** ****************************************************************** */
                                                                         
-// $Revision$
-// $Date$
+// $Revision: 1.4 $
+// $Date: 2009-08-25 22:07:16 $
 // $Source: /usr/local/cvs/OpenSees/SRC/graph/graph/Graph.h,v $
                                                                         
                                                                         

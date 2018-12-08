@@ -22,10 +22,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 // Written: Yoshi (yos@catfish.dpri.kyoto-u.ac.jp)
 // Created: 09/06
 // Revision: A
@@ -89,8 +85,9 @@ ExperimentalSite::ExperimentalSite(const ExperimentalSite& es)
 
 ExperimentalSite::~ExperimentalSite()
 {
-    if (theSetup != 0) 
-        delete theSetup;
+    // theSetup is not a copy, so do not clean it up here
+    //if (theSetup != 0)
+    //    delete theSetup;
     
     if (tDisp != 0) 
         delete tDisp;

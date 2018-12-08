@@ -18,8 +18,8 @@
 **                                                                    **
 ** ****************************************************************** */
                                                                         
-// $Revision$
-// $Date$
+// $Revision: 1.2 $
+// $Date: 2010-03-04 19:05:29 $
 // $Source: /usr/local/cvs/OpenSees/SRC/handler/TCP_Stream.h,v $
 
 

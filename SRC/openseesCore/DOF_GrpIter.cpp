@@ -18,8 +18,8 @@
 **                                                                    **
 ** ****************************************************************** */
                                                                         
-// $Revision$
-// $Date$
+// $Revision: 1.1 $
+// $Date: 2005-11-28 22:07:24 $
 // $Source: /usr/local/cvs/OpenSees/SRC/analysis/model/DOF_GrpIter.cpp,v $
                                                                         
 // Written: fmk 

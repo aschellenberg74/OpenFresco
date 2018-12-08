@@ -18,8 +18,8 @@
 **                                                                    **
 ** ****************************************************************** */
                                                                         
-// $Revision$
-// $Date$
+// $Revision: 1.4 $
+// $Date: 2010-08-06 21:51:24 $
 // $Source: /usr/local/cvs/OpenSees/SRC/actor/channel/UDP_Socket.h,v $
 
 // Written: fmk 

@@ -18,8 +18,8 @@
 **                                                                    **
 ** ****************************************************************** */
                                                                         
-// $Revision$
-// $Date$
+// $Revision: 1.6 $
+// $Date: 2009-12-17 23:50:36 $
 // $Source: /usr/local/cvs/OpenSees/SRC/recorder/response/Response.cpp,v $
                                                                         
 // Written: MHS 

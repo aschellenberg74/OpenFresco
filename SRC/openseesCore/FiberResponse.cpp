@@ -18,8 +18,8 @@
 **                                                                    **
 ** ****************************************************************** */
                                                                         
-// $Revision$
-// $Date$
+// $Revision: 1.3 $
+// $Date: 2001-07-31 18:26:58 $
 // $Source: /usr/local/cvs/OpenSees/SRC/recorder/response/FiberResponse.cpp,v $
                                                                         
 // Written: MHS 

@@ -19,10 +19,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 // Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 09/06
 // Revision: A
@@ -100,19 +96,32 @@ extern ExperimentalSite *getExperimentalSiteFirst()
 }
 
 
-extern int removeExperimentalSite(int tag)
+extern ExperimentalSite *removeExperimentalSite(int tag)
 {
-    if (theExperimentalSites != 0)
-        theExperimentalSites->removeComponent(tag);
+    if (theExperimentalSites == 0)  {
+        opserr << "removeExperimentalSite() - "
+            << "failed to remove experimental site: " << tag << endln
+            << "no experimental site objects have been defined\n";
+        return 0;
+    }
     
-    return 0;
+    TaggedObject *mc = theExperimentalSites->removeComponent(tag);
+    if (mc == 0)
+        return 0;
+    
+    // otherwise we do a cast and return
+    ExperimentalSite *result = (ExperimentalSite *)mc;
+    return result;
 }
 
 
 extern int clearExperimentalSites(Tcl_Interp *interp)
 {
-    if (theExperimentalSites != 0)
-        theExperimentalSites->clearAll(false);
+    if (theExperimentalSites != 0)  {
+        theExperimentalSites->clearAll();
+        delete theExperimentalSites;
+        theExperimentalSites = 0;
+    }
     
     return 0;
 }
@@ -456,7 +465,11 @@ int TclRemoveExpSite(ClientData clientData, Tcl_Interp *interp,
             opserr << "WARNING invalid removeExp site tag\n";
             return TCL_ERROR;
         }
-        if (removeExperimentalSite(tag) < 0)  {
+        ExperimentalSite *theSite = removeExperimentalSite(tag);
+        if (theSite != 0)  {
+            delete theSite;
+            theSite = 0;
+        } else  {
             opserr << "WARNING could not remove expSite with tag " << argv[2] << endln;
             return TCL_ERROR;
         }

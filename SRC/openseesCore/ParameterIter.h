@@ -18,8 +18,8 @@
 **                                                                    **
 ** ****************************************************************** */
                                                                         
-// $Revision$
-// $Date$
+// $Revision: 1.1 $
+// $Date: 2006-12-13 18:17:37 $
 // $Source: /usr/local/cvs/OpenSees/SRC/domain/domain/ParameterIter.h,v $
 
 // Description: This file contains the class definition for ParameterIter.

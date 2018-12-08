@@ -18,8 +18,8 @@
 **                                                                    **
 ** ****************************************************************** */
                                                                         
-// $Revision$
-// $Date$
+// $Revision: 1.1.1.1 $
+// $Date: 2000-09-15 08:23:17 $
 // $Source: /usr/local/cvs/OpenSees/SRC/analysis/numberer/PlainNumberer.h,v $
                                                                         
                                                                         

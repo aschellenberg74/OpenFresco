@@ -18,8 +18,8 @@
 **                                                                    **
 ** ****************************************************************** */
                                                                         
-// $Revision$
-// $Date$
+// $Revision: 1.1 $
+// $Date: 2006-08-03 23:28:34 $
 // $Source: /usr/local/cvs/OpenSees/SRC/handler/DatabaseStream.h,v $
 
 #ifndef _DatabaseStream

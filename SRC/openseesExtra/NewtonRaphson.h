@@ -18,8 +18,8 @@
 **                                                                    **
 ** ****************************************************************** */
                                                                         
-// $Revision$
-// $Date$
+// $Revision: 1.6 $
+// $Date: 2007-04-02 23:41:13 $
 // $Source: /usr/local/cvs/OpenSees/SRC/analysis/algorithm/equiSolnAlgo/NewtonRaphson.h,v $
                                                                         
                                                                         
@@ -35,7 +35,7 @@
 
 // Description: This file contains the class definition for 
 // NewtonRaphson. NewtonRaphson is a class which performs a Newton-Raphson 
-// solution algorihm in solving the equations.
+// solution algorithm in solving the equations.
 // No member functions are declared as virtual as 
 // it is not expected that this class will be subclassed.
 // 

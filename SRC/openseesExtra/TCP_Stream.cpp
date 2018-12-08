@@ -18,8 +18,8 @@
 **                                                                    **
 ** ****************************************************************** */
                                                                         
-// $Revision$
-// $Date$
+// $Revision: 1.1 $
+// $Date: 2010-02-25 20:46:25 $
 // $Source: /usr/local/cvs/OpenSees/SRC/handler/TCP_Stream.cpp,v $
 
 // Written: fmk

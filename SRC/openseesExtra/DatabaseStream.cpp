@@ -18,8 +18,8 @@
 **                                                                    **
 ** ****************************************************************** */
                                                                         
-// $Revision$
-// $Date$
+// $Revision: 1.2 $
+// $Date: 2009-08-25 22:33:11 $
 // $Source: /usr/local/cvs/OpenSees/SRC/handler/DatabaseStream.cpp,v $
                                                                         
 // Written: fmk 

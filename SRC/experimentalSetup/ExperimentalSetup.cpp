@@ -22,10 +22,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 // Written: Yoshi (yos@catfish.dpri.kyoto-u.ac.jp)
 // Created: 09/06
 // Revision: A
@@ -160,8 +156,9 @@ ExperimentalSetup::ExperimentalSetup(const ExperimentalSetup& es)
 
 ExperimentalSetup::~ExperimentalSetup()
 {
-    if (theControl != 0) 
-        delete theControl;
+    // theControl is not a copy, so do not clean it up here
+    //if (theControl != 0)
+    //    delete theControl;
     
     if (tDisp != 0) 
         delete tDisp;

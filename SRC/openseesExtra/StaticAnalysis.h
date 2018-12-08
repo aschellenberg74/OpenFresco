@@ -18,8 +18,8 @@
 **                                                                    **
 ** ****************************************************************** */
                                                                         
-// $Revision$
-// $Date$
+// $Revision: 1.8 $
+// $Date: 2009-05-11 21:32:27 $
 // $Source: /usr/local/cvs/OpenSees/SRC/analysis/analysis/StaticAnalysis.h,v $
                                                                         
                                                                         
@@ -36,15 +36,6 @@
 // What: "@(#) StaticAnalysis.h, revA"
 
 #include <Analysis.h>
-
-
-// AddingSensitivity:BEGIN //////////////////////////////////
-#ifdef _RELIABILITY
-#include <SensitivityAlgorithm.h>
-#include<Integrator.h>
-#include<IncrementalIntegrator.h>
-#endif
-// AddingSensitivity:END ////////////////////////////////////
 
 
 class ConstraintHandler;
@@ -88,12 +79,6 @@ class StaticAnalysis: public Analysis
     StaticIntegrator *getIntegrator(void);
     ConvergenceTest  *getConvergenceTest(void);
 
-    // AddingSensitivity:BEGIN ///////////////////////////////
-#ifdef _RELIABILITY
-    int setSensitivityAlgorithm(/*SensitivityAlgorithm*/Integrator *theSensitivityAlgorithm);
-#endif
-    // AddingSensitivity:END /////////////////////////////////
-    
   protected: 
     
   private:
@@ -107,9 +92,6 @@ class StaticAnalysis: public Analysis
     ConvergenceTest     *theTest;
     int domainStamp;
 
-#ifdef _RELIABILITY
-
-#endif
 };
 
 #endif

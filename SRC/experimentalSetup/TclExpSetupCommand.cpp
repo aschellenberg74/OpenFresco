@@ -19,10 +19,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 // Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 09/06
 // Revision: A
@@ -84,19 +80,32 @@ extern ExperimentalSetup *getExperimentalSetup(int tag)
 }
 
 
-extern int removeExperimentalSetup(int tag)
+extern ExperimentalSetup *removeExperimentalSetup(int tag)
 {
-    if (theExperimentalSetups != 0)
-        theExperimentalSetups->removeComponent(tag);
+    if (theExperimentalSetups == 0)  {
+        opserr << "removeExperimentalSetup() - "
+            << "failed to remove experimental setup: " << tag << endln
+            << "no experimental setup objects have been defined\n";
+        return 0;
+    }
     
-    return 0;
+    TaggedObject *mc = theExperimentalSetups->removeComponent(tag);
+    if (mc == 0)
+        return 0;
+    
+    // otherwise we do a cast and return
+    ExperimentalSetup *result = (ExperimentalSetup *)mc;
+    return result;
 }
 
 
 extern int clearExperimentalSetups(Tcl_Interp *interp)
 {
-    if (theExperimentalSetups != 0)
-        theExperimentalSetups->clearAll(false);
+    if (theExperimentalSetups != 0)  {
+        theExperimentalSetups->clearAll();
+        delete theExperimentalSetups;
+        theExperimentalSetups = 0;
+    }
     
     return 0;
 }
@@ -1981,7 +1990,11 @@ int TclRemoveExpSetup(ClientData clientData, Tcl_Interp *interp,
             opserr << "WARNING invalid removeExp setup tag\n";
             return TCL_ERROR;
         }
-        if (removeExperimentalSetup(tag) < 0)  {
+        ExperimentalSetup *theSetup = removeExperimentalSetup(tag);
+        if (theSetup != 0)  {
+            delete theSetup;
+            theSetup = 0;
+        } else  {
             opserr << "WARNING could not remove expSetup with tag " << argv[2] << endln;
             return TCL_ERROR;
         }

@@ -19,10 +19,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 // Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 02/07
 // Revision: A
@@ -74,19 +70,32 @@ extern ExperimentalCP *getExperimentalCP(int tag)
 }
 
 
-extern int removeExperimentalCP(int tag)
+extern ExperimentalCP *removeExperimentalCP(int tag)
 {
-    if (theExperimentalCPs != 0)
-        theExperimentalCPs->removeComponent(tag);
+    if (theExperimentalCPs == 0)  {
+        opserr << "removeExperimentalCP() - "
+            << "failed to remove experimental control point: " << tag << endln
+            << "no experimental control point objects have been defined\n";
+        return 0;
+    }
     
-    return 0;
+    TaggedObject *mc = theExperimentalCPs->removeComponent(tag);
+    if (mc == 0)
+        return 0;
+    
+    // otherwise we do a cast and return
+    ExperimentalCP *result = (ExperimentalCP *)mc;
+    return result;
 }
 
 
 extern int clearExperimentalCPs(Tcl_Interp *interp)
 {
-    if (theExperimentalCPs != 0)
-        theExperimentalCPs->clearAll(false);
+    if (theExperimentalCPs != 0)  {
+        theExperimentalCPs->clearAll();
+        delete theExperimentalCPs;
+        theExperimentalCPs = 0;
+    }
     
     return 0;
 }
@@ -409,7 +418,11 @@ int TclRemoveExpCP(ClientData clientData, Tcl_Interp *interp,
             opserr << "WARNING invalid removeExp controlPoint tag\n";
             return TCL_ERROR;
         }
-        if (removeExperimentalCP(tag) < 0)  {
+        ExperimentalCP *theCP = removeExperimentalCP(tag);
+        if (theCP != 0)  {
+            delete theCP;
+            theCP = 0;
+        } else  {
             opserr << "WARNING could not remove expControlPoint with tag " << argv[2] << endln;
             return TCL_ERROR;
         }

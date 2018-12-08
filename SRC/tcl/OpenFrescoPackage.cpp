@@ -211,13 +211,9 @@ int openFresco_startSimAppElemServer(ClientData clientData,
 int openFresco_wipeModel(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
 {
-    /*if (theDatabase != 0)  {
-        delete theDatabase;
-        theDatabase = 0;
-    }*/
-    
-    if (theDomain != 0)
-        theDomain->clearAll();
+    // OpenSees will clean up theDomain when wipe is called
+    //if (theDomain != 0)
+    //    theDomain->clearAll();
     
     clearExperimentalCPs(interp);
     clearExperimentalSignalFilters(interp);

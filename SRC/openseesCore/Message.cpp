@@ -18,8 +18,8 @@
 **                                                                    **
 ** ****************************************************************** */
                                                                         
-// $Revision$
-// $Date$
+// $Revision: 1.6 $
+// $Date: 2004-11-25 00:54:09 $
 // $Source: /usr/local/cvs/OpenSees/SRC/actor/message/Message.cpp,v $
                                                                         
                                                                         

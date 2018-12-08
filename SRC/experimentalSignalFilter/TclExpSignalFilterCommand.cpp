@@ -19,10 +19,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 // Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 11/06
 // Revision: A
@@ -75,19 +71,32 @@ extern ExperimentalSignalFilter *getExperimentalSignalFilter(int tag)
 }
 
 
-extern int removeExperimentalSignalFilter(int tag)
+extern ExperimentalSignalFilter *removeExperimentalSignalFilter(int tag)
 {
-    if (theExperimentalSignalFilters != 0)
-        theExperimentalSignalFilters->removeComponent(tag);
+    if (theExperimentalSignalFilters == 0)  {
+        opserr << "removeExperimentalSignalFilter() - "
+            << "failed to remove experimental signal filter: " << tag << endln
+            << "no experimental signal filter objects have been defined\n";
+        return 0;
+    }
     
-    return 0;
+    TaggedObject *mc = theExperimentalSignalFilters->removeComponent(tag);
+    if (mc == 0)
+        return 0;
+    
+    // otherwise we do a cast and return
+    ExperimentalSignalFilter *result = (ExperimentalSignalFilter *)mc;
+    return result;
 }
 
 
 extern int clearExperimentalSignalFilters(Tcl_Interp *interp)
 {
-    if (theExperimentalSignalFilters != 0)
-        theExperimentalSignalFilters->clearAll(false);
+    if (theExperimentalSignalFilters != 0)  {
+        theExperimentalSignalFilters->clearAll();
+        delete theExperimentalSignalFilters;
+        theExperimentalSignalFilters = 0;
+    }
     
     return 0;
 }
@@ -348,7 +357,11 @@ int TclRemoveExpSignalFilter(ClientData clientData, Tcl_Interp *interp,
             opserr << "WARNING invalid removeExp signalFilter tag\n";
             return TCL_ERROR;
         }
-        if (removeExperimentalSignalFilter(tag) < 0)  {
+        ExperimentalSignalFilter *theFilter = removeExperimentalSignalFilter(tag);
+        if (theFilter != 0)  {
+            delete theFilter;
+            theFilter = 0;
+        } else  {
             opserr << "WARNING could not remove expSignalFilter with tag " << argv[2] << endln;
             return TCL_ERROR;
         }

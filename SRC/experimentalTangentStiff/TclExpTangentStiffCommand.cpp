@@ -19,10 +19,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 // Written: Hong Kim (hongkim@berkeley.edu)
 // Created: 05/10
 // Revision: A
@@ -70,24 +66,36 @@ extern ExperimentalTangentStiff *getExperimentalTangentStiff(int tag)
     
     // otherwise we do a cast and return
     ExperimentalTangentStiff *result = (ExperimentalTangentStiff *)mc;
-    
     return result;
 }
 
 
-extern int removeExperimentalTangentStiff(int tag)
+extern ExperimentalTangentStiff *removeExperimentalTangentStiff(int tag)
 {
-    if (theExperimentalTangentStiffs != 0)
-        theExperimentalTangentStiffs->removeComponent(tag);
+    if (theExperimentalTangentStiffs == 0)  {
+        opserr << "removeExperimentalTangentStiff() - "
+            << "failed to remove experimental tangent stiff: " << tag << endln
+            << "no experimental tangent stiff objects have been defined\n";
+        return 0;
+    }
     
-    return 0;
+    TaggedObject *mc = theExperimentalTangentStiffs->removeComponent(tag);
+    if (mc == 0)
+        return 0;
+    
+    // otherwise we do a cast and return
+    ExperimentalTangentStiff *result = (ExperimentalTangentStiff *)mc;
+    return result;
 }
 
 
 extern int clearExperimentalTangentStiffs(Tcl_Interp *interp)
 {
-    if (theExperimentalTangentStiffs != 0)
-        theExperimentalTangentStiffs->clearAll(false);
+    if (theExperimentalTangentStiffs != 0)  {
+        theExperimentalTangentStiffs->clearAll();
+        delete theExperimentalTangentStiffs;
+        theExperimentalTangentStiffs = 0;
+    }
     
     return 0;
 }
@@ -234,7 +242,11 @@ int TclRemoveExpTangentStiff(ClientData clientData, Tcl_Interp *interp,
             opserr << "WARNING invalid removeExp tangentStiff tag\n";
             return TCL_ERROR;
         }
-        if (removeExperimentalTangentStiff(tag) < 0)  {
+        ExperimentalTangentStiff *theTangentStiff = removeExperimentalTangentStiff(tag);
+        if (theTangentStiff != 0)  {
+            delete theTangentStiff;
+            theTangentStiff = 0;
+        } else  {
             opserr << "WARNING could not remove expTangentStiff with tag " << argv[2] << endln;
             return TCL_ERROR;
         }

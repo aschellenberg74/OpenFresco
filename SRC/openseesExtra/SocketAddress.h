@@ -18,8 +18,8 @@
 **                                                                    **
 ** ****************************************************************** */
                                                                         
-// $Revision$
-// $Date$
+// $Revision: 1.3 $
+// $Date: 2007-07-16 22:56:08 $
 // $Source: /usr/local/cvs/OpenSees/SRC/actor/address/SocketAddress.h,v $
                                                                         
 // Written: fmk 11/95

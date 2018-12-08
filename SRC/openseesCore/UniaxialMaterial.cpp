@@ -18,8 +18,8 @@
 **                                                                    **
 ** ****************************************************************** */
                                                                         
-// $Revision$
-// $Date$
+// $Revision: 1.22 $
+// $Date: 2009-08-25 23:40:17 $
 // $Source: /usr/local/cvs/OpenSees/SRC/material/uniaxial/UniaxialMaterial.cpp,v $
                                                                         
                                                                         
@@ -47,6 +47,16 @@ static MapOfTaggedObjects theUniaxialMaterialObjects;
 
 bool OPS_addUniaxialMaterial(UniaxialMaterial *newComponent) {
   return theUniaxialMaterialObjects.addComponent(newComponent);
+}
+
+bool OPS_removeUniaxialMaterial(int tag)
+{
+    TaggedObject* obj = theUniaxialMaterialObjects.removeComponent(tag);
+    if (obj != 0) {
+	delete obj;
+	return true;
+    }
+    return false;
 }
 
 UniaxialMaterial *OPS_getUniaxialMaterial(int tag) {

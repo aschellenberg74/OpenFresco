@@ -19,10 +19,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 // Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 09/06
 // Revision: A
@@ -94,19 +90,32 @@ extern ExperimentalControl *getExperimentalControl(int tag)
 }
 
 
-extern int removeExperimentalControl(int tag)
+extern ExperimentalControl *removeExperimentalControl(int tag)
 {
-    if (theExperimentalControls != 0)
-        theExperimentalControls->removeComponent(tag);
+    if (theExperimentalControls == 0)  {
+        opserr << "removeExperimentalControl() - "
+            << "failed to remove experimental control: " << tag << endln
+            << "no experimental control objects have been defined\n";
+        return 0;
+    }
     
-    return 0;
+    TaggedObject *mc = theExperimentalControls->removeComponent(tag);
+    if (mc == 0)
+        return 0;
+    
+    // otherwise we do a cast and return
+    ExperimentalControl *result = (ExperimentalControl *)mc;
+    return result;
 }
 
 
 extern int clearExperimentalControls(Tcl_Interp *interp)
 {
-    if (theExperimentalControls != 0)
-        theExperimentalControls->clearAll(false);
+    if (theExperimentalControls != 0)  {
+        theExperimentalControls->clearAll();
+        delete theExperimentalControls;
+        theExperimentalControls = 0;
+    }
     
     return 0;
 }
@@ -1307,7 +1316,11 @@ int TclRemoveExpControl(ClientData clientData, Tcl_Interp *interp,
             opserr << "WARNING invalid removeExp control tag\n";
             return TCL_ERROR;
         }
-        if (removeExperimentalControl(tag) < 0)  {
+        ExperimentalControl *theControl = removeExperimentalControl(tag);
+        if (theControl != 0)  {
+            delete theControl;
+            theControl = 0;
+        } else  {
             opserr << "WARNING could not remove expControl with tag " << argv[2] << endln;
             return TCL_ERROR;
         }

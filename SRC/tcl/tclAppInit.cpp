@@ -88,6 +88,10 @@ extern int		Tclxttest_Init _ANSI_ARGS_((Tcl_Interp *interp));
 #include <ExperimentalSite.h>
 #include <ActorExpSite.h>
 
+extern void OPS_clearAllUniaxialMaterial();
+extern void OPS_clearAllNDMaterial();
+extern void OPS_clearAllSectionForceDeformation();
+
 Domain *theDomain = 0;
 TclModelBuilder *theModelBuilder = 0;
 FE_Datastore *theDatabase = 0;
@@ -371,6 +375,17 @@ int getLibraryFunction(const char *libName, const char *funcName,
 int openFresco_wipeModel(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
 {
+    clearExperimentalCPs(interp);
+    clearExperimentalSignalFilters(interp);
+    clearExperimentalControls(interp);
+    clearExperimentalSetups(interp);
+    clearExperimentalSites(interp);
+    clearExperimentalTangentStiffs(interp);
+    
+    OPS_clearAllUniaxialMaterial();
+    OPS_clearAllNDMaterial();
+    OPS_clearAllSectionForceDeformation();
+    
     if (theDatabase != 0)  {
         delete theDatabase;
         theDatabase = 0;
@@ -379,12 +394,7 @@ int openFresco_wipeModel(ClientData clientData,
     if (theDomain != 0)
         theDomain->clearAll();
     
-    clearExperimentalCPs(interp);
-    clearExperimentalSignalFilters(interp);
-    clearExperimentalControls(interp);
-    clearExperimentalSetups(interp);
-    clearExperimentalSites(interp);
-    clearExperimentalTangentStiffs(interp);
+    ops_Dt = 0.0;
     
     return TCL_OK;
 }

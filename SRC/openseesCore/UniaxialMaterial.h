@@ -18,8 +18,8 @@
 **                                                                    **
 ** ****************************************************************** */
                                                                         
-// $Revision$
-// $Date$
+// $Revision: 1.12 $
+// $Date: 2008-08-26 16:36:11 $
 // $Source: /usr/local/cvs/OpenSees/SRC/material/uniaxial/UniaxialMaterial.h,v $
                                                                         
                                                                         
@@ -98,6 +98,7 @@ class UniaxialMaterial : public Material
 
 extern bool OPS_addUniaxialMaterial(UniaxialMaterial *newComponent);
 extern UniaxialMaterial *OPS_getUniaxialMaterial(int tag);
+extern bool OPS_removeUniaxialMaterial(int tag);
 extern void OPS_clearAllUniaxialMaterial(void);
 extern void OPS_printUniaxialMaterial(OPS_Stream &s, int flag = 0);
 

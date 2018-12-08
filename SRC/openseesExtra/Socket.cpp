@@ -18,8 +18,8 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
+// $Revision: 1.3 $
+// $Date: 2007-11-29 19:00:51 $
 // $Source: /usr/local/cvs/OpenSees/SRC/actor/channel/Socket.cpp,v $
 
 // Written: fmk

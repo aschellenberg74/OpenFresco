@@ -18,8 +18,8 @@
 **                                                                    **
 ** ****************************************************************** */
                                                                         
-// $Revision$
-// $Date$
+// $Revision: 1.2 $
+// $Date: 2003-02-14 23:00:48 $
 // $Source: /usr/local/cvs/OpenSees/SRC/analysis/integrator/LoadControl.h,v $
                                                                         
                                                                         
@@ -33,7 +33,7 @@
 // Revision: A
 //
 // Description: This file contains the class definition for LoadControl.
-// LoadControl is an algorithmic class for perfroming a static analysis
+// LoadControl is an algorithmic class for performing a static analysis
 // using a load control integration scheme.
 //
 // What: "@(#) LoadControl.h, revA"

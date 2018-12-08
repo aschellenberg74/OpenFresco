@@ -18,8 +18,8 @@
 **                                                                    **
 ** ****************************************************************** */
                                                                         
-// $Revision$
-// $Date$
+// $Revision: 1.19 $
+// $Date: 2010-06-09 17:43:09 $
 // $Source: /usr/local/cvs/OpenSees/SRC/domain/pattern/LoadPattern.cpp,v $
                                                                         
 // Written: fmk 07/99
@@ -358,6 +358,9 @@ LoadPattern::clearAll(void)
     theSPs->clearAll();
     currentGeoTag++;
     lastChannel = 0;
+    if (dLambdadh != 0) {
+      dLambdadh->Zero();
+    }
 }
 
 NodalLoad *
@@ -1268,11 +1271,15 @@ LoadPattern::getExternalForceSensitivity(int gradNumber)
 int
 LoadPattern::saveLoadFactorSensitivity(double dlambdadh, int gradIndex, int numGrads)
 {
+
+  //opserr << "LoadPattern::savedlamdh " << gradIndex << ' ' << numGrads << endln;
   if (dLambdadh == 0) {
     dLambdadh = new Vector(numGrads);
   }
-  if (dLambdadh != 0 && dLambdadh->Size() != numGrads) {
-    delete dLambdadh;
+
+  if (dLambdadh == 0 || dLambdadh->Size() != numGrads) {
+    if (dLambdadh != 0)
+      delete dLambdadh;
     dLambdadh = new Vector(numGrads);
   }
 

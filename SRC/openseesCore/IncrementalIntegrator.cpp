@@ -18,8 +18,8 @@
 **                                                                    **
 ** ****************************************************************** */
                                                                         
-// $Revision$
-// $Date$
+// $Revision: 1.8 $
+// $Date: 2007-04-02 23:42:26 $
 // $Source: /usr/local/cvs/OpenSees/SRC/analysis/integrator/IncrementalIntegrator.cpp,v $
                                                                         
 // Written: fmk 
@@ -174,7 +174,7 @@ IncrementalIntegrator::getLastResponse(Vector &result, const ID &id)
 	}
 	else {
 	    opserr << "WARNING IncrementalIntegrator::getLastResponse() -";
-	    opserr << "location " << loc << "in ID ouside bounds ";
+	    opserr << "location " << loc << "in ID outside bounds ";
 	    opserr << size << "\n";	
 	    res = -2;
 	}

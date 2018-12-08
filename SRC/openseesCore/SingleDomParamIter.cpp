@@ -18,8 +18,8 @@
 **                                                                    **
 ** ****************************************************************** */
                                                                         
-// $Revision$
-// $Date$
+// $Revision: 1.1 $
+// $Date: 2006-12-13 18:17:37 $
 // $Source: /usr/local/cvs/OpenSees/SRC/domain/domain/single/SingleDomParamIter.cpp,v $
 
 // Description: This file contains the method definitions for class 

@@ -19,8 +19,8 @@
 ** ****************************************************************** */
 
 /*                                                                        
-** $Revision$
-** $Date$
+** $Revision: 1.9 $
+** $Date: 2010-03-05 22:32:36 $
 ** $Source: /usr/local/cvs/OpenSees/SRC/api/elementAPI.h,v $
                                                                         
 ** Written: fmk 
@@ -240,6 +240,8 @@ extern "C" StaticIntegrator		**OPS_GetStaticIntegrator(void);
 extern "C" TransientIntegrator	**OPS_GetTransientIntegrator(void);
 extern "C" ConvergenceTest		**OPS_GetTest(void);
 extern "C" bool								*OPS_builtModel(void);
+
+int OPS_numIter();
 
 #else
 

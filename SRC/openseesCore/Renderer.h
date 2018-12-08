@@ -18,8 +18,8 @@
 **                                                                    **
 ** ****************************************************************** */
                                                                         
-// $Revision$
-// $Date$
+// $Revision: 1.6 $
+// $Date: 2003-05-15 21:42:43 $
 // $Source: /usr/local/cvs/OpenSees/SRC/renderer/Renderer.h,v $
                                                                         
                                                                         

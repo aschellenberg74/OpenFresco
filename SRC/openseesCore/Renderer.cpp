@@ -18,8 +18,8 @@
 **                                                                    **
 ** ****************************************************************** */
                                                                         
-// $Revision$
-// $Date$
+// $Revision: 1.6 $
+// $Date: 2003-05-15 23:20:47 $
 // $Source: /usr/local/cvs/OpenSees/SRC/renderer/Renderer.cpp,v $
                                                                         
                                                                         

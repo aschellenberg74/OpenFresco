@@ -19,20 +19,16 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 #ifndef TclModelBuilder_h
 #define TclModelBuilder_h
 
-// Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 04/11
 // Revision: A
 //
 // Description: This file contains the class definition for TclModelBuilder.
 // A TclModelBuilder adds the commands to create the model for the standard
-// models that can be generated using the elements released with the g3 
+// models that can be generated using the elements released with the OpenSees 
 // framework.
 
 #include <tcl.h>

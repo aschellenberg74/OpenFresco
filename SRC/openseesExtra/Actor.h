@@ -18,8 +18,8 @@
 **                                                                    **
 ** ****************************************************************** */
                                                                         
-// $Revision$
-// $Date$
+// $Revision: 1.4 $
+// $Date: 2005-11-23 18:24:30 $
 // $Source: /usr/local/cvs/OpenSees/SRC/actor/actor/Actor.h,v $
                                                                         
                                                                         

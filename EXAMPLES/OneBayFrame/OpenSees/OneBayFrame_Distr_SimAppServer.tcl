@@ -2,10 +2,6 @@
 # (use with OneBayFrame_Distr_Client.tcl & OneBayFrame_Distr_LabServer.tcl)
 # Units: [kip,in.]
 #
-# $Revision$
-# $Date$
-# $URL$
-#
 # Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 # Created: 11/06
 # Revision: A
@@ -56,7 +52,7 @@ expElement twoNodeLink 1 1 3 -dir 2 -site 1 -initStif 2.8
 # startSimAppSiteServer $siteTag $port <-ssl> <-udp>
 startSimAppSiteServer 1 8090 -udp;  # use with experimental element in FEA
 
-wipe
+wipeExp
 exit
 # --------------------------------
 # End of analysis

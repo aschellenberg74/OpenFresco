@@ -18,8 +18,8 @@
 **                                                                    **
 ** ****************************************************************** */
                                                                         
-// $Revision$
-// $Date$
+// $Revision: 1.3 $
+// $Date: 2009-08-25 23:33:05 $
 // $Source: /usr/local/cvs/OpenSees/SRC/actor/objectBroker/ObjectBroker.cpp,v $
                                                                         
                                                                         

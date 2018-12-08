@@ -18,8 +18,8 @@
 **                                                                    **
 ** ****************************************************************** */
                                                                         
-// $Revision$
-// $Date$
+// $Revision: 1.2 $
+// $Date: 2005-11-28 21:37:12 $
 // $Source: /usr/local/cvs/OpenSees/SRC/analysis/handler/PenaltyConstraintHandler.h,v $
                                                                         
                                                                         
