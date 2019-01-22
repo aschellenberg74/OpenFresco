@@ -19,10 +19,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 #ifndef ESThreeActuators_h
 #define ESThreeActuators_h
 
@@ -48,7 +44,7 @@ public:
         double actLength0, double actLength1, double actLength2,
         double rigidLength0, double rigidLength1,
         ExperimentalControl* control = 0,
-        int nlGeom = 0, char *posAct0 = "left", double phiLocX = 0.0);
+        int nlGeom = 0, char *posAct0 = "left");
     ESThreeActuators(const ESThreeActuators& es);
     
     // destructor
@@ -102,9 +98,6 @@ private:
     double L1;          // rigid link length 1
     int nlGeom;         // non-linear geometry (0: linear, 1: nonlinear)
     char posAct0[6];    // position of actuator 0 (left, right)
-    double phiLocX;     // angle of local x axis w.r.t rigid link [deg]
-    
-    Matrix rotLocX;     // rotation matrix
     
     bool firstWarning[3];
 };

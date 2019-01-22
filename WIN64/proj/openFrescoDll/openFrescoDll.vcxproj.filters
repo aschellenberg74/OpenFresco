@@ -626,6 +626,9 @@
     <ClCompile Include="..\..\..\SRC\experimentalSetup\ESThreeActuators.cpp">
       <Filter>experimentalSetup</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalSetup\ESThreeActuatorsJntOff.cpp">
+      <Filter>experimentalSetup</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\FrescoGlobals.h">
@@ -1223,6 +1226,9 @@
       <Filter>experimentalControlPoint</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\SRC\experimentalSetup\ESThreeActuators.h">
+      <Filter>experimentalSetup</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalSetup\ESThreeActuatorsJntOff.h">
       <Filter>experimentalSetup</Filter>
     </ClInclude>
   </ItemGroup>

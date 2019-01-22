@@ -54,7 +54,6 @@
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\..\..\src;..\..\..\src\experimentalControl;..\..\..\src\experimentalControl\dSpace;..\..\..\src\experimentalControl\MTSCsi;..\..\..\src\experimentalControl\NIEseries;..\..\..\src\experimentalControl\SCRAMNet;..\..\..\src\experimentalControl\SCRAMNetGT;..\..\..\src\experimentalControl\xPCtarget;..\..\..\src\experimentalControlPoint;..\..\..\src\experimentalElement;..\..\..\src\experimentalRecorder;..\..\..\src\experimentalRecorder\response;..\..\..\src\experimentalSetup;..\..\..\src\experimentalSignalFilter;..\..\..\src\experimentalSite;..\..\..\src\experimentalTangentStiff;..\..\..\src\openseesCore;..\..\..\src\openseesExtra;..\..\..\src\utility;C:\Program Files (x86)\Tcl;C:\Program Files (x86)\Tcl\include;C:\Program Files (x86)\OpenSSL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_TCL85;_WIN32;WIN32;PLATFORM_WIN;_DEBUG;_CRT_SECURE_NO_DEPRECATE;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -137,6 +136,7 @@
     <ClCompile Include="..\..\..\SRC\experimentalRecorder\ExpTangentStiffRecorder.cpp" />
     <ClCompile Include="..\..\..\SRC\experimentalRecorder\response\ExpTangentStiffResponse.cpp" />
     <ClCompile Include="..\..\..\SRC\experimentalSetup\ESThreeActuators.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalSetup\ESThreeActuatorsJntOff.cpp" />
     <ClCompile Include="..\..\..\SRC\experimentalSignalFilter\ESFKrylovForceConverter.cpp" />
     <ClCompile Include="..\..\..\SRC\experimentalSignalFilter\ESFTangForceConverter.cpp" />
     <ClCompile Include="..\..\..\SRC\experimentalTangentStiff\ETBfgs.cpp" />
@@ -331,6 +331,7 @@
     <ClInclude Include="..\..\..\SRC\experimentalRecorder\ExpTangentStiffRecorder.h" />
     <ClInclude Include="..\..\..\SRC\experimentalRecorder\response\ExpTangentStiffResponse.h" />
     <ClInclude Include="..\..\..\SRC\experimentalSetup\ESThreeActuators.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalSetup\ESThreeActuatorsJntOff.h" />
     <ClInclude Include="..\..\..\SRC\experimentalSignalFilter\ESFKrylovForceConverter.h" />
     <ClInclude Include="..\..\..\SRC\experimentalSignalFilter\ESFTangForceConverter.h" />
     <ClInclude Include="..\..\..\SRC\experimentalTangentStiff\ETBfgs.h" />

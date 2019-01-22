@@ -23,7 +23,7 @@
 logFile "LShapedColumn_Server1b.log"
 defaultUnits -force kip -length in -time sec -temp F
 
-# create ModelBuilder (with two-dimensions and 2 DOF/node)
+# create ModelBuilder (with two-dimensions and 3 DOF/node)
 model BasicBuilder -ndm 2 -ndf 3
 
 # Load OpenFresco package
@@ -87,7 +87,9 @@ expControl SimDomain  1  -trialCP 1 2  -outCP 3 4
 # expSetup ThreeActuators2d $tag <–control $ctrlTag> $La1 $La2 $La3 $L1 $L2 <–nlGeom> <–posAct1 $pos> <–phiLocX $phi> <-trialDispFact $f> ...
 #expSetup ThreeActuators2d 1 -control 1 54.0 54.0 54.0 36.0 36.0 -phiLocX 90.0
 # expSetup ThreeActuators $tag <–control $ctrlTag> $dofH $dofV $dofR $sizeTrial $sizeOut $La1 $La2 $La3 $L1 $L2 <–nlGeom> <–posAct1 $pos> <-trialDispFact $f> ...
-expSetup ThreeActuators 1 -control 1 2 1 3 3 3 54.0 54.0 54.0 36.0 36.0 -trialDispFact 1 -1 1 -outDispFact 1 -1 1 -outForceFact 1 -1 1
+#expSetup ThreeActuators 1 -control 1  2 1 3  3 3  54.0 54.0 54.0 36.0 36.0 -trialDispFact 1 -1 1 -outDispFact 1 -1 1 -outForceFact 1 -1 1
+# expSetup ThreeActuatorsJntOff $tag <–control $ctrlTag> $dofH $dofV $dofR $sizeTrial $sizeOut $La1 $La2 $La3 $L1 $L2 $L3 $L4 $L5 $L6 <–nlGeom> <–posAct1 $pos> <-trialDispFact $f> ...
+expSetup ThreeActuatorsJntOff 1 -control 1  2 1 3  3 3  54.0 54.0 54.0 12.0 36.0 36.0 12.0 12.0 12.0 -trialDispFact 1 -1 1 -outDispFact 1 -1 1 -outForceFact 1 -1 1
 
 # Define experimental site
 # ------------------------

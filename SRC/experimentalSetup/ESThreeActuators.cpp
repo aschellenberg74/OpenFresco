@@ -19,11 +19,7 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
-// Written: Andreas Schellenberg (andreas.schellenberg@gmail.net)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 09/06
 // Revision: A
 //
@@ -41,12 +37,11 @@ ESThreeActuators::ESThreeActuators(int tag,
     double actLength0, double actLength1, double actLength2,
     double rigidLength0, double rigidLength1,
     ExperimentalControl* control,
-    int nlgeom, char *posact0, double philocx)
+    int nlgeom, char *posact0)
     : ExperimentalSetup(tag, control),
     DOF(dof), sizeT(sizet), sizeO(sizeo),
     La0(actLength0), La1(actLength1), La2(actLength2),
-    L0(rigidLength0), L1(rigidLength1),
-    nlGeom(nlgeom), phiLocX(philocx), rotLocX(3,3)
+    L0(rigidLength0), L1(rigidLength1), nlGeom(nlgeom)
 {
     // check if DOF array has correct size
     if (DOF.Size() != numDOF)  {
@@ -77,8 +72,7 @@ ESThreeActuators::ESThreeActuators(int tag,
 
 
 ESThreeActuators::ESThreeActuators(const ESThreeActuators& es)
-    : ExperimentalSetup(es),
-    rotLocX(3,3)
+    : ExperimentalSetup(es)
 {
     DOF =   es.DOF;
     sizeT = es.sizeT;
@@ -89,7 +83,6 @@ ESThreeActuators::ESThreeActuators(const ESThreeActuators& es)
     L0      = es.L0;
     L1      = es.L1;
     nlGeom  = es.nlGeom;
-    phiLocX = es.phiLocX;
     strcpy(posAct0,es.posAct0);
     
     // call setup method
@@ -132,13 +125,6 @@ int ESThreeActuators::setup()
     (*sizeDaq)(OF_Resp_Time) = 1;
     
     this->setCtrlDaqSize();
-    
-    // initialize rotation matrix
-    rotLocX.Zero();
-    double pi = acos(-1.0);
-    rotLocX(0,0) = cos(phiLocX/180.0*pi); rotLocX(0,1) = -sin(phiLocX/180.0*pi);
-    rotLocX(1,0) = sin(phiLocX/180.0*pi); rotLocX(1,1) =  cos(phiLocX/180.0*pi);
-    rotLocX(2,2) = 1.0;
     
     return OF_ReturnType_completed;
 }
@@ -211,7 +197,6 @@ void ESThreeActuators::Print(OPS_Stream &s, int flag)
     s << " rigidLength2: " << L1 << endln;
     s << " nlGeom      : " << nlGeom << endln;
     s << " posAct1     : " << posAct0 << endln;
-    s << " phiLocX     : " << phiLocX << endln;
     if (theControl != 0)  {
         s << "\tExperimentalControl tag: " << theControl->getTag();
         s << *theControl;
@@ -223,7 +208,6 @@ int ESThreeActuators::transfTrialDisp(const Vector* disp)
 {
     // extract directions
     static Vector d(numDOF);
-    //d = rotLocX*(*disp);
     for (int i=0; i<numDOF; i++)  {
         d(i) = (*disp)(DOF(i));
     }
@@ -280,8 +264,6 @@ int ESThreeActuators::transfTrialVel(const Vector* disp,
 {
     // extract directions
     static Vector d(numDOF), v(numDOF);
-    //d = rotLocX*(*disp);
-    //v = rotLocX*(*vel);
     for (int i=0; i<numDOF; i++)  {
         d(i) = (*disp)(DOF(i));
         v(i) = (*vel)(DOF(i));
@@ -340,9 +322,6 @@ int ESThreeActuators::transfTrialAccel(const Vector* disp,
 {
     // extract directions
     static Vector d(numDOF), v(numDOF), a(numDOF);
-    //d = rotLocX*(*disp);
-    //v = rotLocX*(*vel);
-    //a = rotLocX*(*accel);
     for (int i=0; i<numDOF; i++)  {
         d(i) = (*disp)(DOF(i));
         v(i) = (*vel)(DOF(i));
@@ -394,7 +373,6 @@ int ESThreeActuators::transfTrialForce(const Vector* force)
 {
     // extract directions
     static Vector f(numDOF);
-    //f = rotLocX*(*force);
     for (int i=0; i<numDOF; i++)  {
         f(i) = (*force)(DOF(i));
     }
@@ -564,11 +542,6 @@ int ESThreeActuators::transfDaqDisp(Vector* disp)
         (*disp)(DOF(i)) = d(i);
     }
     
-    // rotate direction if necessary
-    //if (phiLocX != 0.0)  {
-    //    (*disp) = rotLocX^v;
-    //}
-    
     return OF_ReturnType_completed;
 }
 
@@ -619,11 +592,6 @@ int ESThreeActuators::transfDaqVel(Vector* vel)
         (*vel)(DOF(i)) = v(i);
     }
     
-    // rotate direction if necessary
-    //if (phiLocX != 0.0)  {
-    //    (*vel) = rotLocX^v;
-    //}
-    
     return OF_ReturnType_completed;
 }
 
@@ -673,11 +641,6 @@ int ESThreeActuators::transfDaqAccel(Vector* accel)
     for (int i=0; i<numDOF; i++)  {
         (*accel)(DOF(i)) = a(i);
     }
-    
-    // rotate direction if necessary
-    //if (phiLocX != 0.0)  {
-    //    (*accel) = rotLocX^a;
-    //}
     
     return OF_ReturnType_completed;
 }
@@ -806,11 +769,6 @@ int ESThreeActuators::transfDaqForce(Vector* force)
     for (int i=0; i<numDOF; i++)  {
         (*force)(DOF(i)) = f(i);
     }
-    
-    // rotate direction if necessary
-    //if (phiLocX != 0.0)  {
-    //    (*force) = rotLocX^f;
-    //}
     
     return OF_ReturnType_completed;
 }

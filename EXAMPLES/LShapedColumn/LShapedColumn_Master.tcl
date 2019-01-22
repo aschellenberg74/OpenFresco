@@ -58,8 +58,8 @@ expControl SimFEAdapter 1 "127.0.0.1" 44000 -trialCP 1 -outCP 2
 
 # Define experimental setup
 # -------------------------
-# expSetup NoTransformation $tag <–control $ctrlTag> –dir $dirs -sizeTrialOut $t $o <–trialDispFact $f> ...
-expSetup NoTransformation 1 -control 1 -dir 2 1 3 -sizeTrialOut 3 3 -trialDispFact 1 -1 1 -outDispFact 1 -1 1  -outForceFact 1 -1 1
+# expSetup NoTransformation $tag <–control $ctrlTag> –dof $DOFs -sizeTrialOut $t $o <–trialDispFact $f> ...
+expSetup NoTransformation 1 -control 1 -dof 2 1 3 -sizeTrialOut 3 3 -trialDispFact 1 -1 1 -outDispFact 1 -1 1  -outForceFact 1 -1 1
 
 # Define experimental site
 # ------------------------

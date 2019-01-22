@@ -38,6 +38,7 @@
 #include <ESTwoActuators2d.h>
 #include <ESThreeActuators.h>
 #include <ESThreeActuators2d.h>
+#include <ESThreeActuatorsJntOff.h>
 #include <ESThreeActuatorsJntOff2d.h>
 #include <ESInvertedVBrace2d.h>
 #include <ESInvertedVBraceJntOff2d.h>
@@ -505,7 +506,6 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp,
         double La1, La2, La3, L1, L2;
         int nlGeom = 0;
         char posAct0[6] = {'l','e','f','t','\0'};
-        double phiLocX = 0.0;
         
         argi = 2;
         if (Tcl_GetInt(interp, argv[argi], &tag) != TCL_OK)  {
@@ -608,7 +608,7 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp,
         
         // parsing was successful, allocate the setup
         theSetup = new ESThreeActuators(tag, theDOF, sizeTrial, sizeOut,
-            La1, La2, La3, L1, L2, theControl, nlGeom, posAct0, phiLocX);
+            La1, La2, La3, L1, L2, theControl, nlGeom, posAct0);
     }
     
     // ----------------------------------------------------------------------------	
@@ -738,6 +738,151 @@ int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp,
             opserr << "WARNING expSetup ThreeActuatorsJntOff2d command not implemented yet for ndm = 3\n";
             return TCL_ERROR;
         }
+    }
+    
+    // ----------------------------------------------------------------------------	
+    else if (strcmp(argv[1], "ThreeActuatorsJntOff") == 0) {
+    if (argc < 15) {
+        opserr << "WARNING invalid number of arguments\n";
+        printCommand(argc, argv);
+        opserr << "Want: expSetup ThreeActuatorsJntOff tag <-control ctrlTag> "
+            << "dofH dofV dofR sizeTrial sizeOut La1 La2 La3 L1 L2 L3 L4 L5 L6"
+            << "<-nlGeom> <-posAct1 pos>\n";
+        return TCL_ERROR;
+    }
+    
+    int ctrlTag, dof, sizeTrial, sizeOut, i;
+    ID theDOF(3);
+    double La1, La2, La3, L1, L2, L3, L4, L5, L6;
+    int nlGeom = 0;
+    char posAct0[6] = { 'l','e','f','t','\0' };
+    
+    argi = 2;
+    if (Tcl_GetInt(interp, argv[argi], &tag) != TCL_OK) {
+        opserr << "WARNING invalid expSetup ThreeActuatorsJntOff tag\n";
+        return TCL_ERROR;
+    }
+    argi++;
+    if (strcmp(argv[argi], "-control") == 0) {
+        argi++;
+        if (Tcl_GetInt(interp, argv[argi], &ctrlTag) != TCL_OK) {
+            opserr << "WARNING invalid ctrlTag\n";
+            opserr << "expSetup ThreeActuatorsJntOff " << tag << endln;
+            return TCL_ERROR;
+        }
+        theControl = getExperimentalControl(ctrlTag);
+        if (theControl == 0) {
+            opserr << "WARNING experimental control not found\n";
+            opserr << "expControl: " << ctrlTag << endln;
+            opserr << "expSetup ThreeActuatorsJntOff " << tag << endln;
+            return TCL_ERROR;
+        }
+        argi++;
+    }
+    if (Tcl_GetInt(interp, argv[argi], &dof) != TCL_OK) {
+        opserr << "WARNING invalid dofH\n";
+        opserr << "expSetup ThreeActuatorsJntOff " << tag << endln;
+        return TCL_ERROR;
+    }
+    theDOF[0] = dof - 1;
+    argi++;
+    if (Tcl_GetInt(interp, argv[argi], &dof) != TCL_OK) {
+        opserr << "WARNING invalid dofV\n";
+        opserr << "expSetup ThreeActuatorsJntOff " << tag << endln;
+        return TCL_ERROR;
+    }
+    theDOF[1] = dof - 1;
+    argi++;
+    if (Tcl_GetInt(interp, argv[argi], &dof) != TCL_OK) {
+        opserr << "WARNING invalid dofR\n";
+        opserr << "expSetup ThreeActuatorsJntOff " << tag << endln;
+        return TCL_ERROR;
+    }
+    theDOF[2] = dof - 1;
+    argi++;
+    if (Tcl_GetInt(interp, argv[argi], &sizeTrial) != TCL_OK) {
+        opserr << "WARNING invalid sizeTrial\n";
+        opserr << "expSetup ThreeActuatorsJntOff " << tag << endln;
+        return TCL_ERROR;
+    }
+    argi++;
+    if (Tcl_GetInt(interp, argv[argi], &sizeOut) != TCL_OK) {
+        opserr << "WARNING invalid sizeOut\n";
+        opserr << "expSetup ThreeActuatorsJntOff " << tag << endln;
+        return TCL_ERROR;
+    }
+    argi++;
+    if (Tcl_GetDouble(interp, argv[argi], &La1) != TCL_OK) {
+        opserr << "WARNING invalid La1\n";
+        opserr << "expSetup ThreeActuatorsJntOff " << tag << endln;
+        return TCL_ERROR;
+    }
+    argi++;
+    if (Tcl_GetDouble(interp, argv[argi], &La2) != TCL_OK) {
+        opserr << "WARNING invalid La2\n";
+        opserr << "expSetup ThreeActuatorsJntOff " << tag << endln;
+        return TCL_ERROR;
+    }
+    argi++;
+    if (Tcl_GetDouble(interp, argv[argi], &La3) != TCL_OK) {
+        opserr << "WARNING invalid La3\n";
+        opserr << "expSetup ThreeActuatorsJntOff " << tag << endln;
+        return TCL_ERROR;
+    }
+    argi++;
+    if (Tcl_GetDouble(interp, argv[argi], &L1) != TCL_OK) {
+        opserr << "WARNING invalid L1\n";
+        opserr << "expSetup ThreeActuatorsJntOff " << tag << endln;
+        return TCL_ERROR;
+    }
+    argi++;
+    if (Tcl_GetDouble(interp, argv[argi], &L2) != TCL_OK) {
+        opserr << "WARNING invalid L2\n";
+        opserr << "expSetup ThreeActuatorsJntOff " << tag << endln;
+        return TCL_ERROR;
+    }
+    argi++;
+    if (Tcl_GetDouble(interp, argv[argi], &L3) != TCL_OK) {
+        opserr << "WARNING invalid L3\n";
+        opserr << "expSetup ThreeActuatorsJntOff " << tag << endln;
+        return TCL_ERROR;
+    }
+    argi++;
+    if (Tcl_GetDouble(interp, argv[argi], &L4) != TCL_OK) {
+        opserr << "WARNING invalid L4\n";
+        opserr << "expSetup ThreeActuatorsJntOff " << tag << endln;
+        return TCL_ERROR;
+    }
+    argi++;
+    if (Tcl_GetDouble(interp, argv[argi], &L5) != TCL_OK) {
+        opserr << "WARNING invalid L5\n";
+        opserr << "expSetup ThreeActuatorsJntOff " << tag << endln;
+        return TCL_ERROR;
+    }
+    argi++;
+    if (Tcl_GetDouble(interp, argv[argi], &L6) != TCL_OK) {
+        opserr << "WARNING invalid L6\n";
+        opserr << "expSetup ThreeActuatorsJntOff " << tag << endln;
+        return TCL_ERROR;
+    }
+    argi++;
+    for (i = argi; i < argc; i++) {
+        if (strcmp(argv[i], "-nlGeom") == 0) {
+            nlGeom = 1;
+        }
+    }
+    for (i = argi; i < argc; i++) {
+        if (strcmp(argv[i], "-posAct1") == 0) {
+            if (strcmp(argv[i + 1], "left") == 0 || strcmp(argv[i + 1], "l") == 0)
+                strcpy(posAct0, "left");
+            else if (strcmp(argv[i + 1], "right") == 0 || strcmp(argv[i + 1], "r") == 0)
+                strcpy(posAct0, "right");
+        }
+    }
+    
+    // parsing was successful, allocate the setup
+    theSetup = new ESThreeActuatorsJntOff(tag, theDOF, sizeTrial, sizeOut,
+        La1, La2, La3, L1, L2, L3, L4, L5, L6, theControl, nlGeom, posAct0);
     }
     
     // ----------------------------------------------------------------------------	
