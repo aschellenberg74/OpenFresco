@@ -19,10 +19,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 #ifndef ECxPCtarget_h
 #define ECxPCtarget_h
 

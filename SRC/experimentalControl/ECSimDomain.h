@@ -19,10 +19,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 #ifndef ECSimDomain_h
 #define ECSimDomain_h
 

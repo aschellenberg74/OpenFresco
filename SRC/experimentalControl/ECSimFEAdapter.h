@@ -19,10 +19,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 #ifndef ECSimFEAdapter_h
 #define ECSimFEAdapter_h
 
