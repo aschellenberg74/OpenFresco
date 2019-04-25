@@ -19,10 +19,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 // Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 09/06
 // Revision: A
@@ -452,9 +448,16 @@ int EEBeamColumn2d::commitState()
     
     // update dbLast
     const Vector &dbA = theCoordTransf->getBasicTrialDisp();
-    dbLast(0) = (L+dbA(0))*cos(dbA(1))-L;
-    dbLast(1) = -(L+dbA(0))*sin(dbA(1));
-    dbLast(2) = -dbA(1)+dbA(2);
+    if (nlGeo == 0 || nlGeo == 1) {
+        dbLast(0) = dbA(0);
+        dbLast(1) = -L*dbA(1);
+        dbLast(2) = -dbA(1)+dbA(2);
+    }
+    else if (nlGeo == 2) {
+        dbLast(0) = (L+dbA(0))*cos(dbA(1))-L;
+        dbLast(1) = -(L+dbA(0))*sin(dbA(1));
+        dbLast(2) = -dbA(1)+dbA(2);
+    }
     
     return rValue;
 }
