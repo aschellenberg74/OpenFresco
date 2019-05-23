@@ -12,16 +12,12 @@
 ** and redistribution, and for a DISCLAIMER OF ALL WARRANTIES.        **
 **                                                                    **
 ** Developed by:                                                      **
-**   Andreas Schellenberg (andreas.schellenberg@gmx.net)              **
+**   Andreas Schellenberg (andreas.schellenberg@gmail.com)            **
 **   Yoshikazu Takahashi (yos@catfish.dpri.kyoto-u.ac.jp)             **
 **   Gregory L. Fenves (fenves@berkeley.edu)                          **
 **   Stephen A. Mahin (mahin@berkeley.edu)                            **
 **                                                                    **
 ** ****************************************************************** */
-
-// $Revision: 314 $
-// $Date: 2011-05-22 14:17:07 -0700 (Sun, 22 May 2011) $
-// $URL: https://nees.org/tools/openfresco/svn/trunk/SRC/simApplicationClient/matlab/UDPSocket.c $
 
 // Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 02/13
@@ -48,34 +44,39 @@ void mexFunction(int nlhs, mxArray *plhs[],
     char *action, *ipAddr;
     unsigned int ipPort;
     int socketID;
-
+    
     int ierr, nleft, dataTypeSize;
     char *gMsg;
-
+    
     // check for proper number of arguments
     if (nrhs<2)
-        mexErrMsgTxt("UDPSocket::mexFunction - WARNING insufficient input arguments \nWant: varargout = UDPSocket(action,varargin);\n");
+        mexErrMsgIdAndTxt("OpenFresco:UDPSocket:invalidNumInputs",
+                "Insufficient input arguments \nWant: varargout = UDPSocket(action,varargin);\n");
     if (nlhs>1)
-        mexErrMsgTxt("UDPSocket::mexFunction - WARNING to many output arguments \nWant: varargout = UDPSocket(action,varargin);\n");
-
+        mexErrMsgIdAndTxt("OpenFresco:UDPSocket:invalidNumOutputs",
+                "To many output arguments \nWant: varargout = UDPSocket(action,varargin);\n");
+    
     // first input must be a row vector string 
     if (mxIsChar(prhs[0]) != 1)
-        mexErrMsgTxt("UDPSocket::mexFunction - WARNING first input parameter, action, must be a string.\n");
+        mexErrMsgIdAndTxt("OpenFresco:UDPSocket:inputNotString",
+                "First input parameter, action, must be a string.\n");
     if (mxGetM(prhs[0]) != 1)
-        mexErrMsgTxt("UDPSocket::mexFunction - WARNING first input parameter, action, must be a row vector.\n");
-
+        mexErrMsgIdAndTxt("OpenFresco:UDPSocket:inputNotRowVector",
+                "First input parameter, action, must be a row vector.\n");
+    
     // get the action
     action = mxArrayToString(prhs[0]);
-
+    
     // switch according to requested action
     if (strcmp(action,"sendData") == 0)  {
-
+        
         socketID = (int)mxGetScalar(prhs[1]);
         nleft = (int)mxGetScalar(prhs[3]);
         
         // check if data has correct size
         if (nleft != (int)(mxGetM(prhs[2])*mxGetN(prhs[2])))
-            mexErrMsgTxt("UDPSocket::mexFunction - WARNING size of data does not agree with specified dataSize.\n");
+            mexErrMsgIdAndTxt("OpenFresco:UDPSocket:invalidDataSize",
+                    "Size of data does not agree with specified dataSize.\n");
         
         if (mxIsDouble(prhs[2]) == 1)  {
             double *data = (double *)mxGetPr(prhs[2]);
@@ -93,27 +94,30 @@ void mexFunction(int nlhs, mxArray *plhs[],
             dataTypeSize = sizeof(char);
         }
         else  {
-            mexErrMsgTxt("UDPSocket::mexFunction - WARNING data type is not supported.\n");
+            mexErrMsgIdAndTxt("OpenFresco:UDPSocket:invalidDataType",
+                    "Data type is not supported.\n");
         }
         
         udp_senddata(&socketID, &dataTypeSize, gMsg, &nleft, &ierr);
-
+        
         plhs[0] = mxCreateDoubleScalar(ierr);
     }
     else if (strcmp(action,"recvData") == 0)  {
-
-        int dataSize[2];
+        
+        mwSize ndim;
+        const mwSize *dataSize[2];
         char *dataType;
-
+        
         socketID = (int)mxGetScalar(prhs[1]);
         nleft = (int)mxGetScalar(prhs[2]);
+        ndim = 2;
         dataSize[0] = 1;
         dataSize[1] = nleft;
-
+        
         // set the output pointer to the output matrix
         if (nrhs < 4)  {
             double *data;
-            plhs[0] = mxCreateNumericArray(2, dataSize, mxDOUBLE_CLASS, mxREAL);
+            plhs[0] = mxCreateNumericArray(ndim, dataSize, mxDOUBLE_CLASS, mxREAL);
             data = (double *)mxGetPr(plhs[0]);
             gMsg = (char *)data;
             dataTypeSize = sizeof(double);
@@ -122,27 +126,28 @@ void mexFunction(int nlhs, mxArray *plhs[],
             dataType = mxArrayToString(prhs[3]);
             if (strcmp(dataType,"double") == 0)  {
                 double *data;
-                plhs[0] = mxCreateNumericArray(2, dataSize, mxDOUBLE_CLASS, mxREAL);
+                plhs[0] = mxCreateNumericArray(ndim, dataSize, mxDOUBLE_CLASS, mxREAL);
                 data = (double *)mxGetPr(plhs[0]);
                 gMsg = (char *)data;
                 dataTypeSize = sizeof(double);
             }
             else if (strcmp(dataType,"int") == 0)  {
                 int *data;
-                plhs[0] = mxCreateNumericArray(2, dataSize, mxINT32_CLASS, mxREAL);
+                plhs[0] = mxCreateNumericArray(ndim, dataSize, mxINT32_CLASS, mxREAL);
                 data = (int *)mxGetPr(plhs[0]);
                 gMsg = (char *)data;
                 dataTypeSize = sizeof(int);
             }
             else if (strcmp(dataType,"char") == 0)  {
                 char *data;
-                plhs[0] = mxCreateNumericArray(2, dataSize, mxCHAR_CLASS, mxREAL);
+                plhs[0] = mxCreateNumericArray(ndim, dataSize, mxCHAR_CLASS, mxREAL);
                 data = mxArrayToString(plhs[0]);
                 gMsg = (char *)data;
                 dataTypeSize = sizeof(char);
             }
             else  {
-                mexErrMsgTxt("UDPSocket::mexFunction - WARNING data type is not supported.\n");
+                mexErrMsgIdAndTxt("OpenFresco:UDPSocket:invalidDataType",
+                        "Data type is not supported.\n");
             }
         }
         
@@ -164,34 +169,36 @@ void mexFunction(int nlhs, mxArray *plhs[],
             mxFree(ipAddr);
         }
         else  {
-            mexErrMsgTxt("UDPSocket::mexFunction - WARNING wrong number of input arguments received.\n");
+            mexErrMsgIdAndTxt("OpenFresco:UDPSocket:invalidNumInputs",
+                    "Wrong number of input arguments received.\n");
         }
-
+        
         plhs[0] = mxCreateDoubleScalar(socketID);
     }
     else if (strcmp(action,"closeConnection") == 0)  {
-
+        
         socketID = (int)mxGetScalar(prhs[1]);
-
+        
         udp_closeconnection(&socketID, &ierr);
-
+        
         plhs[0] = mxCreateDoubleScalar(ierr);
     }
     else if (strcmp(action,"getSocketID") == 0)  {
         
         int sizeAddr;
-
+        
         ipPort = (int)mxGetScalar(prhs[1]);
         ipAddr = mxArrayToString(prhs[2]);
         sizeAddr = (int)mxGetN(prhs[2]) + 1;
-
+        
         udp_getsocketid(&ipPort, ipAddr, &sizeAddr, &socketID);
-
+        
         plhs[0] = mxCreateDoubleScalar(socketID);
-
+        
         mxFree(ipAddr);
     }
     else  {
-        mexErrMsgTxt("UDPSocket::mexFunction - WARNING invalid action received.\n");        
+        mexErrMsgIdAndTxt("OpenFresco:UDPSocket:invalidAction",
+                "Invalid action received.\n");
     }
 }

@@ -32,7 +32,7 @@
 %   dataSize : size of data vector to be received
 %   dataType : type of data vector to be received
 %              (optional, default: double)
-%   
+%
 %
 % Client Example:
 %  1) setting up a connection to server
@@ -72,16 +72,12 @@
 %** and redistribution, and for a DISCLAIMER OF ALL WARRANTIES.        **
 %**                                                                    **
 %** Developed by:                                                      **
-%**   Andreas Schellenberg (andreas.schellenberg@gmx.net)              **
+%**   Andreas Schellenberg (andreas.schellenberg@gmail.com)            **
 %**   Yoshikazu Takahashi (yos@catfish.dpri.kyoto-u.ac.jp)             **
 %**   Gregory L. Fenves (fenves@berkeley.edu)                          **
 %**   Stephen A. Mahin (mahin@berkeley.edu)                            **
 %**                                                                    **
 %** ****************************************************************** */
-
-% $Revision$
-% $Date$
-% $URL$
 
 % Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 % Created: 10/06

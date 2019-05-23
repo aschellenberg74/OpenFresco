@@ -71,167 +71,167 @@ persistent Time;      % current analysis time
 % =========================================================================
 ndf = 3;          % no of dof's per node
 switch action
-   % =========================================================================
-   case 'size'
-      arsz      = 2*ndf;
-      varargout = {arsz};  % return size of element arrays
-   % =========================================================================
-   case 'chec'
-      if (~isfield(ElemData,'numNodes'));  disp('Element');disp(el_no);error('number of nodes missing'); end
-      if (~isfield(ElemData,'ipPort'));    disp('Element');disp(el_no);error('ip port missing'); end
-      if (~isfield(ElemData,'ipAddr'));    ElemData.ipAddr = '127.0.0.1'; end
-      varargout = {ElemData};
-   % =========================================================================
-   otherwise
-      % extract element properties
-      numNodes = ElemData.numNodes;
-      ipPort   = ElemData.ipPort;
-      ipAddr   = ElemData.ipAddr;
-      numDOF   = numNodes*ndf;
-      
-      % setup connection to experimental element
-      dataSize = max(1+3*numDOF,numDOF^2);
-      sData = zeros(1,dataSize);
-      if isempty(socketID)
-         socketID = TCPSocket('openConnection',ipAddr,ipPort);
-         if (socketID<0)
-            error('TCPSocket:openConnection',['Unable to setup connection to ',...
-               ipAddr,' : ',num2str(ipPort)]);
-         end
-         % set the data size for experimental element
-         dataSizes = int32([numDOF numDOF numDOF 0 1, 0 0 0 numDOF 0, dataSize]);
-         TCPSocket('sendData',socketID,dataSizes,11);
-      end
-   % =========================================================================
+    % =========================================================================
+    case 'size'
+        arsz      = 2*ndf;
+        varargout = {arsz};  % return size of element arrays
+    % =========================================================================
+    case 'chec'
+        if (~isfield(ElemData,'numNodes'));  disp('Element');disp(el_no);error('number of nodes missing'); end
+        if (~isfield(ElemData,'ipPort'));    disp('Element');disp(el_no);error('ip port missing'); end
+        if (~isfield(ElemData,'ipAddr'));    ElemData.ipAddr = '127.0.0.1'; end
+        varargout = {ElemData};
+    % =========================================================================
+    otherwise
+        % extract element properties
+        numNodes = ElemData.numNodes;
+        ipPort   = ElemData.ipPort;
+        ipAddr   = ElemData.ipAddr;
+        numDOF   = numNodes*ndf;
+        
+        % setup connection to experimental element
+        dataSize = max(1+3*numDOF,numDOF^2);
+        sData = zeros(1,dataSize);
+        if isempty(socketID)
+            socketID = TCPSocket('openConnection',ipAddr,ipPort);
+            if (socketID<0)
+                error('TCPSocket:openConnection',['Unable to setup connection to ',...
+                    ipAddr,' : ',num2str(ipPort)]);
+            end
+            % set the data size for experimental element
+            dataSizes = int32([numDOF numDOF numDOF 0 1, 0 0 0 numDOF 0, dataSize]);
+            TCPSocket('sendData',socketID,dataSizes,11);
+        end
+    % =========================================================================
 end
 
 % element actions
 switch action
-   % =========================================================================
-   case 'data'
-      if (HEAD_PR)
-         fprintf (IOW,strcat('\n\n Properties for GenericClient2d Element'));
-         fprintf (IOW,'\n Elem    numNodes    ipPort    ipAddr');
-      end
-      fprintf (IOW,'\n%4d  %7d      %7d    %s', el_no,numNodes,ipPort,ipAddr);
-   % =========================================================================
-   case 'init'
-      % set initial time
-      Time = 0;
-      % history information
-      ElemState.Pres.vh = zeros(numDOF,1);
-      ElemState.Pres.qh = zeros(numDOF,1);
-      varargout = {ElemState};
-   % =========================================================================
-   case 'stif'
-      if (ElemState.Time > Time)
-         % commit state
-         sData(1) = 5;
-         TCPSocket('sendData',socketID,sData,dataSize);
-         % save current time
-         Time = ElemState.Time;
-      end
-
-      % transform end displacements from global reference to basic system
-      vh = ElemState.vh;       % extract end displacements from ElemState
-
-      % send trial response to experimental element
-      sData(1) = 3;
-      sData(2:1+3*numDOF) = vh(:,[1,4,5]);
-      sData(2+3*numDOF) = ElemState.Time;
-      TCPSocket('sendData',socketID,sData,dataSize);
-
-      % obtain stiffness matrix from experimental element
-      sData(1) = 13;
-      TCPSocket('sendData',socketID,sData,dataSize);
-      rData = TCPSocket('recvData',socketID,dataSize);
-      kh = reshape(rData(1:numDOF^2)',numDOF,numDOF);
-
-      % obtain resisting forces from experimental element
-      sData(1) = 10;
-      TCPSocket('sendData',socketID,sData,dataSize);
-      rData = TCPSocket('recvData',socketID,dataSize);
-      qh = rData(1:numDOF)';
-
-      % store history variables
-      ElemState.Pres.vh = vh;
-      ElemState.Pres.qh = qh;
-      
-      % save stiffness and forces in global reference system
-      ElemState.kh = kh;
-      ElemState.qh = qh;
-      varargout = {ElemState};
-   % =========================================================================
-   case 'forc'
-      if (ElemState.Time > Time)
-         % commit state
-         sData(1) = 5;
-         TCPSocket('sendData',socketID,sData,dataSize);
-         % save current time
-         Time = ElemState.Time;
-      end
-
-      % transform end displacements from global reference to basic system
-      vh = ElemState.vh;       % extract end displacements from ElemState
-
-      % send trial response to experimental element
-      sData(1) = 3;
-      sData(2:1+3*numDOF) = vh(:,[1,4,5]);
-      sData(2+3*numDOF) = ElemState.Time;
-      TCPSocket('sendData',socketID,sData,dataSize);
-
-      % obtain resisting forces from experimental element
-      sData(1) = 10;
-      TCPSocket('sendData',socketID,sData,dataSize);
-      rData = TCPSocket('recvData',socketID,dataSize);
-      qh = rData(1:numDOF)';
-
-      % store history variables
-      ElemState.Pres.vh = vh;
-      ElemState.Pres.qh = qh;
-      
-      % save forces in global reference system
-      ElemState.qh = qh;
-      varargout = {ElemState};
-   % =========================================================================
-   case 'post'
-      Post.vh = ElemState.Pres.vh;
-      Post.qh = ElemState.Pres.qh;
-      varargout = {Post};
-   % =========================================================================
-   case 'stre'
-      qh = ElemState.Pres.qh;
-      if (HEAD_PR)
-         fprintf(IOW,'\n End Forces for GenericClient2d Element');
-         fprintf(IOW,'\n Elem      P1           P2           P3           P4           P5           P6');
-      end
-      fprintf(IOW,'\n%4d  %11.3e  %11.3e  %11.3e  %11.3e  %11.3e  %11.3e', el_no,qh);
-   % =========================================================================
-   case 'mass'
-      % obtain consistent mass matrix from experimental element
-      sData(1) = 15;
-      TCPSocket('sendData',socketID,sData,dataSize);
-      rData = TCPSocket('recvData',socketID,dataSize);
-      cm = reshape(rData(1:numDOF^2)',numDOF,numDOF);
-      % lumped mass matrix
-      lm = diag(cm);
-      varargout = {lm cm};
-   % =========================================================================
-   case 'defo'
-      % draw member in deformed configuration
-      xyzd = xyz + MAGF .* reshape(ElemState.vh,ndm,2);
-      switch ndm
-         case 2
-            H=line(xyzd(1,:)',xyzd(2,:)');
-            set(H,'color',[1,1,0]);
-            set(H,'LineWidth',1);
-         case 3
-            H=line(xyzd(1,:)',xyzd(2,:)',xyzd(3,:)');
-            set(H,'color',[1,1,0]);
-            set(H,'LineWidth',1);
-      end
-   % =========================================================================
-   otherwise
-      % add further actions
-   % =========================================================================
+    % =========================================================================
+    case 'data'
+        if (HEAD_PR)
+            fprintf (IOW,strcat('\n\n Properties for GenericClient2d Element'));
+            fprintf (IOW,'\n Elem    numNodes    ipPort    ipAddr');
+        end
+        fprintf (IOW,'\n%4d  %7d      %7d    %s', el_no,numNodes,ipPort,ipAddr);
+    % =========================================================================
+    case 'init'
+        % set initial time
+        Time = 0;
+        % history information
+        ElemState.Pres.vh = zeros(numDOF,1);
+        ElemState.Pres.qh = zeros(numDOF,1);
+        varargout = {ElemState};
+    % =========================================================================
+    case 'stif'
+        if (ElemState.Time > Time)
+            % commit state
+            sData(1) = 5;
+            TCPSocket('sendData',socketID,sData,dataSize);
+            % save current time
+            Time = ElemState.Time;
+        end
+        
+        % transform end displacements from global reference to basic system
+        vh = ElemState.vh;       % extract end displacements from ElemState
+        
+        % send trial response to experimental element
+        sData(1) = 3;
+        sData(2:1+3*numDOF) = vh(:,[1,4,5]);
+        sData(2+3*numDOF) = ElemState.Time;
+        TCPSocket('sendData',socketID,sData,dataSize);
+        
+        % obtain stiffness matrix from experimental element
+        sData(1) = 13;
+        TCPSocket('sendData',socketID,sData,dataSize);
+        rData = TCPSocket('recvData',socketID,dataSize);
+        kh = reshape(rData(1:numDOF^2)',numDOF,numDOF);
+        
+        % obtain resisting forces from experimental element
+        sData(1) = 10;
+        TCPSocket('sendData',socketID,sData,dataSize);
+        rData = TCPSocket('recvData',socketID,dataSize);
+        qh = rData(1:numDOF)';
+        
+        % store history variables
+        ElemState.Pres.vh = vh;
+        ElemState.Pres.qh = qh;
+        
+        % save stiffness and forces in global reference system
+        ElemState.kh = kh;
+        ElemState.qh = qh;
+        varargout = {ElemState};
+    % =========================================================================
+    case 'forc'
+        if (ElemState.Time > Time)
+            % commit state
+            sData(1) = 5;
+            TCPSocket('sendData',socketID,sData,dataSize);
+            % save current time
+            Time = ElemState.Time;
+        end
+        
+        % transform end displacements from global reference to basic system
+        vh = ElemState.vh;       % extract end displacements from ElemState
+        
+        % send trial response to experimental element
+        sData(1) = 3;
+        sData(2:1+3*numDOF) = vh(:,[1,4,5]);
+        sData(2+3*numDOF) = ElemState.Time;
+        TCPSocket('sendData',socketID,sData,dataSize);
+        
+        % obtain resisting forces from experimental element
+        sData(1) = 10;
+        TCPSocket('sendData',socketID,sData,dataSize);
+        rData = TCPSocket('recvData',socketID,dataSize);
+        qh = rData(1:numDOF)';
+        
+        % store history variables
+        ElemState.Pres.vh = vh;
+        ElemState.Pres.qh = qh;
+        
+        % save forces in global reference system
+        ElemState.qh = qh;
+        varargout = {ElemState};
+    % =========================================================================
+    case 'post'
+        Post.vh = ElemState.Pres.vh;
+        Post.qh = ElemState.Pres.qh;
+        varargout = {Post};
+    % =========================================================================
+    case 'stre'
+        qh = ElemState.Pres.qh;
+        if (HEAD_PR)
+            fprintf(IOW,'\n End Forces for GenericClient2d Element');
+            fprintf(IOW,'\n Elem      P1           P2           P3           P4           P5           P6');
+        end
+        fprintf(IOW,'\n%4d  %11.3e  %11.3e  %11.3e  %11.3e  %11.3e  %11.3e', el_no,qh);
+    % =========================================================================
+    case 'mass'
+        % obtain consistent mass matrix from experimental element
+        sData(1) = 15;
+        TCPSocket('sendData',socketID,sData,dataSize);
+        rData = TCPSocket('recvData',socketID,dataSize);
+        cm = reshape(rData(1:numDOF^2)',numDOF,numDOF);
+        % lumped mass matrix
+        lm = diag(cm);
+        varargout = {lm cm};
+    % =========================================================================
+    case 'defo'
+        % draw member in deformed configuration
+        xyzd = xyz + MAGF .* reshape(ElemState.vh,ndm,2);
+        switch ndm
+            case 2
+                H=line(xyzd(1,:)',xyzd(2,:)');
+                set(H,'color',[1,1,0]);
+                set(H,'LineWidth',1);
+            case 3
+                H=line(xyzd(1,:)',xyzd(2,:)',xyzd(3,:)');
+                set(H,'color',[1,1,0]);
+                set(H,'LineWidth',1);
+        end
+    % =========================================================================
+    otherwise
+        % add further actions
+    % =========================================================================
 end

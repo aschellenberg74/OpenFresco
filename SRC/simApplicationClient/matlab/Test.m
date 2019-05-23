@@ -1,6 +1,8 @@
 % use with ..\EXAMPLES\TrussModel\Truss_Local_SimAppServer.tcl
 % make sure that SimAppSiteServer is used and not SimAppElemServer
 
+%#ok<*CLALL>
+
 clear all;
 
 % setup connection to server
@@ -25,7 +27,7 @@ TCPSocket('sendData',socketID,sData,dataSize);
 sData(1) = 10;
 TCPSocket('sendData',socketID,sData,dataSize);
 rData = TCPSocket('recvData',socketID,dataSize);
-q = rData(1)
+q = rData(1)   %#ok<NOPTS>
 
 % disconnect from experimental site
 sData(1) = 99;

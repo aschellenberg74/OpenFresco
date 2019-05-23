@@ -32,7 +32,7 @@
 %   dataSize : size of data vector to be received
 %   dataType : type of data vector to be received
 %              (optional, default: double)
-%   
+%
 %
 % Client Example:
 %  1) setting up a connection to server
@@ -72,16 +72,12 @@
 %** and redistribution, and for a DISCLAIMER OF ALL WARRANTIES.        **
 %**                                                                    **
 %** Developed by:                                                      **
-%**   Andreas Schellenberg (andreas.schellenberg@gmx.net)              **
+%**   Andreas Schellenberg (andreas.schellenberg@gmail.com)            **
 %**   Yoshikazu Takahashi (yos@catfish.dpri.kyoto-u.ac.jp)             **
 %**   Gregory L. Fenves (fenves@berkeley.edu)                          **
 %**   Stephen A. Mahin (mahin@berkeley.edu)                            **
 %**                                                                    **
 %** ****************************************************************** */
-
-% $Revision: 314 $
-% $Date: 2011-05-22 14:17:07 -0700 (Sun, 22 May 2011) $
-% $URL: https://nees.org/tools/openfresco/svn/trunk/SRC/simApplicationClient/matlab/UDPSocket.m $
 
 % Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 % Created: 02/13

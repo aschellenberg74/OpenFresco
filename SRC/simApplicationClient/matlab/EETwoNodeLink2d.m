@@ -76,182 +76,182 @@ persistent Time;      % current analysis time
 % =========================================================================
 ndf = 3;          % no of dof's per node
 switch action
-   % =========================================================================
-   case 'size'
-      arsz      = 2*ndf;
-      varargout = {arsz};  % return size of element arrays
-   % =========================================================================
-   case 'chec'
-      if (~isfield(ElemData,'kInit'));  disp('Element');disp(el_no);error('initial stiffness missing'); end
-      if (~isfield(ElemData,'ipPort')); disp('Element');disp(el_no);error('ip port missing'); end
-      if (~isfield(ElemData,'ipAddr')); ElemData.ipAddr = '127.0.0.1'; end
-      if (~isfield(ElemData,'dir'));    disp('Element');disp(el_no); error('direction ID missing'); end
-      if (~isfield(ElemData,'x'));      ElemData.x = [1;0;0]; end
-      if (~isfield(ElemData,'yp'));     ElemData.yp = [0;1;0]; end
-      if (~isfield(ElemData,'m'));      ElemData.m = 0; end
-      varargout = {ElemData};
-   % =========================================================================
-   otherwise
-      % extract element properties
-      kInit  = ElemData.kInit;
-      ipPort = ElemData.ipPort;
-      ipAddr = ElemData.ipAddr;
-      dir    = ElemData.dir;
-      x      = ElemData.x;
-      yp     = ElemData.yp;
-      m      = ElemData.m;
-      numDir = length(dir);
-      
-      % setup connection to experimental site
-      dataSize = 1+3*numDir;
-      sData = zeros(1,dataSize);
-      if isempty(socketID)
-         socketID = TCPSocket('openConnection',ipAddr,ipPort);
-         if (socketID<0)
-            error('TCPSocket:openConnection',['Unable to setup connection to ',...
-               ipAddr,' : ',num2str(ipPort)]);
-         end
-         % set the data size for the experimental site
-         dataSizes = int32([numDir numDir numDir 0 1, numDir 0 0 numDir 0, dataSize]);
-         TCPSocket('sendData',socketID,dataSizes,11);
-      end
-   % =========================================================================
+    % =========================================================================
+    case 'size'
+        arsz      = 2*ndf;
+        varargout = {arsz};  % return size of element arrays
+    % =========================================================================
+    case 'chec'
+        if (~isfield(ElemData,'kInit'));  disp('Element');disp(el_no);error('initial stiffness missing'); end
+        if (~isfield(ElemData,'ipPort')); disp('Element');disp(el_no);error('ip port missing'); end
+        if (~isfield(ElemData,'ipAddr')); ElemData.ipAddr = '127.0.0.1'; end
+        if (~isfield(ElemData,'dir'));    disp('Element');disp(el_no); error('direction ID missing'); end
+        if (~isfield(ElemData,'x'));      ElemData.x = [1;0;0]; end
+        if (~isfield(ElemData,'yp'));     ElemData.yp = [0;1;0]; end
+        if (~isfield(ElemData,'m'));      ElemData.m = 0; end
+        varargout = {ElemData};
+    % =========================================================================
+    otherwise
+        % extract element properties
+        kInit  = ElemData.kInit;
+        ipPort = ElemData.ipPort;
+        ipAddr = ElemData.ipAddr;
+        dir    = ElemData.dir;
+        x      = ElemData.x;
+        yp     = ElemData.yp;
+        m      = ElemData.m;
+        numDir = length(dir);
+        
+        % setup connection to experimental site
+        dataSize = 1+3*numDir;
+        sData = zeros(1,dataSize);
+        if isempty(socketID)
+            socketID = TCPSocket('openConnection',ipAddr,ipPort);
+            if (socketID<0)
+                error('TCPSocket:openConnection',['Unable to setup connection to ',...
+                    ipAddr,' : ',num2str(ipPort)]);
+            end
+            % set the data size for the experimental site
+            dataSizes = int32([numDir numDir numDir 0 1, numDir 0 0 numDir 0, dataSize]);
+            TCPSocket('sendData',socketID,dataSizes,11);
+        end
+    % =========================================================================
 end
 
 % element actions
 switch action
-   % =========================================================================
-   case 'data'
-      if (HEAD_PR)
-         fprintf (IOW,strcat('\n\n Properties for EETwoNodeLink2d Element'));
-         fprintf (IOW,'\n Elem     kInit     ipPort    ipAddr      dir         x          yp            m');
-      end
-      fprintf (IOW,'\n%4d  %11.3e  %7d  %s  [%s]  [%s]  [%s]  %11.3e', el_no,kInit,ipPort,ipAddr,num2str(dir),num2str(x'),num2str(yp'),m);
-   % =========================================================================
-   case 'init'
-      % get transformation matrix
-      T = getTranGlobalBasic(ndm,ndf,dir,x,yp);
-      % set initial time
-      Time = 0;
-      % history information
-      ElemState.Pres.v = zeros(numDir,1);
-      ElemState.Pres.q = zeros(numDir,1);
-      varargout = {ElemState};
-   % =========================================================================
-   case 'stif'
-      if (Time < ElemState.Time)
-         % commit state
-         sData(1) = 5;
-         TCPSocket('sendData',socketID,sData,dataSize);
-         % save current time
-         Time = ElemState.Time;
-      end
-      
-      % transform end displacements from global reference to basic system
-      vh = ElemState.vh;       % extract end displacements from ElemState
-      v = T*vh;
-
-      % send trial response to experimental site
-      sData(1) = 3;
-      sData(2:1+3*numDir) = v(:,[1,4,5]);
-      sData(2+3*numDir) = ElemState.Time;
-      TCPSocket('sendData',socketID,sData,dataSize);
-
-      % obtain resisting forces from experimental site
-      sData(1) = 10;
-      TCPSocket('sendData',socketID,sData,dataSize);
-      rData = TCPSocket('recvData',socketID,dataSize);
-      q = rData(numDir+1:2*numDir)';
-
-      % store history variables
-      ElemState.Pres.v = v;
-      ElemState.Pres.q = q;
-      
-      % tranform stiffness and forces from basic to global reference system
-      qh = T'*q;
-      kh = T'*kInit*T;
-      ElemState.kh  = kh;
-      ElemState.qh  = qh;
-      varargout = {ElemState};
-   % =========================================================================
-   case 'forc'
-      if (Time < ElemState.Time)
-         % commit state
-         sData(1) = 5;
-         TCPSocket('sendData',socketID,sData,dataSize);
-         % save current time
-         Time = ElemState.Time;
-      end
-
-      % transform end displacements from global reference to basic system
-      vh = ElemState.vh;       % extract end displacements from ElemState
-      v = T*vh;
-
-      % send trial response to experimental site
-      sData(1) = 3;
-      sData(2:1+3*numDir) = v(:,[1,4,5]);
-      sData(2+3*numDir) = ElemState.Time;
-      TCPSocket('sendData',socketID,sData,dataSize);
-
-      % obtain resisting forces from experimental site
-      sData(1) = 10;
-      TCPSocket('sendData',socketID,sData,dataSize);
-      rData = TCPSocket('recvData',socketID,dataSize);
-      q = rData(numDir+1:2*numDir)';
-
-      % store history variables
-      ElemState.Pres.v = v;
-      ElemState.Pres.q = q;
-
-      % tranform forces from basic to global reference system
-      qh = T'*q;
-      ElemState.qh  = qh;
-      varargout = {ElemState};
-   % =========================================================================
-   case 'post'
-      Post.v = ElemState.Pres.v;
-      Post.q = ElemState.Pres.q;
-      varargout = {Post};
-   % =========================================================================
-   case 'stre'
-      q = ElemState.Pres.q;
-      if (HEAD_PR)
-         fprintf(IOW,'\n End Forces for EETwoNodeLink2d Element');
-         fprintf(IOW,'\n Elem      Ni           Vi           Mi           Nj           Vj           Mj');
-      end
-      fprintf(IOW,'\n%4d  %11.3e  %11.3e  %11.3e  %11.3e  %11.3e  %11.3e', el_no,-q,q);
-   % =========================================================================
-   case 'mass'
-      % lumped mass matrix
-      lm = zeros(2*ndf,1);
-      for i=1:ndm
-         lm(i)     = 0.5*m;
-         lm(i+ndf) = 0.5*m;
-      end
-      cm = zeros(2*ndf,2*ndf);
-      for i=1:ndm
-         cm(i,i)         = 0.5*m;
-         cm(i+ndf,i+ndf) = 0.5*m;
-      end
-      varargout = {lm cm};
-   % =========================================================================
-   case 'defo'
-      % draw member in deformed configuration
-      xyzd = xyz + MAGF .* reshape(ElemState.vh,ndm,2);
-      switch ndm
-         case 2
-            H=line(xyzd(1,:)',xyzd(2,:)');
-            set(H,'color',[1,1,0]);
-            set(H,'LineWidth',1);
-         case 3
-            H=line(xyzd(1,:)',xyzd(2,:)',xyzd(3,:)');
-            set(H,'color',[1,1,0]);
-            set(H,'LineWidth',1);
-      end
-   % =========================================================================
-   otherwise
-      % add further actions
-   % =========================================================================
+    % =========================================================================
+    case 'data'
+        if (HEAD_PR)
+            fprintf (IOW,strcat('\n\n Properties for EETwoNodeLink2d Element'));
+            fprintf (IOW,'\n Elem     kInit     ipPort    ipAddr      dir         x          yp            m');
+        end
+        fprintf (IOW,'\n%4d  %11.3e  %7d  %s  [%s]  [%s]  [%s]  %11.3e', el_no,kInit,ipPort,ipAddr,num2str(dir),num2str(x'),num2str(yp'),m);
+    % =========================================================================
+    case 'init'
+        % get transformation matrix
+        T = getTranGlobalBasic(ndm,ndf,dir,x,yp);
+        % set initial time
+        Time = 0;
+        % history information
+        ElemState.Pres.v = zeros(numDir,1);
+        ElemState.Pres.q = zeros(numDir,1);
+        varargout = {ElemState};
+    % =========================================================================
+    case 'stif'
+        if (Time < ElemState.Time)
+            % commit state
+            sData(1) = 5;
+            TCPSocket('sendData',socketID,sData,dataSize);
+            % save current time
+            Time = ElemState.Time;
+        end
+        
+        % transform end displacements from global reference to basic system
+        vh = ElemState.vh;       % extract end displacements from ElemState
+        v = T*vh;
+        
+        % send trial response to experimental site
+        sData(1) = 3;
+        sData(2:1+3*numDir) = v(:,[1,4,5]);
+        sData(2+3*numDir) = ElemState.Time;
+        TCPSocket('sendData',socketID,sData,dataSize);
+        
+        % obtain resisting forces from experimental site
+        sData(1) = 10;
+        TCPSocket('sendData',socketID,sData,dataSize);
+        rData = TCPSocket('recvData',socketID,dataSize);
+        q = rData(numDir+1:2*numDir)';
+        
+        % store history variables
+        ElemState.Pres.v = v;
+        ElemState.Pres.q = q;
+        
+        % tranform stiffness and forces from basic to global reference system
+        qh = T'*q;
+        kh = T'*kInit*T;
+        ElemState.kh  = kh;
+        ElemState.qh  = qh;
+        varargout = {ElemState};
+    % =========================================================================
+    case 'forc'
+        if (Time < ElemState.Time)
+            % commit state
+            sData(1) = 5;
+            TCPSocket('sendData',socketID,sData,dataSize);
+            % save current time
+            Time = ElemState.Time;
+        end
+        
+        % transform end displacements from global reference to basic system
+        vh = ElemState.vh;       % extract end displacements from ElemState
+        v = T*vh;
+        
+        % send trial response to experimental site
+        sData(1) = 3;
+        sData(2:1+3*numDir) = v(:,[1,4,5]);
+        sData(2+3*numDir) = ElemState.Time;
+        TCPSocket('sendData',socketID,sData,dataSize);
+        
+        % obtain resisting forces from experimental site
+        sData(1) = 10;
+        TCPSocket('sendData',socketID,sData,dataSize);
+        rData = TCPSocket('recvData',socketID,dataSize);
+        q = rData(numDir+1:2*numDir)';
+        
+        % store history variables
+        ElemState.Pres.v = v;
+        ElemState.Pres.q = q;
+        
+        % tranform forces from basic to global reference system
+        qh = T'*q;
+        ElemState.qh  = qh;
+        varargout = {ElemState};
+    % =========================================================================
+    case 'post'
+        Post.v = ElemState.Pres.v;
+        Post.q = ElemState.Pres.q;
+        varargout = {Post};
+    % =========================================================================
+    case 'stre'
+        q = ElemState.Pres.q;
+        if (HEAD_PR)
+            fprintf(IOW,'\n End Forces for EETwoNodeLink2d Element');
+            fprintf(IOW,'\n Elem      Ni           Vi           Mi           Nj           Vj           Mj');
+        end
+        fprintf(IOW,'\n%4d  %11.3e  %11.3e  %11.3e  %11.3e  %11.3e  %11.3e', el_no,-q,q);
+    % =========================================================================
+    case 'mass'
+        % lumped mass matrix
+        lm = zeros(2*ndf,1);
+        for i=1:ndm
+            lm(i)     = 0.5*m;
+            lm(i+ndf) = 0.5*m;
+        end
+        cm = zeros(2*ndf,2*ndf);
+        for i=1:ndm
+            cm(i,i)         = 0.5*m;
+            cm(i+ndf,i+ndf) = 0.5*m;
+        end
+        varargout = {lm cm};
+    % =========================================================================
+    case 'defo'
+        % draw member in deformed configuration
+        xyzd = xyz + MAGF .* reshape(ElemState.vh,ndm,2);
+        switch ndm
+            case 2
+                H=line(xyzd(1,:)',xyzd(2,:)');
+                set(H,'color',[1,1,0]);
+                set(H,'LineWidth',1);
+            case 3
+                H=line(xyzd(1,:)',xyzd(2,:)',xyzd(3,:)');
+                set(H,'color',[1,1,0]);
+                set(H,'LineWidth',1);
+        end
+    % =========================================================================
+    otherwise
+        % add further actions
+    % =========================================================================
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -264,54 +264,53 @@ zn = norm(z);
 
 transf = zeros(3,3);
 for i=1:3
-   transf(1,i) = x(i)/xn;
-   transf(2,i) = y(i)/yn;
-   transf(3,i) = z(i)/zn;
+    transf(1,i) = x(i)/xn;
+    transf(2,i) = y(i)/yn;
+    transf(3,i) = z(i)/zn;
 end
 
 T = zeros(length(dir),2*ndf);
 for i=1:length(dir)
-   axisID = mod(dir(i),3);
-   if (ndm==2 && ndf==2)
-      if (dir(i)<=3)
-         T(i,3) = transf(axisID,1);
-         T(i,4) = transf(axisID,2);
-      end
-   elseif (ndm==2 && ndf==3)
-      if (dir(i)<=3)
-         T(i,4) = transf(axisID,1);
-         T(i,5) = transf(axisID,2);
-         T(i,6) = 0.0;
-      else
-         T(i,4) = 0.0;
-         T(i,5) = 0.0;
-         T(i,6) = transf(axisID,3);
-      end
-   elseif (ndm==3 && ndf==3)
-      if (dir(i)<=3)
-         T(i,4) = transf(axisID,1);
-         T(i,5) = transf(axisID,2);
-         T(i,6) = transf(axisID,3);
-      end
-   elseif (ndm==3 && ndf==6)
-      if (dir(i)<=3)
-         T(i,7)  = transf(axisID,1);
-         T(i,8)  = transf(axisID,2);
-         T(i,9)  = transf(axisID,3);
-         T(i,10) = 0.0;
-         T(i,11) = 0.0;
-         T(i,12) = 0.0;
-      else
-         T(i,7)  = 0.0;
-         T(i,8)  = 0.0;
-         T(i,9)  = 0.0;
-         T(i,10) = transf(axisID,1);
-         T(i,11) = transf(axisID,2);
-         T(i,12) = transf(axisID,3);
-      end
-   end
-   for j=1:ndf
-      T(i,j) = -T(i,j+ndf);
-   end
+    axisID = mod(dir(i),3);
+    if (ndm==2 && ndf==2)
+        if (dir(i)<=3)
+            T(i,3) = transf(axisID,1);
+            T(i,4) = transf(axisID,2);
+        end
+    elseif (ndm==2 && ndf==3)
+        if (dir(i)<=3)
+            T(i,4) = transf(axisID,1);
+            T(i,5) = transf(axisID,2);
+            T(i,6) = 0.0;
+        else
+            T(i,4) = 0.0;
+            T(i,5) = 0.0;
+            T(i,6) = transf(axisID,3);
+        end
+    elseif (ndm==3 && ndf==3)
+        if (dir(i)<=3)
+            T(i,4) = transf(axisID,1);
+            T(i,5) = transf(axisID,2);
+            T(i,6) = transf(axisID,3);
+        end
+    elseif (ndm==3 && ndf==6)
+        if (dir(i)<=3)
+            T(i,7)  = transf(axisID,1);
+            T(i,8)  = transf(axisID,2);
+            T(i,9)  = transf(axisID,3);
+            T(i,10) = 0.0;
+            T(i,11) = 0.0;
+            T(i,12) = 0.0;
+        else
+            T(i,7)  = 0.0;
+            T(i,8)  = 0.0;
+            T(i,9)  = 0.0;
+            T(i,10) = transf(axisID,1);
+            T(i,11) = transf(axisID,2);
+            T(i,12) = transf(axisID,3);
+        end
+    end
+    for j=1:ndf
+        T(i,j) = -T(i,j+ndf);
+    end
 end
-return
