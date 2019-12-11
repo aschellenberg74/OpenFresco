@@ -174,11 +174,14 @@ class Node : public DomainComponent
     int createVel(void);
     int createAccel(void); 
 
+    // private method to set up global matrices
+    int setGlobalMatrices();
+
     // private data associated with each node object
     int numberDOF;                    // number of dof at Node
     DOF_Group *theDOF_GroupPtr;       // pointer to associated DOF_Group
     Vector *Crd;                      // original nodal coords
-    Vector *commitDisp, *commitVel, *commitAccel; // commited quantities
+    Vector *commitDisp, *commitVel, *commitAccel; // committed quantities
     Vector *trialDisp, *trialVel, *trialAccel;     // trial quantities
     Vector *unbalLoad;                // unbalanced load
     Vector *incrDisp;

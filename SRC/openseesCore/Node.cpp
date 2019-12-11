@@ -280,33 +280,6 @@ Node::Node(int tag, int ndof, double Crd1, Vector *dLoc)
   }
   
   index = -1;
-  if (numMatrices != 0) {
-    for (int i=0; i<numMatrices; i++)
-      if (theMatrices[i]->noRows() == ndof) {
-	index = i;
-	i = numMatrices;
-      }
-  }
-  if (index == -1) {
-    Matrix **nextMatrices = new Matrix *[numMatrices+1];
-    if (nextMatrices == 0) {
-      opserr << "Element::getTheMatrix - out of memory\n";
-      exit(-1);
-    }
-    for (int j=0; j<numMatrices; j++)
-      nextMatrices[j] = theMatrices[j];
-    Matrix *theMatrix = new Matrix(ndof, ndof);
-    if (theMatrix == 0) {
-      opserr << "Element::getTheMatrix - out of memory\n";
-      exit(-1);
-    }
-    nextMatrices[numMatrices] = theMatrix;
-    if (numMatrices != 0) 
-      delete [] theMatrices;
-    index = numMatrices;
-    numMatrices++;
-    theMatrices = nextMatrices;
-  }
 }
 
 
@@ -340,33 +313,6 @@ Node::Node(int tag, int ndof, double Crd1, double Crd2, Vector *dLoc)
   }
   
   index = -1;
-  if (numMatrices != 0) {
-    for (int i=0; i<numMatrices; i++)
-      if (theMatrices[i]->noRows() == ndof) {
-	index = i;
-	i = numMatrices;
-      }
-  }
-  if (index == -1) {
-    Matrix **nextMatrices = new Matrix *[numMatrices+1];
-    if (nextMatrices == 0) {
-      opserr << "Element::getTheMatrix - out of memory\n";
-      exit(-1);
-    }
-    for (int j=0; j<numMatrices; j++)
-      nextMatrices[j] = theMatrices[j];
-    Matrix *theMatrix = new Matrix(ndof, ndof);
-    if (theMatrix == 0) {
-      opserr << "Element::getTheMatrix - out of memory\n";
-      exit(-1);
-    }
-    nextMatrices[numMatrices] = theMatrix;
-    if (numMatrices != 0) 
-      delete [] theMatrices;
-    index = numMatrices;
-    numMatrices++;
-    theMatrices = nextMatrices;
-  }
 }
 
 
@@ -402,33 +348,6 @@ Node::Node(int tag, int ndof, double Crd1, double Crd2, Vector *dLoc)
   }
   
   index = -1;
-  if (numMatrices != 0) {
-    for (int i=0; i<numMatrices; i++)
-      if (theMatrices[i]->noRows() == ndof) {
-	index = i;
-	i = numMatrices;
-      }
-  }
-  if (index == -1) {
-    Matrix **nextMatrices = new Matrix *[numMatrices+1];
-    if (nextMatrices == 0) {
-      opserr << "Element::getTheMatrix - out of memory\n";
-      exit(-1);
-    }
-    for (int j=0; j<numMatrices; j++)
-      nextMatrices[j] = theMatrices[j];
-    Matrix *theMatrix = new Matrix(ndof, ndof);
-    if (theMatrix == 0) {
-      opserr << "Element::getTheMatrix - out of memory\n";
-      exit(-1);
-    }
-    nextMatrices[numMatrices] = theMatrix;
-    if (numMatrices != 0) 
-      delete [] theMatrices;
-    index = numMatrices;
-    numMatrices++;
-    theMatrices = nextMatrices;
-  }
 }
 
 
@@ -518,33 +437,6 @@ Node::Node(const Node &otherNode, bool copyMass)
   }
 
   index = -1;
-  if (numMatrices != 0) {
-    for (int i=0; i<numMatrices; i++)
-      if (theMatrices[i]->noRows() == numberDOF) {
-	index = i;
-	i = numMatrices;
-      }
-  }
-  if (index == -1) {
-    Matrix **nextMatrices = new Matrix *[numMatrices+1];
-    if (nextMatrices == 0) {
-      opserr << "Element::getTheMatrix - out of memory\n";
-      exit(-1);
-    }
-    for (int j=0; j<numMatrices; j++)
-      nextMatrices[j] = theMatrices[j];
-    Matrix *theMatrix = new Matrix(numberDOF, numberDOF);
-    if (theMatrix == 0) {
-      opserr << "Element::getTheMatrix - out of memory\n";
-      exit(-1);
-    }
-    nextMatrices[numMatrices] = theMatrix;
-    if (numMatrices != 0) 
-      delete [] theMatrices;
-    index = numMatrices;
-    numMatrices++;
-    theMatrices = nextMatrices;
-  }  
 }
 
 
@@ -792,7 +684,7 @@ Node::setTrialDisp(double value, int dof)
 {
     // check vector arg is of correct size
     if (dof < 0 || dof >=  numberDOF) {
-      opserr << "WARNING Node::setTrialDisp() - incompatable sizes\n";
+      opserr << "WARNING Node::setTrialDisp() - incompatible sizes\n";
       opserr << "node: " << this->getTag() << endln;
       return -2;
     }    
@@ -807,7 +699,7 @@ Node::setTrialDisp(double value, int dof)
 	}    
     }
 
-    // perform the assignment .. we dont't go through Vector interface
+    // perform the assignment .. we don't go through Vector interface
     // as we are sure of size and this way is quicker
     double tDisp = value;
     disp[dof+2*numberDOF] = tDisp - disp[dof+numberDOF];
@@ -822,7 +714,7 @@ Node::setTrialDisp(const Vector &newTrialDisp)
 {
     // check vector arg is of correct size
     if (newTrialDisp.Size() != numberDOF) {
-      opserr << "WARNING Node::setTrialDisp() - incompatable sizes\n";
+      opserr << "WARNING Node::setTrialDisp() - incompatible sizes\n";
       opserr << "node: " << this->getTag() << endln;
       return -2;
     }    
@@ -837,7 +729,7 @@ Node::setTrialDisp(const Vector &newTrialDisp)
 	}    
     }
 
-    // perform the assignment .. we dont't go through Vector interface
+    // perform the assignment .. we don't go through Vector interface
     // as we are sure of size and this way is quicker
     for (int i=0; i<numberDOF; i++) {
         double tDisp = newTrialDisp(i);
@@ -854,7 +746,7 @@ Node::setTrialVel(const Vector &newTrialVel)
 {
     // check vector arg is of correct size
     if (newTrialVel.Size() != numberDOF) {
-	    opserr << "WARNING Node::setTrialVel() - incompatable sizes\n";
+	    opserr << "WARNING Node::setTrialVel() - incompatible sizes\n";
 	    return -2;
     }    
 
@@ -880,7 +772,7 @@ Node::setTrialAccel(const Vector &newTrialAccel)
 {
     // check vector arg is of correct size
     if (newTrialAccel.Size() != numberDOF) {
-	    opserr << "WARNING Node::setTrialAccel() - incompatable sizes\n";
+	    opserr << "WARNING Node::setTrialAccel() - incompatible sizes\n";
 	    return -2;
     }    
 
@@ -904,11 +796,11 @@ Node::incrTrialDisp(const Vector &incrDispl)
 {
     // check vector arg is of correct size
     if (incrDispl.Size() != numberDOF) {
-	opserr << "WARNING Node::incrTrialDisp() - incompatable sizes\n";
+	opserr << "WARNING Node::incrTrialDisp() - incompatible sizes\n";
 	return -2;
     }    
 
-    // create a copy if no trial exists andd add committed
+    // create a copy if no trial exists and add committed
     if (trialDisp == 0) {
 	if (this->createDisp() < 0) {
 	    opserr << "FATAL Node::incrTrialDisp() - ran out of memory\n";
@@ -940,7 +832,7 @@ Node::incrTrialVel(const Vector &incrVel)
 {
     // check vector arg is of correct size
     if (incrVel.Size() != numberDOF) {
-	opserr << "WARNING Node::incrTrialVel() - incompatable sizes\n";
+	opserr << "WARNING Node::incrTrialVel() - incompatible sizes\n";
 	return -2;
     }    
 
@@ -969,11 +861,11 @@ Node::incrTrialAccel(const Vector &incrAccel)
 {
     // check vector arg is of correct size
     if (incrAccel.Size() != numberDOF) {
-	opserr << "WARNING Node::incrTrialAccel() - incompatable sizes\n";
+	opserr << "WARNING Node::incrTrialAccel() - incompatible sizes\n";
 	return -2;
     }    
 
-    // create a copy if no trial exists andd add committed    
+    // create a copy if no trial exists and add committed    
     if (trialAccel == 0) {
 	if (this->createAccel() < 0) {
 	    opserr << "FATAL Node::incrTrialAccel() - ran out of memory\n";
@@ -1263,6 +1155,10 @@ Node::revertToStart()
 const Matrix &
 Node::getMass(void) 
 {
+    if (index == -1) {
+	setGlobalMatrices();
+    }
+    
     // make sure it was created before we return it
     if (mass == 0) {
       theMatrices[index]->Zero();
@@ -1282,6 +1178,10 @@ Node::setRayleighDampingFactor(double alpham) {
 const Matrix &
 Node::getDamp(void) 
 {
+    if (index == -1) {
+	setGlobalMatrices();
+    }
+    
     // make sure it was created before we return it
     if (mass == 0 || alphaM == 0.0) {
       theMatrices[index]->Zero();
@@ -1298,6 +1198,10 @@ Node::getDamp(void)
 const Matrix &
 Node::getDampSensitivity(void) 
 {
+    if (index == -1) {
+	setGlobalMatrices();
+    }
+    
     // make sure it was created before we return it
     if (mass == 0 || alphaM == 0.0) {
       theMatrices[index]->Zero();
@@ -1317,7 +1221,7 @@ Node::setMass(const Matrix &newMass)
 {
     // check right size
     if (newMass.noRows() != numberDOF || newMass.noCols() != numberDOF) {
-	opserr << "Node::setMass - incompatable matrices\n";
+	opserr << "Node::setMass - incompatible matrices\n";
 	return -1;
     }	
 
@@ -1421,7 +1325,7 @@ Node::getRV(const Vector &V)
     
     // check dimesions of R and V
     if (R->noCols() != V.Size()) {
-	opserr << "WARNING Node::getRV() - R and V of incompatable dimesions\n";
+	opserr << "WARNING Node::getRV() - R and V of incompatible dimesions\n";
 	opserr << "R: " << *R << "V: " << V;
 	unbalLoadWithInertia->Zero();
 	return *unbalLoadWithInertia;
@@ -1590,7 +1494,7 @@ Node::sendSelf(int cTag, Channel &theChannel)
 	}
     }
 
-    // if get here succesfull
+    // if get here successful
     return 0;
 }
 
@@ -1648,7 +1552,7 @@ Node::recvSelf(int cTag, Channel &theChannel,
 
       // set the trial quantities equal to committed
       for (int i=0; i<numberDOF; i++)
-	disp[i] = disp[i+numberDOF];  // set trial equal commited
+	disp[i] = disp[i+numberDOF];  // set trial equal committed
 
     } else if (commitDisp != 0) {
       // if going back to initial we will just zero the vectors
@@ -1670,7 +1574,7 @@ Node::recvSelf(int cTag, Channel &theChannel,
 
       // set the trial quantity
       for (int i=0; i<numberDOF; i++)
-	vel[i] = vel[i+numberDOF];  // set trial equal commited
+	vel[i] = vel[i+numberDOF];  // set trial equal committed
     }
 
     if (data(4) == 0) {
@@ -1686,7 +1590,7 @@ Node::recvSelf(int cTag, Channel &theChannel,
       
       // set the trial values
       for (int i=0; i<numberDOF; i++)
-	accel[i] = accel[i+numberDOF];  // set trial equal commited
+	accel[i] = accel[i+numberDOF];  // set trial equal committed
     }
 
     if (data(5) == 0) {
@@ -1937,6 +1841,10 @@ Node::createAccel(void)
 Matrix
 Node::getMassSensitivity(void)
 {
+    if (index == -1) {
+	setGlobalMatrices();
+    }
+    
 	if (mass == 0) {
 		theMatrices[index]->Zero();
 		return *theMatrices[index];
@@ -2409,3 +2317,38 @@ Node::setNodalThermalActionPtr(NodalThermalAction* theAction)
 	theNodalThermalActionPtr = theAction;
 }
 //Add Pointer to NodalThermalAction id applicable-----end------L.Jiang, {SIF]
+
+int
+Node::setGlobalMatrices()
+{
+    if (index == -1) {
+	for (int i=0; i<numMatrices; i++) {
+	    if (theMatrices[i]->noRows() == numberDOF) {
+		index = i;
+		i = numMatrices;
+	    }
+	}
+    }
+    if (index == -1) {
+	Matrix **nextMatrices = new Matrix *[numMatrices+1];
+	if (nextMatrices == 0) {
+	    opserr << "Element::getTheMatrix - out of memory\n";
+	    exit(-1);
+	}
+	for (int j=0; j<numMatrices; j++)
+	    nextMatrices[j] = theMatrices[j];
+	Matrix *theMatrix = new Matrix(numberDOF, numberDOF);
+	if (theMatrix == 0) {
+	    opserr << "Element::getTheMatrix - out of memory\n";
+	    exit(-1);
+	}
+	nextMatrices[numMatrices] = theMatrix;
+	if (numMatrices != 0) 
+	    delete [] theMatrices;
+	index = numMatrices;
+	numMatrices++;
+	theMatrices = nextMatrices;
+    }
+
+    return 0;
+}

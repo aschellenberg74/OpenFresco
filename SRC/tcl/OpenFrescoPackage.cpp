@@ -304,7 +304,7 @@ OpenFresco(ClientData clientData, Tcl_Interp *interp, int argc,
     
     theDomain = thedomain;
     
-    if (Tcl_InitStubs(interp, TCL_VERSION, 1) == NULL)  {
+    if (Tcl_InitStubs(interp, TCL_VERSION, 0) == NULL)  {
         return TCL_ERROR;
     }
     
