@@ -17,10 +17,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 // Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 01/07
 // Revision: A
@@ -125,22 +121,22 @@ ECMtsCsi::~ECMtsCsi()
     if (cfgFile != 0)
         delete [] cfgFile;
     
-    // delete memory of control points
-    int i;
-    if (trialCPs != 0)  {
-        for (i=0; i<numTrialCPs; i++)  {
-            if (trialCPs[i] != 0)
-                delete trialCPs[i];
-        }
-        delete [] trialCPs;
-    }
-    if (outCPs != 0)  {
-        for (i=0; i<numOutCPs; i++)  {
-            if (outCPs[i] != 0)
-                delete outCPs[i];
-        }
-        delete [] outCPs;
-    }
+    // control points are not copies, so do not clean them up here
+    //int i;
+    //if (trialCPs != 0)  {
+    //    for (i=0; i<numTrialCPs; i++)  {
+    //        if (trialCPs[i] != 0)
+    //            delete trialCPs[i];
+    //    }
+    //    delete [] trialCPs;
+    //}
+    //if (outCPs != 0)  {
+    //    for (i=0; i<numOutCPs; i++)  {
+    //        if (outCPs[i] != 0)
+    //            delete outCPs[i];
+    //    }
+    //    delete [] outCPs;
+    //}
     
     opserr << endln;
     opserr << "*************************************\n";
