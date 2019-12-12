@@ -1,10 +1,6 @@
 # File: LShapedColumn_Server1b.tcl (use with LShapedColumn_Client1.tcl)
 # Units: [kip,in.]
 #
-# $Revision$
-# $Date$
-# $URL$
-#
 # Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 # Created: 07/07
 # Revision: A
@@ -36,8 +32,15 @@ loadPackage OpenFresco
 # node $tag $xCrd $yCrd $mass
 node  1     0.0   0.0
 node  2     0.0  54.0
-node  3   -36.0  54.0
-node  4    36.0  54.0
+node  3     0.0  72.0
+node  4   -36.0  72.0
+node  5    36.0  72.0
+
+# node  1     0.0   0.0
+# node  3     0.0  54.0
+# node  4   -36.0  54.0
+# node  5    36.0  54.0
+
 
 # set the boundary conditions
 # fix tag DX DY RZ
@@ -66,16 +69,17 @@ geomTransf Linear 1
 # first story column and rigid loading beam
 # element nonlinearBeamColumn $eleTag $iNode $jNode $numIntgrPts $secTag $transfTag
 element nonlinearBeamColumn 1 1 2 5 1 1
-element elasticBeamColumn 2 3 2 2260 29000 5068 1
-element elasticBeamColumn 3 2 4 2260 29000 5068 1
+element elasticBeamColumn 2 2 3 2260 [expr 29000*1E3] 5068 1
+element elasticBeamColumn 3 4 3 2260 [expr 29000*1E3] 5068 1
+element elasticBeamColumn 4 3 5 2260 [expr 29000*1E3] 5068 1
 
 # Define control points
 # ---------------------
 # expControlPoint $tag <-node $nodeTag> $dof $rspType <-fact $f> <-lim $l $u> <-isRel> ...
-expControlPoint 1 -node 3  ux disp  uy disp
-expControlPoint 2 -node 4  uy disp
-expControlPoint 3 -node 3  ux disp  ux force  uy disp  uy force
-expControlPoint 4 -node 4  uy disp  uy force
+expControlPoint 1 -node 4  ux disp  uy disp
+expControlPoint 2 -node 5  uy disp
+expControlPoint 3 -node 4  ux disp  ux force  uy disp  uy force
+expControlPoint 4 -node 5  uy disp  uy force
 
 # Define experimental control
 # ---------------------------
@@ -86,10 +90,10 @@ expControl SimDomain  1  -trialCP 1 2  -outCP 3 4
 # -------------------------
 # expSetup ThreeActuators2d $tag <–control $ctrlTag> $La1 $La2 $La3 $L1 $L2 <–nlGeom> <–posAct1 $pos> <–phiLocX $phi> <-trialDispFact $f> ...
 #expSetup ThreeActuators2d 1 -control 1 54.0 54.0 54.0 36.0 36.0 -phiLocX 90.0
-# expSetup ThreeActuators $tag <–control $ctrlTag> $dofH $dofV $dofR $sizeTrial $sizeOut $La1 $La2 $La3 $L1 $L2 <–nlGeom> <–posAct1 $pos> <-trialDispFact $f> ...
-#expSetup ThreeActuators 1 -control 1  2 1 3  3 3  54.0 54.0 54.0 36.0 36.0 -trialDispFact 1 -1 1 -outDispFact 1 -1 1 -outForceFact 1 -1 1
+# expSetup ThreeActuators $tag <–control $ctrlTag> $dofH $dofV $dofR $sizeTrial $sizeOut $La1 $La2 $La3 $L1 $L2 $L3 <–nlGeom> <–posAct1 $pos> <-trialDispFact $f> ...
+expSetup ThreeActuators 1 -control 1  2 1 3  3 3  54.0 54.0 54.0 36.0 36.0 18.0 –nlGeom -trialDispFact 1 -1 1 -outDispFact 1 -1 1 -outForceFact 1 -1 1
 # expSetup ThreeActuatorsJntOff $tag <–control $ctrlTag> $dofH $dofV $dofR $sizeTrial $sizeOut $La1 $La2 $La3 $L1 $L2 $L3 $L4 $L5 $L6 <–nlGeom> <–posAct1 $pos> <-trialDispFact $f> ...
-expSetup ThreeActuatorsJntOff 1 -control 1  2 1 3  3 3  54.0 54.0 54.0 12.0 36.0 36.0 12.0 12.0 12.0 -trialDispFact 1 -1 1 -outDispFact 1 -1 1 -outForceFact 1 -1 1
+#expSetup ThreeActuatorsJntOff 1 -control 1  2 1 3  3 3  54.0 54.0 54.0 12.0 36.0 36.0 12.0 12.0 12.0 -trialDispFact 1 -1 1 -outDispFact 1 -1 1 -outForceFact 1 -1 1
 
 # Define experimental site
 # ------------------------
@@ -101,8 +105,27 @@ expSite ActorSite 1 -setup 1 8090
 
 
 # ------------------------------
+# Start of recorder generation
+# ------------------------------
+# create the recorder objects
+recorder Node -file ServerBNode_Disp.out -time -node 2 -dof 1 2 3 disp
+
+expRecorder Setup -file ServerBSetup_trialDsp.out -time -setup 1 trialDisp
+expRecorder Setup -file ServerBSetup_outDsp.out -time -setup 1 outDisp
+expRecorder Setup -file ServerBSetup_outFrc.out -time -setup 1 outForce
+expRecorder Setup -file ServerBSetup_ctrlDsp.out -time -setup 1 ctrlDisp
+expRecorder Setup -file ServerBSetup_daqDsp.out -time -setup 1 daqDisp
+expRecorder Setup -file ServerBSetup_daqFrc.out -time -setup 1 daqForce
+# --------------------------------
+# End of recorder generation
+# --------------------------------
+
+
+# ------------------------------
 # Start the server process
 # ------------------------------
+record
+
 # startLabServer $siteTag
 startLabServer  1
 

@@ -1,10 +1,6 @@
 # File: ThreeStoryBuilding_Slave.tcl (use with ThreeStoryBuilding_Master.tcl)
 # Units: [kip,in.]
 #
-# $Revision$
-# $Date$
-# $URL$
-#
 # Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 # Created: 09/07
 # Revision: A
@@ -364,8 +360,8 @@ equalDOF     235     245  1
 equalDOF     235     246  1 
 equalDOF     235     247  1 
 
-# Define materials
-# ----------------
+# Define material
+# ---------------
 # nDMaterial ElasticIsotropic $matTag $E $v $rho 
 nDMaterial ElasticIsotropic 2 +3.600000E+003 +2.000000E-001 +2.248000E-007 
 

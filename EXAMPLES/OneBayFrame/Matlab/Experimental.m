@@ -2,7 +2,7 @@ function ElementPost = Experimental(u, ElementData)
 %EXPERIMENTAL one dof experimental element
 % ElementPost = Experimental(u, ElementData)
 %
-% This is a one degree of freedom experimental element.  It takes the tip 
+% This is a one degree of freedom experimental element.  It takes the tip
 % displacement and returns Pr, the resisting force.
 %
 %                           [+]-->1 DOF
@@ -27,25 +27,21 @@ function ElementPost = Experimental(u, ElementData)
 %** and redistribution, and for a DISCLAIMER OF ALL WARRANTIES.        **
 %**                                                                    **
 %** Developed by:                                                      **
-%**   Andreas Schellenberg (andreas.schellenberg@gmx.net)              **
+%**   Andreas Schellenberg (andreas.schellenberg@gmail.com)            **
 %**   Yoshikazu Takahashi (yos@catfish.dpri.kyoto-u.ac.jp)             **
 %**   Gregory L. Fenves (fenves@berkeley.edu)                          **
 %**   Stephen A. Mahin (mahin@berkeley.edu)                            **
 %**                                                                    **
 %** ****************************************************************** */
 
-% $Revision$
-% $Date$
-% $URL$
-
 % Written: Hong Kim (hong_kim@berkeley.edu)
 % Created: 10/06
 % Revision: A
 
-
 % Set Parameters
-socketID = ElementData.socketID;    % Socket ID
-dataSize = ElementData.dataSize;    % size of send and receive vectors
+socketType = ElementData.socketType;  % Socket type: UDPSocket or TCPSocket
+socketID   = ElementData.socketID;    % Socket ID
+dataSize   = ElementData.dataSize;    % Size of send and receive vectors
 
 % initialize send vector
 sData = zeros(1,dataSize);
@@ -53,20 +49,19 @@ sData = zeros(1,dataSize);
 % send trial response to experimental site
 sData(1) = 3;
 sData(2) = u;
-UDPSocket('sendData',socketID,sData,dataSize);
+feval(socketType,'sendData',socketID,sData,dataSize);
 
 % get measured resisting forces
 sData(1) = 10;
-UDPSocket('sendData',socketID,sData,dataSize);
-rData = UDPSocket('recvData',socketID,dataSize);
+feval(socketType,'sendData',socketID,sData,dataSize);
+rData = feval(socketType,'recvData',socketID,dataSize);
 
 % commit state
 sData(1) = 5;
-UDPSocket('sendData',socketID,sData,dataSize);
+feval(socketType,'sendData',socketID,sData,dataSize);
 
 % Set resisting force
 ElementPost.p_r = rData(1);
 
 ElementPost.v_pl = 0;
 ElementPost.qb   = 0;
-

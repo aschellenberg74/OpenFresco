@@ -1,10 +1,6 @@
 # File: OneBayFrame_Complete.tcl
 # Units: [kip,in.]
 #
-# $Revision$
-# $Date$
-# $URL$
-#
 # Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 # Created: 08/08
 # Revision: A
@@ -41,11 +37,12 @@ fix 4   0  1
 
 # Define materials
 # ----------------
-# uniaxialMaterial Steel02 $matTag $Fy $E $b $R0 $cR1 $cR2 $a1 $a2 $a3 $a4 
 #uniaxialMaterial Elastic 1 2.8
-uniaxialMaterial Steel02 1 1.5 2.8 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0
-#uniaxialMaterial Elastic 2 5.6
-uniaxialMaterial Steel02 2 3.0 5.6 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0 
+uniaxialMaterial Steel01 1 0.95 2.8 0.105
+#uniaxialMaterial Steel02 1 1.5 2.8 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0
+uniaxialMaterial Elastic 2 5.6
+#uniaxialMaterial Steel01 2 3.0 5.6 0.01 
+#uniaxialMaterial Steel02 2 3.0 5.6 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0 
 uniaxialMaterial Elastic 3 [expr 2.0*100.0/1.0]
 
 # Define numerical elements
@@ -125,7 +122,6 @@ recorder Element -file Elmt_Frc.out  -time -ele 1 2 3 forces
 # ------------------------------
 record
 # perform an eigenvalue analysis
-set pi [expr acos(-1.0)]
 set lambda [eigen -fullGenLapack 2]
 puts "\nEigenvalues at start of transient:"
 puts "|   lambda   |  omega   |  period | frequency |"

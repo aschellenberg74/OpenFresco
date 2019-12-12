@@ -54,7 +54,7 @@ uniaxialMaterial Elastic 3 [expr 2.0*100.0/1.0]
 
 # Define control points
 # ---------------------
-# expControlPoint $tag <-node $nodeTag> $dof $rspType <-fact $f> <-lim $l $u> ...
+# expControlPoint $tag <-node $nodeTag> $dof $rspType <-fact $f> <-lim $l $u> <-isRel> ...
 expControlPoint 1  1 disp
 expControlPoint 2  1 disp 1 force
 
@@ -172,7 +172,6 @@ recorder Element -file Elmt_tangStif.out -time -ele 1     tangStif stif
 # ------------------------------
 record
 # perform an eigenvalue analysis
-set pi [expr acos(-1.0)]
 set lambda [eigen -fullGenLapack 2]
 puts "\nEigenvalues at start of transient:"
 puts "|   lambda   |  omega   |  period | frequency |"

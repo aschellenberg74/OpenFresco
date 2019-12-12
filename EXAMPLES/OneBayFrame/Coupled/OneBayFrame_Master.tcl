@@ -1,10 +1,6 @@
 # File: OneBayFrame_Master.tcl (use with OneBayFrame_Slave.tcl)
 # Units: [kip,in.]
 #
-# $Revision$
-# $Date$
-# $URL$
-#
 # Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 # Created: 08/08
 # Revision: A
@@ -38,8 +34,8 @@ set mass4 0.02
 # node $tag $xCrd $yCrd $mass
 node  1     0.0   0.00
 node  2   100.0   0.00
-node  3     0.0  50.00  -mass $mass3 $mass3
-node  4   100.0  50.00  -mass $mass4 $mass4
+node  3     0.0  54.00  -mass $mass3 $mass3
+node  4   100.0  54.00  -mass $mass4 $mass4
 
 # set the boundary conditions
 # fix $tag $DX $DY
@@ -50,11 +46,9 @@ fix 4   0  1
 
 # Define materials
 # ----------------
-# uniaxialMaterial Steel02 $matTag $Fy $E $b $R0 $cR1 $cR2 $a1 $a2 $a3 $a4 
-#uniaxialMaterial Elastic 1 2.8
-uniaxialMaterial Steel02 1 1.5 2.8 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0
-#uniaxialMaterial Elastic 2 5.6
-uniaxialMaterial Steel02 2 3.0 5.6 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0 
+uniaxialMaterial Elastic 2 5.6
+#uniaxialMaterial Steel01 2 3.0 5.6 0.01 
+#uniaxialMaterial Steel02 2 3.0 5.6 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0 
 uniaxialMaterial Elastic 3 [expr 2.0*100.0/1.0]
 
 # Define control points
@@ -65,32 +59,31 @@ expControlPoint 2  1 disp  1 force
 
 # Define experimental control
 # ---------------------------
-# expControl SimUniaxialMaterials $tag $matTags
-expControl SimUniaxialMaterials 1 1
 # expControl SimFEAdapter $tag ipAddr $ipPort -trialCP $cpTags -outCP $cpTags
-expControl SimFEAdapter 2 "127.0.0.1" 44000 -trialCP 1 -outCP 2
+expControl SimFEAdapter 1 "127.0.0.1" 44000 -trialCP 1 -outCP 2
 
 # Define experimental setup
 # -------------------------
 # expSetup OneActuator $tag <-control $ctrlTag> $dir -sizeTrialOut $t $o <-trialDispFact $f> ...
 expSetup OneActuator 1 -control 1 1 -sizeTrialOut 1 1 -trialDispFact -1 -outDispFact -1 -outForceFact -1
-expSetup OneActuator 2 -control 2 1 -sizeTrialOut 1 1 -trialDispFact -1 -outDispFact -1 -outForceFact -1
 
 # Define experimental site
 # ------------------------
 # expSite LocalSite $tag $setupTag
 expSite LocalSite 1 1
-expSite LocalSite 2 2
 
 # Define experimental elements
 # ----------------------------
-# left and right columns
+# left column
 # expElement twoNodeLink $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-orient <$x1 $x2 $x3> $y1 $y2 $y3> <-pDelta Mratios> <-iMod> <-mass $m>
 expElement twoNodeLink 1 1 3 -dir 2 -site 1 -initStif 2.8
-expElement twoNodeLink 2 2 4 -dir 2 -site 2 -initStif 5.6
 
 # Define numerical elements
 # -------------------------
+# right column
+# element twoNodeLink $eleTag $iNode $jNode -mat $matTags -dir $dirs <-orient <$x1 $x2 $x3> $y1 $y2 $y3> <-pDelta $Mratios> <-mass $m>
+element twoNodeLink 2 2 4 -mat 2 -dir 2
+
 # spring
 # element truss $eleTag $iNode $jNode $A $matTag
 element truss 3 3 4 1.0 3
@@ -165,7 +158,6 @@ recorder Element -file Master_Elmt_daqDsp.out  -time -ele 1 2   daqDisp
 # ------------------------------
 record
 # perform an eigenvalue analysis
-set pi [expr acos(-1.0)]
 set lambda [eigen -fullGenLapack 2]
 puts "\nEigenvalues at start of transient:"
 puts "|   lambda   |  omega   |  period | frequency |"

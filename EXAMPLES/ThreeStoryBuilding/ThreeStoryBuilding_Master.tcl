@@ -1,10 +1,6 @@
 # File: ThreeStoryBuilding_Master.tcl (use with ThreeStoryBuilding_Slave.tcl)
 # Units: [kip,in.]
 #
-# $Revision$
-# $Date$
-# $URL$
-#
 # Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 # Created: 09/07
 # Revision: A
@@ -142,8 +138,8 @@ expSite LocalSite 1 1
 # geomTransf Linear $transfTag
 geomTransf Linear 1
 
-# Define numerical element
-# ------------------------
+# Define numerical elements
+# -------------------------
 # exterior column W14x257
 # element elasticBeamColumn $eleTag $iNode $jNode $A $E $Iz $transfTag
 element elasticBeamColumn  1  1  2 75.6 29000 3400 1
@@ -251,7 +247,7 @@ recorder Node -file Master_Node_Acc.out -time -node 2 3 4 18 19 20 -dof 1 2 3 ac
 # Finally perform the analysis
 # ------------------------------
 # perform an eigenvalue analysis
-set pi [expr acos(-1.0)]
+puts "\nStarting Eigenvalue analysis ..."
 set lambda [eigen -fullGenLapack 15]
 puts "\nEigenvalues at start of transient:"
 puts "|   lambda   |  omega   |  period | frequency |"
@@ -265,11 +261,16 @@ foreach lambda $lambda {
 # open output file for writing
 set outFileID [open elapsedTime.txt w]
 # perform the transient analysis
+puts "\nStarting transient analysis ..."
+puts "step 0"
+record
 set tTot [time {
     for {set i 1} {$i < 2500} {incr i} {
         set t [time {analyze  1  $dt}]
         puts $outFileID $t
-        #puts "step $i"
+        if {[expr fmod($i,100)] == 0.0} {
+            puts "step $i"
+        }
     }
 }]
 puts "\nElapsed Time = $tTot \n"

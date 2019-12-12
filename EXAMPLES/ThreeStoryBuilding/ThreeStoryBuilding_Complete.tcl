@@ -1,10 +1,6 @@
 # File: ThreeStoryBuilding_Complete.tcl
 # Units: [kip,in.]
 #
-# $Revision$
-# $Date$
-# $URL$
-#
 # Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 # Created: 09/07
 # Revision: A
@@ -278,7 +274,7 @@ fix 11  1  1
 fix 12  1  1
 fix 13  1  1
 
-# set nodal masses
+# set nodal masses (use mass at nodes 1018, 1019, 1020 instead)
 # mass $tag $mx $my 
 #mass  79  +8.525425E-002  +8.525425E-002 
 #mass  80  +1.705085E-001  +1.705085E-001 
@@ -323,7 +319,7 @@ fix 13  1  1
 # Define materials
 # ----------------
 # nDMaterial ElasticIsotropic $matTag $E $v $rho 
-nDMaterial ElasticIsotropic 2 +3.600000E+003 +2.000000E-001 +0.0
+nDMaterial ElasticIsotropic 2 +3.600000E+003 +2.000000E-001 +0.0;  # do not use material mass
 #nDMaterial ElasticIsotropic 2 +3.600000E+003 +2.000000E-001 +2.248000E-007 
 
 # Define elements
@@ -602,8 +598,8 @@ uniaxialMaterial Elastic  1  29000
 # geomTransf Linear $transfTag
 geomTransf Linear 1
 
-# Define numerical element
-# ------------------------
+# Define numerical elements
+# -------------------------
 # exterior column W14x257
 # element elasticBeamColumn $eleTag $iNode $jNode $A $E $Iz $transfTag
 element elasticBeamColumn  1001  1001  1002 75.6 29000 3400 1
@@ -767,7 +763,7 @@ recorder Node -file Node_Acc.out -time -node 1002 1003 1004 1018 1019 1020 79 15
 # Finally perform the analysis
 # ------------------------------
 # perform an eigenvalue analysis
-set pi [expr acos(-1.0)]
+puts "\nStarting Eigenvalue analysis ..."
 set lambda [eigen -fullGenLapack 15]
 puts "\nEigenvalues at start of transient:"
 puts "|   lambda   |  omega   |  period | frequency |"
@@ -781,17 +777,21 @@ foreach lambda $lambda {
 # open output file for writing
 set outFileID [open elapsedTime.txt w]
 # perform the transient analysis
+puts "\nStarting transient analysis ..."
+puts "step 0"
+record
 set tTot [time {
     for {set i 1} {$i < 2500} {incr i} {
         set t [time {analyze  1  $dt}]
         puts $outFileID $t
-        #puts "step $i"
+        if {[expr fmod($i,100)] == 0.0} {
+            puts "step $i"
+        }
     }
 }]
 puts "\nElapsed Time = $tTot \n"
 # close the output file
 close $outFileID
-
 wipe
 exit
 # --------------------------------

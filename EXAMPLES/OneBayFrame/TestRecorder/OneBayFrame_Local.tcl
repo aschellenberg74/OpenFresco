@@ -143,40 +143,40 @@ recorder Element -file Elmt_Frc.out     -time -ele 1 2 3 forces
 recorder Element -file Elmt_ctrlDsp.out -time -ele 1 2   ctrlDisp
 recorder Element -file Elmt_daqDsp.out  -time -ele 1 2   daqDisp
 
-expRecorder Site -file Site_trialDsp.out -time -site 1 2 trialDisp
-expRecorder Site -file Site_trialVel.out -time -site 1 2 trialVel
-expRecorder Site -file Site_trialAcc.out -time -site 1 2 trialAccel
-expRecorder Site -file Site_trialTme.out -time -site 1 2 trialTime
-expRecorder Site -file Site_outDsp.out -time -site 1 2 outDisp
-expRecorder Site -file Site_outVel.out -time -site 1 2 outVel
-expRecorder Site -file Site_outAcc.out -time -site 1 2 outAccel
-expRecorder Site -file Site_outFrc.out -time -site 1 2 outForce
-expRecorder Site -file Site_outTme.out -time -site 1 2 outTime
+# expRecorder Site -file Site_trialDsp.out -time -site 1 2 trialDisp
+# expRecorder Site -file Site_trialVel.out -time -site 1 2 trialVel
+# expRecorder Site -file Site_trialAcc.out -time -site 1 2 trialAccel
+# expRecorder Site -file Site_trialTme.out -time -site 1 2 trialTime
+# expRecorder Site -file Site_outDsp.out -time -site 1 2 outDisp
+# expRecorder Site -file Site_outVel.out -time -site 1 2 outVel
+# expRecorder Site -file Site_outAcc.out -time -site 1 2 outAccel
+# expRecorder Site -file Site_outFrc.out -time -site 1 2 outForce
+# expRecorder Site -file Site_outTme.out -time -site 1 2 outTime
 
 expRecorder Setup -file Setup_trialDsp.out -time -setup 1 2 trialDisp
-expRecorder Setup -file Setup_trialVel.out -time -setup 1 2 trialVel
-expRecorder Setup -file Setup_trialAcc.out -time -setup 1 2 trialAccel
-expRecorder Setup -file Setup_trialTme.out -time -setup 1 2 trialTime
+# expRecorder Setup -file Setup_trialVel.out -time -setup 1 2 trialVel
+# expRecorder Setup -file Setup_trialAcc.out -time -setup 1 2 trialAccel
+# expRecorder Setup -file Setup_trialTme.out -time -setup 1 2 trialTime
 expRecorder Setup -file Setup_outDsp.out -time -setup 1 2 outDisp
-expRecorder Setup -file Setup_outVel.out -time -setup 1 2 outVel
-expRecorder Setup -file Setup_outAcc.out -time -setup 1 2 outAccel
+# expRecorder Setup -file Setup_outVel.out -time -setup 1 2 outVel
+# expRecorder Setup -file Setup_outAcc.out -time -setup 1 2 outAccel
 expRecorder Setup -file Setup_outFrc.out -time -setup 1 2 outForce
-expRecorder Setup -file Setup_outTme.out -time -setup 1 2 outTime
-expRecorder Setup -file Setup_ctrlDsp.out -time -setup 1 2 ctrlDisp
-expRecorder Setup -file Setup_ctrlVel.out -time -setup 1 2 ctrlVel
-expRecorder Setup -file Setup_ctrlAcc.out -time -setup 1 2 ctrlAccel
-expRecorder Setup -file Setup_ctrlTme.out -time -setup 1 2 ctrlTime
-expRecorder Setup -file Setup_daqDsp.out -time -setup 1 2 daqDisp
-expRecorder Setup -file Setup_daqVel.out -time -setup 1 2 daqVel
-expRecorder Setup -file Setup_daqAcc.out -time -setup 1 2 daqAccel
-expRecorder Setup -file Setup_daqFrc.out -time -setup 1 2 daqForce
-expRecorder Setup -file Setup_daqTme.out -time -setup 1 2 daqTime
+# expRecorder Setup -file Setup_outTme.out -time -setup 1 2 outTime
+# expRecorder Setup -file Setup_ctrlDsp.out -time -setup 1 2 ctrlDisp
+# expRecorder Setup -file Setup_ctrlVel.out -time -setup 1 2 ctrlVel
+# expRecorder Setup -file Setup_ctrlAcc.out -time -setup 1 2 ctrlAccel
+# expRecorder Setup -file Setup_ctrlTme.out -time -setup 1 2 ctrlTime
+# expRecorder Setup -file Setup_daqDsp.out -time -setup 1 2 daqDisp
+# expRecorder Setup -file Setup_daqVel.out -time -setup 1 2 daqVel
+# expRecorder Setup -file Setup_daqAcc.out -time -setup 1 2 daqAccel
+# expRecorder Setup -file Setup_daqFrc.out -time -setup 1 2 daqForce
+# expRecorder Setup -file Setup_daqTme.out -time -setup 1 2 daqTime
 
-expRecorder Control -file Control_ctrlDsp.out -time -control 1 2 ctrlDisp
-expRecorder Control -file Control_ctrlVel.out -time -control 1 2 ctrlVel
-expRecorder Control -file Control_daqDsp.out -time -control 1 2 daqDisp
-expRecorder Control -file Control_daqVel.out -time -control 1 2 daqVel
-expRecorder Control -file Control_daqFrc.out -time -control 1 2 daqForce
+# expRecorder Control -file Control_ctrlDsp.out -time -control 1 2 ctrlDisp
+# expRecorder Control -file Control_ctrlVel.out -time -control 1 2 ctrlVel
+# expRecorder Control -file Control_daqDsp.out -time -control 1 2 daqDisp
+# expRecorder Control -file Control_daqVel.out -time -control 1 2 daqVel
+# expRecorder Control -file Control_daqFrc.out -time -control 1 2 daqForce
 # --------------------------------
 # End of recorder generation
 # --------------------------------

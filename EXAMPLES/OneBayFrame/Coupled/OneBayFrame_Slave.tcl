@@ -1,10 +1,6 @@
 # File: OneBayFrame_Slave.tcl (use with OneBayFrame_Master.tcl)
 # Units: [kip,in.]
 #
-# $Revision$
-# $Date$
-# $URL$
-#
 # Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 # Created: 08/08
 # Revision: A
@@ -29,37 +25,28 @@ model BasicBuilder -ndm 2 -ndf 2
 # Define geometry for model
 # -------------------------
 set mass3 0.00
-set mass4 0.00
 # node $tag $xCrd $yCrd $mass
-node  2   100.0   0.00
-#node  3     0.0  50.00  -mass $mass3 $mass3
-node  4   100.0  50.00  -mass $mass4 $mass4
+node  1     0.0   0.00
+node  3     0.0  54.00  -mass $mass3 $mass3
 
 # set the boundary conditions
 # fix $tag $DX $DY
-fix 2   1  1
-#fix 3   0  1
-fix 4   0  1
+fix 1   1  1
+fix 3   0  1
 
 # Define materials
 # ----------------
-# uniaxialMaterial Steel02 $matTag $Fy $E $b $R0 $cR1 $cR2 $a1 $a2 $a3 $a4 
 #uniaxialMaterial Elastic 1 2.8
-uniaxialMaterial Steel02 1 1.5 2.8 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0
-#uniaxialMaterial Elastic 2 5.6
-uniaxialMaterial Steel02 2 3.0 5.6 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0 
-uniaxialMaterial Elastic 3 [expr 2.0*100.0/1.0]
+uniaxialMaterial Steel01 1 0.95 2.8 0.105
+#uniaxialMaterial Steel02 1 1.5 2.8 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0
 
 # Define elements
 # ---------------
-# element adapter eleTag -node Ndi Ndj ... -dof dofNdi -dof dofNdj ... -stif Kij ipPort <-mass Mij>
-element adapter 1 -node 4 -dof 1 -stif 1E12 44000
-
 # element twoNodeLink $eleTag $iNode $jNode -mat $matTags -dir $dirs <-orient <$x1 $x2 $x3> $y1 $y2 $y3> <-pDelta $Mratios> <-mass $m>
-element twoNodeLink 2 2 4 -mat 2 -dir 2
+element twoNodeLink 1 1 3 -mat 1 -dir 2
 
-# element truss $eleTag $iNode $jNode $A $matTag
-#element truss 3 3 4 1.0 3
+# element adapter eleTag -node Ndi Ndj ... -dof dofNdi -dof dofNdj ... -stif Kij ipPort <-mass Mij>
+element adapter 10 -node 3 -dof 1 -stif 1E12 44000
 
 # Define dynamic loads
 # --------------------
@@ -133,7 +120,8 @@ recorder Element -file Slave_Elmt_daqDsp.out  -time -ele 1   daqDisp
 # Finally perform the analysis
 # ------------------------------
 record
-analyze 16000 0.02
+analyze 16000
+#analyze 16000 0.02
 exit
 # --------------------------------
 # End of analysis

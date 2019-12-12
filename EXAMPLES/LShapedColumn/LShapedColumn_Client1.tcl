@@ -2,10 +2,6 @@
 # (use with LShapedColumn_Server1a.tcl or LShapedColumn_Server1b.tcl)
 # Units: [kip,in.]
 #
-# $Revision$
-# $Date$
-# $URL$
-#
 # Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 # Created: 07/07
 # Revision: A
@@ -138,8 +134,8 @@ recorder Element -file Elmt_daqDsp.out  -time -ele 1   daqDisp
 # ------------------------------
 # Finally perform the analysis
 # ------------------------------
+record
 # perform an eigenvalue analysis
-set pi [expr acos(-1.0)]
 set lambda [eigen -fullGenLapack 6]
 puts "\nEigenvalues at start of transient:"
 puts "|   lambda   |  omega   |  period | frequency |"

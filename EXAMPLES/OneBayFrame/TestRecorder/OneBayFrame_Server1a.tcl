@@ -103,6 +103,8 @@ expRecorder Control -file ServerAControl_daqFrc.out -time -control 1 daqForce
 # ------------------------------
 # startLabServer $siteTag
 startLabServer  1
+
+wipeExp
 exit
 # --------------------------------
 # End of analysis

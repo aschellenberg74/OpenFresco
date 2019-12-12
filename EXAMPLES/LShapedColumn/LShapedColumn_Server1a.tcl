@@ -1,10 +1,6 @@
 # File: LShapedColumn_Server1a.tcl (use with LShapedColumn_Client1.tcl)
 # Units: [kip,in.]
 #
-# $Revision$
-# $Date$
-# $URL$
-#
 # Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 # Created: 07/07
 # Revision: A

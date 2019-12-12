@@ -2,10 +2,6 @@
 # (use with Matlab: OneBayFrame_NewmarkExplicit.m or OneBayFrame_AlphaOS.m)
 # Units: [kip,in.]
 #
-# $Revision$
-# $Date$
-# $URL$
-#
 # Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 # Created: 11/06
 # Revision: A
@@ -20,6 +16,9 @@
 # ------------------------------
 # Start of model generation
 # ------------------------------
+logFile "OneBayFrame_Local_SimAppServer.log"
+defaultUnits -force kip -length in -time sec -temp F
+
 # create ModelBuilder (with two-dimensions and 2 DOF/node)
 model BasicBuilder -ndm 2 -ndf 2
 
@@ -75,6 +74,8 @@ expElement twoNodeLink 1 1 3 -dir 2 -site 1 -initStif 2.8
 
 # startSimAppSiteServer $siteTag $port <-ssl> <-udp>
 startSimAppSiteServer 1 8090 -udp;  # use with experimental element in FEA
+
+wipeExp
 exit
 # --------------------------------
 # End of analysis

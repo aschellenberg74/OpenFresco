@@ -27,21 +27,16 @@ function ElementPost = Elastic(u, ElementData)
 %** and redistribution, and for a DISCLAIMER OF ALL WARRANTIES.        **
 %**                                                                    **
 %** Developed by:                                                      **
-%**   Andreas Schellenberg (andreas.schellenberg@gmx.net)              **
+%**   Andreas Schellenberg (andreas.schellenberg@gmail.com)            **
 %**   Yoshikazu Takahashi (yos@catfish.dpri.kyoto-u.ac.jp)             **
 %**   Gregory L. Fenves (fenves@berkeley.edu)                          **
 %**   Stephen A. Mahin (mahin@berkeley.edu)                            **
 %**                                                                    **
 %** ****************************************************************** */
 
-% $Revision$
-% $Date$
-% $URL$
-
 % Written: Hong Kim (hong_kim@berkeley.edu)
 % Created: 10/06
 % Revision: A
-
 
 % Set Parameters
 k_el = ElementData.k_elem;  % Element Stiffness
