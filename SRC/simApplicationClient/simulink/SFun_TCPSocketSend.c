@@ -12,18 +12,14 @@
 ** and redistribution, and for a DISCLAIMER OF ALL WARRANTIES.        **
 **                                                                    **
 ** Developed by:                                                      **
-**   Andreas Schellenberg (andreas.schellenberg@gmx.net)              **
+**   Andreas Schellenberg (andreas.schellenberg@gmail.com)            **
 **   Yoshikazu Takahashi (yos@catfish.dpri.kyoto-u.ac.jp)             **
 **   Gregory L. Fenves (fenves@berkeley.edu)                          **
 **   Stephen A. Mahin (mahin@berkeley.edu)                            **
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $Source: $
-
-// Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 02/09
 // Revision: A
 //
@@ -38,10 +34,10 @@
 #include <string.h>
 
 // functions defined in socket.c
-void setupconnectionserver(unsigned int *port, int *socketID);
-void setupconnectionclient(unsigned int *port, const char machineInetAddr[], int *lengthInet, int *socketID);
-void closeconnection(int *socketID, int *ierr);
-void senddata(const int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr);
+void tcp_setupconnectionserver(unsigned int *port, int *socketID);
+void tcp_setupconnectionclient(unsigned int *port, const char machineInetAddr[], int *lengthInet, int *socketID);
+void tcp_closeconnection(int *socketID, int *ierr);
+void tcp_senddata(const int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr);
 
 // generic client parameters
 #define ipAddr(S)   ssGetSFcnParam(S,0)    // ip address of server
@@ -150,7 +146,7 @@ static void mdlStart(SimStruct *S)
     // setup the connection
     if (mxIsEmpty(ipAddr(S)))  {
         ipPort = (int_T)mxGetScalar(ipPort(S));
-        setupconnectionserver(&ipPort, socketID);
+        tcp_setupconnectionserver(&ipPort, socketID);
         if (socketID[0] < 0)  {
             ssSetErrorStatus(S,"Failed to setup connection with client");
             return;
@@ -160,7 +156,7 @@ static void mdlStart(SimStruct *S)
         ipAddr = mxArrayToString(ipAddr(S));
         sizeAddr = (int_T)mxGetN(ipAddr(S)) + 1;
         ipPort = (int_T)mxGetScalar(ipPort(S));
-        setupconnectionclient(&ipPort, ipAddr, &sizeAddr, socketID);
+        tcp_setupconnectionclient(&ipPort, ipAddr, &sizeAddr, socketID);
         mxFree(ipAddr);
         if (socketID[0] < 0)  {
             ssSetErrorStatus(S,"Failed to setup connection with server");
@@ -219,7 +215,7 @@ static void mdlOutputs(SimStruct *S, int_T tid)
     }
 
     // send the data
-    senddata(socketID, &dataTypeSize, gMsg, &nleft, &ierr);
+    tcp_senddata(socketID, &dataTypeSize, gMsg, &nleft, &ierr);
 }
 
 
@@ -233,7 +229,7 @@ static void mdlTerminate(SimStruct *S)
     // get socketID
     int_T *socketID = (int_T*)ssGetDWork(S,0);
 
-    closeconnection(socketID, &ierr);
+    tcp_closeconnection(socketID, &ierr);
 }
 
 #ifdef  MATLAB_MEX_FILE    // Is this file being compiled as a MEX-file?
