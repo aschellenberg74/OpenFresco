@@ -653,9 +653,6 @@
     <ClInclude Include="..\..\..\SRC\FrescoGlobals.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\SRC\experimentalControl\ECdSpace.h">
       <Filter>experimentalControl</Filter>
     </ClInclude>
@@ -1262,16 +1259,14 @@
     <ClInclude Include="..\..\..\SRC\experimentalSetup\ESThreeActuatorsJntOff.h">
       <Filter>experimentalSetup</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="OpenFresco.ico">
       <Filter>Resource Files</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="openFrescoExe.rc">
-      <Filter>Resource Files</Filter>
-    </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuildStep Include="..\..\..\SRC\experimentalControl\ECMtsCsi.h">
@@ -1283,5 +1278,10 @@
     <CustomBuildStep Include="..\..\..\SRC\experimentalControl\ECSimDomain.h">
       <Filter>experimentalControl</Filter>
     </CustomBuildStep>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="openFrescoExe.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

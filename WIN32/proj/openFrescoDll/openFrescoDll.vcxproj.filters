@@ -1240,6 +1240,9 @@
     <ClInclude Include="..\..\..\SRC\experimentalSetup\ESThreeActuatorsJntOff.h">
       <Filter>experimentalSetup</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuildStep Include="..\..\..\SRC\experimentalControl\ECMtsCsi.h">

@@ -14,20 +14,20 @@
     <ProjectGuid>{AAF2FD8E-1941-4C21-9653-356DC6D13D91}</ProjectGuid>
     <RootNamespace>openFrescoExe</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>NotSet</CharacterSet>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -477,9 +477,9 @@
     <ClInclude Include="..\..\..\SRC\openseesExtra\XmlFileStream.h" />
     <ClInclude Include="..\..\..\SRC\tcl\TclModelBuilder.h" />
     <ClInclude Include="..\..\..\SRC\FrescoGlobals.h" />
-    <ClInclude Include="resource.h" />
     <ClInclude Include="..\..\..\SRC\experimentalControl\ECdSpace.h" />
     <ClInclude Include="..\..\..\SRC\experimentalControl\ECLabVIEW.h" />
+    <ClInclude Include="resource.h" />
     <CustomBuildStep Include="..\..\..\SRC\experimentalControl\ECMtsCsi.h" />
     <CustomBuildStep Include="..\..\..\SRC\experimentalControl\ECNIEseries.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
