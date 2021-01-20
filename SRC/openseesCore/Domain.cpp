@@ -87,6 +87,7 @@
 Domain       *ops_TheActiveDomain = 0;
 double        ops_Dt = 0.0;
 bool          ops_InitialStateAnalysis = false;
+int           ops_Creep = 0;
 
 Domain::Domain()
 :theRecorders(0), numRecorders(0),
@@ -868,24 +869,24 @@ Domain::addNodalLoad(NodalLoad *load, int pattern)
     int nodTag = load->getNodeTag();
     Node *res = this->getNode(nodTag);
     if (res == 0) {
-      opserr << "Domain::addNodalLoad() HI - no node with tag " << nodTag << 
-	"exits in  the model, not adding the nodal load"  << *load << endln;
+      opserr << "Domain::addNodalLoad() - no node with tag " << nodTag << 
+	" exists in the model, not adding the nodal load "  << *load << endln;
 	return false;
     }
 
     // now add it to the pattern
     TaggedObject *thePattern = theLoadPatterns->getComponentPtr(pattern);
     if (thePattern == 0) {
-      opserr << "Domain::addNodalLoad() - no pattern with tag" << 
-	pattern << "in  the model, not adding the nodal load"  << *load << endln;
+      opserr << "Domain::addNodalLoad() - no pattern with tag " << 
+	pattern << " in the model, not adding the nodal load "  << *load << endln;
       
 	return false;
     }
     LoadPattern *theLoadPattern = (LoadPattern *)thePattern;
     bool result = theLoadPattern->addNodalLoad(load);
     if (result == false) {
-      opserr << "Domain::addNodalLoad() - pattern with tag" << 
-	pattern << "could not add the load" << *load << endln;
+      opserr << "Domain::addNodalLoad() - pattern with tag " << 
+	pattern << " could not add the load " << *load << endln;
 				
       return false;
     }
@@ -1751,6 +1752,17 @@ Domain::setCommittedTime(double newTime)
     dT = currentTime - committedTime;
 }
 
+void
+Domain::setCreep(int newCreep)
+{
+  ops_Creep = newCreep;
+}
+
+int
+Domain::getCreep(void) const
+{
+  return ops_Creep;
+}
 
 void
 Domain::applyLoad(double timeStep)
@@ -3517,3 +3529,39 @@ Domain::getRecorder(int tag)
 	return res;
 }
 
+
+
+
+int Domain::activateElements(const ID& elementList)
+{
+    ElementIter& iter = getElements();
+    Element* theElement;
+    for (int i = 0; i < elementList.Size(); ++i)
+    {
+        int eleTag = elementList(i);
+        Element* theElement = this->getElement(eleTag);
+        if (theElement != 0)
+        {
+            theElement->activate();
+        }
+    }
+    return 0;
+}
+
+
+
+int Domain::deactivateElements(const ID& elementList)
+{
+    // ElementIter& iter = getElements();
+    Element* theElement;
+    for (int i = 0; i < elementList.Size(); ++i)
+    {
+        int eleTag = elementList(i);
+        Element* theElement = this->getElement(eleTag);
+        if (theElement != 0)
+        {
+            theElement->deactivate();
+        }
+    }
+    return 0;
+}
