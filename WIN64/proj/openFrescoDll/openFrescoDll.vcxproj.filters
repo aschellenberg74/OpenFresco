@@ -18,9 +18,6 @@
     <Filter Include="experimentalSite">
       <UniqueIdentifier>{55e013ec-96e8-4033-852f-be4b4b5d7b2c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="tcl">
-      <UniqueIdentifier>{d0d99a71-e11f-47c5-82f9-ec3ff94b14be}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{2392e3b8-2a42-410b-a330-a32b9ae52cce}</UniqueIdentifier>
     </Filter>
@@ -50,6 +47,9 @@
     </Filter>
     <Filter Include="experimentalControl\Simulation">
       <UniqueIdentifier>{ca341c9a-b44c-4b20-bfe8-e75ed566b5ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="interpreter">
+      <UniqueIdentifier>{d0d99a71-e11f-47c5-82f9-ec3ff94b14be}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -91,9 +91,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\SRC\experimentalSite\ShadowExpSite.cpp">
       <Filter>experimentalSite</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\tcl\OpenFrescoPackage.cpp">
-      <Filter>tcl</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\SRC\experimentalElement\EEBeamColumn2d.cpp">
       <Filter>experimentalElement</Filter>
@@ -509,15 +506,6 @@
     <ClCompile Include="..\..\..\SRC\experimentalElement\EEBearing3d.cpp">
       <Filter>experimentalElement</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\SRC\tcl\TclLabServerCommands.cpp">
-      <Filter>tcl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\SRC\tcl\TclSimAppElemServerCommands.cpp">
-      <Filter>tcl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\SRC\tcl\TclSimAppSiteServerCommands.cpp">
-      <Filter>tcl</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\SRC\experimentalRecorder\response\ExpTangentStiffResponse.cpp">
       <Filter>experimentalRecorder\response</Filter>
     </ClCompile>
@@ -590,32 +578,44 @@
     <ClCompile Include="..\..\..\src\experimentalControl\ECSimUniaxialMaterials.cpp">
       <Filter>experimentalControl\Simulation</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\SRC\experimentalControl\TclExpControlCommands.cpp">
-      <Filter>tcl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\SRC\experimentalControlPoint\TclExpCPCommands.cpp">
-      <Filter>tcl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\SRC\experimentalSetup\TclExpSetupCommands.cpp">
-      <Filter>tcl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\SRC\experimentalElement\TclExpElementCommands.cpp">
-      <Filter>tcl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\SRC\experimentalSignalFilter\TclExpSignalFilterCommands.cpp">
-      <Filter>tcl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\SRC\experimentalTangentStiff\TclExpTangentStiffCommands.cpp">
-      <Filter>tcl</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\SRC\openseesExtra\DataFileStreamAdd.cpp">
       <Filter>openseesExtra</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\SRC\experimentalRecorder\TclExpRecorderCommands.cpp">
-      <Filter>tcl</Filter>
+    <ClCompile Include="..\..\..\SRC\interpreter\tcl\OpenFrescoPackage.cpp">
+      <Filter>interpreter</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\SRC\experimentalSite\TclExpSiteCommands.cpp">
-      <Filter>tcl</Filter>
+    <ClCompile Include="..\..\..\SRC\interpreter\tcl\TclLabServerCommands.cpp">
+      <Filter>interpreter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\interpreter\tcl\TclSimAppElemServerCommands.cpp">
+      <Filter>interpreter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\interpreter\tcl\TclSimAppSiteServerCommands.cpp">
+      <Filter>interpreter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\interpreter\tcl\TclExpControlCommands.cpp">
+      <Filter>interpreter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\interpreter\tcl\TclExpCPCommands.cpp">
+      <Filter>interpreter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\interpreter\tcl\TclExpElementCommands.cpp">
+      <Filter>interpreter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\interpreter\tcl\TclExpRecorderCommands.cpp">
+      <Filter>interpreter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\interpreter\tcl\TclExpSetupCommands.cpp">
+      <Filter>interpreter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\interpreter\tcl\TclExpSignalFilterCommands.cpp">
+      <Filter>interpreter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\interpreter\tcl\TclExpSiteCommands.cpp">
+      <Filter>interpreter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\interpreter\tcl\TclExpTangentStiffCommands.cpp">
+      <Filter>interpreter</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

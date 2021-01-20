@@ -25,9 +25,6 @@
     <Filter Include="experimentalSite">
       <UniqueIdentifier>{75ff73af-9939-4915-981c-401bb902cf45}</UniqueIdentifier>
     </Filter>
-    <Filter Include="tcl">
-      <UniqueIdentifier>{2e10bc71-0f3c-40fe-a322-40b178fe602b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="experimentalElement">
       <UniqueIdentifier>{e2ae0171-4afc-476f-9879-473f511c92ca}</UniqueIdentifier>
     </Filter>
@@ -51,6 +48,9 @@
     </Filter>
     <Filter Include="experimentalControl\Simulation">
       <UniqueIdentifier>{c231f958-e946-47ce-8a5c-deffb6fe7c29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="interpreter">
+      <UniqueIdentifier>{2e10bc71-0f3c-40fe-a322-40b178fe602b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -123,12 +123,6 @@
     <ClCompile Include="..\..\..\SRC\experimentalSite\ShadowExpSite.cpp">
       <Filter>experimentalSite</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\SRC\tcl\tclAppInit.cpp">
-      <Filter>tcl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\SRC\tcl\tclMain.cpp">
-      <Filter>tcl</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\SRC\experimentalElement\EEBeamColumn2d.cpp">
       <Filter>experimentalElement</Filter>
     </ClCompile>
@@ -176,9 +170,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\SRC\experimentalRecorder\response\ExpSiteResponse.cpp">
       <Filter>experimentalRecorder\response</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\SRC\tcl\TclModelBuilder.cpp">
-      <Filter>tcl</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\SRC\openseesExtra\Actor.cpp">
       <Filter>openseesExtra</Filter>
@@ -263,9 +254,6 @@
     </ClCompile>
     <ClCompile Include="..\..\MSVCerrno.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\SRC\tcl\elementAPI.cpp">
-      <Filter>tcl</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\SRC\experimentalControl\ECGenericTCP.cpp">
       <Filter>experimentalControl</Filter>
@@ -522,15 +510,6 @@
     <ClCompile Include="..\..\..\SRC\experimentalElement\EEBearing3d.cpp">
       <Filter>experimentalElement</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\SRC\tcl\TclLabServerCommands.cpp">
-      <Filter>tcl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\SRC\tcl\TclSimAppElemServerCommands.cpp">
-      <Filter>tcl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\SRC\tcl\TclSimAppSiteServerCommands.cpp">
-      <Filter>tcl</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\SRC\experimentalRecorder\response\ExpTangentStiffResponse.cpp">
       <Filter>experimentalRecorder\response</Filter>
     </ClCompile>
@@ -603,32 +582,53 @@
     <ClCompile Include="..\..\..\SRC\experimentalControl\ECSimUniaxialMaterials.cpp">
       <Filter>experimentalControl\Simulation</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\SRC\experimentalControl\TclExpControlCommands.cpp">
-      <Filter>tcl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\SRC\experimentalControlPoint\TclExpCPCommands.cpp">
-      <Filter>tcl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\SRC\experimentalSetup\TclExpSetupCommands.cpp">
-      <Filter>tcl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\SRC\experimentalElement\TclExpElementCommands.cpp">
-      <Filter>tcl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\SRC\experimentalSignalFilter\TclExpSignalFilterCommands.cpp">
-      <Filter>tcl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\SRC\experimentalTangentStiff\TclExpTangentStiffCommands.cpp">
-      <Filter>tcl</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\SRC\openseesExtra\DataFileStreamAdd.cpp">
       <Filter>openseesExtra</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\SRC\experimentalRecorder\TclExpRecorderCommands.cpp">
-      <Filter>tcl</Filter>
+    <ClCompile Include="..\..\..\SRC\interpreter\tcl\tclAppInit.cpp">
+      <Filter>interpreter</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\SRC\experimentalSite\TclExpSiteCommands.cpp">
-      <Filter>tcl</Filter>
+    <ClCompile Include="..\..\..\SRC\interpreter\tcl\tclMain.cpp">
+      <Filter>interpreter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\interpreter\tcl\TclModelBuilder.cpp">
+      <Filter>interpreter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\interpreter\tcl\TclLabServerCommands.cpp">
+      <Filter>interpreter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\interpreter\tcl\TclSimAppElemServerCommands.cpp">
+      <Filter>interpreter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\interpreter\tcl\TclSimAppSiteServerCommands.cpp">
+      <Filter>interpreter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\interpreter\tcl\elementAPI.cpp">
+      <Filter>interpreter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\interpreter\tcl\TclExpControlCommands.cpp">
+      <Filter>interpreter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\interpreter\tcl\TclExpCPCommands.cpp">
+      <Filter>interpreter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\interpreter\tcl\TclExpElementCommands.cpp">
+      <Filter>interpreter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\interpreter\tcl\TclExpRecorderCommands.cpp">
+      <Filter>interpreter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\interpreter\tcl\TclExpSetupCommands.cpp">
+      <Filter>interpreter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\interpreter\tcl\TclExpSignalFilterCommands.cpp">
+      <Filter>interpreter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\interpreter\tcl\TclExpSiteCommands.cpp">
+      <Filter>interpreter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\interpreter\tcl\TclExpTangentStiffCommands.cpp">
+      <Filter>interpreter</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -748,9 +748,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\SRC\experimentalRecorder\response\ExpSiteResponse.h">
       <Filter>experimentalRecorder\response</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\SRC\tcl\TclModelBuilder.h">
-      <Filter>tcl</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\SRC\openseesExtra\Actor.h">
       <Filter>openseesExtra</Filter>
@@ -1240,6 +1237,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\SRC\openseesExtra\DataFileStreamAdd.h">
       <Filter>openseesExtra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\interpreter\tcl\TclModelBuilder.h">
+      <Filter>interpreter</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
