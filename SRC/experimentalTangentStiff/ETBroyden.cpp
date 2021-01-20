@@ -19,10 +19,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 // Written: Hong Kim (hongkim@berkeley.edu)
 // Created: 11/09
 // Revision: A
@@ -31,6 +27,38 @@
 // ETBroyden.  
 
 #include "ETBroyden.h"
+
+#include <elementAPI.h>
+
+void* OPF_ETBroyden()
+{
+    // pointer to experimental tangent stiff that will be returned
+    ExperimentalTangentStiff* theTangentStiff = 0;
+    
+    if (OPS_GetNumRemainingInputArgs() < 2) {
+        opserr << "WARNING invalid number of arguments\n";
+        opserr << "Want: expTangentStiff Broyden tag\n";
+        return 0;
+    }
+    
+    // tangent stiff tag
+    int tag;
+    int numdata = 1;
+    if (OPS_GetIntInput(&numdata, &tag) != 0) {
+        opserr << "WARNING invalid expTangentStiff Broyden tag\n";
+        return 0;
+    }
+    
+    // parsing was successful, allocate the tangent stiff
+    theTangentStiff = new ETBroyden(tag);
+    if (theTangentStiff == 0) {
+        opserr << "WARNING could not create experimental tangent stiffness "
+            << "of type ETBroyden\n";
+        return 0;
+    }
+    
+    return theTangentStiff;
+}
 
 
 ETBroyden::ETBroyden(int tag)

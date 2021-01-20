@@ -19,17 +19,124 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
-// Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 09/06
 // Revision: A
 //
 // Description: This file contains the implementation of ESAggregator.
 
 #include "ESAggregator.h"
+
+#include <ExperimentalControl.h>
+
+#include <elementAPI.h>
+
+
+void* OPF_ESAggregator()
+{
+    // pointer to experimental setup that will be returned
+    ExperimentalSetup* theSetup = 0;
+
+    if (OPS_GetNumRemainingInputArgs() < 4) {
+        opserr << "WARNING invalid number of arguments\n";
+        opserr << "Want: expSetup Aggregator tag <-control ctrlTag> "
+            << "-setup setupTagi ...\n";
+        return 0;
+    }
+    
+    // setup tag
+    int tag;
+    int numdata = 1;
+    if (OPS_GetIntInput(&numdata, &tag) != 0) {
+        opserr << "WARNING invalid expSetup Aggregator tag\n";
+        return 0;
+    }
+    
+    // control tag (optional)
+    ExperimentalControl* theControl = 0;
+    const char* type = OPS_GetString();
+    if (strcmp(type, "-control") == 0 || strcmp(type, "-ctrl") == 0) {
+        int ctrlTag;
+        numdata = 1;
+        if (OPS_GetIntInput(&numdata, &ctrlTag) < 0) {
+            opserr << "WARNING invalid ctrlTag\n";
+            opserr << "expSetup Aggregator " << tag << endln;
+            return 0;
+        }
+        theControl = OPF_GetExperimentalControl(ctrlTag);
+        if (theControl == 0) {
+            opserr << "WARNING experimental control not found\n";
+            opserr << "expControl: " << ctrlTag << endln;
+            opserr << "expSetup Aggregator " << tag << endln;
+            return 0;
+        }
+    }
+    else {
+        // move current arg back by one
+        OPS_ResetCurrentInputArg(-1);
+    }
+    
+    // experimental setups
+    type = OPS_GetString();
+    if (strcmp(type, "-setup") != 0) {
+        opserr << "WARNING expecting -setup setupTagi ...\n";
+        opserr << "expSetup Aggregator " << tag << endln;
+        return 0;
+    }
+    ID setupTags(32);
+    int numSetups = 0;
+    while (OPS_GetNumRemainingInputArgs() > 0) {
+        int tagi;
+        numdata = 1;
+        int numArgs = OPS_GetNumRemainingInputArgs();
+        if (OPS_GetIntInput(&numdata, &tagi) < 0) {
+            if (numArgs > OPS_GetNumRemainingInputArgs()) {
+                // move current arg back by one
+                OPS_ResetCurrentInputArg(-1);
+            }
+            break;
+        }
+        setupTags(numSetups++) = tagi;
+    }
+    if (numSetups < 2) {
+        opserr << "WARNING need at least 2 setups\n";
+        opserr << "expSetup Aggregator " << tag << endln;
+        return 0;
+    }
+    setupTags.resize(numSetups);
+    
+    // create the array to hold the experimental setups
+    ExperimentalSetup** expSetups = new ExperimentalSetup * [numSetups];
+    if (expSetups == 0) {
+        opserr << "WARNING out of memory\n";
+        opserr << "expSetup Aggregator " << tag << endln;
+        return 0;
+    }
+    // populate array with experimental setups
+    for (int i = 0; i < numSetups; i++) {
+        expSetups[i] = 0;
+        expSetups[i] = OPF_GetExperimentalSetup(setupTags(i));
+        if (expSetups[i] == 0) {
+            opserr << "WARNING experimental setup not found\n";
+            opserr << "expSetup " << setupTags(i) << endln;
+            opserr << "expSetup Aggregator " << tag << endln;
+            return 0;
+        }
+    }
+    
+    // parsing was successful, allocate the setup
+    theSetup = new ESAggregator(tag, numSetups, expSetups, theControl);
+    
+    // cleanup dynamic memory
+    if (expSetups != 0) {
+        for (int i = 0; i < numSetups; i++)
+            if (expSetups[i] != 0)
+                delete expSetups[i];
+        delete[] expSetups;
+    }
+    
+    return theSetup;
+}
 
 
 ESAggregator::ESAggregator(int tag, int nSetups,

@@ -22,10 +22,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 // Written: Yoshi (yos@catfish.dpri.kyoto-u.ac.jp)
 // Created: 09/06
 // Revision: A
@@ -34,6 +30,48 @@
 // ExperimentalControl.
 
 #include "ExperimentalControl.h"
+
+#include <TaggedObject.h>
+#include <MapOfTaggedObjects.h>
+
+static MapOfTaggedObjects theExperimentalControls;
+
+
+bool OPF_AddExperimentalControl(ExperimentalControl* newComponent)
+{
+    return theExperimentalControls.addComponent(newComponent);
+}
+
+
+bool OPF_RemoveExperimentalControl(int tag)
+{
+    TaggedObject* obj = theExperimentalControls.removeComponent(tag);
+    if (obj != 0) {
+        delete obj;
+        return true;
+    }
+    return false;
+}
+
+
+ExperimentalControl* OPF_GetExperimentalControl(int tag)
+{
+    TaggedObject* theResult = theExperimentalControls.getComponentPtr(tag);
+    if (theResult == 0) {
+        opserr << "OPF_GetExperimentalControl() - "
+            << "none found with tag: " << tag << endln;
+        return 0;
+    }
+    ExperimentalControl* theControl = (ExperimentalControl*)theResult;
+    
+    return theControl;
+}
+
+
+void OPF_ClearExperimentalControls()
+{
+    theExperimentalControls.clearAll();
+}
 
 
 ExperimentalControl::ExperimentalControl(int tag)

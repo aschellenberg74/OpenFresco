@@ -30,6 +30,48 @@
 
 #include "ExperimentalSetup.h"
 
+#include <TaggedObject.h>
+#include <MapOfTaggedObjects.h>
+
+static MapOfTaggedObjects theExperimentalSetups;
+
+
+bool OPF_AddExperimentalSetup(ExperimentalSetup* newComponent)
+{
+    return theExperimentalSetups.addComponent(newComponent);
+}
+
+
+bool OPF_RemoveExperimentalSetup(int tag)
+{
+    TaggedObject* obj = theExperimentalSetups.removeComponent(tag);
+    if (obj != 0) {
+        delete obj;
+        return true;
+    }
+    return false;
+}
+
+
+ExperimentalSetup* OPF_GetExperimentalSetup(int tag)
+{
+    TaggedObject* theResult = theExperimentalSetups.getComponentPtr(tag);
+    if (theResult == 0) {
+        opserr << "OPF_GetExperimentalSetup() - "
+            << "none found with tag: " << tag << endln;
+        return 0;
+    }
+    ExperimentalSetup* theSetup = (ExperimentalSetup*)theResult;
+    
+    return theSetup;
+}
+
+
+void OPF_ClearExperimentalSetups()
+{
+    theExperimentalSetups.clearAll();
+}
+
 
 ExperimentalSetup::ExperimentalSetup(int tag,
     ExperimentalControl *control)

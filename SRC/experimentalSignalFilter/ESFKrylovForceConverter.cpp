@@ -19,10 +19,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 // Written: Hong Kim (hongkim@berkeley.edu)
 // Created: 10/10
 // Revision: A
@@ -35,8 +31,78 @@
 
 #include "ESFKrylovForceConverter.h"
 
+#include <elementAPI.h>
 
-ESFKrylovForceConverter::ESFKrylovForceConverter(int tag, 
+void* OPF_ESFKrylovForceConverter()
+{
+    // pointer to experimental control that will be returned
+    ExperimentalSignalFilter* theFilter = 0;
+    
+    if (OPS_GetNumRemainingInputArgs() < 4) {
+        opserr << "WARNING invalid number of arguments\n";
+        opserr << "Want: expSignalFilter KrylovForceConverter tag "
+            << "numSubspace -initStif Kij\n";
+        return 0;
+    }
+    
+    // filter tag
+    int tag;
+    int numdata = 1;
+    if (OPS_GetIntInput(&numdata, &tag) != 0) {
+        opserr << "WARNING invalid expSignalFilter KrylovForceConverter tag\n";
+        return 0;
+    }
+    
+    // number of subspaces
+    int numSubspace;
+    numdata = 1;
+    if (OPS_GetIntInput(&numdata, &numSubspace) != 0) {
+        opserr << "WARNING invalid numSubspace\n";
+        opserr << "expSignalFilter KrylovForceConverter " << tag << endln;
+        return 0;
+    }
+    
+    // initial stiffness terms
+    const char* type = OPS_GetString();
+    if (strcmp(type, "-initStif") != 0 &&
+        strcmp(type, "-initStiff") != 0) {
+        opserr << "WARNING expecting -initStif Kij\n";
+        opserr << "expSignalFilter KrylovForceConverter " << tag << endln;
+        return 0;
+    }
+    // check size of stiffness matrix
+    int numArg = OPS_GetNumRemainingInputArgs();
+    double dim = sqrt(numArg);
+    if (fmod(dim, 1.0) != 0.0) {
+        opserr << "WARNING Kij is not a square matrix\n";
+        opserr << "expSignalFilter KrylovForceConverter " << tag << endln;
+        return 0;
+    }
+    // set the initial stiffness
+    int numDOF = (int)dim;
+    Matrix theInitStif(numDOF, numDOF);
+    double stif[1024];
+    numdata = numDOF * numDOF;
+    if (OPS_GetDoubleInput(&numdata, stif) != 0) {
+        opserr << "WARNING invalid initial stiffness terms\n";
+        opserr << "expSignalFilter KrylovForceConverter " << tag << endln;
+        return 0;
+    }
+    theInitStif.setData(stif, numDOF, numDOF);
+    
+    // parsing was successful, allocate the signal filter
+    theFilter = new ESFKrylovForceConverter(tag, numSubspace, theInitStif);
+    if (theFilter == 0) {
+        opserr << "WARNING could not create experimental signal filter "
+            << "of type ESFKrylovForceConverter\n";
+        return 0;
+    }
+    
+    return theFilter;
+}
+
+
+ESFKrylovForceConverter::ESFKrylovForceConverter(int tag,
     int ss, Matrix& initStif)
     : ExperimentalSignalFilter(tag), firstWarning(true),
     size(0), szSubspace(ss), dispPast(0), forcePast(0), convertFrc(0), incrDisp(0), 

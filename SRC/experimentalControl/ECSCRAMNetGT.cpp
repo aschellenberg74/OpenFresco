@@ -27,6 +27,79 @@
 
 #include "ECSCRAMNetGT.h"
 
+#include <elementAPI.h>
+
+
+void* OPF_ECSCRAMNetGT()
+{
+    // pointer to experimental control that will be returned
+    ExperimentalControl* theControl = 0;
+    
+    if (OPS_GetNumRemainingInputArgs() < 3) {
+        opserr << "WARNING invalid number of arguments\n";
+        opserr << "Want: expControl SCRAMNetGT tag memOffset numDOF <-nodeID id> <-useRelTrial>"
+            << "<-ctrlFilters (5 filterTag)> <-daqFilters (5 filterTag)>\n";
+        return 0;
+    }
+    
+    // control tag
+    int tag;
+    int numdata = 1;
+    if (OPS_GetIntInput(&numdata, &tag) != 0) {
+        opserr << "WARNING invalid expControl SCRAMNetGT tag\n";
+        return 0;
+    }
+    
+    // memory offset in bytes
+    int memOffset;
+    numdata = 1;
+    if (OPS_GetIntInput(&numdata, &memOffset) != 0) {
+        opserr << "WARNING invalid memOffset\n";
+        opserr << "expControl SCRAMNetGT " << tag << endln;
+        return 0;
+    }
+    
+    // number of dof
+    int numDOF;
+    numdata = 1;
+    if (OPS_GetIntInput(&numdata, &numDOF) != 0) {
+        opserr << "WARNING invalid numDOF\n";
+        opserr << "expControl SCRAMNetGT " << tag << endln;
+        return 0;
+    }
+    
+    // optional parameters
+    int nodeID = 3;
+    int useRelativeTrial = 0;
+    const char* type;
+    while (OPS_GetNumRemainingInputArgs() > 0) {
+        type = OPS_GetString();
+        if (strcmp(type, "-nodeID") == 0) {
+            numdata = 1;
+            if (OPS_GetIntInput(&numdata, &nodeID) != 0) {
+                opserr << "WARNING invalid nodeID\n";
+                opserr << "expControl SCRAMNetGT " << tag << endln;
+                return 0;
+            }
+        }
+        else if (strcmp(type, "-relTrial") == 0 ||
+            strcmp(type, "-relativeTrial") == 0 ||
+            strcmp(type, "-useRelTrial") == 0 ||
+            strcmp(type, "-useRelativeTrial") == 0) {
+            useRelativeTrial = 1;
+        }
+    }
+    
+    // parsing was successful, allocate the control
+    theControl = new ECSCRAMNetGT(tag, memOffset, numDOF, nodeID, useRelativeTrial);
+    if (theControl == 0) {
+        opserr << "WARNING could not create experimental control of type ECSCRAMNetGT\n";
+        return 0;
+    }
+    
+    return theControl;
+}
+
 
 ECSCRAMNetGT::ECSCRAMNetGT(int tag, int memoffset, int numdof,
     unsigned int nodeid, int reltrial)

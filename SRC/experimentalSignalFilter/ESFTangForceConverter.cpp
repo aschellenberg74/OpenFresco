@@ -19,10 +19,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 // Written: Hong Kim (hongkim@berkeley.edu)
 // Created: 10/10
 // Revision: A
@@ -34,6 +30,86 @@
 // method and does nothing with the filtering method. 
 
 #include "ESFTangForceConverter.h"
+
+#include <elementAPI.h>
+
+
+void* OPF_ESFTangForceConverter()
+{
+    // pointer to experimental control that will be returned
+    ExperimentalSignalFilter* theFilter = 0;
+    
+    if (OPS_GetNumRemainingInputArgs() < 4) {
+        opserr << "WARNING invalid number of arguments\n";
+        opserr << "Want: expSignalFilter TangentForceConverter tag "
+            << "-initStif Kij -tangStif tangStifTag\n";
+        return 0;
+    }
+    
+    // filter tag
+    int tag;
+    int numdata = 1;
+    if (OPS_GetIntInput(&numdata, &tag) != 0) {
+        opserr << "WARNING invalid expSignalFilter TangentForceConverter tag\n";
+        return 0;
+    }
+    
+    // initial stiffness terms
+    const char* type = OPS_GetString();
+    if (strcmp(type, "-initStif") != 0 &&
+        strcmp(type, "-initStiff") != 0) {
+        opserr << "WARNING expecting -initStif Kij\n";
+        opserr << "expSignalFilter TangentForceConverter " << tag << endln;
+        return 0;
+    }
+    // check size of stiffness matrix
+    int numArg = OPS_GetNumRemainingInputArgs();
+    double dim = sqrt(numArg);
+    if (fmod(dim, 1.0) != 0.0) {
+        opserr << "WARNING Kij is not a square matrix\n";
+        opserr << "expSignalFilter TangentForceConverter " << tag << endln;
+        return 0;
+    }
+    // set the initial stiffness
+    int numDOF = (int)dim;
+    Matrix theInitStif(numDOF, numDOF);
+    double stif[1024];
+    numdata = numDOF * numDOF;
+    if (OPS_GetDoubleInput(&numdata, stif) != 0) {
+        opserr << "WARNING invalid initial stiffness terms\n";
+        opserr << "expSignalFilter TangentForceConverter " << tag << endln;
+        return 0;
+    }
+    theInitStif.setData(stif, numDOF, numDOF);
+    
+    // tangent stiffness
+    type = OPS_GetString();
+    if (strcmp(type, "-tangStif") != 0 &&
+        strcmp(type, "-tangStiff") != 0) {
+        opserr << "WARNING expecting -tangStif tangStifTag\n";
+        opserr << "expSignalFilter TangentForceConverter " << tag << endln;
+        return 0;
+    }
+    int tangStifTag;
+    ExperimentalTangentStiff* theTangStif = 0;
+    numdata = 1;
+    if (OPS_GetIntInput(&numdata, &tangStifTag) != 0) {
+        opserr << "WARNING invalid tangentStiff Tag\n";
+        opserr << "expSignalFilter TangentForceConverter " << tag << endln;
+        return 0;
+    }
+    theTangStif = OPF_GetExperimentalTangentStiff(tangStifTag);
+    
+    // parsing was successful, allocate the signal filter
+    theFilter = new ESFTangForceConverter(tag, theInitStif, theTangStif);
+    if (theFilter == 0) {
+        opserr << "WARNING could not create experimental signal filter "
+            << "of type ESFTangForceConverter\n";
+        return 0;
+    }
+    
+    return theFilter;
+}
 
 
 ESFTangForceConverter::ESFTangForceConverter(int tag, Matrix& initStif,

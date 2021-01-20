@@ -38,7 +38,7 @@ class ESFErrorSimTimeDelay : public ESFErrorSimulation
 {
 public:
     // constructors
-    ESFErrorSimTimeDelay(int tag, double error);
+    ESFErrorSimTimeDelay(int tag, double delay);
     ESFErrorSimTimeDelay(const ESFErrorSimTimeDelay& esf);
     
     // destructor
@@ -56,7 +56,7 @@ public:
     void Print(OPS_Stream &s, int flag = 0);
     
 private:
-    double undershoot;
+    double delay;
     double data;
     double predata;
 };

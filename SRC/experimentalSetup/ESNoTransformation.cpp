@@ -19,10 +19,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 // Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 09/06
 // Revision: A
@@ -31,6 +27,115 @@
 // ESNoTransformation class.
 
 #include "ESNoTransformation.h"
+
+#include <ExperimentalControl.h>
+
+#include <elementAPI.h>
+
+
+void* OPF_ESNoTransformation()
+{
+    // pointer to experimental setup that will be returned
+    ExperimentalSetup* theSetup = 0;
+    
+    if (OPS_GetNumRemainingInputArgs() < 6) {
+        opserr << "WARNING invalid number of arguments\n";
+        opserr << "Want: expSetup NoTransformation tag <-control ctrlTag> "
+            << "-dof DOFs -sizeTrialOut t o\n";
+        return 0;
+    }
+    
+    // setup tag
+    int tag;
+    int numdata = 1;
+    if (OPS_GetIntInput(&numdata, &tag) != 0) {
+        opserr << "WARNING invalid expSetup NoTransformation tag\n";
+        return 0;
+    }
+    
+    // control tag (optional)
+    ExperimentalControl* theControl = 0;
+    const char* type = OPS_GetString();
+    if (strcmp(type, "-control") == 0 || strcmp(type, "-ctrl") == 0) {
+        int ctrlTag;
+        numdata = 1;
+        if (OPS_GetIntInput(&numdata, &ctrlTag) < 0) {
+            opserr << "WARNING invalid ctrlTag\n";
+            opserr << "expSetup NoTransformation " << tag << endln;
+            return 0;
+        }
+        theControl = OPF_GetExperimentalControl(ctrlTag);
+        if (theControl == 0) {
+            opserr << "WARNING experimental control not found\n";
+            opserr << "expControl: " << ctrlTag << endln;
+            opserr << "expSetup NoTransformation " << tag << endln;
+            return 0;
+        }
+    }
+    else {
+        // move current arg back by one
+        OPS_ResetCurrentInputArg(-1);
+    }
+    
+    // dof IDs
+    type = OPS_GetString();
+    if (strcmp(type, "-dof") != 0 && strcmp(type, "-dir") != 0) {
+        opserr << "WARNING expecting -dof DOFs\n";
+        opserr << "expSetup NoTransformation " << tag << endln;
+        return 0;
+    }
+    ID theDOF(32);
+    int numDOF = 0;
+    while (OPS_GetNumRemainingInputArgs() > 0) {
+        int dof;
+        numdata = 1;
+        int numArgs = OPS_GetNumRemainingInputArgs();
+        if (OPS_GetIntInput(&numdata, &dof) < 0) {
+            if (numArgs > OPS_GetNumRemainingInputArgs()) {
+                // move current arg back by one
+                OPS_ResetCurrentInputArg(-1);
+            }
+            break;
+        }
+        theDOF(numDOF++) = dof-1;
+    }
+    if (numDOF == 0) {
+        opserr << "WARNING no DOFs specified\n";
+        opserr << "expSetup NoTransformation " << tag << endln;
+        return 0;
+    }
+    theDOF.resize(numDOF);
+    
+    // size trial and size out
+    int sizeTrial, sizeOut;
+    type = OPS_GetString();
+    if (strcmp(type, "-sizeTrialOut") != 0) {
+        opserr << "WARNING expecting -sizeTrialOut t o\n";
+        opserr << "expSetup NoTransformation " << tag << endln;
+        return 0;
+    }
+    numdata = 1;
+    if (OPS_GetIntInput(&numdata, &sizeTrial) != 0) {
+        opserr << "WARNING invalid sizeTrial\n";
+        opserr << "expSetup NoTransformation " << tag << endln;
+        return 0;
+    }
+    numdata = 1;
+    if (OPS_GetIntInput(&numdata, &sizeOut) != 0) {
+        opserr << "WARNING invalid sizeOut\n";
+        opserr << "expSetup NoTransformation " << tag << endln;
+        return 0;
+    }
+    
+    // parsing was successful, allocate the setup
+    theSetup = new ESNoTransformation(tag, theDOF, sizeTrial, sizeOut, theControl);
+    if (theSetup == 0) {
+        opserr << "WARNING could not create experimental setup of type ESNoTransformation\n";
+        return 0;
+    }
+    
+    return theSetup;
+}
 
 
 ESNoTransformation::ESNoTransformation(int tag,

@@ -19,10 +19,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 #ifndef ExperimentalCP_h
 #define ExperimentalCP_h
 
@@ -120,5 +116,11 @@ protected:
     int nodeNDF;        // number of degrees of freedom
     Vector nodeCrds;    // vector of nodal coordinates
 };
+
+extern bool OPF_AddExperimentalCP(ExperimentalCP* newComponent);
+extern ExperimentalCP* OPF_GetExperimentalCP(int tag);
+extern bool OPF_RemoveExperimentalCP(int tag);
+extern void OPF_ClearExperimentalCPs();
+void* OPF_ExperimentalCP();
 
 #endif

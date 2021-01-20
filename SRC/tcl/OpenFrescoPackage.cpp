@@ -49,7 +49,7 @@ extern int TclExpCPCommand(ClientData clientData, Tcl_Interp *interp,
     int argc, TCL_Char **argv, Domain *theDomain);
 extern int TclRemoveExpCP(ClientData clientData, Tcl_Interp *interp,
     int argc, TCL_Char **argv);
-extern int clearExperimentalCPs(Tcl_Interp *interp);
+extern void OPF_ClearExperimentalCPs();
 
 int openFresco_addExperimentalCP(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
@@ -62,7 +62,7 @@ extern int TclExpSignalFilterCommand(ClientData clientData, Tcl_Interp *interp,
     int argc, TCL_Char **argv, Domain *theDomain);
 extern int TclRemoveExpSignalFilter(ClientData clientData, Tcl_Interp *interp,
     int argc, TCL_Char **argv);
-extern int clearExperimentalSignalFilters(Tcl_Interp *interp);
+extern void OPF_ClearExperimentalSignalFilters();
 
 int openFresco_addExperimentalSignalFilter(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
@@ -75,7 +75,7 @@ extern int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
     int argc, TCL_Char **argv, Domain *theDomain);
 extern int TclRemoveExpControl(ClientData clientData, Tcl_Interp *interp,
     int argc, TCL_Char **argv);
-extern int clearExperimentalControls(Tcl_Interp *interp);
+extern void OPF_ClearExperimentalControls();
 
 int openFresco_addExperimentalControl(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
@@ -88,7 +88,7 @@ extern int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp,
     int argc, TCL_Char **argv, Domain *theDomain);
 extern int TclRemoveExpSetup(ClientData clientData, Tcl_Interp *interp,
     int argc, TCL_Char **argv);
-extern int clearExperimentalSetups(Tcl_Interp *interp);
+extern void OPF_ClearExperimentalSetups();
 
 int openFresco_addExperimentalSetup(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
@@ -101,7 +101,7 @@ extern int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp,
     int argc, TCL_Char **argv, Domain *theDomain);
 extern int TclRemoveExpSite(ClientData clientData, Tcl_Interp *interp,
     int argc, TCL_Char **argv);
-extern int clearExperimentalSites(Tcl_Interp *interp);
+extern void OPF_ClearExperimentalSites();
 
 int openFresco_addExperimentalSite(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
@@ -114,7 +114,7 @@ extern int TclExpTangentStiffCommand(ClientData clientData, Tcl_Interp *interp,
     int argc, TCL_Char **argv, Domain *theDomain);
 extern int TclRemoveExpTangentStiff(ClientData clientData, Tcl_Interp *interp,
     int argc, TCL_Char **argv);
-extern int clearExperimentalTangentStiffs(Tcl_Interp *interp);
+extern void OPF_ClearExperimentalTangentStiffs();
 
 int openFresco_addExperimentalTangentStiff(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
@@ -215,12 +215,12 @@ int openFresco_wipeModel(ClientData clientData,
     //if (theDomain != 0)
     //    theDomain->clearAll();
     
-    clearExperimentalCPs(interp);
-    clearExperimentalSignalFilters(interp);
-    clearExperimentalControls(interp);
-    clearExperimentalSetups(interp);
-    clearExperimentalSites(interp);
-    clearExperimentalTangentStiffs(interp);
+    OPF_ClearExperimentalCPs();
+    OPF_ClearExperimentalSignalFilters();
+    OPF_ClearExperimentalControls();
+    OPF_ClearExperimentalSetups();
+    OPF_ClearExperimentalSites();
+    OPF_ClearExperimentalTangentStiffs();
     
     return TCL_OK;
 }

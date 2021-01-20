@@ -19,10 +19,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 // Written: Hong Kim (hongkim@berkeley.edu)
 // Created: 10/10
 // Revision: A
@@ -34,6 +30,53 @@
 // (Igarashi 1993 p. 10)
 
 #include "ETBfgs.h"
+
+#include <elementAPI.h>
+
+void* OPF_ETBfgs()
+{
+    // pointer to experimental tangent stiff that will be returned
+    ExperimentalTangentStiff* theTangentStiff = 0;
+    
+    if (OPS_GetNumRemainingInputArgs() < 2) {
+        opserr << "WARNING invalid number of arguments\n";
+        opserr << "Want: expTangentStiff BFGS tag <-eps value>\n";
+        return 0;
+    }
+    
+    // tangent stiff tag
+    int tag;
+    int numdata = 1;
+    if (OPS_GetIntInput(&numdata, &tag) != 0) {
+        opserr << "WARNING invalid expTangentStiff BFGS tag\n";
+        return 0;
+    }
+    
+    // optional parameters
+    double eps = 0.1;
+    const char* type;
+    while (OPS_GetNumRemainingInputArgs() > 0) {
+        type = OPS_GetString();
+        if (strcmp(type, "-eps") == 0) {
+            numdata = 1;
+            if (OPS_GetDoubleInput(&numdata, &eps) != 0) {
+                opserr << "WARNING invalid epsilon value\n";
+                opserr << "expTangentStiff BFGS " << tag << endln;
+                return 0;
+            }
+        }
+    }
+    
+    // parsing was successful, allocate the tangent stiff
+    theTangentStiff = new ETBfgs(tag, eps);
+    if (theTangentStiff == 0) {
+        opserr << "WARNING could not create experimental tangent stiffness "
+            << "of type ETBroyden\n";
+        return 0;
+    }
+    
+    return theTangentStiff;
+}
 
 
 ETBfgs::ETBfgs(int tag , double e)

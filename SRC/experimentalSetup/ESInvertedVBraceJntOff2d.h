@@ -19,10 +19,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 #ifndef ESInvertedVBraceJntOff2d_h
 #define ESInvertedVBraceJntOff2d_h
 

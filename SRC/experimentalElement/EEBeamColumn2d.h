@@ -19,10 +19,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 #ifndef EEBeamColumn2d_h
 #define EEBeamColumn2d_h
 

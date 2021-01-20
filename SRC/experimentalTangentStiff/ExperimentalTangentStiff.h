@@ -19,10 +19,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 #ifndef ExperimentalTangentStiff_h
 #define ExperimentalTangentStiff_h
 
@@ -72,5 +68,10 @@ public:
         OPS_Stream &output);
     virtual int getResponse(int responseID, Information &info);
 };
+
+extern bool OPF_AddExperimentalTangentStiff(ExperimentalTangentStiff* newComponent);
+extern ExperimentalTangentStiff* OPF_GetExperimentalTangentStiff(int tag);
+extern bool OPF_RemoveExperimentalTangentStiff(int tag);
+extern void OPF_ClearExperimentalTangentStiffs();
 
 #endif

@@ -22,10 +22,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 // Written: Yoshi (yos@catfish.dpri.kyoto-u.ac.jp)
 // Created: 09/06
 // Revision: A
@@ -35,9 +31,59 @@
 
 #include "ESFErrorSimRandomGauss.h"
 
+#include <elementAPI.h>
+
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
+
+void* OPF_ESFErrorSimRandomGauss()
+{
+    // pointer to experimental control that will be returned
+    ExperimentalSignalFilter* theFilter = 0;
+    
+    if (OPS_GetNumRemainingInputArgs() < 3) {
+        opserr << "WARNING invalid number of arguments\n";
+        opserr << "Want: expSignalFilter ErrorSimRandomGauss tag avg std\n";
+        return 0;
+    }
+    
+    // filter tag
+    int tag;
+    int numdata = 1;
+    if (OPS_GetIntInput(&numdata, &tag) != 0) {
+        opserr << "WARNING invalid expSignalFilter ErrorSimRandomGauss tag\n";
+        return 0;
+    }
+    
+    // average
+    double avg;
+    numdata = 1;
+    if (OPS_GetDoubleInput(&numdata, &avg) != 0) {
+        opserr << "WARNING invalid average\n";
+        opserr << "expSignalFilter ErrorSimRandomGauss " << tag << endln;
+        return 0;
+    }
+    
+    // standard deviation
+    double std;
+    numdata = 1;
+    if (OPS_GetDoubleInput(&numdata, &std) != 0) {
+        opserr << "WARNING invalid standard deviation\n";
+        opserr << "expSignalFilter ErrorSimRandomGauss " << tag << endln;
+        return 0;
+    }
+    
+    // parsing was successful, allocate the signal filter
+    theFilter = new ESFErrorSimRandomGauss(tag, avg, std);
+    if (theFilter == 0) {
+        opserr << "WARNING could not create experimental signal filter "
+            << "of type ESFErrorSimRandomGauss\n";
+        return 0;
+    }
+    
+    return theFilter;
+}
 
 
 ESFErrorSimRandomGauss::ESFErrorSimRandomGauss(int tag, double ave, double std)

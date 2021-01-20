@@ -31,12 +31,53 @@
 
 #include "ESFErrorSimTimeDelay.h"
 
+#include <elementAPI.h>
+
 #include <math.h>
 
+void* OPF_ESFErrorSimTimeDelay()
+{
+    // pointer to experimental control that will be returned
+    ExperimentalSignalFilter* theFilter = 0;
 
-ESFErrorSimTimeDelay::ESFErrorSimTimeDelay(int tag, double error)
+    if (OPS_GetNumRemainingInputArgs() < 2) {
+        opserr << "WARNING invalid number of arguments\n";
+        opserr << "Want: expSignalFilter ErrorSimTimeDelay tag error\n";
+        return 0;
+    }
+
+    // filter tag
+    int tag;
+    int numdata = 1;
+    if (OPS_GetIntInput(&numdata, &tag) != 0) {
+        opserr << "WARNING invalid expSignalFilter ErrorSimTimeDelay tag\n";
+        return 0;
+    }
+
+    // time delay error
+    double delay;
+    numdata = 1;
+    if (OPS_GetDoubleInput(&numdata, &delay) != 0) {
+        opserr << "WARNING invalid undershoot error\n";
+        opserr << "expSignalFilter ErrorSimTimeDelay " << tag << endln;
+        return 0;
+    }
+
+    // parsing was successful, allocate the signal filter
+    theFilter = new ESFErrorSimTimeDelay(tag, delay);
+    if (theFilter == 0) {
+        opserr << "WARNING could not create experimental signal filter "
+            << "of type ESFErrorSimTimeDelay\n";
+        return 0;
+    }
+
+    return theFilter;
+}
+
+
+ESFErrorSimTimeDelay::ESFErrorSimTimeDelay(int tag, double tau)
     : ESFErrorSimulation(tag),
-    delay(error), data(0.0), predata(0.0)
+    delay(tau), data(0.0), predata(0.0)
 {
     // does nothing
 }

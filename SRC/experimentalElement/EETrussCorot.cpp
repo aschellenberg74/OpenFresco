@@ -19,10 +19,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 // Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 09/06
 // Revision: A
@@ -41,6 +37,7 @@
 #include <TCP_Socket.h>
 #include <TCP_SocketSSL.h>
 #include <UDP_Socket.h>
+#include <elementAPI.h>
 
 #include <math.h>
 #include <stdlib.h>
@@ -56,6 +53,198 @@ Vector EETrussCorot::EETrussCorotV2(2);
 Vector EETrussCorot::EETrussCorotV4(4);
 Vector EETrussCorot::EETrussCorotV6(6);
 Vector EETrussCorot::EETrussCorotV12(12);
+
+void* OPF_EETrussCorot()
+{
+    // pointer to experimental element that will be returned
+    ExperimentalElement* theExpElement = 0;
+    int ndm = OPS_GetNDM();
+    
+    if (OPS_GetNumRemainingInputArgs() < 7) {
+        opserr << "WARNING invalid number of arguments\n";
+        opserr << "Want: expElement corotTruss eleTag iNode jNode -site siteTag -initStif Kij <-tangStif tangStifTag> <-iMod> <-noRayleigh> <-rho rho> <-cMass>\n";
+        opserr << "  or: expElement corotTruss eleTag iNode jNode -server ipPort <ipAddr> <-ssl> <-udp> <-dataSize size> -initStif Kij <-tangStif tangStifTag> <-iMod> <-noRayleigh> <-rho rho> <-cMass>\n";
+        return 0;
+    }
+    
+    // element tag
+    int tag;
+    int numdata = 1;
+    if (OPS_GetIntInput(&numdata, &tag) != 0) {
+        opserr << "WARNING invalid expElement corotTruss eleTag\n";
+        return 0;
+    }
+    
+    // nodes
+    int node[2];
+    numdata = 2;
+    if (OPS_GetIntInput(&numdata, node) != 0) {
+        opserr << "WARNING invalid iNode or jNode\n";
+        opserr << "expElement corotTruss element: " << tag << endln;
+        return 0;
+    }
+    
+    // experimental site or server parameters
+    ExperimentalSite* theSite = 0;
+    int ipPort = 8090;
+    char* ipAddr = new char[10];
+    strcpy(ipAddr, "127.0.0.1");
+    int ssl = 0, udp = 0;
+    int dataSize = OF_Network_dataSize;
+    const char* type = OPS_GetString();
+    if (strcmp(type, "-site") == 0) {
+        // site tag
+        int siteTag;
+        numdata = 1;
+        if (OPS_GetIntInput(&numdata, &siteTag) < 0) {
+            opserr << "WARNING invalid siteTag\n";
+            opserr << "expElement corotTruss element: " << tag << endln;
+            return 0;
+        }
+        theSite = OPF_GetExperimentalSite(siteTag);
+        if (theSite == 0) {
+            opserr << "WARNING experimental site not found\n";
+            opserr << "expSite: " << siteTag << endln;
+            opserr << "expElement corotTruss element: " << tag << endln;
+            return 0;
+        }
+    }
+    else if (strcmp(type, "-server") == 0) {
+        // ip port
+        numdata = 1;
+        if (OPS_GetIntInput(&numdata, &ipPort) < 0) {
+            opserr << "WARNING invalid ipPort\n";
+            opserr << "expElement corotTruss element: " << tag << endln;
+            return 0;
+        }
+        // server options
+        while (OPS_GetNumRemainingInputArgs() > 0) {
+            type = OPS_GetString();
+            if (strcmp(type, "-initStif") == 0 ||
+                strcmp(type, "-initStiff") == 0) {
+                // move current arg back by one
+                OPS_ResetCurrentInputArg(-1);
+                break;
+            }
+            else if (strcmp(type, "-ssl") == 0) {
+                ssl = 1; udp = 0;
+            }
+            else if (strcmp(type, "-udp") == 0) {
+                udp = 1; ssl = 0;
+            }
+            else if (strcmp(type, "-dataSize") == 0) {
+                numdata = 1;
+                if (OPS_GetIntInput(&numdata, &dataSize) < 0) {
+                    opserr << "WARNING invalid dataSize\n";
+                    opserr << "expElement corotTruss element: " << tag << endln;
+                    return 0;
+                }
+            }
+            else {
+                delete[] ipAddr;
+                ipAddr = new char[strlen(type) + 1];
+                strcpy(ipAddr, type);
+            }
+        }
+    }
+    else {
+        opserr << "WARNING expecting -site or -server string but got ";
+        opserr << type << endln;
+        opserr << "expElement corotTruss element: " << tag << endln;
+        return 0;
+    }
+    
+    // initial stiffness
+    type = OPS_GetString();
+    if (strcmp(type, "-initStif") != 0 &&
+        strcmp(type, "-initStiff") != 0) {
+        opserr << "WARNING expecting -initStif\n";
+        opserr << "expElement corotTruss element: " << tag << endln;
+    }
+    Matrix theInitStif(1, 1);
+    double stif;
+    numdata = 1;
+    if (OPS_GetDoubleInput(&numdata, &stif) < 0) {
+        opserr << "WARNING invalid initial stiffness term\n";
+        opserr << "expElement corotTruss element: " << tag << endln;
+        return 0;
+    }
+    theInitStif(0, 0) = stif;
+    
+    // optional parameters
+    ExperimentalTangentStiff* theTangStif = 0;
+    bool iMod = false;
+    int doRayleigh = 1;
+    double rho = 0.0;
+    bool cMass = false;
+    while (OPS_GetNumRemainingInputArgs() > 0) {
+        type = OPS_GetString();
+        // tangent stiffness
+        if (strcmp(type, "-tangStif") == 0 ||
+            strcmp(type, "-tangStiff") == 0) {
+            int tangStifTag;
+            numdata = 1;
+            if (OPS_GetIntInput(&numdata, &tangStifTag) < 0) {
+                opserr << "WARNING invalid tangStifTag\n";
+                opserr << "expElement corotTruss element: " << tag << endln;
+                return 0;
+            }
+            theTangStif = OPF_GetExperimentalTangentStiff(tangStifTag);
+            if (theTangStif == 0) {
+                opserr << "WARNING experimental tangent stiff not found\n";
+                opserr << "expTangStiff: " << tangStifTag << endln;
+                opserr << "expElement corotTruss element: " << tag << endln;
+                return 0;
+            }
+        }
+        else if (strcmp(type, "-iMod") == 0) {
+            iMod = true;
+        }
+        else if (strcmp(type, "-doRayleigh") == 0) {
+            doRayleigh = 1;
+        }
+        else if (strcmp(type, "-noRayleigh") == 0) {
+            doRayleigh = 0;
+        }
+        else if (strcmp(type, "-rho") == 0) {
+            numdata = 1;
+            if (OPS_GetDoubleInput(&numdata, &rho) < 0) {
+                opserr << "WARNING invalid rho\n";
+                opserr << "expElement corotTruss element: " << tag << endln;
+                return 0;
+            }
+        }
+        else if (strcmp(type, "-cMass") == 0) {
+            cMass = true;
+        }
+    }
+    
+    // now create the EETrussCorot
+    if (theSite != 0) {
+        theExpElement = new EETrussCorot(tag, ndm, node[0], node[1],
+            theSite, theTangStif, iMod, doRayleigh, rho, cMass);
+    }
+    else {
+        theExpElement = new EETrussCorot(tag, ndm, node[0], node[1],
+            ipPort, ipAddr, ssl, udp, dataSize, theTangStif,
+            iMod, doRayleigh, rho, cMass);
+    }
+    if (theExpElement == 0) {
+        opserr << "WARNING ran out of memory creating element\n";
+        opserr << "expElement corotTruss element: " << tag << endln;
+        return 0;
+    }
+    
+    // add initial stiffness
+    int setInitStif = theExpElement->setInitialStiff(theInitStif);
+    if (setInitStif != 0) {
+        opserr << "WARNING initial stiffness not set\n";
+        opserr << "expElement corotTruss element: " << tag << endln;
+        return 0;
+    }
+    
+    return theExpElement;
+}
 
 
 // responsible for allocating the necessary space needed
@@ -1050,10 +1239,16 @@ void EETrussCorot::Print(OPS_Stream &s, int flag)
             s << "  ExperimentalSite: " << theSite->getTag() << endln;
         if (theTangStiff != 0)
             s << "  ExperimentalTangStiff: " << theTangStiff->getTag() << endln;
-        s << "  iMod: " << iMod;
+        if (iMod)
+            s << "  iMod: 1";
+        else
+            s << "  iMod: 0";
         s << ", addRayleigh: " << addRayleigh << endln;
         s << "  mass/length: " << rho;
-        s << ", cMass: " << cMass << endln;
+        if (cMass)
+            s << ", cMass: 1\n";
+        else
+            s << ", cMass: 0\n";
         // determine resisting forces in global system
         s << "  resisting force: " << this->getResistingForce() << endln;
     } else if (flag == 1)  {

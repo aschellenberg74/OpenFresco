@@ -19,10 +19,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 #ifndef ESFKrylovForceConverter_h
 #define ESFKrylovForceConverter_h
 

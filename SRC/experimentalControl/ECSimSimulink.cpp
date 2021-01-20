@@ -19,10 +19,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 // Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 09/09
 // Revision: A
@@ -34,22 +30,90 @@
 
 #include <Channel.h>
 #include <TCP_Socket.h>
+#include <TCP_SocketSSL.h>
+#include <UDP_Socket.h>
+#include <elementAPI.h>
+
+
+void* OPF_ECSimSimulink()
+{
+    // pointer to experimental control that will be returned
+    ExperimentalControl* theControl = 0;
+    
+    if (OPS_GetNumRemainingInputArgs() < 3) {
+        opserr << "WARNING invalid number of arguments\n";
+        opserr << "Want: expControl SimSimulink tag ipAddr ipPort <-ssl> <-udp> "
+            << "<-ctrlFilters (5 filterTag)> <-daqFilters (5 filterTag)>\n";
+        return 0;
+    }
+    
+    // control tag
+    int tag;
+    int numdata = 1;
+    if (OPS_GetIntInput(&numdata, &tag) != 0) {
+        opserr << "WARNING invalid expControl SimSimulink tag\n";
+        return 0;
+    }
+    
+    // ip address
+    char* ipAddr;
+    const char* type = OPS_GetString();
+    ipAddr = new char[strlen(type) + 1];
+    strcpy(ipAddr, type);
+    
+    // ip port
+    int ipPort;
+    numdata = 1;
+    if (OPS_GetIntInput(&numdata, &ipPort) < 0) {
+        opserr << "WARNING invalid ipPort\n";
+        opserr << "expControl SimSimulink " << tag << endln;
+        return 0;
+    }
+    
+    // optional parameters
+    int ssl = 0, udp = 0;
+    int useRelativeTrial = 0;
+    while (OPS_GetNumRemainingInputArgs() > 0) {
+        type = OPS_GetString();
+        if (strcmp(type, "-ssl") == 0) {
+            ssl = 1; udp = 0;
+        }
+        else if (strcmp(type, "-udp") == 0) {
+            udp = 1; ssl = 0;
+        }
+    }
+    
+    // parsing was successful, allocate the control
+    theControl = new ECSimSimulink(tag, ipAddr, ipPort);
+    if (theControl == 0) {
+        opserr << "WARNING could not create experimental control of type SimSimulink\n";
+        return 0;
+    }
+    
+    return theControl;
+}
 
 
 ECSimSimulink::ECSimSimulink(int tag,
-    char *ipaddress, int ipport)
-    : ECSimulation(tag),
-    ipAddress(ipaddress), ipPort(ipport),
+    char *ipaddress, int ipport, int _ssl, int _udp)
+    : ECSimulation(tag), ipAddress(ipaddress),
+    ipPort(ipport), ssl(_ssl), udp(_udp),
     dataSize(OF_Network_dataSize), theChannel(0),
     sData(0), sendData(0), rData(0), recvData(0),
     ctrlDisp(0), ctrlForce(0), ctrlTime(0),
     daqDisp(0), daqForce(0), daqTime(0)
 {
     // setup the connection
-    theChannel = new TCP_Socket(ipPort, ipAddress);
+    if (udp)
+        theChannel = new UDP_Socket(ipPort, ipAddress);
+    else if (ssl)
+        theChannel = new TCP_SocketSSL(ipPort, ipAddress);
+    else
+        theChannel = new TCP_Socket(ipPort, ipAddress);
+    
     if (theChannel->setUpConnection() != 0)  {
         opserr << "ECSimSimulink::ECSimSimulink() - "
-            << "failed to setup TCP connection to Simulink model.\n";
+            << "failed to setup connection to Simulink model.\n";
         delete theChannel;
         exit(OF_ReturnType_failed);
     }
@@ -81,7 +145,10 @@ ECSimSimulink::ECSimSimulink(const ECSimSimulink &ec)
 {
     // use the existing channel which is set up
     ipAddress = ec.ipAddress;
-    ipPort = ec.ipPort;
+    ipPort    = ec.ipPort;
+    ssl       = ec.ssl;
+    udp       = ec.udp;
+    
     theChannel = ec.theChannel;
     
     // allocate memory for the send vectors
@@ -486,7 +553,13 @@ void ECSimSimulink::Print(OPS_Stream &s, int flag)
     s << "****************************************************************\n";
     s << "* ExperimentalControl: " << this->getTag() << endln; 
     s << "*   type: ECSimSimulink\n";
-    s << "*   ipAddress: " << ipAddress << ", ipPort: " << ipPort << endln;
+    if (udp)
+        s << "*   channel: UDP, ";
+    else if (ssl)
+        s << "*   channel: SSL, ";
+    else
+        s << "*   channel: TCP, ";
+    s << "ipAddress: " << ipAddress << ", ipPort: " << ipPort << endln;
     s << "*   ctrlFilters:";
     for (int i=0; i<OF_Resp_All; i++)  {
         if (theCtrlFilters[i] != 0)

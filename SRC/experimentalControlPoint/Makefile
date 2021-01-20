@@ -6,7 +6,7 @@ OBJS  = \
 
 all:         $(OBJS)
 
-tcl: TclExpCPCommand.o
+tcl: TclExpCPCommands.o
 
 test:  test.o
 	$(LINKER) $(LINKFLAGS) test.o \

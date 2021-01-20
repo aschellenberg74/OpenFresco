@@ -22,10 +22,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 #ifndef ExperimentalSetup_h
 #define ExperimentalSetup_h
 
@@ -226,5 +222,10 @@ protected:
     virtual void setCtrl();
     virtual void setDaq();
 };
+
+extern bool OPF_AddExperimentalSetup(ExperimentalSetup* newComponent);
+extern ExperimentalSetup* OPF_GetExperimentalSetup(int tag);
+extern bool OPF_RemoveExperimentalSetup(int tag);
+extern void OPF_ClearExperimentalSetups();
 
 #endif

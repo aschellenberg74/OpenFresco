@@ -31,9 +31,6 @@
 #include <ExperimentalSite.h>
 #include <ActorExpSite.h>
 
-extern ExperimentalSite *getExperimentalSite(int tag);
-extern int removeExperimentalSite(int tag);
-
 
 int TclStartLabServer(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
@@ -51,7 +48,7 @@ int TclStartLabServer(ClientData clientData,
         return TCL_ERROR;
     }
     ActorExpSite *theExperimentalSite =
-        dynamic_cast <ActorExpSite*> (getExperimentalSite(siteTag));
+        dynamic_cast <ActorExpSite*> (OPF_GetExperimentalSite(siteTag));
     if (theExperimentalSite != 0)  {
         // start server process
         opserr << "\nActorExpSite " << siteTag
@@ -62,7 +59,7 @@ int TclStartLabServer(ClientData clientData,
         opserr << "unable to start expSite: " << siteTag << endln;
         return TCL_ERROR;
     }
-    //removeExperimentalSite(siteTag);
+    //OPF_RemoveExperimentalSite(siteTag);
     //theExperimentalSite = 0;
     //delete theExperimentalSite;
     
@@ -86,7 +83,7 @@ int TclSetupLabServer(ClientData clientData,
         return TCL_ERROR;
     }
     ActorExpSite *theExperimentalSite =
-        dynamic_cast <ActorExpSite*> (getExperimentalSite(siteTag));
+        dynamic_cast <ActorExpSite*> (OPF_GetExperimentalSite(siteTag));
     if (theExperimentalSite != 0)  {
         // start server process and run till setup is done
         opserr << "\nActorExpSite " << siteTag
@@ -123,7 +120,7 @@ int TclStepLabServer(ClientData clientData,
         return TCL_ERROR;
     }
     ActorExpSite *theExperimentalSite =
-        dynamic_cast <ActorExpSite*> (getExperimentalSite(siteTag));
+        dynamic_cast <ActorExpSite*> (OPF_GetExperimentalSite(siteTag));
     if (theExperimentalSite != 0)  {
         // start server process and run for numSteps
         opserr << "\nActorExpSite " << siteTag
@@ -158,7 +155,7 @@ int TclStopLabServer(ClientData clientData,
         return TCL_ERROR;
     }
     ActorExpSite *theExperimentalSite =
-        dynamic_cast <ActorExpSite*> (getExperimentalSite(siteTag));
+        dynamic_cast <ActorExpSite*> (OPF_GetExperimentalSite(siteTag));
     if (theExperimentalSite != 0)  {
         // stop server process by destructing ExpSite object
         opserr << "\nActorExpSite " << siteTag

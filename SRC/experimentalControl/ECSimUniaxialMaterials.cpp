@@ -12,18 +12,14 @@
 ** and redistribution, and for a DISCLAIMER OF ALL WARRANTIES.        **
 **                                                                    **
 ** Developed by:                                                      **
-**   Andreas Schellenberg (andreas.schellenberg@gmx.net)              **
+**   Andreas Schellenberg (andreas.schellenberg@gmail.com)            **
 **   Yoshikazu Takahashi (yos@catfish.dpri.kyoto-u.ac.jp)             **
 **   Gregory L. Fenves (fenves@berkeley.edu)                          **
 **   Stephen A. Mahin (mahin@berkeley.edu)                            **
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
-// Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 01/07
 // Revision: A
 //
@@ -33,6 +29,84 @@
 #include "ECSimUniaxialMaterials.h"
 
 #include <UniaxialMaterial.h>
+#include <elementAPI.h>
+
+
+void* OPF_ECSimUniaxialMaterial()
+{
+    // pointer to experimental control that will be returned
+    ExperimentalControl* theControl = 0;
+    
+    if (OPS_GetNumRemainingInputArgs() < 2) {
+        opserr << "WARNING invalid number of arguments\n";
+        opserr << "Want: expControl SimUniaxialMaterials tag matTags "
+            << "<-ctrlFilters (5 filterTag)> <-daqFilters (5 filterTag)>\n";
+        return 0;
+    }
+    
+    // control tag
+    int tag;
+    int numdata = 1;
+    if (OPS_GetIntInput(&numdata, &tag) != 0) {
+        opserr << "WARNING invalid expControl SimUniaxialMaterials tag\n";
+        return 0;
+    }
+    
+    // material tags
+    ID matTags(32);
+    int numMats = 0;
+    while (OPS_GetNumRemainingInputArgs() > 0) {
+        int matTag;
+        numdata = 1;
+        int numArgs = OPS_GetNumRemainingInputArgs();
+        if (OPS_GetIntInput(&numdata, &matTag) < 0) {
+            if (numArgs > OPS_GetNumRemainingInputArgs()) {
+                // move current arg back by one
+                OPS_ResetCurrentInputArg(-1);
+            }
+            break;
+        }
+        matTags(numMats++) = matTag;
+    }
+    if (numMats == 0) {
+        opserr << "WARNING no uniaxial materials specified\n";
+        opserr << "expControl SimUniaxialMaterials " << tag << endln;
+        return 0;
+    }
+    matTags.resize(numMats);
+    
+    // create the array to hold the uniaxial materials
+    UniaxialMaterial** theSpecimen = new UniaxialMaterial * [numMats];
+    if (theSpecimen == 0) {
+        opserr << "WARNING out of memory\n";
+        opserr << "expControl SimUniaxialMaterials " << tag << endln;
+        return 0;
+    }
+    // populate array with uniaxial materials
+    for (int i = 0; i < numMats; i++) {
+        theSpecimen[i] = 0;
+        theSpecimen[i] = OPS_GetUniaxialMaterial(matTags(i));
+        if (theSpecimen[i] == 0) {
+            opserr << "WARNING uniaxial material not found\n";
+            opserr << "uniaxialMaterial " << matTags(i) << endln;
+            opserr << "expControl SimUniaxialMaterials " << tag << endln;
+            return 0;
+        }
+    }
+    
+    // parsing was successful, allocate the control
+    theControl = new ECSimUniaxialMaterials(tag, numMats, theSpecimen);
+    if (theControl == 0) {
+        opserr << "WARNING could not create experimental control of type SimUniaxialMaterials\n";
+        return 0;
+    }
+    
+    // cleanup dynamic memory
+    if (theSpecimen != 0)
+        delete[] theSpecimen;
+    
+    return theControl;
+}
 
 
 ECSimUniaxialMaterials::ECSimUniaxialMaterials(int tag,

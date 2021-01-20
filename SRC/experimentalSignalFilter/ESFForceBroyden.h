@@ -19,10 +19,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 #ifndef ESFErrorSimRandomGauss_h
 #define ESFErrorSimRandomGauss_h
 

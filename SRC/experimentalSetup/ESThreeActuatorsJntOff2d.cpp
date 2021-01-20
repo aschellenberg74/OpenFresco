@@ -19,11 +19,7 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
-// Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 01/07
 // Revision: A
 //
@@ -32,7 +28,115 @@
 
 #include "ESThreeActuatorsJntOff2d.h"
 
+#include <ExperimentalControl.h>
+
+#include <elementAPI.h>
+
 #include <math.h>
+
+
+void* OPF_ESThreeActuatorsJntOff2d()
+{
+    // pointer to experimental setup that will be returned
+    ExperimentalSetup* theSetup = 0;
+    
+    if (OPS_GetNumRemainingInputArgs() < 10) {
+        opserr << "WARNING invalid number of arguments\n";
+        opserr << "Want: expSetup ThreeActuatorsJntOff2d tag <-control ctrlTag> "
+            << "La1 La2 La3 L1 L2 L3 L4 L5 L6 "
+            << "<-nlGeom> <-posAct1 pos> <-phiLocX phi>\n";
+        return 0;
+    }
+    
+    // setup tag
+    int tag;
+    int numdata = 1;
+    if (OPS_GetIntInput(&numdata, &tag) != 0) {
+        opserr << "WARNING invalid expSetup ThreeActuatorsJntOff2d tag\n";
+        return 0;
+    }
+    
+    // control tag (optional)
+    ExperimentalControl* theControl = 0;
+    const char* type = OPS_GetString();
+    if (strcmp(type, "-control") == 0 || strcmp(type, "-ctrl") == 0) {
+        int ctrlTag;
+        numdata = 1;
+        if (OPS_GetIntInput(&numdata, &ctrlTag) < 0) {
+            opserr << "WARNING invalid ctrlTag\n";
+            opserr << "expSetup ThreeActuatorsJntOff2d " << tag << endln;
+            return 0;
+        }
+        theControl = OPF_GetExperimentalControl(ctrlTag);
+        if (theControl == 0) {
+            opserr << "WARNING experimental control not found\n";
+            opserr << "expControl: " << ctrlTag << endln;
+            opserr << "expSetup ThreeActuatorsJntOff2d " << tag << endln;
+            return 0;
+        }
+    }
+    else {
+        // move current arg back by one
+        OPS_ResetCurrentInputArg(-1);
+    }
+    
+    // La1, La2, La3
+    double La[3];
+    numdata = 3;
+    if (OPS_GetDoubleInput(&numdata, La) != 0) {
+        opserr << "WARNING invalid La1, La2, or La3\n";
+        opserr << "expSetup ThreeActuatorsJntOff2d " << tag << endln;
+        return 0;
+    }
+    
+    // L1, L2, L3, L4, L5, L6
+    double L[6];
+    numdata = 6;
+    if (OPS_GetDoubleInput(&numdata, L) != 0) {
+        opserr << "WARNING invalid L1, L2, L3, L4, L5, or L6\n";
+        opserr << "expSetup ThreeActuatorsJntOff2d " << tag << endln;
+        return 0;
+    }
+    
+    // optional parameters
+    int nlGeom = 0;
+    char posAct0[6] = { 'l','e','f','t','\0' };
+    double phiLocX = 0.0;
+    while (OPS_GetNumRemainingInputArgs() > 0) {
+        // nlGeom
+        type = OPS_GetString();
+        if (strcmp(type, "-nlGeom") == 0) {
+            nlGeom = 1;
+        }
+        // posAct1
+        else if (strcmp(type, "-posAct1") == 0) {
+            const char* pos = OPS_GetString();
+            if (strcmp(pos, "left") == 0 || strcmp(pos, "l") == 0)
+                strcpy(posAct0, "left");
+            else if (strcmp(pos, "right") == 0 || strcmp(pos, "r") == 0)
+                strcpy(posAct0, "right");
+        }
+        // phiLocX
+        else if (strcmp(type, "-phiLocX") == 0) {
+            numdata = 1;
+            if (OPS_GetDoubleInput(&numdata, &phiLocX) != 0) {
+                opserr << "WARNING invalid phiLocX\n";
+                opserr << "expSetup ThreeActuatorsJntOff2d " << tag << endln;
+                return 0;
+            }
+        }
+    }
+    
+    // parsing was successful, allocate the setup
+    theSetup = new ESThreeActuatorsJntOff2d(tag, La[0], La[1], La[2],
+        L[0], L[1], L[2], L[3], L[4], L[5], theControl, nlGeom, posAct0, phiLocX);
+    if (theSetup == 0) {
+        opserr << "WARNING could not create experimental setup of type ESThreeActuatorsJntOff2d\n";
+        return 0;
+    }
+    
+    return theSetup;
+}
 
 
 ESThreeActuatorsJntOff2d::ESThreeActuatorsJntOff2d(int tag,

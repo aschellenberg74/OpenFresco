@@ -19,10 +19,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 #ifndef ExpTangentStiffResponse_h
 #define ExpTangentStiffResponse_h
 

@@ -22,14 +22,10 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 #ifndef ShadowExpSite_h
 #define ShadowExpSite_h
 
-// Written: Yoshi (yos@catfish.dpri.kyoto-u.ac.jp)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 09/06
 // Revision: A
 //

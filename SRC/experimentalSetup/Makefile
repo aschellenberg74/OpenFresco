@@ -14,7 +14,7 @@ OBJS  = \
 
 all:         $(OBJS)
 
-tcl: TclExpSetupCommand.o
+tcl: TclExpSetupCommands.o
 
 test:  test.o
 	$(LINKER) $(LINKFLAGS) test.o \

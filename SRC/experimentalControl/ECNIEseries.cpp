@@ -22,10 +22,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 // Written: Yoshi (yos@catfish.dpri.kyoto-u.ac.jp)
 // Created: 11/06
 // Revision: A
@@ -33,6 +29,47 @@
 // Description: This file contains the implementation of ECNIEseries.
 
 #include "ECNIEseries.h"
+
+#include <elementAPI.h>
+
+void* OPF_ECNIEseries()
+{
+    // pointer to experimental control that will be returned
+    ExperimentalControl* theControl = 0;
+    
+    if (OPS_GetNumRemainingInputArgs() < 6) {
+        opserr << "WARNING invalid number of arguments\n";
+        opserr << "Want: expControl NIEseries tag device "
+            << "<-ctrlFilters (5 filterTag)> <-daqFilters (5 filterTag)>\n";
+        return 0;
+    }
+    
+    // control tag
+    int tag;
+    int numdata = 1;
+    if (OPS_GetIntInput(&numdata, &tag) != 0) {
+        opserr << "WARNING invalid expControl NIEseries tag\n";
+        return 0;
+    }
+    
+    // device
+    int device;
+    numdata = 1;
+    if (OPS_GetIntInput(&numdata, &device) != 0) {
+        opserr << "WARNING invalid device\n";
+        opserr << "expControl NIEseries " << tag << endln;
+        return 0;
+    }
+    
+    // parsing was successful, allocate the control
+    theControl = new ECNIEseries(tag, device);
+    if (theControl == 0) {
+        opserr << "WARNING could not create experimental control of type NIEseries\n";
+        return 0;
+    }
+    
+    return theControl;
+}
 
 
 ECNIEseries::ECNIEseries(int tag ,int device)//, bool rtest)

@@ -19,10 +19,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 // Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 02/07
 // Revision: A
@@ -31,9 +27,322 @@
 
 #include "ExperimentalCP.h"
 
+#include <stdlib.h>
+#include <elementAPI.h>
+
+#include <TaggedObject.h>
+#include <MapOfTaggedObjects.h>
+#include <Domain.h>
 #include <Node.h>
 
-#include <stdlib.h>
+static MapOfTaggedObjects theExperimentalCPs;
+
+
+bool OPF_AddExperimentalCP(ExperimentalCP* newComponent)
+{
+    return theExperimentalCPs.addComponent(newComponent);
+}
+
+
+bool OPF_RemoveExperimentalCP(int tag)
+{
+    TaggedObject* obj = theExperimentalCPs.removeComponent(tag);
+    if (obj != 0) {
+        delete obj;
+        return true;
+    }
+    return false;
+}
+
+
+ExperimentalCP* OPF_GetExperimentalCP(int tag)
+{
+    TaggedObject* theResult = theExperimentalCPs.getComponentPtr(tag);
+    if (theResult == 0) {
+        opserr << "OPF_GetExperimentalCP() - "
+            << "none found with tag: " << tag << endln;
+        return 0;
+    }
+    ExperimentalCP* theControl = (ExperimentalCP*)theResult;
+    
+    return theControl;
+}
+
+
+void OPF_ClearExperimentalCPs()
+{
+    theExperimentalCPs.clearAll();
+}
+
+
+void* OPF_ExperimentalCP()
+{
+    // pointer to experimental control point that will be returned
+    ExperimentalCP* theCP = 0;
+    
+    if (OPS_GetNumRemainingInputArgs() < 3) {
+        opserr << "WARNING invalid number of arguments\n";
+        opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType "
+            << "<-fact f> <-lim l u> <-isRel> ...\n";
+        return 0;
+    }
+    
+    // control point tag
+    int tag;
+    int numdata = 1;
+    if (OPS_GetIntInput(&numdata, &tag) < 0) {
+        opserr << "WARNING invalid expControlPoint tag\n";
+        return 0;
+    }
+    
+    // node (optional)
+    int ndm = 0, ndf = 0;
+    Domain* theDomain = 0;
+    Node* theNode = 0;
+    const char* type = OPS_GetString();
+    if (strcmp(type, "-node") == 0) {
+        int nodeTag;
+        numdata = 1;
+        if (OPS_GetIntInput(&numdata, &nodeTag) < 0) {
+            opserr << "WARNING invalid nodeTag for control point: " << tag << endln;
+            return 0;
+        }
+        theDomain = OPS_GetDomain();
+        theNode = theDomain->getNode(nodeTag);
+        ndf = theNode->getNumberDOF();
+        ndm = OPS_GetNDM();
+    } else {
+        // move current arg back by one
+        OPS_ResetCurrentInputArg(-1);
+    }
+
+    // get the dof and associated properties
+    ID dof(32);
+    ID rspType(32);
+    Vector factor(32);
+    Vector lowerLim(32);
+    Vector upperLim(32);
+    ID isRelative(32);
+    int numSignals = 0, numLimits = 0, numRefType = 0;
+    while (OPS_GetNumRemainingInputArgs() > 0) {
+        
+        // dof ID
+        type = OPS_GetString();
+        if (ndf == 0) {
+            int dofID = 0;
+            if (sscanf(type, "%d", &dofID) != 1) {
+                if (sscanf(type, "%*[dfouDFOU]%d", &dofID) != 1) {
+                    opserr << "WARNING invalid dof for control point: " << tag << endln;
+                    opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType <-fact f> <-lim l u> <-isRel> ...\n";
+                    return 0;
+                }
+            }
+            dof(numSignals) = dofID - 1;
+        }
+        else if (ndm == 1 && ndf == 1) {
+            if (strcmp(type, "1") == 0 ||
+                strcmp(type, "dof1") == 0 || strcmp(type, "DOF1") == 0 ||
+                strcmp(type, "u1") == 0 || strcmp(type, "U1") == 0 ||
+                strcmp(type, "ux") == 0 || strcmp(type, "UX") == 0)
+                dof(numSignals) = 0;
+            else {
+                opserr << "WARNING invalid dof for control point: " << tag << endln;
+                opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType <-fact f> <-lim l u> <-isRel> ...\n";
+                return 0;
+            }
+        }
+        else if (ndm == 2 && ndf == 2) {
+            if (strcmp(type, "1") == 0 ||
+                strcmp(type, "dof1") == 0 || strcmp(type, "DOF1") == 0 ||
+                strcmp(type, "u1") == 0 || strcmp(type, "U1") == 0 ||
+                strcmp(type, "ux") == 0 || strcmp(type, "UX") == 0)
+                dof(numSignals) = 0;
+            else if (strcmp(type, "2") == 0 ||
+                strcmp(type, "dof2") == 0 || strcmp(type, "DOF2") == 0 ||
+                strcmp(type, "u2") == 0 || strcmp(type, "U2") == 0 ||
+                strcmp(type, "uy") == 0 || strcmp(type, "UY") == 0)
+                dof(numSignals) = 1;
+            else {
+                opserr << "WARNING invalid dof for control point: " << tag << endln;
+                opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType <-fact f> <-lim l u> <-isRel> ...\n";
+                return 0;
+            }
+        }
+        else if (ndm == 2 && ndf == 3) {
+            if (strcmp(type, "1") == 0 ||
+                strcmp(type, "dof1") == 0 || strcmp(type, "DOF1") == 0 ||
+                strcmp(type, "u1") == 0 || strcmp(type, "U1") == 0 ||
+                strcmp(type, "ux") == 0 || strcmp(type, "UX") == 0)
+                dof(numSignals) = 0;
+            else if (strcmp(type, "2") == 0 ||
+                strcmp(type, "dof2") == 0 || strcmp(type, "DOF2") == 0 ||
+                strcmp(type, "u2") == 0 || strcmp(type, "U2") == 0 ||
+                strcmp(type, "uy") == 0 || strcmp(type, "UY") == 0)
+                dof(numSignals) = 1;
+            else if (strcmp(type, "3") == 0 ||
+                strcmp(type, "dof3") == 0 || strcmp(type, "DOF3") == 0 ||
+                strcmp(type, "r3") == 0 || strcmp(type, "R3") == 0 ||
+                strcmp(type, "rz") == 0 || strcmp(type, "RZ") == 0)
+                dof(numSignals) = 2;
+            else {
+                opserr << "WARNING invalid dof for control point: " << tag << endln;
+                opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType <-fact f> <-lim l u> <-isRel> ...\n";
+                return 0;
+            }
+        }
+        else if (ndm == 3 && ndf == 3) {
+            if (strcmp(type, "1") == 0 ||
+                strcmp(type, "dof1") == 0 || strcmp(type, "DOF1") == 0 ||
+                strcmp(type, "u1") == 0 || strcmp(type, "U1") == 0 ||
+                strcmp(type, "ux") == 0 || strcmp(type, "UX") == 0)
+                dof(numSignals) = 0;
+            else if (strcmp(type, "2") == 0 ||
+                strcmp(type, "dof2") == 0 || strcmp(type, "DOF2") == 0 ||
+                strcmp(type, "u2") == 0 || strcmp(type, "U2") == 0 ||
+                strcmp(type, "uy") == 0 || strcmp(type, "UY") == 0)
+                dof(numSignals) = 1;
+            else if (strcmp(type, "3") == 0 ||
+                strcmp(type, "dof3") == 0 || strcmp(type, "DOF3") == 0 ||
+                strcmp(type, "u3") == 0 || strcmp(type, "U3") == 0 ||
+                strcmp(type, "uz") == 0 || strcmp(type, "UZ") == 0)
+                dof(numSignals) = 2;
+            else {
+                opserr << "WARNING invalid dof for control point: " << tag << endln;
+                opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType <-fact f> <-lim l u> <-isRel> ...\n";
+                return 0;
+            }
+        }
+        else if (ndm == 3 && ndf == 6) {
+            if (strcmp(type, "1") == 0 ||
+                strcmp(type, "dof1") == 0 || strcmp(type, "DOF1") == 0 ||
+                strcmp(type, "u1") == 0 || strcmp(type, "U1") == 0 ||
+                strcmp(type, "ux") == 0 || strcmp(type, "UX") == 0)
+                dof(numSignals) = 0;
+            else if (strcmp(type, "2") == 0 ||
+                strcmp(type, "dof2") == 0 || strcmp(type, "DOF2") == 0 ||
+                strcmp(type, "u2") == 0 || strcmp(type, "U2") == 0 ||
+                strcmp(type, "uy") == 0 || strcmp(type, "UY") == 0)
+                dof(numSignals) = 1;
+            else if (strcmp(type, "3") == 0 ||
+                strcmp(type, "dof3") == 0 || strcmp(type, "DOF3") == 0 ||
+                strcmp(type, "u3") == 0 || strcmp(type, "U3") == 0 ||
+                strcmp(type, "uz") == 0 || strcmp(type, "UZ") == 0)
+                dof(numSignals) = 2;
+            else if (strcmp(type, "4") == 0 ||
+                strcmp(type, "dof4") == 0 || strcmp(type, "DOF4") == 0 ||
+                strcmp(type, "r1") == 0 || strcmp(type, "R1") == 0 ||
+                strcmp(type, "rx") == 0 || strcmp(type, "RX") == 0)
+                dof(numSignals) = 3;
+            else if (strcmp(type, "5") == 0 ||
+                strcmp(type, "dof5") == 0 || strcmp(type, "DOF5") == 0 ||
+                strcmp(type, "r2") == 0 || strcmp(type, "R2") == 0 ||
+                strcmp(type, "ry") == 0 || strcmp(type, "RY") == 0)
+                dof(numSignals) = 4;
+            else if (strcmp(type, "6") == 0 ||
+                strcmp(type, "dof6") == 0 || strcmp(type, "DOF6") == 0 ||
+                strcmp(type, "r3") == 0 || strcmp(type, "R3") == 0 ||
+                strcmp(type, "rz") == 0 || strcmp(type, "RZ") == 0)
+                dof(numSignals) = 5;
+            else {
+                opserr << "WARNING invalid dof for control point: " << tag << endln;
+                opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType <-fact f> <-lim l u> <-isRel> ...\n";
+                return 0;
+            }
+        }
+        
+        // response type
+        type = OPS_GetString();
+        if (strcmp(type, "1") == 0 || strcmp(type, "dsp") == 0 ||
+            strcmp(type, "disp") == 0 || strcmp(type, "displacement") == 0)
+            rspType(numSignals) = OF_Resp_Disp;
+        else if (strcmp(type, "2") == 0 || strcmp(type, "vel") == 0 ||
+            strcmp(type, "velocity") == 0)
+            rspType(numSignals) = OF_Resp_Vel;
+        else if (strcmp(type, "3") == 0 || strcmp(type, "acc") == 0 ||
+            strcmp(type, "accel") == 0 || strcmp(type, "acceleration") == 0)
+            rspType(numSignals) = OF_Resp_Accel;
+        else if (strcmp(type, "4") == 0 || strcmp(type, "frc") == 0 ||
+            strcmp(type, "force") == 0)
+            rspType(numSignals) = OF_Resp_Force;
+        else if (strcmp(type, "5") == 0 || strcmp(type, "t") == 0 ||
+            strcmp(type, "tme") == 0 || strcmp(type, "time") == 0)
+            rspType(numSignals) = OF_Resp_Time;
+        else {
+            opserr << "WARNING invalid rspType for control point: " << tag << endln;
+            opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType <-fact f> <-lim l u> <-isRel> ...\n";
+            return 0;
+        }
+        
+        // scale factor (optional)
+        type = OPS_GetString();
+        if (type != 0 && (strcmp(type, "-fact") == 0 || strcmp(type, "-factor") == 0)) {
+            numdata = 1;
+            if (OPS_GetDoubleInput(&numdata, &factor(numSignals)) < 0) {
+                opserr << "WARNING invalid factor for control point: " << tag << endln;
+                opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType <-fact f> <-lim l u> <-isRel> ...\n";
+                return 0;
+            }
+            // read next argument
+            type = OPS_GetString();
+        }
+        else {
+            factor(numSignals) = 1.0;
+        }
+        
+        // response limits (optional)
+        if (type != 0 && (strcmp(type, "-lim") == 0 || strcmp(type, "-limit") == 0)) {
+            numdata = 1;
+            if (OPS_GetDoubleInput(&numdata, &lowerLim(numSignals)) < 0) {
+                opserr << "WARNING invalid lower limit for control point: " << tag << endln;
+                opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType <-fact f> <-lim l u> <-isRel> ...\n";
+                return 0;
+            }
+            if (OPS_GetDoubleInput(&numdata, &upperLim(numSignals)) < 0) {
+                opserr << "WARNING invalid upper limit for control point: " << tag << endln;
+                opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType <-fact f> <-lim l u> <-isRel> ...\n";
+                return 0;
+            }
+            numLimits++;
+            // read next argument
+            type = OPS_GetString();
+        }
+        
+        // relative signal reference (optional)
+        if (type != 0 && (strcmp(type, "-isRel") == 0 || strcmp(type, "-isRelative") == 0)) {
+            isRelative(numSignals) = 1;
+            numRefType++;
+        }
+        
+        numSignals++;
+        if (OPS_GetNumRemainingInputArgs() > 0) {
+            // move current arg back by one
+            OPS_ResetCurrentInputArg(-1);
+        }
+    }
+    dof.resize(numSignals);
+    rspType.resize(numSignals);
+    factor.resize(numSignals);
+    lowerLim.resize(numLimits);
+    upperLim.resize(numLimits);
+    isRelative.resize(numRefType);
+    
+    // parsing was successful, allocate the control point
+    theCP = new ExperimentalCP(tag, dof, rspType, factor);
+    
+    // add limits if available
+    if (numLimits > 0)
+        theCP->setLimits(lowerLim, upperLim);
+    
+    // add signal reference types if available
+    if (numRefType > 0)
+        theCP->setSigRefType(isRelative);
+    
+    // add node if available
+    if (theNode != 0)
+        theCP->setNode(theNode);
+    
+    return theCP;
+}
 
 
 ExperimentalCP::ExperimentalCP(int tag, const ID &dof,
@@ -43,7 +352,7 @@ ExperimentalCP::ExperimentalCP(int tag, const ID &dof,
     DOF(dof), rspType(rsptype), factor(dof.Size()),
     lowerLim(0), upperLim(0), isRelative(dof.Size()),
     uniqueDOF(dof), sizeRspType(5), dofRspType(5),
-    nodeTag(0), nodeNDM(0), nodeNDF(0)
+    nodeTag(0), theNode(0), nodeNDM(0), nodeNDF(0)
 {
     // initialize factors
     if (fact.Size() > 0)  {
@@ -110,6 +419,7 @@ ExperimentalCP::ExperimentalCP(const ExperimentalCP& ecp)
     dofRspType  = ecp.dofRspType;
     
     nodeTag  = ecp.nodeTag;
+    theNode  = ecp.theNode;
     nodeNDM  = ecp.nodeNDM;
     nodeNDF  = ecp.nodeNDF;
     nodeCrds = ecp.nodeCrds;

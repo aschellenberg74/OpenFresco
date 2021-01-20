@@ -31,10 +31,64 @@
 
 #include "ExperimentalSite.h"
 
+#include <TaggedObject.h>
+#include <MapOfTaggedObjects.h>
 #include <Recorder.h>
 
+static MapOfTaggedObjects theExperimentalSites;
 
-ExperimentalSite::ExperimentalSite(int tag, 
+
+bool OPF_AddExperimentalSite(ExperimentalSite* newComponent)
+{
+    return theExperimentalSites.addComponent(newComponent);
+}
+
+
+bool OPF_RemoveExperimentalSite(int tag)
+{
+    TaggedObject* obj = theExperimentalSites.removeComponent(tag);
+    if (obj != 0) {
+        delete obj;
+        return true;
+    }
+    return false;
+}
+
+
+ExperimentalSite* OPF_GetExperimentalSite(int tag)
+{
+    TaggedObject* theResult = theExperimentalSites.getComponentPtr(tag);
+    if (theResult == 0) {
+        opserr << "OPF_GetExperimentalSite() - "
+            << "none found with tag: " << tag << endln;
+        return 0;
+    }
+    ExperimentalSite* theSite = (ExperimentalSite*)theResult;
+    
+    return theSite;
+}
+
+
+ExperimentalSite* OPF_GetExperimentalSiteFirst()
+{
+    TaggedObjectIter &mcIter = theExperimentalSites.getComponents();
+    TaggedObject* theResult = mcIter();
+    if (theResult == 0)
+        return 0;
+    
+    ExperimentalSite* theSite = (ExperimentalSite*)theResult;
+    
+    return theSite;
+}
+
+
+void OPF_ClearExperimentalSites()
+{
+    theExperimentalSites.clearAll();
+}
+
+
+ExperimentalSite::ExperimentalSite(int tag,
     ExperimentalSetup *setup)
     : TaggedObject(tag), theSetup(setup),
     sizeTrial(0), sizeOut(0),

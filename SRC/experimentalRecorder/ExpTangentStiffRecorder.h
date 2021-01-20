@@ -19,10 +19,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 #ifndef ExpTangentStiffRecorder_h
 #define ExpTangentStiffRecorder_h
 

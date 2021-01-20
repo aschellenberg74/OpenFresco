@@ -19,10 +19,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 // Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 09/06
 // Revision: A
@@ -41,6 +37,7 @@
 #include <TCP_Socket.h>
 #include <TCP_SocketSSL.h>
 #include <UDP_Socket.h>
+#include <elementAPI.h>
 
 #include <float.h>
 #include <math.h>
@@ -57,6 +54,293 @@ Vector EETwoNodeLink::EETwoNodeLinkV2(2);
 Vector EETwoNodeLink::EETwoNodeLinkV4(4);
 Vector EETwoNodeLink::EETwoNodeLinkV6(6);
 Vector EETwoNodeLink::EETwoNodeLinkV12(12);
+
+void* OPF_EETwoNodeLink()
+{
+    // pointer to experimental element that will be returned
+    ExperimentalElement* theExpElement = 0;
+    int ndm = OPS_GetNDM();
+    
+    if (OPS_GetNumRemainingInputArgs() < 9) {
+        opserr << "WARNING invalid number of arguments\n";
+        opserr << "Want: expElement twoNodeLink eleTag iNode jNode -dof dofs -site siteTag -initStif Kij <-tangStif tangStifTag> <-orient <x1 x2 x3> y1 y2 y3> <-pDelta Mratios> <-shearDist sDratios> <-iMod> <-noRayleigh> <-mass m>\n";
+        opserr << "  or: expElement twoNodeLink eleTag iNode jNode -dof dofs -server ipPort <ipAddr> <-ssl> <-udp> <-dataSize size> -initStif Kij <-tangStif tangStifTag> <-orient <x1 x2 x3> y1 y2 y3> <-pDelta Mratios> <-shearDist sDratios> <-iMod> <-noRayleigh> <-mass m>\n";
+        return 0;
+    }
+    
+    // element tag
+    int tag;
+    int numdata = 1;
+    if (OPS_GetIntInput(&numdata, &tag) != 0) {
+        opserr << "WARNING invalid expElement twoNodeLink eleTag\n";
+        return 0;
+    }
+    
+    // nodes
+    int node[2];
+    numdata = 2;
+    if (OPS_GetIntInput(&numdata, node) != 0) {
+        opserr << "WARNING invalid iNode or jNode\n";
+        opserr << "expElement twoNodeLink element: " << tag << endln;
+        return 0;
+    }
+    
+    // dof IDs
+    const char* type = OPS_GetString();
+    if (strcmp(type, "-dof") != 0 && strcmp(type, "-dir") != 0) {
+        opserr << "WARNING expecting -dof dofs\n";
+        opserr << "expElement twoNodeLink element: " << tag << endln;
+        return 0;
+    }
+    ID theDOF(32);
+    int numDOF = 0;
+    while (OPS_GetNumRemainingInputArgs() > 0) {
+        int dof;
+        numdata = 1;
+        int numArgs = OPS_GetNumRemainingInputArgs();
+        if (OPS_GetIntInput(&numdata, &dof) < 0) {
+            if (numArgs > OPS_GetNumRemainingInputArgs()) {
+                // move current arg back by one
+                OPS_ResetCurrentInputArg(-1);
+            }
+            break;
+        }
+        theDOF(numDOF++) = dof-1;
+    }
+    if (numDOF == 0) {
+        opserr << "WARNING no directions/dofs specified\n";
+        opserr << "expElement twoNodeLink element: " << tag << endln;
+        return 0;
+    }
+    theDOF.resize(numDOF);
+    
+    // experimental site or server parameters
+    ExperimentalSite* theSite = 0;
+    int ipPort = 8090;
+    char* ipAddr = new char[10];
+    strcpy(ipAddr, "127.0.0.1");
+    int ssl = 0, udp = 0;
+    int dataSize = OF_Network_dataSize;
+    type = OPS_GetString();
+    if (strcmp(type, "-site") == 0) {
+        // site tag
+        int siteTag;
+        numdata = 1;
+        if (OPS_GetIntInput(&numdata, &siteTag) < 0) {
+            opserr << "WARNING invalid siteTag\n";
+            opserr << "expElement twoNodeLink element: " << tag << endln;
+            return 0;
+        }
+        theSite = OPF_GetExperimentalSite(siteTag);
+        if (theSite == 0) {
+            opserr << "WARNING experimental site not found\n";
+            opserr << "expSite: " << siteTag << endln;
+            opserr << "expElement twoNodeLink element: " << tag << endln;
+            return 0;
+        }
+    }
+    else if (strcmp(type, "-server") == 0) {
+        // ip port
+        numdata = 1;
+        if (OPS_GetIntInput(&numdata, &ipPort) < 0) {
+            opserr << "WARNING invalid ipPort\n";
+            opserr << "expElement twoNodeLink element: " << tag << endln;
+            return 0;
+        }
+        // server options
+        while (OPS_GetNumRemainingInputArgs() > 0) {
+            type = OPS_GetString();
+            if (strcmp(type, "-initStif") == 0 ||
+                strcmp(type, "-initStiff") == 0) {
+                // move current arg back by one
+                OPS_ResetCurrentInputArg(-1);
+                break;
+            }
+            else if (strcmp(type, "-ssl") == 0) {
+                ssl = 1; udp = 0;
+            }
+            else if (strcmp(type, "-udp") == 0) {
+                udp = 1; ssl = 0;
+            }
+            else if (strcmp(type, "-dataSize") == 0) {
+                numdata = 1;
+                if (OPS_GetIntInput(&numdata, &dataSize) < 0) {
+                    opserr << "WARNING invalid dataSize\n";
+                    opserr << "expElement twoNodeLink element: " << tag << endln;
+                    return 0;
+                }
+            }
+            else {
+                delete[] ipAddr;
+                ipAddr = new char[strlen(type) + 1];
+                strcpy(ipAddr, type);
+            }
+        }
+    }
+    else {
+        opserr << "WARNING expecting -site or -server string but got ";
+        opserr << type << endln;
+        opserr << "expElement twoNodeLink element: " << tag << endln;
+        return 0;
+    }
+    
+    // initial stiffness
+    type = OPS_GetString();
+    if (strcmp(type, "-initStif") != 0 &&
+        strcmp(type, "-initStiff") != 0) {
+        opserr << "WARNING expecting -initStif\n";
+        opserr << "expElement twoNodeLink element: " << tag << endln;
+    }
+    Matrix theInitStif(numDOF, numDOF);
+    double stif[36];
+    numdata = numDOF*numDOF;
+    if (OPS_GetDoubleInput(&numdata, stif) < 0) {
+        opserr << "WARNING invalid initial stiffness term\n";
+        opserr << "expElement twoNodeLink element: " << tag << endln;
+        return 0;
+    }
+    theInitStif.setData(stif, numDOF, numDOF);
+    
+    // optional parameters
+    ExperimentalTangentStiff* theTangStif = 0;
+    Vector x, y, Mratio, sDistI;
+    bool iMod = false;
+    int doRayleigh = 1;
+    double mass = 0.0;
+    while (OPS_GetNumRemainingInputArgs() > 0) {
+        type = OPS_GetString();
+        // tangent stiffness
+        if (strcmp(type, "-tangStif") == 0 ||
+            strcmp(type, "-tangStiff") == 0) {
+            int tangStifTag;
+            numdata = 1;
+            if (OPS_GetIntInput(&numdata, &tangStifTag) < 0) {
+                opserr << "WARNING invalid tangStifTag\n";
+                opserr << "expElement twoNodeLink element: " << tag << endln;
+                return 0;
+            }
+            theTangStif = OPF_GetExperimentalTangentStiff(tangStifTag);
+            if (theTangStif == 0) {
+                opserr << "WARNING experimental tangent stiff not found\n";
+                opserr << "expTangStiff: " << tangStifTag << endln;
+                opserr << "expElement twoNodeLink element: " << tag << endln;
+                return 0;
+            }
+        }
+        else if (strcmp(type, "-orient") == 0) {
+            if (OPS_GetNumRemainingInputArgs() < 3) {
+                opserr << "WARNING: insufficient arguments after -orient\n";
+                opserr << "expElement twoNodeLink element: " << tag << endln;
+                return 0;
+            }
+            x.resize(3);
+            numdata = 3;
+            if (OPS_GetDoubleInput(&numdata, &x(0)) < 0) {
+                opserr << "WARNING: invalid -orient values\n";
+                opserr << "expElement twoNodeLink element: " << tag << endln;
+                return 0;
+            }
+            if (OPS_GetNumRemainingInputArgs() < 3) {
+                y = x;
+                x = Vector();
+                continue;
+            }
+            y.resize(3);
+            numdata = 3;
+            if (OPS_GetDoubleInput(&numdata, &y(0)) < 0) {
+                y = x;
+                x = Vector();
+                continue;
+            }
+        }
+        else if (strcmp(type, "-pDelta") == 0) {
+            Mratio.resize(4);
+            Mratio.Zero();
+            numdata = 4;
+            double* ptr = &Mratio(0);
+            if (ndm == 2) {
+                numdata = 2;
+                ptr += 2;
+            }
+            if (OPS_GetNumRemainingInputArgs() < numdata) {
+                opserr << "WARNING: insufficient data for -pDelta\n";
+                opserr << "expElement twoNodeLink element: " << tag << endln;
+                return 0;
+            }
+            if (OPS_GetDoubleInput(&numdata, ptr) < 0) {
+                opserr << "WARNING: invalid -pDelta values\n";
+                opserr << "expElement twoNodeLink element: " << tag << endln;
+                return 0;
+            }
+        }
+        else if (strcmp(type, "-shearDist") == 0) {
+            sDistI.resize(2);
+            numdata = 2;
+            if (ndm == 2) {
+                numdata = 1;
+                sDistI(1) = 0.5;
+            }
+            if (OPS_GetNumRemainingInputArgs() < numdata) {
+                opserr << "WARNING: insufficient data for -shearDist\n";
+                opserr << "expElement twoNodeLink element: " << tag << endln;
+                return 0;
+            }
+            if (OPS_GetDoubleInput(&numdata, &sDistI(0)) < 0) {
+                opserr << "WARNING: invalid -shearDist values\n";
+                opserr << "expElement twoNodeLink element: " << tag << endln;
+                return 0;
+            }
+        }
+        else if (strcmp(type, "-iMod") == 0) {
+            iMod = true;
+        }
+        else if (strcmp(type, "-doRayleigh") == 0) {
+            doRayleigh = 1;
+        }
+        else if (strcmp(type, "-noRayleigh") == 0) {
+            doRayleigh = 0;
+        }
+        else if (strcmp(type, "-mass") == 0) {
+            if (OPS_GetNumRemainingInputArgs() < 1) {
+                opserr << "WARNING: insufficient mass value\n";
+                opserr << "expElement twoNodeLink element: " << tag << endln;
+                return 0;
+            }
+            numdata = 1;
+            if (OPS_GetDoubleInput(&numdata, &mass) < 0) {
+                opserr << "WARNING: invalid -mass value\n";
+                opserr << "expElement twoNodeLink element: " << tag << endln;
+                return 0;
+            }
+        }
+    }
+    
+    // now create the EETwoNodeLink
+    if (theSite != 0) {
+        theExpElement = new EETwoNodeLink(tag, ndm, node[0], node[1], theDOF,
+            theSite, theTangStif, y, x, Mratio, sDistI, iMod, doRayleigh, mass);
+    }
+    else {
+        theExpElement = new EETwoNodeLink(tag, ndm, node[0], node[1], theDOF,
+            ipPort, ipAddr, ssl, udp, dataSize, theTangStif, y, x, Mratio,
+            sDistI, iMod, doRayleigh, mass);
+    }
+    if (theExpElement == 0) {
+        opserr << "WARNING ran out of memory creating element\n";
+        opserr << "expElement twoNodeLink element: " << tag << endln;
+        return 0;
+    }
+    
+    // add initial stiffness
+    int setInitStif = theExpElement->setInitialStiff(theInitStif);
+    if (setInitStif != 0) {
+        opserr << "WARNING initial stiffness not set\n";
+        opserr << "expElement twoNodeLink element: " << tag << endln;
+        return 0;
+    }
+    
+    return theExpElement;
+}
 
 
 // responsible for allocating the necessary space needed

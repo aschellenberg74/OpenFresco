@@ -19,10 +19,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 // Written: Hong Kim (hongkim@berkeley.edu)
 // Created: 10/10
 // Revision: A
@@ -34,6 +30,47 @@
 // (Igarashi 1993 p. 10)
 
 #include "ETTranspose.h"
+
+#include <elementAPI.h>
+
+void* OPF_ETTranspose()
+{
+    // pointer to experimental tangent stiff that will be returned
+    ExperimentalTangentStiff* theTangentStiff = 0;
+    
+    if (OPS_GetNumRemainingInputArgs() < 2) {
+        opserr << "WARNING invalid number of arguments\n";
+        opserr << "Want: expTangentStiff Transpose tag numCols\n";
+        return 0;
+    }
+    
+    // tangent stiff tag
+    int tag;
+    int numdata = 1;
+    if (OPS_GetIntInput(&numdata, &tag) != 0) {
+        opserr << "WARNING invalid expTangentStiff Transpose tag\n";
+        return 0;
+    }
+    
+    // number of columns
+    int numCols;
+    numdata = 1;
+    if (OPS_GetIntInput(&numdata, &numCols) != 0) {
+        opserr << "WARNING invalid number of columns value\n";
+        opserr << "expTangentStiff Transpose " << tag << endln;
+        return 0;
+    }
+    
+    // parsing was successful, allocate the tangent stiff
+    theTangentStiff = new ETTranspose(tag, numCols);
+    if (theTangentStiff == 0) {
+        opserr << "WARNING could not create experimental tangent stiffness "
+            << "of type ETTranspose\n";
+        return 0;
+    }
+    
+    return theTangentStiff;
+}
 
 
 ETTranspose::ETTranspose(int tag , int nC)

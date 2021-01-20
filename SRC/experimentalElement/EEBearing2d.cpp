@@ -19,10 +19,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 // Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 01/14
 // Revision: A
@@ -42,6 +38,7 @@
 #include <TCP_Socket.h>
 #include <TCP_SocketSSL.h>
 #include <UDP_Socket.h>
+#include <elementAPI.h>
 
 #include <float.h>
 #include <math.h>
@@ -52,6 +49,302 @@
 // initialize the class wide variables
 Matrix EEBearing2d::theMatrix(6,6);
 Vector EEBearing2d::theVector(6);
+
+void* OPF_EEBearing2d()
+{
+    int ndf = OPS_GetNDF();
+    if (ndf != 3) {
+        opserr << "WARNING invalid ndf: " << ndf;
+        opserr << ", for plane problem need 3 - expElement bearing\n";
+        return 0;
+    }
+    
+    // pointer to experimental element that will be returned
+    ExperimentalElement* theExpElement = 0;
+    
+    if (OPS_GetNumRemainingInputArgs() < 12) {
+        opserr << "WARNING invalid number of arguments\n";
+        opserr << "Want: expElement bearing eleTag iNode jNode pFrcCtrl -P matTag -Mz matTag -site siteTag -initStif Kij <-orient x1 x2 x3 y1 y2 y3> <-pDelta Mratios> <-shearDist sDratio> <-iMod> <-doRayleigh> <-mass m>\n";
+        opserr << "  or: expElement bearing eleTag iNode jNode pFrcCtrl -P matTag -Mz matTag -server ipPort <ipAddr> <-ssl> <-udp> <-dataSize size> -initStif Kij <-orient x1 x2 x3 y1 y2 y3> <-pDelta Mratios> <-shearDist sDratio> <-iMod> <-doRayleigh> <-mass m>\n";
+        return 0;
+    }
+    
+    // element tag
+    int tag;
+    int numdata = 1;
+    if (OPS_GetIntInput(&numdata, &tag) != 0) {
+        opserr << "WARNING invalid expElement bearing eleTag\n";
+        return 0;
+    }
+    
+    // nodes
+    int node[2];
+    numdata = 2;
+    if (OPS_GetIntInput(&numdata, node) != 0) {
+        opserr << "WARNING invalid iNode or jNode\n";
+        opserr << "expElement bearing element: " << tag << endln;
+        return 0;
+    }
+    
+    // axial force control flag
+    int pFrcCtrl;
+    numdata = 1;
+    if (OPS_GetIntInput(&numdata, &pFrcCtrl) != 0) {
+        opserr << "WARNING invalid pFrcCtrl\n";
+        opserr << "expElement bearing element: " << tag << endln;
+        return 0;
+    }
+    
+    // materials for axial and bending
+    int matTag;
+    UniaxialMaterial* theMaterials[2] = { 0, 0 };
+    const char* type = OPS_GetString();
+    if (strcmp(type, "-P") != 0) {
+        opserr << "WARNING expecting -P matTag\n";
+        opserr << "expElement bearing element: " << tag << endln;
+        return 0;
+    }
+	numdata = 1;
+	if (OPS_GetIntInput(&numdata, &matTag) != 0) {
+		opserr << "WARNING invalid -P matTag\n";
+		opserr << "expElement bearing element: " << tag << endln;
+		return 0;
+	}
+	theMaterials[0] = OPS_GetUniaxialMaterial(matTag);
+	if (theMaterials[0] == 0) {
+		opserr << "WARNING material model not found\n";
+		opserr << "uniaxialMaterial: " << matTag << endln;
+		opserr << "expElement bearing element: " << tag << endln;
+		return 0;
+	}
+    type = OPS_GetString();
+    if (strcmp(type, "-Mz") != 0) {
+        opserr << "WARNING expecting -Mz matTag\n";
+        opserr << "expElement bearing element: " << tag << endln;
+        return 0;
+    }
+	numdata = 1;
+	if (OPS_GetIntInput(&numdata, &matTag) != 0) {
+		opserr << "WARNING invalid -Mz matTag\n";
+		opserr << "expElement bearing element: " << tag << endln;
+		return 0;
+	}
+	theMaterials[1] = OPS_GetUniaxialMaterial(matTag);
+	if (theMaterials[1] == 0) {
+		opserr << "WARNING material model not found\n";
+		opserr << "uniaxialMaterial: " << matTag << endln;
+		opserr << "expElement bearing element: " << tag << endln;
+		return 0;
+	}
+    
+    // experimental site or server parameters
+    ExperimentalSite* theSite = 0;
+    int ipPort = 8090;
+    char* ipAddr = new char[10];
+    strcpy(ipAddr, "127.0.0.1");
+    int ssl = 0, udp = 0;
+    int dataSize = OF_Network_dataSize;
+    type = OPS_GetString();
+    if (strcmp(type, "-site") == 0) {
+        // site tag
+        int siteTag;
+        numdata = 1;
+        if (OPS_GetIntInput(&numdata, &siteTag) < 0) {
+            opserr << "WARNING invalid siteTag\n";
+            opserr << "expElement bearing element: " << tag << endln;
+            return 0;
+        }
+        theSite = OPF_GetExperimentalSite(siteTag);
+        if (theSite == 0) {
+            opserr << "WARNING experimental site not found\n";
+            opserr << "expSite: " << siteTag << endln;
+            opserr << "expElement bearing element: " << tag << endln;
+            return 0;
+        }
+    }
+    else if (strcmp(type, "-server") == 0) {
+        // ip port
+        numdata = 1;
+        if (OPS_GetIntInput(&numdata, &ipPort) < 0) {
+            opserr << "WARNING invalid ipPort\n";
+            opserr << "expElement bearing element: " << tag << endln;
+            return 0;
+        }
+        // server options
+        while (OPS_GetNumRemainingInputArgs() > 0) {
+            type = OPS_GetString();
+            if (strcmp(type, "-initStif") == 0 ||
+                strcmp(type, "-initStiff") == 0) {
+                // move current arg back by one
+                OPS_ResetCurrentInputArg(-1);
+                break;
+            }
+            else if (strcmp(type, "-ssl") == 0) {
+                ssl = 1; udp = 0;
+            }
+            else if (strcmp(type, "-udp") == 0) {
+                udp = 1; ssl = 0;
+            }
+            else if (strcmp(type, "-dataSize") == 0) {
+                numdata = 1;
+                if (OPS_GetIntInput(&numdata, &dataSize) < 0) {
+                    opserr << "WARNING invalid dataSize\n";
+                    opserr << "expElement bearing element: " << tag << endln;
+                    return 0;
+                }
+            }
+            else {
+                delete[] ipAddr;
+                ipAddr = new char[strlen(type) + 1];
+                strcpy(ipAddr, type);
+            }
+        }
+    }
+    else {
+        opserr << "WARNING expecting -site or -server string but got ";
+        opserr << type << endln;
+        opserr << "expElement bearing element: " << tag << endln;
+        return 0;
+    }
+    
+    // initial stiffness
+    type = OPS_GetString();
+    if (strcmp(type, "-initStif") != 0 &&
+        strcmp(type, "-initStiff") != 0) {
+        opserr << "WARNING expecting -initStif\n";
+        opserr << "expElement bearing element: " << tag << endln;
+    }
+    Matrix theInitStif(1, 1);
+    double stif;
+    numdata = 1;
+    if (OPS_GetDoubleInput(&numdata, &stif) < 0) {
+        opserr << "WARNING invalid initial stiffness term\n";
+        opserr << "expElement bearing element: " << tag << endln;
+        return 0;
+    }
+    theInitStif(0, 0) = stif;
+    
+    // optional parameters
+    ExperimentalTangentStiff* theTangStif = 0;
+    Vector x(0), y(0), Mratio(0);
+    double sDistI = 0.5;
+    bool iMod = false;
+    int doRayleigh = 1;
+    double mass = 0.0;
+    while (OPS_GetNumRemainingInputArgs() > 0) {
+        type = OPS_GetString();
+        // tangent stiffness
+        if (strcmp(type, "-tangStif") == 0 ||
+            strcmp(type, "-tangStiff") == 0) {
+            int tangStifTag;
+            numdata = 1;
+            if (OPS_GetIntInput(&numdata, &tangStifTag) < 0) {
+                opserr << "WARNING invalid tangStifTag\n";
+                opserr << "expElement bearing element: " << tag << endln;
+                return 0;
+            }
+            theTangStif = OPF_GetExperimentalTangentStiff(tangStifTag);
+            if (theTangStif == 0) {
+                opserr << "WARNING experimental tangent stiff not found\n";
+                opserr << "expTangStiff: " << tangStifTag << endln;
+                opserr << "expElement bearing element: " << tag << endln;
+                return 0;
+            }
+        }
+        else if (strcmp(type, "-orient") == 0) {
+            if (OPS_GetNumRemainingInputArgs() < 6) {
+                opserr << "WARNING: insufficient arguments after -orient\n";
+                opserr << "expElement bearing element: " << tag << endln;
+                return 0;
+            }
+            x.resize(3);
+            numdata = 3;
+            if (OPS_GetDoubleInput(&numdata, &x(0)) < 0) {
+                opserr << "WARNING: invalid -orient x values\n";
+                opserr << "expElement bearing element: " << tag << endln;
+                return 0;
+            }
+            y.resize(3);
+            numdata = 3;
+            if (OPS_GetDoubleInput(&numdata, &y(0)) < 0) {
+                opserr << "WARNING: invalid -orient y values\n";
+                opserr << "expElement bearing element: " << tag << endln;
+                return 0;
+            }
+        }
+        else if (strcmp(type, "-pDelta") == 0) {
+            Mratio.resize(2);
+            Mratio.Zero();
+            numdata = 2;
+            double* ptr = &Mratio(0);
+            if (OPS_GetNumRemainingInputArgs() < numdata) {
+                opserr << "WARNING: insufficient data for -pDelta\n";
+                opserr << "expElement bearing element: " << tag << endln;
+                return 0;
+            }
+            if (OPS_GetDoubleInput(&numdata, ptr) < 0) {
+                opserr << "WARNING: invalid -pDelta values\n";
+                opserr << "expElement bearing element: " << tag << endln;
+                return 0;
+            }
+        }
+        else if (strcmp(type, "-shearDist") == 0) {
+            if (OPS_GetDoubleInput(&numdata, &sDistI) < 0) {
+                opserr << "WARNING: invalid -shearDist value\n";
+                opserr << "expElement bearing element: " << tag << endln;
+                return 0;
+            }
+        }
+        else if (strcmp(type, "-iMod") == 0) {
+            iMod = true;
+        }
+        else if (strcmp(type, "-doRayleigh") == 0) {
+            doRayleigh = 1;
+        }
+        else if (strcmp(type, "-noRayleigh") == 0) {
+            doRayleigh = 0;
+        }
+        else if (strcmp(type, "-mass") == 0) {
+            if (OPS_GetNumRemainingInputArgs() < 1) {
+                opserr << "WARNING: insufficient mass value\n";
+                opserr << "expElement bearing element: " << tag << endln;
+                return 0;
+            }
+            numdata = 1;
+            if (OPS_GetDoubleInput(&numdata, &mass) < 0) {
+                opserr << "WARNING: invalid -mass value\n";
+                opserr << "expElement bearing element: " << tag << endln;
+                return 0;
+            }
+        }
+    }
+    
+    // now create the EEBearing2d
+    if (theSite != 0) {
+        theExpElement = new EEBearing2d(tag, node[0], node[1], pFrcCtrl,
+            theMaterials, theSite, y, x, Mratio, sDistI, iMod, doRayleigh, mass);
+    }
+    else {
+        theExpElement = new EEBearing2d(tag, node[0], node[1], pFrcCtrl,
+            theMaterials, ipPort, ipAddr, ssl, udp, dataSize, y, x, Mratio,
+            sDistI, iMod, doRayleigh, mass);
+    }
+    if (theExpElement == 0) {
+        opserr << "WARNING ran out of memory creating element\n";
+        opserr << "expElement bearing element: " << tag << endln;
+        return 0;
+    }
+    
+    // add initial stiffness
+    int setInitStif = theExpElement->setInitialStiff(theInitStif);
+    if (setInitStif != 0) {
+        opserr << "WARNING initial stiffness not set\n";
+        opserr << "expElement bearing element: " << tag << endln;
+        return 0;
+    }
+    
+    return theExpElement;
+}
 
 
 // responsible for allocating the necessary space needed

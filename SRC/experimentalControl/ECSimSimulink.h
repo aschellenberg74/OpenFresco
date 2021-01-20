@@ -19,10 +19,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 #ifndef ECSimSimulink_h
 #define ECSimSimulink_h
 
@@ -42,7 +38,9 @@ class ECSimSimulink : public ECSimulation
 {
 public:
     // constructors
-    ECSimSimulink(int tag, char *ipAddress, int ipPort = 44000);
+    ECSimSimulink(int tag,
+        char *ipAddress, int ipPort = 44000,
+        int ssl = 0, int udp = 0);
     ECSimSimulink(const ECSimSimulink &ec);
     
     // destructor
@@ -86,6 +84,8 @@ protected:
 private:
     char *ipAddress;            // ip address
     int ipPort;                 // ip port
+    int ssl;                    // secure socket layer flag
+    int udp;                    // udp socket flag
     const int dataSize;         // data size of network transactions
     
     Channel *theChannel;        // channel

@@ -19,10 +19,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 // Written: Hong Kim (hongkim@berkeley.edu)
 // Created: 04/10
 // Revision: A
@@ -31,6 +27,48 @@
 // ExperimentalTangentStiff.
 
 #include "ExperimentalTangentStiff.h"
+
+#include <TaggedObject.h>
+#include <MapOfTaggedObjects.h>
+
+static MapOfTaggedObjects theExperimentalTangentStiffs;
+
+
+bool OPF_AddExperimentalTangentStiff(ExperimentalTangentStiff* newComponent)
+{
+    return theExperimentalTangentStiffs.addComponent(newComponent);
+}
+
+
+bool OPF_RemoveExperimentalTangentStiff(int tag)
+{
+    TaggedObject* obj = theExperimentalTangentStiffs.removeComponent(tag);
+    if (obj != 0) {
+        delete obj;
+        return true;
+    }
+    return false;
+}
+
+
+ExperimentalTangentStiff* OPF_GetExperimentalTangentStiff(int tag)
+{
+    TaggedObject* theResult = theExperimentalTangentStiffs.getComponentPtr(tag);
+    if (theResult == 0) {
+        opserr << "OPF_GetExperimentalTangentStiff() - "
+            << "none found with tag: " << tag << endln;
+        return 0;
+    }
+    ExperimentalTangentStiff* theTangStiff = (ExperimentalTangentStiff*)theResult;
+    
+    return theTangStiff;
+}
+
+
+void OPF_ClearExperimentalTangentStiffs()
+{
+    theExperimentalTangentStiffs.clearAll();
+}
 
 
 ExperimentalTangentStiff::ExperimentalTangentStiff(int tag)

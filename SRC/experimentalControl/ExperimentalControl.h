@@ -22,10 +22,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 #ifndef ExperimentalControl_h
 #define ExperimentalControl_h
 
@@ -111,5 +107,10 @@ protected:
     ExperimentalSignalFilter **theCtrlFilters;
     ExperimentalSignalFilter **theDaqFilters;
 };
+
+extern bool OPF_AddExperimentalControl(ExperimentalControl* newComponent);
+extern ExperimentalControl* OPF_GetExperimentalControl(int tag);
+extern bool OPF_RemoveExperimentalControl(int tag);
+extern void OPF_ClearExperimentalControls();
 
 #endif

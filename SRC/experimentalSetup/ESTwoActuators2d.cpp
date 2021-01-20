@@ -19,11 +19,7 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
-// Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 09/06
 // Revision: A
 //
@@ -32,7 +28,115 @@
 
 #include "ESTwoActuators2d.h"
 
+#include <ExperimentalControl.h>
+
+#include <elementAPI.h>
+
 #include <math.h>
+
+
+void* OPF_ESTwoActuators2d()
+{
+    // pointer to experimental setup that will be returned
+    ExperimentalSetup* theSetup = 0;
+    
+    if (OPS_GetNumRemainingInputArgs() < 4) {
+        opserr << "WARNING invalid number of arguments\n";
+        opserr << "Want: expSetup TwoActuators2d tag <-control ctrlTag> "
+            << "La1 La2 L "
+            << "<-nlGeom> <-posAct pos> <-phiLocX phi>\n";
+        return 0;
+    }
+    
+    // setup tag
+    int tag;
+    int numdata = 1;
+    if (OPS_GetIntInput(&numdata, &tag) != 0) {
+        opserr << "WARNING invalid expSetup TwoActuators2d tag\n";
+        return 0;
+    }
+    
+    // control tag (optional)
+    ExperimentalControl* theControl = 0;
+    const char* type = OPS_GetString();
+    if (strcmp(type, "-control") == 0 || strcmp(type, "-ctrl") == 0) {
+        int ctrlTag;
+        numdata = 1;
+        if (OPS_GetIntInput(&numdata, &ctrlTag) < 0) {
+            opserr << "WARNING invalid ctrlTag\n";
+            opserr << "expSetup TwoActuators2d " << tag << endln;
+            return 0;
+        }
+        theControl = OPF_GetExperimentalControl(ctrlTag);
+        if (theControl == 0) {
+            opserr << "WARNING experimental control not found\n";
+            opserr << "expControl: " << ctrlTag << endln;
+            opserr << "expSetup TwoActuators2d " << tag << endln;
+            return 0;
+        }
+    }
+    else {
+        // move current arg back by one
+        OPS_ResetCurrentInputArg(-1);
+    }
+    
+    // La1, La2
+    double La[2];
+    numdata = 2;
+    if (OPS_GetDoubleInput(&numdata, La) != 0) {
+        opserr << "WARNING invalid La1 or La2\n";
+        opserr << "expSetup TwoActuators2d " << tag << endln;
+        return 0;
+    }
+    
+    // L
+    double L;
+    numdata = 1;
+    if (OPS_GetDoubleInput(&numdata, &L) != 0) {
+        opserr << "WARNING invalid L\n";
+        opserr << "expSetup TwoActuators2d " << tag << endln;
+        return 0;
+    }
+    
+    // optional parameters
+    int nlGeom = 0;
+    char posAct[6] = { 'l','e','f','t','\0' };
+    double phiLocX = 0.0;
+    while (OPS_GetNumRemainingInputArgs() > 0) {
+        // nlGeom
+        type = OPS_GetString();
+        if (strcmp(type, "-nlGeom") == 0) {
+            nlGeom = 1;
+        }
+        // posAct
+        else if (strcmp(type, "-posAct") == 0) {
+            const char* pos = OPS_GetString();
+            if (strcmp(pos, "left") == 0 || strcmp(pos, "l") == 0)
+                strcpy(posAct, "left");
+            else if (strcmp(pos, "right") == 0 || strcmp(pos, "r") == 0)
+                strcpy(posAct, "right");
+        }
+        // phiLocX
+        else if (strcmp(type, "-phiLocX") == 0) {
+            numdata = 1;
+            if (OPS_GetDoubleInput(&numdata, &phiLocX) != 0) {
+                opserr << "WARNING invalid phiLocX\n";
+                opserr << "expSetup TwoActuators2d " << tag << endln;
+                return 0;
+            }
+        }
+    }
+    
+    // parsing was successful, allocate the setup
+    theSetup = new ESTwoActuators2d(tag, La[0], La[1], L,
+        theControl, nlGeom, posAct, phiLocX);
+    if (theSetup == 0) {
+        opserr << "WARNING could not create experimental setup of type ESTwoActuators2d\n";
+        return 0;
+    }
+    
+    return theSetup;
+}
 
 
 ESTwoActuators2d::ESTwoActuators2d(int tag,

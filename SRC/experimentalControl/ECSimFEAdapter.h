@@ -43,6 +43,7 @@ public:
         int nTrialCPs, ExperimentalCP **trialCPs,
         int nOutCPs, ExperimentalCP **outCPs,
         char *ipAddress, int ipPort = 44000,
+        int ssl = 0, int udp = 0,
         int useRelativeTrial = 0);
     ECSimFEAdapter(const ECSimFEAdapter &ec);
     
@@ -93,6 +94,8 @@ private:
     ExperimentalCP **outCPs;    // output control points
     char *ipAddress;            // ip address
     int ipPort;                 // ip port
+    int ssl;                    // secure socket layer flag
+    int udp;                    // udp socket flag
     int dataSize;               // data size of network transactions
     
     Channel *theChannel;        // channel

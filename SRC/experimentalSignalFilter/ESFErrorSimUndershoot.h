@@ -22,10 +22,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 #ifndef ESFErrorSimUndershoot_h
 #define ESFErrorSimUndershoot_h
 

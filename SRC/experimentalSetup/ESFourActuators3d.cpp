@@ -19,10 +19,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 // Written: Vesna Terzic (vesna@berkeley.edu)
 // Created: 01/08
 // Revision: A
@@ -32,8 +28,144 @@
 
 #include "ESFourActuators3d.h"
 
+#include <ExperimentalControl.h>
+
+#include <elementAPI.h>
+
 #include <math.h>
 #include <stdlib.h>
+
+
+void* OPF_ESFourActuators3d()
+{
+    // pointer to experimental setup that will be returned
+    ExperimentalSetup* theSetup = 0;
+    
+    if (OPS_GetNumRemainingInputArgs() < 10) {
+        opserr << "WARNING invalid number of arguments\n";
+        opserr << "Want: expSetup FourActuators tag <-control ctrlTag> "
+            << "L1 L2 L3 L4 a1 a2 a3 a4 h h1 h2 arlN arlS LrodN LrodS Hbeam "
+            << " <-nlGeom> <-phiLocX phi>\n";
+        return 0;
+    }
+    
+    // setup tag
+    int tag;
+    int numdata = 1;
+    if (OPS_GetIntInput(&numdata, &tag) != 0) {
+        opserr << "WARNING invalid expSetup FourActuators tag\n";
+        return 0;
+    }
+    
+    // control tag (optional)
+    ExperimentalControl* theControl = 0;
+    const char* type = OPS_GetString();
+    if (strcmp(type, "-control") == 0 || strcmp(type, "-ctrl") == 0) {
+        int ctrlTag;
+        numdata = 1;
+        if (OPS_GetIntInput(&numdata, &ctrlTag) < 0) {
+            opserr << "WARNING invalid ctrlTag\n";
+            opserr << "expSetup FourActuators " << tag << endln;
+            return 0;
+        }
+        theControl = OPF_GetExperimentalControl(ctrlTag);
+        if (theControl == 0) {
+            opserr << "WARNING experimental control not found\n";
+            opserr << "expControl: " << ctrlTag << endln;
+            opserr << "expSetup FourActuators " << tag << endln;
+            return 0;
+        }
+    }
+    else {
+        // move current arg back by one
+        OPS_ResetCurrentInputArg(-1);
+    }
+    
+    // L1, L2, L3, L4
+    double L[4];
+    numdata = 4;
+    if (OPS_GetDoubleInput(&numdata, L) != 0) {
+        opserr << "WARNING invalid L1, L2, L3, or L4\n";
+        opserr << "expSetup FourActuators " << tag << endln;
+        return 0;
+    }
+    
+    // a1, a2, a3, a4
+    double a[4];
+    numdata = 4;
+    if (OPS_GetDoubleInput(&numdata, a) != 0) {
+        opserr << "WARNING invalid a1, a2, a3, or a4\n";
+        opserr << "expSetup FourActuators " << tag << endln;
+        return 0;
+    }
+    
+    // h, h1, h2
+    double h[3];
+    numdata = 3;
+    if (OPS_GetDoubleInput(&numdata, h) != 0) {
+        opserr << "WARNING invalid h, h1, or h2\n";
+        opserr << "expSetup FourActuators " << tag << endln;
+        return 0;
+    }
+    
+    // arlN, arlS
+    double arl[2];
+    numdata = 2;
+    if (OPS_GetDoubleInput(&numdata, arl) != 0) {
+        opserr << "WARNING invalid arlN or arlS\n";
+        opserr << "expSetup FourActuators " << tag << endln;
+        return 0;
+    }
+    
+    // LrodN, LrodS
+    double Lrod[2];
+    numdata = 2;
+    if (OPS_GetDoubleInput(&numdata, Lrod) != 0) {
+        opserr << "WARNING invalid LrodN or LrodS\n";
+        opserr << "expSetup FourActuators " << tag << endln;
+        return 0;
+    }
+    
+    // Hbeam
+    double Hbeam;
+    numdata = 1;
+    if (OPS_GetDoubleInput(&numdata, &Hbeam) != 0) {
+        opserr << "WARNING invalid Hbeam\n";
+        opserr << "expSetup FourActuators " << tag << endln;
+        return 0;
+    }
+    
+    // optional parameters
+    int nlGeom = 0;
+    double phiLocX = 0.0;
+    while (OPS_GetNumRemainingInputArgs() > 0) {
+        // nlGeom
+        type = OPS_GetString();
+        if (strcmp(type, "-nlGeom") == 0) {
+            nlGeom = 1;
+        }
+        // phiLocX
+        else if (strcmp(type, "-phiLocX") == 0) {
+            numdata = 1;
+            if (OPS_GetDoubleInput(&numdata, &phiLocX) != 0) {
+                opserr << "WARNING invalid phiLocX\n";
+                opserr << "expSetup FourActuators " << tag << endln;
+                return 0;
+            }
+        }
+    }
+    
+    // parsing was successful, allocate the setup
+    theSetup = new ESFourActuators3d(tag, L[0], L[1], L[2], L[3],
+        a[0], a[1], a[2], a[3], h[0], h[1], h[2], arl[0], arl[1],
+        Lrod[0], Lrod[1], Hbeam, theControl, nlGeom, phiLocX);
+    if (theSetup == 0) {
+        opserr << "WARNING could not create experimental setup of type ESFourActuators3d\n";
+        return 0;
+    }
+    
+    return theSetup;
+}
 
 
 ESFourActuators3d::ESFourActuators3d(int tag,

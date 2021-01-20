@@ -22,10 +22,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 #ifndef ExperimentalSignalFilter_h
 #define ExperimentalSignalFilter_h
 
@@ -71,5 +67,10 @@ public:
         OPS_Stream &output);
     virtual int getResponse(int responseID, Information &info);
 };
+
+extern bool OPF_AddExperimentalSignalFilter(ExperimentalSignalFilter* newComponent);
+extern ExperimentalSignalFilter* OPF_GetExperimentalSignalFilter(int tag);
+extern bool OPF_RemoveExperimentalSignalFilter(int tag);
+extern void OPF_ClearExperimentalSignalFilters();
 
 #endif

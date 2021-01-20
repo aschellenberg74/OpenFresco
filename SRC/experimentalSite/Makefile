@@ -8,7 +8,7 @@ OBJS  = \
 
 all:         $(OBJS)
 
-tcl: TclExpSiteCommand.o
+tcl: TclExpSiteCommands.o
 
 test:  test.o
 	$(LINKER) $(LINKFLAGS) test.o \

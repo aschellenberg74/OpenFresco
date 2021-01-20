@@ -22,10 +22,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 // Written: Yoshi (yos@catfish.dpri.kyoto-u.ac.jp)
 // Created: 09/06
 // Revision: A
@@ -34,6 +30,48 @@
 // ExperimentalSignalFilter.
 
 #include "ExperimentalSignalFilter.h"
+
+#include <TaggedObject.h>
+#include <MapOfTaggedObjects.h>
+
+static MapOfTaggedObjects theExperimentalSignalFilters;
+
+
+bool OPF_AddExperimentalSignalFilter(ExperimentalSignalFilter* newComponent)
+{
+    return theExperimentalSignalFilters.addComponent(newComponent);
+}
+
+
+bool OPF_RemoveExperimentalSignalFilter(int tag)
+{
+    TaggedObject* obj = theExperimentalSignalFilters.removeComponent(tag);
+    if (obj != 0) {
+        delete obj;
+        return true;
+    }
+    return false;
+}
+
+
+ExperimentalSignalFilter* OPF_GetExperimentalSignalFilter(int tag)
+{
+    TaggedObject* theResult = theExperimentalSignalFilters.getComponentPtr(tag);
+    if (theResult == 0) {
+        opserr << "OPF_GetExperimentalSignalFilter() - "
+            << "none found with tag: " << tag << endln;
+        return 0;
+    }
+    ExperimentalSignalFilter* theFilter = (ExperimentalSignalFilter*)theResult;
+    
+    return theFilter;
+}
+
+
+void OPF_ClearExperimentalSignalFilters()
+{
+    theExperimentalSignalFilters.clearAll();
+}
 
 
 ExperimentalSignalFilter::ExperimentalSignalFilter(int tag)

@@ -19,10 +19,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 // Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 09/06
 // Revision: A
@@ -41,6 +37,7 @@
 #include <TCP_Socket.h>
 #include <TCP_SocketSSL.h>
 #include <UDP_Socket.h>
+#include <elementAPI.h>
 
 #include <math.h>
 #include <stdlib.h>
@@ -50,6 +47,203 @@
 // initialize the class wide variables
 Matrix EEInvertedVBrace2d::theMatrix(9,9);
 Vector EEInvertedVBrace2d::theVector(9);
+
+void* OPF_EEInvertedVBrace2d()
+{
+    int ndf = OPS_GetNDF();
+    if (ndf != 3) {
+        opserr << "WARNING invalid ndf: " << ndf;
+        opserr << ", for plane problem need 3 - expElement invertedVBrace\n";
+        return 0;
+    }
+    
+    // pointer to experimental element that will be returned
+    ExperimentalElement* theExpElement = 0;
+    
+    if (OPS_GetNumRemainingInputArgs() < 16) {
+        opserr << "WARNING invalid number of arguments\n";
+        opserr << "Want: expElement invertedVBrace eleTag iNode jNode kNode -site siteTag -initStif Kij <-iMod> <-nlGeom> <-noRayleigh> <-rho1 rho1> <-rho2 rho2>\n";
+        opserr << "  or: expElement invertedVBrace eleTag iNode jNode kNode -server ipPort <ipAddr> <-ssl> <-udp> <-dataSize size> -initStif Kij <-iMod> <-nlGeom> <-noRayleigh> <-rho1 rho1> <-rho2 rho2>\n";
+        return 0;
+    }
+    
+    // element tag
+    int tag;
+    int numdata = 1;
+    if (OPS_GetIntInput(&numdata, &tag) != 0) {
+        opserr << "WARNING invalid expElement invertedVBrace eleTag\n";
+        return 0;
+    }
+    
+    // nodes
+    int node[3];
+    numdata = 3;
+    if (OPS_GetIntInput(&numdata, node) != 0) {
+        opserr << "WARNING invalid iNode or jNode\n";
+        opserr << "expElement invertedVBrace element: " << tag << endln;
+        return 0;
+    }
+    
+    // experimental site or server parameters
+    ExperimentalSite* theSite = 0;
+    int ipPort = 8090;
+    char* ipAddr = new char[10];
+    strcpy(ipAddr, "127.0.0.1");
+    int ssl = 0, udp = 0;
+    int dataSize = OF_Network_dataSize;
+    const char* type = OPS_GetString();
+    if (strcmp(type, "-site") == 0) {
+        // site tag
+        int siteTag;
+        numdata = 1;
+        if (OPS_GetIntInput(&numdata, &siteTag) < 0) {
+            opserr << "WARNING invalid siteTag\n";
+            opserr << "expElement invertedVBrace element: " << tag << endln;
+            return 0;
+        }
+        theSite = OPF_GetExperimentalSite(siteTag);
+        if (theSite == 0) {
+            opserr << "WARNING experimental site not found\n";
+            opserr << "expSite: " << siteTag << endln;
+            opserr << "expElement invertedVBrace element: " << tag << endln;
+            return 0;
+        }
+    }
+    else if (strcmp(type, "-server") == 0) {
+        // ip port
+        numdata = 1;
+        if (OPS_GetIntInput(&numdata, &ipPort) < 0) {
+            opserr << "WARNING invalid ipPort\n";
+            opserr << "expElement invertedVBrace element: " << tag << endln;
+            return 0;
+        }
+        // server options
+        while (OPS_GetNumRemainingInputArgs() > 0) {
+            type = OPS_GetString();
+            if (strcmp(type, "-initStif") == 0 ||
+                strcmp(type, "-initStiff") == 0) {
+                // move current arg back by one
+                OPS_ResetCurrentInputArg(-1);
+                break;
+            }
+            else if (strcmp(type, "-ssl") == 0) {
+                ssl = 1; udp = 0;
+            }
+            else if (strcmp(type, "-udp") == 0) {
+                udp = 1; ssl = 0;
+            }
+            else if (strcmp(type, "-dataSize") == 0) {
+                numdata = 1;
+                if (OPS_GetIntInput(&numdata, &dataSize) < 0) {
+                    opserr << "WARNING invalid dataSize\n";
+                    opserr << "expElement invertedVBrace element: " << tag << endln;
+                    return 0;
+                }
+            }
+            else {
+                delete[] ipAddr;
+                ipAddr = new char[strlen(type) + 1];
+                strcpy(ipAddr, type);
+            }
+        }
+    }
+    else {
+        opserr << "WARNING expecting -site or -server string but got ";
+        opserr << type << endln;
+        opserr << "expElement invertedVBrace element: " << tag << endln;
+        return 0;
+    }
+    
+    // initial stiffness
+    type = OPS_GetString();
+    if (strcmp(type, "-initStif") != 0 &&
+        strcmp(type, "-initStiff") != 0) {
+        opserr << "WARNING expecting -initStif\n";
+        opserr << "expElement invertedVBrace element: " << tag << endln;
+    }
+    Matrix theInitStif(3, 3);
+    double stif[9];
+    numdata = 9;
+    if (OPS_GetDoubleInput(&numdata, stif) < 0) {
+        opserr << "WARNING invalid initial stiffness term\n";
+        opserr << "expElement invertedVBrace element: " << tag << endln;
+        return 0;
+    }
+    theInitStif.setData(stif, 3, 3);
+    
+    // optional parameters
+    ExperimentalTangentStiff* theTangStif = 0;
+    bool iMod = false;
+    bool nlGeom = false;
+    int doRayleigh = 1;
+    double rho[2] = { 0.0, 0.0 };
+    while (OPS_GetNumRemainingInputArgs() > 0) {
+        type = OPS_GetString();
+        // tangent stiffness
+        if (strcmp(type, "-tangStif") == 0 ||
+            strcmp(type, "-tangStiff") == 0) {
+            int tangStifTag;
+            numdata = 1;
+            if (OPS_GetIntInput(&numdata, &tangStifTag) < 0) {
+                opserr << "WARNING invalid tangStifTag\n";
+                opserr << "expElement invertedVBrace element: " << tag << endln;
+                return 0;
+            }
+            theTangStif = OPF_GetExperimentalTangentStiff(tangStifTag);
+            if (theTangStif == 0) {
+                opserr << "WARNING experimental tangent stiff not found\n";
+                opserr << "expTangStiff: " << tangStifTag << endln;
+                opserr << "expElement invertedVBrace element: " << tag << endln;
+                return 0;
+            }
+        }
+        else if (strcmp(type, "-iMod") == 0) {
+            iMod = true;
+        }
+        else if (strcmp(type, "-nlGeom") == 0) {
+            nlGeom = true;
+        }
+        else if (strcmp(type, "-doRayleigh") == 0) {
+            doRayleigh = 1;
+        }
+        else if (strcmp(type, "-noRayleigh") == 0) {
+            doRayleigh = 0;
+        }
+        else if (strcmp(type, "-rho") == 0) {
+            numdata = 2;
+            if (OPS_GetDoubleInput(&numdata, rho) < 0) {
+                opserr << "WARNING invalid rho1 or rho2\n";
+                opserr << "expElement invertedVBrace element: " << tag << endln;
+                return 0;
+            }
+        }
+    }
+    
+    // now create the EEInvertedVBrace2d
+    if (theSite != 0) {
+        theExpElement = new EEInvertedVBrace2d(tag, node[0], node[1], node[2],
+            theSite, iMod, nlGeom, doRayleigh, rho[0], rho[1]);
+    }
+    else {
+        theExpElement = new EEInvertedVBrace2d(tag, node[0], node[1], node[2],
+            ipPort, ipAddr, ssl, udp, dataSize, iMod, nlGeom, doRayleigh, rho[0], rho[1]);
+    }
+    if (theExpElement == 0) {
+        opserr << "WARNING ran out of memory creating element\n";
+        opserr << "expElement invertedVBrace element: " << tag << endln;
+        return 0;
+    }
+    
+    // add initial stiffness
+    int setInitStif = theExpElement->setInitialStiff(theInitStif);
+    if (setInitStif != 0) {
+        opserr << "WARNING initial stiffness not set\n";
+        opserr << "expElement invertedVBrace element: " << tag << endln;
+        return 0;
+    }
+    
+    return theExpElement;
+}
 
 
 // responsible for allocating the necessary space needed

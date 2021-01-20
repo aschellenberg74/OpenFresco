@@ -28,15 +28,145 @@
 
 #include "ESThreeActuatorsJntOff.h"
 
+#include <ExperimentalControl.h>
+
+#include <elementAPI.h>
+
 #include <math.h>
 
 const int numDOF = 3;
 
+
+void* OPF_ESThreeActuatorsJntOff()
+{
+    // pointer to experimental setup that will be returned
+    ExperimentalSetup* theSetup = 0;
+    
+    if (OPS_GetNumRemainingInputArgs() < 16) {
+        opserr << "WARNING invalid number of arguments\n";
+        opserr << "Want: expSetup ThreeActuatorsJntOff tag <-control ctrlTag> "
+            << "dofH dofV dofR sizeTrial sizeOut La1 La2 La3 L1 L2 L3 L4 L5 L6 L7 "
+            << "<-nlGeom> <-posAct1 pos>\n";
+        return 0;
+    }
+    
+    // setup tag
+    int tag;
+    int numdata = 1;
+    if (OPS_GetIntInput(&numdata, &tag) != 0) {
+        opserr << "WARNING invalid expSetup ThreeActuatorsJntOff tag\n";
+        return 0;
+    }
+    
+    // control tag (optional)
+    ExperimentalControl* theControl = 0;
+    const char* type = OPS_GetString();
+    if (strcmp(type, "-control") == 0 || strcmp(type, "-ctrl") == 0) {
+        int ctrlTag;
+        numdata = 1;
+        if (OPS_GetIntInput(&numdata, &ctrlTag) < 0) {
+            opserr << "WARNING invalid ctrlTag\n";
+            opserr << "expSetup ThreeActuatorsJntOff " << tag << endln;
+            return 0;
+        }
+        theControl = OPF_GetExperimentalControl(ctrlTag);
+        if (theControl == 0) {
+            opserr << "WARNING experimental control not found\n";
+            opserr << "expControl: " << ctrlTag << endln;
+            opserr << "expSetup ThreeActuatorsJntOff " << tag << endln;
+            return 0;
+        }
+    }
+    else {
+        // move current arg back by one
+        OPS_ResetCurrentInputArg(-1);
+    }
+    
+    // dofH, dofV, dofR 
+    int dof[3];
+    ID theDOF(3);
+    numdata = 3;
+    if (OPS_GetIntInput(&numdata, dof) != 0) {
+        opserr << "WARNING invalid dofH, dofV, or dofR\n";
+        opserr << "expSetup ThreeActuatorsJntOff " << tag << endln;
+        return 0;
+    }
+    theDOF(0) = dof[0] - 1;
+    theDOF(1) = dof[1] - 1;
+    theDOF(2) = dof[2] - 1;
+    
+    // size trial and size out
+    int sizeTrial, sizeOut;
+    numdata = 1;
+    if (OPS_GetIntInput(&numdata, &sizeTrial) != 0) {
+        opserr << "WARNING invalid sizeTrial\n";
+        opserr << "expSetup ThreeActuatorsJntOff " << tag << endln;
+        return 0;
+    }
+    numdata = 1;
+    if (OPS_GetIntInput(&numdata, &sizeOut) != 0) {
+        opserr << "WARNING invalid sizeOut\n";
+        opserr << "expSetup ThreeActuatorsJntOff " << tag << endln;
+        return 0;
+    }
+    
+    // La1, La2, La3
+    double La[3];
+    numdata = 3;
+    if (OPS_GetDoubleInput(&numdata, La) != 0) {
+        opserr << "WARNING invalid La1, La2, or La3\n";
+        opserr << "expSetup ThreeActuatorsJntOff " << tag << endln;
+        return 0;
+    }
+    
+    // L1, L2, L3, L4, L5, L6, L7
+    double L[7];
+    numdata = 7;
+    if (OPS_GetDoubleInput(&numdata, L) != 0) {
+        opserr << "WARNING invalid L1, L2, L3, L4, L5, L6, or L7\n";
+        opserr << "expSetup ThreeActuatorsJntOff " << tag << endln;
+        return 0;
+    }
+    
+    // optional parameters
+    int nlGeom = 0;
+    char posAct0[6] = { 'l','e','f','t','\0' };
+    while (OPS_GetNumRemainingInputArgs() > 0) {
+        // nlGeom
+        type = OPS_GetString();
+        if (strcmp(type, "-nlGeom") == 0) {
+            nlGeom = 1;
+        }
+        // posAct1
+        else if (strcmp(type, "-posAct1") == 0) {
+            const char* pos = OPS_GetString();
+            if (strcmp(pos, "left") == 0 || strcmp(pos, "l") == 0)
+                strcpy(posAct0, "left");
+            else if (strcmp(pos, "right") == 0 || strcmp(pos, "r") == 0)
+                strcpy(posAct0, "right");
+        }
+    }
+    
+    // parsing was successful, allocate the setup
+    theSetup = new ESThreeActuatorsJntOff(tag, theDOF, sizeTrial, sizeOut,
+        La[0], La[1], La[2], L[0], L[1], L[2], L[3], L[4], L[5], L[6],
+        theControl, nlGeom, posAct0);
+    if (theSetup == 0) {
+        opserr << "WARNING could not create experimental setup of type ESThreeActuatorsJntOff\n";
+        return 0;
+    }
+    
+    return theSetup;
+}
+
+
 ESThreeActuatorsJntOff::ESThreeActuatorsJntOff(int tag,
     const ID &dof, int sizet, int sizeo,
     double actLength0, double actLength1, double actLength2,
-    double rigidLength0, double rigidLength1, double rigidLength2,
-    double rigidLength3, double rigidLength4, double rigidLength5,
+    double rigidLength0, double rigidLength1,
+    double rigidLength2, double rigidLength3,
+    double rigidLength4, double rigidLength5,
+    double rigidLength6,
     ExperimentalControl* control,
     int nlgeom, char *posact0)
     : ExperimentalSetup(tag, control),
@@ -44,7 +174,7 @@ ESThreeActuatorsJntOff::ESThreeActuatorsJntOff(int tag,
     La0(actLength0), La1(actLength1), La2(actLength2),
     L0(rigidLength0), L1(rigidLength1), L2(rigidLength2),
     L3(rigidLength3), L4(rigidLength4), L5(rigidLength5),
-    nlGeom(nlgeom)
+    L6(rigidLength6), nlGeom(nlgeom)
 {
     // check if DOF array has correct size
     if (DOF.Size() != numDOF)  {
@@ -77,19 +207,20 @@ ESThreeActuatorsJntOff::ESThreeActuatorsJntOff(int tag,
 ESThreeActuatorsJntOff::ESThreeActuatorsJntOff(const ESThreeActuatorsJntOff& es)
     : ExperimentalSetup(es)
 {
-    DOF =   es.DOF;
-    sizeT = es.sizeT;
-    sizeO = es.sizeO;
-    La0     = es.La0;
-    La1     = es.La1;
-    La2     = es.La2;
-    L0      = es.L0;
-    L1      = es.L1;
-    L2      = es.L2;
-    L3      = es.L3;
-    L4      = es.L4;
-    L5      = es.L5;
-    nlGeom  = es.nlGeom;
+    DOF    = es.DOF;
+    sizeT  = es.sizeT;
+    sizeO  = es.sizeO;
+    La0    = es.La0;
+    La1    = es.La1;
+    La2    = es.La2;
+    L0     = es.L0;
+    L1     = es.L1;
+    L2     = es.L2;
+    L3     = es.L3;
+    L4     = es.L4;
+    L5     = es.L5;
+    L6     = es.L6;
+    nlGeom = es.nlGeom;
     strcpy(posAct0,es.posAct0);
     
     // call setup method
@@ -151,14 +282,14 @@ int ESThreeActuatorsJntOff::transfTrialResponse(const Vector* disp,
         for (int i=0; i<(*sizeCtrl)(OF_Resp_Disp); i++)
             (*cDisp)(i) *= (*cDispFact)(i);
     }
-    if (disp != 0 && vel != 0)  {
+    if (vel != 0 && disp != 0)  {
         for (int i=0; i<(*sizeTrial)(OF_Resp_Vel); i++)
             (*tVel)(i) = (*vel)(i) * (*tVelFact)(i);
         this->transfTrialVel(tDisp,tVel);
         for (int i=0; i<(*sizeCtrl)(OF_Resp_Vel); i++)
             (*cVel)(i) *= (*cVelFact)(i);
     }
-    if (disp != 0 && vel != 0 && accel != 0)  {
+    if (accel != 0 && vel != 0 && disp != 0)  {
         for (int i=0; i<(*sizeTrial)(OF_Resp_Accel); i++)
             (*tAccel)(i) = (*accel)(i) * (*tAccelFact)(i);
         this->transfTrialAccel(tDisp,tVel,tAccel);
@@ -206,6 +337,7 @@ void ESThreeActuatorsJntOff::Print(OPS_Stream &s, int flag)
     s << " rigidLength4: " << L3 << endln;
     s << " rigidLength5: " << L4 << endln;
     s << " rigidLength6: " << L5 << endln;
+    s << " rigidLength7: " << L6 << endln;
     s << " nlGeom      : " << nlGeom << endln;
     s << " posAct1     : " << posAct0 << endln;
     if (theControl != 0)  {
@@ -226,48 +358,38 @@ int ESThreeActuatorsJntOff::transfTrialDisp(const Vector* disp)
     // linear geometry, horizontal actuator left
     if (nlGeom == 0 && strcmp(posAct0, "left") == 0) {
         // actuator 0
-        (*cDisp)(0) = d(0);
+        (*cDisp)(0) = d(0) - L5*d(2);
         // actuator 1
-        (*cDisp)(1) = d(1) - L1 * d(2);
+        (*cDisp)(1) = d(1) - L1*d(2);
         // actuator 2
-        (*cDisp)(2) = d(1) + L2 * d(2);
+        (*cDisp)(2) = d(1) + L2*d(2);
     }
     // linear geometry, horizontal actuator right
     else if (nlGeom == 0 && strcmp(posAct0, "right") == 0) {
         // actuator 0
-        (*cDisp)(0) = -d(0);
+        (*cDisp)(0) = -d(0) + L5*d(2);
         // actuator 1
-        (*cDisp)(1) = d(1) - L1 * d(2);
+        (*cDisp)(1) = d(1) - L1*d(2);
         // actuator 2
-        (*cDisp)(2) = d(1) + L2 * d(2);
+        (*cDisp)(2) = d(1) + L2*d(2);
     }
     // nonlinear geometry, horizontal actuator left
     else if (nlGeom == 1 && strcmp(posAct0, "left") == 0) {
-        double R0 = sqrt(L1*L1 + L4 * L4);
-        double R1 = sqrt(L2*L2 + L5 * L5);
-        double alpha0 = atan2(L4, L1);
-        double alpha1 = atan2(L5, L2);
-
         // actuator 0
-        (*cDisp)(0) = pow(pow(d(0) - (L0 + L1)*cos(d(2)) + L0 + L1 + La0, 2.0) + pow(d(1) - (L0 + L1)*sin(d(2)), 2.0), 0.5) - La0;
+        (*cDisp)(0) = pow(pow(d(0)+(L0+L1)*(1.0-cos(d(2)))-L5*sin(d(2))+La0,2.0)+pow(d(1)-(L0+L1)*sin(d(2))-L5*(1.0-cos(d(2))),2.0),0.5)-La0;
         // actuator 1
-        (*cDisp)(1) = pow(pow(d(0) - R0 * cos(alpha0 + d(2)) + L1, 2.0) + pow(d(1) - R0 * sin(alpha0 + d(2)) + La1 + L4, 2.0), 0.5) - La1;
+        (*cDisp)(1) = pow(pow(d(0)+L1*(1.0-cos(d(2)))-(L5-L4)*sin(d(2)),2.0)+pow(d(1)-L1*sin(d(2))-(L5-L4)*(1.0-cos(d(2)))+La1,2.0),0.5)-La1;
         // actuator 2
-        (*cDisp)(2) = pow(pow(d(0) + R1 * cos(-alpha1 + d(2)) - L2, 2.0) + pow(d(1) + R1 * sin(-alpha1 + d(2)) + La2 + L5, 2.0), 0.5) - La2;
+        (*cDisp)(2) = pow(pow(d(0)-L2*(1.0-cos(d(2)))-(L5-L6)*sin(d(2)),2.0)+pow(d(1)+L2*sin(d(2))-(L5-L6)*(1.0-cos(d(2)))+La2,2.0),0.5)-La2;
     }
     // nonlinear geometry, horizontal actuator right
     else if (nlGeom == 1 && strcmp(posAct0, "right") == 0) {
-        double R0 = sqrt(L1*L1 + L4 * L4);
-        double R1 = sqrt(L2*L2 + L5 * L5);
-        double alpha0 = atan2(L4, L1);
-        double alpha1 = atan2(L5, L2);
-
         // actuator 0
-        (*cDisp)(0) = pow(pow(d(0) + (L2 + L3)*cos(d(2)) - L2 - L3 - La0, 2.0) + pow(d(1) + (L2 + L3)*sin(d(2)), 2.0), 0.5) - La0;
+        (*cDisp)(0) = pow(pow(d(0)-(L2+L3)*(1.0-cos(d(2)))-L5*sin(d(2))-La0,2.0)+pow(d(1)+(L2+L3)*sin(d(2))-L5*(1.0-cos(d(2))),2.0),0.5)-La0;
         // actuator 1
-        (*cDisp)(1) = pow(pow(d(0) - R0 * cos(alpha0 + d(2)) + L1, 2.0) + pow(d(1) - R0 * sin(alpha0 + d(2)) + La1 + L4, 2.0), 0.5) - La1;
+        (*cDisp)(1) = pow(pow(d(0)+L1*(1.0-cos(d(2)))-(L5-L4)*sin(d(2)),2.0)+pow(d(1)-L1*sin(d(2))-(L5-L4)*(1.0-cos(d(2)))+La1,2.0),0.5)-La1;
         // actuator 2
-        (*cDisp)(2) = pow(pow(d(0) + R1 * cos(-alpha1 + d(2)) - L2, 2.0) + pow(d(1) + R1 * sin(-alpha1 + d(2)) + La2 + L5, 2.0), 0.5) - La2;
+        (*cDisp)(2) = pow(pow(d(0)-L2*(1.0-cos(d(2)))-(L5-L6)*sin(d(2)),2.0)+pow(d(1)+L2*sin(d(2))-(L5-L6)*(1.0-cos(d(2)))+La2,2.0),0.5)-La2;
     }
     
     return OF_ReturnType_completed;
@@ -293,48 +415,48 @@ int ESThreeActuatorsJntOff::transfTrialVel(const Vector* disp,
     // linear geometry, horizontal actuator left
     if (nlGeom == 0 && strcmp(posAct0, "left") == 0) {
         // actuator 0
-        (*cVel)(0) = v(0);
+        (*cVel)(0) = v(0) - L5*v(2);
         // actuator 1
-        (*cVel)(1) = v(1) - L1 * v(2);
+        (*cVel)(1) = v(1) - L1*v(2);
         // actuator 2
-        (*cVel)(2) = v(1) + L2 * v(2);
+        (*cVel)(2) = v(1) + L2*v(2);
     }
     // linear geometry, horizontal actuator right
     else if (nlGeom == 0 && strcmp(posAct0, "right") == 0) {
         // actuator 0
-        (*cVel)(0) = -v(0);
+        (*cVel)(0) = -v(0) + L5*v(2);
         // actuator 1
-        (*cVel)(1) = v(1) - L1 * v(2);
+        (*cVel)(1) = v(1) - L1*v(2);
         // actuator 2
-        (*cVel)(2) = v(1) + L2 * v(2);
+        (*cVel)(2) = v(1) + L2*v(2);
     }
     // nonlinear geometry, horizontal actuator left
     else if (nlGeom == 1 && strcmp(posAct0, "left") == 0) {
-        double R0 = sqrt(L1*L1 + L4 * L4);
-        double R1 = sqrt(L2*L2 + L5 * L5);
+        double R0 = sqrt(L1*L1 + L4*L4);
+        double R1 = sqrt(L2*L2 + L6*L6);
         double alpha0 = atan2(L4, L1);
-        double alpha1 = atan2(L5, L2);
-
+        double alpha1 = atan2(L6, L2);
+        
         // actuator 0
         (*cVel)(0) = 0.5*(2.0*(d(0) - (L0 + L1)*cos(d(2)) + L0 + L1 + La0)*(v(0) + (L0 + L1)*sin(d(2))*v(2)) + 2.0*(d(1) - (L0 + L1)*sin(d(2)))*(v(1) - (L0 + L1)*cos(d(2))*v(2))) / pow(pow(d(0) - (L0 + L1)*cos(d(2)) + L0 + L1 + La0, 2.0) + pow(d(1) - (L0 + L1)*sin(d(2)), 2.0), 0.5);
         // actuator 1
         (*cVel)(1) = 0.5*(2.0*(d(0) - R0 * cos(alpha0 + d(2)) + L1)*(v(0) + R0 * sin(alpha0 + d(2))*v(2)) + 2.0*(d(1) - R0 * sin(alpha0 + d(2)) + La1 + L4)*(v(1) - R0 * cos(alpha0 + d(2))*v(2))) / pow(pow(d(0) - R0 * cos(alpha0 + d(2)) + L1, 2.0) + pow(d(1) - R0 * sin(alpha0 + d(2)) + La1 + L4, 2.0), 0.5);
         // actuator 2
-        (*cVel)(2) = 0.5*(2.0*(d(0) + R1 * cos(-alpha1 + d(2)) - L2)*(v(0) - R1 * sin(-alpha1 + d(2))*v(2)) + 2.0*(d(1) + R1 * sin(-alpha1 + d(2)) + La2 + L5)*(v(1) + R1 * cos(-alpha1 + d(2))*v(2))) / pow(pow(d(0) + R1 * cos(-alpha1 + d(2)) - L2, 2.0) + pow(d(1) + R1 * sin(-alpha1 + d(2)) + La2 + L5, 2.0), 0.5);
+        (*cVel)(2) = 0.5*(2.0*(d(0) + R1 * cos(-alpha1 + d(2)) - L2)*(v(0) - R1 * sin(-alpha1 + d(2))*v(2)) + 2.0*(d(1) + R1 * sin(-alpha1 + d(2)) + La2 + L6)*(v(1) + R1 * cos(-alpha1 + d(2))*v(2))) / pow(pow(d(0) + R1 * cos(-alpha1 + d(2)) - L2, 2.0) + pow(d(1) + R1 * sin(-alpha1 + d(2)) + La2 + L6, 2.0), 0.5);
     }
     // nonlinear geometry, horizontal actuator right
     else if (nlGeom == 1 && strcmp(posAct0, "right") == 0) {
-        double R0 = sqrt(L1*L1 + L4 * L4);
-        double R1 = sqrt(L2*L2 + L5 * L5);
+        double R0 = sqrt(L1*L1 + L4*L4);
+        double R1 = sqrt(L2*L2 + L6*L6);
         double alpha0 = atan2(L4, L1);
-        double alpha1 = atan2(L5, L2);
-
+        double alpha1 = atan2(L6, L2);
+        
         // actuator 0
         (*cVel)(0) = 0.5*(2.0*(d(0) + (L2 + L3)*cos(d(2)) - L2 - L3 - La0)*(v(0) - (L2 + L3)*sin(d(2))*v(2)) + 2.0*(d(1) + (L2 + L3)*sin(d(2)))*(v(1) + (L2 + L3)*cos(d(2))*v(2))) / pow(pow(d(0) + (L2 + L3)*cos(d(2)) - L2 - L3 - La0, 2.0) + pow(d(1) + (L2 + L3)*sin(d(2)), 2.0), 0.5);
         // actuator 1
         (*cVel)(1) = 0.5*(2.0*(d(0) - R0 * cos(alpha0 + d(2)) + L1)*(v(0) + R0 * sin(alpha0 + d(2))*v(2)) + 2.0*(d(1) - R0 * sin(alpha0 + d(2)) + La1 + L4)*(v(1) - R0 * cos(alpha0 + d(2))*v(2))) / pow(pow(d(0) - R0 * cos(alpha0 + d(2)) + L1, 2.0) + pow(d(1) - R0 * sin(alpha0 + d(2)) + La1 + L4, 2.0), 0.5);
         // actuator 2
-        (*cVel)(2) = 0.5*(2.0*(d(0) + R1 * cos(-alpha1 + d(2)) - L2)*(v(0) - R1 * sin(-alpha1 + d(2))*v(2)) + 2.0*(d(1) + R1 * sin(-alpha1 + d(2)) + La2 + L5)*(v(1) + R1 * cos(-alpha1 + d(2))*v(2))) / pow(pow(d(0) + R1 * cos(-alpha1 + d(2)) - L2, 2.0) + pow(d(1) + R1 * sin(-alpha1 + d(2)) + La2 + L5, 2.0), 0.5);
+        (*cVel)(2) = 0.5*(2.0*(d(0) + R1 * cos(-alpha1 + d(2)) - L2)*(v(0) - R1 * sin(-alpha1 + d(2))*v(2)) + 2.0*(d(1) + R1 * sin(-alpha1 + d(2)) + La2 + L6)*(v(1) + R1 * cos(-alpha1 + d(2))*v(2))) / pow(pow(d(0) + R1 * cos(-alpha1 + d(2)) - L2, 2.0) + pow(d(1) + R1 * sin(-alpha1 + d(2)) + La2 + L6, 2.0), 0.5);
     }
     
     return OF_ReturnType_completed;
@@ -362,48 +484,48 @@ int ESThreeActuatorsJntOff::transfTrialAccel(const Vector* disp,
     // linear geometry, horizontal actuator left
     if (nlGeom == 0 && strcmp(posAct0, "left") == 0) {
         // actuator 0
-        (*cAccel)(0) = a(0);
+        (*cAccel)(0) = a(0) - L5*a(2);
         // actuator 1
-        (*cAccel)(1) = a(1) - L1 * a(2);
+        (*cAccel)(1) = a(1) - L1*a(2);
         // actuator 2
-        (*cAccel)(2) = a(1) + L2 * a(2);
+        (*cAccel)(2) = a(1) + L2*a(2);
     }
     // linear geometry, horizontal actuator right
     else if (nlGeom == 0 && strcmp(posAct0, "right") == 0) {
         // actuator 0
-        (*cAccel)(0) = -a(0);
+        (*cAccel)(0) = -a(0) + L5*a(2);
         // actuator 1
-        (*cAccel)(1) = a(1) - L1 * a(2);
+        (*cAccel)(1) = a(1) - L1*a(2);
         // actuator 2
-        (*cAccel)(2) = a(1) + L2 * a(2);
+        (*cAccel)(2) = a(1) + L2*a(2);
     }
     // nonlinear geometry, horizontal actuator left
     else if (nlGeom == 1 && strcmp(posAct0, "left") == 0) {
-        double R0 = sqrt(L1*L1 + L4 * L4);
-        double R1 = sqrt(L2*L2 + L5 * L5);
+        double R0 = sqrt(L1*L1 + L4*L4);
+        double R1 = sqrt(L2*L2 + L6*L6);
         double alpha0 = atan2(L4, L1);
-        double alpha1 = atan2(L5, L2);
-
+        double alpha1 = atan2(L6, L2);
+        
         // actuator 0
         (*cAccel)(0) = -0.25*pow(2.0*(d(0) - (L0 + L1)*cos(d(2)) + L0 + L1 + La0)*(v(0) + (L0 + L1)*sin(d(2))*v(2)) + 2.0*(d(1) - (L0 + L1)*sin(d(2)))*(v(1) - (L0 + L1)*cos(d(2))*v(2)), 2.0) / pow(pow(d(0) - (L0 + L1)*cos(d(2)) + L0 + L1 + La0, 2.0) + pow(d(1) - (L0 + L1)*sin(d(2)), 2.0), 1.5) + 0.5*(2.0*pow(v(0) + (L0 + L1)*sin(d(2))*v(2), 2.0) + 2.0*(d(0) - (L0 + L1)*cos(d(2)) + L0 + L1 + La0)*(a(0) + (L0 + L1)*cos(d(2))*pow(v(2), 2.0) + (L0 + L1)*sin(d(2))*a(2)) + 2.0*pow(v(1) - (L0 + L1)*cos(d(2))*v(2), 2.0) + 2.0*(d(1) - (L0 + L1)*sin(d(2)))*(a(1) + (L0 + L1)*sin(d(2))*pow(v(2), 2.0) - (L0 + L1)*cos(d(2))*a(2))) / pow(pow(d(0) - (L0 + L1)*cos(d(2)) + L0 + L1 + La0, 2.0) + pow(d(1) - (L0 + L1)*sin(d(2)), 2.0), 0.5);
         // actuator 1
         (*cAccel)(1) = -0.25*pow(2.0*(d(0) - R0 * cos(alpha0 + d(2)) + L1)*(v(0) + R0 * sin(alpha0 + d(2))*v(2)) + 2.0*(d(1) - R0 * sin(alpha0 + d(2)) + La1 + L4)*(v(1) - R0 * cos(alpha0 + d(2))*v(2)), 2.0) / pow(pow(d(0) - R0 * cos(alpha0 + d(2)) + L1, 2.0) + pow(d(1) - R0 * sin(alpha0 + d(2)) + La1 + L4, 2.0), 1.5) + 0.5*(2.0*pow(v(0) + R0 * sin(alpha0 + d(2))*v(2), 2.0) + 2.0*(d(0) - R0 * cos(alpha0 + d(2)) + L1)*(a(0) + R0 * cos(alpha0 + d(2))*pow(v(2), 2.0) + R0 * sin(alpha0 + d(2))*a(2)) + 2.0*pow(v(1) - R0 * cos(alpha0 + d(2))*v(2), 2.0) + 2.0*(d(1) - R0 * sin(alpha0 + d(2)) + La1 + L4)*(a(1) + R0 * sin(alpha0 + d(2))*pow(v(2), 2.0) - R0 * cos(alpha0 + d(2))*a(2))) / pow(pow(d(0) - R0 * cos(alpha0 + d(2)) + L1, 2.0) + pow(d(1) - R0 * sin(alpha0 + d(2)) + La1 + L4, 2.0), 0.5);
         // actuator 2
-        (*cAccel)(2) = -0.25*pow(2.0*(d(0) + R1 * cos(-alpha1 + d(2)) - L2)*(v(0) - R1 * sin(-alpha1 + d(2))*v(2)) + 2.0*(d(1) + R1 * sin(-alpha1 + d(2)) + La2 + L5)*(v(1) + R1 * cos(-alpha1 + d(2))*v(2)), 2.0) / pow(pow(d(0) + R1 * cos(-alpha1 + d(2)) - L2, 2.0) + pow(d(1) + R1 * sin(-alpha1 + d(2)) + La2 + L5, 2.0), 1.5) + 0.5*(2.0*pow(v(0) - R1 * sin(-alpha1 + d(2))*v(2), 2.0) + 2.0*(d(0) + R1 * cos(-alpha1 + d(2)) - L2)*(a(0) - R1 * cos(-alpha1 + d(2))*pow(v(2), 2.0) - R1 * sin(-alpha1 + d(2))*a(2)) + 2.0*pow(v(1) + R1 * cos(-alpha1 + d(2))*v(2), 2.0) + 2.0*(d(1) + R1 * sin(-alpha1 + d(2)) + La2 + L5)*(a(1) - R1 * sin(-alpha1 + d(2))*pow(v(2), 2.0) + R1 * cos(-alpha1 + d(2))*a(2))) / pow(pow(d(0) + R1 * cos(-alpha1 + d(2)) - L2, 2.0) + pow(d(1) + R1 * sin(-alpha1 + d(2)) + La2 + L5, 2.0), 0.5);
+        (*cAccel)(2) = -0.25*pow(2.0*(d(0) + R1 * cos(-alpha1 + d(2)) - L2)*(v(0) - R1 * sin(-alpha1 + d(2))*v(2)) + 2.0*(d(1) + R1 * sin(-alpha1 + d(2)) + La2 + L6)*(v(1) + R1 * cos(-alpha1 + d(2))*v(2)), 2.0) / pow(pow(d(0) + R1 * cos(-alpha1 + d(2)) - L2, 2.0) + pow(d(1) + R1 * sin(-alpha1 + d(2)) + La2 + L6, 2.0), 1.5) + 0.5*(2.0*pow(v(0) - R1 * sin(-alpha1 + d(2))*v(2), 2.0) + 2.0*(d(0) + R1 * cos(-alpha1 + d(2)) - L2)*(a(0) - R1 * cos(-alpha1 + d(2))*pow(v(2), 2.0) - R1 * sin(-alpha1 + d(2))*a(2)) + 2.0*pow(v(1) + R1 * cos(-alpha1 + d(2))*v(2), 2.0) + 2.0*(d(1) + R1 * sin(-alpha1 + d(2)) + La2 + L6)*(a(1) - R1 * sin(-alpha1 + d(2))*pow(v(2), 2.0) + R1 * cos(-alpha1 + d(2))*a(2))) / pow(pow(d(0) + R1 * cos(-alpha1 + d(2)) - L2, 2.0) + pow(d(1) + R1 * sin(-alpha1 + d(2)) + La2 + L6, 2.0), 0.5);
     }
     // nonlinear geometry, horizontal actuator right
     else if (nlGeom == 1 && strcmp(posAct0, "right") == 0) {
-        double R0 = sqrt(L1*L1 + L4 * L4);
-        double R1 = sqrt(L2*L2 + L5 * L5);
+        double R0 = sqrt(L1*L1 + L4*L4);
+        double R1 = sqrt(L2*L2 + L6*L6);
         double alpha0 = atan2(L4, L1);
-        double alpha1 = atan2(L5, L2);
-
+        double alpha1 = atan2(L6, L2);
+        
         // actuator 0
         (*cAccel)(0) = -0.25*pow(2.0*(d(0) + (L2 + L3)*cos(d(2)) - L2 - L3 - La0)*(v(0) - (L2 + L3)*sin(d(2))*v(2)) + 2.0*(d(1) + (L2 + L3)*sin(d(2)))*(v(1) + (L2 + L3)*cos(d(2))*v(2)), 2.0) / pow(pow(d(0) + (L2 + L3)*cos(d(2)) - L2 - L3 - La0, 2.0) + pow(d(1) + (L2 + L3)*sin(d(2)), 2.0), 1.5) + 0.5*(2.0*pow(v(0) - (L2 + L3)*sin(d(2))*v(2), 2.0) + 2.0*(d(0) + (L2 + L3)*cos(d(2)) - L2 - L3 - La0)*(a(0) - (L2 + L3)*cos(d(2))*pow(v(2), 2.0) - (L2 + L3)*sin(d(2))*a(2)) + 2.0*pow(v(1) + (L2 + L3)*cos(d(2))*v(2), 2.0) + 2.0*(d(1) + (L2 + L3)*sin(d(2)))*(a(1) - (L2 + L3)*sin(d(2))*pow(v(2), 2.0) + (L2 + L3)*cos(d(2))*a(2))) / pow(pow(d(0) + (L2 + L3)*cos(d(2)) - L2 - L3 - La0, 2.0) + pow(d(1) + (L2 + L3)*sin(d(2)), 2.0), 0.5);
         // actuator 1
         (*cAccel)(1) = -0.25*pow(2.0*(d(0) - R0 * cos(alpha0 + d(2)) + L1)*(v(0) + R0 * sin(alpha0 + d(2))*v(2)) + 2.0*(d(1) - R0 * sin(alpha0 + d(2)) + La1 + L4)*(v(1) - R0 * cos(alpha0 + d(2))*v(2)), 2.0) / pow(pow(d(0) - R0 * cos(alpha0 + d(2)) + L1, 2.0) + pow(d(1) - R0 * sin(alpha0 + d(2)) + La1 + L4, 2.0), 1.5) + 0.5*(2.0*pow(v(0) + R0 * sin(alpha0 + d(2))*v(2), 2.0) + 2.0*(d(0) - R0 * cos(alpha0 + d(2)) + L1)*(a(0) + R0 * cos(alpha0 + d(2))*pow(v(2), 2.0) + R0 * sin(alpha0 + d(2))*a(2)) + 2.0*pow(v(1) - R0 * cos(alpha0 + d(2))*v(2), 2.0) + 2.0*(d(1) - R0 * sin(alpha0 + d(2)) + La1 + L4)*(a(1) + R0 * sin(alpha0 + d(2))*pow(v(2), 2.0) - R0 * cos(alpha0 + d(2))*a(2))) / pow(pow(d(0) - R0 * cos(alpha0 + d(2)) + L1, 2.0) + pow(d(1) - R0 * sin(alpha0 + d(2)) + La1 + L4, 2.0), 0.5);
         // actuator 2
-        (*cAccel)(2) = -0.25*pow(2.0*(d(0) + R1 * cos(-alpha1 + d(2)) - L2)*(v(0) - R1 * sin(-alpha1 + d(2))*v(2)) + 2.0*(d(1) + R1 * sin(-alpha1 + d(2)) + La2 + L5)*(v(1) + R1 * cos(-alpha1 + d(2))*v(2)), 2.0) / pow(pow(d(0) + R1 * cos(-alpha1 + d(2)) - L2, 2.0) + pow(d(1) + R1 * sin(-alpha1 + d(2)) + La2 + L5, 2.0), 1.5) + 0.5*(2.0*pow(v(0) - R1 * sin(-alpha1 + d(2))*v(2), 2.0) + 2.0*(d(0) + R1 * cos(-alpha1 + d(2)) - L2)*(a(0) - R1 * cos(-alpha1 + d(2))*pow(v(2), 2.0) - R1 * sin(-alpha1 + d(2))*a(2)) + 2.0*pow(v(1) + R1 * cos(-alpha1 + d(2))*v(2), 2.0) + 2.0*(d(1) + R1 * sin(-alpha1 + d(2)) + La2 + L5)*(a(1) - R1 * sin(-alpha1 + d(2))*pow(v(2), 2.0) + R1 * cos(-alpha1 + d(2))*a(2))) / pow(pow(d(0) + R1 * cos(-alpha1 + d(2)) - L2, 2.0) + pow(d(1) + R1 * sin(-alpha1 + d(2)) + La2 + L5, 2.0), 0.5);
+        (*cAccel)(2) = -0.25*pow(2.0*(d(0) + R1 * cos(-alpha1 + d(2)) - L2)*(v(0) - R1 * sin(-alpha1 + d(2))*v(2)) + 2.0*(d(1) + R1 * sin(-alpha1 + d(2)) + La2 + L6)*(v(1) + R1 * cos(-alpha1 + d(2))*v(2)), 2.0) / pow(pow(d(0) + R1 * cos(-alpha1 + d(2)) - L2, 2.0) + pow(d(1) + R1 * sin(-alpha1 + d(2)) + La2 + L6, 2.0), 1.5) + 0.5*(2.0*pow(v(0) - R1 * sin(-alpha1 + d(2))*v(2), 2.0) + 2.0*(d(0) + R1 * cos(-alpha1 + d(2)) - L2)*(a(0) - R1 * cos(-alpha1 + d(2))*pow(v(2), 2.0) - R1 * sin(-alpha1 + d(2))*a(2)) + 2.0*pow(v(1) + R1 * cos(-alpha1 + d(2))*v(2), 2.0) + 2.0*(d(1) + R1 * sin(-alpha1 + d(2)) + La2 + L6)*(a(1) - R1 * sin(-alpha1 + d(2))*pow(v(2), 2.0) + R1 * cos(-alpha1 + d(2))*a(2))) / pow(pow(d(0) + R1 * cos(-alpha1 + d(2)) - L2, 2.0) + pow(d(1) + R1 * sin(-alpha1 + d(2)) + La2 + L6, 2.0), 0.5);
     }
     
     return OF_ReturnType_completed;
@@ -423,18 +545,18 @@ int ESThreeActuatorsJntOff::transfTrialForce(const Vector* force)
         // actuator 0
         (*cForce)(0) = f(0);
         // actuator 1
-        (*cForce)(1) = 1.0 / (L1 + L2)*(L2*f(1) - f(2));
+        (*cForce)(1) = 1.0/(L1+L2)*(-L5*f(0) + L2*f(1) - f(2));
         // actuator 2
-        (*cForce)(2) = 1.0 / (L1 + L2)*(L1*f(1) + f(2));
+        (*cForce)(2) = 1.0/(L1+L2)*(L5*f(0) + L1*f(1) + f(2));
     }
     // linear geometry, horizontal actuator right
     else if (nlGeom == 0 && strcmp(posAct0, "right") == 0) {
         // actuator 0
         (*cForce)(0) = -f(0);
         // actuator 1
-        (*cForce)(1) = 1.0 / (L1 + L2)*(L2*f(1) - f(2));
+        (*cForce)(1) = 1.0/(L1+L2)*(-L5*f(0) + L2*f(1) - f(2));
         // actuator 2
-        (*cForce)(2) = 1.0 / (L1 + L2)*(L1*f(1) + f(2));
+        (*cForce)(2) = 1.0/(L1+L2)*(L5*f(0) + L1*f(1) + f(2));
     }
     // nonlinear geometry, horizontal actuator left
     else if (nlGeom == 1 && strcmp(posAct0, "left") == 0) {
@@ -447,9 +569,9 @@ int ESThreeActuatorsJntOff::transfTrialForce(const Vector* force)
         // actuator 0
         (*cForce)(0) = f(0);
         // actuator 1
-        (*cForce)(1) = 1.0 / (L1 + L2)*(L2*f(1) - f(2));
+        (*cForce)(1) = 1.0/(L1+L2)*(-L5*f(0) + L2*f(1) - f(2));
         // actuator 2
-        (*cForce)(2) = 1.0 / (L1 + L2)*(L1*f(1) + f(2));
+        (*cForce)(2) = 1.0/(L1+L2)*(L5*f(0) + L1*f(1) + f(2));
     }
     // nonlinear geometry, horizontal actuator right
     else if (nlGeom == 1 && strcmp(posAct0, "right") == 0) {
@@ -462,9 +584,9 @@ int ESThreeActuatorsJntOff::transfTrialForce(const Vector* force)
         // actuator 0
         (*cForce)(0) = -f(0);
         // actuator 1
-        (*cForce)(1) = 1.0 / (L1 + L2)*(L2*f(1) - f(2));
+        (*cForce)(1) = 1.0/(L1+L2)*(-L5*f(0) + L2*f(1) - f(2));
         // actuator 2
-        (*cForce)(2) = 1.0 / (L1 + L2)*(L1*f(1) + f(2));
+        (*cForce)(2) = 1.0/(L1+L2)*(L5*f(0) + L1*f(1) + f(2));
     }
     
     return OF_ReturnType_completed;
@@ -485,15 +607,15 @@ int ESThreeActuatorsJntOff::transfDaqDisp(Vector* disp)
     
     // linear geometry, horizontal actuator left
     if (nlGeom == 0 && strcmp(posAct0, "left") == 0) {
-        d(0) = (*dDisp)(0);
-        d(1) = 1.0 / (L1 + L2)*(L2*(*dDisp)(1) + L1 * (*dDisp)(2));
-        d(2) = 1.0 / (L1 + L2)*(-(*dDisp)(1) + (*dDisp)(2));
+        d(0) = (*dDisp)(0) + L5/(L1+L2)*(-(*dDisp)(1) + (*dDisp)(2));
+        d(1) = 1.0/(L1+L2)*(L2*(*dDisp)(1) + L1*(*dDisp)(2));
+        d(2) = 1.0/(L1+L2)*(-(*dDisp)(1) + (*dDisp)(2));
     }
     // linear geometry, horizontal actuator right
     else if (nlGeom == 0 && strcmp(posAct0, "right") == 0) {
-        d(0) = -(*dDisp)(0);
-        d(1) = 1.0 / (L1 + L2)*(L2*(*dDisp)(1) + L1 * (*dDisp)(2));
-        d(2) = 1.0 / (L1 + L2)*(-(*dDisp)(1) + (*dDisp)(2));
+        d(0) = -(*dDisp)(0) + L5/(L1+L2)*(-(*dDisp)(1) + (*dDisp)(2));
+        d(1) = 1.0/(L1+L2)*(L2*(*dDisp)(1) + L1*(*dDisp)(2));
+        d(2) = 1.0/(L1+L2)*(-(*dDisp)(1) + (*dDisp)(2));
     }
     // nonlinear geometry, horizontal actuator left
     else if (nlGeom == 1 && strcmp(posAct0, "left") == 0) {
@@ -502,44 +624,44 @@ int ESThreeActuatorsJntOff::transfDaqDisp(Vector* disp)
         int iter = 0;
         int maxIter = 15;
         double tol = 1E-9;
-
+        
         double d0 = La0 + (*dDisp)(0);
         double d1 = La1 + (*dDisp)(1);
         double d2 = La2 + (*dDisp)(2);
-
-        theta(0) = (*dDisp)(1) / La0;
-        theta(1) = (*dDisp)(0) / La1;
-        theta(2) = (*dDisp)(0) / La2;
-
+        
+        theta(0) = (*dDisp)(1)/La0;
+        theta(1) = (*dDisp)(0)/La1;
+        theta(2) = (*dDisp)(0)/La2;
+        
         do {
             F(0) = L0 * L0 + L4 * L4 - pow(d0*cos(theta(0)) - La0 - L0 - d1 * sin(theta(1)), 2.0) - pow(d0*sin(theta(0)) + La1 + L4 - d1 * cos(theta(1)), 2.0);
-            F(1) = pow(L1 + L2, 2.0) + pow(L4 - L5, 2.0) - pow(d2*sin(theta(2)) + L1 + L2 - d1 * sin(theta(1)), 2.0) - pow(d2*cos(theta(2)) + La1 + L4 - L5 - La2 - d1 * cos(theta(1)), 2.0);
-            F(2) = pow(L0 + L1 + L2, 2.0) + L5 * L5 - pow(d0*cos(theta(0)) - La0 - L0 - d2 * sin(theta(2)) - L1 - L2, 2.0) - pow(d0*sin(theta(0)) + La2 + L5 - d2 * cos(theta(2)), 2.0);
-
+            F(1) = pow(L1 + L2, 2.0) + pow(L4 - L6, 2.0) - pow(d2*sin(theta(2)) + L1 + L2 - d1 * sin(theta(1)), 2.0) - pow(d2*cos(theta(2)) + La1 + L4 - L6 - La2 - d1 * cos(theta(1)), 2.0);
+            F(2) = pow(L0 + L1 + L2, 2.0) + L6 * L6 - pow(d0*cos(theta(0)) - La0 - L0 - d2 * sin(theta(2)) - L1 - L2, 2.0) - pow(d0*sin(theta(0)) + La2 + L6 - d2 * cos(theta(2)), 2.0);
+            
             DF(0, 0) = 2.0*d0*(-(L4 + La1)*cos(theta(0)) + d1 * cos(theta(1) + theta(0)) - (L0 + La0)*sin(theta(0)));
             DF(0, 1) = 2.0*d1*(-(L0 + La0)*cos(theta(1)) + d0 * cos(theta(1) + theta(0)) - (L4 + La1)*sin(theta(1)));
             DF(0, 2) = 0.0;
             DF(1, 0) = 0.0;
-            DF(1, 1) = 2.0*d1*((L1 + L2)*cos(theta(1)) - d2 * sin(theta(1) - theta(2)) - (L4 - L5 + La1 - La2)*sin(theta(1)));
-            DF(1, 2) = 2.0*d2*(-(L1 + L2)*cos(theta(2)) + d1 * sin(theta(1) - theta(2)) + (L4 - L5 + La1 - La2)*sin(theta(2)));
-            DF(2, 0) = 2.0*d0*(-(L5 + La2)*cos(theta(0)) + d2 * cos(theta(2) + theta(0)) - (L0 + L1 + L2 + La0)*sin(theta(0)));
+            DF(1, 1) = 2.0*d1*((L1 + L2)*cos(theta(1)) - d2 * sin(theta(1) - theta(2)) - (L4 - L6 + La1 - La2)*sin(theta(1)));
+            DF(1, 2) = 2.0*d2*(-(L1 + L2)*cos(theta(2)) + d1 * sin(theta(1) - theta(2)) + (L4 - L6 + La1 - La2)*sin(theta(2)));
+            DF(2, 0) = 2.0*d0*(-(L6 + La2)*cos(theta(0)) + d2 * cos(theta(2) + theta(0)) - (L0 + L1 + L2 + La0)*sin(theta(0)));
             DF(2, 1) = 0.0;
-            DF(2, 2) = 2.0*d2*(-(L0 + L1 + L2 + La0)*cos(theta(2)) + d0 * cos(theta(2) + theta(0)) - (L5 + La2)*sin(theta(2)));
-
+            DF(2, 2) = 2.0*d2*(-(L0 + L1 + L2 + La0)*cos(theta(2)) + d0 * cos(theta(2) + theta(0)) - (L6 + La2)*sin(theta(2)));
+            
             // Newton’s method
             dTheta = F / DF;
             theta -= dTheta;
             iter++;
         } while ((dTheta.Norm() >= tol) && (iter <= maxIter));
-
+        
         // issue warning if iteration did not converge
         if (iter >= maxIter) {
             opserr << "WARNING ESThreeActuatorsJntOff::transfDaqDisp() - "
                 << "did not find the angle theta after "
                 << iter << " iterations and norm: " << dTheta.Norm() << endln;
         }
-
-        d(2) = atan2(d2*cos(theta(2)) + La1 + L4 - L5 - La2 - d1 * cos(theta(1)), d2*sin(theta(2)) + L1 + L2 - d1 * sin(theta(1))) - atan2(L4 - L5, L1 + L2);
+        
+        d(2) = atan2(d2*cos(theta(2)) + La1 + L4 - L6 - La2 - d1 * cos(theta(1)), d2*sin(theta(2)) + L1 + L2 - d1 * sin(theta(1))) - atan2(L4 - L6, L1 + L2);
         double R0 = sqrt(L1*L1 + L4 * L4);
         double beta0 = atan2(L4, L1) + d(2);
         d(0) = d1 * sin(theta(1)) + R0 * cos(beta0) - L1;
@@ -552,44 +674,44 @@ int ESThreeActuatorsJntOff::transfDaqDisp(Vector* disp)
         int iter = 0;
         int maxIter = 15;
         double tol = 1E-9;
-
+        
         double d0 = La0 + (*dDisp)(0);
         double d1 = La1 + (*dDisp)(1);
         double d2 = La2 + (*dDisp)(2);
-
+        
         theta(0) = (*dDisp)(2) / La0;
         theta(1) = (*dDisp)(0) / La1;
         theta(2) = (*dDisp)(0) / La2;
-
+        
         do {
             F(0) = pow(L1 + L2 + L3, 2.0) + L4 * L4 - pow(-d0 * cos(theta(0)) + La0 + L1 + L2 + L3 + d1 * sin(theta(1)), 2.0) - pow(d0*sin(theta(0)) + La1 + L4 - d1 * cos(theta(1)), 2.0);
-            F(1) = pow(L1 + L2, 2.0) + pow(L4 - L5, 2.0) - pow(-d2 * sin(theta(2)) + L1 + L2 + d1 * sin(theta(1)), 2.0) - pow(d2*cos(theta(2)) + La1 + L4 - L5 - La2 - d1 * cos(theta(1)), 2.0);
-            F(2) = L3 * L3 + L5 * L5 - pow(-d0 * cos(theta(0)) + La0 + L3 + d2 * sin(theta(2)), 2.0) - pow(d0*sin(theta(0)) + La2 + L5 - d2 * cos(theta(2)), 2.0);
-
+            F(1) = pow(L1 + L2, 2.0) + pow(L4 - L6, 2.0) - pow(-d2 * sin(theta(2)) + L1 + L2 + d1 * sin(theta(1)), 2.0) - pow(d2*cos(theta(2)) + La1 + L4 - L6 - La2 - d1 * cos(theta(1)), 2.0);
+            F(2) = L3 * L3 + L6 * L6 - pow(-d0 * cos(theta(0)) + La0 + L3 + d2 * sin(theta(2)), 2.0) - pow(d0*sin(theta(0)) + La2 + L6 - d2 * cos(theta(2)), 2.0);
+            
             DF(0, 0) = 2.0*d0*(-(L4 + La1)*cos(theta(0)) + d1 * cos(theta(1) + theta(0)) - (L1 + L2 + L3 + La0)*sin(theta(0)));
             DF(0, 1) = 2.0*d1*(-(L1 + L2 + L3 + La0)*cos(theta(1)) + d0 * cos(theta(1) + theta(0)) - (L4 + La1)*sin(theta(1)));
             DF(0, 2) = 0.0;
             DF(1, 0) = 0.0;
-            DF(1, 1) = 2.0*d1*(-(L1 + L2)*cos(theta(1)) - d2 * sin(theta(1) - theta(2)) - (L4 - L5 + La1 - La2)*sin(theta(1)));
-            DF(1, 2) = 2.0*d2*((L1 + L2)*cos(theta(2)) + d1 * sin(theta(1) - theta(2)) + (L4 - L5 + La1 - La2)*sin(theta(2)));
-            DF(2, 0) = 2.0*d0*(-(L5 + La2)*cos(theta(0)) + d2 * cos(theta(2) + theta(0)) - (L3 + La0)*sin(theta(0)));
+            DF(1, 1) = 2.0*d1*(-(L1 + L2)*cos(theta(1)) - d2 * sin(theta(1) - theta(2)) - (L4 - L6 + La1 - La2)*sin(theta(1)));
+            DF(1, 2) = 2.0*d2*((L1 + L2)*cos(theta(2)) + d1 * sin(theta(1) - theta(2)) + (L4 - L6 + La1 - La2)*sin(theta(2)));
+            DF(2, 0) = 2.0*d0*(-(L6 + La2)*cos(theta(0)) + d2 * cos(theta(2) + theta(0)) - (L3 + La0)*sin(theta(0)));
             DF(2, 1) = 0.0;
-            DF(2, 2) = 2.0*d2*(-(L3 + La0)*cos(theta(2)) + d0 * cos(theta(2) + theta(0)) - (L5 + La2)*sin(theta(2)));
-
+            DF(2, 2) = 2.0*d2*(-(L3 + La0)*cos(theta(2)) + d0 * cos(theta(2) + theta(0)) - (L6 + La2)*sin(theta(2)));
+            
             // Newton’s method
             dTheta = F / DF;
             theta -= dTheta;
             iter++;
         } while ((dTheta.Norm() >= tol) && (iter <= maxIter));
-
+        
         // issue warning if iteration did not converge
         if (iter >= maxIter) {
             opserr << "WARNING ESThreeActuatorsJntOff::transfDaqDisp() - "
                 << "did not find the angle theta after "
                 << iter << " iterations and norm: " << dTheta.Norm() << endln;
         }
-
-        d(2) = atan2(d2*cos(theta(2)) + La1 + L4 - L5 - La2 - d1 * cos(theta(1)), -d2 * sin(theta(2)) + L1 + L2 + d1 * sin(theta(1))) - atan2(L4 - L5, L1 + L2);
+        
+        d(2) = atan2(d2*cos(theta(2)) + La1 + L4 - L6 - La2 - d1 * cos(theta(1)), -d2 * sin(theta(2)) + L1 + L2 + d1 * sin(theta(1))) - atan2(L4 - L6, L1 + L2);
         double R0 = sqrt(L1*L1 + L4 * L4);
         double beta0 = atan2(L4, L1) + d(2);
         d(0) = -d1 * sin(theta(1)) + R0 * cos(beta0) - L1;
@@ -611,15 +733,15 @@ int ESThreeActuatorsJntOff::transfDaqVel(Vector* vel)
     
     // linear geometry, horizontal actuator left
     if (nlGeom == 0 && strcmp(posAct0, "left") == 0) {
-        v(0) = (*dVel)(0);
-        v(1) = 1.0 / (L1 + L2)*(L2*(*dVel)(1) + L1 * (*dVel)(2));
-        v(2) = 1.0 / (L1 + L2)*(-(*dVel)(1) + (*dVel)(2));
+        v(0) = (*dVel)(0) + L5/(L1+L2)*(-(*dVel)(1) + (*dVel)(2));
+        v(1) = 1.0/(L1+L2)*(L2*(*dVel)(1) + L1*(*dVel)(2));
+        v(2) = 1.0/(L1+L2)*(-(*dVel)(1) + (*dVel)(2));
     }
     // linear geometry, horizontal actuator right
     else if (nlGeom == 0 && strcmp(posAct0, "right") == 0) {
-        v(0) = -(*dVel)(0);
-        v(1) = 1.0 / (L1 + L2)*(L2*(*dVel)(1) + L1 * (*dVel)(2));
-        v(2) = 1.0 / (L1 + L2)*(-(*dVel)(1) + (*dVel)(2));
+        v(0) = -(*dVel)(0) + L5/(L1+L2)*(-(*dVel)(1) + (*dVel)(2));
+        v(1) = 1.0/(L1+L2)*(L2*(*dVel)(1) + L1*(*dVel)(2));
+        v(2) = 1.0/(L1+L2)*(-(*dVel)(1) + (*dVel)(2));
     }
     // nonlinear geometry, horizontal actuator left
     else if (nlGeom == 1 && strcmp(posAct0, "left") == 0) {
@@ -629,9 +751,9 @@ int ESThreeActuatorsJntOff::transfDaqVel(Vector* vel)
                 << "not implemented yet. Using linear geometry instead.\n\n";
             firstWarning[1] = false;
         }
-        v(0) = (*dVel)(0);
-        v(1) = 1.0 / (L1 + L2)*(L2*(*dVel)(1) + L1 * (*dVel)(2));
-        v(2) = 1.0 / (L1 + L2)*(-(*dVel)(1) + (*dVel)(2));
+        v(0) = (*dVel)(0) + L5/(L1+L2)*(-(*dVel)(1) + (*dVel)(2));
+        v(1) = 1.0/(L1+L2)*(L2*(*dVel)(1) + L1*(*dVel)(2));
+        v(2) = 1.0/(L1+L2)*(-(*dVel)(1) + (*dVel)(2));
     }
     // nonlinear geometry, horizontal actuator right
     else if (nlGeom == 1 && strcmp(posAct0, "right") == 0) {
@@ -641,9 +763,9 @@ int ESThreeActuatorsJntOff::transfDaqVel(Vector* vel)
                 << "not implemented yet. Using linear geometry instead.\n\n";
             firstWarning[1] = false;
         }
-        v(0) = -(*dVel)(0);
-        v(1) = 1.0 / (L1 + L2)*(L2*(*dVel)(1) + L1 * (*dVel)(2));
-        v(2) = 1.0 / (L1 + L2)*(-(*dVel)(1) + (*dVel)(2));
+        v(0) = -(*dVel)(0) + L5/(L1+L2)*(-(*dVel)(1) + (*dVel)(2));
+        v(1) = 1.0/(L1+L2)*(L2*(*dVel)(1) + L1*(*dVel)(2));
+        v(2) = 1.0/(L1+L2)*(-(*dVel)(1) + (*dVel)(2));
     }
     
     // assemble directions
@@ -661,15 +783,15 @@ int ESThreeActuatorsJntOff::transfDaqAccel(Vector* accel)
     
     // linear geometry, horizontal actuator left
     if (nlGeom == 0 && strcmp(posAct0, "left") == 0) {
-        a(0) = (*dAccel)(0);
-        a(1) = 1.0 / (L1 + L2)*(L2*(*dAccel)(1) + L1 * (*dAccel)(2));
-        a(2) = 1.0 / (L1 + L2)*(-(*dAccel)(1) + (*dAccel)(2));
+        a(0) = (*dAccel)(0) + L5/(L1+L2)*(-(*dAccel)(1) + (*dAccel)(2));
+        a(1) = 1.0/(L1+L2)*(L2*(*dAccel)(1) + L1*(*dAccel)(2));
+        a(2) = 1.0/(L1+L2)*(-(*dAccel)(1) + (*dAccel)(2));
     }
     // linear geometry, horizontal actuator right
     else if (nlGeom == 0 && strcmp(posAct0, "right") == 0) {
-        a(0) = -(*dAccel)(0);
-        a(1) = 1.0 / (L1 + L2) * (L2*(*dAccel)(1) + L1 * (*dAccel)(2));
-        a(2) = 1.0 / (L1 + L2) * (-(*dAccel)(1) + (*dAccel)(2));
+        a(0) = -(*dAccel)(0) + L5/(L1+L2)*(-(*dAccel)(1) + (*dAccel)(2));
+        a(1) = 1.0/(L1+L2)*(L2*(*dAccel)(1) + L1*(*dAccel)(2));
+        a(2) = 1.0/(L1+L2)*(-(*dAccel)(1) + (*dAccel)(2));
     }
     // nonlinear geometry, horizontal actuator left
     else if (nlGeom == 1 && strcmp(posAct0, "left") == 0) {
@@ -679,9 +801,9 @@ int ESThreeActuatorsJntOff::transfDaqAccel(Vector* accel)
                 << "not implemented yet. Using linear geometry instead.\n\n";
             firstWarning[2] = false;
         }
-        a(0) = (*dAccel)(0);
-        a(1) = 1.0 / (L1 + L2)*(L2*(*dAccel)(1) + L1 * (*dAccel)(2));
-        a(2) = 1.0 / (L1 + L2)*(-(*dAccel)(1) + (*dAccel)(2));
+        a(0) = (*dAccel)(0) + L5/(L1+L2)*(-(*dAccel)(1) + (*dAccel)(2));
+        a(1) = 1.0/(L1+L2)*(L2*(*dAccel)(1) + L1*(*dAccel)(2));
+        a(2) = 1.0/(L1+L2)*(-(*dAccel)(1) + (*dAccel)(2));
     }
     // nonlinear geometry, horizontal actuator right
     else if (nlGeom == 1 && strcmp(posAct0, "right") == 0) {
@@ -691,9 +813,9 @@ int ESThreeActuatorsJntOff::transfDaqAccel(Vector* accel)
                 << "not implemented yet. Using linear geometry instead.\n\n";
             firstWarning[2] = false;
         }
-        a(0) = -(*dAccel)(0);
-        a(1) = 1.0 / (L1 + L2) * (L2*(*dAccel)(1) + L1 * (*dAccel)(2));
-        a(2) = 1.0 / (L1 + L2) * (-(*dAccel)(1) + (*dAccel)(2));
+        a(0) = -(*dAccel)(0) + L5/(L1+L2)*(-(*dAccel)(1) + (*dAccel)(2));
+        a(1) = 1.0/(L1+L2)*(L2*(*dAccel)(1) + L1*(*dAccel)(2));
+        a(2) = 1.0/(L1+L2)*(-(*dAccel)(1) + (*dAccel)(2));
     }
     
     // assemble directions
@@ -713,13 +835,13 @@ int ESThreeActuatorsJntOff::transfDaqForce(Vector* force)
     if (nlGeom == 0 && strcmp(posAct0, "left") == 0) {
         f(0) = (*dForce)(0);
         f(1) = (*dForce)(1) + (*dForce)(2);
-        f(2) = -L1 * (*dForce)(1) + L2 * (*dForce)(2);
+        f(2) = -L5*(*dForce)(0) - L1*(*dForce)(1) + L2*(*dForce)(2);
     }
     // linear geometry, horizontal actuator right
     else if (nlGeom == 0 && strcmp(posAct0, "right") == 0) {
         f(0) = -(*dForce)(0);
         f(1) = (*dForce)(1) + (*dForce)(2);
-        f(2) = -L1 * (*dForce)(1) + L2 * (*dForce)(2);
+        f(2) = L5*(*dForce)(0) - L1*(*dForce)(1) + L2*(*dForce)(2);
     }
     // nonlinear geometry, horizontal actuator left
     else if (nlGeom == 1 && strcmp(posAct0, "left") == 0) {
@@ -728,49 +850,49 @@ int ESThreeActuatorsJntOff::transfDaqForce(Vector* force)
         int iter = 0;
         int maxIter = 15;
         double tol = 1E-9;
-
+        
         double d0 = La0 + (*dDisp)(0);
         double d1 = La1 + (*dDisp)(1);
         double d2 = La2 + (*dDisp)(2);
-
+        
         theta(0) = (*dDisp)(1) / La0;
         theta(1) = (*dDisp)(0) / La1;
         theta(2) = (*dDisp)(0) / La2;
-
+        
         do {
             F(0) = L0 * L0 + L4 * L4 - pow(d0*cos(theta(0)) - La0 - L0 - d1 * sin(theta(1)), 2.0) - pow(d0*sin(theta(0)) + La1 + L4 - d1 * cos(theta(1)), 2.0);
-            F(1) = pow(L1 + L2, 2.0) + pow(L4 - L5, 2.0) - pow(d2*sin(theta(2)) + L1 + L2 - d1 * sin(theta(1)), 2.0) - pow(d2*cos(theta(2)) + La1 + L4 - L5 - La2 - d1 * cos(theta(1)), 2.0);
-            F(2) = pow(L0 + L1 + L2, 2.0) + L5 * L5 - pow(d0*cos(theta(0)) - La0 - L0 - d2 * sin(theta(2)) - L1 - L2, 2.0) - pow(d0*sin(theta(0)) + La2 + L5 - d2 * cos(theta(2)), 2.0);
-
+            F(1) = pow(L1 + L2, 2.0) + pow(L4 - L6, 2.0) - pow(d2*sin(theta(2)) + L1 + L2 - d1 * sin(theta(1)), 2.0) - pow(d2*cos(theta(2)) + La1 + L4 - L6 - La2 - d1 * cos(theta(1)), 2.0);
+            F(2) = pow(L0 + L1 + L2, 2.0) + L6 * L6 - pow(d0*cos(theta(0)) - La0 - L0 - d2 * sin(theta(2)) - L1 - L2, 2.0) - pow(d0*sin(theta(0)) + La2 + L6 - d2 * cos(theta(2)), 2.0);
+            
             DF(0, 0) = 2.0*d0*(-(L4 + La1)*cos(theta(0)) + d1 * cos(theta(1) + theta(0)) - (L0 + La0)*sin(theta(0)));
             DF(0, 1) = 2.0*d1*(-(L0 + La0)*cos(theta(1)) + d0 * cos(theta(1) + theta(0)) - (L4 + La1)*sin(theta(1)));
             DF(0, 2) = 0.0;
             DF(1, 0) = 0.0;
-            DF(1, 1) = 2.0*d1*((L1 + L2)*cos(theta(1)) - d2 * sin(theta(1) - theta(2)) - (L4 - L5 + La1 - La2)*sin(theta(1)));
-            DF(1, 2) = 2.0*d2*(-(L1 + L2)*cos(theta(2)) + d1 * sin(theta(1) - theta(2)) + (L4 - L5 + La1 - La2)*sin(theta(2)));
-            DF(2, 0) = 2.0*d0*(-(L5 + La2)*cos(theta(0)) + d2 * cos(theta(2) + theta(0)) - (L0 + L1 + L2 + La0)*sin(theta(0)));
+            DF(1, 1) = 2.0*d1*((L1 + L2)*cos(theta(1)) - d2 * sin(theta(1) - theta(2)) - (L4 - L6 + La1 - La2)*sin(theta(1)));
+            DF(1, 2) = 2.0*d2*(-(L1 + L2)*cos(theta(2)) + d1 * sin(theta(1) - theta(2)) + (L4 - L6 + La1 - La2)*sin(theta(2)));
+            DF(2, 0) = 2.0*d0*(-(L6 + La2)*cos(theta(0)) + d2 * cos(theta(2) + theta(0)) - (L0 + L1 + L2 + La0)*sin(theta(0)));
             DF(2, 1) = 0.0;
-            DF(2, 2) = 2.0*d2*(-(L0 + L1 + L2 + La0)*cos(theta(2)) + d0 * cos(theta(2) + theta(0)) - (L5 + La2)*sin(theta(2)));
-
+            DF(2, 2) = 2.0*d2*(-(L0 + L1 + L2 + La0)*cos(theta(2)) + d0 * cos(theta(2) + theta(0)) - (L6 + La2)*sin(theta(2)));
+            
             // Newton’s method
             dTheta = F / DF;
             theta -= dTheta;
             iter++;
         } while ((dTheta.Norm() >= tol) && (iter <= maxIter));
-
+        
         // issue warning if iteration did not converge
         if (iter >= maxIter) {
             opserr << "WARNING ESThreeActuatorsJntOff::transfDaqForce() - "
                 << "did not find the angle theta after "
                 << iter << " iterations and norm: " << dTheta.Norm() << endln;
         }
-
-        double disp2 = atan2(d2*cos(theta(2)) + La1 + L4 - L5 - La2 - d1 * cos(theta(1)), d2*sin(theta(2)) + L1 + L2 - d1 * sin(theta(1))) - atan2(L4 - L5, L1 + L2);
-        double R0 = sqrt(L1*L1 + L4 * L4);
-        double R1 = sqrt(L2*L2 + L5 * L5);
+        
+        double disp2 = atan2(d2*cos(theta(2)) + La1 + L4 - L6 - La2 - d1 * cos(theta(1)), d2*sin(theta(2)) + L1 + L2 - d1 * sin(theta(1))) - atan2(L4 - L6, L1 + L2);
+        double R0 = sqrt(L1*L1 + L4*L4);
+        double R1 = sqrt(L2*L2 + L6*L6);
         double beta0 = atan2(L4, L1) + disp2;
-        double beta1 = atan2(L5, L2) - disp2;
-
+        double beta1 = atan2(L6, L2) - disp2;
+        
         static Vector fx(3), fy(3);
         fx(0) = (*dForce)(0)*cos(theta(0));
         fx(1) = (*dForce)(1)*sin(theta(1));
@@ -778,7 +900,7 @@ int ESThreeActuatorsJntOff::transfDaqForce(Vector* force)
         fy(0) = (*dForce)(0)*sin(theta(0));
         fy(1) = (*dForce)(1)*cos(theta(1));
         fy(2) = (*dForce)(2)*cos(theta(2));
-
+        
         f(0) = fx(0) + fx(1) + fx(2);
         f(1) = fy(0) + fy(1) + fy(2);
         f(2) = fx(0)*(L0 + L1)*sin(disp2) + fx(1)*R0*sin(beta0) + fx(2)*R1*sin(beta1) - fy(0)*(L0 + L1)*cos(disp2) - fy(1)*R0*cos(beta0) + fy(2)*R1*cos(beta1);
@@ -790,49 +912,49 @@ int ESThreeActuatorsJntOff::transfDaqForce(Vector* force)
         int iter = 0;
         int maxIter = 15;
         double tol = 1E-9;
-
+        
         double d0 = La0 + (*dDisp)(0);
         double d1 = La1 + (*dDisp)(1);
         double d2 = La2 + (*dDisp)(2);
-
+        
         theta(0) = (*dDisp)(2) / La0;
         theta(1) = (*dDisp)(0) / La1;
         theta(2) = (*dDisp)(0) / La2;
-
+        
         do {
             F(0) = pow(L1 + L2 + L3, 2.0) + L4 * L4 - pow(-d0 * cos(theta(0)) + La0 + L1 + L2 + L3 + d1 * sin(theta(1)), 2.0) - pow(d0*sin(theta(0)) + La1 + L4 - d1 * cos(theta(1)), 2.0);
-            F(1) = pow(L1 + L2, 2.0) + pow(L4 - L5, 2.0) - pow(-d2 * sin(theta(2)) + L1 + L2 + d1 * sin(theta(1)), 2.0) - pow(d2*cos(theta(2)) + La1 + L4 - L5 - La2 - d1 * cos(theta(1)), 2.0);
-            F(2) = L3 * L3 + L5 * L5 - pow(-d0 * cos(theta(0)) + La0 + L3 + d2 * sin(theta(2)), 2.0) - pow(d0*sin(theta(0)) + La2 + L5 - d2 * cos(theta(2)), 2.0);
-
+            F(1) = pow(L1 + L2, 2.0) + pow(L4 - L6, 2.0) - pow(-d2 * sin(theta(2)) + L1 + L2 + d1 * sin(theta(1)), 2.0) - pow(d2*cos(theta(2)) + La1 + L4 - L6 - La2 - d1 * cos(theta(1)), 2.0);
+            F(2) = L3 * L3 + L6 * L6 - pow(-d0 * cos(theta(0)) + La0 + L3 + d2 * sin(theta(2)), 2.0) - pow(d0*sin(theta(0)) + La2 + L6 - d2 * cos(theta(2)), 2.0);
+            
             DF(0, 0) = 2.0*d0*(-(L4 + La1)*cos(theta(0)) + d1 * cos(theta(1) + theta(0)) - (L1 + L2 + L3 + La0)*sin(theta(0)));
             DF(0, 1) = 2.0*d1*(-(L1 + L2 + L3 + La0)*cos(theta(1)) + d0 * cos(theta(1) + theta(0)) - (L4 + La1)*sin(theta(1)));
             DF(0, 2) = 0.0;
             DF(1, 0) = 0.0;
-            DF(1, 1) = 2.0*d1*(-(L1 + L2)*cos(theta(1)) - d2 * sin(theta(1) - theta(2)) - (L4 - L5 + La1 - La2)*sin(theta(1)));
-            DF(1, 2) = 2.0*d2*((L1 + L2)*cos(theta(2)) + d1 * sin(theta(1) - theta(2)) + (L4 - L5 + La1 - La2)*sin(theta(2)));
-            DF(2, 0) = 2.0*d0*(-(L5 + La2)*cos(theta(0)) + d2 * cos(theta(2) + theta(0)) - (L3 + La0)*sin(theta(0)));
+            DF(1, 1) = 2.0*d1*(-(L1 + L2)*cos(theta(1)) - d2 * sin(theta(1) - theta(2)) - (L4 - L6 + La1 - La2)*sin(theta(1)));
+            DF(1, 2) = 2.0*d2*((L1 + L2)*cos(theta(2)) + d1 * sin(theta(1) - theta(2)) + (L4 - L6 + La1 - La2)*sin(theta(2)));
+            DF(2, 0) = 2.0*d0*(-(L6 + La2)*cos(theta(0)) + d2 * cos(theta(2) + theta(0)) - (L3 + La0)*sin(theta(0)));
             DF(2, 1) = 0.0;
-            DF(2, 2) = 2.0*d2*(-(L3 + La0)*cos(theta(2)) + d0 * cos(theta(2) + theta(0)) - (L5 + La2)*sin(theta(2)));
-
+            DF(2, 2) = 2.0*d2*(-(L3 + La0)*cos(theta(2)) + d0 * cos(theta(2) + theta(0)) - (L6 + La2)*sin(theta(2)));
+            
             // Newton’s method
             dTheta = F / DF;
             theta -= dTheta;
             iter++;
         } while ((dTheta.Norm() >= tol) && (iter <= maxIter));
-
+        
         // issue warning if iteration did not converge
         if (iter >= maxIter) {
             opserr << "WARNING ESThreeActuatorsJntOff::transfDaqForce() - "
                 << "did not find the angle theta after "
                 << iter << " iterations and norm: " << dTheta.Norm() << endln;
         }
-
-        double disp2 = atan2(d2*cos(theta(2)) + La1 + L4 - L5 - La2 - d1 * cos(theta(1)), -d2 * sin(theta(2)) + L1 + L2 + d1 * sin(theta(1))) - atan2(L4 - L5, L1 + L2);
-        double R0 = sqrt(L1*L1 + L4 * L4);
-        double R1 = sqrt(L2*L2 + L5 * L5);
+        
+        double disp2 = atan2(d2*cos(theta(2)) + La1 + L4 - L6 - La2 - d1 * cos(theta(1)), -d2 * sin(theta(2)) + L1 + L2 + d1 * sin(theta(1))) - atan2(L4 - L6, L1 + L2);
+        double R0 = sqrt(L1*L1 + L4*L4);
+        double R1 = sqrt(L2*L2 + L6*L6);
         double beta0 = atan2(L4, L1) + disp2;
-        double beta1 = atan2(L5, L2) - disp2;
-
+        double beta1 = atan2(L6, L2) - disp2;
+        
         static Vector fx(3), fy(3);
         fx(0) = (*dForce)(0)*cos(theta(0));
         fx(1) = (*dForce)(1)*sin(theta(1));
@@ -840,7 +962,7 @@ int ESThreeActuatorsJntOff::transfDaqForce(Vector* force)
         fy(0) = (*dForce)(0)*sin(theta(0));
         fy(1) = (*dForce)(1)*cos(theta(1));
         fy(2) = (*dForce)(2)*cos(theta(2));
-
+        
         f(0) = -fx(0) - fx(1) - fx(2);
         f(1) = fy(0) + fy(1) + fy(2);
         f(2) = fx(0)*(L2 + L3)*sin(disp2) - fx(1)*R0*sin(beta0) - fx(2)*R1*sin(beta1) + fy(0)*(L2 + L3)*cos(disp2) - fy(1)*R0*cos(beta0) + fy(2)*R1*cos(beta1);

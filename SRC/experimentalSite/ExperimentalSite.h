@@ -22,10 +22,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 #ifndef ExperimentalSite_h
 #define ExperimentalSite_h
 
@@ -154,5 +150,11 @@ protected:
     virtual void setTrial();
     virtual void setOut();
 };
+
+extern bool OPF_AddExperimentalSite(ExperimentalSite* newComponent);
+extern ExperimentalSite* OPF_GetExperimentalSite(int tag);
+extern ExperimentalSite* OPF_GetExperimentalSiteFirst();
+extern bool OPF_RemoveExperimentalSite(int tag);
+extern void OPF_ClearExperimentalSites();
 
 #endif

@@ -19,10 +19,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 // Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 10/06
 // Revision: A
@@ -41,10 +37,269 @@
 #include <TCP_Socket.h>
 #include <TCP_SocketSSL.h>
 #include <UDP_Socket.h>
+#include <elementAPI.h>
 
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
+
+
+void* OPF_EEGeneric()
+{
+    // pointer to experimental element that will be returned
+    ExperimentalElement* theExpElement = 0;
+    int ndf = OPS_GetNDF();
+    
+    if (OPS_GetNumRemainingInputArgs() < 9) {
+        opserr << "WARNING invalid number of arguments\n";
+        opserr << "Want: expElement generic eleTag -node Ndi -dof dofNdi -dof dofNdj ... -site siteTag -initStif Kij <-iMod> <-noRayleigh> <-mass Mij> <-checkTime>\n";
+        opserr << "  or: expElement generic eleTag -node Ndi -dof dofNdi -dof dofNdj ... -server ipPort <ipAddr> <-ssl> <-udp> <-dataSize size> -initStif Kij <-iMod> <-noRayleigh> <-mass Mij> <-checkTime>\n";
+        return 0;
+    }
+    
+    // element tag
+    int tag;
+    int numdata = 1;
+    if (OPS_GetIntInput(&numdata, &tag) != 0) {
+        opserr << "WARNING invalid expElement generic eleTag\n";
+        return 0;
+    }
+    
+    // nodes
+    const char* type = OPS_GetString();
+    if (strcmp(type, "-node") != 0) {
+        opserr << "WARNING expecting -node Ndi Ndj ...\n";
+        opserr << "expElement generic element: " << tag << endln;
+        return 0;
+    }
+    ID nodes(32);
+    int numNodes = 0;
+    while (OPS_GetNumRemainingInputArgs() > 0) {
+        int node;
+        numdata = 1;
+        int numArgs = OPS_GetNumRemainingInputArgs();
+        if (OPS_GetIntInput(&numdata, &node) < 0) {
+            if (numArgs > OPS_GetNumRemainingInputArgs()) {
+                // move current arg back by one
+                OPS_ResetCurrentInputArg(-1);
+            }
+            break;
+        }
+        nodes(numNodes++) = node;
+    }
+    nodes.resize(numNodes);
+    
+    // dofs
+    int numDOF = 0;
+    ID* dofs = new ID[numNodes];
+    for (int i = 0; i < numNodes; i++) {
+        type = OPS_GetString();
+        if (strcmp(type, "-dof") != 0 && strcmp(type, "-dir") != 0) {
+            opserr << "WARNING expecting -dof dofNd"
+                << i + 1 << ", but got " << type << endln;
+            opserr << "expElement generic element: " << tag << endln;
+            return 0;
+        }
+        ID dofsi(ndf);
+        int numDOFi = 0;
+        while (OPS_GetNumRemainingInputArgs() > 0) {
+            int dof;
+            numdata = 1;
+            int numArgs = OPS_GetNumRemainingInputArgs();
+            if (OPS_GetIntInput(&numdata, &dof) < 0) {
+                if (numArgs > OPS_GetNumRemainingInputArgs()) {
+                    // move current arg back by one
+                    OPS_ResetCurrentInputArg(-1);
+                }
+                break;
+            }
+            if (dof < 1 || ndf < dof) {
+                opserr << "WARNING invalid dof ID\n";
+                opserr << "expElement generic element: " << tag << endln;
+                return 0;
+            }
+            dofsi(numDOFi++) = dof - 1;
+            numDOF++;
+        }
+        dofsi.resize(numDOFi);
+        dofs[i] = dofsi;
+    }
+    
+    // experimental site or server parameters
+    ExperimentalSite* theSite = 0;
+    int ipPort = 8090;
+    char* ipAddr = new char[10];
+    strcpy(ipAddr, "127.0.0.1");
+    int ssl = 0, udp = 0;
+    int dataSize = OF_Network_dataSize;
+    type = OPS_GetString();
+    if (strcmp(type, "-site") == 0) {
+        // site tag
+        int siteTag;
+        numdata = 1;
+        if (OPS_GetIntInput(&numdata, &siteTag) < 0) {
+            opserr << "WARNING invalid siteTag\n";
+            opserr << "expElement generic element: " << tag << endln;
+            return 0;
+        }
+        theSite = OPF_GetExperimentalSite(siteTag);
+        if (theSite == 0) {
+            opserr << "WARNING experimental site not found\n";
+            opserr << "expSite: " << siteTag << endln;
+            opserr << "expElement generic element: " << tag << endln;
+            return 0;
+        }
+    }
+    else if (strcmp(type, "-server") == 0) {
+        // ip port
+        numdata = 1;
+        if (OPS_GetIntInput(&numdata, &ipPort) < 0) {
+            opserr << "WARNING invalid ipPort\n";
+            opserr << "expElement generic element: " << tag << endln;
+            return 0;
+        }
+        // server options
+        while (OPS_GetNumRemainingInputArgs() > 0) {
+            type = OPS_GetString();
+            if (strcmp(type, "-initStif") == 0 ||
+                strcmp(type, "-initStiff") == 0) {
+                // move current arg back by one
+                OPS_ResetCurrentInputArg(-1);
+                break;
+            }
+            else if (strcmp(type, "-ssl") == 0) {
+                ssl = 1; udp = 0;
+            }
+            else if (strcmp(type, "-udp") == 0) {
+                udp = 1; ssl = 0;
+            }
+            else if (strcmp(type, "-dataSize") == 0) {
+                numdata = 1;
+                if (OPS_GetIntInput(&numdata, &dataSize) < 0) {
+                    opserr << "WARNING invalid dataSize\n";
+                    opserr << "expElement generic element: " << tag << endln;
+                    return 0;
+                }
+            }
+            else {
+                delete[] ipAddr;
+                ipAddr = new char[strlen(type) + 1];
+                strcpy(ipAddr, type);
+            }
+        }
+    }
+    else {
+        opserr << "WARNING expecting -site or -server string but got ";
+        opserr << type << endln;
+        opserr << "expElement generic element: " << tag << endln;
+        return 0;
+    }
+    
+    // initial stiffness
+    type = OPS_GetString();
+    if (strcmp(type, "-initStif") != 0 &&
+        strcmp(type, "-initStiff") != 0) {
+        opserr << "WARNING expecting -initStif\n";
+        opserr << "expElement generic element: " << tag << endln;
+    }
+    Matrix theInitStif(numDOF, numDOF);
+    double stif[1024];
+    numdata = numDOF * numDOF;
+    if (OPS_GetDoubleInput(&numdata, stif) < 0) {
+        opserr << "WARNING invalid initial stiffness term\n";
+        opserr << "expElement generic element: " << tag << endln;
+        return 0;
+    }
+    theInitStif.setData(stif, numDOF, numDOF);
+    
+    // optional parameters
+    ExperimentalTangentStiff* theTangStif = 0;
+    bool iMod = false;
+    int doRayleigh = 1;
+    Matrix* mass = 0;
+    int checkTime = 0;
+    while (OPS_GetNumRemainingInputArgs() > 0) {
+        type = OPS_GetString();
+        // tangent stiffness
+        if (strcmp(type, "-tangStif") == 0 ||
+            strcmp(type, "-tangStiff") == 0) {
+            int tangStifTag;
+            numdata = 1;
+            if (OPS_GetIntInput(&numdata, &tangStifTag) < 0) {
+                opserr << "WARNING invalid tangStifTag\n";
+                opserr << "expElement generic element: " << tag << endln;
+                return 0;
+            }
+            theTangStif = OPF_GetExperimentalTangentStiff(tangStifTag);
+            if (theTangStif == 0) {
+                opserr << "WARNING experimental tangent stiff not found\n";
+                opserr << "expTangStiff: " << tangStifTag << endln;
+                opserr << "expElement generic element: " << tag << endln;
+                return 0;
+            }
+        }
+        else if (strcmp(type, "-iMod") == 0) {
+            iMod = true;
+        }
+        else if (strcmp(type, "-doRayleigh") == 0) {
+            doRayleigh = 1;
+        }
+        else if (strcmp(type, "-noRayleigh") == 0) {
+            doRayleigh = 0;
+        }
+        else if (strcmp(type, "-mass") == 0) {
+            if (OPS_GetNumRemainingInputArgs() < numDOF*numDOF) {
+                opserr << "WARNING: insufficient mass values\n";
+                opserr << "expElement generic element: " << tag << endln;
+                return 0;
+            }
+            mass = new Matrix(numDOF, numDOF);
+            double m[1024];
+            numdata = numDOF*numDOF;
+            if (OPS_GetDoubleInput(&numdata, m) < 0) {
+                opserr << "WARNING: invalid -mass value\n";
+                opserr << "expElement generic element: " << tag << endln;
+                return 0;
+            }
+            mass->setData(m, numDOF, numDOF);
+        }
+        else if (strcmp(type, "-checkTime") == 0) {
+            checkTime = 1;
+        }
+    }
+    
+    // now create the EEGeneric
+    if (theSite != 0) {
+        theExpElement = new EEGeneric(tag, nodes, dofs, theSite,
+            iMod, doRayleigh, mass, checkTime);
+    }
+    else {
+        theExpElement = new EEGeneric(tag, nodes, dofs, ipPort,
+            ipAddr, ssl, udp, dataSize, iMod, doRayleigh, mass,
+            checkTime);
+    }
+    if (theExpElement == 0) {
+        opserr << "WARNING ran out of memory creating element\n";
+        opserr << "expElement generic element: " << tag << endln;
+        return 0;
+    }
+    
+    // cleanup dynamic memory
+    if (dofs != 0)
+        delete[] dofs;
+    if (mass != 0)
+        delete mass;
+    
+    // add initial stiffness
+    int setInitStif = theExpElement->setInitialStiff(theInitStif);
+    if (setInitStif != 0) {
+        opserr << "WARNING initial stiffness not set\n";
+        opserr << "expElement generic element: " << tag << endln;
+        return 0;
+    }
+    
+    return theExpElement;
+}
 
 
 // responsible for allocating the necessary space needed

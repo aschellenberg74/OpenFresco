@@ -49,6 +49,9 @@
     <Filter Include="experimentalControlPoint">
       <UniqueIdentifier>{195a5ffd-1f6e-448a-8346-964fa77e258d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="experimentalControl\Simulation">
+      <UniqueIdentifier>{a1600f04-7fc7-41dc-a012-901621c9611c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\SRC\experimentalControl\xPCtarget\xpcinitfree.c">
@@ -66,28 +69,10 @@
     <ClCompile Include="..\..\..\SRC\experimentalControl\ECSCRAMNet.cpp">
       <Filter>experimentalControl</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\SRC\experimentalControl\ECSimDomain.cpp">
-      <Filter>experimentalControl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\SRC\experimentalControl\ECSimFEAdapter.cpp">
-      <Filter>experimentalControl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\SRC\experimentalControl\ECSimSimulink.cpp">
-      <Filter>experimentalControl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\SRC\experimentalControl\ECSimulation.cpp">
-      <Filter>experimentalControl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\SRC\experimentalControl\ECSimUniaxialMaterials.cpp">
-      <Filter>experimentalControl</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\SRC\experimentalControl\ECxPCtarget.cpp">
       <Filter>experimentalControl</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\SRC\experimentalControl\ExperimentalControl.cpp">
-      <Filter>experimentalControl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\SRC\experimentalControl\TclExpControlCommand.cpp">
       <Filter>experimentalControl</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\SRC\experimentalSetup\ESAggregator.cpp">
@@ -120,9 +105,6 @@
     <ClCompile Include="..\..\..\SRC\experimentalSetup\ExperimentalSetup.cpp">
       <Filter>experimentalSetup</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\SRC\experimentalSetup\TclExpSetupCommand.cpp">
-      <Filter>experimentalSetup</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\SRC\experimentalSignalFilter\ESFErrorSimRandomGauss.cpp">
       <Filter>experimentalSignalFilter</Filter>
     </ClCompile>
@@ -135,9 +117,6 @@
     <ClCompile Include="..\..\..\SRC\experimentalSignalFilter\ExperimentalSignalFilter.cpp">
       <Filter>experimentalSignalFilter</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\SRC\experimentalSignalFilter\TclExpSignalFilterCommand.cpp">
-      <Filter>experimentalSignalFilter</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\SRC\experimentalSite\ActorExpSite.cpp">
       <Filter>experimentalSite</Filter>
     </ClCompile>
@@ -148,9 +127,6 @@
       <Filter>experimentalSite</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\SRC\experimentalSite\ShadowExpSite.cpp">
-      <Filter>experimentalSite</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\SRC\experimentalSite\TclExpSiteCommand.cpp">
       <Filter>experimentalSite</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\SRC\tcl\tclAppInit.cpp">
@@ -183,24 +159,6 @@
     <ClCompile Include="..\..\..\SRC\experimentalElement\ExperimentalElement.cpp">
       <Filter>experimentalElement</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\SRC\experimentalElement\TclEEBeamColumnCommand.cpp">
-      <Filter>experimentalElement</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\SRC\experimentalElement\TclEEGenericCommand.cpp">
-      <Filter>experimentalElement</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\SRC\experimentalElement\TclEEInvertedVBraceCommand.cpp">
-      <Filter>experimentalElement</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\SRC\experimentalElement\TclEETrussCommand.cpp">
-      <Filter>experimentalElement</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\SRC\experimentalElement\TclEETwoNodeLinkCommand.cpp">
-      <Filter>experimentalElement</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\SRC\experimentalElement\TclExpElementCommands.cpp">
-      <Filter>experimentalElement</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\SRC\experimentalRecorder\ExpControlRecorder.cpp">
       <Filter>experimentalRecorder</Filter>
     </ClCompile>
@@ -211,9 +169,6 @@
       <Filter>experimentalRecorder</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\SRC\experimentalRecorder\ExpSiteRecorder.cpp">
-      <Filter>experimentalRecorder</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\SRC\experimentalRecorder\TclExpRecorderCommands.cpp">
       <Filter>experimentalRecorder</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\SRC\experimentalRecorder\response\ExpControlResponse.cpp">
@@ -570,9 +525,6 @@
     <ClCompile Include="..\..\..\SRC\experimentalElement\EEBearing2d.cpp">
       <Filter>experimentalElement</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\SRC\experimentalElement\TclEEBearingCommand.cpp">
-      <Filter>experimentalElement</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\SRC\experimentalElement\EEBearing3d.cpp">
       <Filter>experimentalElement</Filter>
     </ClCompile>
@@ -609,9 +561,6 @@
     <ClCompile Include="..\..\..\SRC\experimentalTangentStiff\ExperimentalTangentStiff.cpp">
       <Filter>experimentalTangentStiff</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\SRC\experimentalTangentStiff\TclExpTangentStiffCommand.cpp">
-      <Filter>experimentalTangentStiff</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\SRC\openseesCore\FrictionModel.cpp">
       <Filter>openseesCore</Filter>
     </ClCompile>
@@ -639,14 +588,53 @@
     <ClCompile Include="..\..\..\SRC\experimentalControlPoint\ExperimentalCP.cpp">
       <Filter>experimentalControlPoint</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\SRC\experimentalControlPoint\TclExpCPCommand.cpp">
-      <Filter>experimentalControlPoint</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\SRC\experimentalSetup\ESThreeActuators.cpp">
       <Filter>experimentalSetup</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\SRC\experimentalSetup\ESThreeActuatorsJntOff.cpp">
       <Filter>experimentalSetup</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalControl\ECSimDomain.cpp">
+      <Filter>experimentalControl\Simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalControl\ECSimFEAdapter.cpp">
+      <Filter>experimentalControl\Simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalControl\ECSimSimulink.cpp">
+      <Filter>experimentalControl\Simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalControl\ECSimulation.cpp">
+      <Filter>experimentalControl\Simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalControl\ECSimUniaxialMaterials.cpp">
+      <Filter>experimentalControl\Simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\DataFileStreamAdd.cpp">
+      <Filter>openseesExtra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalControl\TclExpControlCommands.cpp">
+      <Filter>tcl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalControlPoint\TclExpCPCommands.cpp">
+      <Filter>tcl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalElement\TclExpElementCommands.cpp">
+      <Filter>tcl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalRecorder\TclExpRecorderCommands.cpp">
+      <Filter>tcl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalSetup\TclExpSetupCommands.cpp">
+      <Filter>tcl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalSignalFilter\TclExpSignalFilterCommands.cpp">
+      <Filter>tcl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalSite\TclExpSiteCommands.cpp">
+      <Filter>tcl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalTangentStiff\TclExpTangentStiffCommands.cpp">
+      <Filter>tcl</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -657,18 +645,6 @@
       <Filter>experimentalControl</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\SRC\experimentalControl\ECLabVIEW.h">
-      <Filter>experimentalControl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\SRC\experimentalControl\ECSimFEAdapter.h">
-      <Filter>experimentalControl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\SRC\experimentalControl\ECSimSimulink.h">
-      <Filter>experimentalControl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\SRC\experimentalControl\ECSimulation.h">
-      <Filter>experimentalControl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\SRC\experimentalControl\ECSimUniaxialMaterials.h">
       <Filter>experimentalControl</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\SRC\experimentalControl\ECxPCtarget.h">
@@ -1262,6 +1238,21 @@
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalControl\ECSimFEAdapter.h">
+      <Filter>experimentalControl\Simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalControl\ECSimSimulink.h">
+      <Filter>experimentalControl\Simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalControl\ECSimulation.h">
+      <Filter>experimentalControl\Simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalControl\ECSimUniaxialMaterials.h">
+      <Filter>experimentalControl\Simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\DataFileStreamAdd.h">
+      <Filter>openseesExtra</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="OpenFresco.ico">
@@ -1276,7 +1267,7 @@
       <Filter>experimentalControl</Filter>
     </CustomBuildStep>
     <CustomBuildStep Include="..\..\..\SRC\experimentalControl\ECSimDomain.h">
-      <Filter>experimentalControl</Filter>
+      <Filter>experimentalControl\Simulation</Filter>
     </CustomBuildStep>
   </ItemGroup>
   <ItemGroup>

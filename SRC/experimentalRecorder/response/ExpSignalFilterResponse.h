@@ -19,10 +19,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 #ifndef ExpSignalFilterResponse_h
 #define ExpSignalFilterResponse_h
 

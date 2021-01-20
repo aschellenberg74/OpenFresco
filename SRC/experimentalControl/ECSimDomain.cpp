@@ -32,6 +32,7 @@
 #include <iostream>
 #include <fstream>
 #include <OPS_Globals.h>
+#include <elementAPI.h>
 #include <StandardStream.h>
 #include <ArrayOfTaggedObjects.h>
 
@@ -75,6 +76,141 @@
 //#include <DataOutputFileHandler.h>
 //#include <NodeRecorder.h>
 //#include <ElementRecorder.h>
+
+
+void* OPF_ECSimDomain()
+{
+    // pointer to experimental control that will be returned
+    ExperimentalControl* theControl = 0;
+    
+    if (OPS_GetNumRemainingInputArgs() < 5) {
+        opserr << "WARNING invalid number of arguments\n";
+        opserr << "Want: expControl SimDomain tag -trialCP cpTags -outCP cpTags "
+            << "<-ctrlFilters (5 filterTag)> <-daqFilters (5 filterTag)>\n";
+        return 0;
+    }
+    
+    // control tag
+    int tag;
+    int numdata = 1;
+    if (OPS_GetIntInput(&numdata, &tag) != 0) {
+        opserr << "WARNING invalid expControl SimDomain tag\n";
+        return 0;
+    }
+    
+    // trialCPs
+    const char* type = OPS_GetString();
+    if (strcmp(type, "-trialCP") != 0) {
+        opserr << "WARNING expecting -trialCP cpTags\n";
+        opserr << "expControl SimDomain " << tag << endln;
+        return 0;
+    }
+    ID cpTags(32);
+    int numTrialCPs = 0;
+    while (OPS_GetNumRemainingInputArgs() > 0) {
+        int cpTag;
+        numdata = 1;
+        int numArgs = OPS_GetNumRemainingInputArgs();
+        if (OPS_GetIntInput(&numdata, &cpTag) < 0) {
+            if (numArgs > OPS_GetNumRemainingInputArgs()) {
+                // move current arg back by one
+                OPS_ResetCurrentInputArg(-1);
+            }
+            break;
+        }
+        cpTags(numTrialCPs++) = cpTag;
+    }
+    if (numTrialCPs == 0) {
+        opserr << "WARNING no trialCPTags specified\n";
+        opserr << "expControl SimDomain " << tag << endln;
+        return 0;
+    }
+    cpTags.resize(numTrialCPs);
+    // create the array to hold the trial control points
+    ExperimentalCP** trialCPs = new ExperimentalCP * [numTrialCPs];
+    if (trialCPs == 0) {
+        opserr << "WARNING out of memory\n";
+        opserr << "expControl SimDomain " << tag << endln;
+        return 0;
+    }
+    // populate array with trial control points
+    for (int i = 0; i < numTrialCPs; i++) {
+        trialCPs[i] = 0;
+        trialCPs[i] = OPF_GetExperimentalCP(cpTags(i));
+        if (trialCPs[i] == 0) {
+            opserr << "WARNING experimental control point not found\n";
+            opserr << "expControlPoint " << cpTags(i) << endln;
+            opserr << "expControl SimDomain " << tag << endln;
+            return 0;
+        }
+    }
+    
+    // outCPs
+    type = OPS_GetString();
+    if (strcmp(type, "-outCP") != 0) {
+        opserr << "WARNING expecting -outCP cpTags\n";
+        opserr << "expControl SimDomain " << tag << endln;
+        return 0;
+    }
+    cpTags.resize(32); cpTags.Zero();
+    int numOutCPs = 0;
+    while (OPS_GetNumRemainingInputArgs() > 0) {
+        int cpTag;
+        numdata = 1;
+        int numArgs = OPS_GetNumRemainingInputArgs();
+        if (OPS_GetIntInput(&numdata, &cpTag) < 0) {
+            if (numArgs > OPS_GetNumRemainingInputArgs()) {
+                // move current arg back by one
+                OPS_ResetCurrentInputArg(-1);
+            }
+            break;
+        }
+        cpTags(numOutCPs++) = cpTag;
+    }
+    if (numOutCPs == 0) {
+        opserr << "WARNING no outCPTags specified\n";
+        opserr << "expControl SimDomain " << tag << endln;
+        return 0;
+    }
+    cpTags.resize(numOutCPs);
+    // create the array to hold the output control points
+    ExperimentalCP** outCPs = new ExperimentalCP * [numOutCPs];
+    if (outCPs == 0) {
+        opserr << "WARNING out of memory\n";
+        opserr << "expControl SimDomain " << tag << endln;
+        return 0;
+    }
+    // populate array with output control points
+    for (int i = 0; i < numOutCPs; i++) {
+        outCPs[i] = 0;
+        outCPs[i] = OPF_GetExperimentalCP(cpTags(i));
+        if (outCPs[i] == 0) {
+            opserr << "WARNING experimental control point not found\n";
+            opserr << "expControlPoint " << cpTags(i) << endln;
+            opserr << "expControl SimDomain " << tag << endln;
+            return 0;
+        }
+    }
+    
+    // get the Domain
+    Domain *theDomain = OPS_GetDomain();
+    
+    // parsing was successful, allocate the control
+    theControl = new ECSimDomain(tag, numTrialCPs, trialCPs,
+        numOutCPs, outCPs, theDomain);
+    if (theControl == 0) {
+        opserr << "WARNING could not create experimental control of type SimDomain\n";
+        return 0;
+    }
+    
+    // cleanup dynamic memory
+    //if (trialCPs != 0)
+    //    delete[] trialCPs;
+    //if (outCPs != 0)
+    //    delete[] outCPs;
+    
+    return theControl;
+}
 
 
 ECSimDomain::ECSimDomain(int tag,

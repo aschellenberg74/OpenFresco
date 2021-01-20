@@ -22,11 +22,7 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
-// Written: Yoshi (yos@catfish.dpri.kyoto-u.ac.jp)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 09/06
 // Revision: A
 //
@@ -34,8 +30,151 @@
 
 #include "ActorExpSite.h"
 
+#include <Channel.h>
+#include <TCP_Socket.h>
+#include <TCP_SocketSSL.h>
+#include <UDP_Socket.h>
+#include <elementAPI.h>
 
-ActorExpSite::ActorExpSite(int tag, 
+
+void* OPF_ActorExpSite()
+{
+    // pointer to experimental site that will be returned
+    ExperimentalSite* theSite = 0;
+    
+    int numArgs = OPS_GetNumRemainingInputArgs();
+    if (4 > numArgs || numArgs > 6) {
+        opserr << "WARNING invalid number of arguments\n";
+        opserr << "Want: expSite ActorSite tag -setup setupTag ipPort <-udp> <-ssl>\n"
+            << "  or: expSite ActorSite tag -control ctrlTag ipPort <-udp> <-ssl>\n";
+        return 0;
+    }
+    
+    // site tag
+    int tag;
+    int numdata = 1;
+    if (OPS_GetIntInput(&numdata, &tag) != 0) {
+        opserr << "WARNING invalid expSite ActorSite tag\n";
+        return 0;
+    }
+    
+    // experimental setup or experimental control
+    ExperimentalSetup* theSetup = 0;
+    ExperimentalControl* theControl = 0;
+    const char* type = OPS_GetString();
+    if (strcmp(type, "-setup") == 0) {
+        int setupTag;
+        numdata = 1;
+        if (OPS_GetIntInput(&numdata, &setupTag) != 0) {
+            opserr << "WARNING invalid setupTag\n";
+            opserr << "expSite ActorSite " << tag << endln;
+            return 0;
+        }
+        theSetup = OPF_GetExperimentalSetup(setupTag);
+        if (theSetup == 0) {
+            opserr << "WARNING experimental setup not found\n";
+            opserr << "expSetup: " << setupTag << endln;
+            opserr << "expSite ActorSite " << tag << endln;
+            return 0;
+        }
+    }
+    else if (strcmp(type, "-control") == 0) {
+        int ctrlTag;
+        numdata = 1;
+        if (OPS_GetIntInput(&numdata, &ctrlTag) != 0) {
+            opserr << "WARNING invalid ctrlTag\n";
+            opserr << "expSite ActorSite " << tag << endln;
+            return 0;
+        }
+        theControl = OPF_GetExperimentalControl(ctrlTag);
+        if (theControl == 0) {
+            opserr << "WARNING experimental control not found\n";
+            opserr << "expControl: " << ctrlTag << endln;
+            opserr << "expSite ActorSite " << tag << endln;
+            return 0;
+        }
+    }
+    
+    // ip port
+    int ipPort;
+    numdata = 1;
+    if (OPS_GetIntInput(&numdata, &ipPort) < 0) {
+        opserr << "WARNING invalid ipPort\n";
+        opserr << "expSite ActorSite " << tag << endln;
+        return 0;
+    }
+    
+    // optional parameters
+    int ssl = 0, udp = 0;
+    int noDelay = 0;
+    while (OPS_GetNumRemainingInputArgs() > 0) {
+        type = OPS_GetString();
+        if (strcmp(type, "-ssl") == 0) {
+            ssl = 1; udp = 0;
+        }
+        else if (strcmp(type, "-udp") == 0) {
+            udp = 1; ssl = 0;
+        }
+        else if (strcmp(type, "-noDelay") == 0) {
+            noDelay = 1;
+        }
+    }
+    
+    // parsing was successful, setup the connection and allocate the site
+    Channel* theChannel = 0;
+    if (ssl) {
+        theChannel = new TCP_SocketSSL(ipPort, true, noDelay);
+        if (theChannel != 0) {
+            opserr << "\nSSL Channel successfully created: "
+                << "Waiting for ShadowExpSite...\n";
+        }
+        else {
+            opserr << "WARNING could not create SSL channel\n";
+            opserr << "expSite ActorSite " << tag << endln;
+            return 0;
+        }
+    }
+    else if (udp) {
+        theChannel = new UDP_Socket(ipPort, true);
+        if (theChannel != 0) {
+            opserr << "\nUDP Channel successfully created: "
+                << "Waiting for ShadowExpSite...\n";
+        }
+        else {
+            opserr << "WARNING could not create UDP channel\n";
+            opserr << "expSite ActorSite " << tag << endln;
+            return 0;
+        }
+    }
+    else {
+        theChannel = new TCP_Socket(ipPort, true, noDelay);
+        if (theChannel != 0) {
+            opserr << "\nTCP Channel successfully created: "
+                << "Waiting for ShadowExpSite...\n";
+        }
+        else {
+            opserr << "WARNING could not create TCP channel\n";
+            opserr << "expSite ActorSite " << tag << endln;
+            return 0;
+        }
+    }
+    
+    // parsing was successful, allocate the site
+    if (theControl == 0)
+        theSite = new ActorExpSite(tag, theSetup, *theChannel);
+    else if (theSetup == 0)
+        theSite = new ActorExpSite(tag, theControl, *theChannel);
+    
+    if (theSite == 0) {
+        opserr << "WARNING could not create experimental site of type ActorSite\n";
+        return 0;
+    }
+    
+    return theSite;
+}
+
+
+ActorExpSite::ActorExpSite(int tag,
     ExperimentalSetup *setup,
     Channel &theChannel,
     FEM_ObjectBroker *theObjectBroker)

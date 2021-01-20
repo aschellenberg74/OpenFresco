@@ -19,11 +19,7 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
-// Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 09/06
 // Revision: A
 //
@@ -31,8 +27,98 @@
 
 #include "ESOneActuator.h"
 
+#include <ExperimentalControl.h>
 
-ESOneActuator::ESOneActuator(int tag, 
+#include <elementAPI.h>
+
+
+void* OPF_ESOneActuator()
+{
+    // pointer to experimental setup that will be returned
+    ExperimentalSetup* theSetup = 0;
+    
+    if (OPS_GetNumRemainingInputArgs() < 5) {
+        opserr << "WARNING invalid number of arguments\n";
+        opserr << "Want: expSetup OneActuator tag <-control ctrlTag> "
+            << "DOF -sizeTrialOut t o\n";
+        return 0;
+    }
+    
+    // setup tag
+    int tag;
+    int numdata = 1;
+    if (OPS_GetIntInput(&numdata, &tag) != 0) {
+        opserr << "WARNING invalid expSetup OneActuator tag\n";
+        return 0;
+    }
+    
+    // control tag (optional)
+    ExperimentalControl* theControl = 0;
+    const char* type = OPS_GetString();
+    if (strcmp(type, "-control") == 0 || strcmp(type, "-ctrl") == 0) {
+        int ctrlTag;
+        numdata = 1;
+        if (OPS_GetIntInput(&numdata, &ctrlTag) < 0) {
+            opserr << "WARNING invalid ctrlTag\n";
+            opserr << "expSetup OneActuator " << tag << endln;
+            return 0;
+        }
+        theControl = OPF_GetExperimentalControl(ctrlTag);
+        if (theControl == 0) {
+            opserr << "WARNING experimental control not found\n";
+            opserr << "expControl: " << ctrlTag << endln;
+            opserr << "expSetup OneActuator " << tag << endln;
+            return 0;
+        }
+    }
+    else {
+        // move current arg back by one
+        OPS_ResetCurrentInputArg(-1);
+    }
+    
+    // dof
+    int dof;
+    numdata = 1;
+    if (OPS_GetIntInput(&numdata, &dof) != 0) {
+        opserr << "WARNING invalid DOF\n";
+        opserr << "expSetup OneActuator " << tag << endln;
+        return 0;
+    }
+    dof--;
+    
+    // size trial and size out
+    int sizeTrial, sizeOut;
+    type = OPS_GetString();
+    if (strcmp(type, "-sizeTrialOut") != 0) {
+        opserr << "WARNING expecting -sizeTrialOut t o\n";
+        opserr << "expSetup OneActuator " << tag << endln;
+        return 0;
+    }
+    numdata = 1;
+    if (OPS_GetIntInput(&numdata, &sizeTrial) != 0) {
+        opserr << "WARNING invalid sizeTrial\n";
+        opserr << "expSetup OneActuator " << tag << endln;
+        return 0;
+    }
+    numdata = 1;
+    if (OPS_GetIntInput(&numdata, &sizeOut) != 0) {
+        opserr << "WARNING invalid sizeOut\n";
+        opserr << "expSetup OneActuator " << tag << endln;
+        return 0;
+    }
+    
+    // parsing was successful, allocate the setup
+    theSetup = new ESOneActuator(tag, dof, sizeTrial, sizeOut, theControl);
+    if (theSetup == 0) {
+        opserr << "WARNING could not create experimental setup of type ESOneActuator\n";
+        return 0;
+    }
+    
+    return theSetup;
+}
+
+
+ESOneActuator::ESOneActuator(int tag,
     int dir, int sizet, int sizeo,
     ExperimentalControl* control)
     : ExperimentalSetup(tag, control),

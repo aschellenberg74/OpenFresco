@@ -28,6 +28,149 @@
 #include "ECdSpace.h"
 #include <ExperimentalCP.h>
 
+#include <elementAPI.h>
+
+extern ExperimentalCP* getExperimentalCP(int tag);
+
+void* OPF_ECdSpace()
+{
+    // pointer to experimental control that will be returned
+    ExperimentalControl* theControl = 0;
+    
+    if (OPS_GetNumRemainingInputArgs() < 6) {
+        opserr << "WARNING invalid number of arguments\n";
+        opserr << "Want: expControl dSpace tag boardName -trialCP cpTags -outCP cpTags "
+            << "<-ctrlFilters (5 filterTag)> <-daqFilters (5 filterTag)>\n";
+        return 0;
+    }
+    
+    // control tag
+    int tag;
+    int numdata = 1;
+    if (OPS_GetIntInput(&numdata, &tag) != 0) {
+        opserr << "WARNING invalid expControl dSpace tag\n";
+        return 0;
+    }
+    
+    // boardName
+    char* boardName;
+    const char* type = OPS_GetString();
+    boardName = new char[strlen(type) + 1];
+    strcpy(boardName, type);
+    
+    // trialCPs
+    type = OPS_GetString();
+    if (strcmp(type, "-trialCP") != 0) {
+        opserr << "WARNING expecting -trialCP cpTags\n";
+        opserr << "expControl dSpace " << tag << endln;
+        return 0;
+    }
+    ID cpTags(32);
+    int numTrialCPs = 0;
+    while (OPS_GetNumRemainingInputArgs() > 0) {
+        int cpTag;
+        numdata = 1;
+        int numArgs = OPS_GetNumRemainingInputArgs();
+        if (OPS_GetIntInput(&numdata, &cpTag) < 0) {
+            if (numArgs > OPS_GetNumRemainingInputArgs()) {
+                // move current arg back by one
+                OPS_ResetCurrentInputArg(-1);
+            }
+            break;
+        }
+        cpTags(numTrialCPs++) = cpTag;
+    }
+    if (numTrialCPs == 0) {
+        opserr << "WARNING no trialCPTags specified\n";
+        opserr << "expControl dSpace " << tag << endln;
+        return 0;
+    }
+    cpTags.resize(numTrialCPs);
+    // create the array to hold the trial control points
+    ExperimentalCP** trialCPs = new ExperimentalCP * [numTrialCPs];
+    if (trialCPs == 0) {
+        opserr << "WARNING out of memory\n";
+        opserr << "expControl dSpace " << tag << endln;
+        return 0;
+    }
+    // populate array with trial control points
+    for (int i = 0; i < numTrialCPs; i++) {
+        trialCPs[i] = 0;
+        trialCPs[i] = getExperimentalCP(cpTags(i));
+        //trialCPs[i] = OPF_GetExperimentalCP(cpTags(i));
+        if (trialCPs[i] == 0) {
+            opserr << "WARNING experimental control point not found\n";
+            opserr << "expControlPoint " << cpTags(i) << endln;
+            opserr << "expControl dSpace " << tag << endln;
+            return 0;
+        }
+    }
+    
+    // outCPs
+    type = OPS_GetString();
+    if (strcmp(type, "-outCP") != 0) {
+        opserr << "WARNING expecting -outCP cpTags\n";
+        opserr << "expControl dSpace " << tag << endln;
+        return 0;
+    }
+    cpTags.resize(32); cpTags.Zero();
+    int numOutCPs = 0;
+    while (OPS_GetNumRemainingInputArgs() > 0) {
+        int cpTag;
+        numdata = 1;
+        int numArgs = OPS_GetNumRemainingInputArgs();
+        if (OPS_GetIntInput(&numdata, &cpTag) < 0) {
+            if (numArgs > OPS_GetNumRemainingInputArgs()) {
+                // move current arg back by one
+                OPS_ResetCurrentInputArg(-1);
+            }
+            break;
+        }
+        cpTags(numOutCPs++) = cpTag;
+    }
+    if (numOutCPs == 0) {
+        opserr << "WARNING no outCPTags specified\n";
+        opserr << "expControl dSpace " << tag << endln;
+        return 0;
+    }
+    cpTags.resize(numOutCPs);
+    // create the array to hold the output control points
+    ExperimentalCP** outCPs = new ExperimentalCP * [numOutCPs];
+    if (outCPs == 0) {
+        opserr << "WARNING out of memory\n";
+        opserr << "expControl dSpace " << tag << endln;
+        return 0;
+    }
+    // populate array with output control points
+    for (int i = 0; i < numOutCPs; i++) {
+        outCPs[i] = 0;
+        outCPs[i] = getExperimentalCP(cpTags(i));
+        //outCPs[i] = OPF_GetExperimentalCP(cpTags(i));
+        if (outCPs[i] == 0) {
+            opserr << "WARNING experimental control point not found\n";
+            opserr << "expControlPoint " << cpTags(i) << endln;
+            opserr << "expControl dSpace " << tag << endln;
+            return 0;
+        }
+    }
+    
+    // parsing was successful, allocate the control
+    theControl = new ECdSpace(tag, numTrialCPs, trialCPs,
+        numOutCPs, outCPs, boardName);
+    if (theControl == 0) {
+        opserr << "WARNING could not create experimental control of type dSpace\n";
+        return 0;
+    }
+    
+    // cleanup dynamic memory
+    //if (trialCPs != 0)
+    //    delete[] trialCPs;
+    //if (outCPs != 0)
+    //    delete[] outCPs;
+    
+    return theControl;
+}
+
 
 ECdSpace::ECdSpace(int tag, int nTrialCPs, ExperimentalCP **trialcps,
     int nOutCPs, ExperimentalCP **outcps, char *boardname)

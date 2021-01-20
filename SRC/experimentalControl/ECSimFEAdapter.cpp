@@ -31,12 +31,184 @@
 
 #include <Channel.h>
 #include <TCP_Socket.h>
+#include <TCP_SocketSSL.h>
+#include <UDP_Socket.h>
+#include <elementAPI.h>
+
+
+void* OPF_ECSimFEAdapter()
+{
+    // pointer to experimental control that will be returned
+    ExperimentalControl* theControl = 0;
+    
+    if (OPS_GetNumRemainingInputArgs() < 7) {
+        opserr << "WARNING invalid number of arguments\n";
+        opserr << "Want: expControl SimFEAdapter tag ipAddr ipPort -trialCP cpTags -outCP cpTags "
+            << "<-ssl> <-udp> <-useRelativeTrial> "
+            << "<-ctrlFilters (5 filterTag)> <-daqFilters (5 filterTag)>\n";
+        return 0;
+    }
+    
+    // control tag
+    int tag;
+    int numdata = 1;
+    if (OPS_GetIntInput(&numdata, &tag) != 0) {
+        opserr << "WARNING invalid expControl SimFEAdapter tag\n";
+        return 0;
+    }
+    
+    // ip address
+    char* ipAddr;
+    const char* type = OPS_GetString();
+    ipAddr = new char[strlen(type) + 1];
+    strcpy(ipAddr, type);
+    
+    // ip port
+    int ipPort;
+    numdata = 1;
+    if (OPS_GetIntInput(&numdata, &ipPort) < 0) {
+        opserr << "WARNING invalid ipPort\n";
+        opserr << "expControl SimFEAdapter " << tag << endln;
+        return 0;
+    }
+    
+    // trialCPs
+    type = OPS_GetString();
+    if (strcmp(type, "-trialCP") != 0) {
+        opserr << "WARNING expecting -trialCP cpTags\n";
+        opserr << "expControl SimFEAdapter " << tag << endln;
+        return 0;
+    }
+    ID cpTags(32);
+    int numTrialCPs = 0;
+    while (OPS_GetNumRemainingInputArgs() > 0) {
+        int cpTag;
+        numdata = 1;
+        int numArgs = OPS_GetNumRemainingInputArgs();
+        if (OPS_GetIntInput(&numdata, &cpTag) < 0) {
+            if (numArgs > OPS_GetNumRemainingInputArgs()) {
+                // move current arg back by one
+                OPS_ResetCurrentInputArg(-1);
+            }
+            break;
+        }
+        cpTags(numTrialCPs++) = cpTag;
+    }
+    if (numTrialCPs == 0) {
+        opserr << "WARNING no trialCPTags specified\n";
+        opserr << "expControl SimFEAdapter " << tag << endln;
+        return 0;
+    }
+    cpTags.resize(numTrialCPs);
+    // create the array to hold the trial control points
+    ExperimentalCP** trialCPs = new ExperimentalCP * [numTrialCPs];
+    if (trialCPs == 0) {
+        opserr << "WARNING out of memory\n";
+        opserr << "expControl SimFEAdapter " << tag << endln;
+        return 0;
+    }
+    // populate array with trial control points
+    for (int i = 0; i < numTrialCPs; i++) {
+        trialCPs[i] = 0;
+        trialCPs[i] = OPF_GetExperimentalCP(cpTags(i));
+        if (trialCPs[i] == 0) {
+            opserr << "WARNING experimental control point not found\n";
+            opserr << "expControlPoint " << cpTags(i) << endln;
+            opserr << "expControl SimFEAdapter " << tag << endln;
+            return 0;
+        }
+    }
+    
+    // outCPs
+    type = OPS_GetString();
+    if (strcmp(type, "-outCP") != 0) {
+        opserr << "WARNING expecting -outCP cpTags\n";
+        opserr << "expControl SimFEAdapter " << tag << endln;
+        return 0;
+    }
+    cpTags.resize(32); cpTags.Zero();
+    int numOutCPs = 0;
+    while (OPS_GetNumRemainingInputArgs() > 0) {
+        int cpTag;
+        numdata = 1;
+        int numArgs = OPS_GetNumRemainingInputArgs();
+        if (OPS_GetIntInput(&numdata, &cpTag) < 0) {
+            if (numArgs > OPS_GetNumRemainingInputArgs()) {
+                // move current arg back by one
+                OPS_ResetCurrentInputArg(-1);
+            }
+            break;
+        }
+        cpTags(numOutCPs++) = cpTag;
+    }
+    if (numOutCPs == 0) {
+        opserr << "WARNING no outCPTags specified\n";
+        opserr << "expControl SimFEAdapter " << tag << endln;
+        return 0;
+    }
+    cpTags.resize(numOutCPs);
+    // create the array to hold the output control points
+    ExperimentalCP** outCPs = new ExperimentalCP * [numOutCPs];
+    if (outCPs == 0) {
+        opserr << "WARNING out of memory\n";
+        opserr << "expControl SimFEAdapter " << tag << endln;
+        return 0;
+    }
+    // populate array with output control points
+    for (int i = 0; i < numOutCPs; i++) {
+        outCPs[i] = 0;
+        outCPs[i] = OPF_GetExperimentalCP(cpTags(i));
+        if (outCPs[i] == 0) {
+            opserr << "WARNING experimental control point not found\n";
+            opserr << "expControlPoint " << cpTags(i) << endln;
+            opserr << "expControl SimFEAdapter " << tag << endln;
+            return 0;
+        }
+    }
+    
+    // optional parameters
+    int ssl = 0, udp = 0;
+    int useRelativeTrial = 0;
+    while (OPS_GetNumRemainingInputArgs() > 0)  {
+        type = OPS_GetString();
+        if (strcmp(type, "-ssl") == 0) {
+            ssl = 1; udp = 0;
+        }
+        else if (strcmp(type, "-udp") == 0) {
+            udp = 1; ssl = 0;
+        }
+        else if (strcmp(type, "-relTrial") == 0 ||
+            strcmp(type, "-relativeTrial") == 0 ||
+            strcmp(type, "-useRelTrial") == 0 ||
+            strcmp(type, "-useRelativeTrial") == 0)  {
+                useRelativeTrial = 1;
+        }
+    }
+    
+    // parsing was successful, allocate the control
+    theControl = new ECSimFEAdapter(tag, numTrialCPs, trialCPs,
+        numOutCPs, outCPs, ipAddr, ipPort, ssl, udp, useRelativeTrial);
+    if (theControl == 0) {
+        opserr << "WARNING could not create experimental control of type SimFEAdapter\n";
+        return 0;
+    }
+    
+    // cleanup dynamic memory
+    //if (trialCPs != 0)
+    //    delete[] trialCPs;
+    //if (outCPs != 0)
+    //    delete[] outCPs;
+    
+    return theControl;
+}
 
 
 ECSimFEAdapter::ECSimFEAdapter(int tag, int nTrialCPs, ExperimentalCP **trialcps,
-    int nOutCPs, ExperimentalCP **outcps, char *ipaddress, int ipport, int reltrial)
+    int nOutCPs, ExperimentalCP **outcps, char *ipaddress, int ipport, int _ssl,
+    int _udp, int reltrial)
     : ECSimulation(tag), numTrialCPs(nTrialCPs), numOutCPs(nOutCPs),
-    ipAddress(ipaddress), ipPort(ipport), dataSize(OF_Network_dataSize),
+    ipAddress(ipaddress), ipPort(ipport), ssl(_ssl), udp(_udp),
+    dataSize(OF_Network_dataSize),
     theChannel(0), sData(0), sendData(0), rData(0), recvData(0),
     numCtrlSignals(0), numDaqSignals(0), ctrlSignal(0), daqSignal(0),
     trialSigOffset(0), useRelativeTrial(reltrial), gotRelativeTrial(!reltrial)
@@ -63,10 +235,16 @@ ECSimFEAdapter::ECSimFEAdapter(int tag, int nTrialCPs, ExperimentalCP **trialcps
         dataSize = numDaqSignals;
     
     // setup the connection
-    theChannel = new TCP_Socket(ipPort, ipAddress);
+    if (udp)
+        theChannel = new UDP_Socket(ipPort, ipAddress);
+    else if (ssl)
+        theChannel = new TCP_SocketSSL(ipPort, ipAddress);
+    else
+        theChannel = new TCP_Socket(ipPort, ipAddress);
+    
     if (theChannel->setUpConnection() != 0)  {
         opserr << "ECSimFEAdapter::ECSimFEAdapter() - "
-            << "failed to setup TCP connection to adapter element.\n";
+            << "failed to setup connection to adapter element.\n";
         delete theChannel;
         exit(OF_ReturnType_failed);
     }
@@ -106,6 +284,8 @@ ECSimFEAdapter::ECSimFEAdapter(const ECSimFEAdapter &ec)
     outCPs      = ec.outCPs;
     ipAddress   = ec.ipAddress;
     ipPort      = ec.ipPort;
+    ssl         = ec.ssl;
+    udp         = ec.udp;
     
     numCtrlSignals = ec.numCtrlSignals;
     numDaqSignals  = ec.numDaqSignals;
@@ -459,7 +639,13 @@ void ECSimFEAdapter::Print(OPS_Stream &s, int flag)
     s << "****************************************************************\n";
     s << "* ExperimentalControl: " << this->getTag() << endln; 
     s << "*   type: ECSimFEAdapter\n";
-    s << "*   ipAddress: " << ipAddress << ", ipPort: " << ipPort << endln;
+    if (udp)
+        s << "*   channel: UDP, ";
+    else if (ssl)
+        s << "*   channel: SSL, ";
+    else
+        s << "*   channel: TCP, ";
+    s << "ipAddress: " << ipAddress << ", ipPort: " << ipPort << endln;
     s << "*   trialCP tag(s):";
     for (int i=0; i<numTrialCPs; i++)
         s << " " << trialCPs[i]->getTag();

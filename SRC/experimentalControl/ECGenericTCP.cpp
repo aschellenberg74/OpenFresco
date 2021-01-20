@@ -19,10 +19,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 // Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 08/11
 // Revision: A
@@ -42,6 +38,110 @@ using std::ios;
 #include <TCP_Socket.h>
 #include <TCP_SocketSSL.h>
 #include <UDP_Socket.h>
+#include <elementAPI.h>
+
+
+void* OPF_ECGenericTCP()
+{
+    // pointer to experimental control that will be returned
+    ExperimentalControl* theControl = 0;
+
+    if (OPS_GetNumRemainingInputArgs() < 15) {
+        opserr << "WARNING invalid number of arguments\n";
+        opserr << "Want: expControl GenericTCP tag ipAddr ipPort -ctrlModes (5 mode) -daqModes (5 mode) "
+            << "<-initFile fileName> <-ssl> <-udp> <-ctrlFilters (5 filterTag)> <-daqFilters (5 filterTag)>\n";
+        return 0;
+    }
+    
+    // control tag
+    int tag;
+    int numdata = 1;
+    if (OPS_GetIntInput(&numdata, &tag) != 0) {
+        opserr << "WARNING invalid expControl GenericTCP tag\n";
+        return 0;
+    }
+    
+    // ip address
+    char* ipAddr;
+    const char* type = OPS_GetString();
+    ipAddr = new char[strlen(type) + 1];
+    strcpy(ipAddr, type);
+    
+    // ip port
+    int ipPort;
+    numdata = 1;
+    if (OPS_GetIntInput(&numdata, &ipPort) < 0) {
+        opserr << "WARNING invalid ipPort\n";
+        opserr << "expControl GenericTCP " << tag << endln;
+        return 0;
+    }
+    
+    // ctrlModes
+    ID ctrlModes(5);
+    type = OPS_GetString();
+    if (strcmp(type, "-ctrlModes") != 0) {
+        opserr << "WARNING expecting -ctrlModes (5 mode)\n";
+        opserr << "expControl GenericTCP " << tag << endln;
+        return 0;
+    }
+    for (int i = 0; i < 5; i++) {
+        int mode;
+        numdata = 1;
+        if (OPS_GetIntInput(&numdata, &mode) < 0) {
+            opserr << "WARNING invalid control mode\n";
+            opserr << "expControl GenericTCP " << tag << endln;
+            return 0;
+        }
+        ctrlModes(i) = mode;
+    }
+    
+    // daqModes
+    ID daqModes(5);
+    type = OPS_GetString();
+    if (strcmp(type, "-daqModes") != 0) {
+        opserr << "WARNING expecting -daqModes (5 mode)\n";
+        opserr << "expControl GenericTCP " << tag << endln;
+        return 0;
+    }
+    for (int i = 0; i < 5; i++) {
+        int mode;
+        numdata = 1;
+        if (OPS_GetIntInput(&numdata, &mode) < 0) {
+            opserr << "WARNING invalid daq mode\n";
+            opserr << "expControl GenericTCP " << tag << endln;
+            return 0;
+        }
+        daqModes(i) = mode;
+    }
+    
+    // optional parameters
+    char* initFileName = 0;
+    int ssl = 0, udp = 0;
+    while (OPS_GetNumRemainingInputArgs() > 0) {
+        type = OPS_GetString();
+        if (strcmp(type, "-initFile") == 0) {
+            type = OPS_GetString();
+            initFileName = new char[strlen(type) + 1];
+            strcpy(initFileName, type);
+        }
+        else if (strcmp(type, "-ssl") == 0) {
+            ssl = 1; udp = 0;
+        }
+        else if (strcmp(type, "-udp") == 0) {
+            udp = 1; ssl = 0;
+        }
+    }
+    
+    // parsing was successful, allocate the control
+    theControl = new ECGenericTCP(tag, ipAddr, ipPort,
+        ctrlModes, daqModes, initFileName, ssl, udp);
+    if (theControl == 0) {
+        opserr << "WARNING could not create experimental control of type GenericTCP\n";
+        return 0;
+    }
+    
+    return theControl;
+}
 
 
 ECGenericTCP::ECGenericTCP(int tag,

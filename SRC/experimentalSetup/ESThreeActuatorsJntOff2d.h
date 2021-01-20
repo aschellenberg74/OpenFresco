@@ -19,10 +19,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 #ifndef ESThreeActuatorsJntOff2d_h
 #define ESThreeActuatorsJntOff2d_h
 

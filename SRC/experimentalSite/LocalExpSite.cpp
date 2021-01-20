@@ -22,11 +22,7 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
-// Written: Yoshi (yos@catfish.dpri.kyoto-u.ac.jp)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 09/06
 // Revision: A
 //
@@ -35,8 +31,56 @@
 
 #include "LocalExpSite.h"
 
+#include <elementAPI.h>
 
-LocalExpSite::LocalExpSite(int tag, 
+
+void* OPF_LocalExpSite()
+{
+    // pointer to experimental site that will be returned
+    ExperimentalSite* theSite = 0;
+    
+    if (OPS_GetNumRemainingInputArgs() < 2) {
+        opserr << "WARNING invalid number of arguments\n";
+        opserr << "Want: expSite LocalSite tag setupTag\n";
+        return 0;
+    }
+    
+    // site tag
+    int tag;
+    int numdata = 1;
+    if (OPS_GetIntInput(&numdata, &tag) != 0) {
+        opserr << "WARNING invalid expSite LocalSite tag\n";
+        return 0;
+    }
+    
+    // experimental setup
+    int setupTag;
+    numdata = 1;
+    if (OPS_GetIntInput(&numdata, &setupTag) != 0) {
+        opserr << "WARNING invalid setupTag\n";
+        opserr << "expSite LocalSite " << tag << endln;
+        return 0;
+    }
+    ExperimentalSetup* theSetup = OPF_GetExperimentalSetup(setupTag);
+    if (theSetup == 0) {
+        opserr << "WARNING experimental setup not found\n";
+        opserr << "expSetup: " << setupTag << endln;
+        opserr << "expSite LocalSite " << tag << endln;
+        return 0;
+    }
+    
+    // parsing was successful, allocate the site
+    theSite = new LocalExpSite(tag, theSetup);
+    if (theSite == 0) {
+        opserr << "WARNING could not create experimental site of type LocalSite\n";
+        return 0;
+    }
+    
+    return theSite;
+}
+
+
+LocalExpSite::LocalExpSite(int tag,
     ExperimentalSetup *setup)
     : ExperimentalSite(tag, setup)
 {

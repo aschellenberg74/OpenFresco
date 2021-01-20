@@ -14,13 +14,7 @@ OBJS  = \
 
 all:         $(OBJS)
 
-tcl:  TclEEBeamColumnCommand.o \
-      TclEEBearingCommand.o \
-	  TclEEGenericCommand.o \
-	  TclEEInvertedVBraceCommand.o \
-	  TclEETrussCommand.o \
-	  TclEETwoNodeLinkCommand.o \
-	  TclExpElementCommands.o 
+tcl:  TclExpElementCommands.o 
 
 # Miscellaneous
 tidy:	

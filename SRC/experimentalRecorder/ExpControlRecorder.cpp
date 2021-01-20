@@ -19,10 +19,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 // Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 08/08
 // Revision: A
@@ -30,7 +26,239 @@
 // Description: This file contains the implementatation of ExpControlRecorder.
 
 #include <ExpControlRecorder.h>
+
 #include <ExperimentalControl.h>
+
+#include <StandardStream.h>
+#include <DataFileStream.h>
+#include <DataFileStreamAdd.h>
+#include <XmlFileStream.h>
+#include <BinaryFileStream.h>
+#include <DatabaseStream.h>
+#include <TCP_Stream.h>
+#include <elementAPI.h>
+
+
+void* OPF_ExpControlRecorder()
+{
+    if (OPS_GetNumRemainingInputArgs() < 5) {
+        opserr << "WARNING insufficient number of experimental recorder arguments\n";
+        opserr << "Want: expRecorder type <specific recorder args>\n";
+        return 0;
+    }
+    
+    const char** data = 0;
+    int nargrem = 0;
+    OPS_Stream* theOutputStream = 0;
+    const char* filename = 0;
+    FE_Datastore* theDatabase = 0;
+    const char* tablename = 0;
+    
+    const int STANDARD_STREAM = 0;
+    const int DATA_STREAM = 1;
+    const int XML_STREAM = 2;
+    const int DATABASE_STREAM = 3;
+    const int BINARY_STREAM = 4;
+    const int DATA_STREAM_CSV = 5;
+    const int TCP_STREAM = 6;
+    const int DATA_STREAM_ADD = 7;
+    
+    int eMode = STANDARD_STREAM;
+    bool echoTimeFlag = false;
+    double deltaT = 0.0;
+    bool doScientific = false;
+    int precision = 6;
+    bool closeOnWrite = false;
+    const char* inetAddr = 0;
+    int inetPort;
+    
+    int numCtrl = 0;
+    ID controlTags(0, 32);
+    ExperimentalControl** theControls = 0;
+    
+    while (OPS_GetNumRemainingInputArgs() > 0) {
+        
+        int numdata;
+        const char* option = OPS_GetString();
+        if (strcmp(option, "-time") == 0 ||
+            strcmp(option, "-load") == 0) {
+            echoTimeFlag = true;
+        }
+        else if (strcmp(option, "-dT") == 0 ||
+            strcmp(option, "-dt") == 0) {
+            if (OPS_GetNumRemainingInputArgs() > 0) {
+                numdata = 1;
+                if (OPS_GetDoubleInput(&numdata, &deltaT) < 0) {
+                    opserr << "WARNING: failed to read dT\n";
+                    return 0;
+                }
+            }
+        }
+        else if (strcmp(option, "-precision") == 0) {
+            if (OPS_GetNumRemainingInputArgs() > 0) {
+                numdata = 1;
+                if (OPS_GetIntInput(&numdata, &precision) < 0) {
+                    opserr << "WARNING: failed to read precision\n";
+                    return 0;
+                }
+            }
+        }
+        else if (strcmp(option, "-scientific") == 0) {
+            doScientific = true;
+        }
+        else if (strcmp(option, "-closeOnWrite") == 0) {
+            closeOnWrite = true;
+        }
+        else if (strcmp(option, "-file") == 0) {
+            if (OPS_GetNumRemainingInputArgs() > 0) {
+                filename = OPS_GetString();
+            }
+            eMode = DATA_STREAM;
+        }
+        else if (strcmp(option, "-fileAdd") == 0) {
+            if (OPS_GetNumRemainingInputArgs() > 0) {
+                filename = OPS_GetString();
+            }
+            eMode = DATA_STREAM_ADD;
+        }
+        else if (strcmp(option, "-csv") == 0 ||
+            strcmp(option, "-CSV") == 0) {
+            if (OPS_GetNumRemainingInputArgs() > 0) {
+                filename = OPS_GetString();
+            }
+            eMode = DATA_STREAM_CSV;
+        }
+        else if (strcmp(option, "-xml") == 0 ||
+            strcmp(option, "-XML") == 0) {
+            if (OPS_GetNumRemainingInputArgs() > 0) {
+                filename = OPS_GetString();
+            }
+            eMode = XML_STREAM;
+        }
+        else if (strcmp(option, "-bin") == 0 ||
+            strcmp(option, "-BIN") == 0 ||
+            strcmp(option, "-binary") == 0) {
+            if (OPS_GetNumRemainingInputArgs() > 0) {
+                filename = OPS_GetString();
+            }
+            eMode = BINARY_STREAM;
+        }
+        else if (strcmp(option, "-tcp") == 0 ||
+            strcmp(option, "-TCP") == 0) {
+            if (OPS_GetNumRemainingInputArgs() > 0) {
+                inetAddr = OPS_GetString();
+            }
+            if (OPS_GetNumRemainingInputArgs() > 0) {
+                numdata = 1;
+                if (OPS_GetIntInput(&numdata, &inetPort) < 0) {
+                    opserr << "WARNING: failed to read inetPort\n";
+                    return 0;
+                }
+            }
+            eMode = TCP_STREAM;
+        }
+        else if (strcmp(option, "-database") == 0) {
+            theDatabase = OPS_GetFEDatastore();
+            if (theDatabase != 0) {
+                if (OPS_GetNumRemainingInputArgs() > 0) {
+                    tablename = OPS_GetString();
+                }
+                eMode = DATABASE_STREAM;
+            }
+            else {
+                opserr << "WARNING: no current database\n";
+            }
+        }
+        else if (strcmp(option, "-control") == 0) {
+            while (OPS_GetNumRemainingInputArgs() > 0) {
+                int tag;
+                numdata = 1;
+                if (OPS_GetIntInput(&numdata, &tag) < 0) {
+                    OPS_ResetCurrentInputArg(-1);
+                    break;
+                }
+                controlTags[numCtrl++] = tag;
+            }
+        }
+        else if (strcmp(option, "-controlRange") == 0) {
+            int start = 0, end = 0;
+            if (OPS_GetNumRemainingInputArgs() > 0) {
+                numdata = 1;
+                if (OPS_GetIntInput(&numdata, &start) < 0) {
+                    opserr << "WARNING: failed to read start control tag\n";
+                    return 0;
+                }
+            }
+            if (OPS_GetNumRemainingInputArgs() > 0) {
+                numdata = 1;
+                if (OPS_GetIntInput(&numdata, &end) < 0) {
+                    opserr << "WARNING: failed to read end control tag\n";
+                    return 0;
+                }
+            }
+            if (start > end) {
+                int swap = end;
+                end = start;
+                start = swap;
+            }
+            for (int i = start; i <= end; i++)
+                controlTags[numCtrl++] = i;
+        }
+        else {
+            // first unknown string then is assumed to start response request
+            nargrem = 1 + OPS_GetNumRemainingInputArgs();
+            data = new const char* [nargrem];
+            data[0] = option;
+            for (int i = 1; i < nargrem; i++)
+                data[i] = OPS_GetString();
+        }
+    }
+    
+    // data handler
+    if (eMode == DATA_STREAM && filename != 0)
+        theOutputStream = new DataFileStream(filename, OVERWRITE, 2, 0, closeOnWrite, precision, doScientific);
+    else if (eMode == DATA_STREAM_ADD && filename != 0)
+        theOutputStream = new DataFileStreamAdd(filename, OVERWRITE, 2, 0, closeOnWrite, precision, doScientific);
+    else if (eMode == DATA_STREAM_CSV && filename != 0)
+        theOutputStream = new DataFileStream(filename, OVERWRITE, 2, 1, closeOnWrite, precision, doScientific);
+    else if (eMode == XML_STREAM && filename != 0)
+        theOutputStream = new XmlFileStream(filename);
+    else if (eMode == DATABASE_STREAM && tablename != 0)
+        theOutputStream = new DatabaseStream(theDatabase, tablename);
+    else if (eMode == BINARY_STREAM && filename != 0)
+        theOutputStream = new BinaryFileStream(filename);
+    else if (eMode == TCP_STREAM && inetAddr != 0)
+        theOutputStream = new TCP_Stream(inetPort, inetAddr);
+    else
+        theOutputStream = new StandardStream();
+    
+    // set precision for stream
+    theOutputStream->setPrecision(precision);
+    
+    // construct array of experimental controls
+    theControls = new ExperimentalControl * [numCtrl];
+    if (theControls == 0) {
+        opserr << "WARNING out of memory creating experimental control recorder\n";
+        return 0;
+    }
+    for (int i = 0; i < numCtrl; i++) {
+        theControls[i] = OPF_GetExperimentalControl(controlTags(i));
+        if (theControls[i] == 0) {
+            opserr << "WARNING experimental control with tag "
+                << controlTags(i) << " not found\n";
+            return 0;
+        }
+    }
+    
+    ExpControlRecorder* recorder = new ExpControlRecorder(numCtrl, theControls,
+        data, nargrem, echoTimeFlag, *theOutputStream, deltaT);
+    
+    // cleanup dynamic memory
+    if (data != 0)
+        delete[] data;
+    
+    return recorder;
+}
 
 
 ExpControlRecorder::ExpControlRecorder(int numcontrols,

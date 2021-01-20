@@ -22,10 +22,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 // Written: Yoshi
 // Created: 09/06
 // Revision: A
@@ -35,7 +31,48 @@
 
 #include "ESFErrorSimUndershoot.h"
 
+#include <elementAPI.h>
+
 #include <math.h>
+
+void* OPF_ESFErrorSimUndershoot()
+{
+    // pointer to experimental control that will be returned
+    ExperimentalSignalFilter* theFilter = 0;
+    
+    if (OPS_GetNumRemainingInputArgs() < 2) {
+        opserr << "WARNING invalid number of arguments\n";
+        opserr << "Want: expSignalFilter ErrorSimUndershoot tag error\n";
+        return 0;
+    }
+    
+    // filter tag
+    int tag;
+    int numdata = 1;
+    if (OPS_GetIntInput(&numdata, &tag) != 0) {
+        opserr << "WARNING invalid expSignalFilter ErrorSimUndershoot tag\n";
+        return 0;
+    }
+    
+    // undershoot error
+    double error;
+    numdata = 1;
+    if (OPS_GetDoubleInput(&numdata, &error) != 0) {
+        opserr << "WARNING invalid undershoot error\n";
+        opserr << "expSignalFilter ErrorSimUndershoot " << tag << endln;
+        return 0;
+    }
+    
+    // parsing was successful, allocate the signal filter
+    theFilter = new ESFErrorSimUndershoot(tag, error);
+    if (theFilter == 0) {
+        opserr << "WARNING could not create experimental signal filter "
+            << "of type ESFErrorSimUndershoot\n";
+        return 0;
+    }
+    
+    return theFilter;
+}
 
 
 ESFErrorSimUndershoot::ESFErrorSimUndershoot(int tag, double error)

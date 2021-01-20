@@ -33,9 +33,6 @@
 
 #include <ExperimentalSite.h>
 
-extern ExperimentalSite *getExperimentalSite(int tag);
-extern int removeExperimentalSite(int tag);
-
 
 int TclStartSimAppSiteServer(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
@@ -54,7 +51,7 @@ int TclStartSimAppSiteServer(ClientData clientData,
         opserr << "WARNING invalid startSimAppSiteServer siteTag\n";
         return TCL_ERROR;
     }
-    ExperimentalSite *theExperimentalSite = getExperimentalSite(siteTag);
+    ExperimentalSite *theExperimentalSite = OPF_GetExperimentalSite(siteTag);
     if (theExperimentalSite == 0)  {
         opserr << "WARNING experimental site not found\n";
         opserr << "startSimAppSiteServer expSite: " << siteTag << endln;
@@ -223,7 +220,7 @@ int TclStartSimAppSiteServer(ClientData clientData,
             theChannel->sendVector(0, 0, *sendData, 0);
             break;
         case OF_RemoteTest_DIE:
-            //removeExperimentalSite(siteTag);
+            //OPF_RemoveExperimentalSite(siteTag);
             //theExperimentalSite = 0;
             exitYet = true;
             break;

@@ -19,10 +19,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
 // Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 09/06
 // Revision: A
@@ -33,25 +29,20 @@
 #include <string.h>
 #include <tcl.h>
 #include <ArrayOfTaggedObjects.h>
+#include <Domain.h>
+#include <elementAPI.h>
 
+#include <ExperimentalElement.h>
 
-extern int addEETruss(ClientData clientData, Tcl_Interp *interp,
-    int argc, TCL_Char **argv, Domain*, int argStart); 
-
-extern int addEEBeamColumn(ClientData clientData, Tcl_Interp *interp,
-    int argc, TCL_Char **argv, Domain*, int argStart); 
-
-extern int addEETwoNodeLink(ClientData clientData, Tcl_Interp *interp,
-    int argc, TCL_Char **argv, Domain*, int argStart); 
-
-extern int addEEGeneric(ClientData clientData, Tcl_Interp *interp,
-    int argc, TCL_Char **argv, Domain*, int argStart); 
-
-extern int addEEInvertedVBrace(ClientData clientData, Tcl_Interp *interp,
-    int argc, TCL_Char **argv, Domain*, int argStart); 
-
-extern int addEEBearing(ClientData clientData, Tcl_Interp *interp,
-    int argc, TCL_Char **argv, Domain*, int argStart); 
+extern void* OPF_EETruss();
+extern void* OPF_EETrussCorot();
+extern void* OPF_EEBeamColumn2d();
+extern void* OPF_EEBeamColumn3d();
+extern void* OPF_EETwoNodeLink();
+extern void* OPF_EEGeneric();
+extern void* OPF_EEInvertedVBrace2d();
+extern void* OPF_EEBearing2d();
+extern void* OPF_EEBearing3d();
 
 
 static void printCommand(int argc, TCL_Char **argv)
@@ -63,58 +54,90 @@ static void printCommand(int argc, TCL_Char **argv)
 } 
 
 
-int TclExpElementCommand(ClientData clientData, Tcl_Interp *interp, int argc,
-    TCL_Char **argv, Domain *theTclDomain)
+int TclExpElementCommand(ClientData clientData, Tcl_Interp *interp,
+    int argc, TCL_Char **argv, Domain *theDomain)
 {
-    // check that there is at least two arguments
-    if (argc < 2)  {
+    // check that there is at least three arguments
+    if (argc < 3)  {
         opserr << "WARNING need to specify an element type\n";
         printCommand(argc,argv);
-        opserr << "Want: expElement eleType <specific element args> .. see manual for valid eleTypes & arguments\n";
+        opserr << "Want: expElement eleType tag <specific element args> .. see manual for valid eleTypes & arguments\n";
         return TCL_ERROR;
     }
-
+    
+    // reset the input args
+    OPS_ResetInputNoBuilder(clientData, interp, 2, argc, argv, theDomain);
+    
+    // pointer to element that will be added
+    ExperimentalElement* theElement = 0;
+    
     // ----------------------------------------------------------------------------	
-    if (strcmp(argv[1],"truss") == 0 || strcmp(argv[1],"corotTruss") == 0)  {
-        int eleArgStart = 1;
-        int result = addEETruss(clientData, interp, argc, argv,
-            theTclDomain, eleArgStart);
-        return result;
+    if (strcmp(argv[1],"truss") == 0)  {
+        void* theEE = OPF_EETruss();
+        if (theEE != 0)
+            theElement = (ExperimentalElement*)theEE;
+        else
+            return TCL_ERROR;
+    }
+    // ----------------------------------------------------------------------------	
+    else if (strcmp(argv[1], "corotTruss") == 0) {
+        void* theEE = OPF_EETrussCorot();
+        if (theEE != 0)
+            theElement = (ExperimentalElement*)theEE;
+        else
+            return TCL_ERROR;
     }
     // ----------------------------------------------------------------------------	
     else if (strcmp(argv[1],"beamColumn") == 0) {
-        int eleArgStart = 1;
-        int result = addEEBeamColumn(clientData, interp, argc, argv,
-            theTclDomain, eleArgStart);
-        return result;
+        ExperimentalElement* theEE = 0;
+        if (OPS_GetNDM() == 2)
+            theEE = (ExperimentalElement*)OPF_EEBeamColumn2d();
+        else
+            theEE = (ExperimentalElement*)OPF_EEBeamColumn3d();
+        if (theEE != 0)
+            theElement = theEE;
+        else
+            return TCL_ERROR;
     }
     // ----------------------------------------------------------------------------	
     else if (strcmp(argv[1],"twoNodeLink") == 0) {
-        int eleArgStart = 1;
-        int result = addEETwoNodeLink(clientData, interp, argc, argv,
-            theTclDomain, eleArgStart);
-        return result;
+        void* theEE = OPF_EETwoNodeLink();
+        if (theEE != 0)
+            theElement = (ExperimentalElement*)theEE;
+        else
+            return TCL_ERROR;
     }
     // ----------------------------------------------------------------------------	
     else if (strcmp(argv[1],"generic") == 0) {
-        int eleArgStart = 1;
-        int result = addEEGeneric(clientData, interp, argc, argv,
-            theTclDomain, eleArgStart);
-        return result;
+        void* theEE = OPF_EEGeneric();
+        if (theEE != 0)
+            theElement = (ExperimentalElement*)theEE;
+        else
+            return TCL_ERROR;
     }
     // ----------------------------------------------------------------------------	
     else if (strcmp(argv[1],"invertedVBrace") == 0) {
-        int eleArgStart = 1;
-        int result = addEEInvertedVBrace(clientData, interp, argc, argv,
-            theTclDomain, eleArgStart);
-        return result;
+        ExperimentalElement* theEE = 0;
+        if (OPS_GetNDM() == 2)
+            theEE = (ExperimentalElement*)OPF_EEInvertedVBrace2d();
+        else
+            opserr << "WARNING expElement invertedVBrace command not implemented yet for ndm = 3\n";
+        if (theEE != 0)
+            theElement = theEE;
+        else
+            return TCL_ERROR;
     }
     // ----------------------------------------------------------------------------	
     else if (strcmp(argv[1],"bearing") == 0) {
-        int eleArgStart = 1;
-        int result = addEEBearing(clientData, interp, argc, argv,
-            theTclDomain, eleArgStart);
-        return result;
+        ExperimentalElement* theEE = 0;
+        if (OPS_GetNDM() == 2)
+            theEE = (ExperimentalElement*)OPF_EEBearing2d();
+        else
+            theEE = (ExperimentalElement*)OPF_EEBearing3d();
+        if (theEE != 0)
+            theElement = theEE;
+        else
+            return TCL_ERROR;
     }
     // ----------------------------------------------------------------------------	
     else {
@@ -122,5 +145,21 @@ int TclExpElementCommand(ClientData clientData, Tcl_Interp *interp, int argc,
         opserr << "WARNING unknown element type: expElement "
             <<  argv[1] << ": check the manual\n";
         return TCL_ERROR;
-    }    
+    }
+    
+    if (theElement == 0) {
+        opserr << "WARNING could not create experimental element " << argv[1] << endln;
+        return TCL_ERROR;
+    }
+    
+    // now add the element to the domain
+    if (theDomain->addElement(theElement) == false) {
+        opserr << "WARNING could not add element of with tag: "
+            << theElement->getTag() << " and of type: "
+            << theElement->getClassType() << " to the domain\n";
+        delete theElement;
+        return TCL_ERROR;
+    }
+    
+    return TCL_OK;
 }

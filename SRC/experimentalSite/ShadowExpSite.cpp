@@ -22,17 +22,147 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $URL$
-
-// Written: Yoshi (yos@catfish.dpri.kyoto-u.ac.jp)
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 // Created: 09/06
 // Revision: A
 //
 // Description: This file contains the implementation of ShadowExpSite.
 
 #include "ShadowExpSite.h"
+
+#include <Channel.h>
+#include <TCP_Socket.h>
+#include <TCP_SocketSSL.h>
+#include <UDP_Socket.h>
+#include <elementAPI.h>
+
+
+void* OPF_ShadowExpSite()
+{
+    // pointer to experimental site that will be returned
+    ExperimentalSite* theSite = 0;
+    
+    int numArgs = OPS_GetNumRemainingInputArgs();
+    if (3 > numArgs || numArgs > 7) {
+        opserr << "WARNING invalid number of arguments\n";
+        opserr << "Want: expSite ShadowSite tag <-setup setupTag> ipAddr ipPort <-udp> <-ssl> <-dataSize size>\n";
+        return 0;
+    }
+    
+    // site tag
+    int tag;
+    int numdata = 1;
+    if (OPS_GetIntInput(&numdata, &tag) != 0) {
+        opserr << "WARNING invalid expSite ShadowSite tag\n";
+        return 0;
+    }
+    
+    // experimental setup (optional)
+    ExperimentalSetup* theSetup = 0;
+    const char* type = OPS_GetString();
+    if (strcmp(type, "-setup") == 0) {
+        int setupTag;
+        numdata = 1;
+        if (OPS_GetIntInput(&numdata, &setupTag) != 0) {
+            opserr << "WARNING invalid setupTag\n";
+            opserr << "expSite ActorSite " << tag << endln;
+            return 0;
+        }
+        theSetup = OPF_GetExperimentalSetup(setupTag);
+        if (theSetup == 0) {
+            opserr << "WARNING experimental setup not found\n";
+            opserr << "expSetup: " << setupTag << endln;
+            opserr << "expSite ActorSite " << tag << endln;
+            return 0;
+        }
+    } else {
+        // move current arg back by one
+        OPS_ResetCurrentInputArg(-1);
+    }
+    
+    // ip address
+    char* ipAddr;
+    type = OPS_GetString();
+    ipAddr = new char[strlen(type) + 1];
+    strcpy(ipAddr, type);
+    
+    // ip port
+    int ipPort;
+    numdata = 1;
+    if (OPS_GetIntInput(&numdata, &ipPort) < 0) {
+        opserr << "WARNING invalid ipPort\n";
+        opserr << "expSite ActorSite " << tag << endln;
+        return 0;
+    }
+    
+    // optional parameters
+    int ssl = 0, udp = 0;
+    int noDelay = 0;
+    int dataSize = OF_Network_dataSize;
+    while (OPS_GetNumRemainingInputArgs() > 0) {
+        type = OPS_GetString();
+        if (strcmp(type, "-ssl") == 0) {
+            ssl = 1; udp = 0;
+        }
+        else if (strcmp(type, "-udp") == 0) {
+            udp = 1; ssl = 0;
+        }
+        else if (strcmp(type, "-noDelay") == 0) {
+            noDelay = 1;
+        }
+        else if (strcmp(type, "-dataSize") == 0) {
+            if (OPS_GetIntInput(&numdata, &dataSize) < 0) {
+                opserr << "WARNING invalid ShadowSite dataSize\n";
+                opserr << "expSite ShadowSite " << tag << endln;
+                return 0;
+            }
+        }
+    }
+    
+    // parsing was successful, setup the connection and allocate the site
+    Channel* theChannel = 0;
+    if (ssl) {
+        theChannel = new TCP_SocketSSL(ipPort, ipAddr, true, noDelay);
+        if (!theChannel) {
+            opserr << "WARNING could not create SSL channel\n";
+            opserr << "expSite ShadowSite " << tag << endln;
+            return 0;
+        }
+    }
+    else if (udp) {
+        theChannel = new UDP_Socket(ipPort, ipAddr, true);
+        if (!theChannel) {
+            opserr << "WARNING could not create UDP channel\n";
+            opserr << "expSite ShadowSite " << tag << endln;
+            return 0;
+        }
+    }
+    else {
+        theChannel = new TCP_Socket(ipPort, ipAddr, true, noDelay);
+        if (!theChannel) {
+            opserr << "WARNING could not create TCP channel\n";
+            opserr << "expSite ShadowSite " << tag << endln;
+            return 0;
+        }
+    }
+    
+    // parsing was successful, allocate the site
+    if (theSetup == 0)
+        theSite = new ShadowExpSite(tag, *theChannel, dataSize);
+    else
+        theSite = new ShadowExpSite(tag, theSetup, *theChannel, dataSize);
+    
+    if (theSite == 0) {
+        opserr << "WARNING could not create experimental site of type ShadowSite\n";
+        return 0;
+    }
+    
+    // cleanup dynamic memory
+    if (ipAddr != 0)
+        delete[] ipAddr;
+    
+    return theSite;
+}
 
 
 ShadowExpSite::ShadowExpSite(int tag,
