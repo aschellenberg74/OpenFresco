@@ -2,10 +2,6 @@
 %
 % Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 % Created: 04/05
-%
-% $Revision$
-% $Date$
-% $URL$
 
 % save workspace
 save(outputFile);

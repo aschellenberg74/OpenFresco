@@ -20,10 +20,6 @@ function varargout = HybridControlxPCtarget(action,nCtrl,nDaq,type,appName,targD
 %
 % Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 % Created: 11/04
-%
-% $Revision$
-% $Date$
-% $URL$
 
 persistent target updateFlagId targetFlagId targDspId targVelId targAccId measDspId measFrcId
 

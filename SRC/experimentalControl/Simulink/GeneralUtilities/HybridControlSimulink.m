@@ -18,10 +18,6 @@ function varargout = HybridControlSimulink(action,type,appName,ctrlDsp,ctrlVel,c
 %
 % Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 % Created: 11/04
-%
-% $Revision$
-% $Date$
-% $URL$
 
 persistent newTargetId switchPCId atTargetId ctrlDspId ctrlVelId ctrlAccId daqDspId daqFrcId
 

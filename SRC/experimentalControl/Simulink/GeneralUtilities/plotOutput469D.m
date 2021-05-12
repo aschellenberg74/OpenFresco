@@ -8,13 +8,9 @@ function data = plotOutput469D(fileName,dofID)
 %
 % Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 % Created: 05/15
-%
-% $Revision$
-% $Date$
-% $URL$
 
 % check for file extension
-if isempty(strfind(fileName,'.bin'))
+if ~contains(fileName,'.bin')
     fileName = [fileName,'.bin'];
 end
 

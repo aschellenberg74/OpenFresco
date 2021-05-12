@@ -7,10 +7,6 @@ function runSimulationXPCtarget(appName,outputFile)
 %
 % Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 % Created: 11/04
-%
-% $Revision$
-% $Date$
-% $URL$
 
 close all;
 clc;

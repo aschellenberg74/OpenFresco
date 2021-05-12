@@ -9,10 +9,6 @@ function data = plotOutputDSpace(fileName,dofID,tStart)
 %
 % Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 % Created: 04/05
-%
-% $Revision$
-% $Date$
-% $URL$
 
 %#ok<*TRYNC>
 

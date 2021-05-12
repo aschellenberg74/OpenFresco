@@ -18,10 +18,6 @@ function varargout = HybridControlDSpace(action,type,boardName,targDsp,targVel,t
 %
 % Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 % Created: 11/04
-%
-% $Revision$
-% $Date$
-% $URL$
 
 persistent simStateId updateFlagId targetFlagId targDspId targVelId targAccId measDspId measFrcId
 

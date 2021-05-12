@@ -13,10 +13,6 @@ function [data,errorMsg] = getXPCtargetVar(fileName,ipAddress,ipPort,drive)
 %
 % Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 % Created: 04/05
-%
-% $Revision$
-% $Date$
-% $URL$
 
 % initialize waitbar
 wbHandle = waitbar(0,'Retrieving variables from the xPC-Target disk ......');

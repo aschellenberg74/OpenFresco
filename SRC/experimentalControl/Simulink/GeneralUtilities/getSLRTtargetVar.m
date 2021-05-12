@@ -12,10 +12,6 @@ function [data,errorMsg] = getSLRTtargetVar(fileName,tg,drive)
 %
 % Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 % Created: 01/18
-%
-% $Revision$
-% $Date$
-% $URL$
 
 % initialize waitbar
 wbHandle = waitbar(0,'Retrieving variables from the SLRT-Target disk ......');

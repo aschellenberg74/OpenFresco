@@ -23,10 +23,6 @@ function [x,deltaT,desc,units,fileInfo,fileDate,header,isText] = loadbin(fileNam
 %
 % Written: Brad Thoen 28-Jun-00.
 % Copyright (c) 2000 by MTS Systems Corporation.
-%
-% $Revision$
-% $Date$
-% $URL$
 
 x 	 = [];
 deltaT	 = [];

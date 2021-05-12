@@ -20,10 +20,6 @@ function savebin(fileName, x, deltaT, desc, units, fileInfo, header, asText)
 %
 % Written: Brad Thoen 10-Jul-00.
 % Copyright (c) 2000 by MTS Systems Corporation.
-%
-% $Revision$
-% $Date$
-% $URL$
 
 % input argument checking
 if ~exist('fileName')

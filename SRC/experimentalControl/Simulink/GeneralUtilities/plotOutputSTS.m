@@ -8,10 +8,6 @@ function data = plotOutputSTS(fileName,actID)
 %
 % Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 % Created: 04/05
-%
-% $Revision$
-% $Date$
-% $URL$
 
 % load the file
 % [data,deltaT,desc,units,fileInfo,fileDate,header,isText] = loadbin(fileName);
