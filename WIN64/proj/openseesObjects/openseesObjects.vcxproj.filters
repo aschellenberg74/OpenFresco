@@ -1,0 +1,786 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="core">
+      <UniqueIdentifier>{0185b3db-ab60-4433-8b52-0aadbadd0b38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="extra">
+      <UniqueIdentifier>{bc60f500-0cc5-4687-8869-bbdda0ac8909}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\SRC\openseesCore\Analysis.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\AnalysisModel.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\ArrayOfTaggedObjects.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\ArrayOfTaggedObjectsIter.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\BeamFiberMaterial.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\BeamFiberMaterial2d.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\BinaryFileStream.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\Channel.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\ConstraintHandler.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\CrdTransf.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\DataFileStream.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\DOF_Group.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\DOF_GrpIter.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\Domain.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\DomainComponent.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\DummyStream.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\EigenSOE.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\EigenSolver.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\Element.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\ElementalLoad.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\ElementalLoadIter.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\ElementResponse.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\FE_Datastore.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\FE_EleIter.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\FE_Element.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\FEM_ObjectBroker.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\FiberResponse.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\File.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\FileIter.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\FrictionModel.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\FrictionResponse.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\Graph.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\ID.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\IncrementalIntegrator.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\Information.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\Integrator.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\LinearSOE.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\LinearSOESolver.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\Load.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\LoadPatternIter.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\MapOfTaggedObjects.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\MapOfTaggedObjectsIter.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\Material.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\MaterialResponse.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\Matrix.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\Message.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\MovableObject.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\MP_Constraint.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\NDMaterial.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\NodalLoad.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\NodalLoadIter.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\Node.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\ObjectBroker.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\OPS_Stream.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\Parameter.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\PlaneStrainMaterial.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\PlaneStressMaterial.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\PlateFiberMaterial.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\Pressure_Constraint.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\Recorder.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\Renderer.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\Response.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\SectionForceDeformation.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\SimulationInformation.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\SingleDomAllSP_Iter.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\SingleDomEleIter.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\SingleDomMP_Iter.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\SingleDomNodIter.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\SingleDomParamIter.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\SingleDomPC_Iter.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\SingleDomSP_Iter.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\SolutionAlgorithm.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\SP_Constraint.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\StandardStream.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\StaticIntegrator.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\StringContainer.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\Subdomain.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\SubdomainNodIter.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\TaggedObject.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\TransientIntegrator.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\UniaxialMaterial.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\Vector.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\Vertex.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\VertexIter.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\Actor.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\BandGenLinLapackSolver.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\BandGenLinSOE.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\BandGenLinSolver.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\ConvergenceTest.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\CTestNormDispIncr.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\DatabaseStream.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\DataFileStreamAdd.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\DOF_Numberer.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\EquiSolnAlgo.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\LimitCurve.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\LinearSeries.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\LineSearch.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\LoadControl.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\LoadPattern.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\NewtonLineSearch.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\NewtonRaphson.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\PenaltyConstraintHandler.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\PenaltyMP_FE.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\PenaltySP_FE.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\PlainNumberer.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\RegulaFalsiLineSearch.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\Shadow.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\Socket.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\StaticAnalysis.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\TCP_Socket.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\TCP_SocketSSL.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\TCP_Stream.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\TimeSeries.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\UDP_Socket.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\XmlFileStream.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\SRC\openseesCore\Analysis.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\AnalysisModel.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\ArrayOfTaggedObjects.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\ArrayOfTaggedObjectsIter.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\BeamFiberMaterial.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\BeamFiberMaterial2d.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\BinaryFileStream.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\Channel.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\classTags.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\ColorMap.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\ConstraintHandler.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\CrdTransf.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\DataFileStream.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\DOF_Group.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\DOF_GrpIter.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\Domain.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\DomainComponent.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\DomainDecompositionAnalysis.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\DummyStream.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\EigenSOE.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\EigenSolver.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\Element.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\ElementalLoad.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\ElementalLoadIter.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\elementAPI.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\ElementIter.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\ElementResponse.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\EquiSolnAlgo.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\FE_Datastore.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\FE_EleIter.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\FE_Element.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\FEM_ObjectBroker.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\Fiber.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\FiberResponse.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\File.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\FileIter.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\FrictionModel.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\FrictionResponse.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\Graph.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\ID.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\IncrementalIntegrator.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\Information.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\Integrator.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\LinearSOE.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\LinearSOESolver.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\Load.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\LoadPattern.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\LoadPatternIter.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\MapOfTaggedObjects.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\MapOfTaggedObjectsIter.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\Material.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\MaterialResponse.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\Matrix.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\MeshRegion.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\Message.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\MovableObject.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\MP_Constraint.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\MP_ConstraintIter.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\NDMaterial.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\NodalLoad.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\NodalLoadIter.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\Node.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\NodeIter.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\ObjectBroker.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\OPS_Globals.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\OPS_Stream.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\Parameter.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\ParameterIter.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\PlainMap.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\PlaneStrainMaterial.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\PlaneStressMaterial.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\PlateFiberMaterial.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\Pressure_Constraint.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\Pressure_ConstraintIter.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\Recorder.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\Renderer.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\Response.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\SectionForceDeformation.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\SimulationInformation.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\SingleDomAllSP_Iter.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\SingleDomEleIter.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\SingleDomMP_Iter.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\SingleDomNodIter.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\SingleDomParamIter.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\SingleDomPC_Iter.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\SingleDomSP_Iter.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\SolutionAlgorithm.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\SP_Constraint.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\SP_ConstraintIter.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\StandardStream.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\StaticIntegrator.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\StringContainer.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\Subdomain.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\SubdomainNodIter.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\TaggedObject.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\TaggedObjectIter.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\TaggedObjectStorage.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\TransientIntegrator.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\UniaxialMaterial.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\Vector.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\Vertex.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\VertexIter.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\Actor.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\BandGenLinLapackSolver.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\BandGenLinSOE.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\BandGenLinSolver.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\bool.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\ChannelAddress.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\ConvergenceTest.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\CTestNormDispIncr.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\DatabaseStream.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\DataFileStreamAdd.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\DOF_Numberer.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\EquiSolnAlgo.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\GraphNumberer.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\GroundMotion.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\LimitCurve.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\LinearSeries.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\LineSearch.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\LoadControl.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\LoadPattern.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\MachineBroker.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\NewtonLineSearch.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\NewtonRaphson.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\packages.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\PenaltyConstraintHandler.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\PenaltyMP_FE.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\PenaltySP_FE.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\PlainNumberer.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\RegulaFalsiLineSearch.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\Shadow.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\Socket.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\SocketAddress.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\StaticAnalysis.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\TCP_Socket.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\TCP_SocketSSL.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\TCP_Stream.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\Timer.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\TimeSeries.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\TimeSeriesIntegrator.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\UDP_Socket.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\XmlFileStream.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
