@@ -35,7 +35,7 @@ void* OPF_ETBroyden()
     // pointer to experimental tangent stiff that will be returned
     ExperimentalTangentStiff* theTangentStiff = 0;
     
-    if (OPS_GetNumRemainingInputArgs() < 2) {
+    if (OPS_GetNumRemainingInputArgs() < 1) {
         opserr << "WARNING invalid number of arguments\n";
         opserr << "Want: expTangentStiff Broyden tag\n";
         return 0;

@@ -75,7 +75,7 @@ void OPF_ClearExperimentalCPs()
 }
 
 
-void* OPF_ExperimentalCP()
+int OPF_ExperimentalCP()
 {
     // pointer to experimental control point that will be returned
     ExperimentalCP* theCP = 0;
@@ -84,7 +84,7 @@ void* OPF_ExperimentalCP()
         opserr << "WARNING invalid number of arguments\n";
         opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType "
             << "<-fact f> <-lim l u> <-isRel> ...\n";
-        return 0;
+        return -1;
     }
     
     // control point tag
@@ -92,7 +92,7 @@ void* OPF_ExperimentalCP()
     int numdata = 1;
     if (OPS_GetIntInput(&numdata, &tag) < 0) {
         opserr << "WARNING invalid expControlPoint tag\n";
-        return 0;
+        return -1;
     }
     
     // node (optional)
@@ -105,7 +105,7 @@ void* OPF_ExperimentalCP()
         numdata = 1;
         if (OPS_GetIntInput(&numdata, &nodeTag) < 0) {
             opserr << "WARNING invalid nodeTag for control point: " << tag << endln;
-            return 0;
+            return -1;
         }
         theDomain = OPS_GetDomain();
         theNode = theDomain->getNode(nodeTag);
@@ -134,7 +134,7 @@ void* OPF_ExperimentalCP()
                 if (sscanf(type, "%*[dfouDFOU]%d", &dofID) != 1) {
                     opserr << "WARNING invalid dof for control point: " << tag << endln;
                     opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType <-fact f> <-lim l u> <-isRel> ...\n";
-                    return 0;
+                    return -1;
                 }
             }
             dof(numSignals) = dofID - 1;
@@ -148,7 +148,7 @@ void* OPF_ExperimentalCP()
             else {
                 opserr << "WARNING invalid dof for control point: " << tag << endln;
                 opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType <-fact f> <-lim l u> <-isRel> ...\n";
-                return 0;
+                return -1;
             }
         }
         else if (ndm == 2 && ndf == 2) {
@@ -165,7 +165,7 @@ void* OPF_ExperimentalCP()
             else {
                 opserr << "WARNING invalid dof for control point: " << tag << endln;
                 opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType <-fact f> <-lim l u> <-isRel> ...\n";
-                return 0;
+                return -1;
             }
         }
         else if (ndm == 2 && ndf == 3) {
@@ -187,7 +187,7 @@ void* OPF_ExperimentalCP()
             else {
                 opserr << "WARNING invalid dof for control point: " << tag << endln;
                 opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType <-fact f> <-lim l u> <-isRel> ...\n";
-                return 0;
+                return -1;
             }
         }
         else if (ndm == 3 && ndf == 3) {
@@ -209,7 +209,7 @@ void* OPF_ExperimentalCP()
             else {
                 opserr << "WARNING invalid dof for control point: " << tag << endln;
                 opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType <-fact f> <-lim l u> <-isRel> ...\n";
-                return 0;
+                return -1;
             }
         }
         else if (ndm == 3 && ndf == 6) {
@@ -246,7 +246,7 @@ void* OPF_ExperimentalCP()
             else {
                 opserr << "WARNING invalid dof for control point: " << tag << endln;
                 opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType <-fact f> <-lim l u> <-isRel> ...\n";
-                return 0;
+                return -1;
             }
         }
         
@@ -270,7 +270,7 @@ void* OPF_ExperimentalCP()
         else {
             opserr << "WARNING invalid rspType for control point: " << tag << endln;
             opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType <-fact f> <-lim l u> <-isRel> ...\n";
-            return 0;
+            return -1;
         }
         
         // scale factor (optional)
@@ -280,7 +280,7 @@ void* OPF_ExperimentalCP()
             if (OPS_GetDoubleInput(&numdata, &factor(numSignals)) < 0) {
                 opserr << "WARNING invalid factor for control point: " << tag << endln;
                 opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType <-fact f> <-lim l u> <-isRel> ...\n";
-                return 0;
+                return -1;
             }
             // read next argument
             type = OPS_GetString();
@@ -295,12 +295,12 @@ void* OPF_ExperimentalCP()
             if (OPS_GetDoubleInput(&numdata, &lowerLim(numSignals)) < 0) {
                 opserr << "WARNING invalid lower limit for control point: " << tag << endln;
                 opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType <-fact f> <-lim l u> <-isRel> ...\n";
-                return 0;
+                return -1;
             }
             if (OPS_GetDoubleInput(&numdata, &upperLim(numSignals)) < 0) {
                 opserr << "WARNING invalid upper limit for control point: " << tag << endln;
                 opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType <-fact f> <-lim l u> <-isRel> ...\n";
-                return 0;
+                return -1;
             }
             numLimits++;
             // read next argument
@@ -341,7 +341,13 @@ void* OPF_ExperimentalCP()
     if (theNode != 0)
         theCP->setNode(theNode);
     
-    return theCP;
+    // now add the control point to the modelBuilder
+    if (OPF_AddExperimentalCP(theCP) == false) {
+        delete theCP; // invoke the destructor, otherwise mem leak
+        return -1;
+    }
+    
+    return 0;
 }
 
 

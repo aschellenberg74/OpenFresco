@@ -39,9 +39,9 @@
 #define WIN_ARCH "64-Bit"
 #endif
 
-#ifndef _bool_h
-#include "bool.h"
-#endif
+//#ifndef _bool_h
+//#include "bool.h"
+//#endif
 
 // Return Type
 static const int OF_ReturnType_completed =  0;

@@ -38,7 +38,7 @@ void* OPF_ETBfgs()
     // pointer to experimental tangent stiff that will be returned
     ExperimentalTangentStiff* theTangentStiff = 0;
     
-    if (OPS_GetNumRemainingInputArgs() < 2) {
+    if (OPS_GetNumRemainingInputArgs() < 1) {
         opserr << "WARNING invalid number of arguments\n";
         opserr << "Want: expTangentStiff BFGS tag <-eps value>\n";
         return 0;
