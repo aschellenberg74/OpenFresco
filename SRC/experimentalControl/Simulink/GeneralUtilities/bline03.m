@@ -1,13 +1,13 @@
-function [dsp,vel,acc,time] = baselineCorrect(acc,dt,polyOrder,varargin)
-%BASELINECORRECT to perform time domain baseline correction
-% [dsp,vel,acc,time] = baselineCorrect(acc,dt,polyOrder,varargin)
+function [acc,vel,dsp,time] = bline03(acc,dt,polyOrder,varargin)
+%BLINE03 to perform time domain baseline correction
+% [acc,vel,dsp,time] = bline03(acc,dt,polyOrder,varargin)
 %
-% dsp       : baseline corrected displacement history
-% vel       : baseline corrected velocity history
-% acc       : baseline corrected acceleration history
+% acc       : baseline corrected ground acceleration history
+% vel       : baseline corrected ground velocity history
+% dsp       : baseline corrected ground displacement history
 % time      : baseline corrected time vector
-% acc       : input acceleration history
-% dt        : time step size of input acceleration history
+% acc       : input ground acceleration history
+% dt        : time step size of input ground acceleration history
 % polyOrder : order of polynomial for baseline correction counted from
 %             the cubic term (usally between 3 and 9)
 % varargin  : variable input arguments
@@ -36,14 +36,22 @@ acc = reshape(acc,[],1);
 
 npflag = 0;
 if (npflag == 0)
-    % remove mean value of first (npts) points of record
-    npts = 10;
-    acc = acc - mean(acc(1:npts));
+    % remove mean value of record
+    acc = acc - mean(acc);
     
     % taper beginning of record over first (npts) points
     npts = 10;
     taper = 0.5*(1 + cos(pi*(0:npts-1)./npts + pi));
     acc(1:npts) = acc(1:npts).*taper';
+    
+    % taper end of record over last (npts) points
+    npts = 10;
+    taper = 0.5*(1 + cos(pi*(npts-1:-1:0)./npts + pi));
+    acc(end-npts+1:end) = acc(end-npts+1:end).*taper';
+    
+    % pad with zeros
+    npts = 0;
+    acc = [zeros(npts,1); acc; zeros(npts,1)];
 end
 
 % integrate to displacement (time domain) for fitting baseline

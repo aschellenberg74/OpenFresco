@@ -107,7 +107,7 @@ end
 % fft of command displacements
 createWindow('cen',0.80*SS(4)/3*4,0.80*SS(4),'FFT Comm Displacement');
 try
-    getFFT(commSig(idS:idE,dofID),dt,sprintf('Command Displacement: DOF %02d',dofID));
+    getFFT(commSig(idS:idE,dofID),dt,'title',sprintf('Command Displacement: DOF %02d',dofID));
     set(gca,'YScale','log');
 end
 %==========================================================================
@@ -300,7 +300,7 @@ try
     tIP = linspace(t(1),t(end),length(t))';
     errorIP = interp1(t,error,tIP,[],0.0);
     dtIP = mean(diff(tIP));
-    getFFT(errorIP,dtIP,sprintf('Error between Measured and Target Displacements: DOF %02d',dofID));
+    getFFT(errorIP,dtIP,'title',sprintf('Error between Measured and Target Displacements: DOF %02d',dofID));
 end
 %==========================================================================
 % subspace plot of measured vs. target displacements
@@ -367,7 +367,7 @@ title(sprintf('RMS Error between Measured and Target Displacements from xPC-Targ
 %createWindow('cen',0.80*SS(4)/3*4,0.80*SS(4),'FFT of Error Meas & Comm Displacement');
 %try
 %   error = measSig(idS:idE,dofID) - commSig(idS:idE,dofID);
-%   getFFT(error,dt,sprintf('Error between Measured and Command Displacements: DOF %02d',dofID));
+%   getFFT(error,dt,'title',sprintf('Error between Measured and Command Displacements: DOF %02d',dofID));
 %end
 %==========================================================================
 % measured force
@@ -383,7 +383,7 @@ title(sprintf('Measured Force from xPC-Target: DOF %02d',dofID),'FontWeight','bo
 % fft of measured force
 createWindow('cen',0.80*SS(4)/3*4,0.80*SS(4),'FFT of Measured Force');
 try
-    getFFT(measFrc(idS:idE,dofID),dt,sprintf('Measured Force: DOF %02d',dofID));
+    getFFT(measFrc(idS:idE,dofID),dt,'title',sprintf('Measured Force: DOF %02d',dofID));
     set(gca,'YScale','log');
 end
 %==========================================================================
