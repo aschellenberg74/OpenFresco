@@ -70,7 +70,7 @@ void* OPF_ActorExpSite()
             opserr << "expSite ActorSite " << tag << endln;
             return 0;
         }
-        theSetup = OPF_GetExperimentalSetup(setupTag);
+        theSetup = OPF_getExperimentalSetup(setupTag);
         if (theSetup == 0) {
             opserr << "WARNING experimental setup not found\n";
             opserr << "expSetup: " << setupTag << endln;
@@ -86,7 +86,7 @@ void* OPF_ActorExpSite()
             opserr << "expSite ActorSite " << tag << endln;
             return 0;
         }
-        theControl = OPF_GetExperimentalControl(ctrlTag);
+        theControl = OPF_getExperimentalControl(ctrlTag);
         if (theControl == 0) {
             opserr << "WARNING experimental control not found\n";
             opserr << "expControl: " << ctrlTag << endln;

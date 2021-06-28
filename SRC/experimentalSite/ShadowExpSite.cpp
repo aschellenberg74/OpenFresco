@@ -68,7 +68,7 @@ void* OPF_ShadowExpSite()
             opserr << "expSite ActorSite " << tag << endln;
             return 0;
         }
-        theSetup = OPF_GetExperimentalSetup(setupTag);
+        theSetup = OPF_getExperimentalSetup(setupTag);
         if (theSetup == 0) {
             opserr << "WARNING experimental setup not found\n";
             opserr << "expSetup: " << setupTag << endln;

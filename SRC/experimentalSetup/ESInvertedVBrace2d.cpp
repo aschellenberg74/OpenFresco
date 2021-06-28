@@ -67,7 +67,7 @@ void* OPF_ESInvertedVBrace2d()
             opserr << "expSetup InvertedVBrace " << tag << endln;
             return 0;
         }
-        theControl = OPF_GetExperimentalControl(ctrlTag);
+        theControl = OPF_getExperimentalControl(ctrlTag);
         if (theControl == 0) {
             opserr << "WARNING experimental control not found\n";
             opserr << "expControl: " << ctrlTag << endln;

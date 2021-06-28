@@ -37,13 +37,13 @@
 static MapOfTaggedObjects theExperimentalSignalFilters;
 
 
-bool OPF_AddExperimentalSignalFilter(ExperimentalSignalFilter* newComponent)
+bool OPF_addExperimentalSignalFilter(ExperimentalSignalFilter* newComponent)
 {
     return theExperimentalSignalFilters.addComponent(newComponent);
 }
 
 
-bool OPF_RemoveExperimentalSignalFilter(int tag)
+bool OPF_removeExperimentalSignalFilter(int tag)
 {
     TaggedObject* obj = theExperimentalSignalFilters.removeComponent(tag);
     if (obj != 0) {
@@ -54,7 +54,7 @@ bool OPF_RemoveExperimentalSignalFilter(int tag)
 }
 
 
-ExperimentalSignalFilter* OPF_GetExperimentalSignalFilter(int tag)
+ExperimentalSignalFilter* OPF_getExperimentalSignalFilter(int tag)
 {
     TaggedObject* theResult = theExperimentalSignalFilters.getComponentPtr(tag);
     if (theResult == 0) {
@@ -68,7 +68,7 @@ ExperimentalSignalFilter* OPF_GetExperimentalSignalFilter(int tag)
 }
 
 
-void OPF_ClearExperimentalSignalFilters()
+void OPF_clearExperimentalSignalFilters()
 {
     theExperimentalSignalFilters.clearAll();
 }

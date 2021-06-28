@@ -34,13 +34,13 @@
 static MapOfTaggedObjects theExperimentalTangentStiffs;
 
 
-bool OPF_AddExperimentalTangentStiff(ExperimentalTangentStiff* newComponent)
+bool OPF_addExperimentalTangentStiff(ExperimentalTangentStiff* newComponent)
 {
     return theExperimentalTangentStiffs.addComponent(newComponent);
 }
 
 
-bool OPF_RemoveExperimentalTangentStiff(int tag)
+bool OPF_removeExperimentalTangentStiff(int tag)
 {
     TaggedObject* obj = theExperimentalTangentStiffs.removeComponent(tag);
     if (obj != 0) {
@@ -51,7 +51,7 @@ bool OPF_RemoveExperimentalTangentStiff(int tag)
 }
 
 
-ExperimentalTangentStiff* OPF_GetExperimentalTangentStiff(int tag)
+ExperimentalTangentStiff* OPF_getExperimentalTangentStiff(int tag)
 {
     TaggedObject* theResult = theExperimentalTangentStiffs.getComponentPtr(tag);
     if (theResult == 0) {
@@ -65,7 +65,7 @@ ExperimentalTangentStiff* OPF_GetExperimentalTangentStiff(int tag)
 }
 
 
-void OPF_ClearExperimentalTangentStiffs()
+void OPF_clearExperimentalTangentStiffs()
 {
     theExperimentalTangentStiffs.clearAll();
 }

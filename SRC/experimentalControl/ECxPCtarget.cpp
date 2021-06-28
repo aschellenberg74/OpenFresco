@@ -111,7 +111,7 @@ void* OPF_ECxPCtarget()
     // populate array with trial control points
     for (int i = 0; i < numTrialCPs; i++) {
         trialCPs[i] = 0;
-        trialCPs[i] = OPF_GetExperimentalCP(cpTags(i));
+        trialCPs[i] = OPF_getExperimentalCP(cpTags(i));
         if (trialCPs[i] == 0) {
             opserr << "WARNING experimental control point not found\n";
             opserr << "expControlPoint " << cpTags(i) << endln;
@@ -158,7 +158,7 @@ void* OPF_ECxPCtarget()
     // populate array with output control points
     for (int i = 0; i < numOutCPs; i++) {
         outCPs[i] = 0;
-        outCPs[i] = OPF_GetExperimentalCP(cpTags(i));
+        outCPs[i] = OPF_getExperimentalCP(cpTags(i));
         if (outCPs[i] == 0) {
             opserr << "WARNING experimental control point not found\n";
             opserr << "expControlPoint " << cpTags(i) << endln;

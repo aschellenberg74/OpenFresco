@@ -38,13 +38,13 @@
 static MapOfTaggedObjects theExperimentalSites;
 
 
-bool OPF_AddExperimentalSite(ExperimentalSite* newComponent)
+bool OPF_addExperimentalSite(ExperimentalSite* newComponent)
 {
     return theExperimentalSites.addComponent(newComponent);
 }
 
 
-bool OPF_RemoveExperimentalSite(int tag)
+bool OPF_removeExperimentalSite(int tag)
 {
     TaggedObject* obj = theExperimentalSites.removeComponent(tag);
     if (obj != 0) {
@@ -55,7 +55,7 @@ bool OPF_RemoveExperimentalSite(int tag)
 }
 
 
-ExperimentalSite* OPF_GetExperimentalSite(int tag)
+ExperimentalSite* OPF_getExperimentalSite(int tag)
 {
     TaggedObject* theResult = theExperimentalSites.getComponentPtr(tag);
     if (theResult == 0) {
@@ -69,7 +69,7 @@ ExperimentalSite* OPF_GetExperimentalSite(int tag)
 }
 
 
-ExperimentalSite* OPF_GetExperimentalSiteFirst()
+ExperimentalSite* OPF_getExperimentalSiteFirst()
 {
     TaggedObjectIter &mcIter = theExperimentalSites.getComponents();
     TaggedObject* theResult = mcIter();
@@ -82,7 +82,7 @@ ExperimentalSite* OPF_GetExperimentalSiteFirst()
 }
 
 
-void OPF_ClearExperimentalSites()
+void OPF_clearExperimentalSites()
 {
     theExperimentalSites.clearAll();
 }

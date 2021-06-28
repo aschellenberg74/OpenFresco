@@ -38,13 +38,13 @@
 static MapOfTaggedObjects theExperimentalCPs;
 
 
-bool OPF_AddExperimentalCP(ExperimentalCP* newComponent)
+bool OPF_addExperimentalCP(ExperimentalCP* newComponent)
 {
     return theExperimentalCPs.addComponent(newComponent);
 }
 
 
-bool OPF_RemoveExperimentalCP(int tag)
+bool OPF_removeExperimentalCP(int tag)
 {
     TaggedObject* obj = theExperimentalCPs.removeComponent(tag);
     if (obj != 0) {
@@ -55,7 +55,7 @@ bool OPF_RemoveExperimentalCP(int tag)
 }
 
 
-ExperimentalCP* OPF_GetExperimentalCP(int tag)
+ExperimentalCP* OPF_getExperimentalCP(int tag)
 {
     TaggedObject* theResult = theExperimentalCPs.getComponentPtr(tag);
     if (theResult == 0) {
@@ -69,7 +69,7 @@ ExperimentalCP* OPF_GetExperimentalCP(int tag)
 }
 
 
-void OPF_ClearExperimentalCPs()
+void OPF_clearExperimentalCPs()
 {
     theExperimentalCPs.clearAll();
 }
@@ -342,7 +342,7 @@ int OPF_ExperimentalCP()
         theCP->setNode(theNode);
     
     // now add the control point to the modelBuilder
-    if (OPF_AddExperimentalCP(theCP) == false) {
+    if (OPF_addExperimentalCP(theCP) == false) {
         delete theCP; // invoke the destructor, otherwise mem leak
         return -1;
     }

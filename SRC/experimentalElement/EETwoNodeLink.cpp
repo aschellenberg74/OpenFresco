@@ -131,7 +131,7 @@ void* OPF_EETwoNodeLink()
             opserr << "expElement twoNodeLink element: " << tag << endln;
             return 0;
         }
-        theSite = OPF_GetExperimentalSite(siteTag);
+        theSite = OPF_getExperimentalSite(siteTag);
         if (theSite == 0) {
             opserr << "WARNING experimental site not found\n";
             opserr << "expSite: " << siteTag << endln;
@@ -219,7 +219,7 @@ void* OPF_EETwoNodeLink()
                 opserr << "expElement twoNodeLink element: " << tag << endln;
                 return 0;
             }
-            theTangStif = OPF_GetExperimentalTangentStiff(tangStifTag);
+            theTangStif = OPF_getExperimentalTangentStiff(tangStifTag);
             if (theTangStif == 0) {
                 opserr << "WARNING experimental tangent stiff not found\n";
                 opserr << "expTangStiff: " << tangStifTag << endln;

@@ -117,10 +117,10 @@ protected:
     Vector nodeCrds;    // vector of nodal coordinates
 };
 
-extern bool OPF_AddExperimentalCP(ExperimentalCP* newComponent);
-extern ExperimentalCP* OPF_GetExperimentalCP(int tag);
-extern bool OPF_RemoveExperimentalCP(int tag);
-extern void OPF_ClearExperimentalCPs();
+extern bool OPF_addExperimentalCP(ExperimentalCP* newComponent);
+extern ExperimentalCP* OPF_getExperimentalCP(int tag);
+extern bool OPF_removeExperimentalCP(int tag);
+extern void OPF_clearExperimentalCPs();
 int OPF_ExperimentalCP();
 
 #endif

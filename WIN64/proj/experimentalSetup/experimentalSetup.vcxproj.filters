@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\..\SRC\experimentalSetup\ESAggregator.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalSetup\ESFourActuators3d.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalSetup\ESInvertedVBrace2d.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalSetup\ESInvertedVBraceJntOff2d.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalSetup\ESNoTransformation.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalSetup\ESOneActuator.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalSetup\ESThreeActuators.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalSetup\ESThreeActuators2d.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalSetup\ESThreeActuatorsJntOff.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalSetup\ESThreeActuatorsJntOff2d.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalSetup\ESTwoActuators2d.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalSetup\ExperimentalSetup.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\SRC\experimentalSetup\ESAggregator.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalSetup\ESFourActuators3d.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalSetup\ESInvertedVBrace2d.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalSetup\ESInvertedVBraceJntOff2d.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalSetup\ESNoTransformation.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalSetup\ESOneActuator.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalSetup\ESThreeActuators.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalSetup\ESThreeActuators2d.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalSetup\ESThreeActuatorsJntOff.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalSetup\ESThreeActuatorsJntOff2d.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalSetup\ESTwoActuators2d.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalSetup\ExperimentalSetup.h" />
+  </ItemGroup>
+</Project>

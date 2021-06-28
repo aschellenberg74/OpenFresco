@@ -45,7 +45,7 @@ P_range = [0.9 1.1;
 % See Table 1 in the paper for more details
 
 %MRC = [2 0.05 0.001];        % maximum rate of change (can use these as default values) 
-MRC = [2 0.05 0.001]./10;        % maximum rate of change (can use these as default values) 
+MRC = [2 0.05 0.001]./10;     % maximum rate of change (can use these as default values) 
 
 % Butterworth filter
 Filter_order = 6;

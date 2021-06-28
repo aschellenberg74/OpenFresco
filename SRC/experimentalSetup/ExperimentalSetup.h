@@ -223,9 +223,9 @@ protected:
     virtual void setDaq();
 };
 
-extern bool OPF_AddExperimentalSetup(ExperimentalSetup* newComponent);
-extern ExperimentalSetup* OPF_GetExperimentalSetup(int tag);
-extern bool OPF_RemoveExperimentalSetup(int tag);
-extern void OPF_ClearExperimentalSetups();
+extern bool OPF_addExperimentalSetup(ExperimentalSetup* newComponent);
+extern bool OPF_removeExperimentalSetup(int tag);
+extern ExperimentalSetup* OPF_getExperimentalSetup(int tag);
+extern void OPF_clearExperimentalSetups();
 
 #endif

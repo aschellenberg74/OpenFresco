@@ -61,7 +61,7 @@ void* OPF_LocalExpSite()
         opserr << "expSite LocalSite " << tag << endln;
         return 0;
     }
-    ExperimentalSetup* theSetup = OPF_GetExperimentalSetup(setupTag);
+    ExperimentalSetup* theSetup = OPF_getExperimentalSetup(setupTag);
     if (theSetup == 0) {
         opserr << "WARNING experimental setup not found\n";
         opserr << "expSetup: " << setupTag << endln;

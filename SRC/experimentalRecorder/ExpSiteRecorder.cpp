@@ -34,7 +34,7 @@
 #include <DataFileStreamAdd.h>
 #include <XmlFileStream.h>
 #include <BinaryFileStream.h>
-#include <DatabaseStream.h>
+//#include <DatabaseStream.h>
 #include <TCP_Stream.h>
 #include <elementAPI.h>
 
@@ -157,7 +157,7 @@ void* OPF_ExpSiteRecorder()
             }
             eMode = TCP_STREAM;
         }
-        else if (strcmp(option, "-database") == 0) {
+        /*else if (strcmp(option, "-database") == 0) {
             theDatabase = OPS_GetFEDatastore();
             if (theDatabase != 0) {
                 if (OPS_GetNumRemainingInputArgs() > 0) {
@@ -168,13 +168,12 @@ void* OPF_ExpSiteRecorder()
             else {
                 opserr << "WARNING: no current database\n";
             }
-        }
+        }*/
         else if (strcmp(option, "-site") == 0) {
             while (OPS_GetNumRemainingInputArgs() > 0) {
                 int tag;
                 numdata = 1;
                 if (OPS_GetIntInput(&numdata, &tag) < 0) {
-                    OPS_ResetCurrentInputArg(-1);
                     break;
                 }
                 siteTags[numSites++] = tag;
@@ -223,8 +222,8 @@ void* OPF_ExpSiteRecorder()
         theOutputStream = new DataFileStream(filename, OVERWRITE, 2, 1, closeOnWrite, precision, doScientific);
     else if (eMode == XML_STREAM && filename != 0)
         theOutputStream = new XmlFileStream(filename);
-    else if (eMode == DATABASE_STREAM && tablename != 0)
-        theOutputStream = new DatabaseStream(theDatabase, tablename);
+    //else if (eMode == DATABASE_STREAM && tablename != 0)
+    //    theOutputStream = new DatabaseStream(theDatabase, tablename);
     else if (eMode == BINARY_STREAM && filename != 0)
         theOutputStream = new BinaryFileStream(filename);
     else if (eMode == TCP_STREAM && inetAddr != 0)
@@ -242,7 +241,7 @@ void* OPF_ExpSiteRecorder()
         return 0;
     }
     for (int i = 0; i < numSites; i++) {
-        theSites[i] = OPF_GetExperimentalSite(siteTags(i));
+        theSites[i] = OPF_getExperimentalSite(siteTags(i));
         if (theSites[i] == 0) {
             opserr << "WARNING experimental site with tag "
                 << siteTags(i) << " not found\n";

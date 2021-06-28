@@ -64,7 +64,7 @@ void* OPF_ESNoTransformation()
             opserr << "expSetup NoTransformation " << tag << endln;
             return 0;
         }
-        theControl = OPF_GetExperimentalControl(ctrlTag);
+        theControl = OPF_getExperimentalControl(ctrlTag);
         if (theControl == 0) {
             opserr << "WARNING experimental control not found\n";
             opserr << "expControl: " << ctrlTag << endln;

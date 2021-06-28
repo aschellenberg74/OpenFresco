@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="controlPoint">
+      <UniqueIdentifier>{37947850-d684-41bb-8f8b-79e442c774a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="simulation">
+      <UniqueIdentifier>{f82919cd-37ec-4783-bc60-a7f04cf95cc2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\SRC\experimentalControl\ECSimDomain.cpp">
+      <Filter>simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalControl\ECSimFEAdapter.cpp">
+      <Filter>simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalControl\ECSimSimulink.cpp">
+      <Filter>simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalControl\ECSimulation.cpp">
+      <Filter>simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalControl\ECSimUniaxialMaterials.cpp">
+      <Filter>simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalControl\ECGenericTCP.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalControl\ECLabVIEW.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalControl\ECSCRAMNet.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalControl\ECSCRAMNetGT.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalControl\ECxPCtarget.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalControl\ExperimentalControl.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalControl\xPCtarget\xpcinitfree.c" />
+    <ClCompile Include="..\..\..\SRC\experimentalControlPoint\ExpControlSP.cpp">
+      <Filter>controlPoint</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalControlPoint\ExperimentalCP.cpp">
+      <Filter>controlPoint</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\SRC\experimentalControl\ECSimDomain.h">
+      <Filter>simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalControl\ECSimFEAdapter.h">
+      <Filter>simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalControl\ECSimSimulink.h">
+      <Filter>simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalControl\ECSimulation.h">
+      <Filter>simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalControl\ECSimUniaxialMaterials.h">
+      <Filter>simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalControl\ECGenericTCP.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalControl\ECLabVIEW.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalControl\ECSCRAMNet.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalControl\ECSCRAMNetGT.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalControl\ECxPCtarget.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalControl\ExperimentalControl.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalControlPoint\ExpControlSP.h">
+      <Filter>controlPoint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalControlPoint\ExperimentalCP.h">
+      <Filter>controlPoint</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

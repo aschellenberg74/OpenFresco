@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\..\SRC\experimentalSite\ActorExpSite.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalSite\ExperimentalSite.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalSite\LocalExpSite.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalSite\ShadowExpSite.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\SRC\experimentalSite\ActorExpSite.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalSite\ExperimentalSite.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalSite\LocalExpSite.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalSite\ShadowExpSite.h" />
+  </ItemGroup>
+</Project>

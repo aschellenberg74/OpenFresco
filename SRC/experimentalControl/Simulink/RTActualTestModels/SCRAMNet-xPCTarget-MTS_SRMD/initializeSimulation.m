@@ -1,10 +1,6 @@
 %INITIALIZESIMULATION to initialize the parameters needed to build the Simulink model
 %
 % created by Andreas Schellenberg (andreas.schellenberg@gmail.com) 11/2004
-%
-% $Revision: 373 $
-% $Date: 2014-10-09 01:56:20 -0700 (Thu, 09 Oct 2014) $
-% $URL: svn://openfresco.berkeley.edu/usr/local/svn/OpenFresco/trunk/SRC/experimentalControl/Simulink/RTActualTestModels/cmAPI-xPCTarget-STS/initializeSimulation.m $
 
 clear;
 close all;
@@ -16,11 +12,11 @@ clc;
 HybridCtrlParameters.nDOF = 1;
 
 % set time steps
-HybridCtrlParameters.upFact   = 4;          % upsample factor
-HybridCtrlParameters.dtInt    = 0.02;       % integration time step (sec)
-HybridCtrlParameters.dtSim    = 0.02;       % simulation time step (sec)
-HybridCtrlParameters.dtCon    = 1/1000;     % controller time step (sec)
-HybridCtrlParameters.delay    = zeros(1,HybridCtrlParameters.nDOF);
+HybridCtrlParameters.upFact = 4;          % upsample factor
+HybridCtrlParameters.dtInt  = 0.02;       % integration time step (sec)
+HybridCtrlParameters.dtSim  = 0.02;       % simulation time step (sec)
+HybridCtrlParameters.dtCon  = 1/1000;     % controller time step (sec)
+HybridCtrlParameters.delay  = zeros(1,HybridCtrlParameters.nDOF);
 %HybridCtrlParameters.delay(1) = 0/1024;     % delay compensation DOF 1 (sec)
 %HybridCtrlParameters.delay(2) = 0/1024;     % delay compensation DOF 2 (sec)
 
@@ -56,3 +52,4 @@ HybridCtrlParameters.rate = HybridCtrlParameters.dtSim/HybridCtrlParameters.dtIn
 disp('Model Properties:');
 disp('=================');
 disp(HybridCtrlParameters);
+disp(' ');

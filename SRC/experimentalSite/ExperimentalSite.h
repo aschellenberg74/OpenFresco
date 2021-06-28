@@ -151,10 +151,10 @@ protected:
     virtual void setOut();
 };
 
-extern bool OPF_AddExperimentalSite(ExperimentalSite* newComponent);
-extern ExperimentalSite* OPF_GetExperimentalSite(int tag);
-extern ExperimentalSite* OPF_GetExperimentalSiteFirst();
-extern bool OPF_RemoveExperimentalSite(int tag);
-extern void OPF_ClearExperimentalSites();
+extern bool OPF_addExperimentalSite(ExperimentalSite* newComponent);
+extern bool OPF_removeExperimentalSite(int tag);
+extern ExperimentalSite* OPF_getExperimentalSite(int tag);
+extern ExperimentalSite* OPF_getExperimentalSiteFirst();
+extern void OPF_clearExperimentalSites();
 
 #endif

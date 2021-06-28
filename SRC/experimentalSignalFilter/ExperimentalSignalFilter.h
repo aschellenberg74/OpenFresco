@@ -68,9 +68,9 @@ public:
     virtual int getResponse(int responseID, Information &info);
 };
 
-extern bool OPF_AddExperimentalSignalFilter(ExperimentalSignalFilter* newComponent);
-extern ExperimentalSignalFilter* OPF_GetExperimentalSignalFilter(int tag);
-extern bool OPF_RemoveExperimentalSignalFilter(int tag);
-extern void OPF_ClearExperimentalSignalFilters();
+extern bool OPF_addExperimentalSignalFilter(ExperimentalSignalFilter* newComponent);
+extern bool OPF_removeExperimentalSignalFilter(int tag);
+extern ExperimentalSignalFilter* OPF_getExperimentalSignalFilter(int tag);
+extern void OPF_clearExperimentalSignalFilters();
 
 #endif

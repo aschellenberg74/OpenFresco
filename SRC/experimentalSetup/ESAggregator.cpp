@@ -63,7 +63,7 @@ void* OPF_ESAggregator()
             opserr << "expSetup Aggregator " << tag << endln;
             return 0;
         }
-        theControl = OPF_GetExperimentalControl(ctrlTag);
+        theControl = OPF_getExperimentalControl(ctrlTag);
         if (theControl == 0) {
             opserr << "WARNING experimental control not found\n";
             opserr << "expControl: " << ctrlTag << endln;
@@ -115,7 +115,7 @@ void* OPF_ESAggregator()
     // populate array with experimental setups
     for (int i = 0; i < numSetups; i++) {
         expSetups[i] = 0;
-        expSetups[i] = OPF_GetExperimentalSetup(setupTags(i));
+        expSetups[i] = OPF_getExperimentalSetup(setupTags(i));
         if (expSetups[i] == 0) {
             opserr << "WARNING experimental setup not found\n";
             opserr << "expSetup " << setupTags(i) << endln;

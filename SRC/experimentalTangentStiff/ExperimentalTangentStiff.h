@@ -69,9 +69,9 @@ public:
     virtual int getResponse(int responseID, Information &info);
 };
 
-extern bool OPF_AddExperimentalTangentStiff(ExperimentalTangentStiff* newComponent);
-extern ExperimentalTangentStiff* OPF_GetExperimentalTangentStiff(int tag);
-extern bool OPF_RemoveExperimentalTangentStiff(int tag);
-extern void OPF_ClearExperimentalTangentStiffs();
+extern bool OPF_addExperimentalTangentStiff(ExperimentalTangentStiff* newComponent);
+extern bool OPF_removeExperimentalTangentStiff(int tag);
+extern ExperimentalTangentStiff* OPF_getExperimentalTangentStiff(int tag);
+extern void OPF_clearExperimentalTangentStiffs();
 
 #endif

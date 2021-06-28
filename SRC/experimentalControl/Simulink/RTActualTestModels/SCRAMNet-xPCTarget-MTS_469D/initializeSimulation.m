@@ -1,10 +1,6 @@
 %INITIALIZESIMULATION to initialize the parameters needed to build the Simulink model
 %
 % created by Andreas Schellenberg (andreas.schellenberg@gmail.com) 01/2014
-%
-% $Revision: $
-% $Date: $
-% $URL: $
 
 clear;
 close all;
@@ -13,15 +9,15 @@ clc;
 %%%%%%%%%% HYBRID CONTROLLER PARAMETERS %%%%%%%%%%
 
 % set number of degrees-of-freedom
-HybridCtrlParameters.nDOF = 1;
-dofID = 1;
+dofID = [1];
+HybridCtrlParameters.nDOF = length(dofID);
 
 % set time steps
-HybridCtrlParameters.upFact   = 5;          % upsample factor
-HybridCtrlParameters.dtInt    = 10/2048;    % integration time step (sec)
-HybridCtrlParameters.dtSim    = 10/2048;    % simulation time step (sec)
-HybridCtrlParameters.dtCon    = 1/2048;     % controller time step (sec)
-HybridCtrlParameters.delay    = zeros(1,HybridCtrlParameters.nDOF);
+HybridCtrlParameters.upFact = 5;          % upsample factor
+HybridCtrlParameters.dtInt  = 10/2048;    % integration time step (sec)
+HybridCtrlParameters.dtSim  = 10/2048;    % simulation time step (sec)
+HybridCtrlParameters.dtCon  = 1/2048;     % controller time step (sec)
+HybridCtrlParameters.delay  = zeros(1,HybridCtrlParameters.nDOF);
 
 % update controller time step
 HybridCtrlParameters.dtCon = HybridCtrlParameters.dtCon/HybridCtrlParameters.upFact;
@@ -55,3 +51,4 @@ HybridCtrlParameters.rate = HybridCtrlParameters.dtSim/HybridCtrlParameters.dtIn
 disp('Model Properties:');
 disp('=================');
 disp(HybridCtrlParameters);
+disp(' ');

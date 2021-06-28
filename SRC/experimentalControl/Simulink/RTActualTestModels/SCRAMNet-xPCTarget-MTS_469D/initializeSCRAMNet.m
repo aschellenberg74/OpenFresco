@@ -2,10 +2,6 @@
 %
 % created by Brad Thoen (MTS)
 % modified by Andreas Schellenberg (andreas.schellenberg@gmail.com) 01/2014
-%
-% $Revision: $
-% $Date: $
-% $URL: $
 
 %%%%%%%%%% SIGNAL COUNTS %%%%%%%%%%
 
@@ -23,10 +19,10 @@ samplePeriod  = controlPeriod/HybridCtrlParameters.upFact;
 
 %%%%%%%%%% SCRAMNET PARTITIONS %%%%%%%%%%
 
-%stsNode  = 1;   % MTS STS node
+stsNode  = 1;   % MTS STS node
 syncNode = 2;	% synchronization node: MTS 469D
 xpcNode	 = 3;	% xPC-Target node
-%opfNode  = 4;   % OpenFresco node
+opfNode  = 4;   % OpenFresco node
 
 
 %%%%%%%%%% START MTS STS %%%%%%%%%%
@@ -108,9 +104,9 @@ inppartition(9).Type	= 'uint32';
 inppartition(9).Size	= num2str(nDinp);
 
 % assemble input node data structure
-node.Interface.NodeID                        = num2str(xpcNode);
-node.Interface.Timeout.NumOfNodesInRing      = '10';
-node.Interface.Timeout.TotalCableLengthInM   = '50';
+node.Interface.NodeID                      = num2str(xpcNode);
+node.Interface.Timeout.NumOfNodesInRing    = '10';
+node.Interface.Timeout.TotalCableLengthInM = '50';
 outpartition	= completepartitionstruct(outpartition);
 inppartition	= completepartitionstruct(inppartition);
 node.Partitions	= [outpartition inppartition];
@@ -128,7 +124,7 @@ clear inppartition outpartition node;
 %%%%%%%%%% outputs to scramnet %%%%%%%%%%
 
 % master span
-baseAddress				= 128;
+baseAddress				= 128+0;
 outpartition(1).Address	= ['0x', dec2hex(baseAddress*4)];
 outpartition(1).Type	= 'single';
 outpartition(1).Size	= '1';
@@ -175,9 +171,9 @@ node.Interface.Interrupts.InterruptOnMemoryMaskMatch = 'on';
 node.Interface.Interrupts.NetworkInterrupt           = 'on';
 
 % assemble input node data structure
-node.Interface.NodeID                        = num2str(xpcNode);
-node.Interface.Timeout.NumOfNodesInRing      = '10';
-node.Interface.Timeout.TotalCableLengthInM   = '50';
+node.Interface.NodeID                      = num2str(xpcNode);
+node.Interface.Timeout.NumOfNodesInRing    = '10';
+node.Interface.Timeout.TotalCableLengthInM = '50';
 outpartition	= completepartitionstruct(outpartition);
 inppartition	= completepartitionstruct(inppartition);
 node.Partitions	= [outpartition inppartition];
@@ -251,9 +247,9 @@ opfpartition(13).Type = 'single';
 opfpartition(13).Size = num2str(nTbl);
 
 % assemble input node data structure
-node.Interface.NodeID                        = num2str(xpcNode);
-node.Interface.Timeout.NumOfNodesInRing      = '10';
-node.Interface.Timeout.TotalCableLengthInM   = '50';
+node.Interface.NodeID                      = num2str(xpcNode);
+node.Interface.Timeout.NumOfNodesInRing    = '10';
+node.Interface.Timeout.TotalCableLengthInM = '50';
 node.Partitions	= completepartitionstruct(opfpartition);
 node            = completenodestruct(node);
 

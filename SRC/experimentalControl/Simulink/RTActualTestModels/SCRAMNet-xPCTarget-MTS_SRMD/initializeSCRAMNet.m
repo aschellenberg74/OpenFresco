@@ -2,10 +2,6 @@
 %
 % created by Brad Thoen (MTS)
 % modified by Andreas Schellenberg (andreas.schellenberg@gmail.com) 11/2015
-%
-% $Revision: $
-% $Date: $
-% $URL: $
 
 %%%%%%%%%% SIGNAL COUNTS %%%%%%%%%%
 

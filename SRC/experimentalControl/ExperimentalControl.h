@@ -108,9 +108,9 @@ protected:
     ExperimentalSignalFilter **theDaqFilters;
 };
 
-extern bool OPF_AddExperimentalControl(ExperimentalControl* newComponent);
-extern ExperimentalControl* OPF_GetExperimentalControl(int tag);
-extern bool OPF_RemoveExperimentalControl(int tag);
-extern void OPF_ClearExperimentalControls();
+extern bool OPF_addExperimentalControl(ExperimentalControl* newComponent);
+extern bool OPF_removeExperimentalControl(int tag);
+extern ExperimentalControl* OPF_getExperimentalControl(int tag);
+extern void OPF_clearExperimentalControls();
 
 #endif

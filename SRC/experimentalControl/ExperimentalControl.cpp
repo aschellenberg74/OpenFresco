@@ -37,13 +37,13 @@
 static MapOfTaggedObjects theExperimentalControls;
 
 
-bool OPF_AddExperimentalControl(ExperimentalControl* newComponent)
+bool OPF_addExperimentalControl(ExperimentalControl* newComponent)
 {
     return theExperimentalControls.addComponent(newComponent);
 }
 
 
-bool OPF_RemoveExperimentalControl(int tag)
+bool OPF_removeExperimentalControl(int tag)
 {
     TaggedObject* obj = theExperimentalControls.removeComponent(tag);
     if (obj != 0) {
@@ -54,7 +54,7 @@ bool OPF_RemoveExperimentalControl(int tag)
 }
 
 
-ExperimentalControl* OPF_GetExperimentalControl(int tag)
+ExperimentalControl* OPF_getExperimentalControl(int tag)
 {
     TaggedObject* theResult = theExperimentalControls.getComponentPtr(tag);
     if (theResult == 0) {
@@ -68,7 +68,7 @@ ExperimentalControl* OPF_GetExperimentalControl(int tag)
 }
 
 
-void OPF_ClearExperimentalControls()
+void OPF_clearExperimentalControls()
 {
     theExperimentalControls.clearAll();
 }

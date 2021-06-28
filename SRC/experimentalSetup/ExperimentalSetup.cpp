@@ -36,13 +36,13 @@
 static MapOfTaggedObjects theExperimentalSetups;
 
 
-bool OPF_AddExperimentalSetup(ExperimentalSetup* newComponent)
+bool OPF_addExperimentalSetup(ExperimentalSetup* newComponent)
 {
     return theExperimentalSetups.addComponent(newComponent);
 }
 
 
-bool OPF_RemoveExperimentalSetup(int tag)
+bool OPF_removeExperimentalSetup(int tag)
 {
     TaggedObject* obj = theExperimentalSetups.removeComponent(tag);
     if (obj != 0) {
@@ -53,7 +53,7 @@ bool OPF_RemoveExperimentalSetup(int tag)
 }
 
 
-ExperimentalSetup* OPF_GetExperimentalSetup(int tag)
+ExperimentalSetup* OPF_getExperimentalSetup(int tag)
 {
     TaggedObject* theResult = theExperimentalSetups.getComponentPtr(tag);
     if (theResult == 0) {
@@ -67,7 +67,7 @@ ExperimentalSetup* OPF_GetExperimentalSetup(int tag)
 }
 
 
-void OPF_ClearExperimentalSetups()
+void OPF_clearExperimentalSetups()
 {
     theExperimentalSetups.clearAll();
 }

@@ -1,0 +1,140 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\SRC\experimentalControlPoint\ExpControlSP.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalControlPoint\ExperimentalCP.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalControl\ECGenericTCP.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalControl\ECLabVIEW.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalControl\ECSCRAMNet.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalControl\ECSCRAMNetGT.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalControl\ECSimDomain.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalControl\ECSimFEAdapter.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalControl\ECSimSimulink.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalControl\ECSimulation.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalControl\ECSimUniaxialMaterials.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalControl\ECxPCtarget.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalControl\ExperimentalControl.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalControl\xPCtarget\xpcinitfree.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\SRC\experimentalControlPoint\ExpControlSP.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalControlPoint\ExperimentalCP.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalControl\ECGenericTCP.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalControl\ECLabVIEW.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalControl\ECSCRAMNet.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalControl\ECSCRAMNetGT.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalControl\ECSimDomain.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalControl\ECSimFEAdapter.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalControl\ECSimSimulink.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalControl\ECSimulation.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalControl\ECSimUniaxialMaterials.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalControl\ECxPCtarget.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalControl\ExperimentalControl.h" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{D9026BC0-B5BF-3BE9-E9CB-3491638F2C38}</ProjectGuid>
+    <SccProjectName />
+    <SccLocalPath />
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\..\lib\release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\..\obj\experimentalControl\release\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\..\lib\debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\..\obj\experimentalControl\debug\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <AdditionalIncludeDirectories>..\..\..\src;..\..\..\src\experimentalControl;..\..\..\src\experimentalControl\SCRAMNet;..\..\..\src\experimentalControl\SCRAMNetGT;..\..\..\src\experimentalControl\xPCtarget;..\..\..\src\experimentalControlPoint;..\..\..\src\experimentalRecorder\response;..\..\..\src\experimentalSignalFilter;..\..\..\src\openseesCore;..\..\..\src\openseesExtra;C:\Program Files\Tcl;C:\Program Files\Tcl\include;C:\Program Files\OpenSSL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_WIN64;WIN64;PLATFORM_WIN;NDEBUG;_CRT_SECURE_NO_DEPRECATE;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeaderOutputFile>..\..\obj\experimentalControl\release\experimentalControl.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>..\..\obj\experimentalControl\release\</AssemblerListingLocation>
+      <ObjectFileName>..\..\obj\experimentalControl\release\</ObjectFileName>
+      <ProgramDataBaseFileName>..\..\obj\experimentalControl\release\</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <CallingConvention>Cdecl</CallingConvention>
+      <CompileAs>Default</CompileAs>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+    </ClCompile>
+    <Lib>
+      <OutputFile>..\..\lib\release\experimentalControl.lib</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <BuildLog>
+      <Path>..\..\obj\experimentalControl\release\$(MSBuildProjectName).log</Path>
+    </BuildLog>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\..\..\src;..\..\..\src\experimentalControl;..\..\..\src\experimentalControl\SCRAMNet;..\..\..\src\experimentalControl\SCRAMNetGT;..\..\..\src\experimentalControl\xPCtarget;..\..\..\src\experimentalControlPoint;..\..\..\src\experimentalRecorder\response;..\..\..\src\experimentalSignalFilter;..\..\..\src\openseesCore;..\..\..\src\openseesExtra;C:\Program Files\Tcl;C:\Program Files\Tcl\include;C:\Program Files\OpenSSL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_WIN64;WIN64;PLATFORM_WIN;_DEBUG;_CRT_SECURE_NO_DEPRECATE;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeaderOutputFile>..\..\obj\experimentalControl\debug\experimentalControl.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>..\..\obj\experimentalControl\debug\</AssemblerListingLocation>
+      <ObjectFileName>..\..\obj\experimentalControl\debug\</ObjectFileName>
+      <ProgramDataBaseFileName>..\..\obj\experimentalControl\debug\</ProgramDataBaseFileName>
+      <BrowseInformation>true</BrowseInformation>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+    </ClCompile>
+    <Lib>
+      <OutputFile>..\..\lib\debug\experimentalControl.lib</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <BuildLog>
+      <Path>..\..\obj\experimentalControl\debug\$(MSBuildProjectName).log</Path>
+    </BuildLog>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

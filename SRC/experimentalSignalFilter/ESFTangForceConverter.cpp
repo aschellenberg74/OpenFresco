@@ -98,7 +98,7 @@ void* OPF_ESFTangForceConverter()
         opserr << "expSignalFilter TangentForceConverter " << tag << endln;
         return 0;
     }
-    theTangStif = OPF_GetExperimentalTangentStiff(tangStifTag);
+    theTangStif = OPF_getExperimentalTangentStiff(tangStifTag);
     
     // parsing was successful, allocate the signal filter
     theFilter = new ESFTangForceConverter(tag, theInitStif, theTangStif);
