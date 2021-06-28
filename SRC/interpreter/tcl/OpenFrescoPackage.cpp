@@ -30,7 +30,9 @@
 #include <tcl.h>
 #include <Domain.h>
 #include <StandardStream.h>
+#include <elementAPI.h>
 #include <FrescoGlobals.h>
+#include <ExperimentalSite.h>
 
 #ifdef _WIN32
 #define DllExport _declspec(dllexport)
@@ -42,243 +44,406 @@ StandardStream sserr;
 OPS_Stream *opserrPtr = &sserr;
 #endif
 
+// main OpenFresco objects commands 
+extern int OPF_ExperimentalCP();
+extern int OPF_ExperimentalSignalFilter();
+extern int OPF_ExperimentalControl();
+extern int OPF_ExperimentalSetup();
+extern int OPF_ExperimentalSite();
+extern int OPF_ExperimentalTangentStiff();
+extern int OPF_ExperimentalElement();
+extern int OPF_ExperimentalRecorder();
+extern int OPF_recordExp();
+
+// server OpenFresco commands
+extern int OPF_startLabServer();
+extern int OPF_setupLabServer();
+extern int OPF_stepLabServer();
+extern int OPF_stopLabServer();
+extern int OPF_startSimAppSiteServer();
+extern int OPF_startSimAppElemServer();
+
+// clear OpenFresco object commands
+extern void OPF_clearExperimentalCPs();
+extern void OPF_clearExperimentalSignalFilters();
+extern void OPF_clearExperimentalControls();
+extern void OPF_clearExperimentalSetups();
+extern void OPF_clearExperimentalSites();
+extern void OPF_clearExperimentalTangentStiffs();
+
+// remove OpenFresco object commands
+extern bool OPF_removeExperimentalCP(int tag);
+extern bool OPF_removeExperimentalSignalFilter(int tag);
+extern bool OPF_removeExperimentalControl(int tag);
+extern bool OPF_removeExperimentalSetup(int tag);
+extern bool OPF_removeExperimentalSite(int tag);
+extern bool OPF_removeExperimentalTangentStiff(int tag);
+
+Tcl_Interp *theInterp = 0;
 Domain *theDomain = 0;
+extern "C" int OPS_ResetInputNoBuilder(ClientData clientData, Tcl_Interp * interp, int cArg, int mArg, TCL_Char * *argv, Domain * domain);
+
 
 // experimental control point commands
-extern int TclExpCPCommand(ClientData clientData, Tcl_Interp *interp,
-    int argc, TCL_Char **argv, Domain *theDomain);
-extern int TclRemoveExpCP(ClientData clientData, Tcl_Interp *interp,
-    int argc, TCL_Char **argv);
-extern void OPF_ClearExperimentalCPs();
-
 int openFresco_addExperimentalCP(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
-{ 
-    return TclExpCPCommand(clientData, interp, argc, argv, theDomain);
+{
+    // reset the input args
+    OPS_ResetInputNoBuilder(clientData, interp, 1, argc, argv, theDomain);
+    
+    return OPF_ExperimentalCP();
 }
+
 
 // experimental signal filter commands
-extern int TclExpSignalFilterCommand(ClientData clientData, Tcl_Interp *interp,
-    int argc, TCL_Char **argv, Domain *theDomain);
-extern int TclRemoveExpSignalFilter(ClientData clientData, Tcl_Interp *interp,
-    int argc, TCL_Char **argv);
-extern void OPF_ClearExperimentalSignalFilters();
-
 int openFresco_addExperimentalSignalFilter(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
-{ 
-    return TclExpSignalFilterCommand(clientData, interp, argc, argv, theDomain);
+{
+    // reset the input args
+    OPS_ResetInputNoBuilder(clientData, interp, 1, argc, argv, theDomain);
+    
+    return OPF_ExperimentalSignalFilter();
 }
+
 
 // experimental control commands
-extern int TclExpControlCommand(ClientData clientData, Tcl_Interp *interp,
-    int argc, TCL_Char **argv, Domain *theDomain);
-extern int TclRemoveExpControl(ClientData clientData, Tcl_Interp *interp,
-    int argc, TCL_Char **argv);
-extern void OPF_ClearExperimentalControls();
-
 int openFresco_addExperimentalControl(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
-{ 
-    return TclExpControlCommand(clientData, interp, argc, argv, theDomain);
+{
+    // reset the input args
+    OPS_ResetInputNoBuilder(clientData, interp, 1, argc, argv, theDomain);
+
+    return OPF_ExperimentalControl();
 }
+
 
 // experimental setup commands
-extern int TclExpSetupCommand(ClientData clientData, Tcl_Interp *interp,
-    int argc, TCL_Char **argv, Domain *theDomain);
-extern int TclRemoveExpSetup(ClientData clientData, Tcl_Interp *interp,
-    int argc, TCL_Char **argv);
-extern void OPF_ClearExperimentalSetups();
-
 int openFresco_addExperimentalSetup(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
-{ 
-    return TclExpSetupCommand(clientData, interp, argc, argv, theDomain);
+{
+    // reset the input args
+    OPS_ResetInputNoBuilder(clientData, interp, 1, argc, argv, theDomain);
+
+    return OPF_ExperimentalSetup();
 }
+
 
 // experimental site commands
-extern int TclExpSiteCommand(ClientData clientData, Tcl_Interp *interp,
-    int argc, TCL_Char **argv, Domain *theDomain);
-extern int TclRemoveExpSite(ClientData clientData, Tcl_Interp *interp,
-    int argc, TCL_Char **argv);
-extern void OPF_ClearExperimentalSites();
-
 int openFresco_addExperimentalSite(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
-{ 
-    return TclExpSiteCommand(clientData, interp, argc, argv, theDomain);
+{
+    // reset the input args
+    OPS_ResetInputNoBuilder(clientData, interp, 1, argc, argv, theDomain);
+
+    return OPF_ExperimentalSite();
 }
+
 
 // experimental tangent stiffness commands
-extern int TclExpTangentStiffCommand(ClientData clientData, Tcl_Interp *interp,
-    int argc, TCL_Char **argv, Domain *theDomain);
-extern int TclRemoveExpTangentStiff(ClientData clientData, Tcl_Interp *interp,
-    int argc, TCL_Char **argv);
-extern void OPF_ClearExperimentalTangentStiffs();
-
 int openFresco_addExperimentalTangentStiff(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
-{ 
-    return TclExpTangentStiffCommand(clientData, interp, argc, argv, theDomain);
+{
+    // reset the input args
+    OPS_ResetInputNoBuilder(clientData, interp, 1, argc, argv, theDomain);
+
+    return OPF_ExperimentalTangentStiff();
 }
 
-// experimental element commands
-extern int TclExpElementCommand(ClientData clientData, Tcl_Interp *interp,
-    int argc, TCL_Char **argv, Domain *theDomain);
 
+// experimental element commands
 int openFresco_addExperimentalElement(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
 {
-    return TclExpElementCommand(clientData, interp, argc, argv, theDomain);
+    // reset the input args
+    OPS_ResetInputNoBuilder(clientData, interp, 1, argc, argv, theDomain);
+
+    return OPF_ExperimentalElement();
 }
 
-// experimental recorder commands
-extern int TclAddExpRecorder(ClientData clientData, Tcl_Interp *interp,
-    int argc, TCL_Char **argv, Domain *theDomain);
-extern int TclRemoveExpRecorder(ClientData clientData, Tcl_Interp *interp,
-    int argc, TCL_Char **argv);
-extern int TclExpRecord(ClientData clientData, Tcl_Interp *interp,
-    int argc, TCL_Char **argv);
 
+// experimental recorder commands
 int openFresco_addExperimentalRecorder(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
 {
-    return TclAddExpRecorder(clientData, interp, argc, argv, theDomain);
+    // reset the input args
+    OPS_ResetInputNoBuilder(clientData, interp, 1, argc, argv, theDomain);
+
+    return OPF_ExperimentalRecorder();
+}
+int openFresco_record(ClientData clientData,
+    Tcl_Interp* interp, int argc, TCL_Char** argv)
+{
+    return OPF_recordExp();
 }
 
-// start laboratory server command
-extern int TclStartLabServer(ClientData clientData, Tcl_Interp *interp,
-    int argc, TCL_Char **argv);
 
+// start laboratory server command
 int openFresco_startLabServer(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
 {
-    return TclStartLabServer(clientData, interp, argc, argv);
+    // reset the input args
+    OPS_ResetInputNoBuilder(clientData, interp, 1, argc, argv, theDomain);
+
+    return OPF_startLabServer();
 }
 
-// setup laboratory server command
-extern int TclSetupLabServer(ClientData clientData, Tcl_Interp *interp,
-    int argc, TCL_Char **argv);
 
+// setup laboratory server command
 int openFresco_setupLabServer(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
 {
-    return TclSetupLabServer(clientData, interp, argc, argv);
+    // reset the input args
+    OPS_ResetInputNoBuilder(clientData, interp, 1, argc, argv, theDomain);
+
+    return OPF_setupLabServer();
 }
 
-// step laboratory server command
-extern int TclStepLabServer(ClientData clientData, Tcl_Interp *interp,
-    int argc, TCL_Char **argv);
 
+// step laboratory server command
 int openFresco_stepLabServer(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
 {
-    return TclStepLabServer(clientData, interp, argc, argv);
+    // reset the input args
+    OPS_ResetInputNoBuilder(clientData, interp, 1, argc, argv, theDomain);
+
+    return OPF_stepLabServer();
 }
 
-// stop laboratory server command
-extern int TclStopLabServer(ClientData clientData, Tcl_Interp *interp,
-    int argc, TCL_Char **argv);
 
+// stop laboratory server command
 int openFresco_stopLabServer(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
 {
-    return TclStopLabServer(clientData, interp, argc, argv);
+    // reset the input args
+    OPS_ResetInputNoBuilder(clientData, interp, 1, argc, argv, theDomain);
+
+    return OPF_stopLabServer();
 }
 
-// start simulation application site server command
-extern int TclStartSimAppSiteServer(ClientData clientData, Tcl_Interp *interp,
-    int argc, TCL_Char **argv);
 
+// start simulation application site server command
 int openFresco_startSimAppSiteServer(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
 {
-    return TclStartSimAppSiteServer(clientData, interp, argc, argv);
+    // reset the input args
+    OPS_ResetInputNoBuilder(clientData, interp, 1, argc, argv, theDomain);
+
+    return OPF_startSimAppSiteServer();
 }
 
-// start simulation application element server command
-extern int TclStartSimAppElemServer(ClientData clientData, Tcl_Interp *interp,
-    int argc, TCL_Char **argv, Domain *theDomain);
 
+// start simulation application element server command
 int openFresco_startSimAppElemServer(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
 {
-    return TclStartSimAppElemServer(clientData, interp, argc, argv, theDomain);
+    // reset the input args
+    OPS_ResetInputNoBuilder(clientData, interp, 1, argc, argv, theDomain);
+
+    return OPF_startSimAppElemServer();
 }
 
 
-// wipe entire model command
-int openFresco_wipeModel(ClientData clientData,
+// wipe entire experiment
+int openFresco_wipeExp(ClientData clientData,
     Tcl_Interp *interp, int argc, TCL_Char **argv)
 {
     // OpenSees will clean up theDomain when wipe is called
     //if (theDomain != 0)
     //    theDomain->clearAll();
     
-    OPF_ClearExperimentalCPs();
-    OPF_ClearExperimentalSignalFilters();
-    OPF_ClearExperimentalControls();
-    OPF_ClearExperimentalSetups();
-    OPF_ClearExperimentalSites();
-    OPF_ClearExperimentalTangentStiffs();
+    OPF_clearExperimentalCPs();
+    OPF_clearExperimentalSignalFilters();
+    OPF_clearExperimentalControls();
+    OPF_clearExperimentalSetups();
+    OPF_clearExperimentalSites();
+    OPF_clearExperimentalTangentStiffs();
     
     return TCL_OK;
 }
 
 
-int openFresco_removeComp(ClientData clientData,
-    Tcl_Interp *interp, int argc, TCL_Char **argv)
+int OPF_removeObject();
+int openFresco_removeObject(ClientData clientData,
+    Tcl_Interp* interp, int argc, TCL_Char** argv)
+{
+    // reset the input args
+    OPS_ResetInputNoBuilder(clientData, interp, 1, argc, argv, theDomain);
+
+    return OPF_removeObject();
+}
+
+
+int OPF_removeObject()
 {
     // make sure there is a minimum number of arguments
-    if (argc < 2)  {
+    if (OPS_GetNumRemainingInputArgs() < 2)  {
         opserr << "WARNING insufficient number of removeExp component arguments\n";
         opserr << "Want: removeExp type <specific args>\n";
-        return TCL_ERROR;
+        return -1;
     }
-    
-    if (strcmp(argv[1], "controlPoint") == 0 || strcmp(argv[1], "controlPoints") == 0)  {
-        return TclRemoveExpCP(clientData, interp, argc, argv);
+
+    const char* type = OPS_GetString();
+    if (strcmp(type, "controlPoint") == 0) {
+        if (OPS_GetNumRemainingInputArgs() < 1) {
+            opserr << "WARNING invalid number of arguments\n";
+            opserr << "Want: removeExp controlPoint tag\n";
+            return -1;
+        }
+        int tag;
+        int numdata = 1;
+        if (OPS_GetIntInput(&numdata, &tag) < 0) {
+            opserr << "WARNING invalid removeExp controlPoint tag\n";
+            return -1;
+        }
+        if (OPF_removeExperimentalCP(tag) == false) {
+            opserr << "WARNING could not remove expControlPoint with tag " << tag << endln;
+            return -1;
+        }
     }
-    
-    else if (strcmp(argv[1], "signalFilter") == 0 || strcmp(argv[1], "signalFilters") == 0)  {
-        return TclRemoveExpSignalFilter(clientData, interp, argc, argv);
+    else if (strcmp(type, "controlPoints") == 0) {
+        OPF_clearExperimentalCPs();
     }
-    
-    else if (strcmp(argv[1], "control") == 0 || strcmp(argv[1], "controls") == 0)  {
-        return TclRemoveExpControl(clientData, interp, argc, argv);
+    else if (strcmp(type, "signalFilter") == 0) {
+        if (OPS_GetNumRemainingInputArgs() < 1) {
+            opserr << "WARNING invalid number of arguments\n";
+            opserr << "Want: removeExp signalFilter tag\n";
+            return -1;
+        }
+        int tag;
+        int numdata = 1;
+        if (OPS_GetIntInput(&numdata, &tag) < 0) {
+            opserr << "WARNING invalid removeExp signalFilter tag\n";
+            return -1;
+        }
+        if (OPF_removeExperimentalSignalFilter(tag) == false) {
+            opserr << "WARNING could not remove expSignalFilter with tag " << tag << endln;
+            return -1;
+        }
     }
-    
-    else if (strcmp(argv[1], "setup") == 0 || strcmp(argv[1], "setups") == 0)  {
-        return TclRemoveExpSetup(clientData, interp, argc, argv);
+    else if (strcmp(type, "signalFilters") == 0) {
+        OPF_clearExperimentalSignalFilters();
     }
-    
-    else if (strcmp(argv[1], "site") == 0 || strcmp(argv[1], "sites") == 0)  {
-        return TclRemoveExpSite(clientData, interp, argc, argv);
+    else if (strcmp(type, "control") == 0) {
+        if (OPS_GetNumRemainingInputArgs() < 1) {
+            opserr << "WARNING invalid number of arguments\n";
+            opserr << "Want: removeExp control tag\n";
+            return -1;
+        }
+        int tag;
+        int numdata = 1;
+        if (OPS_GetIntInput(&numdata, &tag) < 0) {
+            opserr << "WARNING invalid removeExp control tag\n";
+            return -1;
+        }
+        if (OPF_removeExperimentalControl(tag) == false) {
+            opserr << "WARNING could not remove expControl with tag " << tag << endln;
+            return -1;
+        }
     }
-    
-    else if (strcmp(argv[1], "tangentStiff") == 0 || strcmp(argv[1], "tangentStiffs") == 0)  {
-        return TclRemoveExpTangentStiff(clientData, interp, argc, argv);
+    else if (strcmp(type, "controls") == 0) {
+        OPF_clearExperimentalControls();
     }
-    
-    else if (strcmp(argv[1],"recorder") == 0 || strcmp(argv[1],"recorders") == 0)  {
-        return TclRemoveExpRecorder(clientData, interp, argc, argv);
+    else if (strcmp(type, "setup") == 0) {
+        if (OPS_GetNumRemainingInputArgs() < 1) {
+            opserr << "WARNING invalid number of arguments\n";
+            opserr << "Want: removeExp setup tag\n";
+            return -1;
+        }
+        int tag;
+        int numdata = 1;
+        if (OPS_GetIntInput(&numdata, &tag) < 0) {
+            opserr << "WARNING invalid removeExp setup tag\n";
+            return -1;
+        }
+        if (OPF_removeExperimentalSetup(tag) == false) {
+            opserr << "WARNING could not remove expSetup with tag " << tag << endln;
+            return -1;
+        }
     }
-    
+    else if (strcmp(type, "setups") == 0) {
+        OPF_clearExperimentalSetups();
+    }
+    else if (strcmp(type, "site") == 0) {
+        if (OPS_GetNumRemainingInputArgs() < 1) {
+            opserr << "WARNING invalid number of arguments\n";
+            opserr << "Want: removeExp site tag\n";
+            return -1;
+        }
+        int tag;
+        int numdata = 1;
+        if (OPS_GetIntInput(&numdata, &tag) < 0) {
+            opserr << "WARNING invalid removeExp site tag\n";
+            return -1;
+        }
+        if (OPF_removeExperimentalSite(tag) == false) {
+            opserr << "WARNING could not remove expSite with tag " << tag << endln;
+            return -1;
+        }
+    }
+    else if (strcmp(type, "sites") == 0) {
+        OPF_clearExperimentalSites();
+    }
+    else if (strcmp(type, "tangentStiff") == 0) {
+        if (OPS_GetNumRemainingInputArgs() < 1) {
+            opserr << "WARNING invalid number of arguments\n";
+            opserr << "Want: removeExp tangentStiff tag\n";
+            return -1;
+        }
+        int tag;
+        int numdata = 1;
+        if (OPS_GetIntInput(&numdata, &tag) < 0) {
+            opserr << "WARNING invalid removeExp tangentStiff tag\n";
+            return -1;
+        }
+        if (OPF_removeExperimentalTangentStiff(tag) == false) {
+            opserr << "WARNING could not remove expTangentStiff with tag " << tag << endln;
+            return -1;
+        }
+    }
+    else if (strcmp(type, "tangentStiffs") == 0) {
+        OPF_clearExperimentalTangentStiffs();
+    }
+    else if (strcmp(type, "recorder") == 0) {
+        if (OPS_GetNumRemainingInputArgs() < 1) {
+            opserr << "WARNING invalid number of arguments\n";
+            opserr << "Want: removeExp recorder tag\n";
+            return -1;
+        }
+        int tag;
+        int numdata = 1;
+        if (OPS_GetIntInput(&numdata, &tag) < 0) {
+            opserr << "WARNING invalid removeExp recorder tag\n";
+            return -1;
+        }
+        ExperimentalSite* theSite = OPF_getExperimentalSiteFirst();
+        if (theSite == 0) {
+            opserr << "WARNING failed to get first experimental site\n";
+            return -1;
+        }
+        if ((theSite->removeRecorder(tag)) < 0) {
+            opserr << "WARNING could not remove expRecorder with tag " << tag << endln;
+            return -1;
+        }
+    }
+    else if (strcmp(type, "recorders") == 0) {
+        ExperimentalSite* theSite = OPF_getExperimentalSiteFirst();
+        if (theSite == 0) {
+            opserr << "WARNING failed to get first experimental site\n";
+            return -1;
+        }
+        if ((theSite->removeRecorders()) < 0) {
+            opserr << "WARNING could not remove expRecorders\n";
+            return -1;
+        }
+    }
     else {
-        // experimental control type not recognized
+        // experimental object type not recognized
         opserr << "WARNING unknown removeExp type: "
-            << argv[1] << ": check the manual\n";
-        return TCL_ERROR;
+            << type << ": check the manual\n";
+        return -1;
     }
     
-    return TCL_OK;
-}
-
-
-int openFresco_record(ClientData clientData,
-    Tcl_Interp *interp, int argc, TCL_Char **argv)
-{
-    return TclExpRecord(clientData, interp, argc, argv);
+    return 0;
 }
 
 
@@ -294,6 +459,20 @@ int openFresco_version(ClientData clientData,
 }
 
 
+extern "C" int OPS_SetIntOutput(int* numData, int* data, bool scalar)
+{
+    int numArgs = *numData;
+    char buffer[40];
+    
+    for (int i = 0; i < numArgs; i++) {
+        sprintf(buffer, "%d ", data[i]);
+        Tcl_AppendResult(theInterp, buffer, NULL);
+    }
+    
+    return 0;
+}
+
+
 // This is a package initialization procedure, which is called
 // by Tcl when this package is to be added to an interpreter.
 extern "C" DllExport int
@@ -302,6 +481,7 @@ OpenFresco(ClientData clientData, Tcl_Interp *interp, int argc,
 {
     int code;
     
+    theInterp = interp;
     theDomain = thedomain;
     
     if (Tcl_InitStubs(interp, TCL_VERSION, 0) == NULL)  {
@@ -345,6 +525,9 @@ OpenFresco(ClientData clientData, Tcl_Interp *interp, int argc,
     Tcl_CreateCommand(interp, "expRecorder", openFresco_addExperimentalRecorder,
         (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
     
+    Tcl_CreateCommand(interp, "recordExp", openFresco_record,
+        (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
+    
     Tcl_CreateCommand(interp, "startLabServer", openFresco_startLabServer,
         (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
     
@@ -363,13 +546,10 @@ OpenFresco(ClientData clientData, Tcl_Interp *interp, int argc,
     Tcl_CreateCommand(interp, "startSimAppElemServer", openFresco_startSimAppElemServer,
         (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
     
-    Tcl_CreateCommand(interp, "wipeExp", openFresco_wipeModel,
+    Tcl_CreateCommand(interp, "wipeExp", openFresco_wipeExp,
         (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
     
-    Tcl_CreateCommand(interp, "removeExp", openFresco_removeComp,
-        (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
-    
-    Tcl_CreateCommand(interp, "recordExp", openFresco_record,
+    Tcl_CreateCommand(interp, "removeExp", openFresco_removeObject,
         (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
     
     Tcl_CreateCommand(interp, "packageVersion", openFresco_version,
