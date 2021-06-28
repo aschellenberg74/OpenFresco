@@ -14,24 +14,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\SRC\interpreter\tcl\tclAppInit.cpp">
-      <Filter>interpreter</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\SRC\interpreter\tcl\tclMain.cpp">
-      <Filter>interpreter</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\SRC\interpreter\tcl\TclModelBuilder.cpp">
-      <Filter>interpreter</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\SRC\interpreter\tcl\elementAPI.cpp">
-      <Filter>interpreter</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\SRC\openseesExtra\ModelBuilder.cpp">
-      <Filter>interpreter</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\MSVCerrno.cpp">
-      <Filter>interpreter</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\SRC\interpreter\ExpControlCommands.cpp">
       <Filter>interpreter</Filter>
     </ClCompile>
@@ -56,6 +38,27 @@
     <ClCompile Include="..\..\..\SRC\interpreter\ExpTangentStiffCommands.cpp">
       <Filter>interpreter</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\SRC\interpreter\tcl\TclInterpreter.cpp">
+      <Filter>interpreter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\interpreter\tcl\TclWrapper.cpp">
+      <Filter>interpreter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\interpreter\DL_Interpreter.cpp">
+      <Filter>interpreter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\interpreter\OpenFrescoCommands.cpp">
+      <Filter>interpreter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\interpreter\OpenSeesUniaxialMaterialCommands.cpp">
+      <Filter>interpreter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\interpreter\OpenSeesCrdTransfCommands.cpp">
+      <Filter>interpreter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\interpreter\tcl\TclMain.cpp">
+      <Filter>interpreter</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\SRC\FrescoGlobals.h">
@@ -64,11 +67,17 @@
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\SRC\interpreter\tcl\TclModelBuilder.h">
-      <Filter>interpreter</Filter>
+    <ClInclude Include="..\..\..\SRC\interpreter\DL_Interpreter.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\SRC\openseesExtra\ModelBuilder.h">
-      <Filter>interpreter</Filter>
+    <ClInclude Include="..\..\..\SRC\interpreter\OpenFrescoCommands.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\interpreter\tcl\TclInterpreter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\interpreter\tcl\TclWrapper.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

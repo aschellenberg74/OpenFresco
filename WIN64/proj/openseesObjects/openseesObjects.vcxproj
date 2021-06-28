@@ -100,18 +100,27 @@
     <ClCompile Include="..\..\..\SRC\openseesExtra\BandGenLinSOE.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\BandGenLinSolver.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\ConvergenceTest.cpp" />
+    <ClCompile Include="..\..\..\SRC\openseesExtra\CorotCrdTransf2d.cpp" />
+    <ClCompile Include="..\..\..\SRC\openseesExtra\CorotCrdTransf3d.cpp" />
+    <ClCompile Include="..\..\..\SRC\openseesExtra\CorotCrdTransfWarping3d.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\CTestNormDispIncr.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\DatabaseStream.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\DataFileStreamAdd.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\DOF_Numberer.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\EquiSolnAlgo.cpp" />
+    <ClCompile Include="..\..\..\SRC\openseesExtra\HystereticBackbone.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\LimitCurve.cpp" />
+    <ClCompile Include="..\..\..\SRC\openseesExtra\LinearCrdTransf2d.cpp" />
+    <ClCompile Include="..\..\..\SRC\openseesExtra\LinearCrdTransf3d.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\LinearSeries.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\LineSearch.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\LoadControl.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\LoadPattern.cpp" />
+    <ClCompile Include="..\..\..\SRC\openseesExtra\MaterialState.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\NewtonLineSearch.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\NewtonRaphson.cpp" />
+    <ClCompile Include="..\..\..\SRC\openseesExtra\PDeltaCrdTransf2d.cpp" />
+    <ClCompile Include="..\..\..\SRC\openseesExtra\PDeltaCrdTransf3d.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\PenaltyConstraintHandler.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\PenaltyMP_FE.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\PenaltySP_FE.cpp" />
@@ -120,11 +129,15 @@
     <ClCompile Include="..\..\..\SRC\openseesExtra\Shadow.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\Socket.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\StaticAnalysis.cpp" />
+    <ClCompile Include="..\..\..\SRC\openseesExtra\StiffnessDegradation.cpp" />
+    <ClCompile Include="..\..\..\SRC\openseesExtra\StrengthDegradation.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\TCP_Socket.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\TCP_SocketSSL.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\TCP_Stream.cpp" />
+    <ClCompile Include="..\..\..\SRC\openseesExtra\Timer.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\TimeSeries.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\UDP_Socket.cpp" />
+    <ClCompile Include="..\..\..\SRC\openseesExtra\UnloadingRule.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\XmlFileStream.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -146,6 +159,7 @@
     <ClInclude Include="..\..\..\SRC\openseesCore\Domain.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\DomainComponent.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\DomainDecompositionAnalysis.h" />
+    <ClInclude Include="..\..\..\SRC\openseesCore\DomainModalProperties.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\DummyStream.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\EigenSOE.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\EigenSolver.h" />
@@ -237,6 +251,9 @@
     <ClInclude Include="..\..\..\SRC\openseesExtra\bool.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\ChannelAddress.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\ConvergenceTest.h" />
+    <ClInclude Include="..\..\..\SRC\openseesExtra\CorotCrdTransf2d.h" />
+    <ClInclude Include="..\..\..\SRC\openseesExtra\CorotCrdTransf3d.h" />
+    <ClInclude Include="..\..\..\SRC\openseesExtra\CorotCrdTransfWarping3d.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\CTestNormDispIncr.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\DatabaseStream.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\DataFileStreamAdd.h" />
@@ -244,15 +261,21 @@
     <ClInclude Include="..\..\..\SRC\openseesExtra\EquiSolnAlgo.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\GraphNumberer.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\GroundMotion.h" />
+    <ClInclude Include="..\..\..\SRC\openseesExtra\HystereticBackbone.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\LimitCurve.h" />
+    <ClInclude Include="..\..\..\SRC\openseesExtra\LinearCrdTransf2d.h" />
+    <ClInclude Include="..\..\..\SRC\openseesExtra\LinearCrdTransf3d.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\LinearSeries.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\LineSearch.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\LoadControl.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\LoadPattern.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\MachineBroker.h" />
+    <ClInclude Include="..\..\..\SRC\openseesExtra\MaterialState.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\NewtonLineSearch.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\NewtonRaphson.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\packages.h" />
+    <ClInclude Include="..\..\..\SRC\openseesExtra\PDeltaCrdTransf2d.h" />
+    <ClInclude Include="..\..\..\SRC\openseesExtra\PDeltaCrdTransf3d.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\PenaltyConstraintHandler.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\PenaltyMP_FE.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\PenaltySP_FE.h" />
@@ -262,6 +285,8 @@
     <ClInclude Include="..\..\..\SRC\openseesExtra\Socket.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\SocketAddress.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\StaticAnalysis.h" />
+    <ClInclude Include="..\..\..\SRC\openseesExtra\StiffnessDegradation.h" />
+    <ClInclude Include="..\..\..\SRC\openseesExtra\StrengthDegradation.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\TCP_Socket.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\TCP_SocketSSL.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\TCP_Stream.h" />
@@ -269,6 +294,7 @@
     <ClInclude Include="..\..\..\SRC\openseesExtra\TimeSeries.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\TimeSeriesIntegrator.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\UDP_Socket.h" />
+    <ClInclude Include="..\..\..\SRC\openseesExtra\UnloadingRule.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\XmlFileStream.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

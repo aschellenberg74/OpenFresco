@@ -354,6 +354,45 @@
     <ClCompile Include="..\..\..\SRC\openseesExtra\XmlFileStream.cpp">
       <Filter>extra</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\Timer.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\HystereticBackbone.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\StiffnessDegradation.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\StrengthDegradation.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\UnloadingRule.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\MaterialState.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\CorotCrdTransf2d.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\CorotCrdTransf3d.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\LinearCrdTransf2d.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\LinearCrdTransf3d.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\PDeltaCrdTransf2d.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\PDeltaCrdTransf3d.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\CorotCrdTransfWarping3d.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\SRC\openseesCore\Analysis.h">
@@ -780,6 +819,45 @@
       <Filter>extra</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\SRC\openseesExtra\XmlFileStream.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\DomainModalProperties.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\HystereticBackbone.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\StiffnessDegradation.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\StrengthDegradation.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\UnloadingRule.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\MaterialState.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\CorotCrdTransf2d.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\CorotCrdTransf3d.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\LinearCrdTransf2d.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\LinearCrdTransf3d.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\PDeltaCrdTransf2d.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\PDeltaCrdTransf3d.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\CorotCrdTransfWarping3d.h">
       <Filter>extra</Filter>
     </ClInclude>
   </ItemGroup>
