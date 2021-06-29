@@ -1,4 +1,4 @@
-# File: OneBayFrame_Master.tcl (use with OneBayFrame_Slave.tcl)
+# File: OneBayFrame_Main.tcl (use with OneBayFrame_Worker.tcl)
 # Units: [kip,in.]
 #
 # Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
@@ -16,7 +16,7 @@
 # ------------------------------
 # Start of model generation
 # ------------------------------
-logFile "OneBayFrame_Master.log"
+logFile "OneBayFrame_Main.log"
 defaultUnits -force kip -length in -time sec -temp F
 
 # create ModelBuilder (with two-dimensions and 2 DOF/node)
@@ -141,13 +141,13 @@ analysis Transient
 # Start of recorder generation
 # ------------------------------
 # create the recorder objects
-recorder Node -file Master_Node_Dsp.out -time -node 3 4 -dof 1 disp
-recorder Node -file Master_Node_Vel.out -time -node 3 4 -dof 1 vel
-recorder Node -file Master_Node_Acc.out -time -node 3 4 -dof 1 accel
+recorder Node -file Main_Node_Dsp.out -time -node 3 4 -dof 1 disp
+recorder Node -file Main_Node_Vel.out -time -node 3 4 -dof 1 vel
+recorder Node -file Main_Node_Acc.out -time -node 3 4 -dof 1 accel
 
-recorder Element -file Master_Elmt_Frc.out     -time -ele 1 2 3 forces
-recorder Element -file Master_Elmt_ctrlDsp.out -time -ele 1 2   ctrlDisp
-recorder Element -file Master_Elmt_daqDsp.out  -time -ele 1 2   daqDisp
+recorder Element -file Main_Elmt_Frc.out     -time -ele 1 2 3 forces
+recorder Element -file Main_Elmt_ctrlDsp.out -time -ele 1     ctrlDisp
+recorder Element -file Main_Elmt_daqDsp.out  -time -ele 1     daqDisp
 # --------------------------------
 # End of recorder generation
 # --------------------------------
@@ -160,7 +160,7 @@ record
 # perform an eigenvalue analysis
 set lambda [eigen -fullGenLapack 2]
 puts "\nEigenvalues at start of transient:"
-puts "|   lambda   |  omega   |  period | frequency |"
+puts "|  lambda   |  omega   | period  | frequency |"
 foreach lambda $lambda {
     set omega [expr pow($lambda,0.5)]
     set period [expr 2.0*$pi/$omega]
@@ -181,6 +181,7 @@ set tTot [time {
 puts "\nElapsed Time = $tTot \n"
 # close the output file
 close $outFileID
+
 wipeExp
 wipe
 exit

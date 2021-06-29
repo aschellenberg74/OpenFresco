@@ -1,8 +1,4 @@
-** File: OneBayFrame_Slave_Imp.inp (use with OneBayFrame_Master.tcl)
-**
-** $Revision$
-** $Date$
-** $URL$
+** File: OneBayFrame_Worker_Imp.inp (use with OneBayFrame_Main.tcl)
 **
 ** Written: Andreas Schellenberg (andreas.schellenberg@gmail.com
 ** Created: 10/09

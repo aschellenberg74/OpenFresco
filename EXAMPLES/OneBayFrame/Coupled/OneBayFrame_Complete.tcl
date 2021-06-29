@@ -38,8 +38,8 @@ fix 4   0  1
 # Define materials
 # ----------------
 #uniaxialMaterial Elastic 1 2.8
-uniaxialMaterial Steel01 1 0.95 2.8 0.105
-#uniaxialMaterial Steel02 1 1.5 2.8 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0
+#uniaxialMaterial Steel01 1 0.95 2.8 0.105
+uniaxialMaterial Steel02 1 1.5 2.8 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0
 uniaxialMaterial Elastic 2 5.6
 #uniaxialMaterial Steel01 2 3.0 5.6 0.01 
 #uniaxialMaterial Steel02 2 3.0 5.6 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0 
@@ -124,7 +124,7 @@ record
 # perform an eigenvalue analysis
 set lambda [eigen -fullGenLapack 2]
 puts "\nEigenvalues at start of transient:"
-puts "|   lambda   |  omega   |  period | frequency |"
+puts "|  lambda   |  omega   | period  | frequency |"
 foreach lambda $lambda {
     set omega [expr pow($lambda,0.5)]
     set period [expr 2.0*$pi/$omega]

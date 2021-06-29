@@ -1,9 +1,5 @@
-# File: OneBayFrame_Master.tcl (use with Run_OneBayFrame_Slave_Imp.bat)
+# File: OneBayFrame_Main.tcl (use with Run_OneBayFrame_Worker_Imp.bat)
 # Units: [kip,in.]
-#
-# $Revision$
-# $Date$
-# $URL$
 #
 # Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 # Created: 08/08

@@ -1,10 +1,6 @@
 # File: OneBayFrame_Local.tcl
 # Units: [kip,in.]
 #
-# $Revision$
-# $Date$
-# $URL$
-#
 # Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 # Created: 11/06
 # Revision: A
@@ -19,6 +15,9 @@
 # ------------------------------
 # Start of model generation
 # ------------------------------
+logFile "OneBayFrame_Local.log"
+defaultUnits -force kip -length in -time sec -temp F
+
 # create ModelBuilder (with two-dimensions and 2 DOF/node)
 model BasicBuilder -ndm 2 -ndf 2
 
@@ -53,10 +52,21 @@ uniaxialMaterial Elastic 2 5.6
 #uniaxialMaterial Steel02 2 3.0 5.6 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0 
 uniaxialMaterial Elastic 3 [expr 2.0*100.0/1.0]
 
+# Define control points
+# ---------------------
+# expControlPoint $tag <-node $nodeTag> $dof $rspType <-fact $f> <-lim $l $u> <-isRel> ...
+expControlPoint 1  1 disp
+expControlPoint 2  1 disp 1 force
+
 # Define experimental control
 # ---------------------------
 # expControl SimUniaxialMaterials $tag $matTags
 expControl SimUniaxialMaterials 1 1
+#expControl xPCtarget 1 "192.168.2.20" 22222 "D:/PredictorCorrector/RTActualTestModels/cmAPI-xPCTarget-SCRAMNet-STS/HybridControllerD2D2" -trialCP 1 -outCP 2
+#expControl SCRAMNet 1 381020 8 -trialCP 1 -outCP 2
+#expControl dSpace 1 DS1104 -trialCP 1 -outCP 2
+#expControl MTSCsi 1 "D:/Projects/MTS_CSI/OpenFresco/MtsCsi_Example/OneBayFrame/OpenFresco_mNEES.mtscs" 0.01 -trialCP 1 -outCP 2
+#expControl GenericTCP 1 "127.0.0.1" 44000 -ctrlModes 1 0 0 0 0 -daqModes 1 0 0 1 0
 expControl SimUniaxialMaterials 2 2
 
 # Define experimental setup
@@ -74,7 +84,7 @@ expSite LocalSite 2 2
 # Define experimental elements
 # ----------------------------
 # left and right columns
-# expElement twoNodeLink $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-orient <$x1 $x2 $x3> $y1 $y2 $y3> <-pDelta Mratios> <-iMod> <-mass $m>
+# expElement twoNodeLink $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-tangStif tangStifTag> <-orient <$x1 $x2 $x3> $y1 $y2 $y3> <-pDelta Mratios> <-iMod> <-mass $m>
 expElement twoNodeLink 1 1 3 -dir 2 -site 1 -initStif 2.8
 expElement twoNodeLink 2 2 4 -dir 2 -site 2 -initStif 5.6
 
@@ -143,40 +153,40 @@ recorder Element -file Elmt_Frc.out     -time -ele 1 2 3 forces
 recorder Element -file Elmt_ctrlDsp.out -time -ele 1 2   ctrlDisp
 recorder Element -file Elmt_daqDsp.out  -time -ele 1 2   daqDisp
 
-# expRecorder Site -file Site_trialDsp.out -time -site 1 2 trialDisp
-# expRecorder Site -file Site_trialVel.out -time -site 1 2 trialVel
-# expRecorder Site -file Site_trialAcc.out -time -site 1 2 trialAccel
-# expRecorder Site -file Site_trialTme.out -time -site 1 2 trialTime
-# expRecorder Site -file Site_outDsp.out -time -site 1 2 outDisp
-# expRecorder Site -file Site_outVel.out -time -site 1 2 outVel
-# expRecorder Site -file Site_outAcc.out -time -site 1 2 outAccel
-# expRecorder Site -file Site_outFrc.out -time -site 1 2 outForce
-# expRecorder Site -file Site_outTme.out -time -site 1 2 outTime
+expRecorder Site -file Site_trialDsp.out -time -site 1 2 trialDisp
+expRecorder Site -file Site_trialVel.out -time -site 1 2 trialVel
+expRecorder Site -file Site_trialAcc.out -time -site 1 2 trialAccel
+expRecorder Site -file Site_trialTme.out -time -site 1 2 trialTime
+expRecorder Site -file Site_outDsp.out -time -site 1 2 outDisp
+expRecorder Site -file Site_outVel.out -time -site 1 2 outVel
+expRecorder Site -file Site_outAcc.out -time -site 1 2 outAccel
+expRecorder Site -file Site_outFrc.out -time -site 1 2 outForce
+expRecorder Site -file Site_outTme.out -time -site 1 2 outTime
 
 expRecorder Setup -file Setup_trialDsp.out -time -setup 1 2 trialDisp
-# expRecorder Setup -file Setup_trialVel.out -time -setup 1 2 trialVel
-# expRecorder Setup -file Setup_trialAcc.out -time -setup 1 2 trialAccel
-# expRecorder Setup -file Setup_trialTme.out -time -setup 1 2 trialTime
+expRecorder Setup -file Setup_trialVel.out -time -setup 1 2 trialVel
+expRecorder Setup -file Setup_trialAcc.out -time -setup 1 2 trialAccel
+expRecorder Setup -file Setup_trialTme.out -time -setup 1 2 trialTime
 expRecorder Setup -file Setup_outDsp.out -time -setup 1 2 outDisp
-# expRecorder Setup -file Setup_outVel.out -time -setup 1 2 outVel
-# expRecorder Setup -file Setup_outAcc.out -time -setup 1 2 outAccel
+expRecorder Setup -file Setup_outVel.out -time -setup 1 2 outVel
+expRecorder Setup -file Setup_outAcc.out -time -setup 1 2 outAccel
 expRecorder Setup -file Setup_outFrc.out -time -setup 1 2 outForce
-# expRecorder Setup -file Setup_outTme.out -time -setup 1 2 outTime
-# expRecorder Setup -file Setup_ctrlDsp.out -time -setup 1 2 ctrlDisp
-# expRecorder Setup -file Setup_ctrlVel.out -time -setup 1 2 ctrlVel
-# expRecorder Setup -file Setup_ctrlAcc.out -time -setup 1 2 ctrlAccel
-# expRecorder Setup -file Setup_ctrlTme.out -time -setup 1 2 ctrlTime
-# expRecorder Setup -file Setup_daqDsp.out -time -setup 1 2 daqDisp
-# expRecorder Setup -file Setup_daqVel.out -time -setup 1 2 daqVel
-# expRecorder Setup -file Setup_daqAcc.out -time -setup 1 2 daqAccel
-# expRecorder Setup -file Setup_daqFrc.out -time -setup 1 2 daqForce
-# expRecorder Setup -file Setup_daqTme.out -time -setup 1 2 daqTime
+expRecorder Setup -file Setup_outTme.out -time -setup 1 2 outTime
+expRecorder Setup -file Setup_ctrlDsp.out -time -setup 1 2 ctrlDisp
+expRecorder Setup -file Setup_ctrlVel.out -time -setup 1 2 ctrlVel
+expRecorder Setup -file Setup_ctrlAcc.out -time -setup 1 2 ctrlAccel
+expRecorder Setup -file Setup_ctrlTme.out -time -setup 1 2 ctrlTime
+expRecorder Setup -file Setup_daqDsp.out -time -setup 1 2 daqDisp
+expRecorder Setup -file Setup_daqVel.out -time -setup 1 2 daqVel
+expRecorder Setup -file Setup_daqAcc.out -time -setup 1 2 daqAccel
+expRecorder Setup -file Setup_daqFrc.out -time -setup 1 2 daqForce
+expRecorder Setup -file Setup_daqTme.out -time -setup 1 2 daqTime
 
-# expRecorder Control -file Control_ctrlDsp.out -time -control 1 2 ctrlDisp
-# expRecorder Control -file Control_ctrlVel.out -time -control 1 2 ctrlVel
-# expRecorder Control -file Control_daqDsp.out -time -control 1 2 daqDisp
-# expRecorder Control -file Control_daqVel.out -time -control 1 2 daqVel
-# expRecorder Control -file Control_daqFrc.out -time -control 1 2 daqForce
+expRecorder Control -file Control_ctrlDsp.out -time -control 1 2 ctrlDisp
+expRecorder Control -file Control_ctrlVel.out -time -control 1 2 ctrlVel
+expRecorder Control -file Control_daqDsp.out -time -control 1 2 daqDisp
+expRecorder Control -file Control_daqVel.out -time -control 1 2 daqVel
+expRecorder Control -file Control_daqFrc.out -time -control 1 2 daqForce
 # --------------------------------
 # End of recorder generation
 # --------------------------------
@@ -185,11 +195,11 @@ expRecorder Setup -file Setup_outFrc.out -time -setup 1 2 outForce
 # ------------------------------
 # Finally perform the analysis
 # ------------------------------
+record
 # perform an eigenvalue analysis
-set pi [expr acos(-1.0)]
 set lambda [eigen -fullGenLapack 2]
 puts "\nEigenvalues at start of transient:"
-puts "|   lambda   |  omega   |  period | frequency |"
+puts "|   lambda  |   omega  |  period | frequency |"
 foreach lambda $lambda {
     set omega [expr pow($lambda,0.5)]
     set period [expr 2.0*$pi/$omega]
@@ -210,7 +220,7 @@ set tTot [time {
 puts "\nElapsed Time = $tTot \n"
 # close the output file
 close $outFileID
-
+wipeExp
 wipe
 exit
 # --------------------------------

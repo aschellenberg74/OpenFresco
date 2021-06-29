@@ -2,10 +2,6 @@
 # (use with OneBayFrame_Server1a.tcl & OneBayFrame_Server1b.tcl)
 # Units: [kip,in.]
 #
-# $Revision$
-# $Date$
-# $URL$
-#
 # Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 # Created: 11/06
 # Revision: A
@@ -20,6 +16,9 @@
 # ------------------------------
 # Start of model generation
 # ------------------------------
+logFile "OneBayFrame_Client1.log"
+defaultUnits -force kip -length in -time sec -temp F
+
 # create ModelBuilder (with two-dimensions and 2 DOF/node)
 model BasicBuilder -ndm 2 -ndf 2
 
@@ -49,16 +48,11 @@ fix 4   0  1
 # ----------------
 uniaxialMaterial Elastic 3 [expr 2.0*100.0/1.0]
 
-# Define experimental setup
-# -------------------------
-# expSetup OneActuator $tag <-control $ctrlTag> $dir -sizeTrialOut $t $o <-trialDispFact $f> ...
-expSetup OneActuator 2 1 -sizeTrialOut 1 1
-
 # Define experimental site
 # ------------------------
 # expSite ShadowSite $tag <-setup $setupTag> $ipAddr $ipPort <-ssl> <-udp> <-dataSize $size>
 expSite ShadowSite 1 "127.0.0.1" 8090
-expSite ShadowSite 2 -setup 2 "127.0.0.1" 8091
+expSite ShadowSite 2 "127.0.0.1" 8091
 
 # Define experimental elements
 # ----------------------------
@@ -168,11 +162,12 @@ expRecorder Setup -file ClientSetup_daqTme.out -time -setup 2 daqTime
 # ------------------------------
 # Finally perform the analysis
 # ------------------------------
+record
 # perform an eigenvalue analysis
 set pi [expr acos(-1.0)]
 set lambda [eigen -fullGenLapack 2]
 puts "\nEigenvalues at start of transient:"
-puts "|   lambda   |  omega   |  period | frequency |"
+puts "|   lambda  |   omega  |  period | frequency |"
 foreach lambda $lambda {
     set omega [expr pow($lambda,0.5)]
     set period [expr 2.0*$pi/$omega]
@@ -193,7 +188,7 @@ set tTot [time {
 puts "\nElapsed Time = $tTot \n"
 # close the output file
 close $outFileID
-
+wipeExp
 wipe
 exit
 # --------------------------------

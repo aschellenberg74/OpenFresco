@@ -1,4 +1,4 @@
-# File: OneBayFrame_Slave.tcl (use with OneBayFrame_Master.tcl)
+# File: OneBayFrame_Worker.tcl (use with OneBayFrame_Main.tcl)
 # Units: [kip,in.]
 #
 # Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
@@ -16,7 +16,7 @@
 # ------------------------------
 # Start of model generation
 # ------------------------------
-logFile "OneBayFrame_Slave.log"
+logFile "OneBayFrame_Worker.log"
 defaultUnits -force kip -length in -time sec -temp F
 
 # create ModelBuilder (with two-dimensions and 2 DOF/node)
@@ -37,8 +37,8 @@ fix 3   0  1
 # Define materials
 # ----------------
 #uniaxialMaterial Elastic 1 2.8
-uniaxialMaterial Steel01 1 0.95 2.8 0.105
-#uniaxialMaterial Steel02 1 1.5 2.8 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0
+#uniaxialMaterial Steel01 1 0.95 2.8 0.105
+uniaxialMaterial Steel02 1 1.5 2.8 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0
 
 # Define elements
 # ---------------
@@ -66,7 +66,7 @@ set betaKinit  0.0;             # D = beatKinit*Kinit
 set betaKcomm  0.0;             # D = betaKcomm*KlastCommit
 
 # set the Rayleigh damping 
-rayleigh $alphaM $betaK $betaKinit $betaKcomm;
+#rayleigh $alphaM $betaK $betaKinit $betaKcomm;
 # ------------------------------
 # End of model generation
 # ------------------------------
@@ -104,13 +104,13 @@ analysis Static
 # Start of recorder generation
 # ------------------------------
 # create the recorder objects
-recorder Node -file Slave_Node_Dsp.out -time -node 4 -dof 1 disp
-recorder Node -file Slave_Node_Vel.out -time -node 4 -dof 1 vel
-recorder Node -file Slave_Node_Acc.out -time -node 4 -dof 1 accel
+recorder Node -file Worker_Node_Dsp.out -time -node 3 -dof 1 disp
+recorder Node -file Worker_Node_Vel.out -time -node 3 -dof 1 vel
+recorder Node -file Worker_Node_Acc.out -time -node 3 -dof 1 accel
 
-recorder Element -file Slave_Elmt_Frc.out     -time -ele 1 2 forces
-recorder Element -file Slave_Elmt_ctrlDsp.out -time -ele 1   ctrlDisp
-recorder Element -file Slave_Elmt_daqDsp.out  -time -ele 1   daqDisp
+recorder Element -file Worker_Elmt_Frc.out     -time -ele 1 10 forces
+recorder Element -file Worker_Elmt_ctrlDsp.out -time -ele   10 ctrlDisp
+recorder Element -file Worker_Elmt_daqDsp.out  -time -ele   10 daqDisp
 # --------------------------------
 # End of recorder generation
 # --------------------------------
@@ -122,6 +122,7 @@ recorder Element -file Slave_Elmt_daqDsp.out  -time -ele 1   daqDisp
 record
 analyze 16000
 #analyze 16000 0.02
+
 exit
 # --------------------------------
 # End of analysis
