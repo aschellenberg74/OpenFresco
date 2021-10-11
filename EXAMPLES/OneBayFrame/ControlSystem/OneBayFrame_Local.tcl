@@ -1,10 +1,6 @@
 # File: OneBayFrame_Local.tcl (use with Simulink control system model)
 # Units: [kip,in.]
 #
-# $Revision$
-# $Date$
-# $URL$
-#
 # Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 # Created: 11/06
 # Revision: A
@@ -12,13 +8,18 @@
 # Purpose: this file contains the tcl input to perform
 # a local hybrid simulation of a one bay frame with
 # two experimental twoNodeLink elements.
-# The specimens are simulated using the SimUniaxialMaterials
-# controller.
+# Since the simulation of the column is performed in a
+# Simulink model representing the control system, actuator
+# and hydraulic power supply, the SimSimulink experimental
+# control is used to communicate with Simulink.
 
 
 # ------------------------------
 # Start of model generation
 # ------------------------------
+logFile "OneBayFrame_Local.log"
+defaultUnits -force kip -length in -time sec -temp F
+
 # create ModelBuilder (with two-dimensions and 2 DOF/node)
 model BasicBuilder -ndm 2 -ndf 2
 
@@ -55,30 +56,29 @@ uniaxialMaterial Elastic 3 [expr 2.0*100.0/1.0]
 # ---------------------------
 # expControl SimSimulink $tag ipAddr $ipPort
 expControl SimSimulink 1 "127.0.0.1" 8090
-# expControl SimUniaxialMaterials $tag $matTags
-expControl SimUniaxialMaterials 2 2
 
 # Define experimental setup
 # -------------------------
 # expSetup OneActuator $tag <-control $ctrlTag> $dir -sizeTrialOut $t $o <-trialDispFact $f> ...
 expSetup OneActuator 1 -control 1 1 -sizeTrialOut 1 1
-expSetup OneActuator 2 -control 2 1 -sizeTrialOut 1 1
 
 # Define experimental site
 # ------------------------
 # expSite LocalSite $tag $setupTag
 expSite LocalSite 1 1
-expSite LocalSite 2 2
 
 # Define experimental elements
 # ----------------------------
-# left and right columns
+# left column
 # expElement twoNodeLink $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-orient <$x1 $x2 $x3> $y1 $y2 $y3> <-pDelta Mratios> <-iMod> <-mass $m>
 expElement twoNodeLink 1 1 3 -dir 2 -site 1 -initStif 2.8
-expElement twoNodeLink 2 2 4 -dir 2 -site 2 -initStif 5.6
 
 # Define numerical elements
 # -------------------------
+# right column
+# element twoNodeLink $eleTag $iNode $jNode -mat $matTags -dir $dirs <-orient <$x1 $x2 $x3> $y1 $y2 $y3> <-pDelta $Mratios> <-mass $m>
+element twoNodeLink 2 2 4 -mat 2 -dir 2
+
 # spring
 # element truss $eleTag $iNode $jNode $A $matTag
 element truss 3 3 4 1.0 3
@@ -88,7 +88,7 @@ element truss 3 3 4 1.0 3
 # set time series to be passed to uniform excitation
 set dt 0.02
 set scale 1.0
-timeSeries Path 1 -filePath elcentro.txt -dt $dt -factor [expr 386.1*$scale]
+timeSeries Path 1 -filePath elcentro.txt -dt $dt -factor [expr $g*$scale]
 
 # create UniformExcitation load pattern
 # pattern UniformExcitation $tag $dir -accel $tsTag <-vel0 $vel0>
@@ -117,11 +117,10 @@ numberer Plain
 # create the constraint handler
 constraints Plain
 # create the convergence test
-test EnergyIncr 1.0e-6 10
+test NormDispIncr 1.0e-12 10
 # create the integration scheme
 integrator NewmarkExplicit 0.5
 #integrator AlphaOS 1.0
-#integrator Newmark 0.5 0.25
 # create the solution algorithm
 algorithm Linear
 #algorithm Newton
@@ -151,11 +150,11 @@ recorder Element -file output/Elmt_daqDsp.out  -time -ele 1 2   daqDisp
 # ------------------------------
 # Finally perform the analysis
 # ------------------------------
+record
 # perform an eigenvalue analysis
-set pi [expr acos(-1.0)]
 set lambda [eigen -fullGenLapack 2]
 puts "\nEigenvalues at start of transient:"
-puts "|   lambda   |  omega   |  period | frequency |"
+puts "|  lambda   |  omega   | period  | frequency |"
 foreach lambda $lambda {
     set omega [expr pow($lambda,0.5)]
     set period [expr 2.0*$pi/$omega]
@@ -177,6 +176,7 @@ puts "\nElapsed Time = $tTot \n"
 # close the output file
 close $outFileID
 
+wipeExp
 wipe
 exit
 # --------------------------------

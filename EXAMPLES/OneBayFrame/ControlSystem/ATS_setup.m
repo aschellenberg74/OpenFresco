@@ -64,5 +64,5 @@ dt = 1/sample_rate;
 sys = tf(b,a);
 zsys = c2d(sys,dt);
 ztag = get(zsys);
-Znum = ztag.num{1};
-Zden = ztag.den{1};
+Znum = ztag.Numerator{1};
+Zden = ztag.Denominator{1};

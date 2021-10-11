@@ -9,10 +9,6 @@ function data = plotOutputSimulink(fileName,dofID,tStart)
 %
 % Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 % Created: 10/15
-%
-% $Revision: $
-% $Date: $
-% $URL: $
 
 %#ok<*TRYNC>
 
@@ -57,7 +53,7 @@ SS = get(0,'screensize');
 
 %==========================================================================
 % command displacements
-CreateWindow('cen',0.80*SS(4)/3*4,0.80*SS(4));
+createWindow('cen',0.80*SS(4)/3*4,0.80*SS(4));
 try
     plot(time(id:end),commSig(id:end,dofID),'b-','LineWidth',1.0);
 end
@@ -68,7 +64,7 @@ title(sprintf('Command Displacement from Simulink: DOF %02d',dofID),'FontWeight'
 %==========================================================================
 % command velocities
 if exist('commSigDot','var')
-    CreateWindow('cen',0.80*SS(4)/3*4,0.80*SS(4));
+    createWindow('cen',0.80*SS(4)/3*4,0.80*SS(4));
     try
         plot(time(id:end),commSigDot(id:end,dofID),'b-','LineWidth',1.0);
     end
@@ -80,7 +76,7 @@ end
 %==========================================================================
 % command accelerations
 if exist('commSigDotDot','var')
-    CreateWindow('cen',0.80*SS(4)/3*4,0.80*SS(4));
+    createWindow('cen',0.80*SS(4)/3*4,0.80*SS(4));
     try
         plot(time(id:end),(1/g)*commSigDotDot(id:end,dofID),'b-','LineWidth',1.0);
     end
@@ -91,14 +87,14 @@ if exist('commSigDotDot','var')
 end
 %==========================================================================
 % fft of command displacements
-CreateWindow('cen',0.80*SS(4)/3*4,0.80*SS(4));
+createWindow('cen',0.80*SS(4)/3*4,0.80*SS(4));
 try
-    getFFT(commSig(id:end,dofID),dt,sprintf('Command Displacement: DOF %02d',dofID));
+    getFFT(commSig(id:end,dofID),dt,'title',sprintf('Command Displacement: DOF %02d',dofID));
     set(gca,'YScale','log');
 end
 %==========================================================================
 % target, command and measured displacements
-CreateWindow('cen',0.80*SS(4)/3*4,0.80*SS(4));
+createWindow('cen',0.80*SS(4)/3*4,0.80*SS(4));
 try
     plot(time(id:end),targSig(id:end,dofID),'-b','LineWidth',1.0);
     hold('on');
@@ -123,7 +119,7 @@ title(sprintf('Displacements from Simulink: DOF %02d',dofID),'FontWeight','bold'
 legend('target','target @ measured','command','measured');
 %==========================================================================
 % error between measured and target displacements
-CreateWindow('cen',0.80*SS(4)/3*4,0.80*SS(4));
+createWindow('cen',0.80*SS(4)/3*4,0.80*SS(4));
 try
     targID = find(diff(flags(:,3)) > 0) + 1;
     tID = (targID >= id);
@@ -131,7 +127,7 @@ try
     targDspAT = interp1(time(targID),targSig(targID,dofID),time);
     measDspAT = interp1(time(targID),measSig(targID,dofID),time); 
     error = measDspAT - targDspAT;
-    timeShift = getTimeShift(time,targDspAT,time,measDspAT);
+    timeShift = findTimeShift(time,targDspAT,time,measDspAT);
     plot(time(id:end),targDspAT(id:end),'-b','LineWidth',1.0);
     hold('on');
     plot(time(id:end),measDspAT(id:end),'-r','LineWidth',1.0);
@@ -145,7 +141,7 @@ title(sprintf('Error between Measured and Target Displacements from Simulink: DO
 legend('target','measured',sprintf('measured (shifted by %1.0f msec)',1000*timeShift),'error');
 %==========================================================================
 % fft of error between measured and target displacements
-CreateWindow('cen',0.80*SS(4)/3*4,0.80*SS(4));
+createWindow('cen',0.80*SS(4)/3*4,0.80*SS(4));
 try
     targID = find(diff(flags(:,3)) > 0) + 1;
     tID = targID >= id; tID(1) = 0;
@@ -155,11 +151,11 @@ try
     tIP = linspace(t(1),t(end),length(t))';
     errorIP = interp1(t,error,tIP,'linear');
     dtIP = mean(diff(tIP));
-    getFFT(errorIP,dtIP,sprintf('Error between Measured and Target Displacements: DOF %02d',dofID));
+    getFFT(errorIP,dtIP,'title',sprintf('Error between Measured and Target Displacements: DOF %02d',dofID));
 end
 %==========================================================================
 % subspace plot of measured vs. target displacements
-CreateWindow('cen',0.80*SS(4)/3*4,0.80*SS(4));
+createWindow('cen',0.80*SS(4)/3*4,0.80*SS(4));
 try
     targID = find(diff(flags(:,3)) > 0) + 1;
     tID = targID >= id;
@@ -173,7 +169,7 @@ ylabel('Measured Displacement [in.]','FontWeight','bold');
 title(sprintf('Subspace Plot of Measured vs. Target Displacements from Simulink: DOF %02d',dofID),'FontWeight','bold');
 %==========================================================================
 % Mercan (2007) tracking indicator of measured vs. target displacements
-CreateWindow('cen',0.80*SS(4)/3*4,0.80*SS(4));
+createWindow('cen',0.80*SS(4)/3*4,0.80*SS(4));
 try
     targID = find(diff(flags(:,3)) > 0) + 1;
     tID = targID >= id;
@@ -191,7 +187,7 @@ ylabel('Tracking Indicator [in.^2]','FontWeight','bold');
 title(sprintf('Tracking Indicator from Simulink: DOF %02d',dofID),'FontWeight','bold');
 %==========================================================================
 % normalized RMS error between measured and target displacements
-CreateWindow('cen',0.80*SS(4)/3*4,0.80*SS(4));
+createWindow('cen',0.80*SS(4)/3*4,0.80*SS(4));
 try
     targID = find(diff(flags(:,3)) > 0) + 1;
     tID = (targID >= id);
@@ -219,14 +215,14 @@ ylabel('Normalized RMS Error [%]','FontWeight','bold');
 title(sprintf('Normalized RMS Error between Measured and Target Displacements from Simulink: DOF %02d',dofID),'FontWeight','bold');
 %==========================================================================
 % fft of error between measured and commmand displacements
-%CreateWindow('cen',0.80*SS(4)/3*4,0.80*SS(4));
+%createWindow('cen',0.80*SS(4)/3*4,0.80*SS(4));
 %try
 %   error = measSig(id:end,dofID) - commSig(id:end,dofID);
-%   getFFT(error,dt,sprintf('Error between Measured and Command Displacements: DOF %02d',dofID));
+%   getFFT(error,dt,'title',sprintf('Error between Measured and Command Displacements: DOF %02d',dofID));
 %end
 %==========================================================================
 % measured force
-CreateWindow('cen',0.80*SS(4)/3*4,0.80*SS(4));
+createWindow('cen',0.80*SS(4)/3*4,0.80*SS(4));
 try
     plot(time(id:end),measFrc(id:end,dofID),'-b','LineWidth',1.0);
 end
@@ -236,14 +232,14 @@ ylabel('Measured Force [kip]','FontWeight','bold');
 title(sprintf('Measured Force from Simulink: DOF %02d',dofID),'FontWeight','bold');
 %==========================================================================
 % fft of measured force
-CreateWindow('cen',0.80*SS(4)/3*4,0.80*SS(4));
+createWindow('cen',0.80*SS(4)/3*4,0.80*SS(4));
 try
-    getFFT(measFrc(id:end,dofID),dt,sprintf('Measured Force: DOF %02d',dofID));
+    getFFT(measFrc(id:end,dofID),dt,'title',sprintf('Measured Force: DOF %02d',dofID));
     set(gca,'YScale','log');
 end
 %==========================================================================
 % state of predictor-corrector
-CreateWindow('cen',0.80*SS(4)/3*4,0.80*SS(4));
+createWindow('cen',0.80*SS(4)/3*4,0.80*SS(4));
 try
     plot(time(id:end),state(id:end,1),'-b','LineWidth',1.0);
 end
@@ -254,7 +250,7 @@ title('State of Predictor-Corrector from Simulink','FontWeight','bold');
 %==========================================================================
 return
 % counter of predictor-corrector
-CreateWindow('cen',0.80*SS(4)/3*4,0.80*SS(4));
+createWindow('cen',0.80*SS(4)/3*4,0.80*SS(4));
 try
     plot(time(id:end),counter(id:end,1),'-b','LineWidth',1.0);
 end
@@ -264,7 +260,7 @@ ylabel('Counter [-]','FontWeight','bold');
 title('Counter of Predictor-Corrector from Simulink','FontWeight','bold');
 %==========================================================================
 % flags of predictor-corrector
-CreateWindow('cen',0.80*SS(4)/3*4,0.80*SS(4));
+createWindow('cen',0.80*SS(4)/3*4,0.80*SS(4));
 try
     plot(time(id:end),flags(id:end,1),'-b','LineWidth',1.0);
 end

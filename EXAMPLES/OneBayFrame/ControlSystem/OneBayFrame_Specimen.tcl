@@ -1,9 +1,5 @@
-# File: OneBayFrame_LeftCol.tcl (use with Simulink control system model)
+# File: OneBayFrame_Specimen.tcl (use with Simulink control system model)
 # Units: [kip,in.]
-#
-# $Revision$
-# $Date$
-# $URL$
 #
 # Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 # Created: 02/10
@@ -20,6 +16,9 @@
 # ------------------------------
 # Start of model generation
 # ------------------------------
+logFile "OneBayFrame_Specimen.log"
+defaultUnits -force kip -length in -time sec -temp F
+
 # create ModelBuilder (with two-dimensions and 2 DOF/node)
 model BasicBuilder -ndm 2 -ndf 2
 
@@ -37,9 +36,9 @@ fix 3   0  1
 
 # Define materials
 # ----------------
-# uniaxialMaterial Steel02 $matTag $Fy $E $b $R0 $cR1 $cR2 $a1 $a2 $a3 $a4
-uniaxialMaterial Steel02 1 1.5 2.8 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0
 #uniaxialMaterial Elastic 1 2.8
+#uniaxialMaterial Steel01 1 0.95 2.8 0.105
+uniaxialMaterial Steel02 1 1.5 2.8 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0
 
 # Define elements
 # ---------------
@@ -47,14 +46,14 @@ uniaxialMaterial Steel02 1 1.5 2.8 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0
 element twoNodeLink 1 1 3 -mat 1 -dir 2 -orient -1 0 0
 
 # element adapter eleTag -node Ndi Ndj ... -dof dofNdi -dof dofNdj ... -stif Kij ipPort <-mass Mij>
-element adapter 2 -node 3 -dof 1 -stif 1E12 44000
+element adapter 10 -node 3 -dof 1 -stif 1E12 44000
 
 # Define dynamic loads
 # --------------------
 # set time series to be passed to uniform excitation
 #set dt 0.02
 #set scale 1.0
-#timeSeries Path 1 -filePath elcentro.txt -dt $dt -factor [expr 386.1*$scale]
+#timeSeries Path 1 -filePath elcentro.txt -dt $dt -factor [expr $g*$scale]
 
 # create UniformExcitation load pattern
 # pattern UniformExcitation $tag $dir -accel $tsTag <-vel0 $vel0>
@@ -105,13 +104,13 @@ analysis Static
 # Start of recorder generation
 # ------------------------------
 # create the recorder objects
-recorder Node -file output/Slave_Node_Dsp.out -time -node 3 -dof 1 disp
-recorder Node -file output/Slave_Node_Vel.out -time -node 3 -dof 1 vel
-recorder Node -file output/Slave_Node_Acc.out -time -node 3 -dof 1 accel
+recorder Node -file output/Specimen_Node_Dsp.out -time -node 3 -dof 1 disp
+recorder Node -file output/Specimen_Node_Vel.out -time -node 3 -dof 1 vel
+recorder Node -file output/Specimen_Node_Acc.out -time -node 3 -dof 1 accel
 
-recorder Element -file output/Slave_Elmt_Frc.out     -time -ele 1 2 forces
-recorder Element -file output/Slave_Elmt_ctrlDsp.out -time -ele 2   ctrlDisp
-recorder Element -file output/Slave_Elmt_daqDsp.out  -time -ele 2   daqDisp
+recorder Element -file output/Specimen_Elmt_Frc.out     -time -ele 1 10 forces
+recorder Element -file output/Specimen_Elmt_ctrlDsp.out -time -ele   10 ctrlDisp
+recorder Element -file output/Specimen_Elmt_daqDsp.out  -time -ele   10 daqDisp
 
 # recorder display "Name" $xLoc $yLoc $xPixels $yPixels <-wipe> <-dT $deltaT> 
 recorder  display  "Specimen"  5  5  200  600 -wipe -dT 20
