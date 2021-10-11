@@ -19,10 +19,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $Source: $
-
 // Written: Andreas Schellenberg (andreas.schellenberg@gmx.net)
 // Created: 02/09
 // Revision: A
@@ -39,12 +35,12 @@
 #include <string.h>
 
 // functions defined in socket.c
-void setupconnectionserver(unsigned int *port, int *socketID);
-void closeconnection(int *socketID, int *ierr);
-void senddata(const int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr);
-void sendnbdata(const int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr);
-void recvdata(const int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr);
-void recvnbdata(const int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr);
+void tcp_setupconnectionserver(unsigned int *port, int *socketID);
+void tcp_closeconnection(int *socketID, int *ierr);
+void tcp_senddata(const int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr);
+void tcp_sendnbdata(const int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr);
+void tcp_recvdata(const int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr);
+void tcp_recvnbdata(const int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr);
 
 // OPFConnect parameters
 #define ipPort(S)   ssGetSFcnParam(S,0)    // ip port of server
@@ -180,7 +176,7 @@ static void mdlStart(SimStruct *S)
     
     // setup the connection with the ECSimSimulink client
     ipPort = (int_T)mxGetScalar(ipPort(S));
-    setupconnectionserver(&ipPort, socketID);
+    tcp_setupconnectionserver(&ipPort, socketID);
     if (socketID[0] < 0)  {
         ssSetErrorStatus(S,"Failed to setup connection with ECSimSimulink");
         return;
@@ -190,7 +186,7 @@ static void mdlStart(SimStruct *S)
     gMsg = (char_T *)iData;
     dataTypeSize = sizeof(int_T);
     nleft = 11;
-    recvdata(socketID, &dataTypeSize, gMsg, &nleft, &ierr);
+    tcp_recvdata(socketID, &dataTypeSize, gMsg, &nleft, &ierr);
     dataSize[0] = iData[10];
     
     // check for correct data sizes
@@ -247,7 +243,7 @@ static void mdlOutputs(SimStruct *S, int_T tid)
     gMsg = (char_T *)rData;
     dataTypeSize = sizeof(real_T);
     nleft = dataSize[0];
-    recvnbdata(socketID, &dataTypeSize, gMsg, &nleft, &ierr);
+    tcp_recvnbdata(socketID, &dataTypeSize, gMsg, &nleft, &ierr);
     
     if (ierr == 0)  {
         // process new ctrlDisp
@@ -265,7 +261,7 @@ static void mdlOutputs(SimStruct *S, int_T tid)
             sData[0] = (*switchPC)[0];
             
             gMsg = (char_T *)sData;
-            senddata(socketID, &dataTypeSize, gMsg, &nleft, &ierr);
+            tcp_senddata(socketID, &dataTypeSize, gMsg, &nleft, &ierr);
         }
         // process newTarget flag
         else if (rData[0] == 4.2)  {
@@ -276,7 +272,7 @@ static void mdlOutputs(SimStruct *S, int_T tid)
             sData[0] = (*switchPC)[0];
             
             gMsg = (char_T *)sData;
-            senddata(socketID, &dataTypeSize, gMsg, &nleft, &ierr);
+            tcp_senddata(socketID, &dataTypeSize, gMsg, &nleft, &ierr);
         }
         // send daq response back
         else if (rData[0] == 6)  {
@@ -291,7 +287,7 @@ static void mdlOutputs(SimStruct *S, int_T tid)
             sData[id] = ssGetT(S);
             
             gMsg = (char_T *)sData;
-            senddata(socketID, &dataTypeSize, gMsg, &nleft, &ierr);
+            tcp_senddata(socketID, &dataTypeSize, gMsg, &nleft, &ierr);
         }
         // stop the simulation
         else if (rData[0] == 99)  {
@@ -311,7 +307,7 @@ static void mdlTerminate(SimStruct *S)
     // get work vector
     int_T *socketID = (int_T*)ssGetDWork(S,0);
     
-    closeconnection(socketID, &ierr);
+    tcp_closeconnection(socketID, &ierr);
 }
 
 #ifdef  MATLAB_MEX_FILE    // Is this file being compiled as a MEX-file?
