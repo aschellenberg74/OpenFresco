@@ -26,7 +26,6 @@ int initData(int ndof, double dtcon, double dtsim, double dtint)
     dtCon = dtcon;   // initialize controller time step size
     dtSim = dtsim;   // initialize simulation time step size
     dtInt = dtint;   // initialize integration time step size
-    xi = 0;
     
     sig1  = calloc(nDOF, sizeof(double));
     sig2  = calloc(nDOF, sizeof(double));
@@ -64,30 +63,53 @@ int initData(int ndof, double dtcon, double dtsim, double dtint)
 //=============================================================================
 int zeroData()
 {
-    xi = 0;
+    xi = 0.0;
     
     for (i=0; i<nDOF; i++)  {
-        sig1[i] = 0;  sig2[i] = 0;  sig3[i] = 0;
-        sig4[i] = 0;  sig5[i] = 0;  sig6[i] = 0; sigXi[i] = 0;
-        sigDot1[i] = 0;  sigDot2[i] = 0;
-        sigDotDot1[i] = 0;
+        sig1[i] = sig2[i] = sig3[i] = 0.0;
+        sig4[i] = sig5[i] = sig6[i] = 0.0;
+        sigXi[i] = 0.0;
+        sigDot1[i] = sigDot2[i] = 0.0;
+        sigDotDot1[i] = 0.0;
     }
     
     return 0;
 }
 
 //=============================================================================
-int zeroSig(double *sig)
+int setData(double* sig)
 {
-    for (i=0; i<nDOF; i++)  {
-        sig[i] = 0;
+    for (i = 0; i < nDOF; i++) {
+        sig1[i] = sig2[i] = sig3[i] = sig[i];
+        sig4[i] = sig5[i] = sig6[i] = sig[i];
+        sigXi[i] = sig[i];
     }
     
     return 0;
 }
 
 //=============================================================================
-int setCurSig(double *sig, double x)
+int setDataDot(double* sigDot)
+{
+    for (i = 0; i < nDOF; i++) {
+        sigDot1[i] = sigDot2[i] = dtInt*sigDot[i];
+    }
+    
+    return 0;
+}
+
+//=============================================================================
+int setDataDotDot(double* sigDotDot)
+{
+    for (i = 0; i < nDOF; i++) {
+        sigDotDot1[i] = dtInt*sigDotDot[i];
+    }
+    
+    return 0;
+}
+
+//=============================================================================
+int setCurSig(double* sig, double x)
 {
     xi = x;
     
@@ -99,7 +121,7 @@ int setCurSig(double *sig, double x)
 }
 
 //=============================================================================
-int setNewSig(double *sig)
+int setNewSig(double* sig)
 {
     for (i=0; i<nDOF; i++)  {
         // update signals
@@ -146,7 +168,7 @@ int setNewSig(double *sig)
 }
 
 //=============================================================================
-int setNewSigDot(double *sigDot)
+int setNewSigDot(double* sigDot)
 {
     for (i=0; i<nDOF; i++)  {
         sigDot2[i] = sigDot1[i];
@@ -157,10 +179,50 @@ int setNewSigDot(double *sigDot)
 }
 
 //=============================================================================
-int setNewSigDotDot(double *sigDotDot)
+int setNewSigDotDot(double* sigDotDot)
 {
     for (i=0; i<nDOF; i++)  {
         sigDotDot1[i] = dtInt*dtInt*sigDotDot[i];
+    }
+    
+    return 0;
+}
+
+//=============================================================================
+int zeroSig(double* sig)
+{
+    for (i = 0; i < nDOF; i++) {
+        sig[i] = 0;
+    }
+    
+    return 0;
+}
+
+//=============================================================================
+int setSig(double* sig, double* x)
+{
+    for (i = 0; i < nDOF; i++) {
+        sig[i] = x[i];
+    }
+    
+    return 0;
+}
+
+//=============================================================================
+int setSigDot(double* sigDot, double* x)
+{
+    for (i = 0; i < nDOF; i++) {
+        sigDot[i] = dtInt * x[i];
+    }
+    
+    return 0;
+}
+
+//=============================================================================
+int setSigDotDot(double* sigDotDot, double* x)
+{
+    for (i = 0; i < nDOF; i++) {
+        sigDotDot[i] = dtInt * dtInt * x[i];
     }
     
     return 0;
@@ -187,7 +249,7 @@ double getNumSubSteps(double sigDot, int dofID, double sigDotMax, int Nmin)
 }
 
 //=============================================================================
-int predictP0(double *sig, double x)
+int predictP0(double* sig, double x)
 {
     for (i=0; i<nDOF; i++)  {
         sig[i] = sig1[i];
@@ -197,7 +259,7 @@ int predictP0(double *sig, double x)
 }
 
 //=============================================================================
-int predictP1(double *sig, double x)
+int predictP1(double* sig, double x)
 {
     for (i=0; i<nDOF; i++)  {
         sig[i] = sig1[i]*(1.0+x)
@@ -208,7 +270,7 @@ int predictP1(double *sig, double x)
 }
 
 //=============================================================================
-int correctP1(double *sig, double x)
+int correctP1(double* sig, double x)
 {
     for (i=0; i<nDOF; i++)  {
         sig[i] = sig1[i]*(x)
@@ -219,7 +281,7 @@ int correctP1(double *sig, double x)
 }
 
 //=============================================================================
-int predictP2(double *sig, double x)
+int predictP2(double* sig, double x)
 {
     for (i=0; i<nDOF; i++)  {
         sig[i] = sig1[i]*(1.0+x)*(2.0+x)/(2.0)
@@ -231,7 +293,7 @@ int predictP2(double *sig, double x)
 }
 
 //=============================================================================
-int correctP2(double *sig, double x)
+int correctP2(double* sig, double x)
 {
     for (i=0; i<nDOF; i++)  {
         sig[i] = sig1[i]*(x)*(1.0+x)/(2.0)
@@ -243,7 +305,7 @@ int correctP2(double *sig, double x)
 }
 
 //=============================================================================
-int predictP3(double *sig, double x)
+int predictP3(double* sig, double x)
 {
     for (i=0; i<nDOF; i++)  {
         sig[i] = sig1[i]*(1.0+x)*(2.0+x)*(3.0+x)/(6.0)
@@ -256,7 +318,7 @@ int predictP3(double *sig, double x)
 }
 
 //=============================================================================
-int correctP3(double *sig, double x)
+int correctP3(double* sig, double x)
 {
     for (i=0; i<nDOF; i++)  {
         sig[i] = sig1[i]*(x)*(1.0+x)*(2.0+x)/(6.0)
@@ -269,7 +331,7 @@ int correctP3(double *sig, double x)
 }
 
 //=============================================================================
-int predictD0(double *sig, double x)
+int predictD0(double* sig, double x)
 {
     for (i=0; i<nDOF; i++)  {
         sig[i] = sig1[i];
@@ -279,7 +341,7 @@ int predictD0(double *sig, double x)
 }
 
 //=============================================================================
-int predictD1(double *sig, double x)
+int predictD1(double* sig, double x)
 {
     for (i=0; i<nDOF; i++)  {
         sig[i] = sigXi[i]*(1.0+x)/(xi)
@@ -290,7 +352,7 @@ int predictD1(double *sig, double x)
 }
 
 //=============================================================================
-int predictV1(double *sigDot, double x)
+int predictV1(double* sigDot, double x)
 {
     for (i=0; i<nDOF; i++)  {
         sigDot[i] = (sigXi[i] - sig2[i])/(xi);
@@ -301,7 +363,7 @@ int predictV1(double *sigDot, double x)
 }
 
 //=============================================================================
-int predictA1(double *sigDotDot, double x)
+int predictA1(double* sigDotDot, double x)
 {
     for (i=0; i<nDOF; i++)  {
         sigDotDot[i] = 0.0;
@@ -311,7 +373,7 @@ int predictA1(double *sigDotDot, double x)
 }
 
 //=============================================================================
-int correctD1(double *sig, double x)
+int correctD1(double* sig, double x)
 {
     for (i=0; i<nDOF; i++)  {
         sig[i] = sig1[i]*(x-xi)/(1.0-xi)
@@ -322,7 +384,7 @@ int correctD1(double *sig, double x)
 }
 
 //=============================================================================
-int correctV1(double *sigDot, double x)
+int correctV1(double* sigDot, double x)
 {
     for (i=0; i<nDOF; i++)  {
         sigDot[i] = (sig1[i] - sigXi[i])/(1.0-xi);
@@ -333,7 +395,7 @@ int correctV1(double *sigDot, double x)
 }
 
 //=============================================================================
-int correctA1(double *sigDotDot, double x)
+int correctA1(double* sigDotDot, double x)
 {
     for (i=0; i<nDOF; i++)  {
         sigDotDot[i] = 0.0;
@@ -343,7 +405,7 @@ int correctA1(double *sigDotDot, double x)
 }
 
 //=============================================================================
-int predictD2(double *sig, double x)
+int predictD2(double* sig, double x)
 {
     for (i=0; i<nDOF; i++)  {
         sig[i] = sigXi[i]*(1.0+x)*(2.0+x)/(xi)/(1.0+xi)
@@ -355,7 +417,7 @@ int predictD2(double *sig, double x)
 }
 
 //=============================================================================
-int predictV2(double *sigDot, double x)
+int predictV2(double* sigDot, double x)
 {
     for (i=0; i<nDOF; i++)  {
         sigDot[i] = sigXi[i]*(3.0+2.0*x)/(xi)/(1.0+xi)
@@ -368,7 +430,7 @@ int predictV2(double *sigDot, double x)
 }
 
 //=============================================================================
-int predictA2(double *sigDotDot, double x)
+int predictA2(double* sigDotDot, double x)
 {
     for (i=0; i<nDOF; i++)  {
         sigDotDot[i] = sigXi[i]*(2.0)/(xi)/(1.0+xi)
@@ -381,7 +443,7 @@ int predictA2(double *sigDotDot, double x)
 }
 
 //=============================================================================
-int correctD2(double *sig, double x)
+int correctD2(double* sig, double x)
 {
     for (i=0; i<nDOF; i++)  {
         sig[i] = sig1[i]*(x-xi)*(1.0+x)/(2.0)/(1.0-xi)
@@ -393,7 +455,7 @@ int correctD2(double *sig, double x)
 }
 
 //=============================================================================
-int correctV2(double *sigDot, double x)
+int correctV2(double* sigDot, double x)
 {
     for (i=0; i<nDOF; i++)  {
         sigDot[i] = sig1[i]*(1.0+2.0*x-xi)/(2.0)/(1.0-xi)
@@ -406,7 +468,7 @@ int correctV2(double *sigDot, double x)
 }
 
 //=============================================================================
-int correctA2(double *sigDotDot, double x)
+int correctA2(double* sigDotDot, double x)
 {
     for (i=0; i<nDOF; i++)  {
         sigDotDot[i] = sig1[i]/(1.0-xi)
@@ -419,7 +481,7 @@ int correctA2(double *sigDotDot, double x)
 }
 
 //=============================================================================
-int predictD3(double *sig, double x)
+int predictD3(double* sig, double x)
 {
     for (i=0; i<nDOF; i++)  {
         sig[i] = sigXi[i]*(1.0+x)*(2.0+x)*(3.0+x)/(xi)/(1.0+xi)/(2.0+xi)
@@ -432,7 +494,7 @@ int predictD3(double *sig, double x)
 }
 
 //=============================================================================
-int predictV3(double *sigDot, double x)
+int predictV3(double* sigDot, double x)
 {
     for (i=0; i<nDOF; i++)  {
         sigDot[i] = sigXi[i]*(11.0+12.0*x+3.0*x*x)/(xi)/(1.0+xi)/(2.0+xi)
@@ -446,7 +508,7 @@ int predictV3(double *sigDot, double x)
 }
 
 //=============================================================================
-int predictA3(double *sigDotDot, double x)
+int predictA3(double* sigDotDot, double x)
 {
     for (i=0; i<nDOF; i++)  {
         sigDotDot[i] = sigXi[i]*(6.0)*(2.0+x)/(xi)/(1.0+xi)/(2.0+xi)
@@ -460,7 +522,7 @@ int predictA3(double *sigDotDot, double x)
 }
 
 //=============================================================================
-int correctD3(double *sig, double x)
+int correctD3(double* sig, double x)
 {
     for (i=0; i<nDOF; i++)  {
         sig[i] = sig1[i]*(x-xi)*(1.0+x)*(2.0+x)/(6.0)/(1-xi)
@@ -473,7 +535,7 @@ int correctD3(double *sig, double x)
 }
 
 //=============================================================================
-int correctV3(double *sigDot, double x)
+int correctV3(double* sigDot, double x)
 {
     for (i=0; i<nDOF; i++)  {
         sigDot[i] = sig1[i]*(2.0+6.0*x+3.0*x*x-3.0*xi-2.0*x*xi)/(6.0)/(1-xi)
@@ -488,7 +550,7 @@ int correctV3(double *sigDot, double x)
 
 
 //=============================================================================
-int correctA3(double *sigDotDot, double x)
+int correctA3(double* sigDotDot, double x)
 {
     for (i=0; i<nDOF; i++)  {
         sigDotDot[i] = sig1[i]*(3.0+3.0*x-xi)/(3.0)/(1-xi)
@@ -502,7 +564,7 @@ int correctA3(double *sigDotDot, double x)
 }
 
 //=============================================================================
-int predictDV(double *sig, double x)
+int predictDV(double* sig, double x)
 {
     for (i=0; i<nDOF; i++)  {
         sig[i] = sig1[i]*(1.0+x)*(1.0+x)*(1.0-2.0*x)
@@ -515,7 +577,7 @@ int predictDV(double *sig, double x)
 }
 
 //=============================================================================
-int correctDV(double *sig, double x)
+int correctDV(double* sig, double x)
 {
     for (i=0; i<nDOF; i++)  {
         sig[i] = sig1[i]*(x-xi)*(2.0-x-xi)/(1.0-xi)/(1.0-xi)
@@ -527,7 +589,7 @@ int correctDV(double *sig, double x)
 }
 
 //=============================================================================
-int predictDVA(double *sig, double x)
+int predictDVA(double* sig, double x)
 {
     for (i=0; i<nDOF; i++)  {
         sig[i] = sig1[i]
@@ -539,7 +601,7 @@ int predictDVA(double *sig, double x)
 }
 
 //=============================================================================
-int correctDVA(double *sig, double x)
+int correctDVA(double* sig, double x)
 {
     for (i=0; i<nDOF; i++)  {
         sig[i] = sig1[i]*(x-xi)*(3.0-3.0*x+x*x-3.0*xi+x*xi+xi*xi)/(1.0-xi)/(1.0-xi)/(1.0-xi)
