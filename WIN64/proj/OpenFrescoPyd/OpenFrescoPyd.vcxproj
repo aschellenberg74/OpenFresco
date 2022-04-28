@@ -77,7 +77,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/FORCE:MULTIPLE  %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>blas.lib;experimentalControl.lib;experimentalElement.lib;experimentalRecorder.lib;experimentalSetup.lib;experimentalSignalFilter.lib;experimentalSite.lib;experimentalTangentStiff.lib;ifconsol.lib;lapack.lib;libcrypto64MT.lib;libifcoremt.lib;libmmt.lib;libssl64MT.lib;openseesObjects.lib;pnpscr.lib;python38.lib;scgtapi.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>blas.lib;experimentalControl.lib;experimentalElement.lib;experimentalRecorder.lib;experimentalSetup.lib;experimentalSignalFilter.lib;experimentalSite.lib;experimentalTangentStiff.lib;ifconsol.lib;lapack.lib;libcrypto64MT.lib;libifcoremt.lib;libmmt.lib;libssl64MT.lib;openseesObjects.lib;pnpscr.lib;python39.lib;scgtapi.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\..\bin\openfresco.pyd</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>..\..\..\src\experimentalControl\SCRAMNet\lib64;..\..\..\src\experimentalControl\SCRAMNetGT\lib64;..\..\..\win64\lib;..\..\..\win64\lib\release;C:\Program Files\OpenSSL\lib\VC;C:\ProgramData\Anaconda3\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -119,7 +119,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/FORCE:MULTIPLE %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>blas.lib;experimentalControl.lib;experimentalElement.lib;experimentalRecorder.lib;experimentalSetup.lib;experimentalSignalFilter.lib;experimentalSite.lib;experimentalTangentStiff.lib;ifconsol.lib;lapack.lib;libcrypto64MTd.lib;libifcoremt.lib;libmmt.lib;libssl64MTd.lib;openseesObjects.lib;pnpscrd.lib;python38_d.lib;scgtapi.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>blas.lib;experimentalControl.lib;experimentalElement.lib;experimentalRecorder.lib;experimentalSetup.lib;experimentalSignalFilter.lib;experimentalSite.lib;experimentalTangentStiff.lib;ifconsol.lib;lapack.lib;libcrypto64MTd.lib;libifcoremt.lib;libmmt.lib;libssl64MTd.lib;openseesObjects.lib;pnpscrd.lib;python39_d.lib;scgtapi.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\..\bin\openfresco.pyd</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>..\..\..\src\experimentalControl\SCRAMNet\lib64;..\..\..\src\experimentalControl\SCRAMNetGT\lib64;..\..\..\win64\lib;..\..\..\win64\lib\debug;C:\Program Files\OpenSSL\lib\VC;C:\ProgramData\Anaconda3\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
