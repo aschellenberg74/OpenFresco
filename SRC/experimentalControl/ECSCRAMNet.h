@@ -32,13 +32,16 @@
 
 #include "ExperimentalControl.h"
 
+class ExperimentalCP;
+
 class ECSCRAMNet : public ExperimentalControl
 {
 public:
     // constructors
-    ECSCRAMNet(int tag, int memOffset, int numDOF,
-        unsigned short nodeID = 3,
-        int useRelativeTrial = 0);
+    ECSCRAMNet(int tag,
+        int nTrialCPs, ExperimentalCP** trialCPs,
+        int nOutCPs, ExperimentalCP** outCPs,
+        int memOffset, unsigned short nodeID = 10);
     ECSCRAMNet(const ECSCRAMNet &ec);
     
     // destructor
@@ -82,18 +85,23 @@ protected:
     virtual int acquire();
 
 private:
-    const int memOffset;    // memory offset in bytes from SCRAMNet base address
-    const int numDOF;       // number of degrees-of-freedom in control system
-    unsigned short nodeID;  // OpenFresco SCRAMNet node ID
+    int numTrialCPs;            // number of trial control points
+    ExperimentalCP** trialCPs;  // trial control points
+    int numOutCPs;              // number of output control points
+    ExperimentalCP** outCPs;    // output control points
+    const int memOffset;        // memory offset in bytes from SCRAMNet base address
+    unsigned short nodeID;      // OpenFresco SCRAMNet node ID
     
-    const int *memPtrBASE;  // pointer to SCRAMNet base memory address
-    float *memPtrOPF;       // pointer to OpenFresco base memory address
-    
-    int *newTarget, *switchPC, *atTarget;                          // communication flags
-    float *ctrlDisp, *ctrlVel, *ctrlAccel, *ctrlForce, *ctrlTime;  // control signal arrays
-    float *daqDisp, *daqVel, *daqAccel, *daqForce, *daqTime;       // daq signal arrays
-    Vector trialDispOffset, trialForceOffset;                      // trial signal offsets
-    int useRelativeTrial, gotRelativeTrial;                        // relative trial signal flags
+    const int *memPtrBASE;          // pointer to SCRAMNet base memory address
+    float *memPtrOPF;               // pointer to OpenFresco base memory address
+    float *scrCtrlSig, *scrDaqSig;  // pointers to SCRAMNet GT signal arrays
+
+    int *newTarget, *switchPC, *atTarget;  // communication flags
+    int numCtrlSignals, numDaqSignals;     // number of signals
+    Vector ctrlSignal, daqSignal;          // signal arrays
+    Vector trialSigOffset;                 // trial signal offsets
+    Vector ctrlSigOffset, daqSigOffset;    // ctrl and daq signal offsets (i.e. setpoints)
+    int gotRelativeTrial;                  // relative trial signal flags
     
     int flag;  // flag to check states of Simulink model
 };

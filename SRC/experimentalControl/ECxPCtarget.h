@@ -41,8 +41,8 @@ public:
     ECxPCtarget(int tag,
         int nTrialCPs, ExperimentalCP **trialCPs,
         int nOutCPs, ExperimentalCP **outCPs,
-        char *ipAddress, char *ipPort, char *appFile,
-        int timeout = 10, int useRelativeTrial = 0);
+        char *ipAddress, char *ipPort,
+        char *appFile, int timeout = 10);
     ECxPCtarget(const ECxPCtarget &ec);
     
     // destructor
@@ -94,21 +94,21 @@ private:
     char *ipPort;               // ip-port of xPC-target machine
     int timeout;                // host-target communication timeout
     
-    char appName[256];          // name of application to be loaded
-    char appPath[256];          // path to application to be loaded
-    char errMsg[256];           // character array for error messages
-    int port;                   // value returned by xPCOpenTcpIpPort
+    char appName[256];  // name of application to be loaded
+    char appPath[256];  // path to application to be loaded
+    char errMsg[256];   // character array for error messages
+    int port;           // value returned by xPCOpenTcpIpPort
     
-    double newTarget, switchPC, atTarget;    // communication flags
-    int numCtrlSignals, numDaqSignals;       // number of signals
-    double *ctrlSignal, *daqSignal;          // signal arrays
-    Vector ctrlSigOffset, daqSigOffset;      // signal offsets (i.e. setpoints)
-    Vector trialSigOffset;                   // trial signal offsets
-    int useRelativeTrial, gotRelativeTrial;  // relative trial signal flags
+    double newTarget, switchPC, atTarget;  // communication flags
+    int numCtrlSignals, numDaqSignals;     // number of signals
+    double *ctrlSignal, *daqSignal;        // signal arrays
+    Vector trialSigOffset;                 // trial signal offsets
+    Vector ctrlSigOffset, daqSigOffset;    // ctrl and daq signal offsets (i.e. setpoints)
+    int gotRelativeTrial;                  // relative trial signal flags
     
-    int newTargetId, switchPCId, atTargetId;
-    int ctrlSignalId;
-    int *daqSignalId;
+    int newTargetId, switchPCId, atTargetId;  // communication flag IDs
+    int ctrlSignalId;                         // control signal IDs
+    int *daqSignalId;                         // daq signal IDs
 };
 
 #endif

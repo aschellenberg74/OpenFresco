@@ -43,16 +43,16 @@ class ECLabVIEW : public ExperimentalControl
 public:
     // constructors
     ECLabVIEW(int tag,
-        int nTrialCPs, ExperimentalCP **trialCPs,
-        int nOutCPs, ExperimentalCP **outCPs,
-        char *ipAddress, int ipPort = 44000);
-    ECLabVIEW(const ECLabVIEW &ec);
+        int nTrialCPs, ExperimentalCP** trialCPs,
+        int nOutCPs, ExperimentalCP** outCPs,
+        char* ipAddress, int ipPort = 44000);
+    ECLabVIEW(const ECLabVIEW& ec);
     
     // destructor
     virtual ~ECLabVIEW();
     
     // method to get class type
-    const char *getClassType() const {return "ECLabVIEW";};
+    const char* getClassType() const { return "ECLabVIEW"; };
     
     // public methods to set and to get response
     virtual int setup();
@@ -73,15 +73,15 @@ public:
     
     virtual int commitState();
     
-    virtual ExperimentalControl *getCopy();
+    virtual ExperimentalControl* getCopy();
     
     // public methods for experimental control recorder
-    virtual Response *setResponse(const char **argv, int argc,
-        OPS_Stream &output);
-    virtual int getResponse(int responseID, Information &info);
+    virtual Response* setResponse(const char** argv, int argc,
+        OPS_Stream& output);
+    virtual int getResponse(int responseID, Information& info);
     
     // public methods for output
-    void Print(OPS_Stream &s, int flag = 0);
+    void Print(OPS_Stream& s, int flag = 0);
 
 protected:
     // protected methods to set and to get response
@@ -90,27 +90,31 @@ protected:
 
 private:
     int numTrialCPs;            // number of trial control points
-    ExperimentalCP **trialCPs;  // trial control points
+    ExperimentalCP** trialCPs;  // trial control points
     int numOutCPs;              // number of output control points
-    ExperimentalCP **outCPs;    // output control points
-    char *ipAddress;            // ip address
+    ExperimentalCP** outCPs;    // output control points
+    char* ipAddress;            // ip address
     int ipPort;                 // ip port
     
-    TCP_Socket *theSocket;      // tcp/ip socket
-    char *sData;                // send data array
-    Message *sendData;          // send vector
-    char *rData;                // receive data array
-    Message *recvData;          // receive vector
+    TCP_Socket* theSocket;  // tcp/ip socket
+    char* sData;            // send data array
+    Message* sendData;      // send vector
+    char* rData;            // receive data array
+    Message* recvData;      // receive vector
     
-    Vector *ctrlDisp, *ctrlForce;
-    Vector *daqDisp, *daqForce;
+    int numCtrlSignals, numDaqSignals;   // number of signals
+    Vector* ctrlDisp, * ctrlForce;       // control vectors
+    Vector* daqDisp, * daqForce;         // daq vectors
+    Vector trialSigOffset;               // trial signal offsets
+    Vector ctrlSigOffset, daqSigOffset;  // ctrl and daq signal offsets (i.e. setpoints)
+    int gotRelativeTrial;                // relative trial signal flags
     
     time_t rawtime;
-    struct tm *ptm;
+    struct tm* ptm;
     char OPFTransactionID[30];
     char errMsg[80];
     
-    FILE *logFile;
+    FILE* logFile;
 };
 
 #endif

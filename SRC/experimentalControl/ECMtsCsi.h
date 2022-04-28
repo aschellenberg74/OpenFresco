@@ -41,8 +41,7 @@ public:
     ECMtsCsi(int tag,
         int nTrialCPs, ExperimentalCP **trialCPs,
         int nOutCPs, ExperimentalCP **outCPs,
-        char *cfgFile, double rampTime = 0.1,
-        int useRelativeTrial = 0);
+        char *cfgFile, double rampTime = 0.1);
     ECMtsCsi(const ECMtsCsi& ec);
     
     // destructor
@@ -95,11 +94,11 @@ private:
     char *cfgFile;              // CSI controller configuration file
     double rampTime;            // time to ramp signals to new targets
     
-    int numCtrlSignals, numDaqSignals;       // number of signals
-    double *ctrlSignal, *daqSignal;          // signal arrays
-    Vector ctrlSigOffset, daqSigOffset;      // signal offsets (i.e. setpoints)
-    Vector trialSigOffset;                   // trial signal offsets
-    int useRelativeTrial, gotRelativeTrial;  // relative trial signal flags
+    int numCtrlSignals, numDaqSignals;   // number of signals
+    double *ctrlSignal, *daqSignal;      // signal arrays
+    Vector trialSigOffset;               // trial signal offsets
+    Vector ctrlSigOffset, daqSigOffset;  // ctrl and daq signal offsets (i.e. setpoints)
+    int gotRelativeTrial;                // relative trial signal flags
     
     int rampId;  // set this to -1 to get current feedback
 };

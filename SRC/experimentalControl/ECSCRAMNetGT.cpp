@@ -26,6 +26,7 @@
 // Description: This file contains the implementation of the ECSCRAMNetGT class.
 
 #include "ECSCRAMNetGT.h"
+#include <ExperimentalCP.h>
 
 #include <elementAPI.h>
 
@@ -35,9 +36,9 @@ void* OPF_ECSCRAMNetGT()
     // pointer to experimental control that will be returned
     ExperimentalControl* theControl = 0;
     
-    if (OPS_GetNumRemainingInputArgs() < 3) {
+    if (OPS_GetNumRemainingInputArgs() < 8) {
         opserr << "WARNING invalid number of arguments\n";
-        opserr << "Want: expControl SCRAMNetGT tag memOffset numDOF <-nodeID id> <-useRelTrial>"
+        opserr << "Want: expControl SCRAMNetGT tag -nodeID id memOffset -trialCP cpTags -outCP cpTags "
             << "<-ctrlFilters (5 filterTag)> <-daqFilters (5 filterTag)>\n";
         return 0;
     }
@@ -50,6 +51,21 @@ void* OPF_ECSCRAMNetGT()
         return 0;
     }
     
+    // OpenFresco SCRAMNet GT node ID
+    int nodeID;
+    const char* type = OPS_GetString();
+    if (strcmp(type, "-nodeID") != 0) {
+        opserr << "WARNING expecting -nodeID id\n";
+        opserr << "expControl SCRAMNetGT " << tag << endln;
+        return 0;
+    }
+    numdata = 1;
+    if (OPS_GetIntInput(&numdata, &nodeID) != 0) {
+        opserr << "WARNING invalid nodeID\n";
+        opserr << "expControl SCRAMNetGT " << tag << endln;
+        return 0;
+    }
+    
     // memory offset in bytes
     int memOffset;
     numdata = 1;
@@ -59,64 +75,161 @@ void* OPF_ECSCRAMNetGT()
         return 0;
     }
     
-    // number of dof
-    int numDOF;
-    numdata = 1;
-    if (OPS_GetIntInput(&numdata, &numDOF) != 0) {
-        opserr << "WARNING invalid numDOF\n";
+    // trialCPs
+    type = OPS_GetString();
+    if (strcmp(type, "-trialCP") != 0) {
+        opserr << "WARNING expecting -trialCP cpTags\n";
         opserr << "expControl SCRAMNetGT " << tag << endln;
         return 0;
     }
-    
-    // optional parameters
-    int nodeID = 3;
-    int useRelativeTrial = 0;
-    const char* type;
+    ID cpTags(32);
+    int numTrialCPs = 0;
     while (OPS_GetNumRemainingInputArgs() > 0) {
-        type = OPS_GetString();
-        if (strcmp(type, "-nodeID") == 0) {
-            numdata = 1;
-            if (OPS_GetIntInput(&numdata, &nodeID) != 0) {
-                opserr << "WARNING invalid nodeID\n";
-                opserr << "expControl SCRAMNetGT " << tag << endln;
-                return 0;
+        int cpTag;
+        numdata = 1;
+        int numArgs = OPS_GetNumRemainingInputArgs();
+        if (OPS_GetIntInput(&numdata, &cpTag) < 0) {
+            if (numArgs > OPS_GetNumRemainingInputArgs()) {
+                // move current arg back by one
+                OPS_ResetCurrentInputArg(-1);
             }
+            break;
         }
-        else if (strcmp(type, "-relTrial") == 0 ||
-            strcmp(type, "-relativeTrial") == 0 ||
-            strcmp(type, "-useRelTrial") == 0 ||
-            strcmp(type, "-useRelativeTrial") == 0) {
-            useRelativeTrial = 1;
+        cpTags(numTrialCPs++) = cpTag;
+    }
+    if (numTrialCPs == 0) {
+        opserr << "WARNING no trialCPTags specified\n";
+        opserr << "expControl SCRAMNetGT " << tag << endln;
+        return 0;
+    }
+    cpTags.resize(numTrialCPs);
+    // create the array to hold the trial control points
+    ExperimentalCP** trialCPs = new ExperimentalCP * [numTrialCPs];
+    if (trialCPs == 0) {
+        opserr << "WARNING out of memory\n";
+        opserr << "expControl SCRAMNetGT " << tag << endln;
+        return 0;
+    }
+    // populate array with trial control points
+    for (int i = 0; i < numTrialCPs; i++) {
+        trialCPs[i] = 0;
+        trialCPs[i] = OPF_getExperimentalCP(cpTags(i));
+        if (trialCPs[i] == 0) {
+            opserr << "WARNING experimental control point not found\n";
+            opserr << "expControlPoint " << cpTags(i) << endln;
+            opserr << "expControl SCRAMNetGT " << tag << endln;
+            return 0;
+        }
+    }
+    
+    // outCPs
+    type = OPS_GetString();
+    if (strcmp(type, "-outCP") != 0) {
+        opserr << "WARNING expecting -outCP cpTags\n";
+        opserr << "expControl SCRAMNetGT " << tag << endln;
+        return 0;
+    }
+    cpTags.resize(32); cpTags.Zero();
+    int numOutCPs = 0;
+    while (OPS_GetNumRemainingInputArgs() > 0) {
+        int cpTag;
+        numdata = 1;
+        int numArgs = OPS_GetNumRemainingInputArgs();
+        if (OPS_GetIntInput(&numdata, &cpTag) < 0) {
+            if (numArgs > OPS_GetNumRemainingInputArgs()) {
+                // move current arg back by one
+                OPS_ResetCurrentInputArg(-1);
+            }
+            break;
+        }
+        cpTags(numOutCPs++) = cpTag;
+    }
+    if (numOutCPs == 0) {
+        opserr << "WARNING no outCPTags specified\n";
+        opserr << "expControl SCRAMNetGT " << tag << endln;
+        return 0;
+    }
+    cpTags.resize(numOutCPs);
+    // create the array to hold the output control points
+    ExperimentalCP** outCPs = new ExperimentalCP * [numOutCPs];
+    if (outCPs == 0) {
+        opserr << "WARNING out of memory\n";
+        opserr << "expControl SCRAMNetGT " << tag << endln;
+        return 0;
+    }
+    // populate array with output control points
+    for (int i = 0; i < numOutCPs; i++) {
+        outCPs[i] = 0;
+        outCPs[i] = OPF_getExperimentalCP(cpTags(i));
+        if (outCPs[i] == 0) {
+            opserr << "WARNING experimental control point not found\n";
+            opserr << "expControlPoint " << cpTags(i) << endln;
+            opserr << "expControl SCRAMNetGT " << tag << endln;
+            return 0;
         }
     }
     
     // parsing was successful, allocate the control
-    theControl = new ECSCRAMNetGT(tag, memOffset, numDOF, nodeID, useRelativeTrial);
+    theControl = new ECSCRAMNetGT(tag, numTrialCPs, trialCPs,
+        numOutCPs, outCPs, memOffset, nodeID);
     if (theControl == 0) {
         opserr << "WARNING could not create experimental control of type ECSCRAMNetGT\n";
         return 0;
     }
     
+    // cleanup dynamic memory
+    //if (trialCPs != 0)
+    //    delete[] trialCPs;
+    //if (outCPs != 0)
+    //    delete[] outCPs;
+    
     return theControl;
 }
 
 
-ECSCRAMNetGT::ECSCRAMNetGT(int tag, int memoffset, int numdof,
-    unsigned int nodeid, int reltrial)
+ECSCRAMNetGT::ECSCRAMNetGT(int tag, int nTrialCPs, ExperimentalCP** trialcps,
+    int nOutCPs, ExperimentalCP** outcps, int memoffset, unsigned int nodeid)
     : ExperimentalControl(tag),
-    memOffset(memoffset), numDOF(numdof), nodeID(nodeid),
-    memPtrBASE(0), memPtrOPF(0),
+    numTrialCPs(nTrialCPs), trialCPs(0), numOutCPs(nOutCPs), outCPs(0),
+    memOffset(memoffset), nodeID(nodeid),
+    memPtrBASE(0), memPtrOPF(0), scrCtrlSig(0), scrDaqSig(0),
     newTarget(0), switchPC(0), atTarget(0),
-    ctrlDisp(0), ctrlVel(0), ctrlAccel(0), ctrlForce(0), ctrlTime(0),
-    daqDisp(0), daqVel(0), daqAccel(0), daqForce(0), daqTime(0),
-    trialDispOffset(numdof), trialForceOffset(numdof),
-    useRelativeTrial(reltrial), gotRelativeTrial(!reltrial),
-    flag(0)
+    numCtrlSignals(0), numDaqSignals(0), ctrlSignal(0), daqSignal(0),
+    trialSigOffset(0), ctrlSigOffset(0), daqSigOffset(0),
+    gotRelativeTrial(1), flag(0)
 {
+    // get trial and output control points
+    if (trialcps == 0 || outcps == 0) {
+        opserr << "ECSCRAMNetGT::ECSCRAMNetGT() - "
+            << "null trialCPs or outCPs array passed.\n";
+        exit(OF_ReturnType_failed);
+    }
+    trialCPs = trialcps;
+    outCPs = outcps;
+    
+    // get total number of control and daq signals and
+    // check if any signals use relative trial reference
+    // (do this here instead of in setup() method so we
+    // can check that we have enough memory on SCRAMNet
+    // and then map the memory required for OpenFresco)
+    for (int i = 0; i < numTrialCPs; i++) {
+        int numSignals = trialCPs[i]->getNumSignal();
+        numCtrlSignals += numSignals;
+
+        int j = 0;
+        ID isRel = trialCPs[i]->getTrialSigRefType();
+        while (gotRelativeTrial && j < numSignals)
+            gotRelativeTrial = !isRel(j++);
+    }
+    for (int i = 0; i < numOutCPs; i++) {
+        int numSignals = outCPs[i]->getNumSignal();
+        numDaqSignals += numSignals;
+    }
+    
     // initialize a handle to a specific SCRAMNet GT device/unit
     int unit = 0;
     int rValue = scgtOpen(unit, &gtHandle);
-    if (rValue != SCGT_SUCCESS)  {
+    if (rValue != SCGT_SUCCESS) {
         opserr << "ECSCRAMNetGT::ECSCRAMNetGT() - scgtOpen():"
             << " could not open driver to device/unit #"
             << unit << ".\n";
@@ -124,8 +237,8 @@ ECSCRAMNetGT::ECSCRAMNetGT(int tag, int memoffset, int numdof,
     }
     
     // get the pointer to the base memory address
-    memPtrBASE = (int*) scgtMapMem(&gtHandle);
-    if (memPtrBASE == NULL)  {
+    memPtrBASE = (int*)scgtMapMem(&gtHandle);
+    if (memPtrBASE == NULL) {
         opserr << "ECSCRAMNetGT::ECSCRAMNetGT() - scgtMapMem():"
             << " could not map memory into address space.\n";
         exit(OF_ReturnType_failed);
@@ -133,21 +246,22 @@ ECSCRAMNetGT::ECSCRAMNetGT(int tag, int memoffset, int numdof,
     
     // get device information to check amount of mapped memory
     rValue = scgtGetDeviceInfo(&gtHandle, &deviceInfo);
-    if (rValue != SCGT_SUCCESS)  {
+    if (rValue != SCGT_SUCCESS) {
         opserr << "ECSCRAMNetGT::ECSCRAMNetGT() - scgtGetDeviceInfo():"
             << " could not retrive device information.\n";
         exit(rValue);
     }
-    if (int(deviceInfo.mappedMemSize/4) < (3 + 10*numDOF))  {
+    if (int(deviceInfo.mappedMemSize / 4) <
+        (memOffset + 3 + numCtrlSignals + numDaqSignals)) {
         opserr << "ECSCRAMNetGT::ECSCRAMNetGT() - "
             << " mapped memory size too small for required data.\n";
         exit(OF_ReturnType_failed);
     }
     
     // set OpenFresco nodeID
-    // typically: 469D = node1, xPCtarget = node2
+    // (typically: OpenFresco = node10, xPCtarget = node20, controller = node30)
     rValue = scgtSetState(&gtHandle, SCGT_NODE_ID, nodeID);
-    if (rValue != SCGT_SUCCESS)  {
+    if (rValue != SCGT_SUCCESS) {
         opserr << "ECSCRAMNetGT::ECSCRAMNetGT() - scgtSetState():"
             << " could not change nodeID to #" << nodeID << ".\n";
         exit(rValue);
@@ -155,7 +269,7 @@ ECSCRAMNetGT::ECSCRAMNetGT(int tag, int memoffset, int numdof,
     
     /* set to write me last
     rValue = scgtSetState(&gtHandle, SCGT_WRITE_ME_LAST, 0);
-    if (rValue != SCGT_SUCCESS)  {
+    if (rValue != SCGT_SUCCESS) {
         opserr << "ECSCRAMNetGT::ECSCRAMNetGT() - scgtSetState():"
             << " could not change to write me last.\n";
         exit(rValue);
@@ -167,13 +281,13 @@ ECSCRAMNetGT::ECSCRAMNetGT(int tag, int memoffset, int numdof,
     // | 16 bit         | 01 | Q(15:8)  | Q(7:0)   | Q(31:24) | Q(23:16) |
     // | 8 bit          | 10 | Q(7:0)   | Q(15:8)  | Q(23:16) | Q(31:24) |
     rValue = scgtSetState(&gtHandle, SCGT_WORD_SWAP_ENABLE, 0);
-    if (rValue != SCGT_SUCCESS)  {
+    if (rValue != SCGT_SUCCESS) {
         opserr << "ECSCRAMNetGT::ECSCRAMNetGT() - scgtSetState():"
             << " could not disable word swap.\n";
         exit(rValue);
     }
     rValue = scgtSetState(&gtHandle, SCGT_BYTE_SWAP_ENABLE, 0);
-    if (rValue != SCGT_SUCCESS)  {
+    if (rValue != SCGT_SUCCESS) {
         opserr << "ECSCRAMNetGT::ECSCRAMNetGT() - scgtSetState():"
             << " could not disable byte swap.\n";
         exit(rValue);
@@ -181,53 +295,38 @@ ECSCRAMNetGT::ECSCRAMNetGT(int tag, int memoffset, int numdof,
     
     // set state so node can receive and transmit data
     rValue = scgtSetState(&gtHandle, SCGT_RECEIVE_ENABLE, 1);
-    if (rValue != SCGT_SUCCESS)  {
+    if (rValue != SCGT_SUCCESS) {
         opserr << "ECSCRAMNetGT::ECSCRAMNetGT() - scgtSetState():"
             << " could not change node to receive data.\n";
         exit(rValue);
     }
     rValue = scgtSetState(&gtHandle, SCGT_TRANSMIT_ENABLE, 1);
-    if (rValue != SCGT_SUCCESS)  {
+    if (rValue != SCGT_SUCCESS) {
         opserr << "ECSCRAMNetGT::ECSCRAMNetGT() - scgtSetState():"
             << " could not change node to transmit data.\n";
         exit(rValue);
     }
     
-    // get address for OpenFresco memory on SCRAMNet board
+    // get address for OpenFresco memory on SCRAMNet GT board
     // memOffset is given in bytes, so divide by 4
-    memPtrOPF = (float*) (memPtrBASE + (memOffset/4));
-    float *memPtr = memPtrOPF;
+    memPtrOPF = (float*)(memPtrBASE + (memOffset / 4));
+    float* memPtr = memPtrOPF;
     
-    // setup pointers to newTarget flag
-    newTarget = (int*) memPtr;  memPtr++;
-    
-    // setup pointers to control memory locations
-    ctrlDisp  = memPtr;  memPtr += numDOF;
-    ctrlVel   = memPtr;  memPtr += numDOF;
-    ctrlAccel = memPtr;  memPtr += numDOF;
-    ctrlForce = memPtr;  memPtr += numDOF;
-    ctrlTime  = memPtr;  memPtr += numDOF;
-    
-    // setup pointers to switchPC and atTarget flags
-    switchPC  = (int*) memPtr;  memPtr++;
-    atTarget  = (int*) memPtr;  memPtr++;
-    
-    // setup pointers to daq memory locations
-    daqDisp  = memPtr;  memPtr += numDOF;
-    daqVel   = memPtr;  memPtr += numDOF;
-    daqAccel = memPtr;  memPtr += numDOF;
-    daqForce = memPtr;  memPtr += numDOF;
-    daqTime  = memPtr;
-    
-    // initialize everything to zero
+    // setup scr pointers to newTarget flag
+    newTarget = (int*)memPtr;  memPtr++;
     newTarget[0] = 0;
-    for (int i=0; i<numDOF; i++)  {
-        ctrlDisp[i]  = 0.0;
-        ctrlVel[i]   = 0.0;
-        ctrlAccel[i] = 0.0;
-        ctrlForce[i] = 0.0;
-        ctrlTime[i]  = 0.0;
-    }
+    
+    // setup scr pointers to control signals
+    scrCtrlSig = memPtr;  memPtr += numCtrlSignals;
+    for (int i = 0; i < numCtrlSignals; i++)
+        scrCtrlSig[i] = 0.0;
+    
+    // setup scr pointers to switchPC and atTarget flags
+    switchPC = (int*)memPtr;  memPtr++;
+    atTarget = (int*)memPtr;  memPtr++;
+    
+    // setup scr pointers to daq signals
+    scrDaqSig = memPtr;
     
     opserr << "******************************************\n";
     opserr << "* The SCRANNet GT memory has been mapped *\n";
@@ -236,66 +335,72 @@ ECSCRAMNetGT::ECSCRAMNetGT(int tag, int memoffset, int numdof,
 }
 
 
-ECSCRAMNetGT::ECSCRAMNetGT(const ECSCRAMNetGT &ec)
+ECSCRAMNetGT::ECSCRAMNetGT(const ECSCRAMNetGT& ec)
     : ExperimentalControl(ec),
-    memOffset(ec.memOffset), numDOF(ec.numDOF), nodeID(ec.nodeID),
-    memPtrBASE(0), memPtrOPF(0),
+    memOffset(ec.memOffset), nodeID(ec.nodeID),
+    memPtrBASE(0), memPtrOPF(0), scrCtrlSig(0), scrDaqSig(0),
     newTarget(0), switchPC(0), atTarget(0),
-    ctrlDisp(0), ctrlVel(0), ctrlAccel(0), ctrlForce(0), ctrlTime(0),
-    daqDisp(0), daqVel(0), daqAccel(0), daqForce(0), daqTime(0),
-    trialDispOffset(ec.numDOF), trialForceOffset(ec.numDOF),
-    useRelativeTrial(0), gotRelativeTrial(1),
-    flag(0)
+    numCtrlSignals(0), numDaqSignals(0), ctrlSignal(0), daqSignal(0),
+    trialSigOffset(0), ctrlSigOffset(0), daqSigOffset(0),
+    gotRelativeTrial(1), flag(0)
 {
+    numTrialCPs = ec.numTrialCPs;
+    trialCPs = ec.trialCPs;
+    numOutCPs = ec.numOutCPs;
+    outCPs = ec.outCPs;
+    
     memPtrBASE = ec.memPtrBASE;
-    memPtrOPF  = ec.memPtrOPF;
-    newTarget  = ec.newTarget;
-    switchPC   = ec.switchPC;
-    atTarget   = ec.atTarget;
+    memPtrOPF = ec.memPtrOPF;
+    scrCtrlSig = ec.scrCtrlSig;
+    scrDaqSig = ec.scrDaqSig;
+    newTarget = ec.newTarget;
+    switchPC = ec.switchPC;
+    atTarget = ec.atTarget;
     
-    ctrlDisp  = ec.ctrlDisp;
-    ctrlVel   = ec.ctrlVel;
-    ctrlAccel = ec.ctrlAccel;
-    ctrlForce = ec.ctrlForce;
-    ctrlTime  = ec.ctrlTime;
-    
-    daqDisp  = ec.daqDisp;
-    daqVel   = ec.daqVel;
-    daqAccel = ec.daqAccel;
-    daqForce = ec.daqForce;
-    daqTime  = ec.daqTime;
-    
-    useRelativeTrial = ec.useRelativeTrial;
+    numCtrlSignals = ec.numCtrlSignals;
+    numDaqSignals = ec.numDaqSignals;
     gotRelativeTrial = ec.gotRelativeTrial;
 }
 
 
 ECSCRAMNetGT::~ECSCRAMNetGT()
 {
-    // stop predictor-corrector
+    // stop the target application on the xPC Target
     newTarget[0] = -1;
     this->ExperimentalControl::sleep(10);
     
     // set everything back to zero
     newTarget[0] = 0;
-    for (int i=0; i<numDOF; i++)  {
-        ctrlDisp[i]  = 0.0;
-        ctrlVel[i]   = 0.0;
-        ctrlAccel[i] = 0.0;
-        ctrlForce[i] = 0.0;
-        ctrlTime[i]  = 0.0;
-    }
+    for (int i = 0; i < numCtrlSignals; i++)
+        ctrlSignal[i] = 0.0;
     
     // unmap the SCRAMNet physical memory
     scgtUnmapMem(&gtHandle);
     
     // close the handle to the SCRAMNet GT device/unit
     int rValue = scgtClose(&gtHandle);
-    if (rValue != SCGT_SUCCESS)  {
+    if (rValue != SCGT_SUCCESS) {
         opserr << "ECSCRAMNetGT::~ECSCRAMNetGT() - scgtClose():"
             << " could not close driver.\n";
         exit(rValue);
     }
+    
+    // control points are not copies, so do not clean them up here
+    //int i;
+    //if (trialCPs != 0) {
+    //    for (i=0; i<numTrialCPs; i++) {
+    //        if (trialCPs[i] != 0)
+    //            delete trialCPs[i];
+    //    }
+    //    delete [] trialCPs;
+    //}
+    //if (outCPs != 0) {
+    //    for (i=0; i<numOutCPs; i++) {
+    //        if (outCPs[i] != 0)
+    //            delete outCPs[i];
+    //    }
+    //    delete [] outCPs;
+    //}
     
     opserr << endln;
     opserr << "********************************************\n";
@@ -309,6 +414,20 @@ int ECSCRAMNetGT::setup()
 {
     int rValue = 0;
     
+    // resize signal vectors
+    ctrlSignal.resize(numCtrlSignals);
+    ctrlSignal.Zero();
+    daqSignal.resize(numDaqSignals);
+    daqSignal.Zero();
+    
+    // resize signal offset vectors
+    trialSigOffset.resize(numCtrlSignals);
+    trialSigOffset.Zero();
+    ctrlSigOffset.resize(numCtrlSignals);
+    ctrlSigOffset.Zero();
+    daqSigOffset.resize(numDaqSignals);
+    daqSigOffset.Zero();
+    
     // print experimental control information
     this->Print(opserr);
     
@@ -320,28 +439,80 @@ int ECSCRAMNetGT::setup()
     opserr << "****************************************************************\n";
     opserr << endln;
     int c = getchar();
-    if (c == 'c')  {
+    if (c == 'c') {
         getchar();
         this->~ECSCRAMNetGT();
         exit(OF_ReturnType_failed);
     }
     
-    do  {
-        rValue += this->control();
+    do {
+        // get daq signal array from controller/daq
         rValue += this->acquire();
         
-        int i;
+        // determine control signal offsets
+        int kT = 0;
+        for (int iT = 0; iT < numTrialCPs; iT++) {
+            // get trial control point parameters
+            int numSigT = trialCPs[iT]->getNumSignal();
+            ID dofT = trialCPs[iT]->getDOF();
+            ID rspT = trialCPs[iT]->getRspType();
+            ID isRelCtrl = trialCPs[iT]->getCtrlSigRefType();
+            // loop through all the trial control point signals
+            for (int jT = 0; jT < numSigT; jT++) {
+                if (isRelCtrl(jT)) {
+                    // now search through ouput control points to
+                    // find the signal with the same DOF and rspType
+                    int kO = 0;
+                    for (int iO = 0; iO < numOutCPs; iO++) {
+                        int numSigO = outCPs[iO]->getNumSignal();
+                        ID dofO = outCPs[iO]->getDOF();
+                        ID rspO = outCPs[iO]->getRspType();
+                        // loop through all the output control point signals
+                        for (int jO = 0; jO < numSigO; jO++) {
+                            if (dofT(jT) == dofO(jO) && rspT(jT) == rspO(jO)) {
+                                ctrlSigOffset(kT) = daqSignal(kO);
+                                ctrlSignal(kT) = ctrlSigOffset(kT);
+                            }
+                            kO++;
+                        }
+                    }
+                }
+                kT++;
+            }
+        }
+        
+        // send control signals with offsets to controller
+        for (int i = 0; i < numCtrlSignals; i++)
+            scrCtrlSig[i] = (float)ctrlSignal(i);
+        
+        // determine daq signal offsets
+        int kO = 0;
+        for (int i = 0; i < numOutCPs; i++) {
+            // get output control point parameters
+            int numSignals = outCPs[i]->getNumSignal();
+            ID isRelDaq = outCPs[i]->getDaqSigRefType();
+            // loop through all the output control point signals
+            for (int j = 0; j < numSignals; j++) {
+                if (isRelDaq(j))
+                    daqSigOffset(kO) = -daqSignal(kO);
+                kO++;
+            }
+        }
+        
         opserr << "****************************************************************\n";
         opserr << "* Initial values of DAQ are:\n";
+        for (int i = 0; i < numDaqSignals; i++)
+            opserr << "*   daqSig" << i + 1 << " = " << daqSignal(i) << endln;
         opserr << "*\n";
-        opserr << "* dspDaq = [";
-        for (i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)
-            opserr << " " << daqDisp[i];
-        opserr << " ]\n";
-        opserr << "* frcDaq = [";
-        for (i=0; i<(*sizeDaq)(OF_Resp_Force); i++)
-            opserr << " " << daqForce[i];
-        opserr << " ]\n";
+        for (int i = 0; i < numDaqSignals; i++) {
+            if (daqSigOffset(i) != 0)
+                opserr << "*   daqSigOffset" << i + 1 << " = " << daqSigOffset(i) << endln;
+        }
+        opserr << "*\n";
+        for (int i = 0; i < numCtrlSignals; i++) {
+            if (ctrlSigOffset(i) != 0)
+                opserr << "*   ctrlSigOffset" << i + 1 << " = " << ctrlSigOffset(i) << endln;
+        }
         opserr << "*\n";
         opserr << "* Press 'Enter' to start the test or\n";
         opserr << "* 'r' to repeat the measurement or\n";
@@ -349,14 +520,18 @@ int ECSCRAMNetGT::setup()
         opserr << "****************************************************************\n";
         opserr << endln;
         c = getchar();
-        if (c == 'c')  {
+        if (c == 'c') {
             getchar();
             this->~ECSCRAMNetGT();
             exit(OF_ReturnType_failed);
-        } else if (c == 'r')  {
+        }
+        else if (c == 'r') {
             getchar();
         }
     } while (c == 'r');
+    
+    // exit initialization state and start predictor-corrector
+    rValue += this->control();
     
     opserr << "*****************\n";
     opserr << "* Running...... *\n";
@@ -369,27 +544,53 @@ int ECSCRAMNetGT::setup()
 
 int ECSCRAMNetGT::setSize(ID sizeT, ID sizeO)
 {
-    // check sizeTrial and sizeOut
-    // for ECSCRAMNetGT object
+    // check sizeTrial and sizeOut against sizes
+    // specified in the control points
+    // ECSCRAMNetGT objects can use:
+    //     disp, vel, accel, force and time for trial and
+    //     disp, vel, accel, force and time for output
     
-    // ECSCRAMNetGT objects can only use 
-    // trial response vectors with size <= numDOF and
-    // output response vectors with size <= numDOF
-    // check these are available in sizeT/sizeO.
-    if (sizeT(OF_Resp_Disp) > numDOF || sizeT(OF_Resp_Vel) > numDOF ||
-        sizeT(OF_Resp_Accel) > numDOF || sizeT(OF_Resp_Force) > numDOF ||
-        sizeT(OF_Resp_Time) > numDOF ||
-        sizeO(OF_Resp_Disp) > numDOF || sizeO(OF_Resp_Vel) > numDOF ||
-        sizeO(OF_Resp_Accel) > numDOF || sizeO(OF_Resp_Force) > numDOF ||
-        sizeO(OF_Resp_Time) > numDOF)  {
-        opserr << "ECSCRAMNetGT::setSize() - wrong sizeTrial/Out\n"; 
-        opserr << "see User Manual.\n";
-        this->~ECSCRAMNetGT();
-        exit(OF_ReturnType_failed);
+    // get maximum dof IDs for each trial response quantity
+    ID maxdofT(OF_Resp_All);
+    for (int i = 0; i < numTrialCPs; i++) {
+        // get trial control point parameters
+        int numSignals = trialCPs[i]->getNumSignal();
+        ID dof = trialCPs[i]->getDOF();
+        ID rsp = trialCPs[i]->getRspType();
+        
+        // loop through all the trial control point signals
+        for (int j = 0; j < numSignals; j++) {
+            dof(j)++;  // switch to 1-based indexing
+            maxdofT(rsp(j)) = dof(j) > maxdofT(rsp(j)) ? dof(j) : maxdofT(rsp(j));
+        }
     }
-    
-    (*sizeCtrl) = sizeT;
-    (*sizeDaq)  = sizeO;
+    // get maximum dof IDs for each output response quantity
+    ID maxdofO(OF_Resp_All);
+    for (int i = 0; i < numOutCPs; i++) {
+        // get output control point parameters
+        int numSignals = outCPs[i]->getNumSignal();
+        ID dof = outCPs[i]->getDOF();
+        ID rsp = outCPs[i]->getRspType();
+        
+        // loop through all the output control point signals
+        for (int j = 0; j < numSignals; j++) {
+            dof(j)++;  // switch to 1-based indexing
+            maxdofO(rsp(j)) = dof(j) > maxdofO(rsp(j)) ? dof(j) : maxdofO(rsp(j));
+        }
+    }
+    // now check if dof IDs are within limits
+    for (int i = 0; i < OF_Resp_All; i++) {
+        if ((maxdofT(i) != 0 && maxdofT(i) > sizeT(i)) ||
+            (maxdofO(i) != 0 && maxdofO(i) > sizeO(i))) {
+            opserr << "ECSCRAMNetGT::setSize() - wrong sizeTrial/Out\n";
+            opserr << "see User Manual.\n";
+            this->~ECSCRAMNetGT();
+            exit(OF_ReturnType_failed);
+        }
+    }
+    // finally assign sizes
+    (*sizeCtrl) = maxdofT;
+    (*sizeDaq) = maxdofO;
     
     return OF_ReturnType_completed;
 }
@@ -402,72 +603,72 @@ int ECSCRAMNetGT::setTrialResponse(
     const Vector* force,
     const Vector* time)
 {
-    int i, rValue = 0;
+    // loop through all the trial control points
+    int k = 0;
+    for (int i = 0; i < numTrialCPs; i++) {
+        // get trial control point parameters
+        int numSignals = trialCPs[i]->getNumSignal();
+        ID dof = trialCPs[i]->getDOF();
+        ID rsp = trialCPs[i]->getRspType();
+        
+        // loop through all the trial control point dofs
+        for (int j = 0; j < numSignals; j++) {
+            // assemble the control signal array
+            if (rsp(j) == OF_Resp_Disp && disp != 0)
+                ctrlSignal(k) = (*disp)(dof(j));
+            else if (rsp(j) == OF_Resp_Force && force != 0)
+                ctrlSignal(k) = (*force)(dof(j));
+            else if (rsp(j) == OF_Resp_Time && time != 0)
+                ctrlSignal(k) = (*time)(dof(j));
+            else if (rsp(j) == OF_Resp_Vel && vel != 0)
+                ctrlSignal(k) = (*vel)(dof(j));
+            else if (rsp(j) == OF_Resp_Accel && accel != 0)
+                ctrlSignal(k) = (*accel)(dof(j));
+            
+            // get initial trial signal offset
+            if (gotRelativeTrial == 0 && ctrlSignal(k) != 0) {
+                trialSigOffset(k) = -ctrlSignal(k);
+                
+                opserr << endln;
+                opserr << "****************************************************************\n";
+                opserr << "* Initial signal values of FEA are:\n";
+                for (int i = 0; i < numCtrlSignals; i++)
+                    opserr << "*   trialSig" << i + 1 << " = " << ctrlSignal(i) << endln;
+                opserr << "*\n";
+                for (int i = 0; i < numCtrlSignals; i++) {
+                    if (trialSigOffset(i) != 0)
+                        opserr << "*   trialSigOffset" << i + 1 << " = " << trialSigOffset(i) << endln;
+                }
+                opserr << "*\n";
+                opserr << "****************************************************************\n";
+                opserr << endln;
+            }
+            
+            // apply trial signal offset if not zero
+            if (trialSigOffset(k) != 0)
+                ctrlSignal(k) += trialSigOffset(k);
+            
+            // filter control signal if a filter exists
+            if (theCtrlFilters[rsp(j)] != 0)
+                ctrlSignal(k) = theCtrlFilters[rsp(j)]->filtering(ctrlSignal(k));
+            
+            // apply control signal offset if not zero
+            if (ctrlSigOffset(k) != 0)
+                ctrlSignal(k) += ctrlSigOffset(k);
+            
+            // increment counter
+            k++;
+        }
+    }
     
-    // get initial trial signal offsets
-    if (gotRelativeTrial == 0)  {
-        if (disp != 0)  {
-            for (i=0; i<(*sizeCtrl)(OF_Resp_Disp); i++)
-                trialDispOffset(i) = -(*disp)(i);
-        }
-        if (force != 0)  {
-            for (i=0; i<(*sizeCtrl)(OF_Resp_Force); i++)
-                trialForceOffset(i) = -(*force)(i);
-        }
-        // set flag that relative trial signal has been obtained
+    // set flag that relative trial signals have been obtained
+    if (gotRelativeTrial == 0)
         gotRelativeTrial = 1;
-    }
     
-    if (disp != 0)  {
-        if (theCtrlFilters[OF_Resp_Disp] == 0)  {
-            for (i=0; i<(*sizeCtrl)(OF_Resp_Disp); i++)
-                ctrlDisp[i] = float((*disp)(i) + trialDispOffset(i));
-        } else  {
-            for (i=0; i<(*sizeCtrl)(OF_Resp_Disp); i++)
-                ctrlDisp[i] = float(theCtrlFilters[OF_Resp_Disp]->filtering((*disp)(i) + trialDispOffset(i)));
-        }
-    }
-    if (vel != 0)  {
-        if (theCtrlFilters[OF_Resp_Vel] == 0)  {
-            for (i=0; i<(*sizeCtrl)(OF_Resp_Vel); i++)
-                ctrlVel[i] = float((*vel)(i));
-        }
-        else  {
-            for (i=0; i<(*sizeCtrl)(OF_Resp_Vel); i++)
-                ctrlVel[i] = float(theCtrlFilters[OF_Resp_Vel]->filtering((*vel)(i)));
-        }
-    }
-    if (accel != 0)  {
-        if (theCtrlFilters[OF_Resp_Accel] == 0)  {
-            for (i=0; i<(*sizeCtrl)(OF_Resp_Accel); i++)
-                ctrlAccel[i] = float((*accel)(i));
-        } else  {
-            for (i=0; i<(*sizeCtrl)(OF_Resp_Accel); i++)
-                ctrlAccel[i] = float(theCtrlFilters[OF_Resp_Accel]->filtering((*accel)(i)));
-        }
-    }
-    if (force != 0)  {
-        if (theCtrlFilters[OF_Resp_Force] == 0)  {
-            for (i=0; i<(*sizeCtrl)(OF_Resp_Force); i++)
-                ctrlForce[i] = float((*force)(i) + trialForceOffset(i));
-        } else  {
-            for (i=0; i<(*sizeCtrl)(OF_Resp_Force); i++)
-                ctrlForce[i] = float(theCtrlFilters[OF_Resp_Force]->filtering((*force)(i) + trialForceOffset(i)));
-        }
-    }
-    if (time != 0)  {
-        if (theCtrlFilters[OF_Resp_Time] == 0)  {
-            for (i=0; i<(*sizeCtrl)(OF_Resp_Time); i++)
-                ctrlTime[i] = float((*time)(i));
-        } else  {
-            for (i=0; i<(*sizeCtrl)(OF_Resp_Time); i++)
-                ctrlTime[i] = float(theCtrlFilters[OF_Resp_Time]->filtering((*time)(i)));
-        }
-    }
+    // send control signal array to controller
+    k += this->control();
     
-    rValue = this->control();
-    
-    return rValue;
+    return (k - numCtrlSignals);
 }
 
 
@@ -478,57 +679,45 @@ int ECSCRAMNetGT::getDaqResponse(
     Vector* force,
     Vector* time)
 {
-    int i, rValue = 0;
+    // get daq signal array from controller/daq
+    int rValue = this->acquire();
     
-    rValue = this->acquire();
-    
-    if (disp != 0)  {
-        if (theDaqFilters[OF_Resp_Disp] == 0)  {
-            for (i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)
-                (*disp)(i) = daqDisp[i];
-        } else  {
-            for (i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)
-                (*disp)(i) = theDaqFilters[OF_Resp_Disp]->filtering(daqDisp[i]);
+    // loop through all the output control points
+    int k = 0;
+    for (int i = 0; i < numOutCPs; i++) {
+        // get output control point parameters
+        int numSignals = outCPs[i]->getNumSignal();
+        ID dof = outCPs[i]->getDOF();
+        ID rsp = outCPs[i]->getRspType();
+        
+        // loop through all the output control point dofs
+        for (int j = 0; j < numSignals; j++) {
+            // apply daq signal offset if not zero
+            if (daqSigOffset(k) != 0)
+                daqSignal(k) += daqSigOffset(k);
+            
+            // filter daq signal if a filter exists
+            if (theDaqFilters[rsp(j)] != 0)
+                daqSignal(k) = theDaqFilters[rsp(j)]->filtering(daqSignal(k));
+            
+            // populate the daq response vectors
+            if (rsp(j) == OF_Resp_Disp && disp != 0)
+                (*disp)(dof(j)) = daqSignal(k);
+            else if (rsp(j) == OF_Resp_Force && force != 0)
+                (*force)(dof(j)) = daqSignal(k);
+            else if (rsp(j) == OF_Resp_Time && time != 0)
+                (*time)(dof(j)) = daqSignal(k);
+            else if (rsp(j) == OF_Resp_Vel && vel != 0)
+                (*vel)(dof(j)) = daqSignal(k);
+            else if (rsp(j) == OF_Resp_Accel && accel != 0)
+                (*accel)(dof(j)) = daqSignal(k);
+            
+            // increment counter
+            k++;
         }
     }
-    if (vel != 0)  {
-        if (theDaqFilters[OF_Resp_Vel] == 0)  {
-            for (i=0; i<(*sizeDaq)(OF_Resp_Vel); i++)
-                (*vel)(i) = daqVel[i];
-        } else  {
-            for (i=0; i<(*sizeDaq)(OF_Resp_Vel); i++)
-                (*vel)(i) = theDaqFilters[OF_Resp_Vel]->filtering(daqVel[i]);
-        }
-    }
-    if (accel != 0)  {
-        if (theDaqFilters[OF_Resp_Accel] == 0)  {
-            for (i=0; i<(*sizeDaq)(OF_Resp_Accel); i++)
-                (*accel)(i) = daqAccel[i];
-        } else  {
-            for (i=0; i<(*sizeDaq)(OF_Resp_Accel); i++)
-                (*accel)(i) = theDaqFilters[OF_Resp_Accel]->filtering(daqAccel[i]);
-        }
-    }
-    if (force != 0)  {
-        if (theDaqFilters[OF_Resp_Force] == 0)  {
-            for (i=0; i<(*sizeDaq)(OF_Resp_Force); i++)
-                (*force)(i) = daqForce[i];
-        } else  {
-            for (i=0; i<(*sizeDaq)(OF_Resp_Force); i++)
-                (*force)(i) = theDaqFilters[OF_Resp_Force]->filtering(daqForce[i]);
-        }
-    }
-    if (time != 0)  {
-        if (theDaqFilters[OF_Resp_Time] == 0)  {
-            for (i=0; i<(*sizeDaq)(OF_Resp_Time); i++)
-                (*time)(i) = daqTime[i];
-        } else  {
-            for (i=0; i<(*sizeDaq)(OF_Resp_Time); i++)
-                (*time)(i) = theDaqFilters[OF_Resp_Time]->filtering(daqTime[i]);
-        }
-    }
-    
-    return rValue;
+
+    return (k + rValue - numDaqSignals);
 }
 
 
@@ -538,257 +727,93 @@ int ECSCRAMNetGT::commitState()
 }
 
 
-ExperimentalControl *ECSCRAMNetGT::getCopy()
+ExperimentalControl* ECSCRAMNetGT::getCopy()
 {
     return new ECSCRAMNetGT(*this);
 }
 
 
-Response* ECSCRAMNetGT::setResponse(const char **argv, int argc,
-    OPS_Stream &output)
+Response* ECSCRAMNetGT::setResponse(const char** argv, int argc,
+    OPS_Stream& output)
 {
     int i;
     char outputData[15];
-    Response *theResponse = 0;
+    Response* theResponse = 0;
     
     output.tag("ExpControlOutput");
-    output.attr("ctrlType",this->getClassType());
-    output.attr("ctrlTag",this->getTag());
+    output.attr("ctrlType", this->getClassType());
+    output.attr("ctrlTag", this->getTag());
     
-    // ctrl displacements
-    if (ctrlDisp != 0 && (
-        strcmp(argv[0],"ctrlDisp") == 0 ||
-        strcmp(argv[0],"ctrlDisplacement") == 0 ||
-        strcmp(argv[0],"ctrlDisplacements") == 0))
+    // ctrl signals
+    if (ctrlSignal != 0 && (
+        strcmp(argv[0], "ctrlSig") == 0 ||
+        strcmp(argv[0], "ctrlSignal") == 0 ||
+        strcmp(argv[0], "ctrlSignals") == 0))
     {
-        for (i=0; i<(*sizeCtrl)(OF_Resp_Disp); i++)  {
-            sprintf(outputData,"ctrlDisp%d",i+1);
-            output.tag("ResponseType",outputData);
+        for (i = 0; i < numCtrlSignals; i++) {
+            sprintf(outputData, "ctrlSignal%d", i + 1);
+            output.tag("ResponseType", outputData);
         }
         theResponse = new ExpControlResponse(this, 1,
-            Vector((*sizeCtrl)(OF_Resp_Disp)));
+            Vector(numCtrlSignals));
     }
     
-    // ctrl velocities
-    if (ctrlVel != 0 && (
-        strcmp(argv[0],"ctrlVel") == 0 ||
-        strcmp(argv[0],"ctrlVelocity") == 0 ||
-        strcmp(argv[0],"ctrlVelocities") == 0))
+    // daq signals
+    if (daqSignal != 0 && (
+        strcmp(argv[0], "daqSig") == 0 ||
+        strcmp(argv[0], "daqSignal") == 0 ||
+        strcmp(argv[0], "daqSignals") == 0))
     {
-        for (i=0; i<(*sizeCtrl)(OF_Resp_Vel); i++)  {
-            sprintf(outputData,"ctrlVel%d",i+1);
-            output.tag("ResponseType",outputData);
+        for (i = 0; i < numDaqSignals; i++) {
+            sprintf(outputData, "daqSignal%d", i + 1);
+            output.tag("ResponseType", outputData);
         }
         theResponse = new ExpControlResponse(this, 2,
-            Vector((*sizeCtrl)(OF_Resp_Vel)));
+            Vector(numDaqSignals));
     }
-    
-    // ctrl accelerations
-    if (ctrlAccel != 0 && (
-        strcmp(argv[0],"ctrlAccel") == 0 ||
-        strcmp(argv[0],"ctrlAcceleration") == 0 ||
-        strcmp(argv[0],"ctrlAccelerations") == 0))
-    {
-        for (i=0; i<(*sizeCtrl)(OF_Resp_Accel); i++)  {
-            sprintf(outputData,"ctrlAccel%d",i+1);
-            output.tag("ResponseType",outputData);
-        }
-        theResponse = new ExpControlResponse(this, 3,
-            Vector((*sizeCtrl)(OF_Resp_Accel)));
-    }
-    
-    // ctrl forces
-    if (ctrlForce != 0 && (
-        strcmp(argv[0],"ctrlForce") == 0 ||
-        strcmp(argv[0],"ctrlForces") == 0))
-    {
-        for (i=0; i<(*sizeCtrl)(OF_Resp_Force); i++)  {
-            sprintf(outputData,"ctrlForce%d",i+1);
-            output.tag("ResponseType",outputData);
-        }
-        theResponse = new ExpControlResponse(this, 4,
-            Vector((*sizeCtrl)(OF_Resp_Force)));
-    }
-    
-    // ctrl times
-    if (ctrlTime != 0 && (
-        strcmp(argv[0],"ctrlTime") == 0 ||
-        strcmp(argv[0],"ctrlTimes") == 0))
-    {
-        for (i=0; i<(*sizeCtrl)(OF_Resp_Time); i++)  {
-            sprintf(outputData,"ctrlTime%d",i+1);
-            output.tag("ResponseType",outputData);
-        }
-        theResponse = new ExpControlResponse(this, 5,
-            Vector((*sizeCtrl)(OF_Resp_Time)));
-    }
-    
-    // daq displacements
-    if (daqDisp != 0 && (
-        strcmp(argv[0],"daqDisp") == 0 ||
-        strcmp(argv[0],"daqDisplacement") == 0 ||
-        strcmp(argv[0],"daqDisplacements") == 0))
-    {
-        for (i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)  {
-            sprintf(outputData,"daqDisp%d",i+1);
-            output.tag("ResponseType",outputData);
-        }
-        theResponse = new ExpControlResponse(this, 6,
-            Vector((*sizeDaq)(OF_Resp_Disp)));
-    }
-    
-    // daq velocities
-    if (daqVel != 0 && (
-        strcmp(argv[0],"daqVel") == 0 ||
-        strcmp(argv[0],"daqVelocity") == 0 ||
-        strcmp(argv[0],"daqVelocities") == 0))
-    {
-        for (i=0; i<(*sizeDaq)(OF_Resp_Vel); i++)  {
-            sprintf(outputData,"daqVel%d",i+1);
-            output.tag("ResponseType",outputData);
-        }
-        theResponse = new ExpControlResponse(this, 7,
-            Vector((*sizeDaq)(OF_Resp_Vel)));
-    }
-    
-    // daq accelerations
-    if (daqAccel != 0 && (
-        strcmp(argv[0],"daqAccel") == 0 ||
-        strcmp(argv[0],"daqAcceleration") == 0 ||
-        strcmp(argv[0],"daqAccelerations") == 0))
-    {
-        for (i=0; i<(*sizeDaq)(OF_Resp_Accel); i++)  {
-            sprintf(outputData,"daqAccel%d",i+1);
-            output.tag("ResponseType",outputData);
-        }
-        theResponse = new ExpControlResponse(this, 8,
-            Vector((*sizeDaq)(OF_Resp_Accel)));
-    }
-    
-    // daq forces
-    if (daqForce != 0 && (
-        strcmp(argv[0],"daqForce") == 0 ||
-        strcmp(argv[0],"daqForces") == 0))
-    {
-        for (i=0; i<(*sizeDaq)(OF_Resp_Force); i++)  {
-            sprintf(outputData,"daqForce%d",i+1);
-            output.tag("ResponseType",outputData);
-        }
-        theResponse = new ExpControlResponse(this, 9,
-            Vector((*sizeDaq)(OF_Resp_Force)));
-    }
-    
-    // daq times
-    if (daqTime != 0 && (
-        strcmp(argv[0],"daqTime") == 0 ||
-        strcmp(argv[0],"daqTimes") == 0))
-    {
-        for (i=0; i<(*sizeDaq)(OF_Resp_Time); i++)  {
-            sprintf(outputData,"daqTime%d",i+1);
-            output.tag("ResponseType",outputData);
-        }
-        theResponse = new ExpControlResponse(this, 10,
-            Vector((*sizeDaq)(OF_Resp_Time)));
-    }
-    
     output.endTag();
     
     return theResponse;
 }
 
 
-int ECSCRAMNetGT::getResponse(int responseID, Information &info)
+int ECSCRAMNetGT::getResponse(int responseID, Information& info)
 {
-    Vector resp(0);
+    switch (responseID) {
+    case 1:  // ctrl signals
+        return info.setVector(ctrlSignal);
     
-    switch (responseID)  {
-    case 1:  // ctrl displacements
-        resp.resize((*sizeCtrl)(OF_Resp_Disp));
-        for (int i=0; i<(*sizeCtrl)(OF_Resp_Disp); i++)
-            resp(i) = ctrlDisp[i];
-        return info.setVector(resp);
-        
-    case 2:  // ctrl velocities
-        resp.resize((*sizeCtrl)(OF_Resp_Vel));
-        for (int i=0; i<(*sizeCtrl)(OF_Resp_Vel); i++)
-            resp(i) = ctrlVel[i];
-        return info.setVector(resp);
-        
-    case 3:  // ctrl accelerations
-        resp.resize((*sizeCtrl)(OF_Resp_Accel));
-        for (int i=0; i<(*sizeCtrl)(OF_Resp_Accel); i++)
-            resp(i) = ctrlAccel[i];
-        return info.setVector(resp);
-        
-    case 4:  // ctrl forces
-        resp.resize((*sizeCtrl)(OF_Resp_Force));
-        for (int i=0; i<(*sizeCtrl)(OF_Resp_Force); i++)
-            resp(i) = ctrlForce[i];
-        return info.setVector(resp);
-        
-    case 5:  // ctrl times
-        resp.resize((*sizeCtrl)(OF_Resp_Time));
-        for (int i=0; i<(*sizeCtrl)(OF_Resp_Time); i++)
-            resp(i) = ctrlTime[i];
-        return info.setVector(resp);
-        
-    case 6:  // daq displacements
-        resp.resize((*sizeDaq)(OF_Resp_Disp));
-        for (int i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)
-            resp(i) = daqDisp[i];
-        return info.setVector(resp);
-        
-    case 7:  // daq velocities
-        resp.resize((*sizeDaq)(OF_Resp_Vel));
-        for (int i=0; i<(*sizeDaq)(OF_Resp_Vel); i++)
-            resp(i) = daqVel[i];
-        return info.setVector(resp);
-        
-    case 8:  // daq accelerations
-        resp.resize((*sizeDaq)(OF_Resp_Accel));
-        for (int i=0; i<(*sizeDaq)(OF_Resp_Accel); i++)
-            resp(i) = daqAccel[i];
-        return info.setVector(resp);
-        
-    case 9:  // daq forces
-        resp.resize((*sizeDaq)(OF_Resp_Force));
-        for (int i=0; i<(*sizeDaq)(OF_Resp_Force); i++)
-            resp(i) = daqForce[i];
-        return info.setVector(resp);
-        
-    case 10:  // daq times
-        resp.resize((*sizeDaq)(OF_Resp_Time));
-        for (int i=0; i<(*sizeDaq)(OF_Resp_Time); i++)
-            resp(i) = daqTime[i];
-        return info.setVector(resp);
-        
+    case 2:  // daq signals
+        return info.setVector(daqSignal);
+    
     default:
-        return -1;
+        return OF_ReturnType_failed;
     }
 }
 
 
-void ECSCRAMNetGT::Print(OPS_Stream &s, int flag)
+void ECSCRAMNetGT::Print(OPS_Stream& s, int flag)
 {
     s << "****************************************************************\n";
-    s << "* ExperimentalControl: " << this->getTag() << endln; 
+    s << "* ExperimentalControl: " << this->getTag() << endln;
     s << "*   type: ECSCRAMNetGT\n";
     s << "*   nodeID: " << int(nodeID) << endln;
     s << "*   memOffset: " << memOffset << endln;
-    s << "*   numDOF: " << numDOF << endln;
-    if (useRelativeTrial == 0)
-        s << "*   useRelativeTrial: no\n";
-    else
-        s << "*   useRelativeTrial: yes\n";
-    s << "*   ctrlFilters:";
-    for (int i=0; i<OF_Resp_All; i++)  {
+    s << "*   trialCP tag(s):";
+    for (int i = 0; i < numTrialCPs; i++)
+        s << " " << trialCPs[i]->getTag();
+    s << "\n*   outCP tag(s):";
+    for (int i = 0; i < numOutCPs; i++)
+        s << " " << outCPs[i]->getTag();
+    s << "\n*   ctrlFilter tags:";
+    for (int i = 0; i < OF_Resp_All; i++) {
         if (theCtrlFilters[i] != 0)
             s << " " << theCtrlFilters[i]->getTag();
         else
             s << " 0";
     }
-    s << "\n*   daqFilters:";
-    for (int i=0; i<OF_Resp_All; i++)  {
+    s << "\n*   daqFilter tags:";
+    for (int i = 0; i < OF_Resp_All; i++) {
         if (theDaqFilters[i] != 0)
             s << " " << theDaqFilters[i]->getTag();
         else
@@ -800,12 +825,16 @@ void ECSCRAMNetGT::Print(OPS_Stream &s, int flag)
 
 int ECSCRAMNetGT::control()
 {
+    // send control signals
+    for (int i = 0; i < numCtrlSignals; i++)
+        scrCtrlSig[i] = (float)ctrlSignal(i);
+    
     // set newTarget flag
     newTarget[0] = 1;
     
     // wait until switchPC flag has changed as well
     flag = 0;
-    while (flag != 1)  {
+    while (flag != 1) {
         // read switchPC flag
         flag = switchPC[0];
     }
@@ -815,7 +844,7 @@ int ECSCRAMNetGT::control()
     
     // wait until switchPC flag has changed as well
     flag = 1;
-    while (flag != 0)  {
+    while (flag != 0) {
         // read switchPC flag
         flag = switchPC[0];
     }
@@ -828,12 +857,14 @@ int ECSCRAMNetGT::acquire()
 {
     // wait until target is reached
     flag = 0;
-    while (flag != 1)  {
+    while (flag != 1) {
         // read atTarget flag
         flag = atTarget[0];
     }
-    // read atTarget flag one more time
-    flag = atTarget[0];
+    
+    // read measured signals at target
+    for (int i = 0; i < numDaqSignals; i++)
+        daqSignal(i) = (double)scrDaqSig[i];
     
     return OF_ReturnType_completed;
 }
