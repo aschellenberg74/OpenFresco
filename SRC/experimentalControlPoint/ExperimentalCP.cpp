@@ -83,7 +83,7 @@ int OPF_ExperimentalCP()
     if (OPS_GetNumRemainingInputArgs() < 3) {
         opserr << "WARNING invalid number of arguments\n";
         opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType "
-            << "<-fact f> <-lim l u> <-isRel> ...\n";
+            << "<-fact f> <-lim l u> <-relTrial> <-relOut> <-relCtrl> <-relDaq> ...\n";
         return -1;
     }
     
@@ -111,29 +111,36 @@ int OPF_ExperimentalCP()
         theNode = theDomain->getNode(nodeTag);
         ndf = theNode->getNumberDOF();
         ndm = OPS_GetNDM();
-    } else {
+    }
+    else {
         // move current arg back by one
         OPS_ResetCurrentInputArg(-1);
     }
-
+    
     // get the dof and associated properties
+    int dofID;
     ID dof(32);
     ID rspType(32);
     Vector factor(32);
     Vector lowerLim(32);
     Vector upperLim(32);
-    ID isRelative(32);
-    int numSignals = 0, numLimits = 0, numRefType = 0;
+    ID isRelTrial(32);
+    ID isRelOut(32);
+    ID isRelCtrl(32);
+    ID isRelDaq(32);
+    int numSignals = 0, numLimits = 0;
+    int numRelTrial = 0, numRelOut = 0;
+    int numRelCtrl = 0, numRelDaq = 0;
     while (OPS_GetNumRemainingInputArgs() > 0) {
         
         // dof ID
         type = OPS_GetString();
         if (ndf == 0) {
-            int dofID = 0;
             if (sscanf(type, "%d", &dofID) != 1) {
                 if (sscanf(type, "%*[dfouDFOU]%d", &dofID) != 1) {
                     opserr << "WARNING invalid dof for control point: " << tag << endln;
-                    opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType <-fact f> <-lim l u> <-isRel> ...\n";
+                    opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType "
+                        << "<-fact f> <-lim l u> <-relTrial> <-relOut> <-relCtrl> <-relDaq> ...\n";
                     return -1;
                 }
             }
@@ -147,7 +154,8 @@ int OPF_ExperimentalCP()
                 dof(numSignals) = 0;
             else {
                 opserr << "WARNING invalid dof for control point: " << tag << endln;
-                opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType <-fact f> <-lim l u> <-isRel> ...\n";
+                opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType "
+                    << "<-fact f> <-lim l u> <-relTrial> <-relOut> <-relCtrl> <-relDaq> ...\n";
                 return -1;
             }
         }
@@ -164,7 +172,8 @@ int OPF_ExperimentalCP()
                 dof(numSignals) = 1;
             else {
                 opserr << "WARNING invalid dof for control point: " << tag << endln;
-                opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType <-fact f> <-lim l u> <-isRel> ...\n";
+                opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType "
+                    << "<-fact f> <-lim l u> <-relTrial> <-relOut> <-relCtrl> <-relDaq> ...\n";
                 return -1;
             }
         }
@@ -186,7 +195,8 @@ int OPF_ExperimentalCP()
                 dof(numSignals) = 2;
             else {
                 opserr << "WARNING invalid dof for control point: " << tag << endln;
-                opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType <-fact f> <-lim l u> <-isRel> ...\n";
+                opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType "
+                    << "<-fact f> <-lim l u> <-relTrial> <-relOut> <-relCtrl> <-relDaq> ...\n";
                 return -1;
             }
         }
@@ -208,7 +218,8 @@ int OPF_ExperimentalCP()
                 dof(numSignals) = 2;
             else {
                 opserr << "WARNING invalid dof for control point: " << tag << endln;
-                opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType <-fact f> <-lim l u> <-isRel> ...\n";
+                opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType "
+                    << "<-fact f> <-lim l u> <-relTrial> <-relOut> <-relCtrl> <-relDaq> ...\n";
                 return -1;
             }
         }
@@ -245,7 +256,8 @@ int OPF_ExperimentalCP()
                 dof(numSignals) = 5;
             else {
                 opserr << "WARNING invalid dof for control point: " << tag << endln;
-                opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType <-fact f> <-lim l u> <-isRel> ...\n";
+                opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType "
+                    << "<-fact f> <-lim l u> <-relTrial> <-relOut> <-relCtrl> <-relDaq> ...\n";
                 return -1;
             }
         }
@@ -269,48 +281,89 @@ int OPF_ExperimentalCP()
             rspType(numSignals) = OF_Resp_Time;
         else {
             opserr << "WARNING invalid rspType for control point: " << tag << endln;
-            opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType <-fact f> <-lim l u> <-isRel> ...\n";
+            opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType "
+                << "<-fact f> <-lim l u> <-relTrial> <-relOut> <-relCtrl> <-relDaq> ...\n";
             return -1;
         }
         
-        // scale factor (optional)
+        // read optional parameters until next dof ID is specified
         type = OPS_GetString();
-        if (type != 0 && (strcmp(type, "-fact") == 0 || strcmp(type, "-factor") == 0)) {
-            numdata = 1;
-            if (OPS_GetDoubleInput(&numdata, &factor(numSignals)) < 0) {
-                opserr << "WARNING invalid factor for control point: " << tag << endln;
-                opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType <-fact f> <-lim l u> <-isRel> ...\n";
-                return -1;
+        while (type != 0 && sscanf(type, "%d", &dofID) != 1 &&
+             sscanf(type, "%*[dfouDFOU]%d", &dofID) != 1) {
+            
+            // scale factor
+            if (type != 0 && (strcmp(type, "-fact") == 0 || strcmp(type, "-factor") == 0)) {
+                numdata = 1;
+                if (OPS_GetDoubleInput(&numdata, &factor(numSignals)) < 0) {
+                    opserr << "WARNING invalid factor for control point: " << tag << endln;
+                    opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType "
+                        << "<-fact f> <-lim l u> <-relTrial> <-relOut> <-relCtrl> <-relDaq> ...\n";
+                    return -1;
+                }
+                // read next argument
+                type = OPS_GetString();
             }
-            // read next argument
-            type = OPS_GetString();
-        }
-        else {
-            factor(numSignals) = 1.0;
-        }
-        
-        // response limits (optional)
-        if (type != 0 && (strcmp(type, "-lim") == 0 || strcmp(type, "-limit") == 0)) {
-            numdata = 1;
-            if (OPS_GetDoubleInput(&numdata, &lowerLim(numSignals)) < 0) {
-                opserr << "WARNING invalid lower limit for control point: " << tag << endln;
-                opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType <-fact f> <-lim l u> <-isRel> ...\n";
-                return -1;
+            else {
+                factor(numSignals) = 1.0;
             }
-            if (OPS_GetDoubleInput(&numdata, &upperLim(numSignals)) < 0) {
-                opserr << "WARNING invalid upper limit for control point: " << tag << endln;
-                opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType <-fact f> <-lim l u> <-isRel> ...\n";
-                return -1;
+            
+            // response limits
+            if (type != 0 && (strcmp(type, "-lim") == 0 || strcmp(type, "-limit") == 0)) {
+                numdata = 1;
+                if (OPS_GetDoubleInput(&numdata, &lowerLim(numSignals)) < 0) {
+                    opserr << "WARNING invalid lower limit for control point: " << tag << endln;
+                    opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType "
+                        << "<-fact f> <-lim l u> <-relTrial> <-relOut> <-relCtrl> <-relDaq> ...\n";
+                    return -1;
+                }
+                if (OPS_GetDoubleInput(&numdata, &upperLim(numSignals)) < 0) {
+                    opserr << "WARNING invalid upper limit for control point: " << tag << endln;
+                    opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType "
+                        << "<-fact f> <-lim l u> <-relTrial> <-relOut> <-relCtrl> <-relDaq> ...\n";
+                    return -1;
+                }
+                numLimits++;
+                // read next argument
+                type = OPS_GetString();
             }
-            numLimits++;
-            // read next argument
-            type = OPS_GetString();
-        }
-        
-        // relative signal reference (optional)
-        if (type != 0 && (strcmp(type, "-isRel") == 0 || strcmp(type, "-isRelative") == 0)) {
-            isRelative(numSignals) = 1;
-            numRefType++;
+            
+            // relative signal references
+            if (type != 0 && (strcmp(type, "-relTrial") == 0 ||
+                strcmp(type, "-relativeTrial") == 0 ||
+                strcmp(type, "-useRelTrial") == 0 ||
+                strcmp(type, "-useRelativeTrial") == 0)) {
+                isRelTrial(numSignals) = 1;
+                numRelTrial++;
+                // read next argument
+                type = OPS_GetString();
+            }
+            if (type != 0 && (strcmp(type, "-relOut") == 0 ||
+                strcmp(type, "-relativeOut") == 0 ||
+                strcmp(type, "-useRelOut") == 0 ||
+                strcmp(type, "-useRelativeOut") == 0)) {
+                isRelOut(numSignals) = 1;
+                numRelOut++;
+                // read next argument
+                type = OPS_GetString();
+            }
+            if (type != 0 && (strcmp(type, "-relCtrl") == 0 ||
+                strcmp(type, "-relativeCtrl") == 0 ||
+                strcmp(type, "-useRelCtrl") == 0 ||
+                strcmp(type, "-useRelativeCtrl") == 0)) {
+                isRelCtrl(numSignals) = 1;
+                numRelCtrl++;
+                // read next argument
+                type = OPS_GetString();
+            }
+            if (type != 0 && (strcmp(type, "-relDaq") == 0 ||
+                strcmp(type, "-relativeDaq") == 0 ||
+                strcmp(type, "-useRelDaq") == 0 ||
+                strcmp(type, "-useRelativeDaq") == 0)) {
+                isRelDaq(numSignals) = 1;
+                numRelDaq++;
+                // read next argument
+                type = OPS_GetString();
+            }
         }
         
         numSignals++;
@@ -322,9 +375,12 @@ int OPF_ExperimentalCP()
     dof.resize(numSignals);
     rspType.resize(numSignals);
     factor.resize(numSignals);
-    lowerLim.resize(numLimits);
-    upperLim.resize(numLimits);
-    isRelative.resize(numRefType);
+    lowerLim.resize(numSignals);
+    upperLim.resize(numSignals);
+    isRelTrial.resize(numSignals);
+    isRelOut.resize(numSignals);
+    isRelCtrl.resize(numSignals);
+    isRelDaq.resize(numSignals);
     
     // parsing was successful, allocate the control point
     theCP = new ExperimentalCP(tag, dof, rspType, factor);
@@ -334,8 +390,14 @@ int OPF_ExperimentalCP()
         theCP->setLimits(lowerLim, upperLim);
     
     // add signal reference types if available
-    if (numRefType > 0)
-        theCP->setSigRefType(isRelative);
+    if (numRelTrial > 0)
+        theCP->setTrialSigRefType(isRelTrial);
+    if (numRelOut > 0)
+        theCP->setOutSigRefType(isRelOut);
+    if (numRelCtrl > 0)
+        theCP->setCtrlSigRefType(isRelCtrl);
+    if (numRelDaq > 0)
+        theCP->setDaqSigRefType(isRelDaq);
     
     // add node if available
     if (theNode != 0)
@@ -351,39 +413,42 @@ int OPF_ExperimentalCP()
 }
 
 
-ExperimentalCP::ExperimentalCP(int tag, const ID &dof,
-    const ID &rsptype, const Vector &fact)
+ExperimentalCP::ExperimentalCP(int tag, const ID& dof,
+    const ID& rsptype, const Vector& fact)
     : TaggedObject(tag),
     numSignals(dof.Size()), numDOF(dof.Size()),
     DOF(dof), rspType(rsptype), factor(dof.Size()),
-    lowerLim(0), upperLim(0), isRelative(dof.Size()),
+    lowerLim(0), upperLim(0),
+    isRelTrial(dof.Size()), isRelOut(dof.Size()),
+    isRelCtrl(dof.Size()), isRelDaq(dof.Size()),
     uniqueDOF(dof), sizeRspType(5), dofRspType(5),
     nodeTag(0), theNode(0), nodeNDM(0), nodeNDF(0)
 {
     // initialize factors
-    if (fact.Size() > 0)  {
-        if (rspType.Size() != numSignals || 
-            fact.Size() != numSignals)  {
+    if (fact.Size() > 0) {
+        if (rspType.Size() != numSignals ||
+            fact.Size() != numSignals) {
             opserr << "ExperimentalCP::ExperimentalCP() - "
                 << "DOF, rspType and factor arrays need to "
                 << "have the same size.\n";
             exit(OF_ReturnType_failed);
         }
         factor = fact;
-    } else  {
-        if (rspType.Size() != numSignals)  {
+    }
+    else {
+        if (rspType.Size() != numSignals) {
             opserr << "ExperimentalCP::ExperimentalCP() - "
                 << "DOF and rspType arrays need to "
                 << "have the same size.\n";
             exit(OF_ReturnType_failed);
         }
-        for (int i=0; i<numSignals; i++)
+        for (int i = 0; i < numSignals; i++)
             factor(i) = 1.0;
     }
     
     // find unique DOFs and number thereof
     numDOF = uniqueDOF.unique();
-    /*if (numUniqueDir > ndf)  {
+    /*if (numUniqueDir > ndf) {
         opserr << "ExperimentalCP::ExperimentalCP() - "
             << "more unique directions specified than "
             << "available degrees of freedom\n";
@@ -392,8 +457,8 @@ ExperimentalCP::ExperimentalCP(int tag, const ID &dof,
     
     // set sizes of response types
     sizeRspType.Zero();
-    for (int i=0; i<numSignals; i++)  {
-        if (rspType(i) < 0 || 4 < rspType(i))  {
+    for (int i = 0; i < numSignals; i++) {
+        if (rspType(i) < 0 || 4 < rspType(i)) {
             opserr << "ExperimentalCP::ExperimentalCP() - "
                 << "wrong response type received.\n";
             exit(OF_ReturnType_failed);
@@ -401,33 +466,39 @@ ExperimentalCP::ExperimentalCP(int tag, const ID &dof,
         sizeRspType(rspType(i)) += 1;
     }
     
-    // zero the dofRspType vector and the isRelative ID
+    // zero the dofRspType vector and the isRelative IDs
     dofRspType.Zero();
-    isRelative.Zero();
+    isRelTrial.Zero();
+    isRelOut.Zero();
+    isRelCtrl.Zero();
+    isRelDaq.Zero();
 }
 
 
 ExperimentalCP::ExperimentalCP(const ExperimentalCP& ecp)
     : TaggedObject(ecp)
-{    
+{
     numSignals = ecp.numSignals;
-    numDOF     = ecp.numDOF;
+    numDOF = ecp.numDOF;
     
-    DOF        = ecp.DOF;
-    rspType    = ecp.rspType;
-    factor     = ecp.factor;
-    lowerLim   = ecp.lowerLim;
-    upperLim   = ecp.upperLim;
-    isRelative = ecp.isRelative;
+    DOF = ecp.DOF;
+    rspType = ecp.rspType;
+    factor = ecp.factor;
+    lowerLim = ecp.lowerLim;
+    upperLim = ecp.upperLim;
+    isRelTrial = ecp.isRelTrial;
+    isRelOut = ecp.isRelOut;
+    isRelCtrl = ecp.isRelCtrl;
+    isRelDaq = ecp.isRelDaq;
     
-    uniqueDOF   = ecp.uniqueDOF;
+    uniqueDOF = ecp.uniqueDOF;
     sizeRspType = ecp.sizeRspType;
-    dofRspType  = ecp.dofRspType;
+    dofRspType = ecp.dofRspType;
     
-    nodeTag  = ecp.nodeTag;
-    theNode  = ecp.theNode;
-    nodeNDM  = ecp.nodeNDM;
-    nodeNDF  = ecp.nodeNDF;
+    nodeTag = ecp.nodeTag;
+    theNode = ecp.theNode;
+    nodeNDM = ecp.nodeNDM;
+    nodeNDF = ecp.nodeNDF;
     nodeCrds = ecp.nodeCrds;
 }
 
@@ -440,14 +511,14 @@ ExperimentalCP::~ExperimentalCP()
 
 ExperimentalCP* ExperimentalCP::getCopy()
 {
-    ExperimentalCP *theCopy = new ExperimentalCP(*this);
-
+    ExperimentalCP* theCopy = new ExperimentalCP(*this);
+    
     return theCopy;
 }
 
 
-int ExperimentalCP::setData(const ID &dof,
-    const ID &rsptype, const Vector &fact)
+int ExperimentalCP::setData(const ID& dof,
+    const ID& rsptype, const Vector& fact)
 {
     // save the number of directions
     numSignals = dof.Size();
@@ -456,23 +527,24 @@ int ExperimentalCP::setData(const ID &dof,
     rspType = rsptype;
     
     // initialize factors
-    if (fact.Size() > 0)  {
-        if (rspType.Size() != numSignals || 
-            fact.Size() != numSignals)  {
+    if (fact.Size() > 0) {
+        if (rspType.Size() != numSignals ||
+            fact.Size() != numSignals) {
             opserr << "ExperimentalCP::setData() - "
                 << "DOF, rspType and factor arrays need to "
                 << "have the same size.\n";
             return OF_ReturnType_failed;
         }
         factor = fact;
-    } else  {
-        if (rspType.Size() != numSignals)  {
+    }
+    else {
+        if (rspType.Size() != numSignals) {
             opserr << "ExperimentalCP::setData() - "
                 << "DOF and rspType arrays need to "
                 << "have the same size.\n";
             return OF_ReturnType_failed;
         }
-        for (int i=0; i<numSignals; i++)
+        for (int i = 0; i < numSignals; i++)
             factor(i) = 1.0;
     }
     
@@ -487,8 +559,8 @@ int ExperimentalCP::setData(const ID &dof,
     
     // set sizes of response types
     sizeRspType.Zero();
-    for (int i=0; i<numSignals; i++)  {
-        if (rspType(i) < 0 || 4 < rspType(i))  {
+    for (int i = 0; i < numSignals; i++) {
+        if (rspType(i) < 0 || 4 < rspType(i)) {
             opserr << "ExperimentalCP::setData() - "
                 << "wrong response type received.\n";
             return OF_ReturnType_failed;
@@ -503,15 +575,15 @@ int ExperimentalCP::setData(const ID &dof,
 }
 
 
-int ExperimentalCP::setLimits(const Vector &lowerlim,
-    const Vector &upperlim)
+int ExperimentalCP::setLimits(const Vector& lowerlim,
+    const Vector& upperlim)
 {
-    if (lowerlim.Size() != numSignals || 
-        upperlim.Size() != numSignals)  {
-            opserr << "ExperimentalCP::setLimits() - "
-                << "lower and upper limits need to be of "
-                << "size: " << numSignals << endln;
-            return OF_ReturnType_failed;
+    if (lowerlim.Size() != numSignals ||
+        upperlim.Size() != numSignals) {
+        opserr << "ExperimentalCP::setLimits() - "
+            << "lower and upper limits need to be of "
+            << "size: " << numSignals << endln;
+        return OF_ReturnType_failed;
     }
     
     lowerLim = lowerlim;
@@ -521,25 +593,70 @@ int ExperimentalCP::setLimits(const Vector &lowerlim,
 }
 
 
-int ExperimentalCP::setSigRefType(const ID &isrelative)
+int ExperimentalCP::setTrialSigRefType(const ID& isrelative)
 {
-    if (isrelative.Size() != numSignals)  {
-            opserr << "ExperimentalCP::setSigRefType() - "
-                << "signal reference type ID needs to be of "
-                << "size: " << numSignals << endln;
-            return OF_ReturnType_failed;
+    if (isrelative.Size() != numSignals) {
+        opserr << "ExperimentalCP::setTrailSigRefType() - "
+            << "trial signal reference type ID needs to be of "
+            << "size: " << numSignals << endln;
+        return OF_ReturnType_failed;
     }
     
-    isRelative = isrelative;
+    isRelTrial = isrelative;
     
     return 0;
 }
 
 
-int ExperimentalCP::setNode(Node *node)
+int ExperimentalCP::setOutSigRefType(const ID& isrelative)
+{
+    if (isrelative.Size() != numSignals) {
+        opserr << "ExperimentalCP::setOutSigRefType() - "
+            << "out signal reference type ID needs to be of "
+            << "size: " << numSignals << endln;
+        return OF_ReturnType_failed;
+    }
+    
+    isRelOut = isrelative;
+    
+    return 0;
+}
+
+
+int ExperimentalCP::setCtrlSigRefType(const ID& isrelative)
+{
+    if (isrelative.Size() != numSignals) {
+        opserr << "ExperimentalCP::setCtrlSigRefType() - "
+            << "ctrl signal reference type ID needs to be of "
+            << "size: " << numSignals << endln;
+        return OF_ReturnType_failed;
+    }
+    
+    isRelCtrl = isrelative;
+    
+    return 0;
+}
+
+
+int ExperimentalCP::setDaqSigRefType(const ID& isrelative)
+{
+    if (isrelative.Size() != numSignals) {
+        opserr << "ExperimentalCP::setDaqSigRefType() - "
+            << "daq signal reference type ID needs to be of "
+            << "size: " << numSignals << endln;
+        return OF_ReturnType_failed;
+    }
+    
+    isRelDaq = isrelative;
+    
+    return 0;
+}
+
+
+int ExperimentalCP::setNode(Node* node)
 {
     // check node input
-    if (node == 0)  {
+    if (node == 0) {
         opserr << "ExperimentalCP::setNode() - "
             << "null node pointer passed.\n";
         exit(OF_ReturnType_failed);
@@ -576,15 +693,8 @@ const ID& ExperimentalCP::getSizeRspType()
 
 const ID& ExperimentalCP::getDOFRspType(int dir)
 {
-    /*if (dir < 0 || dir > ndf)  {
-        opserr << "ExperimentalCP::getDOFRspType() - "
-            << "direction out of bounds, "
-            << "direction " << dir << " does not exist\n";
-        exit(OF_ReturnType_failed);
-    }*/
-    
     dofRspType.Zero();
-    for (int i=0; i<numSignals; i++)  {
+    for (int i = 0; i < numSignals; i++) {
         if (DOF(i) == dir)
             dofRspType(rspType(i)) = 1;
     }
@@ -595,7 +705,7 @@ const ID& ExperimentalCP::getDOFRspType(int dir)
 
 int ExperimentalCP::getNodeTag()
 {
-    if (nodeTag == 0)  {
+    if (nodeTag == 0) {
         opserr << "ExperimentalCP::getNodeTag() - "
             << "this control point has no node "
             << "assigned.\n";
@@ -608,7 +718,7 @@ int ExperimentalCP::getNodeTag()
 
 int ExperimentalCP::getNodeNDM()
 {
-    if (nodeTag == 0)  {
+    if (nodeTag == 0) {
         opserr << "ExperimentalCP::getNodeNDM() - "
             << "this control point has no node "
             << "assigned.\n";
@@ -621,7 +731,7 @@ int ExperimentalCP::getNodeNDM()
 
 int ExperimentalCP::getNodeNDF()
 {
-    if (nodeTag == 0)  {
+    if (nodeTag == 0) {
         opserr << "ExperimentalCP::getNodeNDF() - "
             << "this control point has no node "
             << "assigned.\n";
@@ -634,7 +744,7 @@ int ExperimentalCP::getNodeNDF()
 
 const Vector& ExperimentalCP::getNodeCrds()
 {
-    if (nodeTag == 0)  {
+    if (nodeTag == 0) {
         opserr << "ExperimentalCP::getNodeCrds() - "
             << "this control point has no node "
             << "assigned.\n";
@@ -671,7 +781,7 @@ const Vector& ExperimentalCP::getFactor()
 
 const Vector& ExperimentalCP::getLowerLimit()
 {
-    if (lowerLim == 0)  {
+    if (lowerLim == 0) {
         opserr << "ExperimentalCP::getLowerLimit() - "
             << "this control point has no lower "
             << "limits assigned.\n";
@@ -684,7 +794,7 @@ const Vector& ExperimentalCP::getLowerLimit()
 
 const Vector& ExperimentalCP::getUpperLimit()
 {
-    if (upperLim == 0)  {
+    if (upperLim == 0) {
         opserr << "ExperimentalCP::getUpperLimit() - "
             << "this control point has no upper "
             << "limits assigned.\n";
@@ -695,15 +805,33 @@ const Vector& ExperimentalCP::getUpperLimit()
 }
 
 
-const ID& ExperimentalCP::getSigRefType()
+const ID& ExperimentalCP::getTrialSigRefType()
 {
-    return isRelative;
+    return isRelTrial;
+}
+
+
+const ID& ExperimentalCP::getOutSigRefType()
+{
+    return isRelOut;
+}
+
+
+const ID& ExperimentalCP::getCtrlSigRefType()
+{
+    return isRelCtrl;
+}
+
+
+const ID& ExperimentalCP::getDaqSigRefType()
+{
+    return isRelDaq;
 }
 
 
 int ExperimentalCP::getDOF(int signalID)
 {
-    if (signalID < 0 || numSignals <= signalID)  {
+    if (signalID < 0 || numSignals <= signalID) {
         opserr << "ExperimentalCP::getDOF() - "
             << "signal ID out of bounds, "
             << "component " << signalID << " does not exist.\n";
@@ -716,7 +844,7 @@ int ExperimentalCP::getDOF(int signalID)
 
 int ExperimentalCP::getRspType(int signalID)
 {
-    if (signalID < 0 || numSignals <= signalID)  {
+    if (signalID < 0 || numSignals <= signalID) {
         opserr << "ExperimentalCP::getRspType() - "
             << "signal ID out of bounds, "
             << "component " << signalID << " does not exist.\n";
@@ -729,7 +857,7 @@ int ExperimentalCP::getRspType(int signalID)
 
 double ExperimentalCP::getFactor(int signalID)
 {
-    if (signalID < 0 || numSignals <= signalID)  {
+    if (signalID < 0 || numSignals <= signalID) {
         opserr << "ExperimentalCP::getFactor() - "
             << "signal ID out of bounds, "
             << "component " << signalID << " does not exist.\n";
@@ -742,14 +870,14 @@ double ExperimentalCP::getFactor(int signalID)
 
 double ExperimentalCP::getLowerLimit(int signalID)
 {
-    if (lowerLim == 0)  {
+    if (lowerLim == 0) {
         opserr << "ExperimentalCP::getLowerLimit() - "
             << "this control point has no lower "
             << "limits assigned.\n";
         exit(OF_ReturnType_failed);
     }
     
-    if (signalID < 0 || numSignals <= signalID)  {
+    if (signalID < 0 || numSignals <= signalID) {
         opserr << "ExperimentalCP::getLowerLimit() - "
             << "signal ID out of bounds, "
             << "component " << signalID << " does not exist.\n";
@@ -762,14 +890,14 @@ double ExperimentalCP::getLowerLimit(int signalID)
 
 double ExperimentalCP::getUpperLimit(int signalID)
 {
-    if (upperLim == 0)  {
+    if (upperLim == 0) {
         opserr << "ExperimentalCP::getUpperLimit() - "
             << "this control point has no upper "
             << "limits assigned.\n";
         exit(OF_ReturnType_failed);
     }
     
-    if (signalID < 0 || numSignals <= signalID)  {
+    if (signalID < 0 || numSignals <= signalID) {
         opserr << "ExperimentalCP::getUpperLimit() - "
             << "signal ID out of bounds, "
             << "component " << signalID << " does not exist.\n";
@@ -780,23 +908,62 @@ double ExperimentalCP::getUpperLimit(int signalID)
 }
 
 
-int ExperimentalCP::getSigRefType(int signalID)
+int ExperimentalCP::getTrialSigRefType(int signalID)
 {
-    if (signalID < 0 || numSignals <= signalID)  {
-        opserr << "ExperimentalCP::getSigRefType() - "
-            << "signal ID out of bounds, "
+    if (signalID < 0 || numSignals <= signalID) {
+        opserr << "ExperimentalCP::getTrialSigRefType() - "
+            << "trial signal ID out of bounds, "
             << "component " << signalID << " does not exist.\n";
         exit(OF_ReturnType_failed);
     }
     
-    return isRelative(signalID);
+    return isRelTrial(signalID);
 }
 
 
-void ExperimentalCP::Print(OPS_Stream &s, int flag)
+int ExperimentalCP::getOutSigRefType(int signalID)
+{
+    if (signalID < 0 || numSignals <= signalID) {
+        opserr << "ExperimentalCP::getOutSigRefType() - "
+            << "out signal ID out of bounds, "
+            << "component " << signalID << " does not exist.\n";
+        exit(OF_ReturnType_failed);
+    }
+    
+    return isRelOut(signalID);
+}
+
+
+int ExperimentalCP::getCtrlSigRefType(int signalID)
+{
+    if (signalID < 0 || numSignals <= signalID) {
+        opserr << "ExperimentalCP::getCtrlSigRefType() - "
+            << "ctrl signal ID out of bounds, "
+            << "component " << signalID << " does not exist.\n";
+        exit(OF_ReturnType_failed);
+    }
+    
+    return isRelCtrl(signalID);
+}
+
+
+int ExperimentalCP::getDaqSigRefType(int signalID)
+{
+    if (signalID < 0 || numSignals <= signalID) {
+        opserr << "ExperimentalCP::getDaqSigRefType() - "
+            << "daq signal ID out of bounds, "
+            << "component " << signalID << " does not exist.\n";
+        exit(OF_ReturnType_failed);
+    }
+    
+    return isRelDaq(signalID);
+}
+
+
+void ExperimentalCP::Print(OPS_Stream& s, int flag)
 {
     s << "ExperimentalCP: " << this->getTag() << endln;
-    s << "  numSignal: " << numSignals << ", numDOF: " << numDOF << endln; 
+    s << "  numSignal: " << numSignals << ", numDOF: " << numDOF << endln;
     s << "  DOF     : " << DOF << endln;
     s << "  rspType : " << rspType << endln;
     s << "  factor  : " << factor << endln;
@@ -804,8 +971,11 @@ void ExperimentalCP::Print(OPS_Stream &s, int flag)
         s << "  lowerLim: " << lowerLim << endln;
     if (upperLim != 0)
         s << "  upperLim: " << upperLim << endln;
-    s << "  isRelative  : " << isRelative << endln;
-    if (nodeTag != 0)  {
+    s << "  isRelTrial  : " << isRelTrial << endln;
+    s << "  isRelOut  : " << isRelOut << endln;
+    s << "  isRelCtrl  : " << isRelCtrl << endln;
+    s << "  isRelDaq  : " << isRelDaq << endln;
+    if (nodeTag != 0) {
         s << "  nodeTag: " << nodeTag << endln;
         s << "    ndm: " << nodeNDM << ", ndf: " << nodeNDF << endln;
         s << "    crds: " << nodeCrds << endln;
@@ -826,11 +996,12 @@ int ExperimentalCP::hasLimits()
 int ExperimentalCP::operator == (ExperimentalCP& ecp)
 {
     // factor value IS NOT checked!
-    if (nodeTag == ecp.nodeTag 
+    if (nodeTag == ecp.nodeTag
         && DOF == ecp.DOF
         && rspType == ecp.rspType) {
         return 1;
-    } else {
+    }
+    else {
         return 0;
     }
 }
@@ -839,11 +1010,12 @@ int ExperimentalCP::operator == (ExperimentalCP& ecp)
 int ExperimentalCP::operator != (ExperimentalCP& ecp)
 {
     // factor value IS NOT checked!
-    if (nodeTag != ecp.nodeTag 
+    if (nodeTag != ecp.nodeTag
         || DOF != ecp.DOF
         || rspType != ecp.rspType) {
         return 1;
-    } else {
+    }
+    else {
         return 0;
     }
 }

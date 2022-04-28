@@ -58,7 +58,10 @@ public:
         const ID &rspType, const Vector &factor = 0);
     int setLimits(const Vector &lowerLimit,
         const Vector &upperLimit);
-    int setSigRefType(const ID &isRelative);
+    int setTrialSigRefType(const ID &isRelative);
+    int setOutSigRefType(const ID &isRelative);
+    int setCtrlSigRefType(const ID &isRelative);
+    int setDaqSigRefType(const ID &isRelative);
     int setNode(Node *theNode);
     
     // methods to get derived control point data
@@ -79,7 +82,10 @@ public:
     const Vector &getFactor();
     const Vector &getLowerLimit();
     const Vector &getUpperLimit();
-    const ID &getSigRefType();
+    const ID &getTrialSigRefType();
+    const ID &getOutSigRefType();
+    const ID &getCtrlSigRefType();
+    const ID &getDaqSigRefType();
     
     const ID &getUniqueDOF();  // DO I STILL NEED THIS ???
     
@@ -88,7 +94,10 @@ public:
     double getFactor(int signalID);
     double getLowerLimit(int signalID);
     double getUpperLimit(int signalID);
-    int getSigRefType(int signalID);
+    int getTrialSigRefType(int signalID);
+    int getOutSigRefType(int signalID);
+    int getCtrlSigRefType(int signalID);
+    int getDaqSigRefType(int signalID);
     
     // methods to query information
     int hasLimits();
@@ -104,7 +113,10 @@ protected:
     Vector factor;      // scaling factors (size = numSignals)
     Vector lowerLim;    // lower limits (size = numSignals)
     Vector upperLim;    // upper limits (size = numSignals)
-    ID isRelative;      // absolute or relative (size = numSignals)
+    ID isRelTrial;      // absolute or relative trial signal(size = numSignals)
+    ID isRelOut;        // absolute or relative out signal (size = numSignals)
+    ID isRelCtrl;       // absolute or relative ctrl signal (size = numSignals)
+    ID isRelDaq;        // absolute or relative daq signal (size = numSignals)
     
     ID uniqueDOF;       // unique DOFs
     ID sizeRspType;     // sizes of response types
