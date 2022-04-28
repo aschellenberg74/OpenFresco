@@ -18,109 +18,125 @@ function data = plotOutputXPCtarget(fileName,dofID,tStart,tEnd,respType,respUnit
 
 %#ok<*LOAD>
 %#ok<*TRYNC>
+%#ok<*NASGU>
 
 % define constants
 g = 32.174*12;
 SS = get(0,'screensize');  % screen size
 debug = 0;
 if (nargin<6)
-    respType = 'Force';
-    respUnit = 'ton';
+    respType = 'Displacement';
+    respUnit = 'in.';
 end
 
 % load the file and extract data
 data = [];
 load(fileName);
-targSig = data(1).values;
-numDOF  = size(targSig,2)-1;
-commSig = data(2).values(:,[1:numDOF,end]);
-measSig = data(3).values(:,[1:numDOF,end]);
-state   = data(4).values;
-counter = data(5).values;
-flags   = data(6).values;
-measDsp = data(7).values;
-measFrc = data(8).values;
-
-time = targSig(:,end);
+time = data(1).values(:,end);
 npts = length(time);
 dt = mean(diff(time));
+% check if we have ATS parameters recorded
+haveATS = rem(size(data(1).values,2)-6,13) == 0;
+if haveATS
+    numDOF = (size(data(1).values,2)-6)/13;
+    targSig       = data(1).values(:,0*numDOF+1:1*numDOF);
+    commSig       = data(1).values(:,1*numDOF+1:2*numDOF);
+    commSigDot    = data(1).values(:,2*numDOF+1:3*numDOF);
+    commSigDotDot = data(1).values(:,3*numDOF+1:4*numDOF);
+    atsDsp        = data(1).values(:,4*numDOF+1:5*numDOF);
+    measSig       = data(1).values(:,5*numDOF+1:7*numDOF);
+    measDsp       = data(1).values(:,7*numDOF+1:8*numDOF);
+    measFrc       = data(1).values(:,8*numDOF+1:9*numDOF);
+    atsPar        = data(1).values(:,9*numDOF+1:13*numDOF);
+    state         = data(1).values(:,13*numDOF+1);
+    counter       = data(1).values(:,13*numDOF+2);
+    flags         = data(1).values(:,13*numDOF+3:13*numDOF+5);
+else
+    numDOF = (size(data(1).values,2)-6)/8;
+    targSig       = data(1).values(:,0*numDOF+1:1*numDOF);
+    commSig       = data(1).values(:,1*numDOF+1:2*numDOF);
+    commSigDot    = data(1).values(:,2*numDOF+1:3*numDOF);
+    commSigDotDot = data(1).values(:,3*numDOF+1:4*numDOF);
+    measSig       = data(1).values(:,4*numDOF+1:6*numDOF);
+    measDsp       = data(1).values(:,6*numDOF+1:7*numDOF);
+    measFrc       = data(1).values(:,7*numDOF+1:8*numDOF);
+    state         = data(1).values(:,8*numDOF+1);
+    counter       = data(1).values(:,8*numDOF+2);
+    flags         = data(1).values(:,8*numDOF+3:8*numDOF+5);
+end
 
 % check for optional parameters
 if (nargin<2)
     dofID = 1;
-    idS = ceil(1/dt);
+    idS = find(state >= 0,1);
     idE = npts;
 elseif (nargin<3)
-    idS = ceil(1/dt);
+    idS = find(state >= 0,1);
     idE = npts;
 elseif (nargin<4)
-    idS = max(find(time>=tStart,1),ceil(1/dt));
+    idS = find(time>=tStart,1);
     idE = npts;
 else
-    idS = max(find(time>=tStart,1),ceil(1/dt));
+    idS = find(time>=tStart,1);
     idE = min(find(time<=tEnd,1,'last'),npts);
 end
-
-% check if commSig derivatives exist
-if (size(data(2).values,2)-1 >= 2*numDOF)
-    commSigDot = data(2).values(:,[numDOF+1:2*numDOF,end]);
-end
-if (size(data(2).values,2)-1 >= 3*numDOF)
-    commSigDotDot = data(2).values(:,[2*numDOF+1:3*numDOF,end]);
-end
+timeID = idS:idE;
 
 % get measured velocities and accelerations
-measVel = (1/dt)*[zeros(1,size(measDsp,2));diff(measDsp)];
-measAcc = (1/dt)*[zeros(1,size(measVel,2));diff(measVel)];
+measVel = (1/dt)*[zeros(1,numDOF);diff(measDsp)];
+measAcc = (1/dt)*[zeros(1,numDOF);diff(measVel)];
 
 %==========================================================================
 % command signal
 createWindow('cen',0.80*SS(4)/3*4,0.80*SS(4),['Command ',respType]);
 try
-    plot(time(idS:idE),commSig(idS:idE,dofID),'b-','LineWidth',1.0);
-    %hold on;
-    %plot(time(idS:idE),measFrc(idS:idE,10),'r-','LineWidth',1.0);
+    plot(time(timeID),commSig(timeID,dofID),'b-','LineWidth',1.0);
+    hold('on');
+    if haveATS
+        plot(time(timeID),atsDsp(timeID,dofID),'r-','LineWidth',1.0);
+    end
 end
 grid('on');
 xlabel('Time [sec]','FontWeight','bold');
 ylabel(['Command ',respType,' [',respUnit,']'],'FontWeight','bold');
 title(sprintf('Command %s from xPC-Target: DOF %02d',respType,dofID),'FontWeight','bold');
-%==========================================================================
-% command signalDot
-if exist('commSigDot','var')
-    createWindow('cen',0.80*SS(4)/3*4,0.80*SS(4),['(Command ',respType,')Dot']);
-    try
-        plot(time(idS:idE),commSigDot(idS:idE,dofID),'b-','LineWidth',1.0);
-    end
-    grid('on');
-    xlabel('Time [sec]','FontWeight','bold');
-    ylabel(['(Command ',respType,')^\bullet [',respUnit,'/sec]'],'FontWeight','bold');
-    title(['(Command ',respType,')^\bullet from xPC-Target: ',sprintf('DOF %02d',dofID)],'FontWeight','bold');
-end
-%==========================================================================
-% command signalDotDot
-if exist('commSigDotDot','var')
-    createWindow('cen',0.80*SS(4)/3*4,0.80*SS(4),['(Command ',respType,')DotDot']);
-    try
-        plot(time(idS:idE),commSigDotDot(idS:idE,dofID),'b-','LineWidth',1.0);
-    end
-    grid('on');
-    xlabel('Time [sec]','FontWeight','bold');
-    ylabel(['(Command ',respType,')^\bullet^\bullet [',respUnit,'/sec^2]'],'FontWeight','bold');
-    title(['(Command ',respType,')^\bullet^\bullet from xPC-Target: ',sprintf('DOF %02d',dofID)],'FontWeight','bold');
+if haveATS
+    legend('command','compensated');
 end
 %==========================================================================
 % fft of command signal
 createWindow('cen',0.80*SS(4)/3*4,0.80*SS(4),['FFT Comm ',respType]);
 try
-    getFFT(commSig(idS:idE,dofID),dt,'title',sprintf('Command %s: DOF %02d',respType,dofID));
+    getFFT(commSig(timeID,dofID),dt,'title',sprintf('Command %s: DOF %02d',respType,dofID));
+    getFFT(atsDsp(timeID,dofID),dt,'title',sprintf('Command %s: DOF %02d',respType,dofID));
     set(gca,'YScale','log');
+    legend('command','compensated');
 end
+%==========================================================================
+% command signalDot
+createWindow('cen',0.80*SS(4)/3*4,0.80*SS(4),['(Command ',respType,')Dot']);
+try
+    plot(time(timeID),commSigDot(timeID,dofID),'b-','LineWidth',1.0);
+end
+grid('on');
+xlabel('Time [sec]','FontWeight','bold');
+ylabel(['(Command ',respType,')^\bullet [',respUnit,'/sec]'],'FontWeight','bold');
+title(['(Command ',respType,')^\bullet from xPC-Target: ',sprintf('DOF %02d',dofID)],'FontWeight','bold');
+%==========================================================================
+% command signalDotDot
+createWindow('cen',0.80*SS(4)/3*4,0.80*SS(4),['(Command ',respType,')DotDot']);
+try
+    plot(time(timeID),commSigDotDot(timeID,dofID),'b-','LineWidth',1.0);
+end
+grid('on');
+xlabel('Time [sec]','FontWeight','bold');
+ylabel(['(Command ',respType,')^\bullet^\bullet [',respUnit,'/sec^2]'],'FontWeight','bold');
+title(['(Command ',respType,')^\bullet^\bullet from xPC-Target: ',sprintf('DOF %02d',dofID)],'FontWeight','bold');
 %==========================================================================
 % target, command, and measured signals
 createWindow('cen',0.80*SS(4)/3*4,0.80*SS(4),['Targ, Comm, & Meas ',respType]);
 try
-    plot(time(idS:idE),targSig(idS:idE,dofID),'-b','LineWidth',1.0);
+    plot(time(timeID),targSig(timeID,dofID),'-b','LineWidth',1.0);
     hold('on');
     targID = find(diff(flags(:,3)) > 0) + 1;
     tID = (idS <= targID & targID <= idE);
@@ -128,14 +144,16 @@ try
     plot(time(targID),targSig(targID,dofID),'ob','MarkerSize',3);
 end
 try
-    plot(time(idS:idE),commSig(idS:idE,dofID),'-r','LineWidth',1.0);
+    plot(time(timeID),commSig(timeID,dofID),'-r','LineWidth',1.0);
 end
 try
-    plot(time(idS:idE),measSig(idS:idE,dofID),'-g','LineWidth',1.0);
+    plot(time(timeID),measSig(timeID,dofID),'-g','LineWidth',1.0);
 end
-%try
-%   plot(time(idS:idE),state(idS:idE,1),'-k','LineWidth',1.0);
-%end
+if debug
+    try
+        plot(time(timeID),state(timeID),'-k','LineWidth',1.0);
+    end
+end
 grid('on');
 xlabel('Time [sec]','FontWeight','bold');
 ylabel([respType,' [',respUnit,']'],'FontWeight','bold');
@@ -153,11 +171,11 @@ try
     measSigAT = interp1(time(targID),measSig(targID,dofID),time,[],0.0);
     error = measSigAT - targSigAT;
     timeShift = findTimeShift(time,targSigAT,time,measSigAT);
-    plot(time(idS:idE),targSigAT(idS:idE),'-b','LineWidth',1.0);
+    plot(time(timeID),targSigAT(timeID),'-b','LineWidth',1.0);
     hold('on');
-    plot(time(idS:idE),measSigAT(idS:idE),'-r','LineWidth',1.0);
-    plot(time(idS:idE)+timeShift,measSigAT(idS:idE),'--m','LineWidth',1.0);
-    plot(time(idS:idE),error(idS:idE),'-g','LineWidth',1.0);
+    plot(time(timeID),measSigAT(timeID),'-r','LineWidth',1.0);
+    plot(time(timeID)+timeShift,measSigAT(timeID),'--m','LineWidth',1.0);
+    plot(time(timeID),error(timeID),'-g','LineWidth',1.0);
 end
 grid('on');
 xlabel('Time [sec]','FontWeight','bold');
@@ -173,11 +191,11 @@ try
     measSigAT = measDsp(:,dofID);
     error = measSigAT - commSigAT;
     timeShift = findTimeShift(time,commSigAT,time,measSigAT);
-    plot(time(idS:idE),commSigAT(idS:idE),'-b','LineWidth',1.0);
+    plot(time(timeID),commSigAT(timeID),'-b','LineWidth',1.0);
     hold('on');
-    plot(time(idS:idE),measSigAT(idS:idE),'-r','LineWidth',1.0);
-    plot(time(idS:idE)+timeShift,measSigAT(idS:idE),'--m','LineWidth',1.0);
-    plot(time(idS:idE),error(idS:idE),'-g','LineWidth',1.0);
+    plot(time(timeID),measSigAT(timeID),'-r','LineWidth',1.0);
+    plot(time(timeID)+timeShift,measSigAT(timeID),'--m','LineWidth',1.0);
+    plot(time(timeID),error(timeID),'-g','LineWidth',1.0);
 end
 grid('on');
 xlabel('Time [sec]','FontWeight','bold');
@@ -193,11 +211,11 @@ try
     measAccAT = (1/g)*measAcc(:,dofID);
     error = measAccAT - commAccAT;
     timeShift = findTimeShift(time,commAccAT,time,measAccAT);
-    plot(time(idS:idE),commAccAT(idS:idE),'-b','LineWidth',1.0);
+    plot(time(timeID),commAccAT(timeID),'-b','LineWidth',1.0);
     hold('on');
-    plot(time(idS:idE),measAccAT(idS:idE),'-r','LineWidth',1.0);
-    plot(time(idS:idE)+timeShift,measAccAT(idS:idE),'--m','LineWidth',1.0);
-    plot(time(idS:idE),error(idS:idE),'-g','LineWidth',1.0);
+    plot(time(timeID),measAccAT(timeID),'-r','LineWidth',1.0);
+    plot(time(timeID)+timeShift,measAccAT(timeID),'--m','LineWidth',1.0);
+    plot(time(timeID),error(timeID),'-g','LineWidth',1.0);
 end
 grid('on');
 xlabel('Time [sec]','FontWeight','bold');
@@ -250,7 +268,7 @@ try
     ylabel('Coherence [-]','FontWeight','bold');
 end
 %==========================================================================
-% transfer function between measured and command accelerations
+% transfer function between measured and command signalDotDot
 createWindow('cen',0.80*SS(4)/3*4,0.80*SS(4),'Transfer Function Meas & Comm Acceleration');
 try
     commAccAT = (1/g)*commSigDotDot(:,dofID);
@@ -369,25 +387,18 @@ try
     normRMS = rmsError./sigRange*100;
     %normRMS = rmsError./sigStdev*100;
     
-    %plot(time(noNaN(idS:idE)),rmsError(idS:idE),'-b','LineWidth',1.0);
-    plot(time(noNaN(idS:idE)),normRMS(idS:idE),'-b','LineWidth',1.0);
+    %plot(time(noNaN(timeID)),rmsError(timeID),'-b','LineWidth',1.0);
+    plot(time(noNaN(timeID)),normRMS(timeID),'-b','LineWidth',1.0);
 end
 grid('on');
 xlabel('Time [sec]','FontWeight','bold');
 ylabel('Normalized RMS Error [%]','FontWeight','bold');
 title(sprintf('RMS Error between Measured and Target %s from xPC-Target: DOF %02d',respType,dofID),'FontWeight','bold');
 %==========================================================================
-% fft of error between measured and commmand signals
-%createWindow('cen',0.80*SS(4)/3*4,0.80*SS(4),['FFT of Error Meas & Comm ',respType]);
-%try
-%   error = measSig(idS:idE,dofID) - commSig(idS:idE,dofID);
-%   getFFT(error,dt,'title',sprintf('Error between Measured and Command %s: DOF %02d',respType,dofID));
-%end
-%==========================================================================
 % measured force
 createWindow('cen',0.80*SS(4)/3*4,0.80*SS(4),'Measured Force');
 try
-    plot(time(idS:idE),measFrc(idS:idE,dofID),'-b','LineWidth',1.0);
+    plot(time(timeID),measFrc(timeID,dofID),'-b','LineWidth',1.0);
 end
 grid('on');
 xlabel('Time [sec]','FontWeight','bold');
@@ -397,49 +408,70 @@ title(sprintf('Measured Force from xPC-Target: DOF %02d',dofID),'FontWeight','bo
 % fft of measured force
 createWindow('cen',0.80*SS(4)/3*4,0.80*SS(4),'FFT of Measured Force');
 try
-    getFFT(measFrc(idS:idE,dofID),dt,'title',sprintf('Measured Force: DOF %02d',dofID));
+    getFFT(measFrc(timeID,dofID),dt,'title',sprintf('Measured Force: DOF %02d',dofID));
     set(gca,'YScale','log');
 end
+%==========================================================================
+% measured displacement vs. measured force
+createWindow('cen',0.80*SS(4)/3*4,0.80*SS(4),'Measured Displacement vs. Force');
+try
+    plot(measDsp(timeID,dofID),measFrc(timeID,dofID),'-b','LineWidth',1.0);
+end
+grid('on');
+xlabel('Measured Displacement [in.]','FontWeight','bold');
+ylabel('Measured Force [kip]','FontWeight','bold');
+title(sprintf('Measured Force from xPC-Target: DOF %02d',dofID),'FontWeight','bold');
 %==========================================================================
 % state of predictor-corrector
 createWindow('cen',0.80*SS(4)/3*4,0.80*SS(4),'State of Predictor-Corrector');
 try
-    plot(time(idS:idE),state(idS:idE,1),'-b','LineWidth',1.0);
+    plot(time(timeID),state(timeID),'-b','LineWidth',1.0);
 end
 grid('on');
 xlabel('Time [sec]','FontWeight','bold');
 ylabel('State [-]','FontWeight','bold');
 title('State of Predictor-Corrector from xPC-Target','FontWeight','bold');
 %==========================================================================
-
 if debug
-    %==========================================================================
     % counter of predictor-corrector
     createWindow('cen',0.80*SS(4)/3*4,0.80*SS(4),'Counter of Predictor-Corrector');
     try
-        plot(time(idS:idE),counter(idS:idE,1),'-b','LineWidth',1.0);
+        plot(time(timeID),counter(timeID),'-b','LineWidth',1.0);
     end
     grid('on');
     xlabel('Time [sec]','FontWeight','bold');
     ylabel('Counter [-]','FontWeight','bold');
     title('Counter of Predictor-Corrector from xPC-Target','FontWeight','bold');
-    %==========================================================================
     % flags of predictor-corrector
     createWindow('cen',0.80*SS(4)/3*4,0.80*SS(4),'Flags of Predictor-Corrector');
     try
-        plot(time(idS:idE),flags(idS:idE,1),'-b','LineWidth',1.0);
+        plot(time(timeID),flags(timeID,1),'-b','LineWidth',1.0);
     end
     hold('on');
     try
-        plot(time(idS:idE),flags(idS:idE,2),'--r','LineWidth',1.0);
+        plot(time(timeID),flags(timeID,2),'--r','LineWidth',1.0);
     end
     try
-        plot(time(idS:idE),flags(idS:idE,3),'-.g','LineWidth',1.0);
+        plot(time(timeID),flags(timeID,3),'-.g','LineWidth',1.0);
     end
     grid('on');
     xlabel('Time [sec]','FontWeight','bold');
     ylabel('Flag [-]','FontWeight','bold');
     title('Flags of Predictor-Corrector from xPC-Target','FontWeight','bold');
     legend('newTarget','switchPC','atTarget');
-    %==========================================================================
+    % task execution time (TET) of predictor-corrector
+    if isfield(data,'logTET') && ~isempty(data(1).logTET)
+        createWindow('cen',0.80*SS(4)/3*4,0.80*SS(4),'TET of Predictor-Corrector');
+        try
+            plot(time(timeID),data(1).logTET(timeID),'-b','LineWidth',1.0);
+            hold('on');
+            plot(time(timeID),repmat(dt,length(timeID),1),'--r','LineWidth',2.0);
+            set(gca,'YScale','log');
+        end
+        grid('on');
+        xlabel('Time [sec]','FontWeight','bold');
+        ylabel('TET [sec]','FontWeight','bold');
+        title('TET of Predictor-Corrector from xPC-Target','FontWeight','bold');
+    end
 end
+%==========================================================================
