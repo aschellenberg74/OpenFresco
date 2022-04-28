@@ -1,0 +1,142 @@
+OSU FlexTest SCRAMNetGT Information    1-Dec-19
+
+
+MEMORY ALLOCATION:
+
+Notes:
+1) The first 1024 words of scramnet memory are reserved
+   for MTS use.
+2) All signals are single precision floating point (32 bits)
+   unless otherwise noted.
+3) Signals designated as integer are 32 bits.
+
+Addr Src Description
+
+0	XPC	Master span
+1	XPC	Long Reference
+2	XPC	Lat Reference
+3	XPC	Vert Reference
+4	XPC	Roll Reference
+5	XPC	Pitch Reference
+6	XPC	Yaw Reference
+7	XPC	X1I Displ fbk
+8	XPC	X1O Displ fbk
+9	XPC	X3I Displ fbk
+10	XPC	X3O Displ fbk
+11	XPC	Y2I Displ fbk
+12	XPC	Y2O Displ fbk
+13	XPC	Y4I Displ fbk
+14	XPC	Y4O Displ fbk
+15	XPC	Z1 Displ fbk
+16	XPC	Z2 Displ fbk
+17	XPC	Z3 Displ fbk
+18	XPC	Z4 Displ fbk
+19	XPC	AX1 Accel fbk
+20	XPC	AX4 Accel fbk
+21	XPC	AX5 Accel fbk
+22	XPC	AY1 Accel fbk
+23	XPC	AY2 Accel fbk
+24	XPC	AY5 Accel fbk
+25	XPC	AZ1 Accel fbk
+26	XPC	AZ2 Accel fbk
+27	XPC	AZ3 Accel fbk
+28	XPC	AZ4 Accel fbk
+29	XPC	AZ5 Accel fbk
+30	XPC	X1I Force fbk
+31	XPC	X1O Force fbk
+32	XPC	X3I Force fbk
+33	XPC	X3O Force fbk
+34	XPC	Y2I Force fbk
+35	XPC	Y2O Force fbk
+36	XPC	Y4I Force fbk
+37	XPC	Y4O Force fbk
+38	XPC	Z1 Force fbk
+39	XPC	Z2 Force fbk
+40	XPC	Z3 Force fbk
+41	XPC	Z4 Force fbk
+42	XPC	X1I Valve add
+43	XPC	X1O Valve add
+44	XPC	X3I Valve add
+45	XPC	X3O Valve add
+46	XPC	Y2I Valve add
+47	XPC	Y2O Valve add
+48	XPC	Y4I Valve add
+49	XPC	Y4O Valve add
+50	XPC	Z1 Valve add
+51	XPC	Z2 Valve add
+52	XPC	Z3 Valve add
+53	XPC	Z4 Valve add
+54	XPC	User A/D #1
+...	XPC	...
+93	XPC	User A/D #40
+94	XPC	User DUC #1
+95	XPC	User DUC #1
+96	XPC	User DUC #1
+97	XPC	User DUC #1
+
+
+256	469D	Master span
+257	469D	Long Reference
+258	469D	Lat Reference
+259	469D	Vert Reference
+260	469D	Roll Reference
+261	469D	Pitch Reference
+262	469D	Yaw Reference
+263	469D	Long Feedback
+264	469D	Lat Feedback
+265	469D	Vert Feedback
+266	469D	Roll Feedback
+267	469D	Pitch Feedback
+268	469D	Yaw Feedback
+269	469D	Long Displacement fbk
+270	469D	Lat Displacement fbk
+271	469D	Vert Displacement fbk
+272	469D	Roll Displacement fbk
+273	469D	Pitch Displacement fbk
+274	469D	Yaw Displacement fbk
+275	469D	Long Velocity fbk
+276	469D	Lat Velocity fbk
+277	469D	Vert Velocity fbk
+278	469D	Roll Velocity fbk
+279	469D	Pitch Velocity fbk
+280	469D	Yaw Velocity fbk
+281	469D	Long Acceleration fbk
+282	469D	Lat Acceleration fbk
+283	469D	Vert Acceleration fbk
+284	469D	Roll Acceleration fbk
+285	469D	Pitch Acceleration fbk
+286	469D	Yaw Acceleration fbk
+287	469D	Long Force fbk
+288	469D	Lat Force fbk
+289	469D	Vert Force fbk
+290	469D	Roll Force fbk
+291	469D	Pitch Force fbk
+292	469D	Yaw Force fbk
+293	469D	X1I Valve cmd
+294	469D	X1O Valve cmd
+295	469D	X3I Valve cmd
+296	469D	X3O Valve cmd
+297	469D	Y2I Valve cmd
+298	469D	Y2O Valve cmd
+299	469D	Y4I Valve cmd
+300	469D	Y4O Valve cmd
+301	469D	Z1 Valve cmd
+302	469D	Z2 Valve cmd
+303	469D	Z3 Valve cmd
+304	469D	Z4 Valve cmd
+305	469D	User A/D #1
+...	469D	...
+344	469D	User A/D #40
+345	469D	User DUC #1
+346	469D	User DUC #2
+347	469D	User DUC #3
+348	469D	User DUC #4
+
+SCRAMNET PARAMETERS:
+	
+	469D node number:	1
+	XPC  node number:	2
+    OPF  node number:   3
+	
+	Broadcast interrupt masks:
+		0x00000002	(accept interrupt from node 1 (469D))
