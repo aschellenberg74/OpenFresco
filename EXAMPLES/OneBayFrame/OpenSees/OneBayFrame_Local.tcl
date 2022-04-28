@@ -54,15 +54,16 @@ uniaxialMaterial Elastic 3 [expr 2.0*100.0/1.0]
 
 # Define control points
 # ---------------------
-# expControlPoint $tag <-node $nodeTag> $dof $rspType <-fact $f> <-lim $l $u> <-isRel> ...
-expControlPoint 1  1 disp
-expControlPoint 2  1 disp 1 force
+# expControlPoint $tag <-node $nodeTag> $dof $rspType <-fact $f> <-lim $l $u> <-relTrial> <-relCtrl> <-relDaq> ...
+expControlPoint 1  1 disp -relCtrl
+expControlPoint 2  1 disp -relDaq 1 force -relDaq
 
 # Define experimental control
 # ---------------------------
+set dtAna [expr 20.0/1024.0]
 # expControl SimUniaxialMaterials $tag $matTags
-expControl SimUniaxialMaterials 1 1
-#expControl xPCtarget 1 "192.168.2.20" 22222 "D:/PredictorCorrector/RTActualTestModels/cmAPI-xPCTarget-SCRAMNet-STS/HybridControllerD2D2" -trialCP 1 -outCP 2
+#expControl SimUniaxialMaterials 1 1
+expControl xPCtarget 1 "10.10.10.100" 22222 "C:/Users/Andreas/Documents/OpenFresco/SourceCode/SRC/experimentalControl/Simulink/RTActualTestModels/cmAPI-xPCTarget-SCRAMNetGT-MTS_STS/HybridControllerD2D2sim" -trialCP 1 -outCP 2
 #expControl SCRAMNet 1 381020 8 -trialCP 1 -outCP 2
 #expControl dSpace 1 DS1104 -trialCP 1 -outCP 2
 #expControl MTSCsi 1 "D:/Projects/MTS_CSI/OpenFresco/MtsCsi_Example/OneBayFrame/OpenFresco_mNEES.mtscs" 0.01 -trialCP 1 -outCP 2
@@ -186,8 +187,8 @@ foreach lambda $lambda {
 set outFileID [open elapsedTime.txt w]
 # perform the transient analysis
 set tTot [time {
-    for {set i 1} {$i < 1600} {incr i} {
-        set t [time {analyze  1  $dt}]
+    for {set i 1} {$i < 1790} {incr i} {
+        set t [time {analyze  1  $dtAna}]
         puts $outFileID $t
         #puts "step $i"
     }
