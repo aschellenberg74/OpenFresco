@@ -18,43 +18,65 @@
 **                                                                    **
 ** ****************************************************************** */
                                                                         
-// $Revision$
-// $Date$
-// $Source$
-
-// Written: MHS
-// Created: August 2000
+// $Revision: 1.4 $
+// $Date: 2007-03-02 00:12:50 $
+// $Source: /usr/local/cvs/OpenSees/SRC/recorder/response/CrdTransfResponse.cpp,v $
+                                                                        
+// Written: MHS 
+// Created: Oct 2000
 //
-// Description: This file contains the interface for MaterialState,
-// which is the base for classes which model states of hysteretic
-// degradation.
+// Description: This file contains the CrdTransfResponse class implementation
 
-#ifndef MaterialState_h
-#define MaterialState_h
+#include <CrdTransfResponse.h>
+#include <CrdTransf.h>
 
-#include <DomainComponent.h>
-#include <MovableObject.h>
-
-class OPS_Stream;
-class Information;
-class Response;
-
-class MaterialState : public TaggedObject, public MovableObject
+CrdTransfResponse::CrdTransfResponse(CrdTransf *mat, int id):
+  Response(), theCrdTransf(mat), responseID(id)
 {
- public:
-  MaterialState(int tag, int classTag);    
-  virtual ~MaterialState();
 
-  virtual Response *setResponse(const char **argv, int argc, OPS_Stream &s);
-  virtual int getResponse(int responseID, Information &info);
-  
-  virtual int setVariable(const char *argv);
-  virtual int getVariable(int variableID, double &info);
-  
- protected:
-  
- private:
+}
 
-};
+CrdTransfResponse::CrdTransfResponse(CrdTransf *mat, int id, int val):
+  Response(val), theCrdTransf(mat), responseID(id)
+{
 
-#endif
+}
+
+CrdTransfResponse::CrdTransfResponse(CrdTransf *mat, int id, double val):
+  Response(val), theCrdTransf(mat), responseID(id)
+{
+
+}
+
+CrdTransfResponse::CrdTransfResponse(CrdTransf *mat, int id, const ID &val):
+  Response(val), theCrdTransf(mat), responseID(id)
+{
+
+}
+
+CrdTransfResponse::CrdTransfResponse(CrdTransf *mat, int id, const Vector &val):
+  Response(val), theCrdTransf(mat), responseID(id)
+{
+
+}
+
+CrdTransfResponse::CrdTransfResponse(CrdTransf *mat, int id, const Matrix &val):
+  Response(val), theCrdTransf(mat), responseID(id)
+{
+
+}
+
+CrdTransfResponse::~CrdTransfResponse()
+{
+
+}
+
+int
+CrdTransfResponse::getResponse(void)
+{
+  if (theCrdTransf != 0)
+    return theCrdTransf->getResponse(responseID, myInfo);
+  else
+    return 0;
+}
+

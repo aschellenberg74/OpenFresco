@@ -25,6 +25,9 @@
 #include <OPS_Stream.h>
 #include <elementAPI.h>
 #include <SimulationInformation.h>
+
+// override byte to prevent clashes with <cstddef>
+#define byte win_byte_override
 #include <windows.h>
 
 #define DllExport _declspec(dllexport)

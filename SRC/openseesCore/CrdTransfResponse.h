@@ -18,43 +18,45 @@
 **                                                                    **
 ** ****************************************************************** */
                                                                         
-// $Revision$
-// $Date$
-// $Source$
-
-// Written: MHS
-// Created: August 2000
+// $Revision: 1.5 $
+// $Date: 2007-03-02 00:12:50 $
+// $Source: /usr/local/cvs/OpenSees/SRC/recorder/response/CrdTransfResponse.h,v $
+                                                                        
+// Written: MHS 
+// Created: Oct 2000
 //
-// Description: This file contains the interface for MaterialState,
-// which is the base for classes which model states of hysteretic
-// degradation.
+// Description: This file contains the CrdTransfResponse class interface
 
-#ifndef MaterialState_h
-#define MaterialState_h
+#ifndef CrdTransfResponse_h
+#define CrdTransfResponse_h
 
-#include <DomainComponent.h>
-#include <MovableObject.h>
+#include <Response.h>
+#include <Information.h>
 
-class OPS_Stream;
-class Information;
-class Response;
+class CrdTransf;
+class CrdTransfState;
 
-class MaterialState : public TaggedObject, public MovableObject
+class ID;
+class Vector;
+class Matrix;
+
+class CrdTransfResponse : public Response
 {
  public:
-  MaterialState(int tag, int classTag);    
-  virtual ~MaterialState();
+  CrdTransfResponse(CrdTransf *mat, int id);
+  CrdTransfResponse(CrdTransf *mat, int id, int val);
+  CrdTransfResponse(CrdTransf *mat, int id, double val);
+  CrdTransfResponse(CrdTransf *mat, int id, const ID &val);
+  CrdTransfResponse(CrdTransf *mat, int id, const Vector &val);
+  CrdTransfResponse(CrdTransf *mat, int id, const Matrix &val);
 
-  virtual Response *setResponse(const char **argv, int argc, OPS_Stream &s);
-  virtual int getResponse(int responseID, Information &info);
+  ~CrdTransfResponse();
   
-  virtual int setVariable(const char *argv);
-  virtual int getVariable(int variableID, double &info);
-  
- protected:
-  
- private:
+  int getResponse(void);
 
+private:
+  CrdTransf *theCrdTransf;
+  int responseID;
 };
 
 #endif
