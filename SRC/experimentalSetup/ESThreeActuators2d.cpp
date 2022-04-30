@@ -143,7 +143,7 @@ ESThreeActuators2d::ESThreeActuators2d(int tag,
     double actLength0, double actLength1, double actLength2,
     double rigidLength0, double rigidLength1,
     ExperimentalControl* control,
-    int nlgeom, char *posact0, double philocx)
+    int nlgeom, const char *posact0, double philocx)
     : ExperimentalSetup(tag, control),
     La0(actLength0), La1(actLength1), La2(actLength2),
     L0(rigidLength0), L1(rigidLength1),

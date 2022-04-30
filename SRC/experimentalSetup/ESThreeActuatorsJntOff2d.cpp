@@ -144,7 +144,7 @@ ESThreeActuatorsJntOff2d::ESThreeActuatorsJntOff2d(int tag,
     double rigidLength0, double rigidLength1, double rigidLength2,
     double rigidLength3, double rigidLength4, double rigidLength5,
     ExperimentalControl* control,
-    int nlgeom, char *posact0, double philocx)
+    int nlgeom, const char *posact0, double philocx)
     : ExperimentalSetup(tag, control),
     La0(actLength0), La1(actLength1), La2(actLength2),
     L0(rigidLength0), L1(rigidLength1), L2(rigidLength2),

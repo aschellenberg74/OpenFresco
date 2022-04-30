@@ -43,7 +43,7 @@ public:
         double actLength0, double actLength1,
         double rigidLength,
         ExperimentalControl* control = 0,
-        int nlGeom = 0, char *posAct = "left", double phiLocX = 0.0);
+        int nlGeom = 0, const char *posAct = "left", double phiLocX = 0.0);
     ESTwoActuators2d(const ESTwoActuators2d& es);
     
     // destructor

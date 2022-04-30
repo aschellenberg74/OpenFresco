@@ -43,7 +43,7 @@ public:
         double actLength0, double actLength1, double actLength2,
         double rigidLength0, double rigidLength1,
         ExperimentalControl* control = 0,
-        int nlGeom = 0, char *posAct0 = "left", double phiLocX = 0.0);
+        int nlGeom = 0, const char *posAct0 = "left", double phiLocX = 0.0);
     ESThreeActuators2d(const ESThreeActuators2d& es);
     
     // destructor

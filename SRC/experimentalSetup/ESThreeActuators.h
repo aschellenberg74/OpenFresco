@@ -45,7 +45,7 @@ public:
         double rigidLength0, double rigidLength1,
         double rigidLength2,
         ExperimentalControl* control = 0,
-        int nlGeom = 0, char *posAct0 = "left");
+        int nlGeom = 0, const char *posAct0 = "left");
     ESThreeActuators(const ESThreeActuators& es);
     
     // destructor

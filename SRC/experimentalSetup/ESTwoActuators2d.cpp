@@ -143,7 +143,7 @@ ESTwoActuators2d::ESTwoActuators2d(int tag,
     double actLength0, double actLength1,
     double rigidLength,
     ExperimentalControl* control,
-    int nlgeom, char *posact, double philocx)
+    int nlgeom, const char *posact, double philocx)
     : ExperimentalSetup(tag, control),
     La0(actLength0), La1(actLength1), L(rigidLength),
     nlGeom(nlgeom), phiLocX(philocx), rotLocX(3,3)
