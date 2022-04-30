@@ -21,6 +21,7 @@
     <ClCompile Include="..\..\..\SRC\openseesCore\Channel.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\ConstraintHandler.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\CrdTransf.cpp" />
+    <ClCompile Include="..\..\..\SRC\openseesCore\CrdTransfResponse.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\DataFileStream.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\DOF_Group.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\DOF_GrpIter.cpp" />
@@ -153,6 +154,7 @@
     <ClInclude Include="..\..\..\SRC\openseesCore\ColorMap.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\ConstraintHandler.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\CrdTransf.h" />
+    <ClInclude Include="..\..\..\SRC\openseesCore\CrdTransfResponse.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\DataFileStream.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\DOF_Group.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\DOF_GrpIter.h" />
@@ -334,7 +336,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>..\..\..\src;..\..\..\src\experimentalControl;..\..\..\src\experimentalRecorder\response;..\..\..\src\experimentalSetup;..\..\..\src\experimentalSignalFilter;..\..\..\src\experimentalSite;..\..\..\src\experimentalTangentStiff;..\..\..\src\openseesCore;..\..\..\src\openseesExtra;C:\Program Files\Tcl;C:\Program Files\Tcl\include;C:\Program Files\OpenSSL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\src;..\..\..\src\experimentalControl;..\..\..\src\experimentalRecorder\response;..\..\..\src\experimentalSetup;..\..\..\src\experimentalSignalFilter;..\..\..\src\experimentalSite;..\..\..\src\experimentalTangentStiff;..\..\..\src\openseesCore;..\..\..\src\openseesExtra;C:\Program Files\OpenSSL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WIN64;WIN64;PLATFORM_WIN;NDEBUG;_CRT_SECURE_NO_DEPRECATE;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -348,6 +350,7 @@
       <CallingConvention>Cdecl</CallingConvention>
       <CompileAs>Default</CompileAs>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Lib>
       <OutputFile>..\..\lib\release\openseesObjects.lib</OutputFile>
@@ -364,7 +367,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\src\interpreter\tcl;..\..\..\src\openseesCore;..\..\..\src\openseesExtra;C:\Program Files\Tcl;C:\Program Files\Tcl\include;C:\Program Files\OpenSSL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\src\interpreter\tcl;..\..\..\src\openseesCore;..\..\..\src\openseesExtra;C:\Program Files\OpenSSL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WIN64;WIN64;PLATFORM_WIN;_DEBUG;_CRT_SECURE_NO_DEPRECATE;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeaderOutputFile>..\..\obj\openseesObjects\debug\openseesObjects.pch</PrecompiledHeaderOutputFile>
@@ -377,6 +380,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Lib>
       <OutputFile>..\..\lib\debug\openseesObjects.lib</OutputFile>

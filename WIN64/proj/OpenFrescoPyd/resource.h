@@ -1,6 +1,7 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
-// Used by OpenSeesPy.rc
+// Used by OpenFrescoPyd.rc
+//
 
 // Next default values for new objects
 // 

@@ -78,7 +78,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>..\..\..\src;..\..\..\src\experimentalControl;..\..\..\src\experimentalControl\SCRAMNet;..\..\..\src\experimentalControl\SCRAMNetGT;..\..\..\src\experimentalControl\xPCtarget;..\..\..\src\experimentalControlPoint;..\..\..\src\experimentalRecorder\response;..\..\..\src\experimentalSignalFilter;..\..\..\src\openseesCore;..\..\..\src\openseesExtra;C:\Program Files\Tcl;C:\Program Files\Tcl\include;C:\Program Files\OpenSSL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\src;..\..\..\src\experimentalControl;..\..\..\src\experimentalControl\SCRAMNet;..\..\..\src\experimentalControl\SCRAMNetGT;..\..\..\src\experimentalControl\xPCtarget;..\..\..\src\experimentalControlPoint;..\..\..\src\experimentalRecorder\response;..\..\..\src\experimentalSignalFilter;..\..\..\src\openseesCore;..\..\..\src\openseesExtra;C:\Program Files\OpenSSL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WIN64;WIN64;PLATFORM_WIN;NDEBUG;_CRT_SECURE_NO_DEPRECATE;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -92,6 +92,7 @@
       <CallingConvention>Cdecl</CallingConvention>
       <CompileAs>Default</CompileAs>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Lib>
       <OutputFile>..\..\lib\release\experimentalControl.lib</OutputFile>
@@ -108,7 +109,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\src;..\..\..\src\experimentalControl;..\..\..\src\experimentalControl\SCRAMNet;..\..\..\src\experimentalControl\SCRAMNetGT;..\..\..\src\experimentalControl\xPCtarget;..\..\..\src\experimentalControlPoint;..\..\..\src\experimentalRecorder\response;..\..\..\src\experimentalSignalFilter;..\..\..\src\openseesCore;..\..\..\src\openseesExtra;C:\Program Files\Tcl;C:\Program Files\Tcl\include;C:\Program Files\OpenSSL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\src;..\..\..\src\experimentalControl;..\..\..\src\experimentalControl\SCRAMNet;..\..\..\src\experimentalControl\SCRAMNetGT;..\..\..\src\experimentalControl\xPCtarget;..\..\..\src\experimentalControlPoint;..\..\..\src\experimentalRecorder\response;..\..\..\src\experimentalSignalFilter;..\..\..\src\openseesCore;..\..\..\src\openseesExtra;C:\Program Files\OpenSSL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WIN64;WIN64;PLATFORM_WIN;_DEBUG;_CRT_SECURE_NO_DEPRECATE;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeaderOutputFile>..\..\obj\experimentalControl\debug\experimentalControl.pch</PrecompiledHeaderOutputFile>
@@ -121,6 +122,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Lib>
       <OutputFile>..\..\lib\debug\experimentalControl.lib</OutputFile>
