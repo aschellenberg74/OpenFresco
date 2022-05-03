@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\..\SRC\experimentalRecorder\ExpControlRecorder.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalRecorder\ExpSetupRecorder.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalRecorder\ExpSignalFilterRecorder.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalRecorder\ExpSiteRecorder.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalRecorder\ExpTangentStiffRecorder.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalRecorder\response\ExpControlResponse.cpp">
+      <Filter>response</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalRecorder\response\ExpSetupResponse.cpp">
+      <Filter>response</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalRecorder\response\ExpSignalFilterResponse.cpp">
+      <Filter>response</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalRecorder\response\ExpSiteResponse.cpp">
+      <Filter>response</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalRecorder\response\ExpTangentStiffResponse.cpp">
+      <Filter>response</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\SRC\experimentalRecorder\ExpControlRecorder.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalRecorder\ExpSetupRecorder.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalRecorder\ExpSignalFilterRecorder.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalRecorder\ExpSiteRecorder.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalRecorder\ExpTangentStiffRecorder.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalRecorder\response\ExpControlResponse.h">
+      <Filter>response</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalRecorder\response\ExpSetupResponse.h">
+      <Filter>response</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalRecorder\response\ExpSignalFilterResponse.h">
+      <Filter>response</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalRecorder\response\ExpSiteResponse.h">
+      <Filter>response</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalRecorder\response\ExpTangentStiffResponse.h">
+      <Filter>response</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="response">
+      <UniqueIdentifier>{622168c4-06f4-4a60-8c54-2e7b50dd230e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

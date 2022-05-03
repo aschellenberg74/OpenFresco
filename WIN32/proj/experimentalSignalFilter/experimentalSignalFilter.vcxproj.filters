@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\..\SRC\experimentalSignalFilter\ESFErrorSimRandomGauss.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalSignalFilter\ESFErrorSimulation.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalSignalFilter\ESFErrorSimUndershoot.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalSignalFilter\ESFKrylovForceConverter.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalSignalFilter\ESFTangForceConverter.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalSignalFilter\ExperimentalSignalFilter.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\SRC\experimentalSignalFilter\ESFErrorSimRandomGauss.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalSignalFilter\ESFErrorSimulation.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalSignalFilter\ESFErrorSimUndershoot.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalSignalFilter\ESFKrylovForceConverter.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalSignalFilter\ESFTangForceConverter.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalSignalFilter\ExperimentalSignalFilter.h" />
+  </ItemGroup>
+</Project>

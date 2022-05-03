@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\..\SRC\experimentalElement\EEBeamColumn2d.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalElement\EEBeamColumn3d.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalElement\EEBearing2d.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalElement\EEBearing3d.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalElement\EEGeneric.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalElement\EEInvertedVBrace2d.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalElement\EETruss.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalElement\EETrussCorot.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalElement\EETwoNodeLink.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalElement\ExperimentalElement.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\SRC\experimentalElement\EEBeamColumn2d.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalElement\EEBeamColumn3d.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalElement\EEBearing2d.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalElement\EEBearing3d.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalElement\EEGeneric.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalElement\EEInvertedVBrace2d.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalElement\EETruss.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalElement\EETrussCorot.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalElement\EETwoNodeLink.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalElement\ExperimentalElement.h" />
+  </ItemGroup>
+</Project>

@@ -1,7 +1,5 @@
 // Microsoft Visual C++ generated resource script.
 //
-#pragma code_page(65001)
-
 #include "resource.h"
 
 #define APSTUDIO_READONLY_SYMBOLS
@@ -19,6 +17,7 @@
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -52,8 +51,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2,7,1,0
- PRODUCTVERSION 2,7,1,0
+ FILEVERSION 2,7,2,0
+ PRODUCTVERSION 2,7,2,1
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -70,12 +69,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "PEER"
             VALUE "FileDescription", "Middleware that connects finite element software with control and data aquisition systems in laboratories."
-            VALUE "FileVersion", "2.7.1 (Build 180801) 32-bit"
-            VALUE "InternalName", "OpenFresco.dll"
+            VALUE "FileVersion", "2.7.2 (Build 220428) 32-bit"
+            VALUE "InternalName", "OpenFresco.pyd"
             VALUE "LegalCopyright", "Copyright (C) 2006"
-            VALUE "OriginalFilename", "OpenFresco.dll"
+            VALUE "OriginalFilename", "OpenFresco.pyd"
             VALUE "ProductName", "Open Framework for Experimental Setup and Control"
-            VALUE "ProductVersion", "2.7.1 (Build 180801) 32-bit"
+            VALUE "ProductVersion", "2.7.2 (Build 220428) 32-bit"
         END
     END
     BLOCK "VarFileInfo"
