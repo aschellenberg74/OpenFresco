@@ -257,13 +257,13 @@ typedef board_spec_tp *board_spec_ptp;
 
 /*** RTP board access control (user level) ***/
 
-int DS_board_index(char *board_name,unsigned int *board_index);
+int DS_board_index(const char *board_name,unsigned int *board_index);
 
 int DS_board_spec(unsigned int board_index, struct board_spec *board);
 
 int DS_lock_program(unsigned int board_index);
 
-int DS_register_host_app(char *appname);
+int DS_register_host_app(const char *appname);
 
 int DS_unlock_program(unsigned int board_index);
 
@@ -286,7 +286,7 @@ int DS_restart_rtp(unsigned int board_index);
 /*** RTP memory access ***/
 
 int DS_get_var_addr(unsigned int board_index,
-                    char         *varname,
+                    const char   *varname,
                     UInt32       *addr);
 
 int DS_alloc_mem(unsigned int board_index, UInt32 requirement,

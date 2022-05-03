@@ -33,7 +33,6 @@
 #include <map>
 
 extern void* OPF_ECSimUniaxialMaterial();
-//extern void* OPF_ECSimUniaxialMaterialForce();
 extern void* OPF_ECSimDomain();
 extern void* OPF_ECSimFEAdapter();
 extern void* OPF_ECSimSimulink();
@@ -45,7 +44,7 @@ extern void* OPF_ECSCRAMNetGT();
 #ifndef _WIN64
 extern void* OPF_ECdSpace();
 extern void* OPF_ECMtsCsi();
-extern void* OPF_ECNIEseries();
+//extern void* OPF_ECNIEseries();
 #endif
 
 
@@ -75,7 +74,7 @@ namespace {
 #ifndef _WIN64
         expControlMap.insert(std::make_pair("dSpace", &OPF_ECdSpace));
         expControlMap.insert(std::make_pair("MTSCsi", &OPF_ECMtsCsi));
-        expControlMap.insert(std::make_pair("NIEseries", &OPF_ECNIEseries));
+        //expControlMap.insert(std::make_pair("NIEseries", &OPF_ECNIEseries));
 #endif
         return 0;
     }

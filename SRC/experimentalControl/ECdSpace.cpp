@@ -30,7 +30,6 @@
 
 #include <elementAPI.h>
 
-extern ExperimentalCP* getExperimentalCP(int tag);
 
 void* OPF_ECdSpace()
 {
@@ -96,8 +95,7 @@ void* OPF_ECdSpace()
     // populate array with trial control points
     for (int i = 0; i < numTrialCPs; i++) {
         trialCPs[i] = 0;
-        trialCPs[i] = getExperimentalCP(cpTags(i));
-        //trialCPs[i] = OPF_GetExperimentalCP(cpTags(i));
+        trialCPs[i] = OPF_getExperimentalCP(cpTags(i));
         if (trialCPs[i] == 0) {
             opserr << "WARNING experimental control point not found\n";
             opserr << "expControlPoint " << cpTags(i) << endln;
@@ -144,8 +142,7 @@ void* OPF_ECdSpace()
     // populate array with output control points
     for (int i = 0; i < numOutCPs; i++) {
         outCPs[i] = 0;
-        outCPs[i] = getExperimentalCP(cpTags(i));
-        //outCPs[i] = OPF_GetExperimentalCP(cpTags(i));
+        outCPs[i] = OPF_getExperimentalCP(cpTags(i));
         if (outCPs[i] == 0) {
             opserr << "WARNING experimental control point not found\n";
             opserr << "expControlPoint " << cpTags(i) << endln;
