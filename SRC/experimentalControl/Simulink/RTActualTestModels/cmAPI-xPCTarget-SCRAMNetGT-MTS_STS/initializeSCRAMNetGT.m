@@ -2,10 +2,6 @@
 %
 % created by Brad Thoen (MTS)
 % modified by Andreas Schellenberg (andreas.schellenberg@gmail.com) 01/2014
-%
-% $Revision: $
-% $Date: $
-% $URL: $
 
 %%%%%%%%%% SIGNAL COUNTS %%%%%%%%%%
 
@@ -19,26 +15,20 @@ nEncCmd = 2;                                         % number of encoders comman
 nUDPOut = 1+7*nAct+nAdcU+nDucU+nEncU+nDinp+nEncCmd;  % no. of outputs from simulink bridge
 nUDPInp = 1+6*nAct+nAdcU+nDucU+nEncU+nDinp+nEncCmd;  % no. of inputs to simulink bridge
 
-%%%%%%%%%% SAMPLE PERIODS %%%%%%%%%%
-
-controlPeriod = 1/2048;		% controller sample period (sec)
-samplePeriod  = controlPeriod/HybridCtrlParameters.upFact;
-
 %%%%%%%%%% SCRAMNET PARTITIONS %%%%%%%%%%
 
 syncNode = 1;   % synchronization node: MTS STS
 xpcNode  = 2;   % xPC-Target node
 
-
 %%%%%%%%%% START MTS (STS) %%%%%%%%%%
 
-%%%%%%%%%% outputs to scramnet %%%%%%%%%%
+%%%%%%%%%% outputs to STS from xPC %%%%%%%%%%
 
 % master span
-baseAddress          = 0;
+baseAddress = 0;
 partition(1).Address = ['0x', dec2hex(baseAddress*4)];
-partition(1).Type    = 'single';
-partition(1).Size    = '1';
+partition(1).Type = 'single';
+partition(1).Size = '1';
 
 % control modes
 partition(2).Type = 'uint32';
@@ -80,7 +70,7 @@ partition(10).Size = num2str(nEncU);
 partition(11).Type = 'uint32';
 partition(11).Size = num2str(nDout);
 
-%%%%%%%%%% inputs from scramnet %%%%%%%%%%
+%%%%%%%%%% inputs from STS to xPC %%%%%%%%%%
 
 % master span
 partition(12).Type = 'single';
