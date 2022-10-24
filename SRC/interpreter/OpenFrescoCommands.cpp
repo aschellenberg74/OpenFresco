@@ -155,15 +155,12 @@ int OPS_SetDoubleOutput(int* numData, double* data, bool scalar)
 }
 
 
-const char* OPS_GetString(void)
+const char* OPS_GetString()
 {
-    if (cmds == 0) return "Invalid String Input!";
+    const char* res = 0;
+    if (cmds == 0) return res;
     DL_Interpreter* interp = cmds->getInterpreter();
-    const char* res = interp->getString();
-    if (res == 0) {
-        return "Invalid String Input!";
-    }
-    return res;
+    return interp->getString();
 }
 
 
@@ -175,7 +172,7 @@ int OPS_SetString(const char* str)
 }
 
 
-Domain* OPS_GetDomain(void)
+Domain* OPS_GetDomain()
 {
     if (cmds == 0) return 0;
     return cmds->getDomain();
