@@ -141,8 +141,9 @@ for i in range(2):
     print('{:>6}{:>12.3e}{:>10.4f}{:>10.4f}{:>10.4f}'.format(i+1, lam[i], omega, period, frequ))
 
 # perform the transient analysis
-for i in range(1600):
-    analyze(1, dt)
+dtAna = 20.0/1024.0
+for i in range(1790):
+    analyze(1, dtAna)
 
 print('')
 stop()

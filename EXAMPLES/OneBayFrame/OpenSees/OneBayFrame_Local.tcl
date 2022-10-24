@@ -55,16 +55,16 @@ uniaxialMaterial Elastic 3 [expr 2.0*100.0/1.0]
 # Define control points
 # ---------------------
 # expControlPoint $tag <-node $nodeTag> $dof $rspType <-fact $f> <-lim $l $u> <-relTrial> <-relCtrl> <-relDaq> ...
-expControlPoint 1  1 disp -relCtrl
-expControlPoint 2  1 disp -relDaq 1 force -relDaq
+expControlPoint 1  1 disp
+expControlPoint 2  1 disp 1 force
 
 # Define experimental control
 # ---------------------------
-set dtAna [expr 20.0/1024.0]
 # expControl SimUniaxialMaterials $tag $matTags
-#expControl SimUniaxialMaterials 1 1
-expControl xPCtarget 1 "10.10.10.100" 22222 "C:/Users/Andreas/Documents/OpenFresco/SourceCode/SRC/experimentalControl/Simulink/RTActualTestModels/cmAPI-xPCTarget-SCRAMNetGT-MTS_STS/HybridControllerD2D2sim" -trialCP 1 -outCP 2
-#expControl SCRAMNet 1 381020 8 -trialCP 1 -outCP 2
+expControl SimUniaxialMaterials 1 1
+#expControl xPCtarget 1 "10.10.10.100" 22222 "C:/Users/Andreas/Documents/OpenFresco/SourceCode/SRC/experimentalControl/Simulink/RTActualTestModels/cmAPI-xPCTarget-SCRAMNetGT-MTS_STS/HybridControllerD2D2sim" -trialCP 1 -outCP 2
+#expControl SCRAMNet 1 381020 -trialCP 1 -outCP 2
+#expControl SCRAMNetGT 1 4096 -trialCP 1 -outCP 2
 #expControl dSpace 1 DS1104 -trialCP 1 -outCP 2
 #expControl MTSCsi 1 "D:/Projects/MTS_CSI/OpenFresco/MtsCsi_Example/OneBayFrame/OpenFresco_mNEES.mtscs" 0.01 -trialCP 1 -outCP 2
 #expControl GenericTCP 1 "127.0.0.1" 44000 -ctrlModes 1 0 0 0 0 -daqModes 1 0 0 1 0
@@ -95,8 +95,8 @@ expTangentStiff Broyden 1
 # ----------------------------
 # left and right columns
 # expElement twoNodeLink $eleTag $iNode $jNode -dir $dirs -site $siteTag -initStif $Kij <-tangStif tangStifTag> <-orient <$x1 $x2 $x3> $y1 $y2 $y3> <-pDelta Mratios> <-iMod> <-mass $m>
-expElement twoNodeLink 1 1 3 -dir 2 -site 1 -initStif 2.8 -tangStif 1
-expElement twoNodeLink 2 2 4 -dir 2 -site 2 -initStif 5.6 -tangStif 1
+expElement twoNodeLink 1 1 3 -dir 2 -site 1 -initStif 2.8; # -tangStif 1
+expElement twoNodeLink 2 2 4 -dir 2 -site 2 -initStif 5.6; # -tangStif 1
 
 # Define numerical elements
 # -------------------------
@@ -186,6 +186,7 @@ foreach lambda $lambda {
 # open output file for writing
 set outFileID [open elapsedTime.txt w]
 # perform the transient analysis
+set dtAna [expr 20.0/1024.0]
 set tTot [time {
     for {set i 1} {$i < 1790} {incr i} {
         set t [time {analyze  1  $dtAna}]
