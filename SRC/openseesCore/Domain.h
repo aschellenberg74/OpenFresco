@@ -154,6 +154,7 @@ class Domain
 
     // methods to query the state of the domain
     virtual double  getCurrentTime(void) const;
+    virtual double  getDT(void) const;
     virtual int getCreep(void) const;
     virtual int     getCommitTag(void) const;    	
     virtual int getNumElements(void) const;
@@ -201,7 +202,7 @@ class Domain
     virtual double getTimeEigenvaluesSet(void);
     void setModalProperties(const DomainModalProperties& dmp);
     void unsetModalProperties(void);
-    const DomainModalProperties& getModalProperties(void) const;
+    int getModalProperties(DomainModalProperties & dmp) const;
     int setModalDampingFactors(Vector *, bool inclModalMatrix = false);
     const Vector *getModalDampingFactors(void);
     bool inclModalDampingMatrix(void);

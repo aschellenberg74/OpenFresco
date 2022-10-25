@@ -345,8 +345,9 @@ PDeltaCrdTransf3d::computeElemtLengthAndOrient()
     L = dx.Norm();
     
     if (L == 0.0) {
-        opserr << "\nPDeltaCrdTransf3d::computeElemtLengthAndOrien: 0 length\n";
-        return -2;  
+      opserr << "\nPDeltaCrdTransf3d::computeElemtLengthAndOrien transfTag = "
+	     << this->getTag() << "\nelement has zero length" << endln;
+      return -2;        
     }
     
     // calculate the element local x axis components (direction cossines)
@@ -398,9 +399,9 @@ PDeltaCrdTransf3d::getLocalAxes(Vector &XAxis, Vector &YAxis, Vector &ZAxis)
     double ynorm = yAxis.Norm();
     
     if (ynorm == 0) {
-        opserr << "\nPDeltaCrdTransf3d::getLocalAxes";
-        opserr << "\nvector v that defines plane xz is parallel to x axis\n";
-        return -3;
+      opserr << "\nPDeltaCrdTransf3d::getLocalAxes transfTag = " << this->getTag();
+      opserr << "\nvector v that defines plane xz is parallel to x axis" << endln;
+      return -3;
     }
     
     yAxis /= ynorm;
@@ -427,6 +428,22 @@ PDeltaCrdTransf3d::getLocalAxes(Vector &XAxis, Vector &YAxis, Vector &ZAxis)
     return 0;
 }
 
+int
+PDeltaCrdTransf3d::getRigidOffsets(Vector &offsets)
+{
+  if (nodeIOffset != 0) {
+    offsets(0) = nodeIOffset[0];
+    offsets(1) = nodeIOffset[1];
+    offsets(2) = nodeIOffset[2];
+  }
+  if (nodeJOffset != 0) {
+    offsets(3) = nodeJOffset[0];
+    offsets(4) = nodeJOffset[1];
+    offsets(5) = nodeJOffset[2];
+  }
+  
+  return 0;
+}
 
 double 
 PDeltaCrdTransf3d::getInitialLength(void)
