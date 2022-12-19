@@ -85,7 +85,7 @@ expSite LocalSite 2 2
 # Define experimental tangent stiffness
 # -------------------------------------
 # expTangentStiff Broyden $tag
-expTangentStiff Broyden 1
+#expTangentStiff Broyden 1
 # expTangentStiff BFGS $tag <-eps $value>
 #expTangentStiff BFGS 1
 # expTangentStiff Transpose $tag $numCols
@@ -162,7 +162,7 @@ recorder Node -file Node_Acc.out -time -node 3 4 -dof 1 accel
 recorder Element -file Elmt_Frc.out      -time -ele 1 2 3 forces
 recorder Element -file Elmt_ctrlDsp.out  -time -ele 1 2   ctrlDisp
 recorder Element -file Elmt_daqDsp.out   -time -ele 1 2   daqDisp
-recorder Element -file Elmt_tangStif.out -time -ele 1     tangStif stif
+#recorder Element -file Elmt_tangStif.out -time -ele 1     tangStif stif
 # --------------------------------
 # End of recorder generation
 # --------------------------------
@@ -188,6 +188,7 @@ set outFileID [open elapsedTime.txt w]
 # perform the transient analysis
 set dtAna [expr 20.0/1024.0]
 set tTot [time {
+    #analyzeInteractive  1790  $dtAna
     for {set i 1} {$i < 1790} {incr i} {
         set t [time {analyze  1  $dtAna}]
         puts $outFileID $t

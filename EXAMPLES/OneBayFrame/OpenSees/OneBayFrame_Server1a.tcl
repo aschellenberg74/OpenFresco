@@ -63,7 +63,9 @@ expSite ActorSite 1 -setup 1 8090
 # Start the server process
 # ------------------------------
 # startLabServer $siteTag
-startLabServer  1
+#startLabServer  1
+#stepLabServer  1 1790
+startLabServerInteractive  1 1790
 
 wipeExp
 exit
