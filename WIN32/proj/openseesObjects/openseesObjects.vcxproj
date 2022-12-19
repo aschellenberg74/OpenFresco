@@ -275,6 +275,7 @@
     <ClCompile Include="..\..\..\SRC\openseesExtra\CTestNormDispIncr.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\DatabaseStream.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\DataFileStreamAdd.cpp" />
+    <ClCompile Include="..\..\..\SRC\openseesExtra\DirectIntegrationAnalysis.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\DOF_Numberer.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\EquiSolnAlgo.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\HystereticBackbone.cpp" />
@@ -305,8 +306,10 @@
     <ClCompile Include="..\..\..\SRC\openseesExtra\TCP_Stream.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\Timer.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\TimeSeries.cpp" />
+    <ClCompile Include="..\..\..\SRC\openseesExtra\TransientAnalysis.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\UDP_Socket.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\UnloadingRule.cpp" />
+    <ClCompile Include="..\..\..\SRC\openseesExtra\VariableTimeStepDirectIntegrationAnalysis.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\XmlFileStream.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -427,6 +430,7 @@
     <ClInclude Include="..\..\..\SRC\openseesExtra\CTestNormDispIncr.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\DatabaseStream.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\DataFileStreamAdd.h" />
+    <ClInclude Include="..\..\..\SRC\openseesExtra\DirectIntegrationAnalysis.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\DOF_Numberer.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\EquiSolnAlgo.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\GraphNumberer.h" />
@@ -463,8 +467,10 @@
     <ClInclude Include="..\..\..\SRC\openseesExtra\Timer.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\TimeSeries.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\TimeSeriesIntegrator.h" />
+    <ClInclude Include="..\..\..\SRC\openseesExtra\TransientAnalysis.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\UDP_Socket.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\UnloadingRule.h" />
+    <ClInclude Include="..\..\..\SRC\openseesExtra\VariableTimeStepDirectIntegrationAnalysis.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\XmlFileStream.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

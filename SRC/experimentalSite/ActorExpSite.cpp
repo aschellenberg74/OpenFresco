@@ -314,6 +314,9 @@ int ActorExpSite::runTill(int exitWhen)
             this->commitState();
             if (exitWhen == action)
                 exitYet = true;
+            // check if we need to force a server shutdown
+            if (exitWhen == OF_RemoteTest_shutdown)
+                exitYet = true;
             break;
         case OF_RemoteTest_getDaqResponse:
             this->checkDaqResponse();
@@ -328,13 +331,13 @@ int ActorExpSite::runTill(int exitWhen)
             sendV(0) = OF_ReturnType_received;
             sendV(1) = this->getTag();
             this->sendVector(sendV);
-            if (exitWhen == action)
-                exitYet = true;
+            exitYet = true;
             break;
         default:
             opserr << "ActorExpSite::run() - invalid action "
                 << action << " received" << endln;
             recvV(0) = OF_ReturnType_failed;
+            break;
         }
     }
     

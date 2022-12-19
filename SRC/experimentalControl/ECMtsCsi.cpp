@@ -263,8 +263,26 @@ ECMtsCsi::ECMtsCsi(const ECMtsCsi& ec)
 
 ECMtsCsi::~ECMtsCsi()
 {
-    // reset the csi-controller
-    CsiController->reset();
+    opserr << endln;
+    opserr << "***********************************************************\n";
+    opserr << "* Make sure that the FlexTest controller has been stopped *\n";
+    opserr << "* before the MTS CSI interface is being reset             *\n";
+    opserr << "*                                                         *\n";
+    opserr << "* Press 'Enter' to proceed or 's' to skip the reset       *\n";
+    opserr << "***********************************************************\n";
+    int c = getchar();
+    if (c == '\n') {
+        // reset the csi-controller
+        CsiController->reset();
+        
+        opserr << "****************************************\n";
+        opserr << "* The MTS CSI interface has been reset *\n";
+        opserr << "****************************************\n";
+        opserr << endln;
+    }
+    else {
+        getchar();
+    }
     
     // delete the csi-controller
     if (CsiController != 0)
@@ -296,13 +314,7 @@ ECMtsCsi::~ECMtsCsi()
     //            delete outCPs[i];
     //    }
     //    delete [] outCPs;
-    //}
-    
-    opserr << endln;
-    opserr << "*************************************\n";
-    opserr << "* The CSI controller has been reset *\n";
-    opserr << "*************************************\n";
-    opserr << endln;
+    //}    
 }
 
 
@@ -350,7 +362,7 @@ int ECMtsCsi::setup()
     this->Print(opserr);
     
     opserr << "****************************************************************\n";
-    opserr << "* Make sure that offset values of controller are set to ZERO   *\n";
+    opserr << "* Make sure that offset values of the FlexTest are set to ZERO *\n";
     opserr << "*                                                              *\n";
     opserr << "* Press 'Enter' to proceed or 'c' to cancel the initialization *\n";
     opserr << "****************************************************************\n";

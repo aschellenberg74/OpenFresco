@@ -28,8 +28,13 @@
 // the dll to be the same as those in the existing process address space.
 
 #include <tcl.h>
-#include <Domain.h>
 #include <StandardStream.h>
+#include <conio.h>
+#include <Domain.h>
+#include <AnalysisModel.h>
+#include <StaticAnalysis.h>
+#include <DirectIntegrationAnalysis.h>
+#include <VariableTimeStepDirectIntegrationAnalysis.h>
 #include <elementAPI.h>
 #include <FrescoGlobals.h>
 #include <ExperimentalSite.h>
@@ -79,8 +84,12 @@ extern bool OPF_removeExperimentalSetup(int tag);
 extern bool OPF_removeExperimentalSite(int tag);
 extern bool OPF_removeExperimentalTangentStiff(int tag);
 
-Tcl_Interp *theInterp = 0;
-Domain *theDomain = 0;
+Tcl_Interp* theInterp = 0;
+Domain* theDomain = 0;
+StaticAnalysis** theStaticAnalysis = 0;
+DirectIntegrationAnalysis** theTransientAnalysis = 0;
+VariableTimeStepDirectIntegrationAnalysis** theVariableTimeStepTransientAnalysis = 0;
+
 extern "C" int OPS_ResetInputNoBuilder(ClientData clientData, Tcl_Interp * interp, int cArg, int mArg, TCL_Char * *argv, Domain * domain);
 
 
@@ -112,7 +121,7 @@ int openFresco_addExperimentalControl(ClientData clientData,
 {
     // reset the input args
     OPS_ResetInputNoBuilder(clientData, interp, 1, argc, argv, theDomain);
-
+    
     return OPF_ExperimentalControl();
 }
 
@@ -123,7 +132,7 @@ int openFresco_addExperimentalSetup(ClientData clientData,
 {
     // reset the input args
     OPS_ResetInputNoBuilder(clientData, interp, 1, argc, argv, theDomain);
-
+    
     return OPF_ExperimentalSetup();
 }
 
@@ -134,7 +143,7 @@ int openFresco_addExperimentalSite(ClientData clientData,
 {
     // reset the input args
     OPS_ResetInputNoBuilder(clientData, interp, 1, argc, argv, theDomain);
-
+    
     return OPF_ExperimentalSite();
 }
 
@@ -145,7 +154,7 @@ int openFresco_addExperimentalTangentStiff(ClientData clientData,
 {
     // reset the input args
     OPS_ResetInputNoBuilder(clientData, interp, 1, argc, argv, theDomain);
-
+    
     return OPF_ExperimentalTangentStiff();
 }
 
@@ -156,7 +165,7 @@ int openFresco_addExperimentalElement(ClientData clientData,
 {
     // reset the input args
     OPS_ResetInputNoBuilder(clientData, interp, 1, argc, argv, theDomain);
-
+    
     return OPF_ExperimentalElement();
 }
 
@@ -167,7 +176,7 @@ int openFresco_addExperimentalRecorder(ClientData clientData,
 {
     // reset the input args
     OPS_ResetInputNoBuilder(clientData, interp, 1, argc, argv, theDomain);
-
+    
     return OPF_ExperimentalRecorder();
 }
 int openFresco_record(ClientData clientData,
@@ -183,7 +192,7 @@ int openFresco_startLabServer(ClientData clientData,
 {
     // reset the input args
     OPS_ResetInputNoBuilder(clientData, interp, 1, argc, argv, theDomain);
-
+    
     return OPF_startLabServer();
 }
 
@@ -194,7 +203,7 @@ int openFresco_setupLabServer(ClientData clientData,
 {
     // reset the input args
     OPS_ResetInputNoBuilder(clientData, interp, 1, argc, argv, theDomain);
-
+    
     return OPF_setupLabServer();
 }
 
@@ -205,7 +214,7 @@ int openFresco_stepLabServer(ClientData clientData,
 {
     // reset the input args
     OPS_ResetInputNoBuilder(clientData, interp, 1, argc, argv, theDomain);
-
+    
     return OPF_stepLabServer();
 }
 
@@ -216,7 +225,7 @@ int openFresco_stopLabServer(ClientData clientData,
 {
     // reset the input args
     OPS_ResetInputNoBuilder(clientData, interp, 1, argc, argv, theDomain);
-
+    
     return OPF_stopLabServer();
 }
 
@@ -227,7 +236,7 @@ int openFresco_startSimAppSiteServer(ClientData clientData,
 {
     // reset the input args
     OPS_ResetInputNoBuilder(clientData, interp, 1, argc, argv, theDomain);
-
+    
     return OPF_startSimAppSiteServer();
 }
 
@@ -238,8 +247,387 @@ int openFresco_startSimAppElemServer(ClientData clientData,
 {
     // reset the input args
     OPS_ResetInputNoBuilder(clientData, interp, 1, argc, argv, theDomain);
-
+    
     return OPF_startSimAppElemServer();
+}
+
+
+// opensees command to analyze a model interactively
+int opensees_analyzeModelInteractive(ClientData clientData,
+    Tcl_Interp* interp, int argc, TCL_Char** argv)
+{
+    // reset the input args
+    OPS_ResetInputNoBuilder(clientData, interp, 1, argc, argv, theDomain);
+    
+    int result = 0;
+    int numSteps;
+    bool exitYet = false;
+    bool showMsg = true;
+    int action = 'r';
+    int step = 1;
+    int numdata = 1;
+    
+    theStaticAnalysis = OPS_GetStaticAnalysis();
+    theTransientAnalysis = OPS_GetTransientAnalysis();
+    theVariableTimeStepTransientAnalysis = OPS_GetVariableTimeStepTransientAnalysis();
+    
+    if (*theStaticAnalysis != 0) {
+        if (OPS_GetNumRemainingInputArgs() < 1) {
+            opserr << "WARNING insufficient arguments\n"
+                << "Want: analyzeInteractive numSteps ...\n";
+            return -1;
+        }
+        
+        if (OPS_GetIntInput(&numdata, &numSteps) < 0) {
+            opserr << "WARNING invalid analyzeInteractive numSteps\n";
+            return -1;
+        }
+        
+        // interactively run the analysis (i.e. the test) for numSteps
+        opserr << "\nStaticAnalysis - now interactively running for "
+            << numSteps << " steps..." << endln;
+        opserr << "Press 'p' to pause, 'r' to resume, 's' to step, or 'e' to end the test." << endln;
+        while (step <= numSteps && exitYet == false) {
+            // check if we got a keyboard input
+            if (_kbhit())
+                action = _getch();
+            
+            switch (action) {
+            case 'r':
+                // run or resume test
+                if (!showMsg) {
+                    opserr << "\nStaticAnalysis - now resuming the test..." << endln;
+                    showMsg = true;
+                }
+                result = (*theStaticAnalysis)->analyze(1);
+                step++;
+                break;
+            case 'p':
+                // pause test
+                if (showMsg) {
+                    opserr << "\nStaticAnalysis - at step "
+                        << step << " - now pausing the test..." << endln;
+                    showMsg = false;
+                }
+                break;
+            case 's':
+            case '0':
+                // 10^0 times step test
+                if (!showMsg) {
+                    opserr << "\nStaticAnalysis - at step "
+                        << step << " - now stepping the test..." << endln;
+                    showMsg = false;
+                }
+                result = (*theStaticAnalysis)->analyze(1);
+                action = 'p';
+                step++;
+                break;
+            case '1':
+                // 10^1 times step test
+                if (!showMsg) {
+                    opserr << "\nStaticAnalysis - at step "
+                        << step << " - now 10x stepping the test..." << endln;
+                    showMsg = false;
+                }
+                result = (*theStaticAnalysis)->analyze(10);
+                action = 'p';
+                step += 10;
+                break;
+            case '2':
+                // 10^2 times step test
+                if (!showMsg) {
+                    opserr << "\nStaticAnalysis - at step "
+                        << step << " - now 100x stepping the test..." << endln;
+                    showMsg = false;
+                }
+                result = (*theStaticAnalysis)->analyze(100);
+                action = 'p';
+                step += 100;
+                break;
+            case '3':
+                // 10^3 times step test
+                if (!showMsg) {
+                    opserr << "\nStaticAnalysis - at step "
+                        << step << " - now 1000x stepping the test..." << endln;
+                    showMsg = false;
+                }
+                result = (*theStaticAnalysis)->analyze(1000);
+                action = 'p';
+                step += 1000;
+                break;
+            case '4':
+                // 10^4 times step test
+                if (!showMsg) {
+                    opserr << "\nStaticAnalysis - at step "
+                        << step << " - now 10000x stepping the test..." << endln;
+                    showMsg = false;
+                }
+                result = (*theStaticAnalysis)->analyze(10000);
+                action = 'p';
+                step += 10000;
+                break;
+            case 'e':
+                // end test
+                opserr << "\nStaticAnalysis - at step "
+                    << step << " - now shut down." << endln;
+                (*theStaticAnalysis)->clearAll();
+                exitYet = true;
+                break;
+            }
+        }
+    }
+    else if (*theTransientAnalysis != 0) {
+        if (OPS_GetNumRemainingInputArgs() < 2) {
+            opserr << "WARNING insufficient arguments\n"
+                << "Want: analyzeInteractive numSteps dt\n";
+            return -1;
+        }
+        
+        double dT;
+        if (OPS_GetIntInput(&numdata, &numSteps) < 0) {
+            opserr << "WARNING invalid analyzeInteractive numSteps\n";
+            return -1;
+        }
+        if (OPS_GetDoubleInput(&numdata, &dT) < 0) {
+            opserr << "WARNING invalid analyzeInteractive dt\n";
+            return -1;
+        }
+        
+        // set global timestep variable
+        ops_Dt = dT;
+        
+        if (OPS_GetNumRemainingInputArgs() == 0) {
+            
+            // interactively run the analysis (i.e. the test) for numSteps
+            opserr << "\nTransientAnalysis - now interactively running for "
+                << numSteps << " steps..." << endln;
+            opserr << "Press 'p' to pause, 'r' to resume, 's' to step, or 'e' to end the test." << endln;
+            while (step <= numSteps && exitYet == false) {
+                // check if we got a keyboard input
+                if (_kbhit())
+                    action = _getch();
+                
+                switch (action) {
+                case 'r':
+                    // run or resume test
+                    if (!showMsg) {
+                        opserr << "\nTransientAnalysis - now resuming the test..." << endln;
+                        showMsg = true;
+                    }
+                    result = (*theTransientAnalysis)->analyze(1,dT);
+                    step++;
+                    break;
+                case 'p':
+                    // pause test
+                    if (showMsg) {
+                        opserr << "\nTransientAnalysis - at step "
+                            << step << " - now pausing the test..." << endln;
+                        showMsg = false;
+                    }
+                    break;
+                case 's':
+                case '0':
+                    // 10^0 times step test
+                    if (!showMsg) {
+                        opserr << "\nTransientAnalysis - at step "
+                            << step << " - now stepping the test..." << endln;
+                        showMsg = false;
+                    }
+                    result = (*theTransientAnalysis)->analyze(1,dT);
+                    action = 'p';
+                    step++;
+                    break;
+                case '1':
+                    // 10^1 times step test
+                    if (!showMsg) {
+                        opserr << "\nTransientAnalysis - at step "
+                            << step << " - now 10x stepping the test..." << endln;
+                        showMsg = false;
+                    }
+                    result = (*theTransientAnalysis)->analyze(10, dT);
+                    action = 'p';
+                    step+=10;
+                    break;
+                case '2':
+                    // 10^2 times step test
+                    if (!showMsg) {
+                        opserr << "\nTransientAnalysis - at step "
+                            << step << " - now 100x stepping the test..." << endln;
+                        showMsg = false;
+                    }
+                    result = (*theTransientAnalysis)->analyze(100, dT);
+                    action = 'p';
+                    step+=100;
+                    break;
+                case '3':
+                    // 10^3 times step test
+                    if (!showMsg) {
+                        opserr << "\nTransientAnalysis - at step "
+                            << step << " - now 1000x stepping the test..." << endln;
+                        showMsg = false;
+                    }
+                    result = (*theTransientAnalysis)->analyze(1000, dT);
+                    action = 'p';
+                    step += 1000;
+                    break;
+                case '4':
+                    // 10^4 times step test
+                    if (!showMsg) {
+                        opserr << "\nTransientAnalysis - at step "
+                            << step << " - now 10000x stepping the test..." << endln;
+                        showMsg = false;
+                    }
+                    result = (*theTransientAnalysis)->analyze(10000, dT);
+                    action = 'p';
+                    step += 10000;
+                    break;
+                case 'e':
+                    // end test
+                    opserr << "\nTransientAnalysis - at step "
+                        << step << " - now shut down." << endln;
+                    (*theTransientAnalysis)->clearAll();
+                    exitYet = true;
+                    break;
+                }
+            }
+        }
+        else if (OPS_GetNumRemainingInputArgs() < 3) {
+            opserr << "WARNING insufficient arguments for variable transient\n"
+                << "Want: analyzeInteractive numSteps dt dtMin dtMax Jd\n";
+            return -1;
+        }
+        else {
+            int Jd;
+            double dtMin, dtMax;
+            if (OPS_GetDoubleInput(&numdata, &dtMin) < 0) {
+                opserr << "WARNING invalid analyzeInteractive dtMin\n";
+                return -1;
+            }
+            if (OPS_GetDoubleInput(&numdata, &dtMax) < 0) {
+                opserr << "WARNING invalid analyzeInteractive dtMax\n";
+                return -1;
+            }
+            if (OPS_GetIntInput(&numdata, &Jd) < 0) {
+                opserr << "WARNING invalid analyzeInteractive Jd\n";
+                return -1;
+            }
+            
+            if (*theVariableTimeStepTransientAnalysis != 0) {
+                
+                // interactively run the analysis (i.e. the test) for numSteps
+                opserr << "\nVariableTimeStepTransientAnalysis - now interactively running for "
+                    << numSteps << " steps..." << endln;
+                opserr << "Press 'p' to pause, 'r' to resume, 's' to step, or 'e' to end the test." << endln;
+                while (step <= numSteps && exitYet == false) {
+                    // check if we got a keyboard input
+                    if (_kbhit())
+                        action = _getch();
+                    
+                    switch (action) {
+                    case 'r':
+                        // run or resume test
+                        if (!showMsg) {
+                            opserr << "\nVariableTimeStepTransientAnalysis - now resuming the test..." << endln;
+                            showMsg = true;
+                        }
+                        result = (*theVariableTimeStepTransientAnalysis)->analyze(1, dT, dtMin, dtMax, Jd);
+                        step++;
+                        break;
+                    case 'p':
+                        // pause test
+                        if (showMsg) {
+                            opserr << "\nVariableTimeStepTransientAnalysis - at step "
+                                << step << " - now pausing the test..." << endln;
+                            showMsg = false;
+                        }
+                        break;
+                    case 's':
+                    case '0':
+                        // 10^0 times step test
+                        if (!showMsg) {
+                            opserr << "\nVariableTimeStepTransientAnalysis - at step "
+                                << step << " - now stepping the test..." << endln;
+                            showMsg = false;
+                        }
+                        result = (*theVariableTimeStepTransientAnalysis)->analyze(1, dT, dtMin, dtMax, Jd);
+                        action = 'p';
+                        step++;
+                        break;
+                    case '1':
+                        // 10^1 times step test
+                        if (!showMsg) {
+                            opserr << "\nVariableTimeStepTransientAnalysis - at step "
+                                << step << " - now 10x stepping the test..." << endln;
+                            showMsg = false;
+                        }
+                        result = (*theVariableTimeStepTransientAnalysis)->analyze(10, dT, dtMin, dtMax, Jd);
+                        action = 'p';
+                        step += 10;
+                        break;
+                    case '2':
+                        // 10^2 times step test
+                        if (!showMsg) {
+                            opserr << "\nVariableTimeStepTransientAnalysis - at step "
+                                << step << " - now 100x stepping the test..." << endln;
+                            showMsg = false;
+                        }
+                        result = (*theVariableTimeStepTransientAnalysis)->analyze(100, dT, dtMin, dtMax, Jd);
+                        action = 'p';
+                        step += 100;
+                        break;
+                    case '3':
+                        // 10^3 times step test
+                        if (!showMsg) {
+                            opserr << "\nVariableTimeStepTransientAnalysis - at step "
+                                << step << " - now 1000x stepping the test..." << endln;
+                            showMsg = false;
+                        }
+                        result = (*theVariableTimeStepTransientAnalysis)->analyze(1000, dT, dtMin, dtMax, Jd);
+                        action = 'p';
+                        step += 1000;
+                        break;
+                    case '4':
+                        // 10^4 times step test
+                        if (!showMsg) {
+                            opserr << "\nVariableTimeStepTransientAnalysis - at step "
+                                << step << " - now 10000x stepping the test..." << endln;
+                            showMsg = false;
+                        }
+                        result = (*theVariableTimeStepTransientAnalysis)->analyze(10000, dT, dtMin, dtMax, Jd);
+                        action = 'p';
+                        step += 10000;
+                        break;
+                    case 'e':
+                        // end test
+                        opserr << "\nVariableTimeStepTransientAnalysis - at step "
+                            << step << " - now shut down." << endln;
+                        (*theVariableTimeStepTransientAnalysis)->clearAll();
+                        exitYet = true;
+                        break;
+                    }
+                }
+            }
+            else {
+                opserr << "WARNING analyzeInteractive - no variable time step transient analysis object constructed\n";
+                return -1;
+            }
+        }
+    }
+    else {
+        opserr << "WARNING No Analysis type has been specified\n";
+        return -1;
+    }
+    
+    if (result < 0) {
+        opserr << "OpenSees > analyzeInteractive failed, returned: " << result << " error flag\n";
+    }
+    
+    if (OPS_SetIntOutput(&numdata, &result, true) < 0) {
+        opserr << "WARNING failed to set output\n";
+        return -1;
+    }
+    
+    return 0;
 }
 
 
@@ -268,7 +656,7 @@ int openFresco_removeObject(ClientData clientData,
 {
     // reset the input args
     OPS_ResetInputNoBuilder(clientData, interp, 1, argc, argv, theDomain);
-
+    
     return OPF_removeObject();
 }
 
@@ -281,7 +669,7 @@ int OPF_removeObject()
         opserr << "Want: removeExp type <specific args>\n";
         return -1;
     }
-
+    
     const char* type = OPS_GetString();
     if (strcmp(type, "controlPoint") == 0) {
         if (OPS_GetNumRemainingInputArgs() < 1) {
@@ -544,6 +932,9 @@ OpenFresco(ClientData clientData, Tcl_Interp *interp, int argc,
         (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
     
     Tcl_CreateCommand(interp, "startSimAppElemServer", openFresco_startSimAppElemServer,
+        (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
+    
+    Tcl_CreateCommand(interp, "analyzeInteractive", opensees_analyzeModelInteractive,
         (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
     
     Tcl_CreateCommand(interp, "wipeExp", openFresco_wipeExp,

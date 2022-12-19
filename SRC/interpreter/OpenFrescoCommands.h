@@ -104,6 +104,7 @@ int OPF_ExperimentalRecorder();
 
 // server OpenFresco commands
 int OPF_startLabServer();
+int OPF_startLabServerInteractive();
 int OPF_setupLabServer();
 int OPF_stepLabServer();
 int OPF_stopLabServer();

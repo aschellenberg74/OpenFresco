@@ -31,7 +31,7 @@
 //
 // Description: This file contains the global values in OpenFresco
 
-#define OPF_VERSION "2.7.2 (Build 220428)"
+#define OPF_VERSION "2.7.2 (Build 221218)"
 
 #ifndef _WIN64
 #define WIN_ARCH "32-Bit"
@@ -77,6 +77,7 @@ static const int OF_RemoteTest_getInitialStiff  = 12;
 static const int OF_RemoteTest_getTangentStiff  = 13;
 static const int OF_RemoteTest_getDamp          = 14;
 static const int OF_RemoteTest_getMass          = 15;
+static const int OF_RemoteTest_shutdown         = 98;
 static const int OF_RemoteTest_DIE              = 99;
 
 // tentative remote test

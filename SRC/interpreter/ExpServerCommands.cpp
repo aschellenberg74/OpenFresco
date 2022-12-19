@@ -37,6 +37,8 @@
 #include <ExperimentalSite.h>
 #include <ActorExpSite.h>
 
+#include <conio.h>
+
 
 int OPF_startLabServer()
 {
@@ -57,17 +59,152 @@ int OPF_startLabServer()
     if (theExperimentalSite != 0)  {
         // start server process
         opserr << "\nActorExpSite " << siteTag
-            << " now running..." << endln;
+            << " - now running..." << endln;
         theExperimentalSite->run();
     } else  {
         opserr << "WARNING actor experimental site not found\n";
         opserr << "unable to start expSite: " << siteTag << endln;
         return -1;
     }
-    //OPF_removeExperimentalSite(siteTag);
-    //theExperimentalSite = 0;
-    //delete theExperimentalSite;
     
+    return 0;
+}
+
+
+int OPF_startLabServerInteractive()
+{
+    if (OPS_GetNumRemainingInputArgs() != 2) {
+        opserr << "WARNING insufficient arguments\n"
+            << "Want: startLabServerInteractive siteTag numSteps\n";
+        return -1;
+    }
+
+    int siteTag, numSteps;
+    bool exitYet = false;
+    bool showMsg = true;
+    int action = 'r';
+    int step = 1;
+    int numdata = 1;
+    if (OPS_GetIntInput(&numdata, &siteTag) < 0) {
+        opserr << "WARNING invalid startLabServerInteractive siteTag\n";
+        return -1;
+    }
+    numdata = 1;
+    if (OPS_GetIntInput(&numdata, &numSteps) < 0) {
+        opserr << "WARNING invalid startLabServerInteractive numSteps\n";
+        return -1;
+    }
+    ActorExpSite* theExperimentalSite =
+        dynamic_cast <ActorExpSite*> (OPF_getExperimentalSite(siteTag));
+    if (theExperimentalSite != 0) {
+        // start server process and run for numSteps
+        opserr << "\nActorExpSite " << siteTag
+            << " - now interactively running for " << numSteps << " steps..." << endln;
+        opserr << "Press 'p' to pause, 'r' to resume, 's' to step, or 'e' to end the test." << endln;
+        while (step <= numSteps && exitYet == false) {
+            // check if we got a keyboard input
+            if (_kbhit())
+                action = _getch();
+            
+            switch (action) {
+            case 'r':
+                // run or resume test
+                if (!showMsg) {
+                    opserr << "\nActorExpSite " << siteTag
+                        << " - now resuming the test..." << endln;
+                    showMsg = true;
+                }
+                theExperimentalSite->runTill(OF_RemoteTest_commitState);
+                step++;
+                break;
+            case 'p':
+                // pause test
+                if (showMsg) {
+                    opserr << "\nActorExpSite " << siteTag << " - at step "
+                        << step << " - now pausing the test..." << endln;
+                    showMsg = false;
+                }
+                break;
+            case 's':
+            case '0':
+                // 10^0 times step test
+                if (!showMsg) {
+                    opserr << "\nActorExpSite " << siteTag << " - at step "
+                        << step << " - now stepping the test..." << endln;
+                    showMsg = false;
+                }
+                theExperimentalSite->runTill(OF_RemoteTest_commitState);
+                action = 'p';
+                step++;
+                break;
+            case '1':
+                // 10^1 times step test
+                if (!showMsg) {
+                    opserr << "\nActorExpSite " << siteTag << " - at step "
+                        << step << " - now 10x stepping the test..." << endln;
+                    showMsg = false;
+                }
+                for (int s=0; s<10; s++) {
+                    theExperimentalSite->runTill(OF_RemoteTest_commitState);
+                    step++;
+                }
+                action = 'p';
+                break;
+            case '2':
+                // 10^2 times step test
+                if (!showMsg) {
+                    opserr << "\nActorExpSite " << siteTag << " - at step "
+                        << step << " - now 100x stepping the test..." << endln;
+                    showMsg = false;
+                }
+                for (int s=0; s<100; s++) {
+                    theExperimentalSite->runTill(OF_RemoteTest_commitState);
+                    step++;
+                }
+                action = 'p';
+                break;
+            case '3':
+                // 10^3 times step test
+                if (!showMsg) {
+                    opserr << "\nActorExpSite " << siteTag << " - at step "
+                        << step << " - now 1000x stepping the test..." << endln;
+                    showMsg = false;
+                }
+                for (int s=0; s<1000; s++) {
+                    theExperimentalSite->runTill(OF_RemoteTest_commitState);
+                    step++;
+                }
+                action = 'p';
+                break;
+            case '4':
+                // 10^4 times step test
+                if (!showMsg) {
+                    opserr << "\nActorExpSite " << siteTag << " - at step "
+                        << step << " - now 10000x stepping the test..." << endln;
+                    showMsg = false;
+                }
+                for (int s = 0; s < 10000; s++) {
+                    theExperimentalSite->runTill(OF_RemoteTest_commitState);
+                    step++;
+                }
+                action = 'p';
+                break;
+            case 'e':
+                // end test and stop server process
+                opserr << "\nActorExpSite " << siteTag << " - at step "
+                    << step << " - now shut down." << endln;
+                theExperimentalSite->runTill(OF_RemoteTest_shutdown);
+                exitYet = true;
+                break;
+            }
+        }
+    }
+    else {
+        opserr << "WARNING actor experimental site not found\n";
+        opserr << "unable to interactively start expSite: " << siteTag << endln;
+        return -1;
+    }
+
     return 0;
 }
 
@@ -91,7 +228,7 @@ int OPF_setupLabServer()
     if (theExperimentalSite != 0)  {
         // start server process and run till setup is done
         opserr << "\nActorExpSite " << siteTag
-            << " now being setup..." << endln;
+            << " - now being setup..." << endln;
         theExperimentalSite->runTill(OF_RemoteTest_setup);
     } else  {
         opserr << "WARNING actor experimental site not found\n";
@@ -128,7 +265,7 @@ int OPF_stepLabServer()
     if (theExperimentalSite != 0)  {
         // start server process and run for numSteps
         opserr << "\nActorExpSite " << siteTag
-            << " now running for " << numSteps << " steps..." << endln;
+            << " - now running for " << numSteps << " steps..." << endln;
         while (step <= numSteps)  {
             theExperimentalSite->runTill(OF_RemoteTest_commitState);
             step++;
@@ -160,10 +297,10 @@ int OPF_stopLabServer()
     ActorExpSite *theExperimentalSite =
         dynamic_cast <ActorExpSite*> (OPF_getExperimentalSite(siteTag));
     if (theExperimentalSite != 0)  {
-        // stop server process by destructing ExpSite object
+        // stop server process
         opserr << "\nActorExpSite " << siteTag
-            << " now terminated." << endln;
-        delete theExperimentalSite;
+            << " - now shut down." << endln;
+        theExperimentalSite->runTill(OF_RemoteTest_shutdown);
     } else  {
         opserr << "WARNING actor experimental site not found\n";
         opserr << "unable to stop expSite: " << siteTag << endln;
@@ -319,7 +456,7 @@ int OPF_startSimAppSiteServer()
     
     // start server loop
     opserr << "\nSimAppSiteServer with ExpSite " << siteTag
-        << " now running...\n";
+        << " - now running...\n";
     bool exitYet = false;
     while (!exitYet) {
         theChannel->recvVector(0, 0, *recvData, 0);
@@ -376,7 +513,7 @@ int OPF_startSimAppSiteServer()
         }
     }
     opserr << "\nSimAppSiteServer with ExpSite " << siteTag
-        << " shutdown\n\n";
+        << " - shut down\n\n";
     
     // delete allocated memory
     if (theChannel != 0)
@@ -595,7 +732,7 @@ int OPF_startSimAppElemServer()
     
     // start server loop
     opserr << "\nSimAppElemServer with ExpElement " << eleTag
-        << " now running...\n";
+        << " - now running...\n";
     Vector nodeData(1);
     bool exitYet = false;
     while (!exitYet) {
@@ -696,7 +833,7 @@ int OPF_startSimAppElemServer()
         }
     }
     opserr << "\nSimAppElemServer with ExpElement " << eleTag
-        << " shutdown\n\n";
+        << " - shut down\n\n";
     
     // delete allocated memory
     if (theChannel != 0)

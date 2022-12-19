@@ -396,6 +396,15 @@
     <ClCompile Include="..\..\..\SRC\openseesCore\CrdTransfResponse.cpp">
       <Filter>core</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\DirectIntegrationAnalysis.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\VariableTimeStepDirectIntegrationAnalysis.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\TransientAnalysis.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\SRC\openseesCore\Analysis.h">
@@ -865,6 +874,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\SRC\openseesCore\CrdTransfResponse.h">
       <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\DirectIntegrationAnalysis.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\VariableTimeStepDirectIntegrationAnalysis.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\TransientAnalysis.h">
+      <Filter>extra</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -191,6 +191,15 @@ static int Tcl_opf_startLabServer(ClientData clientData, Tcl_Interp *interp, int
     return TCL_OK;
 }
 
+static int Tcl_opf_startLabServerInteractive(ClientData clientData, Tcl_Interp* interp, int argc, TCL_Char** argv)
+{
+    wrapper->resetCommandLine(argc, 1, argv);
+
+    if (OPF_startLabServerInteractive() < 0) return TCL_ERROR;
+
+    return TCL_OK;
+}
+
 static int Tcl_opf_setupLabServer(ClientData clientData, Tcl_Interp *interp, int argc, TCL_Char **argv)
 {
     wrapper->resetCommandLine(argc, 1, argv);
@@ -419,6 +428,7 @@ void TclWrapper::addOpenFrescoCommands(Tcl_Interp* interp)
     addCommand(interp, "expRecorder", &Tcl_opf_expRecorder);
     addCommand(interp, "recordExp", &Tcl_opf_recordExp);
     addCommand(interp, "startLabServer", &Tcl_opf_startLabServer);
+    addCommand(interp, "startLabServerInteractive", &Tcl_opf_startLabServerInteractive);
     addCommand(interp, "setupLabServer", &Tcl_opf_setupLabServer);
     addCommand(interp, "stepLabServer", &Tcl_opf_stepLabServer);
     addCommand(interp, "stopLabServer", &Tcl_opf_stopLabServer);
