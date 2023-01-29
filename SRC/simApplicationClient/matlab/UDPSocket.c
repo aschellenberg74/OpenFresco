@@ -29,7 +29,7 @@
 #include "mex.h"
 #include <string.h>
 
-// functions defined in socket.c
+// functions defined in udp_socket.c
 void udp_setupconnectionserver(unsigned int *port, int *socketID);
 void udp_setupconnectionclient(unsigned int *port, const char machineInetAddr[], int *lengthInet, int *socketID);
 void udp_closeconnection(int *socketID, int *ierr);

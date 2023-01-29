@@ -19,10 +19,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision: 314 $
-// $Date: 2011-05-22 14:17:07 -0700 (Sun, 22 May 2011) $
-// $Source: $
-
 // Written: Andreas Schellenberg & Frank McKenna
 // Created: 02/13
 // Revision: A
@@ -166,11 +162,12 @@ void CALL_CONV udp_setupconnectionserver(unsigned int *port, int *socketID)
     
     // wait for remote process to send message
     // the remote address and its length is also received and saved
-    ierr = recvfrom(sockfd, &data, 1, 0, &other_Addr.addr, &addrLength);    
+    addrLength = sizeof(other_Addr.addr);
+    ierr = recvfrom(sockfd, &data, 1, 0, &other_Addr.addr, &addrLength);
     
     // then send a message back
     data = 'b';
-    ierr = sendto(sockfd, &data, 1, 0, &other_Addr.addr, addrLength);        
+    ierr = sendto(sockfd, &data, 1, 0, &other_Addr.addr, addrLength);
     
     // get other_Port and other_InetAddr
     other_Port = ntohs(other_Addr.addr_in.sin_port);

@@ -29,7 +29,7 @@
 #include "mex.h"
 #include <string.h>
 
-// functions defined in socket.c
+// functions defined in tcp_socket.c
 void tcp_setupconnectionserver(unsigned int *port, int *socketID);
 void tcp_setupconnectionclient(unsigned int *port, const char machineInetAddr[], int *lengthInet, int *socketID);
 void tcp_closeconnection(int *socketID, int *ierr);

@@ -19,10 +19,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision$
-// $Date$
-// $Source: $
-
 // Written: Frank McKenna & Andreas Schellenberg
 // Created: 10/06
 // Revision: A

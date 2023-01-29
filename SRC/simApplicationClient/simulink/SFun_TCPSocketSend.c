@@ -24,7 +24,7 @@
 // Revision: A
 //
 // Description: This file contains the Simulink s-function for 
-// the sending end of the tcp/ip socket.c.
+// the sending end of the tcp_socket.c.
 
 #define S_FUNCTION_NAME SFun_TCPSocketSend
 #define S_FUNCTION_LEVEL 2
@@ -33,7 +33,7 @@
 #include <math.h>
 #include <string.h>
 
-// functions defined in socket.c
+// functions defined in tcp_socket.c
 void tcp_setupconnectionserver(unsigned int *port, int *socketID);
 void tcp_setupconnectionclient(unsigned int *port, const char machineInetAddr[], int *lengthInet, int *socketID);
 void tcp_closeconnection(int *socketID, int *ierr);

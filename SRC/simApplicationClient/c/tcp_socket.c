@@ -19,10 +19,6 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// $Revision: 314 $
-// $Date: 2011-05-22 14:17:07 -0700 (Sun, 22 May 2011) $
-// $URL: $
-
 // Written: Frank McKenna & Andreas Schellenberg
 // Created: 10/06
 // Revision: A

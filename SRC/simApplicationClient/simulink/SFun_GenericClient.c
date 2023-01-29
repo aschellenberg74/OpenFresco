@@ -35,7 +35,7 @@
 #include <math.h>
 #include <string.h>
 
-// functions defined in socket.c
+// functions defined in tcp_socket.c
 void tcp_setupconnectionclient(unsigned int *port, const char machineInetAddr[], int *lengthInet, int *socketID);
 void tcp_closeconnection(int *socketID, int *ierr);
 void tcp_senddata(const int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr);

@@ -168,9 +168,10 @@ UDP_Socket::UDP_Socket(unsigned int other_Port,
         opserr << "UDP_Socket::UDP_Socket() - could not bind local address\n";
     }
     
+    // get my_address info
     addrLength = sizeof(my_Addr.addr);
     getsockname(sockfd, &my_Addr.addr, &addrLength);
-    myPort = ntohs(my_Addr.addr_in.sin_port);    
+    myPort = ntohs(my_Addr.addr_in.sin_port);
 }
 
 
@@ -196,6 +197,7 @@ UDP_Socket::setUpConnection()
         
         // send a message to address
         char data = 'a';
+        addrLength = sizeof(other_Addr.addr);
         sendto(sockfd, &data, 1, 0, &other_Addr.addr, addrLength);
         
         // receive a message from other
@@ -228,6 +230,7 @@ UDP_Socket::setUpConnection()
         
         // wait for remote process to send message
         char data;
+        addrLength = sizeof(other_Addr.addr);
         recvfrom(sockfd, &data, 1, 0, &other_Addr.addr, &addrLength);    
         
         // then send a message back
