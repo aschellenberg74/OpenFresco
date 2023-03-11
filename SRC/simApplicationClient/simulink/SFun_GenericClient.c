@@ -156,6 +156,7 @@ static void mdlInitializeSampleTimes(SimStruct *S)
 
 static void mdlStart(SimStruct *S)
 {
+    static char errMsg[80];
     char_T *ipAddr;
     uint_T ipPort;
     int_T sizeAddr, iData[11];
@@ -195,7 +196,8 @@ static void mdlStart(SimStruct *S)
     tcp_setupconnectionclient(&ipPort, ipAddr, &sizeAddr, socketID);
     mxFree(ipAddr);
     if (socketID[0] < 0)  {
-        ssSetErrorStatus(S,"Failed to setup connection with server");
+        sprintf(errMsg, "Failed to setup connection with server: %d", socketID[0]);
+        ssSetErrorStatus(S, errMsg);
         return;
     }
     

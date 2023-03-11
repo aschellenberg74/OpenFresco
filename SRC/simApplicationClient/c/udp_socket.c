@@ -122,7 +122,7 @@ void CALL_CONV udp_setupconnectionserver(unsigned int *port, int *socketID)
     unsigned int other_Port;
     char *other_InetAddr;
     char data;
-    int ierr;
+    int ierr, trial;
     
     // initialize sockets
     startupsockets(&ierr);
@@ -160,14 +160,32 @@ void CALL_CONV udp_setupconnectionserver(unsigned int *port, int *socketID)
         return;
     }
     
-    // wait for remote process to send message
+    // wait for remote process to send a 1-byte message (try 3-times)
     // the remote address and its length is also received and saved
     addrLength = sizeof(other_Addr.addr);
-    ierr = recvfrom(sockfd, &data, 1, 0, &other_Addr.addr, &addrLength);
+    trial = 0;
+    do {
+        ierr = recvfrom(sockfd, &data, 1, 0, &other_Addr.addr, &addrLength);
+        trial++;
+    } while (ierr != 1 && data != 'a' && trial < 3);
+    if (ierr != 1) {
+        fprintf(stderr, "udp_socket::setupconnectionserver() - could not receive intial message\n");
+        *socketID = -4;
+        return;
+    }
     
-    // then send a message back
+    // then send a 1-byte message back (try 3-times)
     data = 'b';
-    ierr = sendto(sockfd, &data, 1, 0, &other_Addr.addr, addrLength);
+    trial = 0;
+    do {
+        ierr = sendto(sockfd, &data, 1, 0, &other_Addr.addr, addrLength);
+        trial++;
+    } while (ierr != 1 && trial < 3);
+    if (ierr != 1) {
+        fprintf(stderr, "udp_socket::setupconnectionserver() - could not send intial message\n");
+        *socketID = -5;
+        return;
+    }
     
     // get other_Port and other_InetAddr
     other_Port = ntohs(other_Addr.addr_in.sin_port);
@@ -216,7 +234,7 @@ void CALL_CONV udp_setupconnectionclient(unsigned int *other_Port,
     socket_type sockfd;
     socklen_type addrLength;
     char data;    
-    int ierr;
+    int ierr, trial;
     
     // check inputs
     if (other_InetAddr == 0) {
@@ -282,14 +300,32 @@ void CALL_CONV udp_setupconnectionclient(unsigned int *other_Port,
         return;
     }
     
-    // send a message to address
+    // send a 1-byte message to address (try 3-times)
     data = 'a';
     addrLength = sizeof(other_Addr.addr);
-    ierr = sendto(sockfd, &data, 1, 0, &other_Addr.addr, addrLength);
+    trial = 0;
+    do {
+        ierr = sendto(sockfd, &data, 1, 0, &other_Addr.addr, addrLength);
+        trial++;
+    } while (ierr != 1 && trial < 3);
+    if (ierr != 1) {
+        fprintf(stderr, "udp_socket::setupconnectionclient() - could not send intial message\n");
+        *socketID = -5;
+        return;
+    }
     
-    // receive a message from other
-    ierr = recvfrom(sockfd, &data, 1, 0, &other_Addr.addr, &addrLength);
-    
+    // receive a 1-byte message from other (try 3-times)
+    trial = 0;
+    do {
+        ierr = recvfrom(sockfd, &data, 1, 0, &other_Addr.addr, &addrLength);
+        trial++;
+    } while (ierr != 1 && data != 'b' && trial < 3);
+    if (ierr != 1) {
+        fprintf(stderr, "udp_socket::setupconnectionclient() - could not receive intial message\n");
+        *socketID = -6;
+        return;
+    }
+
     // add a new socket connection
     theSocket = (SocketConnection *)malloc(sizeof(SocketConnection));
     

@@ -71,8 +71,9 @@ static void mdlCheckParameters(SimStruct *S)
         ssSetErrorStatus(S,"dataType must be a string");
         return;
     }
-    if (!mxIsDouble(sampleTime(S)) || mxGetPr(sampleTime(S))[0] <= 0)  {
-        ssSetErrorStatus(S,"sampleTime must be a positive nonzero value");
+    if ((!mxIsDouble(sampleTime(S)) || mxGetPr(sampleTime(S))[0] <= 0) &&
+        (mxGetPr(sampleTime(S))[0] != -1))  {
+        ssSetErrorStatus(S,"sampleTime must be a positive nonzero value or -1 for inherited");
         return;
     }
 }
@@ -150,7 +151,10 @@ static void mdlInitializeSizes(SimStruct *S)
 
 static void mdlInitializeSampleTimes(SimStruct *S)
 {
-    ssSetSampleTime(S, 0, mxGetPr(sampleTime(S))[0]);
+    if (mxGetPr(sampleTime(S))[0] == -1)
+        ssSetSampleTime(S, 0, INHERITED_SAMPLE_TIME);
+    else
+        ssSetSampleTime(S, 0, mxGetPr(sampleTime(S))[0]);
     ssSetOffsetTime(S, 0, 0.0);
 }
 
@@ -164,6 +168,7 @@ static void mdlInitializeSampleTimes(SimStruct *S)
 
 static void mdlStart(SimStruct *S)
 {
+    static char errMsg[80];
     char_T *ipAddr;
     uint_T ipPort;
     int_T nleft, sizeAddr;
@@ -178,7 +183,8 @@ static void mdlStart(SimStruct *S)
         ipPort = (int_T)mxGetScalar(ipPort(S));
         udp_setupconnectionserver(&ipPort, socketID);
         if (socketID[0] < 0)  {
-            ssSetErrorStatus(S,"Failed to setup connection with client");
+            sprintf(errMsg, "Failed to setup connection with client: %d", socketID[0]);
+            ssSetErrorStatus(S, errMsg);
             return;
         }
     }
@@ -189,7 +195,8 @@ static void mdlStart(SimStruct *S)
         udp_setupconnectionclient(&ipPort, ipAddr, &sizeAddr, socketID);
         mxFree(ipAddr);
         if (socketID[0] < 0)  {
-            ssSetErrorStatus(S,"Failed to setup connection with server");
+            sprintf(errMsg, "Failed to setup connection with server: %d", socketID[0]);
+            ssSetErrorStatus(S,errMsg);
             return;
         }
     }
