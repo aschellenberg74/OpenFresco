@@ -34,24 +34,17 @@ end
 % reshape input into column vector
 acc = reshape(acc,[],1);
 
-npflag = 0;
+% remove DC of initial part of record and taper beginning of record
+npflag = 1;  % don't run this!!!
 if (npflag == 0)
-    % remove mean value of record
-    acc = acc - mean(acc);
+    % remove mean value of first 10 points of record
+    npts = 10;
+    acc = acc - sum(acc(1:npts))/length(acc);
     
-    % taper beginning of record over first (npts) points
+    % taper beginning of record over first 10 points
     npts = 10;
     taper = 0.5*(1 + cos(pi*(0:npts-1)./npts + pi));
     acc(1:npts) = acc(1:npts).*taper';
-    
-    % taper end of record over last (npts) points
-    npts = 10;
-    taper = 0.5*(1 + cos(pi*(npts-1:-1:0)./npts + pi));
-    acc(end-npts+1:end) = acc(end-npts+1:end).*taper';
-    
-    % pad with zeros
-    npts = 0;
-    acc = [zeros(npts,1); acc; zeros(npts,1)];
 end
 
 % integrate to displacement (time domain) for fitting baseline
