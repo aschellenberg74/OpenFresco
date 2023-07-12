@@ -96,7 +96,7 @@ int OPF_ExperimentalCP()
     }
     
     // node (optional)
-    int ndm = 0, ndf = 0;
+    int ndf = 0;
     Domain* theDomain = 0;
     Node* theNode = 0;
     const char* type = OPS_GetString();
@@ -110,7 +110,6 @@ int OPF_ExperimentalCP()
         theDomain = OPS_GetDomain();
         theNode = theDomain->getNode(nodeTag);
         ndf = theNode->getNumberDOF();
-        ndm = OPS_GetNDM();
     }
     else {
         // move current arg back by one
@@ -118,7 +117,7 @@ int OPF_ExperimentalCP()
     }
     
     // get the dof and associated properties
-    int dofID;
+    int dofID = 0;
     ID dof(32);
     ID rspType(32);
     Vector factor(32);
@@ -135,132 +134,21 @@ int OPF_ExperimentalCP()
         
         // dof ID
         type = OPS_GetString();
-        if (ndf == 0) {
-            if (sscanf(type, "%d", &dofID) != 1) {
-                if (sscanf(type, "%*[dfouDFOU]%d", &dofID) != 1) {
-                    opserr << "WARNING invalid dof for control point: " << tag << endln;
-                    opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType "
-                        << "<-fact f> <-lim l u> <-relTrial> <-relOut> <-relCtrl> <-relDaq> ...\n";
-                    return -1;
-                }
-            }
-            dof(numSignals) = dofID - 1;
-        }
-        else if (ndm == 1 && ndf == 1) {
-            if (strcmp(type, "1") == 0 ||
-                strcmp(type, "dof1") == 0 || strcmp(type, "DOF1") == 0 ||
-                strcmp(type, "u1") == 0 || strcmp(type, "U1") == 0 ||
-                strcmp(type, "ux") == 0 || strcmp(type, "UX") == 0)
-                dof(numSignals) = 0;
-            else {
+        if (sscanf(type, "%d", &dofID) != 1) {
+            if (sscanf(type, "%*[dfouDFOU]%d", &dofID) != 1) {
                 opserr << "WARNING invalid dof for control point: " << tag << endln;
                 opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType "
                     << "<-fact f> <-lim l u> <-relTrial> <-relOut> <-relCtrl> <-relDaq> ...\n";
                 return -1;
             }
         }
-        else if (ndm == 2 && ndf == 2) {
-            if (strcmp(type, "1") == 0 ||
-                strcmp(type, "dof1") == 0 || strcmp(type, "DOF1") == 0 ||
-                strcmp(type, "u1") == 0 || strcmp(type, "U1") == 0 ||
-                strcmp(type, "ux") == 0 || strcmp(type, "UX") == 0)
-                dof(numSignals) = 0;
-            else if (strcmp(type, "2") == 0 ||
-                strcmp(type, "dof2") == 0 || strcmp(type, "DOF2") == 0 ||
-                strcmp(type, "u2") == 0 || strcmp(type, "U2") == 0 ||
-                strcmp(type, "uy") == 0 || strcmp(type, "UY") == 0)
-                dof(numSignals) = 1;
-            else {
-                opserr << "WARNING invalid dof for control point: " << tag << endln;
-                opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType "
-                    << "<-fact f> <-lim l u> <-relTrial> <-relOut> <-relCtrl> <-relDaq> ...\n";
-                return -1;
-            }
+        if (dofID < 1 || (ndf != 0 && ndf < dofID)) {
+            opserr << "WARNING out-of-bound dof for control point: " << tag << endln;
+            opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType "
+                << "<-fact f> <-lim l u> <-relTrial> <-relOut> <-relCtrl> <-relDaq> ...\n";
+            return -1;
         }
-        else if (ndm == 2 && ndf == 3) {
-            if (strcmp(type, "1") == 0 ||
-                strcmp(type, "dof1") == 0 || strcmp(type, "DOF1") == 0 ||
-                strcmp(type, "u1") == 0 || strcmp(type, "U1") == 0 ||
-                strcmp(type, "ux") == 0 || strcmp(type, "UX") == 0)
-                dof(numSignals) = 0;
-            else if (strcmp(type, "2") == 0 ||
-                strcmp(type, "dof2") == 0 || strcmp(type, "DOF2") == 0 ||
-                strcmp(type, "u2") == 0 || strcmp(type, "U2") == 0 ||
-                strcmp(type, "uy") == 0 || strcmp(type, "UY") == 0)
-                dof(numSignals) = 1;
-            else if (strcmp(type, "3") == 0 ||
-                strcmp(type, "dof3") == 0 || strcmp(type, "DOF3") == 0 ||
-                strcmp(type, "r3") == 0 || strcmp(type, "R3") == 0 ||
-                strcmp(type, "rz") == 0 || strcmp(type, "RZ") == 0)
-                dof(numSignals) = 2;
-            else {
-                opserr << "WARNING invalid dof for control point: " << tag << endln;
-                opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType "
-                    << "<-fact f> <-lim l u> <-relTrial> <-relOut> <-relCtrl> <-relDaq> ...\n";
-                return -1;
-            }
-        }
-        else if (ndm == 3 && ndf == 3) {
-            if (strcmp(type, "1") == 0 ||
-                strcmp(type, "dof1") == 0 || strcmp(type, "DOF1") == 0 ||
-                strcmp(type, "u1") == 0 || strcmp(type, "U1") == 0 ||
-                strcmp(type, "ux") == 0 || strcmp(type, "UX") == 0)
-                dof(numSignals) = 0;
-            else if (strcmp(type, "2") == 0 ||
-                strcmp(type, "dof2") == 0 || strcmp(type, "DOF2") == 0 ||
-                strcmp(type, "u2") == 0 || strcmp(type, "U2") == 0 ||
-                strcmp(type, "uy") == 0 || strcmp(type, "UY") == 0)
-                dof(numSignals) = 1;
-            else if (strcmp(type, "3") == 0 ||
-                strcmp(type, "dof3") == 0 || strcmp(type, "DOF3") == 0 ||
-                strcmp(type, "u3") == 0 || strcmp(type, "U3") == 0 ||
-                strcmp(type, "uz") == 0 || strcmp(type, "UZ") == 0)
-                dof(numSignals) = 2;
-            else {
-                opserr << "WARNING invalid dof for control point: " << tag << endln;
-                opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType "
-                    << "<-fact f> <-lim l u> <-relTrial> <-relOut> <-relCtrl> <-relDaq> ...\n";
-                return -1;
-            }
-        }
-        else if (ndm == 3 && ndf == 6) {
-            if (strcmp(type, "1") == 0 ||
-                strcmp(type, "dof1") == 0 || strcmp(type, "DOF1") == 0 ||
-                strcmp(type, "u1") == 0 || strcmp(type, "U1") == 0 ||
-                strcmp(type, "ux") == 0 || strcmp(type, "UX") == 0)
-                dof(numSignals) = 0;
-            else if (strcmp(type, "2") == 0 ||
-                strcmp(type, "dof2") == 0 || strcmp(type, "DOF2") == 0 ||
-                strcmp(type, "u2") == 0 || strcmp(type, "U2") == 0 ||
-                strcmp(type, "uy") == 0 || strcmp(type, "UY") == 0)
-                dof(numSignals) = 1;
-            else if (strcmp(type, "3") == 0 ||
-                strcmp(type, "dof3") == 0 || strcmp(type, "DOF3") == 0 ||
-                strcmp(type, "u3") == 0 || strcmp(type, "U3") == 0 ||
-                strcmp(type, "uz") == 0 || strcmp(type, "UZ") == 0)
-                dof(numSignals) = 2;
-            else if (strcmp(type, "4") == 0 ||
-                strcmp(type, "dof4") == 0 || strcmp(type, "DOF4") == 0 ||
-                strcmp(type, "r1") == 0 || strcmp(type, "R1") == 0 ||
-                strcmp(type, "rx") == 0 || strcmp(type, "RX") == 0)
-                dof(numSignals) = 3;
-            else if (strcmp(type, "5") == 0 ||
-                strcmp(type, "dof5") == 0 || strcmp(type, "DOF5") == 0 ||
-                strcmp(type, "r2") == 0 || strcmp(type, "R2") == 0 ||
-                strcmp(type, "ry") == 0 || strcmp(type, "RY") == 0)
-                dof(numSignals) = 4;
-            else if (strcmp(type, "6") == 0 ||
-                strcmp(type, "dof6") == 0 || strcmp(type, "DOF6") == 0 ||
-                strcmp(type, "r3") == 0 || strcmp(type, "R3") == 0 ||
-                strcmp(type, "rz") == 0 || strcmp(type, "RZ") == 0)
-                dof(numSignals) = 5;
-            else {
-                opserr << "WARNING invalid dof for control point: " << tag << endln;
-                opserr << "Want: expControlPoint tag <-node nodeTag> dof rspType "
-                    << "<-fact f> <-lim l u> <-relTrial> <-relOut> <-relCtrl> <-relDaq> ...\n";
-                return -1;
-            }
-        }
+        dof(numSignals) = dofID - 1;
         
         // response type
         type = OPS_GetString();
