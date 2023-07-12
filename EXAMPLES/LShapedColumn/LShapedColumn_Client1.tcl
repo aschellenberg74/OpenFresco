@@ -90,24 +90,18 @@ set betaKcomm  0.0;             # D = betaKcomm*KlastCommit
 # ------------------------------
 # create the system of equations
 system BandGeneral
-
 # create the DOF numberer
 numberer Plain
-
 # create the constraint handler
 constraints Plain
-
 # create the convergence test
 test EnergyIncr 1.0e-8 25
-
 # create the integration scheme
 #integrator Newmark 0.5 0.25
 #integrator NewmarkExplicit 0.5
 integrator AlphaOS 1.0
-
 # create the solution algorithm
 algorithm Linear
-
 # create the analysis object 
 analysis Transient
 # ------------------------------
@@ -138,7 +132,8 @@ record
 # perform an eigenvalue analysis
 set lambda [eigen -fullGenLapack 6]
 puts "\nEigenvalues at start of transient:"
-puts "|   lambda   |  omega   |  period | frequency |"
+puts "|   lambda  |   omega  |  period | frequency |"
+puts "----------------------------------------------"
 foreach lambda $lambda {
     set omega [expr pow($lambda,0.5)]
     set period [expr 2.0*$pi/$omega]
@@ -159,6 +154,7 @@ set tTot [time {
 puts "\nElapsed Time = $tTot \n"
 # close the output file
 close $outFileID
+
 wipeExp
 wipe
 exit

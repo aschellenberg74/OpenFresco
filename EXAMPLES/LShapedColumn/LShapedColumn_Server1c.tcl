@@ -1,10 +1,6 @@
 # File: LShapedColumn_Server1c.tcl (use with LShapedColumn_Client1.tcl)
 # Units: [kip,in.]
 #
-# $Revision$
-# $Date$
-# $URL$
-#
 # Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 # Created: 07/07
 # Revision: A
@@ -27,8 +23,8 @@ model BasicBuilder -ndm 3 -ndf 6
 # Define control points
 # ---------------------
 # expControlPoint $tag <-node $nodeTag> $dof $rspType <-fact $f> <-lim $l $u> <-isRel> ...
-expControlPoint 1 -node 2  ux disp  uz disp  ry disp
-expControlPoint 2 -node 2  ux disp  ux force  uz disp  uz force  ry disp  ry force
+expControlPoint 1 -node 2  1 disp  2 disp  3 disp
+expControlPoint 2 -node 2  1 disp  1 force  2 disp  2 force  3 disp  3 force
 
 # Define experimental control
 # ---------------------------

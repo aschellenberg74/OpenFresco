@@ -57,14 +57,14 @@ geomTransf Linear 1
 
 # Define element
 # --------------
-# element nonlinearBeamColumn $eleTag $iNode $jNode $numIntgrPts $secTag $transfTag
-element nonlinearBeamColumn 1 1 2 5 1 1
+# element forceBeamColumn $eleTag $iNode $jNode $numIntgrPts $secTag $transfTag
+element forceBeamColumn 1 1 2 5 1 1
 
 # Define control points
 # ---------------------
 # expControlPoint $tag <-node $nodeTag> $dof $rspType <-fact $f> <-lim $l $u> <-isRel> ...
-expControlPoint 1 -node 2  ux disp  uy disp  rz disp
-expControlPoint 2 -node 2  ux disp  ux force  uy disp  uy force  rz disp  rz force
+expControlPoint 1 -node 2  1 disp  2 disp  3 disp
+expControlPoint 2 -node 2  1 disp  2 disp  3 disp 1 force  2 force  3 force
 
 # Define experimental control
 # ---------------------------
@@ -86,8 +86,27 @@ expSite ActorSite 1 -setup 1 8090
 
 
 # ------------------------------
+# Start of recorder generation
+# ------------------------------
+# create the recorder objects
+recorder Node -file ServerANode_Disp.out -time -node 2 -dof 1 2 3 disp
+
+expRecorder Site -file ServerASite_trialDsp.out -time -site 1 trialDisp
+expRecorder Site -file ServerASite_outDsp.out  -time -site 1 daqDisp
+expRecorder Site -file ServerASite_outFrc.out  -time -site 1 daqForce
+expRecorder Control -file ServerACtrl_ctrlDsp.out -time -control 1 ctrlDisp
+expRecorder Control -file ServerACtrl_daqDsp.out  -time -control 1 daqDisp
+expRecorder Control -file ServerACtrl_daqFrc.out  -time -control 1 daqForce
+# --------------------------------
+# End of recorder generation
+# --------------------------------
+
+
+# ------------------------------
 # Start the server process
 # ------------------------------
+record
+
 # startLabServer $siteTag
 startLabServer  1
 

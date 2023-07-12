@@ -66,9 +66,11 @@ geomTransf Linear 1
 
 # Define element
 # --------------
-# first story column and rigid loading beam
-# element nonlinearBeamColumn $eleTag $iNode $jNode $numIntgrPts $secTag $transfTag
-element nonlinearBeamColumn 1 1 2 5 1 1
+# first story column
+# element forceBeamColumn $eleTag $iNode $jNode $numIntgrPts $secTag $transfTag
+element forceBeamColumn 1 1 2 5 1 1
+# rigid loading beam
+# element elasticBeamColumn $eleTag $iNode $jNode $A $E $Iz $transfTag
 element elasticBeamColumn 2 2 3 2260 [expr 29000*1E3] 5068 1
 element elasticBeamColumn 3 4 3 2260 [expr 29000*1E3] 5068 1
 element elasticBeamColumn 4 3 5 2260 [expr 29000*1E3] 5068 1
@@ -76,10 +78,10 @@ element elasticBeamColumn 4 3 5 2260 [expr 29000*1E3] 5068 1
 # Define control points
 # ---------------------
 # expControlPoint $tag <-node $nodeTag> $dof $rspType <-fact $f> <-lim $l $u> <-isRel> ...
-expControlPoint 1 -node 4  ux disp  uy disp
-expControlPoint 2 -node 5  uy disp
-expControlPoint 3 -node 4  ux disp  ux force  uy disp  uy force
-expControlPoint 4 -node 5  uy disp  uy force
+expControlPoint 1 -node 4  1 disp  2 disp
+expControlPoint 2 -node 5  2 disp
+expControlPoint 3 -node 4  1 disp  1 force  2 disp  2 force
+expControlPoint 4 -node 5  2 disp  2 force
 
 # Define experimental control
 # ---------------------------
