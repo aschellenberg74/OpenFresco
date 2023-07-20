@@ -27,6 +27,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h> // added by Kiida Lai for the timeout feature of recvdata
 #include <math.h>
 #include <string.h>
 
@@ -518,6 +519,78 @@ void CALL_CONV tcp_recvdata(int *socketID, int *dataTypeSize, char data[], int *
     }
 }
 
+/*
+* tcp_recvdata_timeout() - function to receive data in blocking mode with timeout feature
+* Note: this function for now only is tested on windows
+* written by Kiida Lai (u93132@gmail.com)
+*
+* input: int *socketID - socket identifier
+*        int *dataTypeSize - size of data type
+*        char *data - pointer to data to receive
+*        int *lenData - length of data
+*        double *timeout - if data didn't arrive on time, then return ierr = -3
+*                          if a timeout < 0 is given, the function will not do the check
+*                          unit: seconds
+*        
+* return: int *ierr - 0 if successfull, negative number if not
+*/
+void CALL_CONV tcp_recvdata_timeout(int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr, double *timeout)
+{
+    SocketConnection *theSocket = theSockets;
+    socket_type sockfd;
+    int nread, nleft;
+    double timer;
+    unsigned long nbMode = 0;
+    char *gMsg = data;
+    clock_t start_t = clock(); // from time.h
+    
+    *ierr = 0;
+    
+    // find the socket
+    while (theSocket != 0 && theSocket->socketID != *socketID)
+        theSocket=theSocket->next;
+    if (theSocket == 0) {
+        fprintf(stderr,"tcp_socket::recvdata() - could not find socket to receive data\n");
+        *ierr = -1;
+        return;
+    }
+    sockfd = theSocket->sockfd;
+    
+    // turn on blocking mode
+#ifdef _WIN32
+    if (ioctlsocket(sockfd, FIONBIO, &nbMode) != 0) {
+        fprintf(stderr,"tcp_socket::recvdata() - could not turn on blocking mode\n");
+        *ierr = -2;
+        return;
+    }
+#else
+    if (ioctl(sockfd, FIONBIO, &nbMode) != 0) {
+        fprintf(stderr,"tcp_socket::recvdata() - could not turn on blocking mode\n");
+        *ierr = -2;
+        return;
+    }
+#endif
+    
+    // receive the data
+    // if o.k. get a pointer to the data in the message and
+    // place the incoming data there
+    nleft = *lenData * *dataTypeSize;
+    
+    while (nleft > 0) {
+        // While loop will break when data isn't arrive on time
+        if (*timeout > 0) {
+            timer = (clock() - start_t) / CLOCKS_PER_SEC;
+            if (timer > *timeout) {
+                *ierr = -3;
+                fprintf(stderr,"tcp_socket::recvdata() - data didn't receive on time\n");
+                break;
+            }
+        }
+        nread = recv(sockfd, gMsg, nleft, 0);
+        nleft -= nread;
+        gMsg +=  nread;
+    }
+}
 
 /*
 * tcp_recvnbdata() - function to receive data in nonblocking mode
