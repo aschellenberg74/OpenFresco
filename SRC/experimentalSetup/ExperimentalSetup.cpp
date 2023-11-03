@@ -344,7 +344,7 @@ int ExperimentalSetup::checkSize(ID sizeT, ID sizeO)
                    << "           setup = " << *sizeTrial;
             opserr << "sizeOut: site  = " << sizeO 
                    << "         setup = " << *sizeOut << endln;
-            return OF_ReturnType_failed;
+            exit(OF_ReturnType_failed);
         }
     }
     
@@ -812,7 +812,7 @@ Response* ExperimentalSetup::setResponse(const char **argv, int argc,
     }
     
     // control displacements
-    if (cDisp != 0 && (
+    else if (cDisp != 0 && (
         strcmp(argv[0],"ctrlDisp") == 0 ||
         strcmp(argv[0],"ctrlDisplacement") == 0 ||
         strcmp(argv[0],"ctrlDisplacements") == 0))
@@ -947,64 +947,124 @@ int ExperimentalSetup::getResponse(int responseID, Information &info)
 {
     switch (responseID)  {
     case 1:  // trial displacements
-        return info.setVector(*tDisp);
+        if (tDisp != 0)
+            return info.setVector(*tDisp);
+        else
+            return -1;
         
     case 2:  // trial velocities
-        return info.setVector(*tVel);
+        if (tVel != 0)
+            return info.setVector(*tVel);
+        else
+            return -1;
         
     case 3:  // trial accelerations
-        return info.setVector(*tAccel);
+        if (tAccel != 0)
+            return info.setVector(*tAccel);
+        else
+            return -1;
         
     case 4:  // trial forces
-        return info.setVector(*tForce);
+        if (tForce != 0)
+            return info.setVector(*tForce);
+        else
+            return -1;
         
     case 5:  // trial times
-        return info.setVector(*tTime);
+        if (tTime != 0)
+            return info.setVector(*tTime);
+        else
+            return -1;
         
     case 6:  // output displacements
-        return info.setVector(*oDisp);
+        if (oDisp != 0)
+            return info.setVector(*oDisp);
+        else
+            return -1;
         
     case 7:  // output velocities
-        return info.setVector(*oVel);
+        if (oVel != 0)
+            return info.setVector(*oVel);
+        else
+            return -1;
         
     case 8:  // output accelerations
-        return info.setVector(*oAccel);
+        if (oAccel != 0)
+            return info.setVector(*oAccel);
+        else
+            return -1;
         
     case 9:  // output forces
-        return info.setVector(*oForce);
+        if (oForce != 0)
+            return info.setVector(*oForce);
+        else
+            return -1;
         
     case 10:  // output times
-        return info.setVector(*oTime);
+        if (oTime != 0)
+            return info.setVector(*oTime);
+        else
+            return -1;
         
     case 11:  // control displacements
-        return info.setVector(*cDisp);
+        if (cDisp != 0)
+            return info.setVector(*cDisp);
+        else
+            return -1;
         
     case 12:  // control velocities
-        return info.setVector(*cVel);
+        if (cVel != 0)
+            return info.setVector(*cVel);
+        else
+            return -1;
         
     case 13:  // control accelerations
-        return info.setVector(*cAccel);
+        if (cAccel != 0)
+            return info.setVector(*cAccel);
+        else
+            return -1;
         
     case 14:  // control forces
-        return info.setVector(*cForce);
+        if (cForce != 0)
+            return info.setVector(*cForce);
+        else
+            return -1;
         
     case 15:  // control times
-        return info.setVector(*cTime);
+        if (cTime != 0)
+            return info.setVector(*cTime);
+        else
+            return -1;
         
     case 16:  // daq displacements
-        return info.setVector(*dDisp);
+        if (dDisp != 0)
+            return info.setVector(*dDisp);
+        else
+            return -1;
         
     case 17:  // daq velocities
-        return info.setVector(*dVel);
+        if (dVel != 0)
+            return info.setVector(*dVel);
+        else
+            return -1;
         
     case 18:  // daq accelerations
-        return info.setVector(*dAccel);
+        if (dAccel != 0)
+            return info.setVector(*dAccel);
+        else
+            return -1;
         
     case 19:  // daq forces
-        return info.setVector(*dForce);
+        if (dForce != 0)
+            return info.setVector(*dForce);
+        else
+            return -1;
         
     case 20:  // daq times
-        return info.setVector(*dTime);
+        if (dTime != 0)
+            return info.setVector(*dTime);
+        else
+            return -1;
         
     default:
         return -1;
