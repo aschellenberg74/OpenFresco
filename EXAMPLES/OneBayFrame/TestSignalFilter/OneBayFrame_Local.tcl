@@ -1,10 +1,6 @@
 # File: OneBayFrame_Local.tcl
 # Units: [kip,in.]
 #
-# $Revision$
-# $Date$
-# $URL$
-#
 # Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 # Created: 11/06
 # Revision: A
@@ -19,6 +15,9 @@
 # ------------------------------
 # Start of model generation
 # ------------------------------
+logFile "OneBayFrame_Local.log"
+defaultUnits -force kip -length in -time sec -temp F
+
 # create ModelBuilder (with two-dimensions and 2 DOF/node)
 model BasicBuilder -ndm 2 -ndf 2
 
@@ -157,11 +156,11 @@ recorder Element -file Elmt_daqDsp.out  -time -ele 1 2   daqDisp
 # ------------------------------
 # Finally perform the analysis
 # ------------------------------
+record
 # perform an eigenvalue analysis
-set pi [expr acos(-1.0)]
 set lambda [eigen -fullGenLapack 2]
 puts "\nEigenvalues at start of transient:"
-puts "|   lambda   |  omega   |  period | frequency |"
+puts "|   lambda  |   omega  |  period | frequency |"
 foreach lambda $lambda {
     set omega [expr pow($lambda,0.5)]
     set period [expr 2.0*$pi/$omega]
@@ -183,6 +182,7 @@ puts "\nElapsed Time = $tTot \n"
 # close the output file
 close $outFileID
 
+wipeExp
 wipe
 exit
 # --------------------------------

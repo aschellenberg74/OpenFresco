@@ -1,10 +1,6 @@
 # File: Truss_Local_SimAppServer.tcl (use with Truss_Local_Client.tcl)
 # Units: [kip,in.]
 #
-# $Revision$
-# $Date$
-# $URL$
-#
 # Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 # Created: 11/06
 # Revision: A
@@ -58,7 +54,7 @@ expSite LocalSite 1 1
 # Define experimental element
 # ---------------------------
 # expElement truss $eleTag $iNode $jNode -site $siteTag -initStif $Kij <-iMod> <-rho $rho> 
-expElement truss 3 3 4 -site 1 -initStif $kInit
+#expElement truss 3 3 4 -site 1 -initStif $kInit
 # ------------------------------
 # End of model generation
 # ------------------------------
@@ -68,11 +64,11 @@ expElement truss 3 3 4 -site 1 -initStif $kInit
 # Start the server process
 # ------------------------------
 # startSimAppElemServer $eleTag $port <-ssl> <-udp>
-startSimAppElemServer 3 8090 -udp;  # use with generic client element in FEA
+#startSimAppElemServer 3 8090 -udp;  # use with generic client element in FEA
 
 # startSimAppSiteServer $siteTag $port <-ssl> <-udp>
-#startSimAppSiteServer 1 8090 -udp;  # use with experimental element in FEA
-wipe
+startSimAppSiteServer 1 8090 -udp;  # use with experimental element in FEA
+wipeExp
 exit
 # --------------------------------
 # End of analysis

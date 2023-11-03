@@ -1,10 +1,6 @@
 # File: Truss_Local_Client.tcl (use with Truss_Local_SimAppServer.tcl)
 # Units: [kip,in.]
 #
-# $Revision$
-# $Date$
-# $URL$
-#
 # Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 # Created: 11/06
 # Revision: A
@@ -62,8 +58,8 @@ element truss 2 2 4 5.0 1
 # Define experimental elements
 # ----------------------------
 # element genericClient $eleTag -node $Ndi -dof $dofNdi -dof $dofNdj ... -server $ipPort <$ipAddr> <-ssl> <-udp> <-dataSize $size>
-element genericClient 3 -node 3 4 -dof 1 2 -dof 1 2 -server 8090 -udp;  # use with SimAppElemServer
-#expElement truss 3 3 4 -server 8090 -udp -initStif $kInit;  # use with SimAppSiteServer
+#element genericClient 3 -node 3 4 -dof 1 2 -dof 1 2 -server 8090 -udp;  # use with SimAppElemServer
+expElement truss 3 3 4 -server 8090 -udp -initStif $kInit;  # use with SimAppSiteServer
 
 # Define static loads
 # -------------------
