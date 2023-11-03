@@ -629,7 +629,7 @@ Response* ECLabVIEW::setResponse(const char** argv, int argc,
     }
     
     // ctrl forces
-    if (ctrlForce != 0 && (
+    else if (ctrlForce != 0 && (
         strcmp(argv[0], "ctrlForce") == 0 ||
         strcmp(argv[0], "ctrlForces") == 0))
     {
@@ -641,7 +641,7 @@ Response* ECLabVIEW::setResponse(const char** argv, int argc,
     }
     
     // daq displacements
-    if (daqDisp != 0 && (
+    else if (daqDisp != 0 && (
         strcmp(argv[0], "daqDisp") == 0 ||
         strcmp(argv[0], "daqDisplacement") == 0 ||
         strcmp(argv[0], "daqDisplacements") == 0))
@@ -654,7 +654,7 @@ Response* ECLabVIEW::setResponse(const char** argv, int argc,
     }
     
     // daq forces
-    if (daqForce != 0 && (
+    else if (daqForce != 0 && (
         strcmp(argv[0], "daqForce") == 0 ||
         strcmp(argv[0], "daqForces") == 0))
     {
@@ -925,7 +925,7 @@ int ECLabVIEW::acquire()
     theSocket->sendMsg(0, 0, *sendData, 0);
     
     // receive output control point daq values
-    int direction, response;
+    int direction = 0, response = 0;
     int dID = 0, fID = 0;
     for (int i = 0; i < numOutCPs; i++) {
         // disaggregate received data

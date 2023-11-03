@@ -455,7 +455,7 @@ Response* ECSimSimulink::setResponse(const char **argv, int argc,
     }
     
     // ctrl forces
-    if (ctrlForce != 0 && (
+    else if (ctrlForce != 0 && (
         strcmp(argv[0],"ctrlForce") == 0 ||
         strcmp(argv[0],"ctrlForces") == 0))
     {
@@ -467,7 +467,7 @@ Response* ECSimSimulink::setResponse(const char **argv, int argc,
     }
     
     // ctrl time
-    if (ctrlTime != 0 && (
+    else if (ctrlTime != 0 && (
         strcmp(argv[0],"ctrlTime") == 0 ||
         strcmp(argv[0],"ctrlTimes") == 0))
     {
@@ -479,7 +479,7 @@ Response* ECSimSimulink::setResponse(const char **argv, int argc,
     }
     
     // daq displacements
-    if (daqDisp != 0 && (
+    else if (daqDisp != 0 && (
         strcmp(argv[0],"daqDisp") == 0 ||
         strcmp(argv[0],"daqDisplacement") == 0 ||
         strcmp(argv[0],"daqDisplacements") == 0))
@@ -492,7 +492,7 @@ Response* ECSimSimulink::setResponse(const char **argv, int argc,
     }
     
     // daq forces
-    if (daqForce != 0 && (
+    else if (daqForce != 0 && (
         strcmp(argv[0],"daqForce") == 0 ||
         strcmp(argv[0],"daqForces") == 0))
     {
@@ -504,7 +504,7 @@ Response* ECSimSimulink::setResponse(const char **argv, int argc,
     }
     
     // daq time
-    if (daqTime != 0 && (
+    else if (daqTime != 0 && (
         strcmp(argv[0],"daqTime") == 0 ||
         strcmp(argv[0],"daqTimes") == 0))
     {

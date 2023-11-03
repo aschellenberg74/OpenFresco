@@ -217,8 +217,8 @@ ECSimDomain::ECSimDomain(int tag,
     int nTrialCPs, ExperimentalCP **trialcps,
     int nOutCPs, ExperimentalCP **outcps, Domain *thedomain)
     : ECSimulation(tag), numTrialCPs(nTrialCPs), numOutCPs(nOutCPs),
-    theDomain(0), theModel(0), theTest(0), theAlgorithm(0), theIntegrator(0),
-    theHandler(0), theNumberer(0), theSOE(0), theAnalysis(0),
+    theDomain(0), theModel(0), theTest(0), theLineSearch(0), theAlgorithm(0),
+    theIntegrator(0), theHandler(0), theNumberer(0), theSOE(0), theAnalysis(0),
     theSeries(0), thePattern(0), theSPs(0), theNodes(0), numSPs(0),
     ctrlDisp(0), ctrlVel(0), ctrlAccel(0), ctrlForce(0),
     daqDisp(0), daqVel(0), daqAccel(0), daqForce(0)
@@ -249,8 +249,8 @@ ECSimDomain::ECSimDomain(int tag,
 
 ECSimDomain::ECSimDomain(const ECSimDomain& ec)
     : ECSimulation(ec), trialCPs(0), outCPs(0),
-    theDomain(0), theModel(0), theTest(0), theAlgorithm(0), theIntegrator(0),
-    theHandler(0), theNumberer(0), theSOE(0), theAnalysis(0),
+    theDomain(0), theModel(0), theTest(0), theLineSearch(0), theAlgorithm(0),
+    theIntegrator(0), theHandler(0), theNumberer(0), theSOE(0), theAnalysis(0),
     theSeries(0), thePattern(0), theSPs(0), theNodes(0), numSPs(0),
     ctrlDisp(0), ctrlVel(0), ctrlAccel(0), ctrlForce(0),
     daqDisp(0), daqVel(0), daqAccel(0), daqForce(0)
@@ -633,6 +633,7 @@ Response* ECSimDomain::setResponse(const char **argv, int argc,
     
     // ctrl displacements
     if (ctrlDisp != 0 && (
+        strcmp(argv[0], "ctrlSig") == 0 ||
         strcmp(argv[0],"ctrlDisp") == 0 ||
         strcmp(argv[0],"ctrlDisplacement") == 0 ||
         strcmp(argv[0],"ctrlDisplacements") == 0))
@@ -646,7 +647,7 @@ Response* ECSimDomain::setResponse(const char **argv, int argc,
     }
     
     // ctrl velocities
-    if (ctrlVel != 0 && (
+    else if (ctrlVel != 0 && (
         strcmp(argv[0],"ctrlVel") == 0 ||
         strcmp(argv[0],"ctrlVelocity") == 0 ||
         strcmp(argv[0],"ctrlVelocities") == 0))
@@ -660,7 +661,7 @@ Response* ECSimDomain::setResponse(const char **argv, int argc,
     }
     
     // ctrl accelerations
-    if (ctrlAccel != 0 && (
+    else if (ctrlAccel != 0 && (
         strcmp(argv[0],"ctrlAccel") == 0 ||
         strcmp(argv[0],"ctrlAcceleration") == 0 ||
         strcmp(argv[0],"ctrlAccelerations") == 0))
@@ -674,7 +675,7 @@ Response* ECSimDomain::setResponse(const char **argv, int argc,
     }
     
     // ctrl forces
-    if (ctrlForce != 0 && (
+    else if (ctrlForce != 0 && (
         strcmp(argv[0],"ctrlForce") == 0 ||
         strcmp(argv[0],"ctrlForces") == 0))
     {
@@ -687,7 +688,7 @@ Response* ECSimDomain::setResponse(const char **argv, int argc,
     }
     
     // daq displacements
-    if (daqDisp != 0 && (
+    else if (daqDisp != 0 && (
         strcmp(argv[0],"daqDisp") == 0 ||
         strcmp(argv[0],"daqDisplacement") == 0 ||
         strcmp(argv[0],"daqDisplacements") == 0))
@@ -701,7 +702,7 @@ Response* ECSimDomain::setResponse(const char **argv, int argc,
     }
     
     // daq velocities
-    if (daqVel != 0 && (
+    else if (daqVel != 0 && (
         strcmp(argv[0],"daqVel") == 0 ||
         strcmp(argv[0],"daqVelocity") == 0 ||
         strcmp(argv[0],"daqVelocities") == 0))
@@ -715,7 +716,7 @@ Response* ECSimDomain::setResponse(const char **argv, int argc,
     }
     
     // daq accelerations
-    if (daqAccel != 0 && (
+    else if (daqAccel != 0 && (
         strcmp(argv[0],"daqAccel") == 0 ||
         strcmp(argv[0],"daqAcceleration") == 0 ||
         strcmp(argv[0],"daqAccelerations") == 0))
@@ -729,7 +730,8 @@ Response* ECSimDomain::setResponse(const char **argv, int argc,
     }
     
     // daq forces
-    if (daqForce != 0 && (
+    else if (daqForce != 0 && (
+        strcmp(argv[0], "daqSig") == 0 ||
         strcmp(argv[0],"daqForce") == 0 ||
         strcmp(argv[0],"daqForces") == 0))
     {
@@ -752,7 +754,7 @@ int ECSimDomain::getResponse(int responseID, Information &info)
     Vector resp(0);
     
     switch (responseID)  {
-    case 1:  // ctrl displacements
+    case 1:  // ctrl signals, ctrl displacements
         resp.setData(ctrlDisp,(*sizeCtrl)(OF_Resp_Disp));
         return info.setVector(resp);
         
@@ -780,7 +782,7 @@ int ECSimDomain::getResponse(int responseID, Information &info)
         resp.setData(daqAccel,(*sizeDaq)(OF_Resp_Accel));
         return info.setVector(resp);
         
-    case 8:  // daq forces
+    case 8:  // daq signals, daq forces
         resp.setData(daqForce,(*sizeDaq)(OF_Resp_Force));
         return info.setVector(resp);
         

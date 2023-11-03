@@ -711,7 +711,7 @@ Response* ECGenericTCP::setResponse(const char **argv, int argc,
     }
     
     // ctrl velocities
-    if (ctrlVel != 0 && (
+    else if (ctrlVel != 0 && (
         strcmp(argv[0],"ctrlVel") == 0 ||
         strcmp(argv[0],"ctrlVelocity") == 0 ||
         strcmp(argv[0],"ctrlVelocities") == 0))
@@ -724,7 +724,7 @@ Response* ECGenericTCP::setResponse(const char **argv, int argc,
     }
     
     // ctrl accelerations
-    if (ctrlAccel != 0 && (
+    else if (ctrlAccel != 0 && (
         strcmp(argv[0],"ctrlAccel") == 0 ||
         strcmp(argv[0],"ctrlAcceleration") == 0 ||
         strcmp(argv[0],"ctrlAccelerations") == 0))
@@ -737,7 +737,7 @@ Response* ECGenericTCP::setResponse(const char **argv, int argc,
     }
     
     // ctrl forces
-    if (ctrlForce != 0 && (
+    else if (ctrlForce != 0 && (
         strcmp(argv[0],"ctrlForce") == 0 ||
         strcmp(argv[0],"ctrlForces") == 0))
     {
@@ -749,7 +749,7 @@ Response* ECGenericTCP::setResponse(const char **argv, int argc,
     }
     
     // ctrl times
-    if (ctrlTime != 0 && (
+    else if (ctrlTime != 0 && (
         strcmp(argv[0],"ctrlTime") == 0 ||
         strcmp(argv[0],"ctrlTimes") == 0))
     {
@@ -761,7 +761,7 @@ Response* ECGenericTCP::setResponse(const char **argv, int argc,
     }
     
     // daq displacements
-    if (daqDisp != 0 && (
+    else if (daqDisp != 0 && (
         strcmp(argv[0],"daqDisp") == 0 ||
         strcmp(argv[0],"daqDisplacement") == 0 ||
         strcmp(argv[0],"daqDisplacements") == 0))
@@ -774,7 +774,7 @@ Response* ECGenericTCP::setResponse(const char **argv, int argc,
     }
     
     // daq velocities
-    if (daqVel != 0 && (
+    else if (daqVel != 0 && (
         strcmp(argv[0],"daqVel") == 0 ||
         strcmp(argv[0],"daqVelocity") == 0 ||
         strcmp(argv[0],"daqVelocities") == 0))
@@ -787,7 +787,7 @@ Response* ECGenericTCP::setResponse(const char **argv, int argc,
     }
     
     // daq accelerations
-    if (daqAccel != 0 && (
+    else if (daqAccel != 0 && (
         strcmp(argv[0],"daqAccel") == 0 ||
         strcmp(argv[0],"daqAcceleration") == 0 ||
         strcmp(argv[0],"daqAccelerations") == 0))
@@ -800,7 +800,7 @@ Response* ECGenericTCP::setResponse(const char **argv, int argc,
     }
     
     // daq forces
-    if (daqForce != 0 && (
+    else if (daqForce != 0 && (
         strcmp(argv[0],"daqForce") == 0 ||
         strcmp(argv[0],"daqForces") == 0))
     {
@@ -812,7 +812,7 @@ Response* ECGenericTCP::setResponse(const char **argv, int argc,
     }
     
     // daq times
-    if (daqTime != 0 && (
+    else if (daqTime != 0 && (
         strcmp(argv[0],"daqTime") == 0 ||
         strcmp(argv[0],"daqTimes") == 0))
     {

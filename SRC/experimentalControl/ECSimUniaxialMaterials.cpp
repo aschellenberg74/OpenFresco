@@ -390,7 +390,7 @@ Response* ECSimUniaxialMaterials::setResponse(const char **argv, int argc,
     }
     
     // ctrl velocities
-    if (ctrlVel != 0 && (
+    else if (ctrlVel != 0 && (
         strcmp(argv[0],"ctrlVel") == 0 ||
         strcmp(argv[0],"ctrlVelocity") == 0 ||
         strcmp(argv[0],"ctrlVelocities") == 0))
@@ -403,7 +403,7 @@ Response* ECSimUniaxialMaterials::setResponse(const char **argv, int argc,
     }
     
     // daq displacements
-    if (daqDisp != 0 && (
+    else if (daqDisp != 0 && (
         strcmp(argv[0],"daqDisp") == 0 ||
         strcmp(argv[0],"daqDisplacement") == 0 ||
         strcmp(argv[0],"daqDisplacements") == 0))
@@ -416,7 +416,7 @@ Response* ECSimUniaxialMaterials::setResponse(const char **argv, int argc,
     }
     
     // daq velocities
-    if (daqVel != 0 && (
+    else if (daqVel != 0 && (
         strcmp(argv[0],"daqVel") == 0 ||
         strcmp(argv[0],"daqVelocity") == 0 ||
         strcmp(argv[0],"daqVelocities") == 0))
@@ -429,7 +429,7 @@ Response* ECSimUniaxialMaterials::setResponse(const char **argv, int argc,
     }
     
     // daq forces
-    if (daqForce != 0 && (
+    else if (daqForce != 0 && (
         strcmp(argv[0],"daqForce") == 0 ||
         strcmp(argv[0],"daqForces") == 0))
     {

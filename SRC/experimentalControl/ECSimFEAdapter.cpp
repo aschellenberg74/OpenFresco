@@ -602,7 +602,7 @@ Response* ECSimFEAdapter::setResponse(const char **argv, int argc,
     }
     
     // daq signals
-    if (daqSignal != 0 && (
+    else if (daqSignal != 0 && (
         strcmp(argv[0],"daqSig") == 0 ||
         strcmp(argv[0],"daqSignal") == 0 ||
         strcmp(argv[0],"daqSignals") == 0))
