@@ -5,7 +5,7 @@ function [f,mag] = getFFT(x,dt,varargin)
 % f        : frequency vector [Hz]
 % mag      : scaled magnitude vector
 % x        : input signal
-% dt       : sampling time [sec]
+% dt       : sampling interval [sec]
 % varargin : variable input arguments
 %     title : title for plotting signal in time and frquency domain
 %
@@ -33,10 +33,10 @@ nfft = 2^nextpow2(npts);
 
 % take fft, padding with zeros, length(fftx)==nfft
 fftx = fft(x,nfft);
-NumUniquePts = ceil((nfft+1)/2);
+numUniquePts = ceil((nfft+1)/2);
 
 % fft is symmetric, throw away second half
-fftx = fftx(1:NumUniquePts,:);
+fftx = fftx(1:numUniquePts,:);
 % take magnitude of X
 mag = abs(fftx);
 
@@ -50,7 +50,7 @@ mag(size(mag,1),:) = mag(size(mag,1),:)./2;
 mag = mag/npts;
 
 % frequency vector
-f = 2*fn/nfft*(0:NumUniquePts-1)';
+f = 2*fn/nfft*(0:numUniquePts-1)';
 
 % plot the results
 if ~isempty(optArgs.title)
