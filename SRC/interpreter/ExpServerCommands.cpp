@@ -396,6 +396,9 @@ int OPF_startSimAppSiteServer()
     
     theChannel->recvID(0, 0, idData, 0);
     theExperimentalSite->setSize(sizeCtrl, sizeDaq);
+    opserr << "\nSimAppSiteServer with ExpSite " << siteTag
+        << " has the following DOF sizes:" << endln;
+    opserr << "   sizeCtrl = " << sizeCtrl << "   sizeDaq  = " << sizeDaq;
     
     // initialize the receive and send vectors
     Vector* rDisp = 0, * sDisp = 0;
@@ -657,8 +660,9 @@ int OPF_startSimAppElemServer()
         (sizeCtrl(OF_Resp_Accel) != 0 && sizeCtrl(OF_Resp_Accel) != ndf) ||
         (sizeCtrl(OF_Resp_Force) != 0 && sizeCtrl(OF_Resp_Force) != ndf) ||
         (sizeCtrl(OF_Resp_Time) != 0 && sizeCtrl(OF_Resp_Time) != 1)) {
-        opserr << "WARNING incorrect number of control degrees of freedom (ndf)\n";
-        opserr << "want: " << ndf << " but got: " << sizeCtrl << endln;
+        opserr << "\nSimAppElemServer with ExpElement " << eleTag
+            << " - incorrect number of control DOF (ndf)\n"
+            << "want: " << ndf << " but got: " << sizeCtrl << endln;
         return -1;
     }
     if ((sizeDaq(OF_Resp_Disp) != 0 && sizeDaq(OF_Resp_Disp) != ndf) ||
@@ -666,11 +670,15 @@ int OPF_startSimAppElemServer()
         (sizeDaq(OF_Resp_Accel) != 0 && sizeDaq(OF_Resp_Accel) != ndf) ||
         (sizeDaq(OF_Resp_Force) != 0 && sizeDaq(OF_Resp_Force) != ndf) ||
         (sizeDaq(OF_Resp_Time) != 0 && sizeDaq(OF_Resp_Time) != 1)) {
-        opserr << "WARNING incorrect number of daq degrees of freedom (ndf)\n";
-        opserr << "want: " << ndf << " but got: " << sizeDaq << endln;
+        opserr << "\nSimAppElemServer with ExpElement " << eleTag
+            << " - incorrect number of daq DOF (ndf)\n"
+            << "want: " << ndf << " but got: " << sizeDaq << endln;
         return -1;
     }
-    
+    opserr << "\nSimAppElemServer with ExpElement " << eleTag
+        << " has the following DOF sizes:" << endln;
+    opserr << "   sizeCtrl = " << sizeCtrl << "   sizeDaq  = " << sizeDaq;
+
     // initialize the receive and send vectors
     Vector* rDisp = 0, * sDisp = 0;
     Vector* rVel = 0, * sVel = 0;
