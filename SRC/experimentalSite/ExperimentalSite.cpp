@@ -34,6 +34,7 @@
 #include <TaggedObject.h>
 #include <MapOfTaggedObjects.h>
 #include <Recorder.h>
+#include <elementAPI.h>
 
 static MapOfTaggedObjects theExperimentalSites;
 
@@ -85,6 +86,96 @@ ExperimentalSite* OPF_getExperimentalSiteFirst()
 void OPF_clearExperimentalSites()
 {
     theExperimentalSites.clearAll();
+}
+
+
+int OPF_setSizeExperimentalSite()
+{
+    // pointer to experimental site that will be returned
+    ExperimentalSite* theSite = 0;
+    
+    if (OPS_GetNumRemainingInputArgs() < 13) {
+        opserr << "WARNING invalid number of arguments\n";
+        opserr << "Want: setSizeExpSite siteTag -ctrlSizes (5 size) -daqSizes (5 size)\n";
+        return -1;
+    }
+    
+    // site tag
+    int siteTag;
+    int numdata = 1;
+    if (OPS_GetIntInput(&numdata, &siteTag) != 0) {
+        opserr << "WARNING invalid setSizeExpSite siteTag\n";
+        return -1;
+    }
+    ExperimentalSite* theExperimentalSite = OPF_getExperimentalSite(siteTag);
+    if (theExperimentalSite == 0) {
+        opserr << "WARNING experimental site not found\n";
+        opserr << "setSizeExpSite: " << siteTag << endln;
+        return -1;
+    }
+    
+    // ctrl sizes
+    const char* type = OPS_GetString();
+    if (strcmp(type, "-ctrlSizes") != 0) {
+        opserr << "WARNING expecting -ctrlSizes (5 size)\n";
+        opserr << "setSizeExpSite: " << siteTag << endln;
+        return -1;
+    }
+    ID sizeCtrl(5);
+    sizeCtrl.Zero();
+    int numCtrl = 0;
+    while (OPS_GetNumRemainingInputArgs() > 0) {
+        int size;
+        numdata = 1;
+        int numArgs = OPS_GetNumRemainingInputArgs();
+        if (OPS_GetIntInput(&numdata, &size) < 0) {
+            if (numArgs > OPS_GetNumRemainingInputArgs()) {
+                // move current arg back by one
+                OPS_ResetCurrentInputArg(-1);
+            }
+            break;
+        }
+        sizeCtrl(numCtrl++) = size;
+    }
+    if (numCtrl != 5) {
+        opserr << "WARNING expecting 5 sizes for -ctrlSizes\n";
+        opserr << "setSizeExpSite: " << siteTag << endln;
+        return -1;
+    }
+    
+    // daq sizes
+    type = OPS_GetString();
+    if (strcmp(type, "-daqSizes") != 0) {
+        opserr << "WARNING expecting -daqSizes (5 size)\n";
+        opserr << "setSizeExpSite: " << siteTag << endln;
+        return -1;
+    }
+    ID sizeDaq(5);
+    sizeDaq.Zero();
+    int numDaq = 0;
+    while (OPS_GetNumRemainingInputArgs() > 0) {
+        int size;
+        numdata = 1;
+        int numArgs = OPS_GetNumRemainingInputArgs();
+        if (OPS_GetIntInput(&numdata, &size) < 0) {
+            if (numArgs > OPS_GetNumRemainingInputArgs()) {
+                // move current arg back by one
+                OPS_ResetCurrentInputArg(-1);
+            }
+            break;
+        }
+        sizeDaq(numDaq++) = size;
+    }
+    if (numDaq != 5) {
+        opserr << "WARNING expecting 5 sizes for -daqSizes\n";
+        opserr << "setSizeExpSite: " << siteTag << endln;
+        return -1;
+    }
+    
+    // parsing was successful, set the sizes
+    theExperimentalSite->setSize(sizeCtrl, sizeDaq);
+    
+    return 0;
 }
 
 
