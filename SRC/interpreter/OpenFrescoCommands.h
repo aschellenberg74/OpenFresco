@@ -88,11 +88,14 @@ int OPS_HomogeneousBC_X();
 int OPS_HomogeneousBC_Y();
 int OPS_HomogeneousBC_Z();
 int OPS_UniaxialMaterial();
+int OPS_LimitCurve();
+//int OPS_NDMaterial();
+int OPS_FrictionModel();
 int OPS_CrdTransf();
 int OPS_rayleighDamping();
 int OPS_setElementRayleighDampingFactors();
 
-// main OpenFresco objects commands 
+// main OpenFresco objects commands
 int OPF_ExperimentalCP();
 int OPF_ExperimentalSignalFilter();
 int OPF_ExperimentalControl();
@@ -129,8 +132,10 @@ bool OPF_removeExperimentalTangentStiff(int tag);
 
 // miscellaneous OpenFresco commands
 int OPF_version();
+int OPF_setSizeExperimentalSite();
 int OPF_recordExp();
 int OPF_wipeExp();
 int OPF_removeObject();
+
 
 #endif

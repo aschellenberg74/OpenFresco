@@ -11,8 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\SRC\experimentalControlPoint\ExpControlSP.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalControlPoint\ExpDispControl.cpp" />
     <ClCompile Include="..\..\..\SRC\experimentalControlPoint\ExperimentalCP.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalControlPoint\ExpForceControl.cpp" />
     <ClCompile Include="..\..\..\SRC\experimentalControl\ECGenericTCP.cpp" />
     <ClCompile Include="..\..\..\SRC\experimentalControl\ECLabVIEW.cpp" />
     <ClCompile Include="..\..\..\SRC\experimentalControl\ECSCRAMNet.cpp" />
@@ -22,13 +23,15 @@
     <ClCompile Include="..\..\..\SRC\experimentalControl\ECSimSimulink.cpp" />
     <ClCompile Include="..\..\..\SRC\experimentalControl\ECSimulation.cpp" />
     <ClCompile Include="..\..\..\SRC\experimentalControl\ECSimUniaxialMaterials.cpp" />
+    <ClCompile Include="..\..\..\SRC\experimentalControl\ECSpeedgoat.cpp" />
     <ClCompile Include="..\..\..\SRC\experimentalControl\ECxPCtarget.cpp" />
     <ClCompile Include="..\..\..\SRC\experimentalControl\ExperimentalControl.cpp" />
     <ClCompile Include="..\..\..\SRC\experimentalControl\xPCtarget\xpcinitfree.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\SRC\experimentalControlPoint\ExpControlSP.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalControlPoint\ExpDispControl.h" />
     <ClInclude Include="..\..\..\SRC\experimentalControlPoint\ExperimentalCP.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalControlPoint\ExpForceControl.h" />
     <ClInclude Include="..\..\..\SRC\experimentalControl\ECGenericTCP.h" />
     <ClInclude Include="..\..\..\SRC\experimentalControl\ECLabVIEW.h" />
     <ClInclude Include="..\..\..\SRC\experimentalControl\ECSCRAMNet.h" />
@@ -38,6 +41,7 @@
     <ClInclude Include="..\..\..\SRC\experimentalControl\ECSimSimulink.h" />
     <ClInclude Include="..\..\..\SRC\experimentalControl\ECSimulation.h" />
     <ClInclude Include="..\..\..\SRC\experimentalControl\ECSimUniaxialMaterials.h" />
+    <ClInclude Include="..\..\..\SRC\experimentalControl\ECSpeedgoat.h" />
     <ClInclude Include="..\..\..\SRC\experimentalControl\ECxPCtarget.h" />
     <ClInclude Include="..\..\..\SRC\experimentalControl\ExperimentalControl.h" />
   </ItemGroup>

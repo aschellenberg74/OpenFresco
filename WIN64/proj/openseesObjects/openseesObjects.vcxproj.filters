@@ -405,6 +405,12 @@
     <ClCompile Include="..\..\..\SRC\openseesExtra\TransientAnalysis.cpp">
       <Filter>extra</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\CorotCrdTransfWarping2d.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\BeamFiberMaterial2dPS.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\SRC\openseesCore\Analysis.h">
@@ -883,6 +889,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\SRC\openseesExtra\TransientAnalysis.h">
       <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\CorotCrdTransfWarping2d.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\BeamFiberMaterial2dPS.h">
+      <Filter>core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

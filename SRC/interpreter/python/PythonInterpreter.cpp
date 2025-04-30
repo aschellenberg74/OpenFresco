@@ -19,7 +19,7 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// Written: Minjie
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 //
 // Description: This file contains the class definition for Python Interpreter
 // PythonInterpreter implements a DL_Interpreter for the python language
@@ -30,7 +30,7 @@
 
 static PythonStream sserr;
 OPS_Stream* opserrPtr = &sserr;
-static PythonInterpreter* module = 0;
+static PythonInterpreter* interp = 0;
 
 
 PythonInterpreter::PythonInterpreter()
@@ -78,7 +78,6 @@ int PythonInterpreter::getInt(int* data, int numArgs)
 	
 	for (int i = 0; i < numArgs; i++) {
 		PyObject* o = PyTuple_GetItem(wrapper.getCurrentArgv(), wrapper.getCurrentArg());
-		//wrapper.incrCurrentArg();
 		if (PyLong_Check(o) || PyFloat_Check(o) || PyBool_Check(o)) {
 			PyErr_Clear();
 			data[i] = PyLong_AsLong(o);
@@ -104,7 +103,6 @@ int PythonInterpreter::getDouble(double* data, int numArgs)
 	
 	for (int i = 0; i < numArgs; i++) {
 		PyObject* o = PyTuple_GetItem(wrapper.getCurrentArgv(), wrapper.getCurrentArg());
-		//wrapper.incrCurrentArg();
 		if (PyLong_Check(o) || PyFloat_Check(o) || PyBool_Check(o)) {
 			PyErr_Clear();
 			data[i] = PyFloat_AsDouble(o);
@@ -116,6 +114,56 @@ int PythonInterpreter::getDouble(double* data, int numArgs)
 		else {
 			return -1;
 		}
+	}
+	
+	return 0;
+}
+
+
+int PythonInterpreter::getDoubleList(int* size, Vector* data)
+{
+	if (wrapper.getCurrentArg() >= wrapper.getNumberArgs()) {
+		return -1;
+	}
+	
+	PyObject* o = PyTuple_GetItem(wrapper.getCurrentArgv(), wrapper.getCurrentArg());
+	wrapper.incrCurrentArg();
+	
+	if (PyList_Check(o)) {
+		*size = (int)PyList_Size(o);
+		data->resize(*size);
+		for (int i = 0; i < *size; i++) {
+			PyErr_Clear();
+			PyObject* item = PyList_GetItem(o, i);
+			if (!(PyLong_Check(item) || PyFloat_Check(item) || PyBool_Check(item))) {
+				opserr << "PythonInterpreter::getDoubleList error: item " << i << " in list is not a float (or int or bool)\n";
+				return -1;
+			}
+			(*data)(i) = PyFloat_AsDouble(item);
+			if (PyErr_Occurred()) {
+				return -1;
+			}
+		}
+	}
+	else if (PyTuple_Check(o)) {
+		*size = (int)PyTuple_Size(o);
+		data->resize(*size);
+		for (int i = 0; i < *size; i++) {
+			PyErr_Clear();
+			PyObject* item = PyTuple_GetItem(o, i);
+			if (!(PyLong_Check(item) || PyFloat_Check(item) || PyBool_Check(item))) {
+				opserr << "PythonInterpreter::getDoubleList error: item " << i << " in tuple is not a float (or int or bool)\n";
+				return -1;
+			}
+			(*data)(i) = PyFloat_AsDouble(item);
+			if (PyErr_Occurred()) {
+				return -1;
+			}
+		}
+	}
+	else {
+		opserr << "PythonInterpreter::getDoubleList error: input is neither a list nor a tuple\n";
+		return -1;
 	}
 	
 	return 0;
@@ -223,6 +271,43 @@ int PythonInterpreter::getStringCopy(char** stringPtr)
 }
 
 
+int PythonInterpreter::evalDoubleStringExpression(const char* theExpression, double& current_val)
+{
+	if (theExpression == 0) {
+		opserr << "PythonInterpreter::evalDoubleStringExpression error: Expression not set\n";
+		return -1;
+	}
+	
+	// run the string and get results
+	PyObject* py_main = PyImport_AddModule("__main__");
+	if (py_main == NULL) {
+		opserr << "PythonInterpreter::evalDoubleStringExpression error: cannot add module  __main__\n";
+		return -1;
+	}
+	PyObject* py_dict = PyModule_GetDict(py_main);
+	if (py_main == NULL) {
+		opserr << "PythonInterpreter::evalDoubleStringExpression error: cannot get dict of module __main__\n";
+		return -1;
+	}
+	PyObject* PyRes = PyRun_String(theExpression, Py_eval_input, py_dict, py_dict);
+	
+	if (PyRes == NULL) {
+		opserr << "PythonInterpreter::evalDoubleStringExpression error: failed to evaluate expression\n";
+		return -1;
+	}
+	
+	// get results
+	if (!(PyLong_Check(PyRes) || PyFloat_Check(PyRes) || PyBool_Check(PyRes))) {
+		opserr << "PythonInterpreter::evalDoubleStringExpression error: the expression must return a float (or int or bool)\n";
+		return -1;
+	}
+	current_val = PyFloat_AsDouble(PyRes);
+	
+	// done
+	return 0;
+}
+
+
 void PythonInterpreter::resetInput(int cArg)
 {
 	wrapper.resetCommandLine(cArg);
@@ -237,10 +322,58 @@ int PythonInterpreter::setInt(int* data, int numArgs, bool scalar)
 }
 
 
+int PythonInterpreter::setInt(std::vector<std::vector<int>>& data)
+{
+	wrapper.setOutputs(data);
+	
+	return 0;
+}
+
+
+int PythonInterpreter::setInt(std::map<const char*, int>& data)
+{
+	wrapper.setOutputs(data);
+		
+	return 0;
+}
+
+
+int PythonInterpreter::setInt(std::map<const char*, std::vector<int>>& data)
+{
+	wrapper.setOutputs(data);
+		
+	return 0;
+}
+
+
 int PythonInterpreter::setDouble(double* data, int numArgs, bool scalar)
 {
 	wrapper.setOutputs(data, numArgs, scalar);
 	
+	return 0;
+}
+
+
+int PythonInterpreter::setDouble(std::vector<std::vector<double>>& data)
+{
+	wrapper.setOutputs(data);
+	
+	return 0;
+}
+
+
+int PythonInterpreter::setDouble(std::map<const char*, double>& data)
+{
+	wrapper.setOutputs(data);
+		
+	return 0;
+}
+
+
+int PythonInterpreter::setDouble(std::map<const char*, std::vector<double>>& data)
+{
+	wrapper.setOutputs(data);
+		
 	return 0;
 }
 
@@ -253,6 +386,38 @@ int PythonInterpreter::setString(const char* str)
 }
 
 
+int PythonInterpreter::setString(std::vector<const char*>& data)
+{
+	wrapper.setOutputs(data);
+	
+	return 0;
+}
+
+
+int PythonInterpreter::setString(std::vector<std::vector<const char*>>& data)
+{
+	wrapper.setOutputs(data);
+		
+	return 0;
+}
+
+
+int PythonInterpreter::setString(std::map<const char*, const char*>& data)
+{
+	wrapper.setOutputs(data);
+		
+	return 0;
+}
+
+
+int PythonInterpreter::setString(std::map<const char*, std::vector<const char*>>& data)
+{
+	wrapper.setOutputs(data);
+		
+	return 0;
+}
+
+
 int PythonInterpreter::runCommand(const char* cmd)
 {
 	return PyRun_SimpleString(cmd);
@@ -261,8 +426,8 @@ int PythonInterpreter::runCommand(const char* cmd)
 
 PyMethodDef* getmethodsFunc()
 {
-	module = new PythonInterpreter;
-	PythonWrapper* wrapper = module->getWrapper();
+	interp = new PythonInterpreter;
+	PythonWrapper* wrapper = interp->getWrapper();
 	wrapper->addOpenFrescoCommands();
 		
 	return wrapper->getMethods();
@@ -271,9 +436,9 @@ PyMethodDef* getmethodsFunc()
 
 void cleanupFunc()
 {
-	module->getCmds().wipeExp();
-	if (module != 0) {
-		delete module;
+	interp->getCmds().wipeExp();
+	if (interp != 0) {
+		delete interp;
 	}
 }
 
@@ -311,7 +476,7 @@ static int openfresco_clear(PyObject* m)
 
 static struct PyModuleDef moduledef = {
 		PyModuleDef_HEAD_INIT,
-		"openfresco",
+		"OpenFrescoPy",
 		NULL,
 		sizeof(struct module_state),
 		getmethodsFunc(),
@@ -324,27 +489,27 @@ static struct PyModuleDef moduledef = {
 #define INITERROR return NULL
 
 PyMODINIT_FUNC
-PyInit_openfresco(void)
+PyInit_OpenFrescoPy(void)
 
 #else
 #define INITERROR return
 
 //void
 PyMODINIT_FUNC
-initopenfresco(void)
+initopenfrescopy(void)
 #endif
 {
 #if PY_MAJOR_VERSION >= 3
 	PyObject* pymodule = PyModule_Create(&moduledef);
 #else
-	PyObject* pymodule = Py_InitModule("openfresco", getmethodsFunc());
+	PyObject* pymodule = Py_InitModule("OpenFrescoPy", getmethodsFunc());
 #endif
 	
 	if (pymodule == NULL)
 		INITERROR;
 	struct module_state* st = GETSTATE(pymodule);
 	
-	st->error = PyErr_NewExceptionWithDoc("openfresco.OpenFrescoError", "Internal OpenFresco errors.", NULL, NULL);
+	st->error = PyErr_NewExceptionWithDoc("OpenFrescoPy.OpenFrescoError", "Internal OpenFresco errors.", NULL, NULL);
 	if (st->error == NULL) {
 		Py_DECREF(pymodule);
 		INITERROR;

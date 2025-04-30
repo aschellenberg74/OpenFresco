@@ -9,9 +9,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\SRC\experimentalControlPoint\ExpControlSP.cpp">
-      <Filter>controlPoint</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\SRC\experimentalControlPoint\ExperimentalCP.cpp">
       <Filter>controlPoint</Filter>
     </ClCompile>
@@ -39,11 +36,15 @@
       <Filter>simulation</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\experimentalControl\xPCtarget\xpcinitfree.c" />
+    <ClCompile Include="..\..\..\SRC\experimentalControlPoint\ExpDispControl.cpp">
+      <Filter>controlPoint</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalControlPoint\ExpForceControl.cpp">
+      <Filter>controlPoint</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalControl\ECspeedgoat.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\SRC\experimentalControlPoint\ExpControlSP.h">
-      <Filter>controlPoint</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\SRC\experimentalControlPoint\ExperimentalCP.h">
       <Filter>controlPoint</Filter>
     </ClInclude>
@@ -70,5 +71,12 @@
     <ClInclude Include="..\..\..\SRC\experimentalControl\ECSimUniaxialMaterials.h">
       <Filter>simulation</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalControlPoint\ExpDispControl.h">
+      <Filter>controlPoint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalControlPoint\ExpForceControl.h">
+      <Filter>controlPoint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalControl\ECspeedgoat.h" />
   </ItemGroup>
 </Project>

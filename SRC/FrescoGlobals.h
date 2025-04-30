@@ -31,7 +31,7 @@
 //
 // Description: This file contains the global values in OpenFresco
 
-#define OPF_VERSION "2.7.2 (Build 221218)"
+#define OPF_VERSION "2.8.0 (Build 250501)"
 
 #ifndef _WIN64
 #define WIN_ARCH "32-Bit"
@@ -84,6 +84,6 @@ static const int OF_RemoteTest_DIE              = 99;
 static const int OF_RemoteTest_acquire          = 50;
 
 // Network Transmition Data Size
-static const int OF_Network_dataSize = 256; //536; 
+static const int OF_Network_dataSize = 256;
 
 #endif

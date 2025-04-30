@@ -17,6 +17,7 @@
     <ClCompile Include="..\..\..\SRC\openseesCore\ArrayOfTaggedObjectsIter.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\BeamFiberMaterial.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\BeamFiberMaterial2d.cpp" />
+    <ClCompile Include="..\..\..\SRC\openseesCore\BeamFiberMaterial2dPS.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\BinaryFileStream.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\Channel.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesCore\ConstraintHandler.cpp" />
@@ -103,6 +104,7 @@
     <ClCompile Include="..\..\..\SRC\openseesExtra\ConvergenceTest.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\CorotCrdTransf2d.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\CorotCrdTransf3d.cpp" />
+    <ClCompile Include="..\..\..\SRC\openseesExtra\CorotCrdTransfWarping2d.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\CorotCrdTransfWarping3d.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\CTestNormDispIncr.cpp" />
     <ClCompile Include="..\..\..\SRC\openseesExtra\DatabaseStream.cpp" />
@@ -151,6 +153,7 @@
     <ClInclude Include="..\..\..\SRC\openseesCore\ArrayOfTaggedObjectsIter.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\BeamFiberMaterial.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\BeamFiberMaterial2d.h" />
+    <ClInclude Include="..\..\..\SRC\openseesCore\BeamFiberMaterial2dPS.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\BinaryFileStream.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\Channel.h" />
     <ClInclude Include="..\..\..\SRC\openseesCore\classTags.h" />
@@ -258,6 +261,7 @@
     <ClInclude Include="..\..\..\SRC\openseesExtra\ConvergenceTest.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\CorotCrdTransf2d.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\CorotCrdTransf3d.h" />
+    <ClInclude Include="..\..\..\SRC\openseesExtra\CorotCrdTransfWarping2d.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\CorotCrdTransfWarping3d.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\CTestNormDispIncr.h" />
     <ClInclude Include="..\..\..\SRC\openseesExtra\DatabaseStream.h" />

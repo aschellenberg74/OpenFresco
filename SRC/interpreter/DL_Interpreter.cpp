@@ -72,13 +72,31 @@ int DL_Interpreter::getDouble(double *, int numArgs)
 }
 
 
+int DL_Interpreter::getDoubleList(int* size, Vector* data)
+{
+    return -1;
+}
+
+
 const char* DL_Interpreter::getString()
 {
     return 0;
 }
 
 
+const char* DL_Interpreter::getStringFromAll(char* buffer, int len)
+{
+    return 0;
+}
+
+
 int DL_Interpreter::getStringCopy(char **stringPtr)
+{
+    return -1;
+}
+
+
+int DL_Interpreter::evalDoubleStringExpression(const char* theExpression, double& current_val)
 {
     return -1;
 }
@@ -96,13 +114,73 @@ int DL_Interpreter::setInt(int *, int numArgs, bool scalar)
 }
 
 
+int DL_Interpreter::setInt(std::vector<std::vector<int>>& data)
+{
+    return -1;
+}
+
+
+int DL_Interpreter::setInt(std::map<const char*, int>& data)
+{
+    return -1;
+}
+
+
+int DL_Interpreter::setInt(std::map<const char*, std::vector<int>>& data)
+{
+    return -1;
+}
+
+
 int DL_Interpreter::setDouble(double *, int numArgs, bool scalar)
 {
     return -1;
 }
 
 
+int DL_Interpreter::setDouble(std::vector<std::vector<double>>& data)
+{
+    return -1;
+}
+
+
+int DL_Interpreter::setDouble(std::map<const char*, double>& data)
+{
+    return -1;
+}
+
+
+int DL_Interpreter::setDouble(std::map<const char*, std::vector<double>>& data)
+{
+    return -1;
+}
+
+
 int DL_Interpreter::setString(const char*)
+{
+    return -1;
+}
+
+
+int DL_Interpreter::setString(std::vector<const char*>& data)
+{
+    return -1;
+}
+
+
+int DL_Interpreter::setString(std::map<const char*, const char*>& data)
+{
+    return -1;
+}
+
+
+int DL_Interpreter::setString(std::vector<std::vector<const char*>>& data)
+{
+    return -1;
+}
+
+
+int DL_Interpreter::setString(std::map<const char*, std::vector<const char*>>& data)
 {
     return -1;
 }

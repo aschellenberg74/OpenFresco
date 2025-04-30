@@ -19,12 +19,16 @@
 **                                                                    **
 ** ****************************************************************** */
 
-// Written: Minjie
+// Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 //
 // Description: A python wrapper for OpenFresco commands
 
 #ifndef PythonWrapper_h
 #define PythonWrapper_h
+
+#ifdef _WIN32
+#include <corecrt.h>
+#endif
 
 #ifdef _DEBUG
 #undef _DEBUG
@@ -35,44 +39,55 @@
 #endif
 
 #include <vector>
+#include <map>
 
 class PythonWrapper
 {
 public:
-	PythonWrapper();
-	~PythonWrapper();
-
-	// reset command line
-	void resetCommandLine(int nArgs, int cArg, PyObject* argv);
-	void resetCommandLine(int cArg);
-
-	// wrapper commands
-	void addOpenFrescoCommands();
-	void addCommand(const char* name, PyCFunction proc);
-	PyMethodDef* getMethods();
-
-	// get command line arguments
-	PyObject* getCurrentArgv() { return currentArgv; }
-	int getCurrentArg() const { return currentArg; }
-	int getNumberArgs() const { return numberArgs; }
-	void incrCurrentArg() { currentArg++; }
-
-	// set outputs
-	void setOutputs(int* data, int numArgs, bool scalar);
-	void setOutputs(double* data, int numArgs, bool scalar);
-	void setOutputs(const char* str);
-	PyObject* getResults();
-
+    PythonWrapper();
+    ~PythonWrapper();
+    
+    // reset command line
+    void resetCommandLine(int nArgs, int cArg, PyObject* argv);
+    void resetCommandLine(int cArg);
+    
+    // wrapper commands
+    void addOpenFrescoCommands();
+    void addCommand(const char* name, PyCFunction proc);
+    PyMethodDef* getMethods();
+    
+    // get command line arguments
+    PyObject* getCurrentArgv() { return currentArgv; }
+    int getCurrentArg() const { return currentArg; }
+    int getNumberArgs() const { return numberArgs; }
+    void incrCurrentArg() { currentArg++; }
+    
+    // set outputs
+    void setOutputs(int* data, int numArgs, bool scalar);
+    void setOutputs(double* data, int numArgs, bool scalar);
+    void setOutputs(const char* str);
+    void setOutputs(std::vector<std::vector<int>>& data);
+    void setOutputs(std::map<const char*, int>& data);
+    void setOutputs(std::map<const char*, std::vector<int>>& data);
+    void setOutputs(std::vector<std::vector<double>>& data);
+    void setOutputs(std::map<const char*, double>& data);
+    void setOutputs(std::map<const char*, std::vector<double>>& data);
+    void setOutputs(std::vector<const char*>& data);
+    void setOutputs(std::vector<std::vector<const char*>>& data);
+    void setOutputs(std::map<const char*, const char*>& data);
+    void setOutputs(std::map<const char*, std::vector<const char*>>& data);
+    PyObject* getResults();
+    
 private:
-	// command line arguments
-	PyObject* currentArgv;
-	int currentArg;
-	int numberArgs;
-
-	// methods table
-	std::vector<PyMethodDef> methodsOpenFresco;
-	const char* openfresco_docstring;
-	PyObject* currentResult;
+    // command line arguments
+    PyObject* currentArgv;
+    int currentArg;
+    int numberArgs;
+    
+    // methods table
+    std::vector<PyMethodDef> methodsOpenFresco;
+    const char* openfresco_docstring;
+    PyObject* currentResult;
 };
 
 #endif

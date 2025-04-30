@@ -30,7 +30,6 @@
 #define TclInterpreter_h
 
 #include <tcl.h>
-//#include <OPS_Globals.h>
 #include "DL_Interpreter.h"
 #include "TclWrapper.h"
 #include "OpenFrescoCommands.h"
@@ -52,15 +51,28 @@ class TclInterpreter: public DL_Interpreter
     virtual int getNumRemainingInputArgs(void);
     virtual int getInt(int *, int numArgs);
     virtual int getDouble(double *, int numArgs);
+    virtual int getDoubleList(int* size, Vector* data);
     virtual const char* getString();
+    virtual const char* getStringFromAll(char* buffer, int len);
     virtual int getStringCopy(char **stringPtr);
+    virtual int evalDoubleStringExpression(const char* theExpression, double& current_val);
     virtual void resetInput(int cArg);
 
-    // methods for interpreters to output results
+    // methods for interpreter to output results
     virtual int setInt(int *, int numArgs, bool scalar);
+    virtual int setInt(std::vector<std::vector<int>>& data);
+    virtual int setInt(std::map<const char*, int>& data);
+    virtual int setInt(std::map<const char*, std::vector<int>>& data);
     virtual int setDouble(double *, int numArgs, bool scalar);
+    virtual int setDouble(std::vector<std::vector<double>>& data);
+    virtual int setDouble(std::map<const char*, double>& data);
+    virtual int setDouble(std::map<const char*, std::vector<double>>& data);
     virtual int setString(const char*);
-    
+    virtual int setString(std::vector<const char*>& data);
+    virtual int setString(std::vector<std::vector<const char*>>& data);
+    virtual int setString(std::map<const char*, const char*>& data);
+    virtual int setString(std::map<const char*, std::vector<const char*>>& data);
+
   private:
     Tcl_Obj *resultPtr;
     Tcl_Obj *commandPtr;

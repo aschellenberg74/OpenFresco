@@ -30,6 +30,7 @@
 #include <elementAPI.h>
 #include <Domain.h>
 #include <UniaxialMaterial.h>
+#include <LimitCurve.h>
 #include <NDMaterial.h>
 #include <SectionForceDeformation.h>
 #include <FrictionModel.h>
@@ -84,9 +85,11 @@ void OpenFrescoCommands::wipeExp()
     OPF_clearExperimentalTangentStiffs();
 
     OPS_clearAllUniaxialMaterial();
+    OPS_clearAllLimitCurve();
     OPS_clearAllNDMaterial();
     OPS_clearAllSectionForceDeformation();
     OPS_clearAllFrictionModel();
+    OPS_clearAllCrdTransf();
 
     //if (theDatabase != 0) {
     //    delete theDatabase;
@@ -138,6 +141,30 @@ int OPS_SetIntOutput(int* numData, int* data, bool scalar)
 }
 
 
+int OPS_SetIntListsOutput(std::vector<std::vector<int>>& data)
+{
+    if (cmds == 0) return 0;
+    DL_Interpreter* interp = cmds->getInterpreter();
+    return interp->setInt(data);
+}
+
+
+int OPS_SetIntDictOutput(std::map<const char*, int>& data)
+{
+    if (cmds == 0) return 0;
+    DL_Interpreter* interp = cmds->getInterpreter();
+    return interp->setInt(data);
+}
+
+
+int OPS_SetIntDictListOutput(std::map<const char*, std::vector<int>>& data)
+{
+    if (cmds == 0) return 0;
+    DL_Interpreter* interp = cmds->getInterpreter();
+    return interp->setInt(data);
+}
+
+
 int OPS_GetDoubleInput(int* numData, double* data)
 {
     if (cmds == 0) return 0;
@@ -147,11 +174,50 @@ int OPS_GetDoubleInput(int* numData, double* data)
 }
 
 
+int OPS_GetDoubleListInput(int* size, Vector* data)
+{
+    if (cmds == 0) return 0;
+    DL_Interpreter* interp = cmds->getInterpreter();
+    return interp->getDoubleList(size, data);
+}
+
+
+int OPS_EvalDoubleStringExpression(const char* theExpression, double& current_val) {
+    if (cmds == 0) return 0;
+    DL_Interpreter* interp = cmds->getInterpreter();
+    return interp->evalDoubleStringExpression(theExpression, current_val);
+}
+
+
 int OPS_SetDoubleOutput(int* numData, double* data, bool scalar)
 {
     if (cmds == 0) return 0;
     DL_Interpreter* interp = cmds->getInterpreter();
     return interp->setDouble(data, *numData, scalar);
+}
+
+
+int OPS_SetDoubleListsOutput(std::vector<std::vector<double>>& data)
+{
+    if (cmds == 0) return 0;
+    DL_Interpreter* interp = cmds->getInterpreter();
+    return interp->setDouble(data);
+}
+
+
+int OPS_SetDoubleDictOutput(std::map<const char*, double>& data)
+{
+    if (cmds == 0) return 0;
+    DL_Interpreter* interp = cmds->getInterpreter();
+    return interp->setDouble(data);
+}
+
+
+int OPS_SetDoubleDictListOutput(std::map<const char*, std::vector<double>>& data)
+{
+    if (cmds == 0) return 0;
+    DL_Interpreter* interp = cmds->getInterpreter();
+    return interp->setDouble(data);
 }
 
 
@@ -164,11 +230,55 @@ const char* OPS_GetString()
 }
 
 
+const char* OPS_GetStringFromAll(char* buffer, int len)
+{
+    if (cmds == 0) return "Invalid String Input!";
+    DL_Interpreter* interp = cmds->getInterpreter();
+    const char* res = interp->getStringFromAll(buffer, len);
+    if (res == 0) {
+        return "Invalid String Input!";
+    }
+    return res;
+}
+
+
 int OPS_SetString(const char* str)
 {
     if (cmds == 0) return 0;
     DL_Interpreter* interp = cmds->getInterpreter();
     return interp->setString(str);
+}
+
+
+int OPS_SetStringList(std::vector<const char*>& data)
+{
+    if (cmds == 0) return 0;
+    DL_Interpreter* interp = cmds->getInterpreter();
+    return interp->setString(data);
+}
+
+
+int OPS_SetStringLists(std::vector<std::vector<const char*>>& data)
+{
+    if (cmds == 0) return 0;
+    DL_Interpreter* interp = cmds->getInterpreter();
+    return interp->setString(data);
+}
+
+
+int OPS_SetStringDict(std::map<const char*, const char*>& data)
+{
+    if (cmds == 0) return 0;
+    DL_Interpreter* interp = cmds->getInterpreter();
+    return interp->setString(data);
+}
+
+
+int OPS_SetStringDictList(std::map<const char*, std::vector<const char*>>& data)
+{
+    if (cmds == 0) return 0;
+    DL_Interpreter* interp = cmds->getInterpreter();
+    return interp->setString(data);
 }
 
 
@@ -673,6 +783,12 @@ int OPS_setElementRayleighDampingFactors()
 UniaxialMaterial* OPS_GetUniaxialMaterial(int matTag)
 {
     return OPS_getUniaxialMaterial(matTag);
+}
+
+
+LimitCurve* OPS_GetLimitCurve(int limCrvTag)
+{
+    return OPS_getLimitCurve(limCrvTag);
 }
 
 

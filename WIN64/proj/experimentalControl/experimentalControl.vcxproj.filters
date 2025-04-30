@@ -31,12 +31,16 @@
     <ClCompile Include="..\..\..\SRC\experimentalControl\ECxPCtarget.cpp" />
     <ClCompile Include="..\..\..\SRC\experimentalControl\ExperimentalControl.cpp" />
     <ClCompile Include="..\..\..\SRC\experimentalControl\xPCtarget\xpcinitfree.c" />
-    <ClCompile Include="..\..\..\SRC\experimentalControlPoint\ExpControlSP.cpp">
-      <Filter>controlPoint</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\SRC\experimentalControlPoint\ExperimentalCP.cpp">
       <Filter>controlPoint</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalControlPoint\ExpDispControl.cpp">
+      <Filter>controlPoint</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalControlPoint\ExpForceControl.cpp">
+      <Filter>controlPoint</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\experimentalControl\ECSpeedgoat.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\SRC\experimentalControl\ECSimDomain.h">
@@ -60,11 +64,15 @@
     <ClInclude Include="..\..\..\SRC\experimentalControl\ECSCRAMNetGT.h" />
     <ClInclude Include="..\..\..\SRC\experimentalControl\ECxPCtarget.h" />
     <ClInclude Include="..\..\..\SRC\experimentalControl\ExperimentalControl.h" />
-    <ClInclude Include="..\..\..\SRC\experimentalControlPoint\ExpControlSP.h">
-      <Filter>controlPoint</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\SRC\experimentalControlPoint\ExperimentalCP.h">
       <Filter>controlPoint</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalControlPoint\ExpDispControl.h">
+      <Filter>controlPoint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalControlPoint\ExpForceControl.h">
+      <Filter>controlPoint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\experimentalControl\ECSpeedgoat.h" />
   </ItemGroup>
 </Project>
