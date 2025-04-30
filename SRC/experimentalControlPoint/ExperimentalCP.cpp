@@ -174,6 +174,9 @@ int OPF_ExperimentalCP()
             return -1;
         }
         
+        // factor (initialize to 1.0)
+        factor(numSignals) = 1.0;
+        
         // read optional parameters until next dof ID is specified
         type = OPS_GetString();
         while (type != 0 && sscanf(type, "%d", &dofID) != 1 &&
@@ -190,9 +193,6 @@ int OPF_ExperimentalCP()
                 }
                 // read next argument
                 type = OPS_GetString();
-            }
-            else {
-                factor(numSignals) = 1.0;
             }
             
             // response limits
@@ -304,7 +304,7 @@ int OPF_ExperimentalCP()
 ExperimentalCP::ExperimentalCP(int tag, const ID& dof,
     const ID& rsptype, const Vector& fact)
     : TaggedObject(tag),
-    numSignals(dof.Size()), numDOF(dof.Size()),
+    numSignals(dof.Size()), numDOF(0),
     DOF(dof), rspType(rsptype), factor(dof.Size()),
     lowerLim(0), upperLim(0),
     isRelTrial(dof.Size()), isRelOut(dof.Size()),
@@ -336,12 +336,6 @@ ExperimentalCP::ExperimentalCP(int tag, const ID& dof,
     
     // find unique DOFs and number thereof
     numDOF = uniqueDOF.unique();
-    /*if (numUniqueDir > ndf) {
-        opserr << "ExperimentalCP::ExperimentalCP() - "
-            << "more unique directions specified than "
-            << "available degrees of freedom\n";
-        exit(OF_ReturnType_failed);
-    }*/
     
     // set sizes of response types
     sizeRspType.Zero();
@@ -408,9 +402,8 @@ ExperimentalCP* ExperimentalCP::getCopy()
 int ExperimentalCP::setData(const ID& dof,
     const ID& rsptype, const Vector& fact)
 {
-    // save the number of directions
+    // save the number of signals
     numSignals = dof.Size();
-    numDOF = dof.Size();
     DOF = dof;
     rspType = rsptype;
     
@@ -438,12 +431,6 @@ int ExperimentalCP::setData(const ID& dof,
     
     // find unique DOFs and number thereof
     numDOF = uniqueDOF.unique();
-    /*if (numUniqueDir > ndf)  {
-        opserr << "ExperimentalCP::ExperimentalCP() - "
-            << "more directions specified than available "
-            << "degrees of freedom\n";
-        exit(OF_ReturnType_failed);
-    }*/
     
     // set sizes of response types
     sizeRspType.Zero();
@@ -456,8 +443,12 @@ int ExperimentalCP::setData(const ID& dof,
         sizeRspType(rspType(i)) += 1;
     }
     
-    // zero the dofRspType vector
+    // zero the dofRspType vector and the isRelative IDs
     dofRspType.Zero();
+    isRelTrial.Zero();
+    isRelOut.Zero();
+    isRelCtrl.Zero();
+    isRelDaq.Zero();
     
     return 0;
 }
@@ -579,11 +570,11 @@ const ID& ExperimentalCP::getSizeRspType()
 }
 
 
-const ID& ExperimentalCP::getDOFRspType(int dir)
+const ID& ExperimentalCP::getDOFRspType(int dof)
 {
     dofRspType.Zero();
     for (int i = 0; i < numSignals; i++) {
-        if (DOF(i) == dir)
+        if (DOF(i) == dof)
             dofRspType(rspType(i)) = 1;
     }
     
@@ -850,25 +841,45 @@ int ExperimentalCP::getDaqSigRefType(int signalID)
 
 void ExperimentalCP::Print(OPS_Stream& s, int flag)
 {
-    s << "ExperimentalCP: " << this->getTag() << endln;
-    s << "  numSignal: " << numSignals << ", numDOF: " << numDOF << endln;
-    s << "  DOF     : " << DOF << endln;
-    s << "  rspType : " << rspType << endln;
-    s << "  factor  : " << factor << endln;
-    if (lowerLim != 0)
-        s << "  lowerLim: " << lowerLim << endln;
-    if (upperLim != 0)
-        s << "  upperLim: " << upperLim << endln;
-    s << "  isRelTrial  : " << isRelTrial << endln;
-    s << "  isRelOut  : " << isRelOut << endln;
-    s << "  isRelCtrl  : " << isRelCtrl << endln;
-    s << "  isRelDaq  : " << isRelDaq << endln;
-    if (nodeTag != 0) {
-        s << "  nodeTag: " << nodeTag << endln;
-        s << "    ndm: " << nodeNDM << ", ndf: " << nodeNDF << endln;
-        s << "    crds: " << nodeCrds << endln;
+    s << "* ExperimentalCP: " << this->getTag() << endln;
+    s << "*   numSignal : " << numSignals << ", numDOF: " << numDOF << endln;
+    //s << "*   uniqueDOF : " << uniqueDOF;
+    s << "*   DOF       :";
+    for (int i = 0; i < numSignals; i++)
+        s << " " << DOF(i)+1;
+    s << endln;
+    s << "*   rspType   :";
+    for (int i = 0; i < numSignals; i++) {
+        if (rspType(i) == OF_Resp_Disp)
+            s << " d";
+        else if (rspType(i) == OF_Resp_Vel)
+            s << " v";
+        else if (rspType(i) == OF_Resp_Accel)
+            s << " a";
+        else if (rspType(i) == OF_Resp_Force)
+            s << " f";
+        else if (rspType(i) == OF_Resp_Time)
+            s << " t";
     }
     s << endln;
+    if (isRelTrial != 0)
+        s << "*   isRelTrial: " << isRelTrial;
+    if (isRelOut != 0)
+        s << "*   isRelOut  : " << isRelOut;
+    if (isRelCtrl != 0)
+        s << "*   isRelCtrl : " << isRelCtrl;
+    if (isRelDaq != 0)
+        s << "*   isRelDaq  : " << isRelDaq;
+    s << "*   factor    : " << factor;
+    if (lowerLim != 0)
+        s << "*   lowerLim  : " << lowerLim;
+    if (upperLim != 0)
+        s << "*   upperLim  : " << upperLim;
+    if (nodeTag != 0) {
+        s << "*   nodeTag   : " << nodeTag << endln;
+        s << "*     ndm : " << nodeNDM << ", ndf: " << nodeNDF << endln;
+        s << "*     crds: " << nodeCrds;
+    }
 }
 
 

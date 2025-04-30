@@ -51,7 +51,7 @@ public:
     virtual ~ExperimentalCP();
     
     virtual ExperimentalCP *getCopy();
-    virtual void Print(OPS_Stream &s, int flag);
+    virtual void Print(OPS_Stream &s, int flag = 0);
     
     // methods to set control point data
     int setData(const ID &DOF,
@@ -113,14 +113,14 @@ protected:
     Vector factor;      // scaling factors (size = numSignals)
     Vector lowerLim;    // lower limits (size = numSignals)
     Vector upperLim;    // upper limits (size = numSignals)
-    ID isRelTrial;      // absolute or relative trial signal(size = numSignals)
+    ID isRelTrial;      // absolute or relative trial signal (size = numSignals)
     ID isRelOut;        // absolute or relative out signal (size = numSignals)
     ID isRelCtrl;       // absolute or relative ctrl signal (size = numSignals)
     ID isRelDaq;        // absolute or relative daq signal (size = numSignals)
     
-    ID uniqueDOF;       // unique DOFs
-    ID sizeRspType;     // sizes of response types
-    ID dofRspType;      // response types for each unique direction
+    ID uniqueDOF;       // unique DOFs (size = numDOF)
+    ID sizeRspType;     // sizes of response types (size = 5)
+    ID dofRspType;      // response types for each unique DOF (size = 5)
     
     int nodeTag;        // node tag with which CP is associated
     Node *theNode;      // pointer to node with which CP is associated
