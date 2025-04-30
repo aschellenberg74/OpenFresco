@@ -548,7 +548,6 @@ int correctV3(double* sigDot, double x)
     return 0;
 }
 
-
 //=============================================================================
 int correctA3(double* sigDotDot, double x)
 {
