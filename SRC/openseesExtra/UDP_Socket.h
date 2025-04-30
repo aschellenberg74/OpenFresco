@@ -17,7 +17,7 @@
 **   Filip C. Filippou (filippou@ce.berkeley.edu)                     **
 **                                                                    **
 ** ****************************************************************** */
-                                                                        
+
 // $Revision: 1.4 $
 // $Date: 2010-08-06 21:51:24 $
 // $Source: /usr/local/cvs/OpenSees/SRC/actor/channel/UDP_Socket.h,v $
@@ -40,78 +40,80 @@
 
 class UDP_Socket : public Channel
 {
-  public:
+public:
     UDP_Socket();
-    UDP_Socket(unsigned int port, bool checkEndianness = false);
-    UDP_Socket(unsigned int other_Port, const char *other_InetAddr,
-        bool checkEndianness = false);
+    UDP_Socket(unsigned int port,
+        bool initialHandshake = false, bool checkEndianness = false);
+    UDP_Socket(unsigned int other_Port, const char* other_InetAddr,
+        bool initialHandshake = false, bool checkEndianness = false);
     ~UDP_Socket();
     
-    char *addToProgram();
+    char* addToProgram();
     
     virtual int setUpConnection();
-
-    int setNextAddress(const ChannelAddress &otherChannelAddress);
-    virtual ChannelAddress *getLastSendersAddress(){ return 0;};
-
+    
+    int setNextAddress(const ChannelAddress& otherChannelAddress);
+    virtual ChannelAddress* getLastSendersAddress() { return 0; };
+    
     int sendObj(int commitTag,
-		MovableObject &theObject,
-		ChannelAddress *theAddress =0);
+        MovableObject& theObject,
+        ChannelAddress* theAddress = 0);
     int recvObj(int commitTag,
-		MovableObject &theObject,
-		FEM_ObjectBroker &theBroker,
-		ChannelAddress *theAddress =0);
-	
+        MovableObject& theObject,
+        FEM_ObjectBroker& theBroker,
+        ChannelAddress* theAddress = 0);
+    
     int sendMsg(int dbTag, int commitTag,
-		const Message &,
-		ChannelAddress *theAddress =0);
+        const Message&,
+        ChannelAddress* theAddress = 0);
     int recvMsg(int dbTag, int commitTag,
-		Message &,
-		ChannelAddress *theAddress =0);
+        Message&,
+        ChannelAddress* theAddress = 0);
     int recvMsgUnknownSize(int dbTag, int commitTag,
-		Message &,
-		ChannelAddress *theAddress =0);
-
+        Message&,
+        ChannelAddress* theAddress = 0);
+    
     int sendMatrix(int dbTag, int commitTag,
-		   const Matrix &theMatrix,
-		   ChannelAddress *theAddress =0);
+        const Matrix& theMatrix,
+        ChannelAddress* theAddress = 0);
     int recvMatrix(int dbTag, int commitTag,
-		   Matrix &theMatrix,
-		   ChannelAddress *theAddress =0);
+        Matrix& theMatrix,
+        ChannelAddress* theAddress = 0);
     
     int sendVector(int dbTag, int commitTag,
-		   const Vector &theVector, ChannelAddress *theAddress =0);
+        const Vector& theVector, ChannelAddress* theAddress = 0);
     int recvVector(int dbTag, int commitTag,
-		   Vector &theVector,
-		   ChannelAddress *theAddress =0);
+        Vector& theVector,
+        ChannelAddress* theAddress = 0);
     
     int sendID(int dbTag, int commitTag,
-	       const ID &theID,
-	       ChannelAddress *theAddress =0);
+        const ID& theID,
+        ChannelAddress* theAddress = 0);
     int recvID(int dbTag, int commitTag,
-	       ID &theID,
-	       ChannelAddress *theAddress =0);
-    
-  protected:
+        ID& theID,
+        ChannelAddress* theAddress = 0);
+
+protected:
     unsigned int getPortNumber() const;
     unsigned int getBytesAvailable();
-    
-  private:
+
+private:
     socket_type sockfd;
     
     union {
-	  struct sockaddr    addr;
-	  struct sockaddr_in addr_in;
+        struct sockaddr    addr;
+        struct sockaddr_in addr_in;
     } my_Addr;
     union {
-      struct sockaddr    addr;
-      struct sockaddr_in addr_in;
+        struct sockaddr    addr;
+        struct sockaddr_in addr_in;
     } other_Addr;
     
     socklen_type addrLength;
     
     unsigned int myPort;
     int connectType;
+    bool initialHandshake;
     bool checkEndianness;
     bool endiannessProblem;
 };
