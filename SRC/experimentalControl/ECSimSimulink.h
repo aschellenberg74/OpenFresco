@@ -28,19 +28,22 @@
 //
 // Description: This file contains the class definition for ECSimSimulink.
 // ECSimSimulink is a controller class for communicating with a Simulink
-// model of the entire control system over a single TCP/IP connection.
+// model using the OPFConnect S-function block over a socket connection.
 
 #include "ECSimulation.h"
 
 class Channel;
+class ExperimentalCP;
 
 class ECSimSimulink : public ECSimulation
 {
 public:
     // constructors
     ECSimSimulink(int tag,
-        char *ipAddress, int ipPort = 44000,
-        int ssl = 0, int udp = 0);
+        int nTrialCPs, ExperimentalCP** trialCPs,
+        int nOutCPs, ExperimentalCP** outCPs,
+        char *ipAddress, int ipPort = 22222,
+        int udp = 0);
     ECSimSimulink(const ECSimSimulink &ec);
     
     // destructor
@@ -53,12 +56,14 @@ public:
     virtual int setup();
     virtual int setSize(ID sizeT, ID sizeO);
     
-    virtual int setTrialResponse(const Vector* disp,
+    virtual int setTrialResponse(
+        const Vector* disp,
         const Vector* vel,
         const Vector* accel,
         const Vector* force,
         const Vector* time);
-    virtual int getDaqResponse(Vector* disp,
+    virtual int getDaqResponse(
+        Vector* disp,
         Vector* vel,
         Vector* accel,
         Vector* force,
@@ -82,9 +87,12 @@ protected:
     virtual int acquire();
 
 private:
+    int numTrialCPs;            // number of trial control points
+    ExperimentalCP** trialCPs;  // trial control points
+    int numOutCPs;              // number of output control points
+    ExperimentalCP** outCPs;    // output control points
     char *ipAddress;            // ip address
     int ipPort;                 // ip port
-    int ssl;                    // secure socket layer flag
     int udp;                    // udp socket flag
     const int dataSize;         // data size of network transactions
     
@@ -94,9 +102,12 @@ private:
     double *rData;              // receive data array
     Vector *recvData;           // receive vector
     
-    double newTarget, switchPC, atTarget;
-    Vector *ctrlDisp, *ctrlForce, *ctrlTime;
-    Vector *daqDisp, *daqForce, *daqTime;
+    double newTarget, switchPC, atTarget;  // communication flags
+    int numCtrlSignals, numDaqSignals;     // number of signals
+    Vector *ctrlSignal, *daqSignal;        // signal arrays
+    Vector trialSigOffset;                 // trial signal offsets
+    Vector ctrlSigOffset, daqSigOffset;    // ctrl and daq signal offsets (i.e. setpoints)
+    int gotRelativeTrial;                  // relative trial signal flag
 };
 
 #endif
