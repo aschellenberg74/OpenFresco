@@ -95,7 +95,7 @@ protected:
     virtual int control() = 0;
     virtual int acquire() = 0;
     
-    // method to pause for wait msec
+    // method to pause for wait [msec]
     void sleep(const clock_t wait);
     
     // size of ctrl/daq data

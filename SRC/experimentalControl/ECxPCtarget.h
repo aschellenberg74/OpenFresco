@@ -104,7 +104,7 @@ private:
     double *ctrlSignal, *daqSignal;        // signal arrays
     Vector trialSigOffset;                 // trial signal offsets
     Vector ctrlSigOffset, daqSigOffset;    // ctrl and daq signal offsets (i.e. setpoints)
-    int gotRelativeTrial;                  // relative trial signal flags
+    int gotRelativeTrial;                  // relative trial signal flag
     
     int newTargetId, switchPCId, atTargetId;  // communication flag IDs
     int ctrlSignalId;                         // control signal IDs

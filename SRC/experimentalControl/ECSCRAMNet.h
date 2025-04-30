@@ -95,13 +95,13 @@ private:
     const int *memPtrBASE;          // pointer to SCRAMNet base memory address
     float *memPtrOPF;               // pointer to OpenFresco base memory address
     float *scrCtrlSig, *scrDaqSig;  // pointers to SCRAMNet GT signal arrays
-
+    
     int *newTarget, *switchPC, *atTarget;  // communication flags
     int numCtrlSignals, numDaqSignals;     // number of signals
     Vector ctrlSignal, daqSignal;          // signal arrays
     Vector trialSigOffset;                 // trial signal offsets
     Vector ctrlSigOffset, daqSigOffset;    // ctrl and daq signal offsets (i.e. setpoints)
-    int gotRelativeTrial;                  // relative trial signal flags
+    int gotRelativeTrial;                  // relative trial signal flag
     
     int flag;  // flag to check states of Simulink model
 };

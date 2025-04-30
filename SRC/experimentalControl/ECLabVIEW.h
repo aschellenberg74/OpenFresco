@@ -107,7 +107,7 @@ private:
     Vector* daqDisp, * daqForce;         // daq vectors
     Vector trialSigOffset;               // trial signal offsets
     Vector ctrlSigOffset, daqSigOffset;  // ctrl and daq signal offsets (i.e. setpoints)
-    int gotRelativeTrial;                // relative trial signal flags
+    int gotRelativeTrial;                // relative trial signal flag
     
     time_t rawtime;
     struct tm* ptm;

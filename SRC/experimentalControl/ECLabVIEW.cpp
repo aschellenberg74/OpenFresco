@@ -190,7 +190,7 @@ ECLabVIEW::ECLabVIEW(int tag, int nTrialCPs, ExperimentalCP** trialcps,
     numCtrlSignals(0), numDaqSignals(0),
     ctrlDisp(0), ctrlForce(0), daqDisp(0), daqForce(0),
     trialSigOffset(0), ctrlSigOffset(0), daqSigOffset(0),
-    gotRelativeTrial(1)
+    gotRelativeTrial(0)
 {
     // open log file
     logFile = fopen("ECLabVIEW.log", "w");
@@ -209,16 +209,10 @@ ECLabVIEW::ECLabVIEW(int tag, int nTrialCPs, ExperimentalCP** trialcps,
     trialCPs = trialcps;
     outCPs = outcps;
     
-    // get total number of control and daq signals and
-    // check if any signals use relative trial reference
+    // get total number of control and daq signals
     for (int i = 0; i < numTrialCPs; i++) {
         int numSignals = trialCPs[i]->getNumSignal();
         numCtrlSignals += numSignals;
-        
-        int j = 0;
-        ID isRel = trialCPs[i]->getTrialSigRefType();
-        while (gotRelativeTrial && j < numSignals)
-            gotRelativeTrial = !isRel(j++);
     }
     for (int i = 0; i < numOutCPs; i++) {
         int numSignals = outCPs[i]->getNumSignal();
@@ -289,7 +283,7 @@ ECLabVIEW::ECLabVIEW(const ECLabVIEW& ec)
     numCtrlSignals(0), numDaqSignals(0),
     ctrlDisp(0), ctrlForce(0), daqDisp(0), daqForce(0),
     trialSigOffset(0), ctrlSigOffset(0), daqSigOffset(0),
-    gotRelativeTrial(1)
+    gotRelativeTrial(0)
 {
     numTrialCPs = ec.numTrialCPs;
     trialCPs = ec.trialCPs;

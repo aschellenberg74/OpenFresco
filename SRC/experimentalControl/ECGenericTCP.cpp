@@ -33,12 +33,13 @@ using std::ifstream;
 #include <iomanip>
 using std::ios;
 
+#include <elementAPI.h>
+
 #include <Message.h>
 #include <Channel.h>
 #include <TCP_Socket.h>
 #include <TCP_SocketSSL.h>
 #include <UDP_Socket.h>
-#include <elementAPI.h>
 
 
 void* OPF_ECGenericTCP()

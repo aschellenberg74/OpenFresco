@@ -208,7 +208,7 @@ ECxPCtarget::ECxPCtarget(int tag, int nTrialCPs, ExperimentalCP** trialcps,
     newTarget(0), switchPC(0), atTarget(0),
     numCtrlSignals(0), numDaqSignals(0), ctrlSignal(0), daqSignal(0),
     trialSigOffset(0), ctrlSigOffset(0), daqSigOffset(0),
-    gotRelativeTrial(1), newTargetId(0), switchPCId(0), atTargetId(0),
+    gotRelativeTrial(0), newTargetId(0), switchPCId(0), atTargetId(0),
     ctrlSignalId(0), daqSignalId(0)
 {
     // get trial and output control points
@@ -220,16 +220,10 @@ ECxPCtarget::ECxPCtarget(int tag, int nTrialCPs, ExperimentalCP** trialcps,
     trialCPs = trialcps;
     outCPs = outcps;
     
-    // get total number of control and daq signals and
-    // check if any signals use relative trial reference
+    // get total number of control and daq signals
     for (int i = 0; i < numTrialCPs; i++) {
         int numSignals = trialCPs[i]->getNumSignal();
         numCtrlSignals += numSignals;
-
-        int j = 0;
-        ID isRel = trialCPs[i]->getTrialSigRefType();
-        while (gotRelativeTrial && j < numSignals)
-            gotRelativeTrial = !isRel(j++);
     }
     for (int i = 0; i < numOutCPs; i++) {
         int numSignals = outCPs[i]->getNumSignal();
@@ -356,7 +350,7 @@ ECxPCtarget::ECxPCtarget(const ECxPCtarget& ec)
     newTarget(0), switchPC(0), atTarget(0),
     numCtrlSignals(0), numDaqSignals(0), ctrlSignal(0), daqSignal(0),
     trialSigOffset(0), ctrlSigOffset(0), daqSigOffset(0),
-    gotRelativeTrial(1), newTargetId(0), switchPCId(0), atTargetId(0),
+    gotRelativeTrial(0), newTargetId(0), switchPCId(0), atTargetId(0),
     ctrlSignalId(0), daqSignalId(0)
 {
     numTrialCPs = ec.numTrialCPs;
@@ -370,6 +364,10 @@ ECxPCtarget::ECxPCtarget(const ECxPCtarget& ec)
     strcpy(appName, ec.appName);
     strcpy(appPath, ec.appPath);
     port = ec.port;
+    
+    newTarget = ec.newTarget;
+    switchPC = ec.switchPC;
+    atTarget = ec.atTarget;
     
     numCtrlSignals = ec.numCtrlSignals;
     numDaqSignals = ec.numDaqSignals;
@@ -414,7 +412,7 @@ ECxPCtarget::~ECxPCtarget()
     //    }
     //    delete [] outCPs;
     //}
-
+    
     opserr << endln;
     opserr << "****************************************\n";
     opserr << "* The rtp application has been stopped *\n";
@@ -621,12 +619,12 @@ int ECxPCtarget::setup()
             opserr << "*   daqSig" << i + 1 << " = " << daqSignal[i] << endln;
         opserr << "*\n";
         for (int i = 0; i < numDaqSignals; i++) {
-            if (daqSigOffset(i) != 0)
+            if (daqSigOffset(i) != 0.0)
                 opserr << "*   daqSigOffset" << i + 1 << " = " << daqSigOffset(i) << endln;
         }
         opserr << "*\n";
         for (int i = 0; i < numCtrlSignals; i++) {
-            if (ctrlSigOffset(i) != 0)
+            if (ctrlSigOffset(i) != 0.0)
                 opserr << "*   ctrlSigOffset" << i + 1 << " = " << ctrlSigOffset(i) << endln;
         }
         opserr << "*\n";
@@ -663,8 +661,8 @@ int ECxPCtarget::setSize(ID sizeT, ID sizeO)
     // check sizeTrial and sizeOut against sizes
     // specified in the control points
     // ECxPCtarget objects can use:
-    //     disp, vel, accel, force and time for trial and
-    //     disp, vel, accel, force and time for output
+    //     disp, vel, accel, force, and time for trial and
+    //     disp, vel, accel, force, and time for output
     
     // get maximum dof IDs for each trial response quantity
     ID maxdofT(OF_Resp_All);
@@ -727,6 +725,7 @@ int ECxPCtarget::setTrialResponse(
         int numSignals = trialCPs[i]->getNumSignal();
         ID dof = trialCPs[i]->getDOF();
         ID rsp = trialCPs[i]->getRspType();
+        ID isRelTrial = trialCPs[i]->getTrialSigRefType();
         
         // loop through all the trial control point dofs
         for (int j = 0; j < numSignals; j++) {
@@ -743,26 +742,11 @@ int ECxPCtarget::setTrialResponse(
                 ctrlSignal[k] = (*accel)(dof(j));
             
             // get initial trial signal offset
-            if (gotRelativeTrial == 0 && ctrlSignal[k] != 0) {
+            if (gotRelativeTrial == 0 && isRelTrial(j))
                 trialSigOffset(k) = -ctrlSignal[k];
-                
-                opserr << endln;
-                opserr << "****************************************************************\n";
-                opserr << "* Initial signal values of FEA are:\n";
-                for (int i = 0; i < numCtrlSignals; i++)
-                    opserr << "*   trialSig" << i + 1 << " = " << ctrlSignal[i] << endln;
-                opserr << "*\n";
-                for (int i = 0; i < numCtrlSignals; i++) {
-                    if (trialSigOffset(i) != 0)
-                        opserr << "*   trialSigOffset" << i + 1 << " = " << trialSigOffset(i) << endln;
-                }
-                opserr << "*\n";
-                opserr << "****************************************************************\n";
-                opserr << endln;
-            }
             
             // apply trial signal offset if not zero
-            if (trialSigOffset(k) != 0)
+            if (trialSigOffset(k) != 0.0)
                 ctrlSignal[k] += trialSigOffset(k);
             
             // filter control signal if a filter exists
@@ -770,7 +754,7 @@ int ECxPCtarget::setTrialResponse(
                 ctrlSignal[k] = theCtrlFilters[rsp(j)]->filtering(ctrlSignal[k]);
             
             // apply control signal offset if not zero
-            if (ctrlSigOffset(k) != 0)
+            if (ctrlSigOffset(k) != 0.0)
                 ctrlSignal[k] += ctrlSigOffset(k);
             
             // increment counter
@@ -778,9 +762,22 @@ int ECxPCtarget::setTrialResponse(
         }
     }
     
-    // set flag that relative trial signals have been obtained
-    if (gotRelativeTrial == 0)
+    // print relative trial signal information once
+    if (gotRelativeTrial == 0) {
+        opserr << endln;
+        opserr << "****************************************************************\n";
+        opserr << "* Initial signal values of FEA are:\n";
+        for (int i = 0; i < numCtrlSignals; i++) {
+            if (trialSigOffset(i) != 0.0)
+                opserr << "*   trialSigOffset" << i + 1 << " = " << trialSigOffset(i) << endln;
+        }
+        opserr << "*\n";
+        opserr << "****************************************************************\n";
+        opserr << endln;
+        
+        // now set flag that relative trial signals have been obtained
         gotRelativeTrial = 1;
+    }
     
     // send control signal array to controller
     k += this->control();
@@ -810,7 +807,7 @@ int ECxPCtarget::getDaqResponse(
         // loop through all the output control point dofs
         for (int j = 0; j < numSignals; j++) {
             // apply daq signal offset if not zero
-            if (daqSigOffset(k) != 0)
+            if (daqSigOffset(k) != 0.0)
                 daqSignal[k] += daqSigOffset(k);
             
             // filter daq signal if a filter exists
@@ -992,7 +989,7 @@ int ECxPCtarget::control()
         return OF_ReturnType_failed;
     }
     
-    // wait until switchPC flag has changed as well
+    // wait until switchPC flag has changed back
     switchPC = 1;
     while (switchPC != 0) {
         switchPC = xPCGetSignal(port, switchPCId);
