@@ -40,9 +40,10 @@
 #include <Node.h>
 #include <LinearSeries.h>
 #include <LoadPattern.h>
-#include <SP_Constraint.h>
-#include <ExpControlSP.h>
 #include <NodalLoad.h>
+#include <SP_Constraint.h>
+#include <ExpForceControl.h>
+#include <ExpDispControl.h>
 
 #include <AnalysisModel.h>
 #include <CTestNormDispIncr.h>
@@ -219,7 +220,8 @@ ECSimDomain::ECSimDomain(int tag,
     : ECSimulation(tag), numTrialCPs(nTrialCPs), numOutCPs(nOutCPs),
     theDomain(0), theModel(0), theTest(0), theLineSearch(0), theAlgorithm(0),
     theIntegrator(0), theHandler(0), theNumberer(0), theSOE(0), theAnalysis(0),
-    theSeries(0), thePattern(0), theSPs(0), theNodes(0), numSPs(0),
+    theSeries(0), thePattern(0), theNodalLoads(0), theSPs(0), theNodes(0),
+    numNodalLoads(0), numSPs(0),
     ctrlDisp(0), ctrlVel(0), ctrlAccel(0), ctrlForce(0),
     daqDisp(0), daqVel(0), daqAccel(0), daqForce(0)
 {
@@ -251,7 +253,8 @@ ECSimDomain::ECSimDomain(const ECSimDomain& ec)
     : ECSimulation(ec), trialCPs(0), outCPs(0),
     theDomain(0), theModel(0), theTest(0), theLineSearch(0), theAlgorithm(0),
     theIntegrator(0), theHandler(0), theNumberer(0), theSOE(0), theAnalysis(0),
-    theSeries(0), thePattern(0), theSPs(0), theNodes(0), numSPs(0),
+    theSeries(0), thePattern(0), theNodalLoads(0), theSPs(0), theNodes(0),
+    numNodalLoads(0), numSPs(0),
     ctrlDisp(0), ctrlVel(0), ctrlAccel(0), ctrlForce(0),
     daqDisp(0), daqVel(0), daqAccel(0), daqForce(0)
 {
@@ -303,7 +306,9 @@ ECSimDomain::~ECSimDomain()
     if (theDomain != 0)
         theDomain->clearAll();
     
-    // delete memory of SP constraints and nodes
+    // delete memory of nodal loads, SP constraints, and nodes
+    if (theNodalLoads != 0)
+        delete[] theNodalLoads;
     if (theSPs != 0)
         delete [] theSPs;
     if (theNodes != 0)
@@ -397,7 +402,7 @@ int ECSimDomain::setup()
     }
     
     // print experimental control information
-    this->Print(opserr);
+    this->Print(opserr, 1);
     
     // define load pattern
     theSeries  = new LinearSeries(1,1.0);
@@ -405,35 +410,80 @@ int ECSimDomain::setup()
     thePattern->setTimeSeries(theSeries);
     theDomain->addLoadPattern(thePattern);
     
+    // find total number of required nodal loads
+    for (int i=0; i<numTrialCPs; i++) {
+        ID rspT = trialCPs[i]->getSizeRspType();
+        numNodalLoads += rspT(3);
+    }
+    
+    // create array of nodal loads
+    if (numNodalLoads > 0) {
+        theNodalLoads = new NodalLoad * [numNodalLoads];
+        for (int i=0; i<numNodalLoads; i++)
+            theNodalLoads[i] = 0;
+    }
+    
     // find total number of required SPs
-    for (int i=0; i<numTrialCPs; i++)
-        numSPs += trialCPs[i]->getNumDOF();
+    for (int i=0; i<numTrialCPs; i++) {
+        ID rspT = trialCPs[i]->getSizeRspType();
+        numSPs += rspT(0);
+    }
     
     // create array of single point constraints
-    theSPs = new SP_Constraint* [numSPs];
-    for (int i=0; i<numSPs; i++)
-        theSPs[i] = 0;
+    if (numSPs > 0) {
+        theSPs = new SP_Constraint * [numSPs];
+        for (int i=0; i<numSPs; i++)
+            theSPs[i] = 0;
+    }
     
+    /*// loop through all the trial control points
+    int k = 0;
+    for (int i = 0; i < numTrialCPs; i++) {
+        // get trial control point parameters
+        int nodeTag = trialCPs[i]->getNodeTag();
+        int numSignals = trialCPs[i]->getNumSignal();
+        ID dof = trialCPs[i]->getDOF();
+        ID rsp = trialCPs[i]->getRspType();
+
+        // loop through all the trial control point dofs
+        for (int j = 0; j < numSignals; j++) {
+            // assemble the control signal array
+            if (rsp(j) == OF_Resp_Disp && disp != 0)
+                ctrlSignal[k] = (*disp)(dof(j));
+            else if (rsp(j) == OF_Resp_Force && force != 0)
+                ctrlSignal[k] = (*force)(dof(j));
+            else if (rsp(j) == OF_Resp_Time && time != 0)
+                ctrlSignal[k] = (*time)(dof(j));
+            else if (rsp(j) == OF_Resp_Vel && vel != 0)
+                ctrlSignal[k] = (*vel)(dof(j));
+            else if (rsp(j) == OF_Resp_Accel && accel != 0)
+                ctrlSignal[k] = (*accel)(dof(j));
+        }
+    }*/
+
     // loop through all the trial control points
     int iSP = 0;
+    int iNL = 0;
     for (int i=0; i<numTrialCPs; i++)  {
         // get trial control point parameters
         int nodeTag = trialCPs[i]->getNodeTag();
-        int numDir = trialCPs[i]->getNumDOF();
-        ID dir = trialCPs[i]->getUniqueDOF();
+        int numDOF = trialCPs[i]->getNumDOF();
+        ID dof = trialCPs[i]->getUniqueDOF();
         
-        // loop through all the directions
-        for (int j=0; j<numDir; j++)  {
+        // loop through all the dofs
+        for (int j=0; j<numDOF; j++)  {
             if ((*sizeCtrl)(OF_Resp_Disp) != 0 &&
                 (*sizeCtrl)(OF_Resp_Vel) != 0 &&
                 (*sizeCtrl)(OF_Resp_Accel) != 0)
-                theSPs[iSP] = new ExpControlSP(nodeTag, dir(j), &ctrlDisp[iSP], 1.0, &ctrlVel[iSP], 1.0, &ctrlAccel[iSP], 1.0);
+                theSPs[iSP] = new ExpDispControl(nodeTag, dof(j), &ctrlDisp[iSP], 1.0, &ctrlVel[iSP], 1.0, &ctrlAccel[iSP], 1.0);
             else if ((*sizeCtrl)(OF_Resp_Disp) != 0 &&
                 (*sizeCtrl)(OF_Resp_Vel) != 0)
-                theSPs[iSP] = new ExpControlSP(nodeTag, dir(j), &ctrlDisp[iSP], 1.0, &ctrlVel[iSP], 1.0);
+                theSPs[iSP] = new ExpDispControl(nodeTag, dof(j), &ctrlDisp[iSP], 1.0, &ctrlVel[iSP], 1.0);
             else if ((*sizeCtrl)(OF_Resp_Disp) != 0)
-                theSPs[iSP] = new ExpControlSP(nodeTag, dir(j), &ctrlDisp[iSP], 1.0);
-            
+                theSPs[iSP] = new ExpDispControl(nodeTag, dof(j), &ctrlDisp[iSP], 1.0);
+            else if ((*sizeCtrl)(OF_Resp_Force) != 0)
+                theNodalLoads[iNL] = new ExpForceControl(iNL+1, nodeTag, dof(j), &ctrlForce[iNL], 1.0);
+
             // add the SP constraints to the load pattern
             theDomain->addSP_Constraint(theSPs[iSP], 1);
             iSP++;
@@ -489,35 +539,54 @@ int ECSimDomain::setup()
 
 int ECSimDomain::setSize(ID sizeT, ID sizeO)
 {
-    // check sizeTrial and sizeOut
-    // for ECSimDomain object
-    
-    // ECSimDomain objects can use 
-    // disp, vel, accel and force for trial and
-    // disp, vel, accel and force for output
-    // only check if disp and force are available in sizeT/sizeO.
-    int sizeTDisp = 0, sizeTForce = 0;
-    int sizeODisp = 0, sizeOForce = 0;
-    for (int i=0; i<numTrialCPs; i++)  {
-        sizeTDisp  += (trialCPs[i]->getSizeRspType())(OF_Resp_Disp);
-        sizeTForce += (trialCPs[i]->getSizeRspType())(OF_Resp_Force);
+    // check sizeTrial and sizeOut against sizes
+    // specified in the control points
+    // ECSimDomain objects can use:
+    //     disp, vel, accel, force, and time for trial and
+    //     disp, vel, accel, force, and time for output
+
+    // get maximum dof IDs for each trial response quantity
+    ID maxdofT(OF_Resp_All);
+    for (int i = 0; i < numTrialCPs; i++) {
+        // get trial control point parameters
+        int numSignals = trialCPs[i]->getNumSignal();
+        ID dof = trialCPs[i]->getDOF();
+        ID rsp = trialCPs[i]->getRspType();
+
+        // loop through all the trial control point signals
+        for (int j = 0; j < numSignals; j++) {
+            dof(j)++;  // switch to 1-based indexing
+            maxdofT(rsp(j)) = dof(j) > maxdofT(rsp(j)) ? dof(j) : maxdofT(rsp(j));
+        }
     }
-    for (int i=0; i<numOutCPs; i++)  {
-        sizeODisp  += (outCPs[i]->getSizeRspType())(OF_Resp_Disp);
-        sizeOForce += (outCPs[i]->getSizeRspType())(OF_Resp_Force);
+    // get maximum dof IDs for each output response quantity
+    ID maxdofO(OF_Resp_All);
+    for (int i = 0; i < numOutCPs; i++) {
+        // get output control point parameters
+        int numSignals = outCPs[i]->getNumSignal();
+        ID dof = outCPs[i]->getDOF();
+        ID rsp = outCPs[i]->getRspType();
+
+        // loop through all the output control point signals
+        for (int j = 0; j < numSignals; j++) {
+            dof(j)++;  // switch to 1-based indexing
+            maxdofO(rsp(j)) = dof(j) > maxdofO(rsp(j)) ? dof(j) : maxdofO(rsp(j));
+        }
     }
-    if ((sizeTDisp != 0 && sizeTDisp != sizeT(OF_Resp_Disp)) ||
-        (sizeTForce != 0 && sizeTForce != sizeT(OF_Resp_Force)) ||
-        (sizeODisp != 0 && sizeODisp != sizeO(OF_Resp_Disp)) ||
-        (sizeOForce != 0 && sizeOForce != sizeO(OF_Resp_Force)))  {
-        opserr << "ECSimDomain::setSize() - wrong sizeTrial/Out\n"; 
-        opserr << "see User Manual.\n";
-        exit(OF_ReturnType_failed);
+    // now check if dof IDs are within limits
+    for (int i = 0; i < OF_Resp_All; i++) {
+        if ((maxdofT(i) != 0 && maxdofT(i) > sizeT(i)) ||
+            (maxdofO(i) != 0 && maxdofO(i) > sizeO(i))) {
+            opserr << "ECSimDomain::setSize() - wrong sizeTrial/Out\n";
+            opserr << "see User Manual.\n";
+            theDomain->clearAll();
+            exit(OF_ReturnType_failed);
+        }
     }
-    
-    (*sizeCtrl) = sizeT;
-    (*sizeDaq)  = sizeO;
-    
+    // finally assign sizes
+    (*sizeCtrl) = maxdofT;
+    (*sizeDaq) = maxdofO;
+
     return OF_ReturnType_completed;
 }
 
@@ -633,7 +702,6 @@ Response* ECSimDomain::setResponse(const char **argv, int argc,
     
     // ctrl displacements
     if (ctrlDisp != 0 && (
-        strcmp(argv[0], "ctrlSig") == 0 ||
         strcmp(argv[0],"ctrlDisp") == 0 ||
         strcmp(argv[0],"ctrlDisplacement") == 0 ||
         strcmp(argv[0],"ctrlDisplacements") == 0))
@@ -731,7 +799,6 @@ Response* ECSimDomain::setResponse(const char **argv, int argc,
     
     // daq forces
     else if (daqForce != 0 && (
-        strcmp(argv[0], "daqSig") == 0 ||
         strcmp(argv[0],"daqForce") == 0 ||
         strcmp(argv[0],"daqForces") == 0))
     {
@@ -754,7 +821,7 @@ int ECSimDomain::getResponse(int responseID, Information &info)
     Vector resp(0);
     
     switch (responseID)  {
-    case 1:  // ctrl signals, ctrl displacements
+    case 1:  // ctrl displacements
         resp.setData(ctrlDisp,(*sizeCtrl)(OF_Resp_Disp));
         return info.setVector(resp);
         
@@ -782,7 +849,7 @@ int ECSimDomain::getResponse(int responseID, Information &info)
         resp.setData(daqAccel,(*sizeDaq)(OF_Resp_Accel));
         return info.setVector(resp);
         
-    case 8:  // daq signals, daq forces
+    case 8:  // daq forces
         resp.setData(daqForce,(*sizeDaq)(OF_Resp_Force));
         return info.setVector(resp);
         
@@ -797,27 +864,29 @@ void ECSimDomain::Print(OPS_Stream &s, int flag)
     s << "****************************************************************\n";
     s << "* ExperimentalControl: " << this->getTag() << endln; 
     s << "*   type: ECSimDomain";
-    s << "\n*   trialCPs:";
-    for (int i=0; i<numTrialCPs; i++)
-        s << " " << trialCPs[i]->getTag();
-    s << "\n*   outCPs:";
-    for (int i=0; i<numOutCPs; i++)
-        s << " " << outCPs[i]->getTag();
-    s << "\n*   ctrlFilters:";
+    s << "*   ctrlFilter tags:";
     for (int i=0; i<OF_Resp_All; i++)  {
         if (theCtrlFilters[i] != 0)
             s << " " << theCtrlFilters[i]->getTag();
         else
             s << " 0";
     }
-    s << "\n*   daqFilters:";
+    s << "\n*   daqFilter tags:";
     for (int i=0; i<OF_Resp_All; i++)  {
         if (theDaqFilters[i] != 0)
             s << " " << theDaqFilters[i]->getTag();
         else
             s << " 0";
     }
-    s << "\n****************************************************************\n\n";
+    if (flag == 1) {
+        // print experimental control point information
+        for (int i = 0; i < numTrialCPs; i++)
+            trialCPs[i]->Print(opserr);
+        for (int i = 0; i < numOutCPs; i++)
+            outCPs[i]->Print(opserr);
+    }
+    s << "\n****************************************************************\n";
+    s << endln;
 }
 
 
@@ -836,31 +905,31 @@ int ECSimDomain::acquire()
         theDomain->calculateNodalReactions(true);
     
     // loop through all the output control points
-    int iSP = 0;
+    int iDOF = 0;
     for (int i=0; i<numOutCPs; i++)  {
         // get output control point parameters
-        int numDir = outCPs[i]->getNumDOF();
-        ID dir = outCPs[i]->getUniqueDOF();
+        int numDOF = outCPs[i]->getNumDOF();
+        ID dof = outCPs[i]->getUniqueDOF();
         
-        // loop through all the directions
-        for (int j=0; j<numDir; j++)  {
+        // loop through all the dofs
+        for (int j=0; j<numDOF; j++)  {
             if ((*sizeDaq)(OF_Resp_Disp) != 0)  {
                 const Vector &d = theNodes[i]->getTrialDisp();
-                daqDisp[iSP] = d(dir(j));
+                daqDisp[iDOF] = d(dof(j));
             }
             if ((*sizeDaq)(OF_Resp_Vel) != 0)  {
                 const Vector &v = theNodes[i]->getTrialVel();
-                daqVel[iSP] = v(dir(j));
+                daqVel[iDOF] = v(dof(j));
             }
             if ((*sizeDaq)(OF_Resp_Accel) != 0)  {
                 const Vector &a = theNodes[i]->getTrialAccel();
-                daqAccel[iSP] = a(dir(j));
+                daqAccel[iDOF] = a(dof(j));
             }
             if ((*sizeDaq)(OF_Resp_Force) != 0)  {
                 const Vector &f = theNodes[i]->getReaction();
-                daqForce[iSP] = f(dir(j));
+                daqForce[iDOF] = f(dof(j));
             }
-            iSP++;
+            iDOF++;
         }
     }
     

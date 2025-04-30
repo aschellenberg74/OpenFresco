@@ -46,6 +46,7 @@ class LinearSOE;
 class StaticAnalysis;
 class TimeSeries;
 class LoadPattern;
+class NodalLoad;
 class SP_Constraint;
 class Node;
 
@@ -116,10 +117,12 @@ private:
     
     TimeSeries    *theSeries;
     LoadPattern   *thePattern;
-    SP_Constraint **theSPs;
+    NodalLoad     **theNodalLoads;  // array for load control
+    SP_Constraint **theSPs;         // array for displacement control
     Node          **theNodes;
     
-    int numSPs;     // total number of SP constraints
+    int numNodalLoads;  // total number of nodal loads
+    int numSPs;         // total number of SP constraints
     
     double *ctrlDisp, *ctrlVel, *ctrlAccel, *ctrlForce;
     double *daqDisp, *daqVel, *daqAccel, *daqForce;
