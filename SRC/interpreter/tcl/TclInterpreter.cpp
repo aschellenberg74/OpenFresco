@@ -111,6 +111,7 @@ int Tcl_AppInit _ANSI_ARGS_((Tcl_Interp* interp));
 # undef TCL_STORAGE_CLASS
 # define TCL_STORAGE_CLASS DLLEXPORT
 
+
 /*
 *----------------------------------------------------------------------
 *
@@ -131,6 +132,7 @@ int (*tclDummyLinkVarPtr)(Tcl_Interp* interp, const char* a,
 int (*tclDummyLinkVarPtr)(Tcl_Interp* interp, char* a,
     char* b, int c) = Tcl_LinkVar;
 #endif
+
 
 /*
 *----------------------------------------------------------------------
@@ -581,10 +583,10 @@ const char* TclInterpreter::getStringFromAll(char* buffer, int len)
 }
 
 
-int TclInterpreter::getStringCopy(char** stringPtr)
+/*int TclInterpreter::getStringCopy(char** stringPtr)
 {
     return -1;
-}
+}*/
 
 
 int TclInterpreter::evalDoubleStringExpression(

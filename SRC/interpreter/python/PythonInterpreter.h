@@ -43,36 +43,39 @@
 #include "PythonWrapper.h"
 #include "OpenFrescoCommands.h"
 
-class PythonInterpreter: public DL_Interpreter
+class PythonInterpreter : public DL_Interpreter
 {
-  public:
+public:
+    // constructor
     PythonInterpreter();
+    
+    // destructor
     virtual ~PythonInterpreter();
-
+    
     // method to run once the interpreter is set up
     virtual int run();
-
+    
     // methods to add & remove additional commands
-    virtual int addCommand(const char *, Command &);
-    virtual int removeCommand(const char *);
-
+    virtual int addCommand(const char*, Command&);
+    virtual int removeCommand(const char*);
+    
     // methods for commands to parse the command line
     virtual int getNumRemainingInputArgs(void);
-    virtual int getInt(int *, int numArgs);
-    virtual int getDouble(double *, int numArgs);
+    virtual int getInt(int*, int numArgs);
+    virtual int getDouble(double*, int numArgs);
     virtual int getDoubleList(int* size, Vector* data);
     virtual const char* getString();
     virtual const char* getStringFromAll(char* buffer, int len);
-    virtual int getStringCopy(char **stringPtr);
+    //virtual int getStringCopy(char** stringPtr);
     virtual int evalDoubleStringExpression(const char* theExpression, double& current_val);
     virtual void resetInput(int cArg);
-
+    
     // methods for interpreter to output results
-    virtual int setInt(int *, int numArgs, bool scalar);
+    virtual int setInt(int*, int numArgs, bool scalar);
     virtual int setInt(std::vector<std::vector<int>>& data);
     virtual int setInt(std::map<const char*, int>& data);
     virtual int setInt(std::map<const char*, std::vector<int>>& data);
-    virtual int setDouble(double *, int numArgs, bool scalar);
+    virtual int setDouble(double*, int numArgs, bool scalar);
     virtual int setDouble(std::vector<std::vector<double>>& data);
     virtual int setDouble(std::map<const char*, double>& data);
     virtual int setDouble(std::map<const char*, std::vector<double>>& data);
@@ -81,15 +84,15 @@ class PythonInterpreter: public DL_Interpreter
     virtual int setString(std::vector<std::vector<const char*>>& data);
     virtual int setString(std::map<const char*, const char*>& data);
     virtual int setString(std::map<const char*, std::vector<const char*>>& data);
-
+    
     // methods to run a command in the interpreter
     virtual int runCommand(const char*);
-
-    // getwrapper
-    PythonWrapper* getWrapper() {return &wrapper;}
-    OpenFrescoCommands& getCmds() {return cmds;}
     
-  private:
+    // getwrapper
+    PythonWrapper* getWrapper() { return &wrapper; }
+    OpenFrescoCommands& getCmds() { return cmds; }
+
+private:
     PythonWrapper wrapper;
     OpenFrescoCommands cmds;
 };

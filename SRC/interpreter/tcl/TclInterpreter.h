@@ -20,8 +20,6 @@
 ** ****************************************************************** */
 
 // Written: Frank McKenna & Andreas Schellenberg
-// Created: 01/21
-// Revision: A
 //
 // Description: This file contains the class definition for TclInterpreter
 // TclInterpreter implements a DL_Interpreter for the Tcl language
@@ -34,36 +32,36 @@
 #include "TclWrapper.h"
 #include "OpenFrescoCommands.h"
 
-class TclInterpreter: public DL_Interpreter
+class TclInterpreter : public DL_Interpreter
 {
-  public:
-    TclInterpreter(int argc, char **argv);
+public:
+    TclInterpreter(int argc, char** argv);
     virtual ~TclInterpreter();
-
+    
     // method to run once the interpreter is set up
     virtual int run();
-
+    
     // methods to add & remove additional commands
-    virtual int addCommand(const char *, Command &);
-    virtual int removeCommand(const char *);
-
+    virtual int addCommand(const char*, Command&);
+    virtual int removeCommand(const char*);
+    
     // methods for commands to parse the command line
     virtual int getNumRemainingInputArgs(void);
-    virtual int getInt(int *, int numArgs);
-    virtual int getDouble(double *, int numArgs);
+    virtual int getInt(int*, int numArgs);
+    virtual int getDouble(double*, int numArgs);
     virtual int getDoubleList(int* size, Vector* data);
     virtual const char* getString();
     virtual const char* getStringFromAll(char* buffer, int len);
-    virtual int getStringCopy(char **stringPtr);
+    //virtual int getStringCopy(char** stringPtr);
     virtual int evalDoubleStringExpression(const char* theExpression, double& current_val);
     virtual void resetInput(int cArg);
-
+    
     // methods for interpreter to output results
-    virtual int setInt(int *, int numArgs, bool scalar);
+    virtual int setInt(int*, int numArgs, bool scalar);
     virtual int setInt(std::vector<std::vector<int>>& data);
     virtual int setInt(std::map<const char*, int>& data);
     virtual int setInt(std::map<const char*, std::vector<int>>& data);
-    virtual int setDouble(double *, int numArgs, bool scalar);
+    virtual int setDouble(double*, int numArgs, bool scalar);
     virtual int setDouble(std::vector<std::vector<double>>& data);
     virtual int setDouble(std::map<const char*, double>& data);
     virtual int setDouble(std::map<const char*, std::vector<double>>& data);
@@ -72,17 +70,17 @@ class TclInterpreter: public DL_Interpreter
     virtual int setString(std::vector<std::vector<const char*>>& data);
     virtual int setString(std::map<const char*, const char*>& data);
     virtual int setString(std::map<const char*, std::vector<const char*>>& data);
-
-  private:
-    Tcl_Obj *resultPtr;
-    Tcl_Obj *commandPtr;
-    char buffer[1000], *args;
+    
+private:
+    Tcl_Obj* resultPtr;
+    Tcl_Obj* commandPtr;
+    char buffer[1000], * args;
     int code, gotPartial, tty, length;
     int exitCode;
     Tcl_Channel inChannel, outChannel, errChannel;
     Tcl_DString argString;
-    Tcl_Interp *interp;
-
+    Tcl_Interp* interp;
+    
     TclWrapper wrapper;
     OpenFrescoCommands cmds;
 };

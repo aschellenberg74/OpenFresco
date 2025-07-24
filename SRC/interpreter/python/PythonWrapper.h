@@ -44,6 +44,7 @@
 class PythonWrapper
 {
 public:
+    // constructor & destructor
     PythonWrapper();
     ~PythonWrapper();
     
@@ -77,7 +78,7 @@ public:
     void setOutputs(std::map<const char*, const char*>& data);
     void setOutputs(std::map<const char*, std::vector<const char*>>& data);
     PyObject* getResults();
-    
+
 private:
     // command line arguments
     PyObject* currentArgv;
