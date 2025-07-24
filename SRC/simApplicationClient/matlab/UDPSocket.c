@@ -30,12 +30,20 @@
 #include <string.h>
 
 // functions defined in udp_socket.c
-void udp_setupconnectionserver(unsigned int *port, int *socketID);
-void udp_setupconnectionclient(unsigned int *port, const char machineInetAddr[], int *lengthInet, int *socketID);
+void udp_setupconnectionserver(unsigned int *port, int initialHandshake, int *socketID);
+void udp_setupconnectionclient(unsigned int *port, const char machineInetAddr[],
+    int *lengthInet, int initialHandshake, int *socketID);
 void udp_closeconnection(int *socketID, int *ierr);
-void udp_senddata(const int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr);
-void udp_recvdata(const int *socketID, int *dataTypeSize, char data[], int *lenData, int *ierr);
-void udp_getsocketid(unsigned int *port, const char machineInetAddr[], int *lengthInet, int *socketID);
+void udp_senddata(const int *socketID, int *dataTypeSize, char data[],
+    int *lenData, int *ierr);
+void udp_sendnbdata(const int* socketID, int* dataTypeSize, char data[],
+    int* lenData, int* ierr);
+void udp_recvdata(const int *socketID, int *dataTypeSize, char data[],
+    int *lenData, int *ierr);
+void udp_recvnbdata(const int* socketID, int* dataTypeSize, char data[],
+    int* lenData, int* ierr);
+void udp_getsocketid(unsigned int *port, const char machineInetAddr[],
+    int *lengthInet, int *socketID);
 
 // the gateway function
 void mexFunction(int nlhs, mxArray *plhs[],
@@ -102,6 +110,40 @@ void mexFunction(int nlhs, mxArray *plhs[],
         
         plhs[0] = mxCreateDoubleScalar(ierr);
     }
+    else if (strcmp(action, "sendNBData") == 0) {
+        
+        socketID = (int)mxGetScalar(prhs[1]);
+        nleft = (int)mxGetScalar(prhs[3]);
+        
+        // check if data has correct size
+        if (nleft != (int)(mxGetM(prhs[2]) * mxGetN(prhs[2])))
+            mexErrMsgIdAndTxt("OpenFresco:UDPSocket:invalidDataSize",
+                "Size of data does not agree with specified dataSize.\n");
+        
+        if (mxIsDouble(prhs[2]) == 1) {
+            double* data = (double*)mxGetPr(prhs[2]);
+            gMsg = (char*)data;
+            dataTypeSize = sizeof(double);
+        }
+        else if (mxIsInt32(prhs[2]) == 1) {
+            int* data = (int*)mxGetPr(prhs[2]);
+            gMsg = (char*)data;
+            dataTypeSize = sizeof(int);
+        }
+        else if (mxIsChar(prhs[2]) == 1) {
+            char* data = mxArrayToString(prhs[2]);
+            gMsg = (char*)data;
+            dataTypeSize = sizeof(char);
+        }
+        else {
+            mexErrMsgIdAndTxt("OpenFresco:UDPSocket:invalidDataType",
+                "Data type is not supported.\n");
+        }
+        
+        udp_sendnbdata(&socketID, &dataTypeSize, gMsg, &nleft, &ierr);
+        
+        plhs[0] = mxCreateDoubleScalar(ierr);
+    }
     else if (strcmp(action,"recvData") == 0)  {
         
         mwSize ndim;
@@ -153,19 +195,71 @@ void mexFunction(int nlhs, mxArray *plhs[],
         
         udp_recvdata(&socketID, &dataTypeSize, gMsg, &nleft, &ierr);
     }
+    else if (strcmp(action, "recvNBData") == 0) {
+        
+        mwSize ndim;
+        const mwSize* dataSize[2];
+        char* dataType;
+        
+        socketID = (int)mxGetScalar(prhs[1]);
+        nleft = (int)mxGetScalar(prhs[2]);
+        ndim = 2;
+        dataSize[0] = 1;
+        dataSize[1] = nleft;
+        
+        // set the output pointer to the output matrix
+        if (nrhs < 4) {
+            double* data;
+            plhs[0] = mxCreateNumericArray(ndim, dataSize, mxDOUBLE_CLASS, mxREAL);
+            data = (double*)mxGetPr(plhs[0]);
+            gMsg = (char*)data;
+            dataTypeSize = sizeof(double);
+        }
+        else {
+            dataType = mxArrayToString(prhs[3]);
+            if (strcmp(dataType, "double") == 0) {
+                double* data;
+                plhs[0] = mxCreateNumericArray(ndim, dataSize, mxDOUBLE_CLASS, mxREAL);
+                data = (double*)mxGetPr(plhs[0]);
+                gMsg = (char*)data;
+                dataTypeSize = sizeof(double);
+            }
+            else if (strcmp(dataType, "int") == 0) {
+                int* data;
+                plhs[0] = mxCreateNumericArray(ndim, dataSize, mxINT32_CLASS, mxREAL);
+                data = (int*)mxGetPr(plhs[0]);
+                gMsg = (char*)data;
+                dataTypeSize = sizeof(int);
+            }
+            else if (strcmp(dataType, "char") == 0) {
+                char* data;
+                plhs[0] = mxCreateNumericArray(ndim, dataSize, mxCHAR_CLASS, mxREAL);
+                data = mxArrayToString(plhs[0]);
+                gMsg = (char*)data;
+                dataTypeSize = sizeof(char);
+            }
+            else {
+                mexErrMsgIdAndTxt("OpenFresco:UDPSocket:invalidDataType",
+                    "Data type is not supported.\n");
+            }
+        }
+        
+        udp_recvnbdata(&socketID, &dataTypeSize, gMsg, &nleft, &ierr);
+    }
     else if (strcmp(action,"openConnection") == 0)  {
         
         int sizeAddr;
+        int initialHandshake = 0;  // do not use initial handshake
         
         if (nrhs==2)  {
             ipPort = (int)mxGetScalar(prhs[1]);
-            udp_setupconnectionserver(&ipPort, &socketID);
+            udp_setupconnectionserver(&ipPort, initialHandshake, &socketID);
         }
         else if (nrhs==3)  {
             ipAddr = mxArrayToString(prhs[1]);
             sizeAddr = (int)mxGetN(prhs[1]) + 1;
             ipPort = (int)mxGetScalar(prhs[2]);
-            udp_setupconnectionclient(&ipPort, ipAddr, &sizeAddr, &socketID);
+            udp_setupconnectionclient(&ipPort, ipAddr, &sizeAddr, initialHandshake, &socketID);
             mxFree(ipAddr);
         }
         else  {
@@ -173,6 +267,29 @@ void mexFunction(int nlhs, mxArray *plhs[],
                     "Wrong number of input arguments received.\n");
         }
         
+        plhs[0] = mxCreateDoubleScalar(socketID);
+    }
+    else if (strcmp(action, "openConnectionHandshake") == 0) {
+
+        int sizeAddr;
+        int initialHandshake = 1;  // use initial handshake
+
+        if (nrhs == 2) {
+            ipPort = (int)mxGetScalar(prhs[1]);
+            udp_setupconnectionserver(&ipPort, initialHandshake, &socketID);
+        }
+        else if (nrhs == 3) {
+            ipAddr = mxArrayToString(prhs[1]);
+            sizeAddr = (int)mxGetN(prhs[1]) + 1;
+            ipPort = (int)mxGetScalar(prhs[2]);
+            udp_setupconnectionclient(&ipPort, ipAddr, &sizeAddr, initialHandshake, &socketID);
+            mxFree(ipAddr);
+        }
+        else {
+            mexErrMsgIdAndTxt("OpenFresco:UDPSocket:invalidNumInputs",
+                "Wrong number of input arguments received.\n");
+        }
+
         plhs[0] = mxCreateDoubleScalar(socketID);
     }
     else if (strcmp(action,"closeConnection") == 0)  {

@@ -2,6 +2,7 @@
 % make sure that SimAppSiteServer is used and not SimAppElemServer
 
 %#ok<*CLALL>
+%#ok<*FVAL>
 
 clear all;
 

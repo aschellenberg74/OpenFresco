@@ -12,10 +12,13 @@
 %   data     : data vector that is requested from other side
 %
 % action : switch with following possible values
-%  'openConnection'   open a connection to an experimental site
+%  'openConnection'   open a connection to an experimental site (no initial handshake)
+%  'openConnectionHandshake'   open a connection to an experimental site (with initial handshake)
 %  'closeConnection'  close the connection to an experimental site
 %  'sendData'         send data to an experimental site
+%  'sendNBData'       send non-blocking data to an experimental site
 %  'recvData'         receive data from an experimental site
+%  'recvNBData'       receive non-blocking data from an experimental site
 %  'getSocketID'      get socketID of an open connection
 %
 % varargin : variable input argument list
