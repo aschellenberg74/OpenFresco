@@ -25,8 +25,10 @@ model BasicBuilder -ndm 2 -ndf 2
 
 # Load OpenFresco package
 # -----------------------
-# (make sure all dlls are in the same folder as openSees.exe)
-loadPackage OpenFresco
+# (make sure all dlls are in the same folder as OpenFrescoTcl)
+loadPackage OpenFrescoTcl
+set ver [packageVersion]
+puts "package version = $ver"
 
 # Define geometry for model
 # -------------------------
@@ -52,10 +54,16 @@ uniaxialMaterial Elastic 2 5.6
 #uniaxialMaterial Steel02 2 3.0 5.6 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0 
 uniaxialMaterial Elastic 3 [expr 2.0*100.0/1.0]
 
+# Define control points
+# ---------------------
+# expControlPoint $tag <-node $nodeTag> $dof $rspType <-fact $f> <-lim $l $u> <-relTrial> <-relCtrl> <-relDaq> ...
+expControlPoint 1  1 disp 1 time
+expControlPoint 2  1 disp 1 force 1 time
+
 # Define experimental control
 # ---------------------------
-# expControl SimSimulink $tag ipAddr $ipPort
-expControl SimSimulink 1 "127.0.0.1" 8090
+=# expControl SimSimulinkCP $tag ipAddr $ipPort -trialCP $cpTags -outCP $cpTags
+expControl SimSimulink 1 "127.0.0.1" 8090 -trialCP 1 -outCP 2
 
 # Define experimental setup
 # -------------------------

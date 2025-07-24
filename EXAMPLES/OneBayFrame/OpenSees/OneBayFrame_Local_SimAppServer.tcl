@@ -21,6 +21,11 @@ defaultUnits -force kip -length in -time sec -temp F
 # create ModelBuilder (with two-dimensions and 2 DOF/node)
 model BasicBuilder -ndm 2 -ndf 2
 
+# Load OpenFresco package
+# -----------------------
+# (make sure all dlls are in the same folder as OpenFrescoTcl)
+loadPackage OpenFrescoTcl
+
 # Define geometry for model
 # -------------------------
 # node $tag $xCrd $yCrd $mass
@@ -74,10 +79,10 @@ expElement twoNodeLink 1 1 3 -dir 2 -site 1 -initStif 2.8
 # Start the server process
 # ------------------------------
 # startSimAppElemServer $eleTag $port <-ssl> <-udp>
-#startSimAppElemServer 1 8090 -udp;  # use with generic client element in FEA
+startSimAppElemServer 1 8090 -udp;  # use with generic client element in FEA
 
 # startSimAppSiteServer $siteTag $port <-ssl> <-udp>
-startSimAppSiteServer 1 8090 -udp;  # use with experimental element in FEA
+#startSimAppSiteServer 1 8090;  # use with experimental element in FEA
 
 wipeExp
 exit

@@ -10,8 +10,8 @@
 
 # import the OpenSees Python module
 import sys
-sys.path.append("C:\\Users\\Andreas\\Documents\\OpenSees\\SourceCode\\Win64\\bin")
-from opensees import *
+sys.path.append("C:/Users/Andreas/Documents/OpenSees/SourceCode/Win64/bin")
+from OpenSeesPy import *
 import math
 
 # ------------------------------
@@ -52,7 +52,7 @@ uniaxialMaterial("Elastic", 3, 2.0*100.0/1.0)
 # Define elements
 # ---------------
 # left and right columns
-# element("twoNodeLink", eleTag, iNode, jNode, "-mat", matTags, "-dir", dirs, "-orient", x1, x2, x3, y1, y2, y3, "-pDelta", Mratios, "-mass", m)
+# element("twoNodeLink", eleTag, iNode, jNode, "-mat", matTags, "-dir", dirs, <"-orient", <x1, x2, x3,> y1, y2, y3,> <"-pDelta", Mratios,> <"-mass", m>)
 element("twoNodeLink", 1, 1, 3, "-mat", 1, "-dir", 2)
 element("twoNodeLink", 2, 2, 4, "-mat", 2, "-dir", 2)
 
@@ -88,7 +88,7 @@ rayleigh(alphaM, betaK, betaKinit, betaKcomm)
 # Start of analysis generation
 # ------------------------------
 # create the system of equations
-system("ProfileSPD")
+system("BandGeneral")
 # create the DOF numberer
 numberer("Plain")
 # create the constraint handler

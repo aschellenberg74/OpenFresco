@@ -13,10 +13,8 @@
 
 # import the OpenSees Python module
 import sys
-sys.path.append("C:\\Users\\Andreas\\Documents\\OpenSees\\SourceCode\\Win64\\bin")
-from opensees import *
-sys.path.append("C:\\Users\\Andreas\\Documents\\OpenFresco\\SourceCode\\WIN64\\bin")
-#from openfresco import *
+sys.path.append("C:/Users/Andreas/Documents/OpenSees/SourceCode/Win64/bin")
+from OpenSeesPy import *
 import math
 
 # ------------------------------
@@ -28,11 +26,16 @@ defaultUnits("-force", "kip", "-length", "in", "-time", "sec", "-temp", "F")
 # create ModelBuilder (with two-dimensions and 2 DOF/node)
 model("BasicBuilder", "-ndm", 2, "-ndf", 2)
 
+# Load OpenFresco package
+# -----------------------
+# (make sure all dlls are in the same folder as OpenFrescoPy)
+loadPackage("OpenFrescoPy")
+
 # Define geometry for model
 # -------------------------
 mass3 = 0.04
 mass4 = 0.02
-# node(tag, xCrd, yCrd, "-mass", mass)
+# node(tag, xCrd, yCrd, <"-mass", mass>)
 node(1,   0.0,  0.00)
 node(2, 100.0,  0.00)
 node(3,   0.0, 54.00, "-mass", mass3, mass3)
@@ -56,18 +59,18 @@ uniaxialMaterial("Elastic", 3, 2.0*100.0/1.0)
 
 # Define experimental control
 # ---------------------------
-# expControl SimUniaxialMaterials $tag $matTags
-#expControl SimUniaxialMaterials 2 2
+# expControl("SimUniaxialMaterials", tag, matTags)
+#expControl("SimUniaxialMaterials", 2, 2)
 
 # Define experimental setup
 # -------------------------
-# expSetup OneActuator $tag <-control $ctrlTag> $dir -sizeTrialOut $t $o <-trialDispFact $f> ...
-#expSetup OneActuator 2 -control 2 1 -sizeTrialOut 1 1
+# expSetup("OneActuator", tag, <"-control", ctrlTag,> dir, "-sizeTrialOut", t, o, <"-trialDispFact", f,> ...)
+#expSetup("OneActuator", 2, "-control", 2, 1, "-sizeTrialOut", 1, 1)
 
 # Define experimental site
 # ------------------------
-# expSite LocalSite $tag $setupTag
-#expSite LocalSite 2 2
+# expSite("LocalSite", tag, setupTag)
+#expSite("LocalSite", 2, 2)
 
 # Define experimental elements
 # ----------------------------
@@ -75,13 +78,13 @@ uniaxialMaterial("Elastic", 3, 2.0*100.0/1.0)
 # element("genericClient", eleTag, "-node", Ndi, Ndj, ..., "-dof", dofNdi, "-dof", dofNdj, ..., "-server", ipPort, ipAddr, "-ssl", "-udp", "-dataSize", size)
 element("genericClient", 1, "-node", 1, 3, "-dof", 1, 2, "-dof", 1, 2, "-server", 8090, "-udp");  # use with SimAppElemServer
 
-# expElement twoNodeLink $eleTag $iNode $jNode -dir $dirs -server $ipPort <ipAddr> <-ssl> <-udp> <-dataSize $size> -initStif $Kij <-orient <$x1 $x2 $x3> $y1 $y2 $y3> <-pDelta Mratios> <-iMod> <-mass $m>
+# expElement("twoNodeLink", eleTag, iNode, jNode, "-dir", dirs, "-server", ipPort, <ipAddr,> <"-ssl",> <"-udp",> <"-dataSize", size,> "-initStif", Kij, <"-orient", <x1, x2, x3,> y1, y2, y3,> <"-pDelta", Mratios,> <"-iMod",> <"-mass", m>)
 #expElement("twoNodeLink", 1, 1, 3, "-dir", 2, "-server", 8090, "-udp", "-initStif", 2.8);  # use with SimAppSiteServer
 
 # Define numerical elements
 # -------------------------
 # left and right columns
-# element("twoNodeLink", eleTag, iNode, jNode, "-mat", matTags, "-dir", dirs, "-orient", x1, x2, x3, y1, y2, y3, "-pDelta", Mratios, "-mass", m)
+# element("twoNodeLink", eleTag, iNode, jNode, "-mat", matTags, "-dir", dirs, <"-orient", <x1, x2, x3,> y1, y2, y3,> <"-pDelta", Mratios,> <"-mass", m)>
 element("twoNodeLink", 2, 2, 4, "-mat", 2, "-dir", 2)
 
 # spring
@@ -96,7 +99,7 @@ scale = 1.0
 timeSeries("Path", 1, "-filePath", "elcentro.txt", "-dt", dt, "-factor", 386.1*scale)
 
 # create UniformExcitation load pattern
-# pattern("UniformExcitation", tag, dir, "-accel", tsTag, "-vel0", v0)
+# pattern("UniformExcitation", tag, dir, "-accel", tsTag, <"-vel0", v0>)
 pattern("UniformExcitation", 1, 1, "-accel", 1)
 
 # calculate the Rayleigh damping factors for nodes & elements

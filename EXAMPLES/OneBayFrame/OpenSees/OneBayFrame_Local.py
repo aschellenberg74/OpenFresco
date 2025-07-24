@@ -13,10 +13,9 @@
 
 # import the OpenSees and OpenFresco Python module
 import sys
-sys.path.append("C:\\Users\\Andreas\\Documents\\OpenSees\\SourceCode\\Win64\\bin")
+sys.path.append("C:/Users/Andreas/Documents/OpenSees/SourceCode/Win64/bin")
+sys.path.append("C:/Users/Andreas/Documents/OpenFresco/SourceCode/Win64/bin")
 from opensees import *
-sys.path.append("C:\\Users\\Andreas\\Documents\\OpenFresco\\SourceCode\\WIN64\\bin")
-from openfresco import *
 import math
 
 # ------------------------------
@@ -28,11 +27,16 @@ defaultUnits("-force", "kip", "-length", "in", "-time", "sec", "-temp", "F")
 # create ModelBuilder (with two-dimensions and 2 DOF/node)
 model("BasicBuilder", "-ndm", 2, "-ndf", 2)
 
+# Load OpenFresco package
+# -----------------------
+# (make sure all dlls are in the same folder as OpenFrescoPy)
+loadPackage("OpenFrescoPy")
+
 # Define geometry for model
 # -------------------------
 mass3 = 0.04
 mass4 = 0.02
-# node(tag, xCrd, yCrd, "-mass", mass)
+# node(tag, xCrd, yCrd, <"-mass", mass>)
 node(1,   0.0,  0.00)
 node(2, 100.0,  0.00)
 node(3,   0.0, 54.00, "-mass", mass3, mass3)
@@ -56,7 +60,7 @@ uniaxialMaterial("Elastic", 3, 2.0*100.0/1.0)
 
 # Define control points
 # ---------------------
-# expControlPoint(tag, <-node nodeTag>, dof, rspType, <-fact f>, <-lim l u>, <-relTrial>, <-relCtrl>, <-relDaq>, ...)
+# expControlPoint(tag, <"-node", nodeTag,> dof, rspType, <"-fact", f,> <"-lim", l, u,> <"-relTrial",> <"-relCtrl",> <"-relDaq",> ...)
 expControlPoint(1,  "1", "disp")
 expControlPoint(2,  "1", "disp", "1", "force")
 
@@ -64,21 +68,32 @@ expControlPoint(2,  "1", "disp", "1", "force")
 # ---------------------------
 # expControl("SimUniaxialMaterials", tag, matTags)
 expControl("SimUniaxialMaterials", 1, 1)
-#expControl xPCtarget 1 "192.168.2.20" 22222 "D:/PredictorCorrector/RTActualTestModels/cmAPI-xPCTarget-SCRAMNet-STS/HybridControllerD2D2" -trialCP 1 -outCP 2
+#expControl("xPCtarget", 1, "192.168.2.20", 22222, "D:/PredictorCorrector/RTActualTestModels/cmAPI-xPCTarget-SCRAMNet-STS/HybridControllerD2D2", "-trialCP", 1, "-outCP", 2)
 #expControl("SCRAMNet", 1, 381020, "-trialCP", 1, "-outCP", 2)
 #expControl("SCRAMNetGT", 1, 4096, "-trialCP", 1, "-outCP", 2)
-#expControl("dSpace", 1, "DS1104", "-trialCP", 1, "-outCP", 2)
-#expControl MTSCsi 1 "D:/Projects/MTS_CSI/OpenFresco/MtsCsi_Example/OneBayFrame/OpenFresco_mNEES.mtscs" 0.01 -trialCP 1 -outCP 2
-#expControl GenericTCP 1 "127.0.0.1" 44000 -ctrlModes 1 0 0 0 0 -daqModes 1 0 0 1 0
 expControl("SimUniaxialMaterials", 2, 2)
 
-# Define elements
-# ---------------
-# left and right columns
-# element("twoNodeLink", eleTag, iNode, jNode, "-mat", matTags, "-dir", dirs, "-orient", x1, x2, x3, y1, y2, y3, "-pDelta", Mratios, "-mass", m)
-element("twoNodeLink", 1, 1, 3, "-mat", 1, "-dir", 2)
-element("twoNodeLink", 2, 2, 4, "-mat", 2, "-dir", 2)
+# Define experimental setup
+# -------------------------
+# expSetup("OneActuator", tag, <"-control", ctrlTag,> dir, "-sizeTrialOut", t, o, <"-trialDispFact", f,> ...)
+expSetup("OneActuator", 1, "-control", 1, 1, "-sizeTrialOut", 1, 1)
+expSetup("OneActuator", 2, "-control", 2, 1, "-sizeTrialOut", 1, 1)
 
+# Define experimental site
+# ------------------------
+# expSite("LocalSite", tag, setupTag)
+expSite("LocalSite", 1, 1)
+expSite("LocalSite", 2, 2)
+
+# Define experimental elements
+# ----------------------------
+# left and right columns
+# expElement("twoNodeLink", eleTag, iNode, jNode, "-dir", dirs, "-site", siteTag, "-initStif", Kij, <"-orient", <x1, x2, x3,> y1, y2, y3,> <"-pDelta", Mratios,> <"-iMod",> <"-mass", m>)
+expElement("twoNodeLink", 1, 1, 3, "-dir", 2, "-site", 1, "-initStif", 2.8)
+expElement("twoNodeLink", 2, 2, 4, "-dir", 2, "-site", 2, "-initStif", 5.6)
+
+# Define numerical elements
+# -------------------------
 # spring
 # element("truss", eleTag, iNode, jNode, A, matTag)
 element("truss", 3, 3, 4, 1.0, 3)
@@ -91,7 +106,7 @@ scale = 1.0
 timeSeries("Path", 1, "-filePath", "elcentro.txt", "-dt", dt, "-factor", 386.1*scale)
 
 # create UniformExcitation load pattern
-# pattern("UniformExcitation", tag, dir, "-accel", tsTag, "-vel0", v0)
+# pattern("UniformExcitation", tag, dir, "-accel", tsTag, <"-vel0", v0>)
 pattern("UniformExcitation", 1, 1, "-accel", 1)
 
 # calculate the Rayleigh damping factors for nodes & elements
@@ -111,13 +126,13 @@ rayleigh(alphaM, betaK, betaKinit, betaKcomm)
 # Start of analysis generation
 # ------------------------------
 # create the system of equations
-system("ProfileSPD")
+system("BandGeneral")
 # create the DOF numberer
 numberer("Plain")
 # create the constraint handler
 constraints("Plain")
 # create the convergence test
-test("NormDispIncr", 1.0e-12, 10)
+test("EnergyIncr", 1.0e-6, 10)
 # create the integration scheme
 #integrator("Newmark", 0.5, 0.25)
 integrator("NewmarkExplicit", 0.5)
@@ -141,6 +156,8 @@ recorder("Node", "-file", "Node_Vel.out", "-time", "-node", 3, 4, "-dof", 1, "ve
 recorder("Node", "-file", "Node_Acc.out", "-time", "-node", 3, 4, "-dof", 1, "accel")
 
 recorder("Element", "-file", "Elmt_Frc.out", "-time", "-ele", 1, 2, 3, "forces")
+recorder("Element", "-file", "Elmt_ctrlDsp.out", "-time", "-ele", 1, "ctrlDisp")
+recorder("Element", "-file", "Elmt_daqDsp.out", "-time", "-ele", 1, "daqDisp")
 # --------------------------------
 # End of recorder generation
 # --------------------------------
@@ -172,6 +189,7 @@ print('')
 stop()
 #print("\nElapsed Time = $tTot \n")
 
+wipeExp()
 wipe()
 exit()
 # --------------------------------

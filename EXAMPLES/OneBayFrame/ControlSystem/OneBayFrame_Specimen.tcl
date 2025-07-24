@@ -43,7 +43,7 @@ uniaxialMaterial Steel02 1 1.5 2.8 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0
 # Define elements
 # ---------------
 # element twoNodeLink $eleTag $iNode $jNode -mat $matTags -dir $dirs <-orient <$x1 $x2 $x3> $y1 $y2 $y3> <-pDelta $Mratios> <-mass $m>
-element twoNodeLink 1 1 3 -mat 1 -dir 2 -orient -1 0 0
+element twoNodeLink 1 1 3 -mat 1 -dir 2
 
 # element adapter eleTag -node Ndi Ndj ... -dof dofNdi -dof dofNdj ... -stif Kij ipPort <-mass Mij>
 element adapter 10 -node 3 -dof 1 -stif 1E12 44000

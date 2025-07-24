@@ -83,7 +83,7 @@ set betaKcomm  0.0;             # D = betaKcomm*KlastCommit
 # Start of analysis generation
 # ------------------------------
 # create the system of equations
-system ProfileSPD
+system BandGeneral
 # create the DOF numberer
 numberer Plain
 # create the constraint handler

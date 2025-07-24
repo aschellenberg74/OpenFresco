@@ -25,7 +25,7 @@ model BasicBuilder -ndm 2 -ndf 2
 # Load OpenFresco package
 # -----------------------
 # (make sure all dlls are in the same folder as openSees.exe)
-loadPackage OpenFresco
+loadPackage OpenFrescoTcl
 
 # Define geometry for model
 # -------------------------
