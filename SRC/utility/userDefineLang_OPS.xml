@@ -1,0 +1,64 @@
+<NotepadPlus>
+    <UserLang name="OpenSees" ext="tcl" udlVersion="2.1">
+        <Settings>
+            <Global caseIgnored="no" allowFoldOfComments="no" foldCompact="no" forcePureLC="0" decimalSeparator="0" />
+            <Prefix Keywords1="no" Keywords2="no" Keywords3="no" Keywords4="no" Keywords5="no" Keywords6="no" Keywords7="no" Keywords8="no" />
+        </Settings>
+        <KeywordLists>
+            <Keywords name="Comments">03 03 04 00# 01 02</Keywords>
+            <Keywords name="Numbers, prefix1"></Keywords>
+            <Keywords name="Numbers, prefix2"></Keywords>
+            <Keywords name="Numbers, extras1"></Keywords>
+            <Keywords name="Numbers, extras2"></Keywords>
+            <Keywords name="Numbers, suffix1"></Keywords>
+            <Keywords name="Numbers, suffix2"></Keywords>
+            <Keywords name="Numbers, range"></Keywords>
+            <Keywords name="Operators1">! % &amp; ( ) * , / : ; ? @ [ \ ] ^ { | } ~ + &lt; = &gt;</Keywords>
+            <Keywords name="Operators2"></Keywords>
+            <Keywords name="Folders in code1, open"></Keywords>
+            <Keywords name="Folders in code1, middle"></Keywords>
+            <Keywords name="Folders in code1, close"></Keywords>
+            <Keywords name="Folders in code2, open"></Keywords>
+            <Keywords name="Folders in code2, middle"></Keywords>
+            <Keywords name="Folders in code2, close"></Keywords>
+            <Keywords name="Folders in comment, open"></Keywords>
+            <Keywords name="Folders in comment, middle"></Keywords>
+            <Keywords name="Folders in comment, close"></Keywords>
+            <Keywords name="Keywords1">after append array auto_execok auto_load auto_mkindex auto_reset bgerror binary break case catch cd class clock close common concat console constructor continue destructor else elseif eof error eval exec exit expr fblocked fconfigure fcopy file fileevent flush for foreach format gets glob global history if incr info inherit interp join lappend lindex linsert list llength lrange lreplace lsearch lsort method namespace open package parray pid private proc protected public puts pwd read regexp regsub rename return scan seek set socket source split string subst switch tcl_endOfWord tcl_startOfNextWord tcl_startOfPreviousWord tcl_wordBreakAfter tcl_wordBreakBefore tell time trace unknown unset update uplevel upvar variable vwait while</Keywords>
+            <Keywords name="Keywords2">bell bind bindtags bitmap button canvas checkbutton clipboard destroy entry event focus frame grab grid image label listbox lower menu menubutton message option pack photo place radiobutton raise scale scrollbar selection send text tk tk_bindForTraversal tk_bisque tk_chooseColor tk_dialog tk_focusFollowsMouse tk_focusNext tk_focusPrev tk_getOpenFile tk_getSaveFile tk_menuBar tk_messageBox tk_optionMenu tk_popup tk_setPalette tkerror tkvars tkwait toplevel winfo wm</Keywords>
+            <Keywords name="Keywords3">algorithm analysis analyze block2d block3d build Constant constraints database defaultUnits eigen eleLoad element eleNodes eleResponse equalDOF expControl expControlPoint expElement expRecorder expSetup expSignalFilter expSite expTangentStiff fiber fix fixX fixY fixZ frictionModel geomTransf getEleTags getNodeTags getTime groundMotion imposedMotion integrator layer linear load loadConst loadPackage logFile mass metaData model nDMaterial node nodeBounds nodeCoord nodeDisp nodeEigenvector nodeVel nodeAccel numberer patch pattern play print printA PySimple1Gen rayleigh record recorder recordExp rectangular region remove removeExp reset restore rigidDiaphragm rigidLink save section series ShallowFoundationGen setMaxOpenFiles setupLabServer sine sp startLabServer startSimAppElemServer startSimAppSiteServer stepLabServer stopLabServer system test testIter testNorms timeSeries TzSimple1Gen uniaxialMaterial video wipe wipeAnalysis wipeExp</Keywords>
+            <Keywords name="Keywords4">9_4_QuadUP 20_8_BrickUP AC3D8 ActorSite AcousticMedium Aggregator AlphaOS AlphaOSGeneralized AMD ArcLength ASI3D8 AV3D4 AxialSp AxialSpHD actuator adapter BackwardEuler BandGeneral BandGeneral_Single BandSPD BarSlip BasicBuilder BeamContact2D BeamContact3D BeamEndContact3D BFGS Bidirectional Bilin BilinearOilDamper Bond01 Bond02 Bond_SP01 BoucWen BoundingCamClay Brick20N Brick20N_u_p_U Brick8N Brick8N_u_p_U brickUP Broyden bbarBrick bbarBrickUP bbarQuad bbarQuadUP beamColumn beamColumnJoint beamWithHinges bearing BWBN Cast CentralDifference CentralDifferenceAlternative CentralDifferenceNoDamping CFSSSWP CFSWSWP Collocation CollocationHSIncrReduct CollocationHSIncrLimit CollocationHSFixedNumIter Constant Control Concrete01 Concrete02 Concrete03 Concrete04 Concrete05 Concrete06 Concrete07 Concrete01WithSITC ConfinedConcrete01 ConcreteCM ConcreteD ContactMaterial2D ContactMaterial3D Corotational Coulomb CoupledZeroLength CuSP CycLiqCP circ control controls controlPoint controlPoints corotTruss corotTrussSection CycLiqCPSP Damage2p Diagonal DisplacementControl Dodd_Restrepo Drift DruckerPrager dispBeamColumn dispBeamColumnInt display dSpace ECC01 Elastic ElasticBilin ElasticIsotropic ElasticIsotropic3D ElasticMembranePlateSection ElasticMultiLinear ElasticOrthotropic ElasticPowerFunc ElasticPP ElasticPPGap ElasticTimoshenkoBeam ElasticTubularJoint ElastomericX Element EnergyIncr ENT EnvelopeElement EnvelopeNode elasticBeamColumn elastomericBearing elastomericBearingBoucWen elastomericBearingPlasticity enhancedQuad ErrorSimRandomGauss ErrorSimUndershoot Fiber Fatigue FixedNumIter flatSliderBearing FluidSolidPorousMaterial forceBeamColumn FourActuators FRPConfinedConcrete FSAM FullGeneral generic genericClient Hardening HDR Houbolt HHT HHTExplicit HHTGeneralized HHTGeneralizedExplicit HHTHSIncrReduct HHTHSIncrLimit HHTHSFixedNumIter HyperbolicGapMaterial Hysteretic ImpactMaterial Inerter InitialStateAnalysisWrapper InitStrainMaterial InitStressMaterial InvertedVBrace InvertedVBraceJntOff invertedVBrace Iso2spring J2Plasticity Joint2D KikuchiAikenHDR KikuchiAikenLRB KikuchiBearing KrylovNewton LabVIEW Lagrange LeadRubberX LimitState Linear linearElasticSpring LoadControl LocalSite ManzariDafalias MaxNodeDisp Maxwell MinMax MinUnbalDispNorm ModifiedNewton ModIMKPeakOriented ModIMKPinching MPIDiagonal MTSCsi MultiLinear multipleShearSpring MultipleSupport Mumps MVLEM Newmark NewmarkExplicit NewmarkHSIncrReduct NewmarkHSIncrLimit NewmarkHSFixedNumIter NewmarkWithSensitivity Newton NewtonLineSearch NIEseries Node ModElasticBeam2d NormDispIncr NormUnbalance NoTransformation nonlinearBeamColumn OneActuator OpenFresco Parallel ParallelPlain ParallelProfileSPD ParkLMS3 Path PDelta Penalty PeerMotion PeerNGAMotion Petsc Pinching4 PinchingLimitStateMaterial Plain PlaneStrain PlaneStress PlateFiber PressureDependMultiYield PressureDependMultiYield02 PressureIndependMultiYield ProfileSPD Pulse playback plot PyLiq1 PySimple1 quad quadUP QzSimple1 RambergOsgoodSteel RCM RCSection2d Rectangular ReinforcingSteel RelativeEnergyIncr RelativeNormDispIncr RelativeNormUnbalance RemoteSite RJWatsonEqsBearing recorder recorders SCRAMNet SCRAMNetGT SelfCentering Series Setup SFI_MVLEM ShadowSite ShellDKGQ ShellMITC4 ShellNL ShellNLDKGQ SignalFilter SimFEAdapter SimDomain SimSimulink SimUniaxialMaterials Sine Site SimpleContact2D SimpleContact3D singleFPBearing SparseGEN SparseGeneral SparseSPD SparseSYM SSPbrick SSPbrickUP SSPquad SSPquadUP Static Steel01 Steel02 Steel4 SteelMPF StressDensityModel SuperLU SurfaceLoad SAWS setup setups signalFilter signalFilters site sites stdBrick straight TangentStiff Template3Dep TFP ThreeActuators ThreeActuatorsJntOff Transformation Transient Transpose TRBDF2 TRBDF3 Triangle Trig TripleFrictionPendulum TwoActuators TzLiq1 TzSimple1 tangentStiff tangentStiffs twoNodeLink tri31 truss trussSection UmfPack Uniaxial Uniform UniformExcitation VariableTransient VelDependent VelDepMultiLinear VelNormalFrcDep VelPressureDep Viscous ViscousDamper VS3D4 WFSection2d WilsonTheta xPCtarget YamamotoBiaxialHDR zeroLength zeroLengthContact2D zeroLengthContact3D zeroLengthImpact3D zeroLengthInterface2D zeroLengthND zeroLengthContactNTS2D zeroLengthSection</Keywords>
+            <Keywords name="Keywords5"></Keywords>
+            <Keywords name="Keywords6"></Keywords>
+            <Keywords name="Keywords7"></Keywords>
+            <Keywords name="Keywords8"></Keywords>
+            <Keywords name="Delimiters">00&quot; 01 02&quot; 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23</Keywords>
+        </KeywordLists>
+        <Styles>
+            <WordsStyle name="DEFAULT" fgColor="F1F2F3" bgColor="1E1E1E" fontName="" fontStyle="0" fontSize="" nesting="0" />
+            <WordsStyle name="COMMENTS" fgColor="57A64A" bgColor="1E1E1E" fontName="&#x001F;" fontStyle="0" nesting="0" />
+            <WordsStyle name="LINE COMMENTS" fgColor="57A64A" bgColor="1E1E1E" fontName="-1" fontStyle="0" nesting="0" />
+            <WordsStyle name="NUMBERS" fgColor="A6CEA8" bgColor="1E1E1E" fontName="XML" fontStyle="0" nesting="0" />
+            <WordsStyle name="KEYWORDS1" fgColor="559CD6" bgColor="1E1E1E" fontName="" fontStyle="1" nesting="0" />
+            <WordsStyle name="KEYWORDS2" fgColor="00FFFF" bgColor="1E1E1E" fontName="" fontStyle="1" nesting="0" />
+            <WordsStyle name="KEYWORDS3" fgColor="00B9B9" bgColor="1E1E1E" fontName="" fontStyle="1" nesting="0" />
+            <WordsStyle name="KEYWORDS4" fgColor="B915AC" bgColor="1E1E1E" fontName="&#x001F;" fontStyle="1" nesting="0" />
+            <WordsStyle name="KEYWORDS5" fgColor="000000" bgColor="1E1E1E" fontStyle="0" nesting="0" />
+            <WordsStyle name="KEYWORDS6" fgColor="000000" bgColor="1E1E1E" fontStyle="0" nesting="0" />
+            <WordsStyle name="KEYWORDS7" fgColor="000000" bgColor="1E1E1E" fontStyle="0" nesting="0" />
+            <WordsStyle name="KEYWORDS8" fgColor="000000" bgColor="1E1E1E" fontStyle="0" nesting="0" />
+            <WordsStyle name="OPERATORS" fgColor="9B9B9B" bgColor="1E1E1E" fontName="-1" fontStyle="0" nesting="0" />
+            <WordsStyle name="FOLDER IN CODE1" fgColor="9B9B9B" bgColor="1E1E1E" fontName="" fontStyle="0" nesting="0" />
+            <WordsStyle name="FOLDER IN CODE2" fgColor="000000" bgColor="1E1E1E" fontStyle="0" nesting="0" />
+            <WordsStyle name="FOLDER IN COMMENT" fgColor="000000" bgColor="1E1E1E" fontStyle="0" nesting="0" />
+            <WordsStyle name="DELIMITERS1" fgColor="D69D85" bgColor="1E1E1E" fontName="-1" fontStyle="0" nesting="0" />
+            <WordsStyle name="DELIMITERS2" fgColor="9B9B9B" bgColor="1E1E1E" fontName="&#x001F;" fontStyle="0" nesting="0" />
+            <WordsStyle name="DELIMITERS3" fgColor="9B9B9B" bgColor="1E1E1E" fontName="&#x001F;" fontStyle="0" nesting="0" />
+            <WordsStyle name="DELIMITERS4" fgColor="000000" bgColor="1E1E1E" fontStyle="0" nesting="0" />
+            <WordsStyle name="DELIMITERS5" fgColor="000000" bgColor="1E1E1E" fontStyle="0" nesting="0" />
+            <WordsStyle name="DELIMITERS6" fgColor="000000" bgColor="1E1E1E" fontStyle="0" nesting="0" />
+            <WordsStyle name="DELIMITERS7" fgColor="000000" bgColor="1E1E1E" fontStyle="0" nesting="0" />
+            <WordsStyle name="DELIMITERS8" fgColor="000000" bgColor="1E1E1E" fontStyle="0" nesting="0" />
+        </Styles>
+    </UserLang>
+</NotepadPlus>
