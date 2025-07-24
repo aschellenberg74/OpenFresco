@@ -120,13 +120,14 @@ void CALL_CONV tcp_setupconnectionserver(unsigned int *port, int *socketID)
     socket_type newsockfd;
     socklen_type addrLength;
     unsigned int other_Port;
-    char *other_InetAddr;    
+    char *other_InetAddr;
     int ierr;
     
     // initialize sockets
     startupsockets(&ierr);
     if (ierr != 0) {
         fprintf(stderr,"tcp_socket::setupconnectionserver() - could not startup server socket\n");
+        cleanupsockets();
         *socketID = -1;
         return;
     }
@@ -138,7 +139,6 @@ void CALL_CONV tcp_setupconnectionserver(unsigned int *port, int *socketID)
     bzero((char *) &my_Addr, sizeof(my_Addr));
     my_Addr.addr_in.sin_family = AF_INET;
     my_Addr.addr_in.sin_port = htons(*port);
-    
 #ifdef _WIN32
     my_Addr.addr_in.sin_addr.S_un.S_addr = htonl(INADDR_ANY);
 #else
@@ -148,6 +148,7 @@ void CALL_CONV tcp_setupconnectionserver(unsigned int *port, int *socketID)
     // open a socket
     if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         fprintf(stderr,"tcp_socket::setupconnectionserver() - could not open server socket\n");
+        cleanupsockets();
         *socketID = -2;
         return;
     }
@@ -155,19 +156,41 @@ void CALL_CONV tcp_setupconnectionserver(unsigned int *port, int *socketID)
     // bind local address to it
     if (bind(sockfd, &my_Addr.addr, sizeof(my_Addr.addr)) < 0) {
         fprintf(stderr,"tcp_socket::setupconnectionserver() - could not bind local address\n");
+#ifdef _WIN32
+        closesocket(sockfd);
+#else
+        close(sockfd);
+#endif
+        cleanupsockets();
         *socketID = -3;
         return;
     }
     
     // wait for other process to contact me & setup connection
-    listen(sockfd, 1);
+    if (listen(sockfd, 1) < 0) {
+        fprintf(stderr, "tcp_socket::setupconnectionserver() - listen function failed\n");
+#ifdef _WIN32
+        closesocket(sockfd);
+#else
+        close(sockfd);
+#endif
+        cleanupsockets();
+        *socketID = -4;
+        return;
+    }
     addrLength = sizeof(other_Addr.addr);
     newsockfd = accept(sockfd, &other_Addr.addr, &addrLength);
     if (newsockfd < 0) {
         fprintf(stderr,"tcp_socket::setupconnectionserver() - could not accept client connection\n");
-        *socketID = -4;
+#ifdef _WIN32
+        closesocket(sockfd);
+#else
+        close(sockfd);
+#endif
+        cleanupsockets();
+        *socketID = -5;
         return;
-    }    
+    }
     
     // close old socket & reset sockfd
     // we can close as we are not going to wait for others to connect
@@ -208,8 +231,8 @@ void CALL_CONV tcp_setupconnectionserver(unsigned int *port, int *socketID)
 *
 * return: int *socketID - negative number if failed to setup connection
 */
-void CALL_CONV tcp_setupconnectionclient(unsigned int *other_Port,
-    const char other_InetAddr[], int *lengthInet, int *socketID)
+void CALL_CONV tcp_setupconnectionclient(unsigned int* other_Port,
+    const char other_InetAddr[], int* lengthInet, int* socketID)
 {
     union {
         struct sockaddr    addr;
@@ -220,13 +243,13 @@ void CALL_CONV tcp_setupconnectionclient(unsigned int *other_Port,
         struct sockaddr_in addr_in;
     } other_Addr;
     
-    SocketConnection *theSocket = theSockets;
-    socket_type sockfd;    
+    SocketConnection* theSocket = theSockets;
+    socket_type sockfd;
     int ierr;
     
     // check inputs
     if (other_InetAddr == 0) {
-        fprintf(stderr,"tcp_socket::setupconnectionclient() - missing other_InetAddr\n");
+        fprintf(stderr, "tcp_socket::setupconnectionclient() - missing other_InetAddr\n");
         *socketID = -1;
         return;
     }
@@ -234,7 +257,8 @@ void CALL_CONV tcp_setupconnectionclient(unsigned int *other_Port,
     // initialize sockets
     startupsockets(&ierr);
     if (ierr != 0) {
-        fprintf(stderr,"tcp_socket::setupconnectionclient() - could not startup client socket\n");
+        fprintf(stderr, "tcp_socket::setupconnectionclient() - could not startup client socket\n");
+        cleanupsockets();
         *socketID = -2;
         return;
     }
@@ -253,10 +277,9 @@ void CALL_CONV tcp_setupconnectionclient(unsigned int *other_Port,
     // address of remote machine to which the connection is made.
     
     // set up remote address
-    bzero((char *) &other_Addr, sizeof(other_Addr));
+    bzero((char*)&other_Addr, sizeof(other_Addr));
     other_Addr.addr_in.sin_family = AF_INET;
     other_Addr.addr_in.sin_port = htons(*other_Port);
-    
 #ifdef _WIN32
     other_Addr.addr_in.sin_addr.S_un.S_addr = inet_addr(other_InetAddr);
 #else
@@ -264,10 +287,9 @@ void CALL_CONV tcp_setupconnectionclient(unsigned int *other_Port,
 #endif
     
     // set up my_Addr.addr_in
-    bzero((char *) &my_Addr, sizeof(my_Addr));
+    bzero((char*)&my_Addr, sizeof(my_Addr));
     my_Addr.addr_in.sin_family = AF_INET;
     my_Addr.addr_in.sin_port = htons(0);
-    
 #ifdef _WIN32
     my_Addr.addr_in.sin_addr.S_un.S_addr = htonl(INADDR_ANY);
 #else
@@ -276,23 +298,36 @@ void CALL_CONV tcp_setupconnectionclient(unsigned int *other_Port,
     
     // open a socket
     if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-        fprintf(stderr,"tcp_socket::setupconnectionclient() - could not open client socket\n");
+        fprintf(stderr, "tcp_socket::setupconnectionclient() - could not open client socket\n");
+        cleanupsockets();
         *socketID = -3;
         return;
     }
     
     // bind local address to it
     if (bind(sockfd, &my_Addr.addr, sizeof(my_Addr.addr)) < 0) {
-        fprintf(stderr,"tcp_socket::setupconnectionclient() - could not bind local address\n");
-        *socketID = -4;
+        fprintf(stderr, "tcp_socket::setupconnectionclient() - could not bind local address\n");
+#ifdef _WIN32
+        closesocket(sockfd);
+#else
+        close(sockfd);
+#endif
+        cleanupsockets();
+        * socketID = -4;
         return;
     }
     
     // now try to connect to socket with remote address
     if (connect(sockfd, &other_Addr.addr, sizeof(other_Addr.addr)) < 0) {
-            fprintf(stderr,"tcp_socket::setupconnectionclient() - could not connect to server\n");
-            *socketID = -5;
-            return;
+        fprintf(stderr, "tcp_socket::setupconnectionclient() - could not connect to server\n");
+#ifdef _WIN32
+        closesocket(sockfd);
+#else
+        close(sockfd);
+#endif
+        cleanupsockets();
+        * socketID = -5;
+        return;
     }
     
     // add a new socket connection
@@ -325,7 +360,7 @@ void CALL_CONV tcp_closeconnection(int *socketID, int *ierr)
     *ierr = 0;
     
     // find the socket
-    while (theSocket->socketID != *socketID) 
+    while (theSocket->socketID != *socketID)
         theSocket = theSocket->next;
     if (theSocket == 0) {
         fprintf(stderr,"tcp_socket::closeconnection() - could not find socket to close\n");
@@ -391,7 +426,7 @@ void CALL_CONV tcp_senddata(int *socketID, int *dataTypeSize, char data[], int *
     // send the data
     // if o.k. get a pointer to the data in the message and
     // place the incoming data there
-    nleft = *lenData * *dataTypeSize;
+    nleft = (*lenData) * (*dataTypeSize);
     
     while (nleft > 0) {
         nwrite = send(sockfd, gMsg, nleft, 0);
@@ -448,7 +483,7 @@ void CALL_CONV tcp_sendnbdata(int *socketID, int *dataTypeSize, char data[], int
     // send the data
     // if o.k. get a pointer to the data in the message and
     // place the incoming data there
-    nleft = *lenData * *dataTypeSize;
+    nleft = (*lenData) * (*dataTypeSize);
     
     while (nleft > 0) {
         nwrite = send(sockfd, gMsg, nleft, 0);
@@ -509,7 +544,7 @@ void CALL_CONV tcp_recvdata(int *socketID, int *dataTypeSize, char data[], int *
     // receive the data
     // if o.k. get a pointer to the data in the message and
     // place the incoming data there
-    nleft = *lenData * *dataTypeSize;
+    nleft = (*lenData) * (*dataTypeSize);
     
     while (nleft > 0) {
         nread = recv(sockfd, gMsg, nleft, 0);
@@ -566,7 +601,7 @@ void CALL_CONV tcp_recvnbdata(int *socketID, int *dataTypeSize, char data[], int
     // receive the data
     // if o.k. get a pointer to the data in the message and
     // place the incoming data there
-    nleft = *lenData * *dataTypeSize;
+    nleft = (*lenData) * (*dataTypeSize);
     
     while (nleft > 0) {
         nread = recv(sockfd, gMsg, nleft, 0);

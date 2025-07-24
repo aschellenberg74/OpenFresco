@@ -44,7 +44,7 @@
 #include <strings.h>
 #endif
 
-#define MAX_UDP_DATAGRAM 9126
+#define MAX_UDP_DATAGRAM 512
 #define MAX_INET_ADDR 28
 
 #ifdef _WIN32
@@ -102,10 +102,11 @@ void CALL_CONV cleanupsockets()
 * udp_setupconnectionserver() - function to setup a connection from server
 *
 * input: unsigned int *port - the port number
+*        int initialHandshake - flag to perform initial handshake
 *
 * return: int *socketID - negative number if failed to setup connection
 */
-void CALL_CONV udp_setupconnectionserver(unsigned int *port, int *socketID)
+void CALL_CONV udp_setupconnectionserver(unsigned int* port, int initialHandshake, int* socketID)
 {
     union {
         struct sockaddr    addr;
@@ -116,18 +117,19 @@ void CALL_CONV udp_setupconnectionserver(unsigned int *port, int *socketID)
         struct sockaddr_in addr_in;
     } other_Addr;
     
-    SocketConnection *theSocket = theSockets;
+    SocketConnection* theSocket = theSockets;
     socket_type sockfd;
     socklen_type addrLength;
     unsigned int other_Port;
-    char *other_InetAddr;
+    char* other_InetAddr;
     char data;
     int ierr, trial;
     
     // initialize sockets
     startupsockets(&ierr);
     if (ierr != 0) {
-        fprintf(stderr,"udp_socket::setupconnectionserver() - could not startup server socket\n");
+        fprintf(stderr, "udp_socket::setupconnectionserver() - could not startup server socket\n");
+        cleanupsockets();
         *socketID = -1;
         return;
     }
@@ -136,10 +138,9 @@ void CALL_CONV udp_setupconnectionserver(unsigned int *port, int *socketID)
     // machine on which the process that uses this routine is running.
     
     // set up my_Addr
-    bzero((char *) &my_Addr, sizeof(my_Addr));
+    bzero((char*)&my_Addr, sizeof(my_Addr));
     my_Addr.addr_in.sin_family = AF_INET;
     my_Addr.addr_in.sin_port = htons(*port);
-    
 #ifdef _WIN32
     my_Addr.addr_in.sin_addr.S_un.S_addr = htonl(INADDR_ANY);
 #else
@@ -148,43 +149,65 @@ void CALL_CONV udp_setupconnectionserver(unsigned int *port, int *socketID)
     
     // open a socket
     if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
-        fprintf(stderr,"udp_socket::setupconnectionserver() - could not open server socket\n");
+        fprintf(stderr, "udp_socket::setupconnectionserver() - could not open server socket\n");
+        cleanupsockets();
         *socketID = -2;
         return;
     }
     
     // bind local address to it
     if (bind(sockfd, &my_Addr.addr, sizeof(my_Addr.addr)) < 0) {
-        fprintf(stderr,"udp_socket::setupconnectionserver() - could not bind local address\n");
+        fprintf(stderr, "udp_socket::setupconnectionserver() - could not bind local address\n");
+#ifdef _WIN32
+        closesocket(sockfd);
+#else
+        close(sockfd);
+#endif
+        cleanupsockets();
         *socketID = -3;
         return;
     }
     
-    // wait for remote process to send a 1-byte message (try 3-times)
-    // the remote address and its length is also received and saved
-    addrLength = sizeof(other_Addr.addr);
-    trial = 0;
-    do {
-        ierr = recvfrom(sockfd, &data, 1, 0, &other_Addr.addr, &addrLength);
-        trial++;
-    } while (ierr != 1 && data != 'a' && trial < 3);
-    if (ierr != 1) {
-        fprintf(stderr, "udp_socket::setupconnectionserver() - could not receive intial message\n");
-        *socketID = -4;
-        return;
-    }
-    
-    // then send a 1-byte message back (try 3-times)
-    data = 'b';
-    trial = 0;
-    do {
-        ierr = sendto(sockfd, &data, 1, 0, &other_Addr.addr, addrLength);
-        trial++;
-    } while (ierr != 1 && trial < 3);
-    if (ierr != 1) {
-        fprintf(stderr, "udp_socket::setupconnectionserver() - could not send intial message\n");
-        *socketID = -5;
-        return;
+    // perform initial handshake if requested
+    if (initialHandshake == 1) {
+        // wait for remote process to send a 1-byte message (try 3-times)
+        // the remote address and its length is also received and saved
+        addrLength = sizeof(other_Addr.addr);
+        trial = 0;
+        do {
+            ierr = recvfrom(sockfd, &data, 1, 0, &other_Addr.addr, &addrLength);
+            trial++;
+        } while (ierr != 1 && data != 'a' && trial < 3);
+        if (ierr != 1) {
+            fprintf(stderr, "udp_socket::setupconnectionserver() - could not receive intial handshake message\n");
+#ifdef _WIN32
+            closesocket(sockfd);
+#else
+            close(sockfd);
+#endif
+            cleanupsockets();
+            *socketID = -4;
+            return;
+        }
+        
+        // then send a 1-byte message back (try 3-times)
+        data = 'b';
+        trial = 0;
+        do {
+            ierr = sendto(sockfd, &data, 1, 0, &other_Addr.addr, addrLength);
+            trial++;
+        } while (ierr != 1 && trial < 3);
+        if (ierr != 1) {
+            fprintf(stderr, "udp_socket::setupconnectionserver() - could not send intial handshake message\n");
+#ifdef _WIN32
+            closesocket(sockfd);
+#else
+            close(sockfd);
+#endif
+            cleanupsockets();
+            *socketID = -5;
+            return;
+        }
     }
     
     // get other_Port and other_InetAddr
@@ -215,11 +238,12 @@ void CALL_CONV udp_setupconnectionserver(unsigned int *port, int *socketID)
 * input: unsigned int *other_Port - the port number
 *        const char *other_InetAddr - the machine inet address
 *        int *lengthInet - length of machine inet address
+*        int initialHandshake - flag to perform initial handshake
 *
 * return: int *socketID - negative number if failed to setup connection
 */
 void CALL_CONV udp_setupconnectionclient(unsigned int *other_Port,
-    const char other_InetAddr[], int *lengthInet, int *socketID)
+    const char other_InetAddr[], int *lengthInet, int initialHandshake, int *socketID)
 {
     union {
         struct sockaddr    addr;
@@ -233,12 +257,12 @@ void CALL_CONV udp_setupconnectionclient(unsigned int *other_Port,
     SocketConnection *theSocket = theSockets;
     socket_type sockfd;
     socklen_type addrLength;
-    char data;    
+    char data;
     int ierr, trial;
     
     // check inputs
     if (other_InetAddr == 0) {
-        fprintf(stderr,"udp_socket::setupconnectionclient() - missing other_InetAddr\n");
+        fprintf(stderr, "udp_socket::setupconnectionclient() - missing other_InetAddr\n");
         *socketID = -1;
         return;
     }
@@ -246,7 +270,8 @@ void CALL_CONV udp_setupconnectionclient(unsigned int *other_Port,
     // initialize sockets
     startupsockets(&ierr);
     if (ierr != 0) {
-        fprintf(stderr,"udp_socket::setupconnectionclient() - could not startup client socket\n");
+        fprintf(stderr, "udp_socket::setupconnectionclient() - could not startup client socket\n");
+        cleanupsockets();
         *socketID = -2;
         return;
     }
@@ -268,7 +293,6 @@ void CALL_CONV udp_setupconnectionclient(unsigned int *other_Port,
     bzero((char *) &other_Addr, sizeof(other_Addr));
     other_Addr.addr_in.sin_family = AF_INET;
     other_Addr.addr_in.sin_port = htons(*other_Port);
-    
 #ifdef _WIN32
     other_Addr.addr_in.sin_addr.S_un.S_addr = inet_addr(other_InetAddr);
 #else
@@ -279,7 +303,6 @@ void CALL_CONV udp_setupconnectionclient(unsigned int *other_Port,
     bzero((char *) &my_Addr, sizeof(my_Addr));
     my_Addr.addr_in.sin_family = AF_INET;
     my_Addr.addr_in.sin_port = htons(0);
-    
 #ifdef _WIN32
     my_Addr.addr_in.sin_addr.S_un.S_addr = htonl(INADDR_ANY);
 #else
@@ -288,42 +311,64 @@ void CALL_CONV udp_setupconnectionclient(unsigned int *other_Port,
     
     // open a socket
     if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
-        fprintf(stderr,"udp_socket::setupconnectionclient() - could not open client socket\n");
+        fprintf(stderr, "udp_socket::setupconnectionclient() - could not open client socket\n");
+        cleanupsockets();
         *socketID = -3;
         return;
     }
     
     // bind local address to it
     if (bind(sockfd, &my_Addr.addr, sizeof(my_Addr.addr)) < 0) {
-        fprintf(stderr,"udp_socket::setupconnectionclient() - could not bind local address\n");
+        fprintf(stderr, "udp_socket::setupconnectionclient() - could not bind local address\n");
+#ifdef _WIN32
+        closesocket(sockfd);
+#else
+        close(sockfd);
+#endif
+        cleanupsockets();
         *socketID = -4;
         return;
     }
     
-    // send a 1-byte message to address (try 3-times)
-    data = 'a';
-    addrLength = sizeof(other_Addr.addr);
-    trial = 0;
-    do {
-        ierr = sendto(sockfd, &data, 1, 0, &other_Addr.addr, addrLength);
-        trial++;
-    } while (ierr != 1 && trial < 3);
-    if (ierr != 1) {
-        fprintf(stderr, "udp_socket::setupconnectionclient() - could not send intial message\n");
-        *socketID = -5;
-        return;
-    }
-    
-    // receive a 1-byte message from other (try 3-times)
-    trial = 0;
-    do {
-        ierr = recvfrom(sockfd, &data, 1, 0, &other_Addr.addr, &addrLength);
-        trial++;
-    } while (ierr != 1 && data != 'b' && trial < 3);
-    if (ierr != 1) {
-        fprintf(stderr, "udp_socket::setupconnectionclient() - could not receive intial message\n");
-        *socketID = -6;
-        return;
+    // perform initial handshake if requested
+    if (initialHandshake == 1) {
+        // send a 1-byte message to address (try 3-times)
+        data = 'a';
+        addrLength = sizeof(other_Addr.addr);
+        trial = 0;
+        do {
+            ierr = sendto(sockfd, &data, 1, 0, &other_Addr.addr, addrLength);
+            trial++;
+        } while (ierr != 1 && trial < 3);
+        if (ierr != 1) {
+            fprintf(stderr, "udp_socket::setupconnectionclient() - could not send intial handshake message\n");
+#ifdef _WIN32
+            closesocket(sockfd);
+#else
+            close(sockfd);
+#endif
+            cleanupsockets();
+            *socketID = -5;
+            return;
+        }
+        
+        // receive a 1-byte message from other (try 3-times)
+        trial = 0;
+        do {
+            ierr = recvfrom(sockfd, &data, 1, 0, &other_Addr.addr, &addrLength);
+            trial++;
+        } while (ierr != 1 && data != 'b' && trial < 3);
+        if (ierr != 1) {
+            fprintf(stderr, "udp_socket::setupconnectionclient() - could not receive intial handshake message\n");
+#ifdef _WIN32
+            closesocket(sockfd);
+#else
+            close(sockfd);
+#endif
+            cleanupsockets();
+            *socketID = -6;
+            return;
+        }
     }
 
     // add a new socket connection
@@ -357,7 +402,7 @@ void CALL_CONV udp_closeconnection(int *socketID, int *ierr)
     *ierr = 0;
     
     // find the socket
-    while (theSocket->socketID != *socketID) 
+    while (theSocket->socketID != *socketID)
         theSocket = theSocket->next;
     if (theSocket == 0) {
         fprintf(stderr,"udp_socket::closeconnection() - could not find socket to close\n");
@@ -372,7 +417,7 @@ void CALL_CONV udp_closeconnection(int *socketID, int *ierr)
 #endif
     
     // cleanup sockets
-    cleanupsockets();    
+    cleanupsockets();
 }
 
 
@@ -392,7 +437,7 @@ void CALL_CONV udp_senddata(int *socketID, int *dataTypeSize, char data[], int *
     socket_type sockfd;
     struct sockaddr otherAddr;
     socklen_type addrLength;
-    int size;
+    int nwrite, nleft;
     unsigned long nbMode = 0;
     char *gMsg = data;
     *ierr = 0;
@@ -427,18 +472,15 @@ void CALL_CONV udp_senddata(int *socketID, int *dataTypeSize, char data[], int *
     // send the data
     // if o.k. get a pointer to the data in the message and
     // place the incoming data there
-    size = *lenData * *dataTypeSize;
+    nleft = (*lenData) * (*dataTypeSize);
     
-    while (size > 0) {
-        if (size <= MAX_UDP_DATAGRAM) {
-            *ierr = sendto(sockfd, gMsg, size, 0, &otherAddr, addrLength);
-            size = 0;
-        }
-        else {	
-            *ierr = sendto(sockfd, gMsg, MAX_UDP_DATAGRAM, 0, &otherAddr, addrLength);
-            gMsg += MAX_UDP_DATAGRAM;
-            size -= MAX_UDP_DATAGRAM;
-        }
+    while (nleft > 0) {
+        if (nleft <= MAX_UDP_DATAGRAM)
+            nwrite = sendto(sockfd, gMsg, nleft, 0, &otherAddr, addrLength);
+        else
+            nwrite = sendto(sockfd, gMsg, MAX_UDP_DATAGRAM, 0, &otherAddr, addrLength);
+        nleft -= nwrite;
+        gMsg += nwrite;
     }
 }
 
@@ -458,8 +500,8 @@ void CALL_CONV udp_sendnbdata(int *socketID, int *dataTypeSize, char data[], int
     SocketConnection *theSocket = theSockets;
     socket_type sockfd;
     struct sockaddr otherAddr;
-    socklen_type addrLength;    
-    int size;
+    socklen_type addrLength;
+    int nwrite, nleft;
     unsigned long nbMode = 1;
     char *gMsg = data;
     *ierr = 0;
@@ -494,26 +536,19 @@ void CALL_CONV udp_sendnbdata(int *socketID, int *dataTypeSize, char data[], int
     // send the data
     // if o.k. get a pointer to the data in the message and
     // place the incoming data there
-    size = *lenData * *dataTypeSize;
+    nleft = (*lenData) * (*dataTypeSize);
     
-    while (size > 0) {
-        if (size <= MAX_UDP_DATAGRAM) {
-            *ierr = sendto(sockfd, gMsg, size, 0, &otherAddr, addrLength);
-            if (*ierr < 0) {
-                *ierr = -3;
-                return;
-            }
-            size = 0;
+    while (nleft > 0) {
+        if (nleft <= MAX_UDP_DATAGRAM)
+            nwrite = sendto(sockfd, gMsg, nleft, 0, &otherAddr, addrLength);
+        else
+            nwrite = sendto(sockfd, gMsg, MAX_UDP_DATAGRAM, 0, &otherAddr, addrLength);
+        if (nwrite < 0) {
+            *ierr = -3;
+            return;
         }
-        else {	
-            *ierr = sendto(sockfd, gMsg, MAX_UDP_DATAGRAM, 0, &otherAddr, addrLength);
-            if (*ierr < 0) {
-                *ierr = -3;
-                return;
-            }
-            gMsg += MAX_UDP_DATAGRAM;
-            size -= MAX_UDP_DATAGRAM;
-        }
+        nleft -= nwrite;
+        gMsg += nwrite;
     }
 }
 
@@ -534,7 +569,7 @@ void CALL_CONV udp_recvdata(int *socketID, int *dataTypeSize, char data[], int *
     socket_type sockfd;
     struct sockaddr otherAddr;
     socklen_type addrLength;
-    int size;
+    int nread, nleft;
     unsigned long nbMode = 0;
     char *gMsg = data;
     *ierr = 0;
@@ -569,18 +604,15 @@ void CALL_CONV udp_recvdata(int *socketID, int *dataTypeSize, char data[], int *
     // receive the data
     // if o.k. get a pointer to the data in the message and
     // place the incoming data there
-    size = *lenData * *dataTypeSize;
+    nleft = (*lenData) * (*dataTypeSize);
     
-    while (size > 0) {
-        if (size <= MAX_UDP_DATAGRAM) {
-            *ierr = recvfrom(sockfd, gMsg, size, 0, &otherAddr, &addrLength);
-            size = 0;
-        }
-        else {
-            *ierr = recvfrom(sockfd, gMsg, MAX_UDP_DATAGRAM, 0, &otherAddr, &addrLength);
-            gMsg += MAX_UDP_DATAGRAM;
-            size -= MAX_UDP_DATAGRAM;
-        }
+    while (nleft > 0) {
+        if (nleft <= MAX_UDP_DATAGRAM)
+            nread = recvfrom(sockfd, gMsg, nleft, 0, &otherAddr, &addrLength);
+        else
+            nread = recvfrom(sockfd, gMsg, MAX_UDP_DATAGRAM, 0, &otherAddr, &addrLength);
+        nleft -= nread;
+        gMsg += nread;
     }
 }
 
@@ -600,8 +632,8 @@ void CALL_CONV udp_recvnbdata(int *socketID, int *dataTypeSize, char data[], int
     SocketConnection *theSocket = theSockets;
     socket_type sockfd;
     struct sockaddr otherAddr;
-    socklen_type addrLength;    
-    int size;
+    socklen_type addrLength;
+    int nread, nleft;
     unsigned long nbMode = 1;
     char *gMsg = data;
     *ierr = 0;
@@ -636,26 +668,19 @@ void CALL_CONV udp_recvnbdata(int *socketID, int *dataTypeSize, char data[], int
     // receive the data
     // if o.k. get a pointer to the data in the message and
     // place the incoming data there
-    size = *lenData * *dataTypeSize;
+    nleft = (*lenData) * (*dataTypeSize);
     
-    while (size > 0) {
-        if (size <= MAX_UDP_DATAGRAM) {
-            *ierr = recvfrom(sockfd, gMsg, size, 0, &otherAddr, &addrLength);
-            if (*ierr < 0) {
-                *ierr = -3;
-                return;
-            }
-            size = 0;
+    while (nleft > 0) {
+        if (nleft <= MAX_UDP_DATAGRAM)
+            nread = recvfrom(sockfd, gMsg, nleft, 0, &otherAddr, &addrLength);
+        else
+            nread = recvfrom(sockfd, gMsg, MAX_UDP_DATAGRAM, 0, &otherAddr, &addrLength);
+        if (nread < 0) {
+            *ierr = -3;
+            return;
         }
-        else {
-            *ierr = recvfrom(sockfd, gMsg, MAX_UDP_DATAGRAM, 0, &otherAddr, &addrLength);
-            if (*ierr < 0) {
-                *ierr = -3;
-                return;
-            }
-            gMsg += MAX_UDP_DATAGRAM;
-            size -= MAX_UDP_DATAGRAM;
-        }
+        nleft -= nread;
+        gMsg += nread;
     }
 }
 
