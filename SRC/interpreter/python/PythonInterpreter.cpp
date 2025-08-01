@@ -309,6 +309,12 @@ int PythonInterpreter::evalDoubleStringExpression(const char* theExpression, dou
 }
 
 
+void PythonInterpreter::resetInput(int nArgs, int cArg, const char** argv)
+{
+    wrapper.resetCommandLine(nArgs, cArg, (PyObject*)argv);
+}
+
+
 void PythonInterpreter::resetInput(int cArg)
 {
     wrapper.resetCommandLine(cArg);

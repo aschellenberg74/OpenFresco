@@ -602,6 +602,12 @@ int TclInterpreter::evalDoubleStringExpression(
 }
 
 
+void TclInterpreter::resetInput(int nArgs, int cArg, const char** argv)
+{
+    wrapper.resetCommandLine(nArgs, cArg, argv);
+}
+
+
 void TclInterpreter::resetInput(int cArg)
 {
     wrapper.resetCommandLine(cArg);

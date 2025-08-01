@@ -27,7 +27,7 @@
 
 #include "DL_Interpreter.h"
 
-DL_Interpreter  *ops_TheActiveInterpreter = 0;
+DL_Interpreter* ops_TheActiveInterpreter = 0;
 
 
 DL_Interpreter::DL_Interpreter()
@@ -42,13 +42,13 @@ DL_Interpreter::~DL_Interpreter()
 }
 
 
-int DL_Interpreter::addCommand(const char *, Command &)
+int DL_Interpreter::addCommand(const char*, Command&)
 {
     return -1;
 }
 
 
-int DL_Interpreter::removeCommand(const char *)
+int DL_Interpreter::removeCommand(const char*)
 {
     return -1;
 }
@@ -60,13 +60,13 @@ int DL_Interpreter::getNumRemainingInputArgs(void)
 }
 
 
-int DL_Interpreter::getInt(int *, int numArgs)
+int DL_Interpreter::getInt(int*, int numArgs)
 {
     return -1;
 }
 
 
-int DL_Interpreter::getDouble(double *, int numArgs)
+int DL_Interpreter::getDouble(double*, int numArgs)
 {
     return -1;
 }
@@ -90,7 +90,7 @@ const char* DL_Interpreter::getStringFromAll(char* buffer, int len)
 }
 
 
-int DL_Interpreter::getStringCopy(char **stringPtr)
+int DL_Interpreter::getStringCopy(char** stringPtr)
 {
     return -1;
 }
@@ -102,13 +102,19 @@ int DL_Interpreter::evalDoubleStringExpression(const char* theExpression, double
 }
 
 
+void DL_Interpreter::resetInput(int nArgs, int cArg, const char** argv)
+{
+    // does nothing
+}
+
+
 void DL_Interpreter::resetInput(int cArg)
 {
     // does nothing
 }
 
 
-int DL_Interpreter::setInt(int *, int numArgs, bool scalar)
+int DL_Interpreter::setInt(int*, int numArgs, bool scalar)
 {
     return -1;
 }
@@ -132,7 +138,7 @@ int DL_Interpreter::setInt(std::map<const char*, std::vector<int>>& data)
 }
 
 
-int DL_Interpreter::setDouble(double *, int numArgs, bool scalar)
+int DL_Interpreter::setDouble(double*, int numArgs, bool scalar)
 {
     return -1;
 }

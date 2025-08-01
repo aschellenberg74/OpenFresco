@@ -232,13 +232,10 @@ const char* OPS_GetString()
 
 const char* OPS_GetStringFromAll(char* buffer, int len)
 {
-    if (cmds == 0) return "Invalid String Input!";
+    const char* res = 0;
+    if (cmds == 0) return res;
     DL_Interpreter* interp = cmds->getInterpreter();
-    const char* res = interp->getStringFromAll(buffer, len);
-    if (res == 0) {
-        return "Invalid String Input!";
-    }
-    return res;
+    return interp->getStringFromAll(buffer, len);
 }
 
 
