@@ -100,11 +100,11 @@ extern bool OPF_removeExperimentalTangentStiff(int tag);
 std::vector<PyMethodDef> methodsOpenFresco;
 const char* openfresco_docstring = "";
 PyObject* currentResult;
-PyObject* theModule = 0;
-Domain* theDomain = 0;
-StaticAnalysis** theStaticAnalysis = 0;
-DirectIntegrationAnalysis** theTransientAnalysis = 0;
-VariableTimeStepDirectIntegrationAnalysis** theVariableTimeStepTransientAnalysis = 0;
+PyObject* theModule = nullptr;
+Domain* theDomain = nullptr;
+StaticAnalysis** theStaticAnalysis = nullptr;
+DirectIntegrationAnalysis** theTransientAnalysis = nullptr;
+VariableTimeStepDirectIntegrationAnalysis** theVariableTimeStepTransientAnalysis = nullptr;
 
 
 void setOutputs(int* data, int numArgs, bool scalar)
@@ -381,22 +381,28 @@ void Py_opf_addCommand(const char* name, PyCFunction proc)
     PyObject* moduleName = PyUnicode_FromString(PyModule_GetName(theModule));
     PyObject* moduleDict = PyModule_GetDict(theModule);
     
-    // set up the method definition structure
-    PyMethodDef method = { name,proc,METH_VARARGS,openfresco_docstring };
+    // we MUST allocate this dynamically if using PyCFunction_NewEx
+    PyMethodDef* method = new PyMethodDef{ name,proc,METH_VARARGS,openfresco_docstring };
     
-    // create a callable Python object from the method definition
-    PyObject* obj = PyCFunction_NewEx(&method, (PyObject*)NULL, moduleName);
-    if (obj == NULL) {
-        opserr << "WARNING failed to create Python object for method: " << name << endln;
+    // create a callable Python function object from the method definition
+    PyObject* func = PyCFunction_NewEx(method, (PyObject*)NULL, moduleName);
+    Py_DECREF(moduleName);
+    if (func == nullptr) {
+        opserr << "WARNING failed to create Python function object for: " << name << endln;
+        delete method;
         return;
     }
     
-    // add the method to the module dictionary
-    if (PyDict_SetItemString(moduleDict, name, obj) < 0) {
-        opserr << "WARNING failed to add method: " << name << " to module dictionary\n";
-        Py_DECREF(obj);
+    // insert the function into the module dictionary
+    if (PyDict_SetItemString(moduleDict, name, func) < 0) {
+        opserr << "WARNING failed to add function: " << name << " to module dictionary\n";
+        Py_DECREF(func);
+        delete method;
         return;
     }
+    
+    // Do NOT delete method — it must stay alive as long as func does
+    // Optional: store in a global list for later cleanup if needed
 }
 
 
@@ -1058,7 +1064,15 @@ extern "C" DllExport int
 OpenFrescoPy(PyObject* self, PyObject* args, PyObject* module, Domain* domain)
 {
     theModule = module;
+    if (theModule == nullptr) {
+        opserr << "WARNING OpenFrescoPy.dll - failed to get OpenSees module\n";
+        return -1;
+    }
     theDomain = domain;
+    if (theDomain == nullptr) {
+        opserr << "WARNING OpenFrescoPy.dll - failed to get OpenSees domain\n";
+        return -2;
+    }
     
     // alternative way to get the module by its name
     //PyObject* moduleName = PyUnicode_FromString("opensees");
