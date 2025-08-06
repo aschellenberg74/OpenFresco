@@ -1,33 +1,43 @@
-# File: OneBayFrame_Analytical.py
+# File: OneBayFrame_Client1.py
+# (use with OneBayFrame_Server1a.py & OneBayFrame_Server1b.py)
 # Units: [kip,in.]
 #
 # Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
-# Created: 11/06
+# Created: 06/21
 # Revision: A
 #
 # Purpose: this file contains the python input to perform
-# a purely numerical simulation of a one bay frame.
+# a distributed hybrid simulation of a one bay frame with
+# two experimental twoNodeLink elements.
+# The specimens are simulated using the SimUniaxialMaterials
+# controller.
 
-# import the OpenSees Python module
+# import the OpenSees and OpenFresco Python module
 import sys
 sys.path.append("C:/Users/Andreas/Documents/OpenSees/SourceCode/Win64/bin")
+sys.path.append("C:/Users/Andreas/Documents/OpenFresco/SourceCode/Win64/bin")
 import opensees as ops
 import math
 
 # ------------------------------
 # Start of model generation
 # ------------------------------
-ops.logFile("OneBayFrame_Analytical.log")
+ops.logFile("OneBayFrame_Client1.log")
 ops.defaultUnits("-force", "kip", "-length", "in", "-time", "sec", "-temp", "F")
 
 # create ModelBuilder (with two-dimensions and 2 DOF/node)
 ops.model("BasicBuilder", "-ndm", 2, "-ndf", 2)
 
+# Load OpenFresco package
+# -----------------------
+# (make sure all dlls are in the same folder as OpenFrescoPy)
+ops.loadPackage("OpenFrescoPy")
+
 # Define geometry for model
 # -------------------------
 mass3 = 0.04
 mass4 = 0.02
-# node(tag, xCrd, yCrd, "-mass", mass)
+# node(tag, xCrd, yCrd, <"-mass", mass>)
 ops.node(1,   0.0,  0.00)
 ops.node(2, 100.0,  0.00)
 ops.node(3,   0.0, 54.00, "-mass", mass3, mass3)
@@ -43,19 +53,23 @@ ops.fix(4, 0, 1)
 # Define materials
 # ----------------
 # uniaxialMaterial("Steel02", matTag, Fy, E, b, R0, cR1, cR2, a1, a2, a3, a4) 
-#ops.uniaxialMaterial("Elastic", 1, 2.8)
-ops.uniaxialMaterial("Steel02", 1, 1.5, 2.8, 0.01, 18.5, 0.925, 0.15, 0.0, 1.0, 0.0, 1.0)
-ops.uniaxialMaterial("Elastic", 2, 5.6)
-#ops.uniaxialMaterial("Steel02", 2, 3.0, 5.6, 0.01, 18.5, 0.925, 0.15, 0.0, 1.0, 0.0, 1.0) 
 ops.uniaxialMaterial("Elastic", 3, 2.0*100.0/1.0)
 
-# Define elements
-# ---------------
-# left and right columns
-# element("twoNodeLink", eleTag, iNode, jNode, "-mat", matTags, "-dir", dirs, <"-orient", <x1, x2, x3,> y1, y2, y3,> <"-pDelta", Mratios,> <"-mass", m>)
-ops.element("twoNodeLink", 1, 1, 3, "-mat", 1, "-dir", 2)
-ops.element("twoNodeLink", 2, 2, 4, "-mat", 2, "-dir", 2)
+# Define experimental site
+# ------------------------
+# expSite("ShadowSite", tag, <"-setup", setupTag,> ipAddr, ipPort, <"-ssl",> <"-udp",> <"-dataSize", size>)
+ops.expSite("ShadowSite", 1, "127.0.0.1", 8090)
+ops.expSite("ShadowSite", 2, "127.0.0.1", 8091)
 
+# Define experimental elements
+# ----------------------------
+# left and right columns
+# expElement("twoNodeLink", eleTag, iNode, jNode, "-dir", dirs, "-site", siteTag, "-initStif", Kij, <"-orient", <x1, x2, x3,> y1, y2, y3,> <"-pDelta", Mratios,> <"-iMod",> <"-mass", m>)
+ops.expElement("twoNodeLink", 1, 1, 3, "-dir", 2, "-site", 1, "-initStif", 2.8)
+ops.expElement("twoNodeLink", 2, 2, 4, "-dir", 2, "-site", 2, "-initStif", 5.6)
+
+# Define numerical elements
+# -------------------------
 # spring
 # element("truss", eleTag, iNode, jNode, A, matTag)
 ops.element("truss", 3, 3, 4, 1.0, 3)
@@ -68,7 +82,7 @@ scale = 1.0
 ops.timeSeries("Path", 1, "-filePath", "elcentro.txt", "-dt", dt, "-factor", 386.1*scale)
 
 # create UniformExcitation load pattern
-# pattern("UniformExcitation", tag, dir, "-accel", tsTag, "-vel0", v0)
+# pattern("UniformExcitation", tag, dir, "-accel", tsTag, <"-vel0", v0>)
 ops.pattern("UniformExcitation", 1, 1, "-accel", 1)
 
 # calculate the Rayleigh damping factors for nodes & elements
@@ -94,13 +108,12 @@ ops.numberer("Plain")
 # create the constraint handler
 ops.constraints("Plain")
 # create the convergence test
-ops.test("NormDispIncr", 1.0e-12, 10)
+ops.test("EnergyIncr", 1.0e-6, 10)
 # create the integration scheme
 #ops.integrator("Newmark", 0.5, 0.25)
 ops.integrator("NewmarkExplicit", 0.5)
-#ops.integrator("AlphaOS", 1.0)
+#integrator("AlphaOS", 1.0)
 # create the solution algorithm
-#ops.algorithm("Newton)
 ops.algorithm("Linear")
 # create the analysis object 
 ops.analysis("Transient")
@@ -118,6 +131,8 @@ ops.recorder("Node", "-file", "Node_Vel.out", "-time", "-node", 3, 4, "-dof", 1,
 ops.recorder("Node", "-file", "Node_Acc.out", "-time", "-node", 3, 4, "-dof", 1, "accel")
 
 ops.recorder("Element", "-file", "Elmt_Frc.out", "-time", "-ele", 1, 2, 3, "forces")
+ops.recorder("Element", "-file", "Elmt_ctrlDsp.out", "-time", "-ele", 1, "ctrlDisp")
+ops.recorder("Element", "-file", "Elmt_daqDsp.out", "-time", "-ele", 1, "daqDisp")
 # --------------------------------
 # End of recorder generation
 # --------------------------------
@@ -149,6 +164,7 @@ print('')
 ops.stop()
 #print("\nElapsed Time = $tTot \n")
 
+ops.wipeExp()
 ops.wipe()
 exit()
 # --------------------------------

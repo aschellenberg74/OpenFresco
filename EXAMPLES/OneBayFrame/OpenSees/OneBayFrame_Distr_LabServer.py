@@ -1,8 +1,9 @@
-# File: OneBayFrame_Server1b.py (use with OneBayFrame_Client1.py)
+# File: OneBayFrame_Distr_LabServer.py
+# (use with OneBayFrame_Distr_Client.py & OneBayFrame_Distr_SimAppServer.py)
 # Units: [kip,in.]
 #
 # Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
-# Created: 11/06
+# Created: 06/25
 # Revision: A
 #
 # Purpose: this file contains the python input to perform
@@ -21,7 +22,7 @@ import math
 # ------------------------------
 # Start of model generation
 # ------------------------------
-opf.logFile("OneBayFrame_Server1b.log")
+opf.logFile("OneBayFrame_Distr_LabServer.log")
 opf.defaultUnits("-force", "kip", "-length", "in", "-time", "sec", "-temp", "F")
 
 # create ModelBuilder (with two-dimensions and 2 DOF/node)
@@ -30,9 +31,8 @@ opf.model("BasicBuilder", "-ndm", 2, "-ndf", 2)
 # Define materials
 # ----------------
 # uniaxialMaterial("Steel02", matTag, Fy, E, b, R0, cR1, cR2, a1, a2, a3, a4) 
-opf.uniaxialMaterial("Elastic", 1, 5.6);  # UC Berkeley Cantilever Column [kip/in]
-#opf.uniaxialMaterial("Elastic", 1, 16.0);  # UBC Cantilever Column [kN/cm]
-#opf.uniaxialMaterial("Elastic", 1, ????);  # Kyoto University Cantilever Column [??/??]
+#opf.uniaxialMaterial("Elastic", 1, 2.8)
+opf.uniaxialMaterial("Steel02", 1, 1.5, 2.8, 0.01, 18.5, 0.925, 0.15, 0.0, 1.0, 0.0, 1.0)
 
 # Define control points
 # ---------------------
@@ -51,14 +51,12 @@ opf.expControl("SimUniaxialMaterials", 1, 1)
 # Define experimental setup
 # -------------------------
 # expSetup("OneActuator", tag, <"-control", ctrlTag,> dir, "-sizeTrialOut", t, o, <"-trialDispFact", f,> ...)
-opf.expSetup("OneActuator", 1, "-control", 1, 1, "-sizeTrialOut", 1, 1);  # UC Berkeley setup
-#opf.expSetup("OneActuator", 1, "-control", 1, 1, "-sizeTrialOut", 1, 1, "-trialDispFact", 2.54, "-outDispFact", 1.0/2.54, "-outForceFact", 0.2248);  # UBC setup with units conversion
-#opf.expSetup("OneActuator", 1, "-control", 1, 1, "-sizeTrialOut", 1, 1, "-trialDispFact", ???, "-outDispFact", ???, "-outForceFact", ???);  # Kyoto University with units conversion
+opf.expSetup("OneActuator", 1, "-control", 1, 1, "-sizeTrialOut", 1, 1)
 
 # Define experimental site
 # ------------------------
 # expSite("ActorSite", tag, "-setup", setupTag, ipPort, <"-ssl",> <"-udp">)
-opf.expSite("ActorSite", 2, "-setup", 1, 8091)
+opf.expSite("ActorSite", 1, "-setup", 1, 8091)
 # ------------------------------
 # End of model generation
 # ------------------------------
@@ -68,7 +66,9 @@ opf.expSite("ActorSite", 2, "-setup", 1, 8091)
 # Start the server process
 # ------------------------------
 # startLabServer(siteTag)
-opf.startLabServer(2)
+opf.startLabServer(1)
+#opf.stepLabServer(1, 1790)
+#opf.startLabServerInteractive(1, 1790)
 
 opf.wipeExp()
 exit()
