@@ -80,12 +80,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "PEER"
             VALUE "FileDescription", "Middleware that connects finite element software with control and data aquisition systems in laboratories."
-            VALUE "FileVersion", "2.8.0 (Build 240801) 64-bit"
-            VALUE "InternalName", "OpenFresco.exe"
+            VALUE "FileVersion", "2.8.0 (Build 250801) 64-bit"
+            VALUE "InternalName", "OpenFrescoTcl.exe"
             VALUE "LegalCopyright", "Copyright (C) 2006"
-            VALUE "OriginalFilename", "OpenFresco.exe"
+            VALUE "OriginalFilename", "OpenFrescoTcl.exe"
             VALUE "ProductName", "Open Framework for Experimental Setup and Control"
-            VALUE "ProductVersion", "2.8.0 (Build 240801) 64-bit"
+            VALUE "ProductVersion", "2.8.0 (Build 250801) 64-bit"
         END
     END
     BLOCK "VarFileInfo"

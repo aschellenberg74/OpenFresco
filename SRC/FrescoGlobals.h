@@ -31,7 +31,7 @@
 //
 // Description: This file contains the global values in OpenFresco
 
-#define OPF_VERSION "2.8.0 (Build 250501)"
+#define OPF_VERSION "2.8.0 (Build 250801)"
 
 #ifndef _WIN64
 #define WIN_ARCH "32-Bit"
