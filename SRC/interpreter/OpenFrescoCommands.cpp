@@ -223,19 +223,21 @@ int OPS_SetDoubleDictListOutput(std::map<const char*, std::vector<double>>& data
 
 const char* OPS_GetString()
 {
-    const char* res = 0;
-    if (cmds == 0) return res;
+    if (cmds == 0) return "Invalid String Input!";
     DL_Interpreter* interp = cmds->getInterpreter();
-    return interp->getString();
+    const char* res = interp->getString();
+    if (res == 0) return "Invalid String Input!";
+    return res;
 }
 
 
 const char* OPS_GetStringFromAll(char* buffer, int len)
 {
-    const char* res = 0;
-    if (cmds == 0) return res;
+    if (cmds == 0) return "Invalid String Input!";
     DL_Interpreter* interp = cmds->getInterpreter();
-    return interp->getStringFromAll(buffer, len);
+    const char* res = interp->getStringFromAll(buffer, len);
+    if (res == 0) return "Invalid String Input!";
+    return res;
 }
 
 

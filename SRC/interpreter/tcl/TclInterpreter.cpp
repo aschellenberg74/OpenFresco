@@ -502,6 +502,7 @@ int TclInterpreter::getInt(int* data, int numArgs)
     
     for (int i = 0; i < numArgs; i++) {
         if (Tcl_GetInt(interp, wrapper.getCurrentArgv()[wrapper.getCurrentArg()], &data[i]) != TCL_OK) {
+            wrapper.incrCurrentArg();
             return -1;
         }
         else {
@@ -521,6 +522,7 @@ int TclInterpreter::getDouble(double* data, int numArgs)
     
     for (int i = 0; i < numArgs; i++) {
         if (Tcl_GetDouble(interp, wrapper.getCurrentArgv()[wrapper.getCurrentArg()], &data[i]) != TCL_OK) {
+            wrapper.incrCurrentArg();
             return -1;
         }
         else {

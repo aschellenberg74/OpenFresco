@@ -174,6 +174,10 @@ void* OPF_ExpSiteRecorder()
                 int tag;
                 numdata = 1;
                 if (OPS_GetIntInput(&numdata, &tag) < 0) {
+                    // this is only necessary because in OPS the current arg 
+                    // is incremented when an error occurs in reading input
+                    if (OPS_GetNumRemainingInputArgs() == 0)
+                        OPS_ResetCurrentInputArg(-1);
                     break;
                 }
                 siteTags[numSites++] = tag;

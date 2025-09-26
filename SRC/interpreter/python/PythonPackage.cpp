@@ -192,7 +192,7 @@ int OPS_SetString(const char* str)
 int OPF_removeObject()
 {
     // make sure there is a minimum number of arguments
-    if (OPS_GetNumRemainingInputArgs() < 2) {
+    if (OPS_GetNumRemainingInputArgs() < 1) {
         opserr << "WARNING insufficient number of removeExp component arguments\n";
         opserr << "Want: removeExp type <specific args>\n";
         return -1;
