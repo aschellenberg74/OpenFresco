@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.32413.511
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36518.9 d17.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenFrescoTcl_dll", "proj\OpenFrescoTcl_dll\OpenFrescoTcl_dll.vcxproj", "{41D52F86-31CD-4DCF-8F58-BEC7C09D48E7}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -41,18 +41,6 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "experimentalTangentStiff", "proj\experimentalTangentStiff\experimentalTangentStiff.vcxproj", "{4348FB01-52B7-4985-8C73-2ECB3F2BBC80}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "openseesObjects", "proj\openseesObjects\openseesObjects.vcxproj", "{3F38B122-ABB4-40C8-9FC4-F726610E6844}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenFrescoPy", "proj\OpenFrescoPy\OpenFrescoPy.vcxproj", "{5D56BF73-BEBD-466D-AA17-E670A6B61C16}"
-	ProjectSection(ProjectDependencies) = postProject
-		{4348FB01-52B7-4985-8C73-2ECB3F2BBC80} = {4348FB01-52B7-4985-8C73-2ECB3F2BBC80}
-		{F6B3130A-E1ED-4E12-8B08-0D8E732FA9F1} = {F6B3130A-E1ED-4E12-8B08-0D8E732FA9F1}
-		{BDE03522-35ED-4E29-9313-DBC56BF14A78} = {BDE03522-35ED-4E29-9313-DBC56BF14A78}
-		{3F38B122-ABB4-40C8-9FC4-F726610E6844} = {3F38B122-ABB4-40C8-9FC4-F726610E6844}
-		{3F0D6A32-FE16-48F1-945C-71A6ADE7B288} = {3F0D6A32-FE16-48F1-945C-71A6ADE7B288}
-		{183FF9A2-35E5-4F05-8263-64DC88D29798} = {183FF9A2-35E5-4F05-8263-64DC88D29798}
-		{3E2AA8E0-EEAA-449E-80F4-4C6C0F1ED6A1} = {3E2AA8E0-EEAA-449E-80F4-4C6C0F1ED6A1}
-		{2FD3B8EC-80B5-4096-A4D2-BF5C067A6370} = {2FD3B8EC-80B5-4096-A4D2-BF5C067A6370}
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -100,10 +88,6 @@ Global
 		{3F38B122-ABB4-40C8-9FC4-F726610E6844}.Debug|Win32.Build.0 = Debug|Win32
 		{3F38B122-ABB4-40C8-9FC4-F726610E6844}.Release|Win32.ActiveCfg = Release|Win32
 		{3F38B122-ABB4-40C8-9FC4-F726610E6844}.Release|Win32.Build.0 = Release|Win32
-		{5D56BF73-BEBD-466D-AA17-E670A6B61C16}.Debug|Win32.ActiveCfg = Debug|Win32
-		{5D56BF73-BEBD-466D-AA17-E670A6B61C16}.Debug|Win32.Build.0 = Debug|Win32
-		{5D56BF73-BEBD-466D-AA17-E670A6B61C16}.Release|Win32.ActiveCfg = Release|Win32
-		{5D56BF73-BEBD-466D-AA17-E670A6B61C16}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
