@@ -131,8 +131,8 @@ ops.recorder("Node", "-file", "Node_Vel.out", "-time", "-node", 3, 4, "-dof", 1,
 ops.recorder("Node", "-file", "Node_Acc.out", "-time", "-node", 3, 4, "-dof", 1, "accel")
 
 ops.recorder("Element", "-file", "Elmt_Frc.out", "-time", "-ele", 1, 2, 3, "forces")
-ops.recorder("Element", "-file", "Elmt_ctrlDsp.out", "-time", "-ele", 1, "ctrlDisp")
-ops.recorder("Element", "-file", "Elmt_daqDsp.out", "-time", "-ele", 1, "daqDisp")
+ops.recorder("Element", "-file", "Elmt_ctrlDsp.out", "-time", "-ele", 1, 2, "ctrlDisp")
+ops.recorder("Element", "-file", "Elmt_daqDsp.out", "-time", "-ele", 1, 2, "daqDisp")
 # --------------------------------
 # End of recorder generation
 # --------------------------------

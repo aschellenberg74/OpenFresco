@@ -1,8 +1,8 @@
-# File: OneBayFrame_Local.py
+# File: OneBayFrame_Local_Client.py (use with OneBayFrame_Local_SimAppServer.py)
 # Units: [kip,in.]
 #
 # Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
-# Created: 06/21
+# Created: 11/06
 # Revision: A
 #
 # Purpose: this file contains the python input to perform
@@ -21,7 +21,7 @@ import math
 # ------------------------------
 # Start of model generation
 # ------------------------------
-ops.logFile("OneBayFrame_Local.log")
+ops.logFile("OneBayFrame_Local_Client.log")
 ops.defaultUnits("-force", "kip", "-length", "in", "-time", "sec", "-temp", "F")
 
 # create ModelBuilder (with two-dimensions and 2 DOF/node)
@@ -58,45 +58,39 @@ ops.uniaxialMaterial("Elastic", 2, 5.6)
 #ops.uniaxialMaterial("Steel02", 2, 3.0, 5.6, 0.01, 18.5, 0.925, 0.15, 0.0, 1.0, 0.0, 1.0) 
 ops.uniaxialMaterial("Elastic", 3, 2.0*100.0/1.0)
 
-# Define control points
-# ---------------------
-# expControlPoint(tag, <"-node", nodeTag,> dof, rspType, <"-fact", f,> <"-lim", l, u,> <"-relTrial",> <"-relCtrl",> <"-relDaq",> ...)
-ops.expControlPoint(1,  "1", "disp")
-ops.expControlPoint(2,  "1", "disp", "1", "force")
-
 # Define experimental control
 # ---------------------------
 # expControl("SimUniaxialMaterials", tag, matTags)
-ops.expControl("SimUniaxialMaterials", 1, 1)
-#ops.expControl("xPCtarget", 1, "192.168.2.20", 22222, "D:/PredictorCorrector/RTActualTestModels/cmAPI-xPCTarget-SCRAMNet-STS/HybridControllerD2D2", "-trialCP", 1, "-outCP", 2)
-#ops.expControl("SCRAMNet", 1, 381020, "-trialCP", 1, "-outCP", 2)
-#ops.expControl("SCRAMNetGT", 1, 4096, "-trialCP", 1, "-outCP", 2)
 ops.expControl("SimUniaxialMaterials", 2, 2)
 
 # Define experimental setup
 # -------------------------
 # expSetup("OneActuator", tag, <"-control", ctrlTag,> dir, "-sizeTrialOut", t, o, <"-trialDispFact", f,> ...)
-ops.expSetup("OneActuator", 1, "-control", 1, 1, "-sizeTrialOut", 1, 1)
 ops.expSetup("OneActuator", 2, "-control", 2, 1, "-sizeTrialOut", 1, 1)
 
 # Define experimental site
 # ------------------------
 # expSite("LocalSite", tag, setupTag)
-ops.expSite("LocalSite", 1, 1)
 ops.expSite("LocalSite", 2, 2)
 
 # Define experimental elements
 # ----------------------------
-# left and right columns
-# expElement("twoNodeLink", eleTag, iNode, jNode, "-dir", dirs, "-site", siteTag, "-initStif", Kij, <"-orient", <x1, x2, x3,> y1, y2, y3,> <"-pDelta", Mratios,> <"-iMod",> <"-mass", m>)
-ops.expElement("twoNodeLink", 1, 1, 3, "-dir", 2, "-site", 1, "-initStif", 2.8)
-ops.expElement("twoNodeLink", 2, 2, 4, "-dir", 2, "-site", 2, "-initStif", 5.6)
+# left column
+# element("genericClient", eleTag, "-node", Ndi, Ndj, ..., "-dof", dofNdi, "-dof", dofNdj, ..., "-server", ipPort, ipAddr, "-ssl", "-udp", "-dataSize", size)
+#ops.element("genericClient", 1, "-node", 1, 3, "-dof", 1, 2, "-dof", 1, 2, "-server", 8090, "-udp");  # use with SimAppElemServer
+
+# expElement("twoNodeLink", eleTag, iNode, jNode, "-dir", dirs, "-server", ipPort, <ipAddr,> <"-ssl",> <"-udp",> <"-dataSize", size,> "-initStif", Kij, <"-orient", <x1, x2, x3,> y1, y2, y3,> <"-pDelta", Mratios,> <"-iMod",> <"-mass", m>)
+ops.expElement("twoNodeLink", 1, 1, 3, "-dir", 2, "-server", 8090, "-udp", "-initStif", 2.8);  # use with SimAppSiteServer
 
 # Define numerical elements
 # -------------------------
 # spring
 # element("truss", eleTag, iNode, jNode, A, matTag)
 ops.element("truss", 3, 3, 4, 1.0, 3)
+
+# right column
+# element("twoNodeLink", eleTag, iNode, jNode, "-mat", matTags, "-dir", dirs, <"-orient", <x1, x2, x3,> y1, y2, y3,> <"-pDelta", Mratios,> <"-mass", m)>
+ops.element("twoNodeLink", 2, 2, 4, "-mat", 2, "-dir", 2)
 
 # Define dynamic loads
 # --------------------
@@ -134,11 +128,9 @@ ops.constraints("Plain")
 # create the convergence test
 ops.test("EnergyIncr", 1.0e-6, 10)
 # create the integration scheme
-#ops.integrator("Newmark", 0.5, 0.25)
 ops.integrator("NewmarkExplicit", 0.5)
-#integrator("AlphaOS", 1.0)
+#ops.integrator("AlphaOS", 1.0)
 # create the solution algorithm
-#ops.algorithm("Newton")
 ops.algorithm("Linear")
 # create the analysis object 
 ops.analysis("Transient")
@@ -151,13 +143,48 @@ ops.analysis("Transient")
 # Start of recorder generation
 # ------------------------------
 # create the recorder objects
-ops.recorder("Node", "-file", "Node_Dsp.out", "-time", "-node", 3, 4, "-dof", 1, "disp")
-ops.recorder("Node", "-file", "Node_Vel.out", "-time", "-node", 3, 4, "-dof", 1, "vel")
-ops.recorder("Node", "-file", "Node_Acc.out", "-time", "-node", 3, 4, "-dof", 1, "accel")
+ops.recorder("Node", "-file", "ClientNode_Dsp.out", "-time", "-node", 3, 4, "-dof", 1, "disp")
+ops.recorder("Node", "-file", "ClientNode_Vel.out", "-time", "-node", 3, 4, "-dof", 1, "vel")
+ops.recorder("Node", "-file", "ClientNode_Acc.out", "-time", "-node", 3, 4, "-dof", 1, "accel")
 
-ops.recorder("Element", "-file", "Elmt_Frc.out", "-time", "-ele", 1, 2, 3, "forces")
-ops.recorder("Element", "-file", "Elmt_ctrlDsp.out", "-time", "-ele", 1, 2, "ctrlDisp")
-ops.recorder("Element", "-file", "Elmt_daqDsp.out", "-time", "-ele", 1, 2, "daqDisp")
+ops.recorder("Element", "-file", "ClientElmt_Frc.out", "-time", "-ele", 1, 2, 3, "forces")
+ops.recorder("Element", "-file", "ClientElmt_ctrlDsp.out", "-time", "-ele", 1, 2, "ctrlDisp")
+ops.recorder("Element", "-file", "ClientElmt_daqDsp.out", "-time", "-ele", 1, 2, "daqDisp")
+
+ops.expRecorder("Site", "-file", "ServerSite_trialDsp.out", "-time", "-site", 2, "trialDisp")
+ops.expRecorder("Site", "-file", "ServerSite_trialVel.out", "-time", "-site", 2, "trialVel")
+ops.expRecorder("Site", "-file", "ServerSite_trialAcc.out", "-time", "-site", 2, "trialAccel")
+ops.expRecorder("Site", "-file", "ServerSite_trialTme.out", "-time", "-site", 2, "trialTime")
+ops.expRecorder("Site", "-file", "ServerSite_outDsp.out", "-time", "-site", 2, "outDisp")
+ops.expRecorder("Site", "-file", "ServerSite_outVel.out", "-time", "-site", 2, "outVel")
+ops.expRecorder("Site", "-file", "ServerSite_outAcc.out", "-time", "-site", 2, "outAccel")
+ops.expRecorder("Site", "-file", "ServerSite_outFrc.out", "-time", "-site", 2, "outForce")
+ops.expRecorder("Site", "-file", "ServerSite_outTme.out", "-time", "-site", 2, "outTime")
+
+ops.expRecorder("Setup", "-file", "ServerSetup_trialDsp.out", "-time", "-setup", 2, "trialDisp")
+ops.expRecorder("Setup", "-file", "ServerSetup_trialVel.out", "-time", "-setup", 2, "trialVel")
+ops.expRecorder("Setup", "-file", "ServerSetup_trialAcc.out", "-time", "-setup", 2, "trialAccel")
+ops.expRecorder("Setup", "-file", "ServerSetup_trialTme.out", "-time", "-setup", 2, "trialTime")
+ops.expRecorder("Setup", "-file", "ServerSetup_outDsp.out", "-time", "-setup", 2, "outDisp")
+ops.expRecorder("Setup", "-file", "ServerSetup_outVel.out", "-time", "-setup", 2, "outVel")
+ops.expRecorder("Setup", "-file", "ServerSetup_outAcc.out", "-time", "-setup", 2, "outAccel")
+ops.expRecorder("Setup", "-file", "ServerSetup_outFrc.out", "-time", "-setup", 2, "outForce")
+ops.expRecorder("Setup", "-file", "ServerSetup_outTme.out", "-time", "-setup", 2, "outTime")
+ops.expRecorder("Setup", "-file", "ServerSetup_ctrlDsp.out", "-time", "-setup", 2, "ctrlDisp")
+ops.expRecorder("Setup", "-file", "ServerSetup_ctrlVel.out", "-time", "-setup", 2, "ctrlVel")
+ops.expRecorder("Setup", "-file", "ServerSetup_ctrlAcc.out", "-time", "-setup", 2, "ctrlAccel")
+ops.expRecorder("Setup", "-file", "ServerSetup_ctrlTme.out", "-time", "-setup", 2, "ctrlTime")
+ops.expRecorder("Setup", "-file", "ServerSetup_daqDsp.out", "-time", "-setup", 2, "daqDisp")
+ops.expRecorder("Setup", "-file", "ServerSetup_daqVel.out", "-time", "-setup", 2, "daqVel")
+ops.expRecorder("Setup", "-file", "ServerSetup_daqAcc.out", "-time", "-setup", 2, "daqAccel")
+ops.expRecorder("Setup", "-file", "ServerSetup_daqFrc.out", "-time", "-setup", 2, "daqForce")
+ops.expRecorder("Setup", "-file", "ServerSetup_daqTme.out", "-time", "-setup", 2, "daqTime")
+
+ops.expRecorder("Control", "-file", "ServerControl_ctrlDsp.out", "-time", "-control", 2, "ctrlDisp")
+ops.expRecorder("Control", "-file", "ServerControl_ctrlVel.out", "-time", "-control", 2, "ctrlVel")
+ops.expRecorder("Control", "-file", "ServerControl_daqDsp.out", "-time", "-control", 2, "daqDisp")
+ops.expRecorder("Control", "-file", "ServerControl_daqVel.out", "-time", "-control", 2, "daqVel")
+ops.expRecorder("Control", "-file", "ServerControl_daqFrc.out", "-time", "-control", 2, "daqForce")
 # --------------------------------
 # End of recorder generation
 # --------------------------------
@@ -189,7 +216,7 @@ print('')
 ops.stop()
 #print("\nElapsed Time = $tTot \n")
 
-ops.wipeExp()
+#wipeExp()
 ops.wipe()
 exit()
 # --------------------------------

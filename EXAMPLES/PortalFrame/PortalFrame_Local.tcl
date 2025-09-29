@@ -1,10 +1,6 @@
 # File: PortalFrame_Local.tcl
 # Units: [kip,in.]
 #
-# $Revision$
-# $Date$
-# $URL$
-#
 # Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
 # Created: 10/07
 # Revision: A
@@ -28,8 +24,8 @@ model BasicBuilder -ndm 2 -ndf 3
 
 # Load OpenFresco package
 # -----------------------
-# (make sure all dlls are in the same folder as openSees.exe)
-loadPackage OpenFresco
+# (make sure all dlls are in the same folder as OpenFrescoTcl)
+loadPackage OpenFrescoTcl
 
 # Define geometry for model
 # -------------------------
@@ -57,7 +53,7 @@ uniaxialMaterial Steel02 1 1.5 2.8 0.01 18.5 0.925 0.15 0.0 1.0 0.0 1.0
 
 # Define control points
 # ---------------------
-# expControlPoint $tag <-node $nodeTag> $dof $rspType <-fact $f> <-lim $l $u> ...
+# expControlPoint $tag <-node $nodeTag> $dof $rspType <-fact $f> <-lim $l $u> <-relTrial> <-relCtrl> <-relDaq> ...
 expControlPoint 1  1 disp
 expControlPoint 2  1 disp 1 force
 
@@ -101,7 +97,8 @@ if {$withGravity} {
     # Define gravity loads
     # --------------------
     # Create a Plain load pattern with a Linear TimeSeries
-    pattern Plain 1 "Linear" {
+	timeSeries Linear 1
+    pattern Plain 1 1 {
         # Create nodal loads at nodes 2
         #    nd    FX          FY  MZ 
         load  3   0.0  [expr -$P] 0.0
@@ -126,7 +123,7 @@ if {$withGravity} {
     # Create the integration scheme
     integrator LoadControl 0.1
     # Create the solution algorithm
-    algorithm Newton
+    algorithm NewtonLineSearch
     # Create the analysis object
     analysis Static
     # ------------------------------
@@ -177,11 +174,11 @@ if {$withGravity} {
 # set time series to be passed to uniform excitation
 set dt 0.01
 set scale 1.2
-timeSeries Path 1 -filePath SACNF01.txt -dt $dt -factor [expr 386.1*$scale]
+timeSeries Path 2 -filePath SACNF01.txt -dt $dt -factor [expr 386.1*$scale]
 
 # create UniformExcitation load pattern
 # pattern UniformExcitation $tag $dir -accel $tsTag <-vel0 $vel0>
-pattern UniformExcitation 2 1 -accel 1
+pattern UniformExcitation 2 1 -accel 2
 
 # calculate the Rayleigh damping factors for nodes & elements
 set alphaM     1.2797;    # D = alphaM*M
@@ -199,6 +196,7 @@ rayleigh $alphaM $betaK $betaKinit $betaKcomm
 # ------------------------------
 # Start of analysis generation
 # ------------------------------
+wipeAnalysis
 # create the system of equations
 system BandGeneral
 # create the DOF numberer
@@ -214,7 +212,7 @@ integrator NewmarkHSFixedNumIter 0.5 0.25
 #integrator CollocationHSFixedNumIter 1.5
 #integrator AlphaOS 0.9
 # create the solution algorithm
-algorithm Newton
+algorithm NewtonLineSearch
 #algorithm Linear
 # create the analysis object 
 analysis Transient
@@ -251,7 +249,7 @@ record
 set pi [expr acos(-1.0)]
 set lambda [eigen -fullGenLapack 4]
 puts "\nEigenvalues at start of transient:"
-puts "|   lambda   |  omega   |  period | frequency |"
+puts "|   lambda  |   omega  |  period | frequency |"
 foreach lambda $lambda {
     set omega [expr pow($lambda,0.5)]
     set period [expr 2.0*$pi/$omega]

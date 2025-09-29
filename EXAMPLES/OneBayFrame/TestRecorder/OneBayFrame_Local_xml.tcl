@@ -23,8 +23,8 @@ model BasicBuilder -ndm 2 -ndf 2
 
 # Load OpenFresco package
 # -----------------------
-# (make sure all dlls are in the same folder as openSees.exe)
-loadPackage OpenFresco
+# (make sure all dlls are in the same folder as OpenFrescoTcl)
+loadPackage OpenFrescoTcl
 
 # Define geometry for model
 # -------------------------
@@ -54,7 +54,7 @@ uniaxialMaterial Elastic 3 [expr 2.0*100.0/1.0]
 
 # Define control points
 # ---------------------
-# expControlPoint $tag <-node $nodeTag> $dof $rspType <-fact $f> <-lim $l $u> <-isRel> ...
+# expControlPoint $tag <-node $nodeTag> $dof $rspType <-fact $f> <-lim $l $u> <-relTrial> <-relCtrl> <-relDaq> ...
 expControlPoint 1  1 disp
 expControlPoint 2  1 disp 1 force
 

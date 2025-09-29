@@ -31,7 +31,7 @@ uniaxialMaterial Elastic 1  5.6;  # UC Berkeley Cantilever Column [kip/in]
 
 # Define control points
 # ---------------------
-# expControlPoint $tag <-node $nodeTag> $dof $rspType <-fact $f> <-lim $l $u> ...
+# expControlPoint $tag <-node $nodeTag> $dof $rspType <-fact $f> <-lim $l $u> <-relTrial> <-relCtrl> <-relDaq> ...
 expControlPoint 1  1 disp
 expControlPoint 2  1 disp 1 force
 
