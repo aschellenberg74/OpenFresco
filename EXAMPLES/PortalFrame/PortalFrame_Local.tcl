@@ -174,7 +174,7 @@ if {$withGravity} {
 # set time series to be passed to uniform excitation
 set dt 0.01
 set scale 1.2
-timeSeries Path 2 -filePath SACNF01.txt -dt $dt -factor [expr 386.1*$scale]
+timeSeries Path 2 -filePath SACNF01.txt -dt $dt -factor [expr 32.174*12*$scale]
 
 # create UniformExcitation load pattern
 # pattern UniformExcitation $tag $dir -accel $tsTag <-vel0 $vel0>
