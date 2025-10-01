@@ -226,7 +226,7 @@ ECSpeedgoat::ECSpeedgoat(int tag, int nTrialCPs, ExperimentalCP** trialcps,
     
     // setup the connection to the Speedgoat target
     if (udp)
-        theChannel = new UDP_Socket(ipPort, ipAddress, false);
+        theChannel = new UDP_Socket(ipPort, false, false);
     else
         theChannel = new TCP_Socket(ipPort, ipAddress);
     if (!theChannel) {
