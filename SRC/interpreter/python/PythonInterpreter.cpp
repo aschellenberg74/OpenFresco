@@ -460,9 +460,11 @@ void cleanupFunc()
     if (interp != 0) {
         delete interp;
     }
-    if (pymodule != 0) {
-        delete pymodule;
-    }
+    // NOTE: do NOT `delete pymodule`. It is a PyObject* created by
+    // PyModule_Create and owned/ref-counted by Python (allocated with
+    // Python's allocator). C++ delete frees it with the system allocator,
+    // causing "free(): invalid pointer" (SIGABRT) at interpreter shutdown.
+    // Python releases the module itself during finalization.
 }
 
 
