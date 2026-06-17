@@ -400,6 +400,19 @@ static PyObject* Py_opf_startLabServer(PyObject* self, PyObject* args)
 }
 
 
+static PyObject* Py_opf_startLabServerInteractive(PyObject* self, PyObject* args)
+{
+    wrapper->resetCommandLine((int)PyTuple_Size(args), 1, args);
+    
+    if (OPF_startLabServerInteractive() < 0) {
+        opserr << (void*)0;
+        return NULL;
+    }
+    
+    return wrapper->getResults();
+}
+
+
 static PyObject* Py_opf_setupLabServer(PyObject* self, PyObject* args)
 {
     wrapper->resetCommandLine((int)PyTuple_Size(args), 1, args);
@@ -717,6 +730,7 @@ void PythonWrapper::addOpenFrescoCommands()
     addCommand("expRecorder", &Py_opf_expRecorder);
     addCommand("recordExp", &Py_opf_recordExp);
     addCommand("startLabServer", &Py_opf_startLabServer);
+    addCommand("startLabServerInteractive", &Py_opf_startLabServerInteractive);
     addCommand("setupLabServer", &Py_opf_setupLabServer);
     addCommand("stepLabServer", &Py_opf_stepLabServer);
     addCommand("stopLabServer", &Py_opf_stopLabServer);
