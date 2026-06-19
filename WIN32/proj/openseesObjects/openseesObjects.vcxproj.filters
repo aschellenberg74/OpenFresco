@@ -411,6 +411,24 @@
     <ClCompile Include="..\..\..\SRC\openseesCore\BeamFiberMaterial2dPS.cpp">
       <Filter>core</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\EQ_Constraint.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesCore\SingleDomEQ_Iter.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\BisectionLineSearch.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\InitialInterpolatedLineSearch.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\PenaltyEQ_FE.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\SRC\openseesExtra\SecantLineSearch.cpp">
+      <Filter>extra</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\SRC\openseesCore\Analysis.h">
@@ -895,6 +913,30 @@
     </ClInclude>
     <ClInclude Include="..\..\..\SRC\openseesCore\BeamFiberMaterial2dPS.h">
       <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\EQ_Constraint.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\EQ_ConstraintIter.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\GenericDict.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesCore\SingleDomEQ_Iter.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\BisectionLineSearch.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\InitialInterpolatedLineSearch.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\PenaltyEQ_FE.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\SRC\openseesExtra\SecantLineSearch.h">
+      <Filter>extra</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

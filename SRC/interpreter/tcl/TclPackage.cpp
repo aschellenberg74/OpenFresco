@@ -129,6 +129,26 @@ int OPS_SetString(const char* str)
 }
 
 
+int OPS_SetStringList(std::vector<const char*>& data)
+{
+    // a vector holds tcl objects of lists
+    std::vector<Tcl_Obj*> tclData(data.size());
+    
+    // for each string
+    for (int i = 0; i < (int)data.size(); ++i) {
+        tclData[i] = Tcl_NewStringObj(data[i], (int)strlen(data[i]));
+    }
+    
+    // Tcl object for list of list
+    Tcl_Obj* list = Tcl_NewListObj((int)tclData.size(), &tclData[0]);
+    
+    // set result
+    Tcl_SetObjResult(theInterp, list);
+    
+    return 0;
+}
+
+
 int OPF_removeObject()
 {
     // make sure there is a minimum number of arguments

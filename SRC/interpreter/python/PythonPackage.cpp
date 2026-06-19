@@ -149,6 +149,17 @@ void setOutputs(const char* str)
 }
 
 
+void setOutputs(std::vector<const char*>& data)
+{
+    PyObject* item = PyList_New((Py_ssize_t)data.size());
+    for (std::size_t i = 0; i < data.size(); ++i) {
+        setOutputs(data[i]);
+        PyList_SET_ITEM(item, i, currentResult);
+    }
+    currentResult = item;
+}
+
+
 PyObject* getResults()
 {
     PyObject* result = currentResult;
@@ -184,6 +195,14 @@ int OPS_SetDoubleOutput(int* numData, double* data, bool scalar)
 int OPS_SetString(const char* str)
 {
     setOutputs(str);
+    
+    return 0;
+}
+
+
+int OPS_SetStringList(std::vector<const char*>& data)
+{
+    setOutputs(data);
     
     return 0;
 }

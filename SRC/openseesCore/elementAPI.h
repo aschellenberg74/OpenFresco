@@ -29,6 +29,8 @@
 #ifndef _eleAPI
 #define _eleAPI
 
+#include "GenericDict.h"
+
 #define ISW_INIT 0
 #define ISW_COMMIT 1
 #define ISW_REVERT 2
@@ -221,6 +223,8 @@ extern "C" int         OPS_SetStringList(std::vector<const char*>& data);
 extern "C" int         OPS_SetStringLists(std::vector<std::vector<const char*>>& data);
 extern "C" int         OPS_SetStringDict(std::map<const char*, const char*>& data);
 extern "C" int         OPS_SetStringDictList(std::map<const char*, std::vector<const char*>>& data);
+extern "C" int         OPS_SetGenericDict(GenericDict& data);
+extern "C" void*       OPS_GetVoidPtr();
 
 extern "C" int         OPS_GetNDM();
 extern "C" int         OPS_GetNDF();
@@ -300,6 +304,7 @@ int     OPS_InvokeMaterial(eleObject*, int*, modelState*, double*, double*, doub
 int     OPS_InvokeMaterialDirectly(matObject**, modelState*, double*, double*, double*, int*);
 int     OPS_InvokeMaterialDirectly2(matObject*, modelState*, double*, double*, double*, int*);
 
+void*  OPS_GetVoidPtr();
 AnalysisModel** OPS_GetAnalysisModel(void);
 EquiSolnAlgo** OPS_GetAlgorithm(void);
 ConstraintHandler** OPS_GetHandler(void);
