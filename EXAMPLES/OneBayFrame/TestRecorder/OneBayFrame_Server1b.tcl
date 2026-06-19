@@ -32,14 +32,17 @@ uniaxialMaterial Elastic 1  5.6;  # UC Berkeley Cantilever Column [kip/in]
 # Define control points
 # ---------------------
 # expControlPoint $tag <-node $nodeTag> $dof $rspType <-fact $f> <-lim $l $u> <-relTrial> <-relCtrl> <-relDaq> ...
-expControlPoint 1  1 disp
-expControlPoint 2  1 disp 1 force
+expControlPoint 1 1 disp
+expControlPoint 2 1 disp 1 force
 
 # Define experimental control
 # ---------------------------
 # expControl SimUniaxialMaterials $tag $matTags
 expControl SimUniaxialMaterials 1 1
-#expControl xPCtarget 1 "192.168.2.20" 22222 "D:/PredictorCorrector/RTActualTestModels/cmAPI-xPCTarget-SCRAMNet-STS/HybridControllerD2D2" -trialCP 1 -outCP 2
+#ops.expControl("xPCtarget", 1, "192.168.2.20", 22222, "D:/PredictorCorrector/RTActualTestModels/cmAPI-xPCTarget-SCRAMNet-STS/HybridControllerD2D2", "-trialCP", 1, "-outCP", 2)
+#ops.expControl("Speedgoat", 1, "10.10.10.5", 25000, "-udp", "-trialCP", 1, "-outCP", 2)
+#ops.expControl("SCRAMNet", 1, "-nodeID", 3, 381020, "-trialCP", 1, "-outCP", 2)
+#ops.expControl("SCRAMNetGT", 1, "-nodeID", 3, 4096, "-trialCP", 1, "-outCP", 2)
 
 # Define experimental setup
 # -------------------------

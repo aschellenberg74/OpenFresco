@@ -37,16 +37,17 @@ opf.uniaxialMaterial("Steel02", 1, 1.5, 2.8, 0.01, 18.5, 0.925, 0.15, 0.0, 1.0, 
 # Define control points
 # ---------------------
 # expControlPoint(tag, <"-node", nodeTag,> dof, rspType, <"-fact", f,> <"-lim", l, u,> <"-relTrial",> <"-relCtrl",> <"-relDaq",> ...)
-opf.expControlPoint(1,  "1", "disp")
-opf.expControlPoint(2,  "1", "disp", "1", "force")
+opf.expControlPoint(1, "1", "disp")
+opf.expControlPoint(2, "1", "disp", "1", "force")
 
 # Define experimental control
 # ---------------------------
 # expControl("SimUniaxialMaterials", tag, matTags)
 opf.expControl("SimUniaxialMaterials", 1, 1)
-#opf.expControl("xPCtarget", 1, "192.168.2.20", 22222, "D:/PredictorCorrector/RTActualTestModels/cmAPI-xPCTarget-SCRAMNet-STS/HybridControllerD2D2", "-trialCP", 1, "-outCP", 2)
-#opf.expControl("SCRAMNet", 1, 381020, "-trialCP", 1, "-outCP", 2)
-#opf.expControl("SCRAMNetGT", 1, 4096, "-trialCP", 1, "-outCP", 2)
+#ops.expControl("xPCtarget", 1, "192.168.2.20", 22222, "D:/PredictorCorrector/RTActualTestModels/cmAPI-xPCTarget-SCRAMNet-STS/HybridControllerD2D2", "-trialCP", 1, "-outCP", 2)
+#ops.expControl("Speedgoat", 1, "10.10.10.5", 25000, "-udp", "-trialCP", 1, "-outCP", 2)
+#ops.expControl("SCRAMNet", 1, "-nodeID", 3, 381020, "-trialCP", 1, "-outCP", 2)
+#ops.expControl("SCRAMNetGT", 1, "-nodeID", 3, 4096, "-trialCP", 1, "-outCP", 2)
 
 # Define experimental setup
 # -------------------------

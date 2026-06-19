@@ -61,16 +61,17 @@ ops.uniaxialMaterial("Elastic", 3, 2.0*100.0/1.0)
 # Define control points
 # ---------------------
 # expControlPoint(tag, <"-node", nodeTag,> dof, rspType, <"-fact", f,> <"-lim", l, u,> <"-relTrial",> <"-relCtrl",> <"-relDaq",> ...)
-ops.expControlPoint(1,  "1", "disp")
-ops.expControlPoint(2,  "1", "disp", "1", "force")
+ops.expControlPoint(1, "1", "disp")
+ops.expControlPoint(2, "1", "disp", "1", "force")
 
 # Define experimental control
 # ---------------------------
 # expControl("SimUniaxialMaterials", tag, matTags)
 ops.expControl("SimUniaxialMaterials", 1, 1)
 #ops.expControl("xPCtarget", 1, "192.168.2.20", 22222, "D:/PredictorCorrector/RTActualTestModels/cmAPI-xPCTarget-SCRAMNet-STS/HybridControllerD2D2", "-trialCP", 1, "-outCP", 2)
-#ops.expControl("SCRAMNet", 1, 381020, "-trialCP", 1, "-outCP", 2)
-#ops.expControl("SCRAMNetGT", 1, 4096, "-trialCP", 1, "-outCP", 2)
+#ops.expControl("Speedgoat", 1, "10.10.10.5", 25000, "-udp", "-trialCP", 1, "-outCP", 2)
+#ops.expControl("SCRAMNet", 1, "-nodeID", 3, 381020, "-trialCP", 1, "-outCP", 2)
+#ops.expControl("SCRAMNetGT", 1, "-nodeID", 3, 4096, "-trialCP", 1, "-outCP", 2)
 ops.expControl("SimUniaxialMaterials", 2, 2)
 
 # Define experimental setup

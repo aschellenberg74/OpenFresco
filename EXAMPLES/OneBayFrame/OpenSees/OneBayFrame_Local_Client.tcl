@@ -69,10 +69,10 @@ expSite LocalSite 2 2
 # ----------------------------
 # left column
 # element genericClient $eleTag -node $Ndi $Ndj ... -dof $dofNdi -dof $dofNdj ... -server $ipPort <$ipAddr> <-ssl> <-udp> <-dataSize $size>
-element genericClient 1 -node 1 3 -dof 1 2 -dof 1 2 -server 8090 -udp;  # use with SimAppElemServer
+#element genericClient 1 -node 1 3 -dof 1 2 -dof 1 2 -server 8090 -udp;  # use with SimAppElemServer
 
 # expElement twoNodeLink $eleTag $iNode $jNode -dir $dirs -server $ipPort <ipAddr> <-ssl> <-udp> <-dataSize $size> -initStif $Kij <-orient <$x1 $x2 $x3> $y1 $y2 $y3> <-pDelta Mratios> <-iMod> <-mass $m>
-#expElement twoNodeLink 1 1 3 -dir 2 -server 8090 -udp -initStif 2.8;  # use with SimAppSiteServer
+expElement twoNodeLink 1 1 3 -dir 2 -server 8090 -udp -initStif 2.8;  # use with SimAppSiteServer
 
 # Define numerical elements
 # -------------------------
@@ -168,6 +168,7 @@ set outFileID [open elapsedTime.txt w]
 # perform the transient analysis
 set dtAna [expr 20.0/1024.0]
 set tTot [time {
+	#analyzeInteractive  1790  $dtAna
     for {set i 1} {$i < 1790} {incr i} {
         set t [time {analyze  1  $dtAna}]
         puts $outFileID $t

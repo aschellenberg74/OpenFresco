@@ -174,6 +174,7 @@ for i in range(2):
 
 # perform the transient analysis
 dtAna = 20.0/1024.0
+#ops.analyzeInteractive(1790, dtAna)
 for i in range(1790):
     ops.analyze(1, dtAna)
 
@@ -181,7 +182,7 @@ print('')
 ops.stop()
 #print("\nElapsed Time = $tTot \n")
 
-#wipeExp()
+ops.wipeExp()
 ops.wipe()
 exit()
 # --------------------------------
