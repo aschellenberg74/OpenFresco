@@ -122,6 +122,7 @@ private:
     Matrix theMatrix;           // objects matrix
     Vector theVector;           // objects vector
     Vector theLoad;             // load vector
+    Vector accelScratch;        // scratch for inertia assembly (avoids per-step allocation)
     
     Channel *theChannel;        // channel
     double *sData;              // send data array

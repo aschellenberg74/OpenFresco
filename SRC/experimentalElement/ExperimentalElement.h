@@ -80,6 +80,12 @@ protected:
     // initial stiffness matrix
     Matrix theInitStiff;
 
+    // per-instance zero vectors returned by the default response
+    // getters (replaces function-local statics that were shared
+    // between elements of different size)
+    Vector zeroResponse;
+    Vector zeroTime;
+
 private:
     // the following methods must be defined if the Element object 
     // is inherited, but are meaningless for this element.

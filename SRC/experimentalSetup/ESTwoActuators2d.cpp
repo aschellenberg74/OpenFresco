@@ -146,7 +146,8 @@ ESTwoActuators2d::ESTwoActuators2d(int tag,
     int nlgeom, const char *posact, double philocx)
     : ExperimentalSetup(tag, control),
     La0(actLength0), La1(actLength1), L(rigidLength),
-    nlGeom(nlgeom), phiLocX(philocx), rotLocX(3,3)
+    nlGeom(nlgeom), phiLocX(philocx), rotLocX(3,3),
+    dRot(3), vRot(3), aRot(3), fRot(3)
 {
     strcpy(posAct,posact);
 
@@ -157,7 +158,8 @@ ESTwoActuators2d::ESTwoActuators2d(int tag,
 
 ESTwoActuators2d::ESTwoActuators2d(const ESTwoActuators2d& es)
     : ExperimentalSetup(es),
-    rotLocX(3,3)
+    rotLocX(3,3),
+    dRot(3), vRot(3), aRot(3), fRot(3)
 {
     La0     = es.La0;
     La1     = es.La1;
@@ -289,8 +291,8 @@ void ESTwoActuators2d::Print(OPS_Stream &s, int flag)
 int ESTwoActuators2d::transfTrialDisp(const Vector* disp)
 {  
     // rotate direction
-    static Vector d(3);
-    d = rotLocX*(*disp);
+    Vector &d = dRot;
+    d.addMatrixVector(0.0, rotLocX, *disp, 1.0);
 
     // linear geometry, actuators left
     if (nlGeom == 0 && strcmp(posAct,"left") == 0)  {
@@ -335,9 +337,9 @@ int ESTwoActuators2d::transfTrialVel(const Vector* disp,
     const Vector* vel)
 {  
     // rotate direction
-    static Vector d(3), v(3);
-    d = rotLocX*(*disp);
-    v = rotLocX*(*vel);
+    Vector &d = dRot, &v = vRot;
+    d.addMatrixVector(0.0, rotLocX, *disp, 1.0);
+    v.addMatrixVector(0.0, rotLocX, *vel, 1.0);
 
     // linear geometry, actuators left
     if (nlGeom == 0 && strcmp(posAct,"left") == 0)  {
@@ -383,10 +385,10 @@ int ESTwoActuators2d::transfTrialAccel(const Vector* disp,
     const Vector* accel)
 {  
     // rotate direction
-    static Vector d(3), v(3), a(3);
-    d = rotLocX*(*disp);
-    v = rotLocX*(*vel);
-    a = rotLocX*(*accel);
+    Vector &d = dRot, &v = vRot, &a = aRot;
+    d.addMatrixVector(0.0, rotLocX, *disp, 1.0);
+    v.addMatrixVector(0.0, rotLocX, *vel, 1.0);
+    a.addMatrixVector(0.0, rotLocX, *accel, 1.0);
 
     // linear geometry, actuators left
     if (nlGeom == 0 && strcmp(posAct,"left") == 0)  {
@@ -424,8 +426,8 @@ int ESTwoActuators2d::transfTrialAccel(const Vector* disp,
 int ESTwoActuators2d::transfTrialForce(const Vector* force)
 {  
     // rotate direction
-    static Vector f(3);
-    f = rotLocX*(*force);
+    Vector &f = fRot;
+    f.addMatrixVector(0.0, rotLocX, *force, 1.0);
 
     // linear geometry, actuators left
     if (nlGeom == 0 && strcmp(posAct,"left") == 0)  {

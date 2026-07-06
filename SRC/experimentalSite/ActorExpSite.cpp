@@ -106,7 +106,7 @@ void* OPF_ActorExpSite()
     
     // optional parameters
     int ssl = 0, udp = 0;
-    int noDelay = 0;
+    int noDelay = 1;
     while (OPS_GetNumRemainingInputArgs() > 0) {
         type = OPS_GetString();
         if (strcmp(type, "-ssl") == 0) {

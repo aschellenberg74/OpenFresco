@@ -97,7 +97,7 @@ void* OPF_ShadowExpSite()
     
     // optional parameters
     int ssl = 0, udp = 0;
-    int noDelay = 0;
+    int noDelay = 1;
     int dataSize = OF_Network_dataSize;
     while (OPS_GetNumRemainingInputArgs() > 0) {
         type = OPS_GetString();
@@ -328,11 +328,39 @@ int ShadowExpSite::setSize(ID sizeT, ID sizeO)
     
     // send experimental setup to ActorExpSite
     this->setup();
-    
+
     // resize channel Vectors
     sendV.resize(dataSize);
     recvV.resize(dataSize);
-    
+
+    // pre-allocate the communication buffers here so that the first
+    // setTrialResponse()/checkDaqResponse() call does not pay the
+    // allocation cost (avoids a first-step latency spike)
+    if (theSetup != 0 && bDisp == 0)  {
+        if (getCtrlSize(OF_Resp_Disp) != 0)
+            bDisp = new Vector(getCtrlSize(OF_Resp_Disp));
+        if (getCtrlSize(OF_Resp_Vel) != 0)
+            bVel = new Vector(getCtrlSize(OF_Resp_Vel));
+        if (getCtrlSize(OF_Resp_Accel) != 0)
+            bAccel = new Vector(getCtrlSize(OF_Resp_Accel));
+        if (getCtrlSize(OF_Resp_Force) != 0)
+            bForce = new Vector(getCtrlSize(OF_Resp_Force));
+        if (getCtrlSize(OF_Resp_Time) != 0)
+            bTime = new Vector(getCtrlSize(OF_Resp_Time));
+    }
+    if (rDisp == 0)  {
+        if (getDaqSize(OF_Resp_Disp) != 0)
+            rDisp = new Vector(getDaqSize(OF_Resp_Disp));
+        if (getDaqSize(OF_Resp_Vel) != 0)
+            rVel = new Vector(getDaqSize(OF_Resp_Vel));
+        if (getDaqSize(OF_Resp_Accel) != 0)
+            rAccel = new Vector(getDaqSize(OF_Resp_Accel));
+        if (getDaqSize(OF_Resp_Force) != 0)
+            rForce = new Vector(getDaqSize(OF_Resp_Force));
+        if (getDaqSize(OF_Resp_Time) != 0)
+            rTime = new Vector(getDaqSize(OF_Resp_Time));
+    }
+
     return OF_ReturnType_completed;
 }
 

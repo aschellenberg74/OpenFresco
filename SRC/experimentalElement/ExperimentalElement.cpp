@@ -49,6 +49,7 @@ ExperimentalElement::ExperimentalElement(int tag,
     theSite(site), theTangStiff(0),
     sizeCtrl(0), sizeDaq(0),
     theInitStiff(1,1),
+    zeroResponse(1), zeroTime(1),
     firstWarning(true)
 {
     // get copy of experimental tangent stiffness
@@ -104,36 +105,46 @@ const Matrix& ExperimentalElement::getInitialStiff()
 const Vector& ExperimentalElement::getDisp()
 {
     // return global vector with all components zero
-    static Vector dg(this->getNumDOF());
-    
-    return dg;
+    // (member instead of a function-local static, which was shared
+    // between elements and kept the size of the first caller)
+    if (zeroResponse.Size() != this->getNumDOF())  {
+        zeroResponse.resize(this->getNumDOF());
+        zeroResponse.Zero();
+    }
+    return zeroResponse;
 }
 
 
 const Vector& ExperimentalElement::getVel()
 {
     // return global vector with all components zero
-    static Vector vg(this->getNumDOF());
-    
-    return vg;
+    // (member instead of a function-local static, which was shared
+    // between elements and kept the size of the first caller)
+    if (zeroResponse.Size() != this->getNumDOF())  {
+        zeroResponse.resize(this->getNumDOF());
+        zeroResponse.Zero();
+    }
+    return zeroResponse;
 }
 
 
 const Vector& ExperimentalElement::getAccel()
 {
     // return global vector with all components zero
-    static Vector ag(this->getNumDOF());
-    
-    return ag;
+    // (member instead of a function-local static, which was shared
+    // between elements and kept the size of the first caller)
+    if (zeroResponse.Size() != this->getNumDOF())  {
+        zeroResponse.resize(this->getNumDOF());
+        zeroResponse.Zero();
+    }
+    return zeroResponse;
 }
 
 
 const Vector& ExperimentalElement::getTime()
 {
     // return global vector with all components zero
-    static Vector time(1);
-    
-    return time;
+    return zeroTime;
 }
 
 

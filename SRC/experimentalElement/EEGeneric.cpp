@@ -27,6 +27,8 @@
 
 #include "EEGeneric.h"
 
+#include <float.h>
+
 #include <Domain.h>
 #include <Node.h>
 #include <Channel.h>
@@ -312,7 +314,7 @@ EEGeneric::EEGeneric(int tag, ID nodes, ID *dof,
     numExternalNodes(0), numDOF(0), numBasicDOF(0),
     iMod(iM), addRayleigh(addRay), mass(0),
     checkTime(checktime),
-    theMatrix(1,1), theVector(1), theLoad(1),
+    theMatrix(1,1), theVector(1), theLoad(1), accelScratch(1),
     db(0), vb(0), ab(0), t(0),
     dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
     dbCtrl(1), vbCtrl(1), abCtrl(1),
@@ -406,7 +408,7 @@ EEGeneric::EEGeneric(int tag, ID nodes, ID *dof,
     numExternalNodes(0), numDOF(0), numBasicDOF(0),
     iMod(iM), addRayleigh(addRay), mass(0),
     checkTime(checktime),
-    theMatrix(1,1), theVector(1), theLoad(1),
+    theMatrix(1,1), theVector(1), theLoad(1), accelScratch(1),
     theChannel(0), sData(0), sendData(0), rData(0), recvData(0),
     db(0), vb(0), ab(0), t(0),
     dbDaq(0), vbDaq(0), abDaq(0), qDaq(0), tDaq(0),
@@ -671,7 +673,9 @@ void EEGeneric::setDomain(Domain *theDomain)
     theVector.Zero();
     theLoad.resize(numDOF);
     theLoad.Zero();
-    
+    accelScratch.resize(numDOF);
+    accelScratch.Zero();
+
     // call the base class method
     this->DomainComponent::setDomain(theDomain);
 }
@@ -714,24 +718,30 @@ int EEGeneric::update()
     Domain *theDomain = this->getDomain();
     (*t)(0) = theDomain->getCurrentTime();
     
-    // assemble response vectors
-    int ndim = 0, i;
-    db->Zero(); vb->Zero(); ab->Zero();
+    // assemble response vectors (element-wise to avoid allocating
+    // temporary Vectors on this per-step path)
+    int ndim = 0, i, j;
     for (i=0; i<numExternalNodes; i++)  {
-        Vector disp = theNodes[i]->getTrialDisp();
-        Vector vel = theNodes[i]->getTrialVel();
-        Vector accel = theNodes[i]->getTrialAccel();
-        db->Assemble(disp(theDOF[i]), ndim);
-        vb->Assemble(vel(theDOF[i]), ndim);
-        ab->Assemble(accel(theDOF[i]), ndim);
-        ndim += theDOF[i].Size();
+        const Vector &disp = theNodes[i]->getTrialDisp();
+        const Vector &vel = theNodes[i]->getTrialVel();
+        const Vector &accel = theNodes[i]->getTrialAccel();
+        const ID &dof = theDOF[i];
+        for (j=0; j<dof.Size(); j++)  {
+            (*db)(ndim+j) = disp(dof(j));
+            (*vb)(ndim+j) = vel(dof(j));
+            (*ab)(ndim+j) = accel(dof(j));
+        }
+        ndim += dof.Size();
     }
-    
-    Vector dbDelta = (*db) - dbLast;
+
+    // check if displacements have changed, without allocating a delta vector
+    // (equivalent to ((*db) - dbLast).pNorm(0) > DBL_EPSILON)
+    bool dbChanged = false;
+    for (i=0; i<db->Size() && !dbChanged; i++)
+        dbChanged = fabs((*db)(i) - dbLast(i)) > DBL_EPSILON;
     // do not check time for right now because of transformation constraint
     // handler calling update at beginning of new step when applying load
-    // if (dbDelta.pNorm(0) > DBL_EPSILON || (*t)(0) > tLast)  {
-    if (dbDelta.pNorm(0) > DBL_EPSILON || (checkTime && (*t)(0) > tLast))  {
+    if (dbChanged || (checkTime && (*t)(0) > tLast))  {
         // set the trial response at the site
         if (theSite != 0)  {
             theSite->setTrialResponse(db, vb, ab, (Vector*)0, t);
@@ -819,18 +829,18 @@ int EEGeneric::addInertiaLoadToUnbalance(const Vector &accel)
     }
     
     int ndim = 0, i;
-    Vector Raccel(numDOF);
-    
+
     // get mass matrix
-    Matrix M = this->getMass();
+    const Matrix &M = this->getMass();
     // assemble Raccel vector
+    accelScratch.Zero();
     for (i=0; i<numExternalNodes; i++ )  {
-        Raccel.Assemble(theNodes[i]->getRV(accel), ndim);
+        accelScratch.Assemble(theNodes[i]->getRV(accel), ndim);
         ndim += theNodes[i]->getNumberDOF();
     }
-    
+
     // want to add ( - fact * M R * accel ) to unbalance
-    theLoad.addMatrixVector(1.0, M, Raccel, -1.0);
+    theLoad.addMatrixVector(1.0, M, accelScratch, -1.0);
     
     return 0;
 }
@@ -896,17 +906,17 @@ const Vector& EEGeneric::getResistingForceIncInertia()
     // add inertia forces from element mass
     if (mass != 0)  {
         int ndim = 0, i;
-        Vector accel(numDOF);
-        
+
         // get mass matrix
-        Matrix M = this->getMass();
+        const Matrix &M = this->getMass();
         // assemble accel vector
+        accelScratch.Zero();
         for (i=0; i<numExternalNodes; i++ )  {
-            accel.Assemble(theNodes[i]->getTrialAccel(), ndim);
+            accelScratch.Assemble(theNodes[i]->getTrialAccel(), ndim);
             ndim += theNodes[i]->getNumberDOF();
         }
-        
-        theVector.addMatrixVector(1.0, M, accel, 1.0);
+
+        theVector.addMatrixVector(1.0, M, accelScratch, 1.0);
     }
     
     return theVector;

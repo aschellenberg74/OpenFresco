@@ -27,6 +27,8 @@
 
 #include "EETruss.h"
 
+#include <float.h>
+
 #include <Domain.h>
 #include <Node.h>
 #include <Channel.h>
@@ -711,12 +713,11 @@ int EETruss::update()
         (*ab)(0) += (accel2(i)-accel1(i))*cosX[i];
     }
     
-    // calculate incremental displacement command
-    Vector dbDelta = (*db) - dbLast;
+    // check if the displacement command changed, without allocating
+    // a delta vector on this per-step path (db has size 1)
     // do not check time for right now because of transformation constraint
     // handler calling update at beginning of new step when applying load
-    // if (dbDelta.pNorm(0) > DBL_EPSILON || (*t)(0) > tLast)  {
-    if (dbDelta.pNorm(0) > DBL_EPSILON)  {
+    if (fabs((*db)(0) - dbLast(0)) > DBL_EPSILON)  {
         // set the trial response at the site
         if (theSite != 0)  {
             theSite->setTrialResponse(db, vb, ab, (Vector*)0, t);

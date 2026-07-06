@@ -95,7 +95,15 @@ private:
     double phiLocX;     // angle of local x axis w.r.t actuator 0 [deg]
     
     Matrix rotLocX;     // rotation matrix
-    
+
+    // pre-allocated scratch for the rotated response (avoids
+    // function-local statics that are not reentrant and heap
+    // temporaries on the per-step transformation path)
+    Vector dRot;
+    Vector vRot;
+    Vector aRot;
+    Vector fRot;
+
     bool firstWarning[3];
 };
 

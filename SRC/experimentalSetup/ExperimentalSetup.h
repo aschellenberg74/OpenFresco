@@ -203,7 +203,15 @@ protected:
     Vector *dAccelFact;
     Vector *dForceFact;
     Vector *dTimeFact;
-    
+
+    // cached result of checking whether all factors are 1.0, used to
+    // skip the per-step scaling passes in transfTrialResponse() and
+    // transfDaqResponse(); recomputed whenever a factor changes
+    bool factorsDirty;
+    bool trialFactUnity;
+    bool daqFactUnity;
+    void updateFactorCache();
+
     // protected tranformation methods
     virtual int transfTrialDisp(const Vector* disp) = 0;
     virtual int transfTrialVel(const Vector* vel) = 0;

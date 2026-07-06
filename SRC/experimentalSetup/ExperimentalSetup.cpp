@@ -84,7 +84,8 @@ ExperimentalSetup::ExperimentalSetup(int tag,
     tDispFact(0), tVelFact(0), tAccelFact(0), tForceFact(0), tTimeFact(0),
     oDispFact(0), oVelFact(0), oAccelFact(0), oForceFact(0), oTimeFact(0),
     cDispFact(0), cVelFact(0), cAccelFact(0), cForceFact(0), cTimeFact(0),
-    dDispFact(0), dVelFact(0), dAccelFact(0), dForceFact(0), dTimeFact(0)
+    dDispFact(0), dVelFact(0), dAccelFact(0), dForceFact(0), dTimeFact(0),
+    factorsDirty(true), trialFactUnity(false), daqFactUnity(false)
 {
     sizeTrial = new ID(OF_Resp_All);
     sizeOut = new ID(OF_Resp_All);
@@ -114,7 +115,8 @@ ExperimentalSetup::ExperimentalSetup(const ExperimentalSetup& es)
     tDispFact(0), tVelFact(0), tAccelFact(0), tForceFact(0), tTimeFact(0),
     oDispFact(0), oVelFact(0), oAccelFact(0), oForceFact(0), oTimeFact(0),
     cDispFact(0), cVelFact(0), cAccelFact(0), cForceFact(0), cTimeFact(0),
-    dDispFact(0), dVelFact(0), dAccelFact(0), dForceFact(0), dTimeFact(0)
+    dDispFact(0), dVelFact(0), dAccelFact(0), dForceFact(0), dTimeFact(0),
+    factorsDirty(true), trialFactUnity(false), daqFactUnity(false)
 {
     if (es.theControl != 0)  {
         theControl = (es.theControl)->getCopy();
@@ -564,49 +566,117 @@ int ExperimentalSetup::getDaqResponse(Vector* disp,
 }
 
 
-int ExperimentalSetup::transfTrialResponse(const Vector* disp, 
+static bool vectorIsUnity(const Vector* v)
+{
+    if (v == 0)
+        return true;
+    for (int i=0; i<v->Size(); i++)
+        if ((*v)(i) != 1.0)
+            return false;
+    return true;
+}
+
+
+void ExperimentalSetup::updateFactorCache()
+{
+    trialFactUnity = vectorIsUnity(tDispFact) && vectorIsUnity(tVelFact)
+        && vectorIsUnity(tAccelFact) && vectorIsUnity(tForceFact)
+        && vectorIsUnity(tTimeFact)
+        && vectorIsUnity(cDispFact) && vectorIsUnity(cVelFact)
+        && vectorIsUnity(cAccelFact) && vectorIsUnity(cForceFact)
+        && vectorIsUnity(cTimeFact);
+    daqFactUnity = vectorIsUnity(dDispFact) && vectorIsUnity(dVelFact)
+        && vectorIsUnity(dAccelFact) && vectorIsUnity(dForceFact)
+        && vectorIsUnity(dTimeFact)
+        && vectorIsUnity(oDispFact) && vectorIsUnity(oVelFact)
+        && vectorIsUnity(oAccelFact) && vectorIsUnity(oForceFact)
+        && vectorIsUnity(oTimeFact);
+    factorsDirty = false;
+}
+
+
+int ExperimentalSetup::transfTrialResponse(const Vector* disp,
     const Vector* vel,
     const Vector* accel,
     const Vector* force,
     const Vector* time)
 {
-    // transform data
+    if (factorsDirty)
+        this->updateFactorCache();
+
+    // transform data (the scaling passes are skipped when all
+    // factors are 1.0, which is the common case)
     if (disp != 0)  {
-        for (int i=0; i<(*sizeTrial)(OF_Resp_Disp); i++)
-            (*tDisp)(i) = (*disp)(i) * (*tDispFact)(i);
-        this->transfTrialDisp(tDisp);
-        for (int i=0; i<(*sizeCtrl)(OF_Resp_Disp); i++)
-            (*cDisp)(i) *= (*cDispFact)(i);
+        if (trialFactUnity)  {
+            for (int i=0; i<(*sizeTrial)(OF_Resp_Disp); i++)
+                (*tDisp)(i) = (*disp)(i);
+            this->transfTrialDisp(tDisp);
+        }
+        else  {
+            for (int i=0; i<(*sizeTrial)(OF_Resp_Disp); i++)
+                (*tDisp)(i) = (*disp)(i) * (*tDispFact)(i);
+            this->transfTrialDisp(tDisp);
+            for (int i=0; i<(*sizeCtrl)(OF_Resp_Disp); i++)
+                (*cDisp)(i) *= (*cDispFact)(i);
+        }
     }
     if (vel != 0)  {
-        for (int i=0; i<(*sizeTrial)(OF_Resp_Vel); i++)
-            (*tVel)(i) = (*vel)(i) * (*tVelFact)(i);
-        this->transfTrialVel(tVel);
-        for (int i=0; i<(*sizeCtrl)(OF_Resp_Vel); i++)
-            (*cVel)(i) *= (*cVelFact)(i);
+        if (trialFactUnity)  {
+            for (int i=0; i<(*sizeTrial)(OF_Resp_Vel); i++)
+                (*tVel)(i) = (*vel)(i);
+            this->transfTrialVel(tVel);
+        }
+        else  {
+            for (int i=0; i<(*sizeTrial)(OF_Resp_Vel); i++)
+                (*tVel)(i) = (*vel)(i) * (*tVelFact)(i);
+            this->transfTrialVel(tVel);
+            for (int i=0; i<(*sizeCtrl)(OF_Resp_Vel); i++)
+                (*cVel)(i) *= (*cVelFact)(i);
+        }
     }
     if (accel != 0)  {
-        for (int i=0; i<(*sizeTrial)(OF_Resp_Accel); i++)
-            (*tAccel)(i) = (*accel)(i) * (*tAccelFact)(i);
-        this->transfTrialAccel(tAccel);
-        for (int i=0; i<(*sizeCtrl)(OF_Resp_Accel); i++)
-            (*cAccel)(i) *= (*cAccelFact)(i);
+        if (trialFactUnity)  {
+            for (int i=0; i<(*sizeTrial)(OF_Resp_Accel); i++)
+                (*tAccel)(i) = (*accel)(i);
+            this->transfTrialAccel(tAccel);
+        }
+        else  {
+            for (int i=0; i<(*sizeTrial)(OF_Resp_Accel); i++)
+                (*tAccel)(i) = (*accel)(i) * (*tAccelFact)(i);
+            this->transfTrialAccel(tAccel);
+            for (int i=0; i<(*sizeCtrl)(OF_Resp_Accel); i++)
+                (*cAccel)(i) *= (*cAccelFact)(i);
+        }
     }
     if (force != 0)  {
-        for (int i=0; i<(*sizeTrial)(OF_Resp_Force); i++)
-            (*tForce)(i) = (*force)(i) * (*tForceFact)(i);
-        this->transfTrialForce(tForce);
-        for (int i=0; i<(*sizeCtrl)(OF_Resp_Force); i++)
-            (*cForce)(i) *= (*cForceFact)(i);
+        if (trialFactUnity)  {
+            for (int i=0; i<(*sizeTrial)(OF_Resp_Force); i++)
+                (*tForce)(i) = (*force)(i);
+            this->transfTrialForce(tForce);
+        }
+        else  {
+            for (int i=0; i<(*sizeTrial)(OF_Resp_Force); i++)
+                (*tForce)(i) = (*force)(i) * (*tForceFact)(i);
+            this->transfTrialForce(tForce);
+            for (int i=0; i<(*sizeCtrl)(OF_Resp_Force); i++)
+                (*cForce)(i) *= (*cForceFact)(i);
+        }
     }
     if (time != 0)  {
-        for (int i=0; i<(*sizeTrial)(OF_Resp_Time); i++)
-            (*tTime)(i) = (*time)(i) * (*tTimeFact)(i);
-        this->transfTrialTime(tTime);
-        for (int i=0; i<(*sizeCtrl)(OF_Resp_Time); i++)
-            (*cTime)(i) *= (*cTimeFact)(i);
+        if (trialFactUnity)  {
+            for (int i=0; i<(*sizeTrial)(OF_Resp_Time); i++)
+                (*tTime)(i) = (*time)(i);
+            this->transfTrialTime(tTime);
+        }
+        else  {
+            for (int i=0; i<(*sizeTrial)(OF_Resp_Time); i++)
+                (*tTime)(i) = (*time)(i) * (*tTimeFact)(i);
+            this->transfTrialTime(tTime);
+            for (int i=0; i<(*sizeCtrl)(OF_Resp_Time); i++)
+                (*cTime)(i) *= (*cTimeFact)(i);
+        }
     }
-    
+
     return OF_ReturnType_completed;
 }
 
@@ -617,43 +687,82 @@ int ExperimentalSetup::transfDaqResponse(Vector* disp,
     Vector* force,
     Vector* time)
 {
-    // transform data
+    if (factorsDirty)
+        this->updateFactorCache();
+
+    // transform data (the scaling passes are skipped when all
+    // factors are 1.0, which is the common case)
     if (disp != 0)  {
-        for (int i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)
-            (*dDisp)(i) *= (*dDispFact)(i);
-        this->transfDaqDisp(oDisp);
-        for (int i=0; i<(*sizeOut)(OF_Resp_Disp); i++)
-            (*disp)(i) = (*oDisp)(i) * (*oDispFact)(i);
+        if (daqFactUnity)  {
+            this->transfDaqDisp(oDisp);
+            for (int i=0; i<(*sizeOut)(OF_Resp_Disp); i++)
+                (*disp)(i) = (*oDisp)(i);
+        }
+        else  {
+            for (int i=0; i<(*sizeDaq)(OF_Resp_Disp); i++)
+                (*dDisp)(i) *= (*dDispFact)(i);
+            this->transfDaqDisp(oDisp);
+            for (int i=0; i<(*sizeOut)(OF_Resp_Disp); i++)
+                (*disp)(i) = (*oDisp)(i) * (*oDispFact)(i);
+        }
     }
     if (vel != 0)  {
-        for (int i=0; i<(*sizeDaq)(OF_Resp_Vel); i++)
-            (*dVel)(i) *= (*dVelFact)(i);
-        this->transfDaqVel(oVel);
-        for (int i=0; i<(*sizeOut)(OF_Resp_Vel); i++)
-            (*vel)(i) = (*oVel)(i) * (*oVelFact)(i);
+        if (daqFactUnity)  {
+            this->transfDaqVel(oVel);
+            for (int i=0; i<(*sizeOut)(OF_Resp_Vel); i++)
+                (*vel)(i) = (*oVel)(i);
+        }
+        else  {
+            for (int i=0; i<(*sizeDaq)(OF_Resp_Vel); i++)
+                (*dVel)(i) *= (*dVelFact)(i);
+            this->transfDaqVel(oVel);
+            for (int i=0; i<(*sizeOut)(OF_Resp_Vel); i++)
+                (*vel)(i) = (*oVel)(i) * (*oVelFact)(i);
+        }
     }
     if (accel != 0)  {
-        for (int i=0; i<(*sizeDaq)(OF_Resp_Accel); i++)
-            (*dAccel)(i) *= (*dAccelFact)(i);
-        this->transfDaqAccel(oAccel);
-        for (int i=0; i<(*sizeOut)(OF_Resp_Accel); i++)
-            (*accel)(i) = (*oAccel)(i) * (*oAccelFact)(i);
+        if (daqFactUnity)  {
+            this->transfDaqAccel(oAccel);
+            for (int i=0; i<(*sizeOut)(OF_Resp_Accel); i++)
+                (*accel)(i) = (*oAccel)(i);
+        }
+        else  {
+            for (int i=0; i<(*sizeDaq)(OF_Resp_Accel); i++)
+                (*dAccel)(i) *= (*dAccelFact)(i);
+            this->transfDaqAccel(oAccel);
+            for (int i=0; i<(*sizeOut)(OF_Resp_Accel); i++)
+                (*accel)(i) = (*oAccel)(i) * (*oAccelFact)(i);
+        }
     }
     if (force != 0)  {
-        for (int i=0; i<(*sizeDaq)(OF_Resp_Force); i++)
-            (*dForce)(i) *= (*dForceFact)(i);
-        this->transfDaqForce(oForce);
-        for (int i=0; i<(*sizeOut)(OF_Resp_Force); i++)
-            (*force)(i) = (*oForce)(i) * (*oForceFact)(i);
+        if (daqFactUnity)  {
+            this->transfDaqForce(oForce);
+            for (int i=0; i<(*sizeOut)(OF_Resp_Force); i++)
+                (*force)(i) = (*oForce)(i);
+        }
+        else  {
+            for (int i=0; i<(*sizeDaq)(OF_Resp_Force); i++)
+                (*dForce)(i) *= (*dForceFact)(i);
+            this->transfDaqForce(oForce);
+            for (int i=0; i<(*sizeOut)(OF_Resp_Force); i++)
+                (*force)(i) = (*oForce)(i) * (*oForceFact)(i);
+        }
     }
     if (time != 0)  {
-        for (int i=0; i<(*sizeDaq)(OF_Resp_Time); i++)
-            (*dTime)(i) *= (*dTimeFact)(i);
-        this->transfDaqTime(oTime);
-        for (int i=0; i<(*sizeOut)(OF_Resp_Time); i++)
-            (*time)(i) = (*oTime)(i) * (*oTimeFact)(i);
+        if (daqFactUnity)  {
+            this->transfDaqTime(oTime);
+            for (int i=0; i<(*sizeOut)(OF_Resp_Time); i++)
+                (*time)(i) = (*oTime)(i);
+        }
+        else  {
+            for (int i=0; i<(*sizeDaq)(OF_Resp_Time); i++)
+                (*dTime)(i) *= (*dTimeFact)(i);
+            this->transfDaqTime(oTime);
+            for (int i=0; i<(*sizeOut)(OF_Resp_Time); i++)
+                (*time)(i) = (*oTime)(i) * (*oTimeFact)(i);
+        }
     }
-    
+
     return OF_ReturnType_completed;
 }
 
@@ -1080,6 +1189,7 @@ void ExperimentalSetup::setTrialDispFactor(const Vector& f)
         exit(OF_ReturnType_failed);
     }
     *tDispFact = f;
+    factorsDirty = true;
 }
 
 
@@ -1091,6 +1201,7 @@ void ExperimentalSetup::setTrialVelFactor(const Vector& f)
         exit(OF_ReturnType_failed);
     }
     *tVelFact = f;
+    factorsDirty = true;
 }
 
 
@@ -1102,6 +1213,7 @@ void ExperimentalSetup::setTrialAccelFactor(const Vector& f)
         exit(OF_ReturnType_failed);
     }
     *tAccelFact = f;
+    factorsDirty = true;
 }
 
 
@@ -1113,6 +1225,7 @@ void ExperimentalSetup::setTrialForceFactor(const Vector& f)
         exit(OF_ReturnType_failed);
     }
     *tForceFact = f;
+    factorsDirty = true;
 }
 
 
@@ -1124,6 +1237,7 @@ void ExperimentalSetup::setTrialTimeFactor(const Vector& f)
         exit(OF_ReturnType_failed);
     }
     *tTimeFact = f;
+    factorsDirty = true;
 }
 
 
@@ -1135,6 +1249,7 @@ void ExperimentalSetup::setOutDispFactor(const Vector& f)
         exit(OF_ReturnType_failed);
     }
     *oDispFact = f;
+    factorsDirty = true;
 }
 
 
@@ -1146,6 +1261,7 @@ void ExperimentalSetup::setOutVelFactor(const Vector& f)
         exit(OF_ReturnType_failed);
     }
     *oVelFact = f;
+    factorsDirty = true;
 }
 
 
@@ -1157,6 +1273,7 @@ void ExperimentalSetup::setOutAccelFactor(const Vector& f)
         exit(OF_ReturnType_failed);
     }
     *oAccelFact = f;
+    factorsDirty = true;
 }
 
 
@@ -1168,6 +1285,7 @@ void ExperimentalSetup::setOutForceFactor(const Vector& f)
         exit(OF_ReturnType_failed);
     }
     *oForceFact = f;
+    factorsDirty = true;
 }
 
 
@@ -1179,6 +1297,7 @@ void ExperimentalSetup::setOutTimeFactor(const Vector& f)
         exit(OF_ReturnType_failed);
     }
     *oTimeFact = f;
+    factorsDirty = true;
 }
 
 
@@ -1190,6 +1309,7 @@ void ExperimentalSetup::setCtrlDispFactor(const Vector& f)
         exit(OF_ReturnType_failed);
     }
     *cDispFact = f;
+    factorsDirty = true;
 }
 
 
@@ -1201,6 +1321,7 @@ void ExperimentalSetup::setCtrlVelFactor(const Vector& f)
         exit(OF_ReturnType_failed);
     }
     *cVelFact = f;
+    factorsDirty = true;
 }
 
 
@@ -1212,6 +1333,7 @@ void ExperimentalSetup::setCtrlAccelFactor(const Vector& f)
         exit(OF_ReturnType_failed);
     }
     *cAccelFact = f;
+    factorsDirty = true;
 }
 
 
@@ -1223,6 +1345,7 @@ void ExperimentalSetup::setCtrlForceFactor(const Vector& f)
         exit(OF_ReturnType_failed);
     }
     *cForceFact = f;
+    factorsDirty = true;
 }
 
 
@@ -1234,6 +1357,7 @@ void ExperimentalSetup::setCtrlTimeFactor(const Vector& f)
         exit(OF_ReturnType_failed);
     }
     *cTimeFact = f;
+    factorsDirty = true;
 }
 
 
@@ -1245,6 +1369,7 @@ void ExperimentalSetup::setDaqDispFactor(const Vector& f)
         exit(OF_ReturnType_failed);
     }
     *dDispFact = f;
+    factorsDirty = true;
 }
 
 
@@ -1256,6 +1381,7 @@ void ExperimentalSetup::setDaqVelFactor(const Vector& f)
         exit(OF_ReturnType_failed);
     }
     *dVelFact = f;
+    factorsDirty = true;
 }
 
 
@@ -1267,6 +1393,7 @@ void ExperimentalSetup::setDaqAccelFactor(const Vector& f)
         exit(OF_ReturnType_failed);
     }
     *dAccelFact = f;
+    factorsDirty = true;
 }
 
 
@@ -1278,6 +1405,7 @@ void ExperimentalSetup::setDaqForceFactor(const Vector& f)
         exit(OF_ReturnType_failed);
     }
     *dForceFact = f;
+    factorsDirty = true;
 }
 
 
@@ -1289,6 +1417,7 @@ void ExperimentalSetup::setDaqTimeFactor(const Vector& f)
         exit(OF_ReturnType_failed);
     }
     *dTimeFact = f;
+    factorsDirty = true;
 }
 
 

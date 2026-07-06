@@ -294,15 +294,16 @@ int ExperimentalSite::setTrialResponse(const Vector* disp,
     const Vector* force,
     const Vector* time)
 {
-    if (tDisp != 0)
+    // skip self-copies: callers may pass the site's own vectors
+    if (tDisp != 0 && tDisp != disp)
         *tDisp = *disp;
-    if (tVel != 0)
+    if (tVel != 0 && tVel != vel)
         *tVel = *vel;
-    if (tAccel != 0)
+    if (tAccel != 0 && tAccel != accel)
         *tAccel = *accel;
-    if (tForce != 0)
+    if (tForce != 0 && tForce != force)
         *tForce = *force;
-    if (tTime != 0)
+    if (tTime != 0 && tTime != time)
         *tTime = *time;
     
     return OF_ReturnType_completed;
@@ -315,15 +316,18 @@ int ExperimentalSite::setDaqResponse(const Vector* disp,
     const Vector* force,
     const Vector* time)
 {
-    if (oDisp != 0)
+    // skip self-copies: LocalExpSite::checkDaqResponse() passes the
+    // site's own output vectors, which made these full vector copies
+    // of themselves on every step
+    if (oDisp != 0 && oDisp != disp)
         *oDisp = *disp;
-    if (oVel != 0)
+    if (oVel != 0 && oVel != vel)
         *oVel = *vel;
-    if (oAccel != 0)
+    if (oAccel != 0 && oAccel != accel)
         *oAccel = *accel;
-    if (oForce != 0)
+    if (oForce != 0 && oForce != force)
         *oForce = *force;
-    if (oTime != 0)
+    if (oTime != 0 && oTime != time)
         *oTime = *time;
     
     return OF_ReturnType_completed;
