@@ -31,6 +31,7 @@
 
 #include "UDP_Socket.h"
 #include <string.h>
+#include <errno.h>
 #include <Matrix.h>
 #include <Vector.h>
 #include <ID.h>
@@ -72,6 +73,16 @@ UDP_Socket::UDP_Socket()
         opserr << "UDP_Socket::UDP_Socket() - could not open socket\n";
         cleanup_sockets();
         exit(-1);
+    }
+
+    // enlarge kernel buffers so bursts of per-step datagrams are not
+    // dropped (UDP has no retransmission)
+    {
+        int bufSize = 512*1024;
+        setsockopt(sockfd, SOL_SOCKET, SO_RCVBUF,
+            (char *)&bufSize, sizeof(bufSize));
+        setsockopt(sockfd, SOL_SOCKET, SO_SNDBUF,
+            (char *)&bufSize, sizeof(bufSize));
     }
     
     // bind local address to it
@@ -120,6 +131,16 @@ UDP_Socket::UDP_Socket(unsigned int port,
         opserr << "UDP_Socket::UDP_Socket() - could not open socket\n";
         cleanup_sockets();
         exit(-1);
+    }
+
+    // enlarge kernel buffers so bursts of per-step datagrams are not
+    // dropped (UDP has no retransmission)
+    {
+        int bufSize = 512*1024;
+        setsockopt(sockfd, SOL_SOCKET, SO_RCVBUF,
+            (char *)&bufSize, sizeof(bufSize));
+        setsockopt(sockfd, SOL_SOCKET, SO_SNDBUF,
+            (char *)&bufSize, sizeof(bufSize));
     }
     
     // bind local address to it
@@ -178,6 +199,16 @@ UDP_Socket::UDP_Socket(unsigned int other_Port,
         opserr << "UDP_Socket::UDP_Socket() - could not open socket\n";
         cleanup_sockets();
         exit(-1);
+    }
+
+    // enlarge kernel buffers so bursts of per-step datagrams are not
+    // dropped (UDP has no retransmission)
+    {
+        int bufSize = 512*1024;
+        setsockopt(sockfd, SOL_SOCKET, SO_RCVBUF,
+            (char *)&bufSize, sizeof(bufSize));
+        setsockopt(sockfd, SOL_SOCKET, SO_SNDBUF,
+            (char *)&bufSize, sizeof(bufSize));
     }
     
     // bind local address to it
@@ -453,15 +484,18 @@ UDP_Socket::recvMsg(int dbTag, int commitTag,
     size = msg.length;
     
     while (size > 0) {
-        if (size <= MAX_UDP_DATAGRAM) {
-            recvfrom(sockfd, gMsg, size, 0, &other_Addr.addr, &addrLength);
-            size = 0;
+        int nchunk = (size <= MAX_UDP_DATAGRAM) ? size : MAX_UDP_DATAGRAM;
+        int nread = recvfrom(sockfd, gMsg, nchunk, 0, &other_Addr.addr, &addrLength);
+        if (nread <= 0) {
+#ifndef _WIN32
+            if (nread < 0 && errno == EINTR)
+                continue;
+#endif
+            opserr << "UDP_Socket::recvMsg() - error receiving data\n";
+            return -1;
         }
-        else {
-            recvfrom(sockfd, gMsg, MAX_UDP_DATAGRAM, 0, &other_Addr.addr, &addrLength);
-            gMsg += MAX_UDP_DATAGRAM;
-            size -= MAX_UDP_DATAGRAM;
-        }
+        gMsg += nread;
+        size -= nread;
     }
     
     // check the address that message came from was correct
@@ -530,15 +564,18 @@ UDP_Socket::sendMsg(int dbTag, int commitTag,
     size = msg.length;
     
     while (size > 0) {
-        if (size <= MAX_UDP_DATAGRAM) {
-            sendto(sockfd, gMsg, size, 0, &other_Addr.addr, addrLength);
-            size = 0;
+        int nchunk = (size <= MAX_UDP_DATAGRAM) ? size : MAX_UDP_DATAGRAM;
+        int nwrite = sendto(sockfd, gMsg, nchunk, 0, &other_Addr.addr, addrLength);
+        if (nwrite <= 0) {
+#ifndef _WIN32
+            if (nwrite < 0 && errno == EINTR)
+                continue;
+#endif
+            opserr << "UDP_Socket::sendMsg() - error sending data\n";
+            return -1;
         }
-        else {
-            sendto(sockfd, gMsg, MAX_UDP_DATAGRAM, 0, &other_Addr.addr, addrLength);
-            gMsg += MAX_UDP_DATAGRAM;
-            size -= MAX_UDP_DATAGRAM;
-        }
+        gMsg += nwrite;
+        size -= nwrite;
     }
     
     return 0;
@@ -557,15 +594,18 @@ UDP_Socket::recvMatrix(int dbTag, int commitTag,
     size = theMatrix.dataSize * sizeof(double);
     
     while (size > 0) {
-        if (size <= MAX_UDP_DATAGRAM) {
-            recvfrom(sockfd, gMsg, size, 0, &other_Addr.addr, &addrLength);
-            size = 0;
+        int nchunk = (size <= MAX_UDP_DATAGRAM) ? size : MAX_UDP_DATAGRAM;
+        int nread = recvfrom(sockfd, gMsg, nchunk, 0, &other_Addr.addr, &addrLength);
+        if (nread <= 0) {
+#ifndef _WIN32
+            if (nread < 0 && errno == EINTR)
+                continue;
+#endif
+            opserr << "UDP_Socket::recvMatrix() - error receiving data\n";
+            return -1;
         }
-        else {
-            recvfrom(sockfd, gMsg, MAX_UDP_DATAGRAM, 0, &other_Addr.addr, &addrLength);
-            gMsg += MAX_UDP_DATAGRAM;
-            size -= MAX_UDP_DATAGRAM;
-        }
+        gMsg += nread;
+        size -= nread;
     }
     
 #ifndef _WIN32
@@ -639,15 +679,23 @@ UDP_Socket::sendMatrix(int dbTag, int commitTag,
 #endif
     
     while (size > 0) {
-        if (size <= MAX_UDP_DATAGRAM) {
-            sendto(sockfd, gMsg, size, 0, &other_Addr.addr, addrLength);
-            size = 0;
+        int nchunk = (size <= MAX_UDP_DATAGRAM) ? size : MAX_UDP_DATAGRAM;
+        int nwrite = sendto(sockfd, gMsg, nchunk, 0, &other_Addr.addr, addrLength);
+        if (nwrite <= 0) {
+#ifndef _WIN32
+            if (nwrite < 0 && errno == EINTR)
+                continue;
+            // restore the caller's data before bailing out
+            if (endiannessProblem) {
+                void *array = (void *)data;
+                byte_swap(array, theMatrix.dataSize, sizeof(double));
+            }
+#endif
+            opserr << "UDP_Socket::sendMatrix() - error sending data\n";
+            return -1;
         }
-        else {
-            sendto(sockfd, gMsg, MAX_UDP_DATAGRAM, 0, &other_Addr.addr, addrLength);
-            gMsg += MAX_UDP_DATAGRAM;
-            size -= MAX_UDP_DATAGRAM;
-        }
+        gMsg += nwrite;
+        size -= nwrite;
     }
     
 #ifndef _WIN32
@@ -673,15 +721,18 @@ UDP_Socket::recvVector(int dbTag, int commitTag,
     size = theVector.sz * sizeof(double);
     
     while (size > 0) {
-        if (size <= MAX_UDP_DATAGRAM) {
-            recvfrom(sockfd, gMsg, size, 0, &other_Addr.addr, &addrLength);
-            size = 0;
+        int nchunk = (size <= MAX_UDP_DATAGRAM) ? size : MAX_UDP_DATAGRAM;
+        int nread = recvfrom(sockfd, gMsg, nchunk, 0, &other_Addr.addr, &addrLength);
+        if (nread <= 0) {
+#ifndef _WIN32
+            if (nread < 0 && errno == EINTR)
+                continue;
+#endif
+            opserr << "UDP_Socket::recvVector() - error receiving data\n";
+            return -1;
         }
-        else {
-            recvfrom(sockfd, gMsg, MAX_UDP_DATAGRAM, 0, &other_Addr.addr, &addrLength);
-            gMsg += MAX_UDP_DATAGRAM;
-            size -= MAX_UDP_DATAGRAM;
-        }
+        gMsg += nread;
+        size -= nread;
     }
     
 #ifndef _WIN32
@@ -755,15 +806,23 @@ UDP_Socket::sendVector(int dbTag, int commitTag,
 #endif
     
     while (size > 0) {
-        if (size <= MAX_UDP_DATAGRAM) {
-            sendto(sockfd, gMsg, size, 0, &other_Addr.addr, addrLength);
-            size = 0;
+        int nchunk = (size <= MAX_UDP_DATAGRAM) ? size : MAX_UDP_DATAGRAM;
+        int nwrite = sendto(sockfd, gMsg, nchunk, 0, &other_Addr.addr, addrLength);
+        if (nwrite <= 0) {
+#ifndef _WIN32
+            if (nwrite < 0 && errno == EINTR)
+                continue;
+            // restore the caller's data before bailing out
+            if (endiannessProblem) {
+                void *array = (void *)data;
+                byte_swap(array, theVector.sz, sizeof(double));
+            }
+#endif
+            opserr << "UDP_Socket::sendVector() - error sending data\n";
+            return -1;
         }
-        else {
-            sendto(sockfd, gMsg, MAX_UDP_DATAGRAM, 0, &other_Addr.addr, addrLength);
-            gMsg += MAX_UDP_DATAGRAM;
-            size -= MAX_UDP_DATAGRAM;
-        }
+        gMsg += nwrite;
+        size -= nwrite;
     }
     
 #ifndef _WIN32
@@ -789,15 +848,18 @@ UDP_Socket::recvID(int dbTag, int commitTag,
     size = theID.sz * sizeof(int);
     
     while (size > 0) {
-        if (size <= MAX_UDP_DATAGRAM) {
-            recvfrom(sockfd, gMsg, size, 0, &other_Addr.addr, &addrLength);
-            size = 0;
+        int nchunk = (size <= MAX_UDP_DATAGRAM) ? size : MAX_UDP_DATAGRAM;
+        int nread = recvfrom(sockfd, gMsg, nchunk, 0, &other_Addr.addr, &addrLength);
+        if (nread <= 0) {
+#ifndef _WIN32
+            if (nread < 0 && errno == EINTR)
+                continue;
+#endif
+            opserr << "UDP_Socket::recvID() - error receiving data\n";
+            return -1;
         }
-        else {
-            recvfrom(sockfd, gMsg, MAX_UDP_DATAGRAM, 0, &other_Addr.addr, &addrLength);
-            gMsg += MAX_UDP_DATAGRAM;
-            size -= MAX_UDP_DATAGRAM;
-        }
+        gMsg += nread;
+        size -= nread;
     }
     
 #ifndef _WIN32
@@ -871,15 +933,23 @@ UDP_Socket::sendID(int dbTag, int commitTag,
 #endif
     
     while (size > 0) {
-        if (size <= MAX_UDP_DATAGRAM) {
-            sendto(sockfd, gMsg, size, 0, &other_Addr.addr, addrLength);
-            size = 0;
+        int nchunk = (size <= MAX_UDP_DATAGRAM) ? size : MAX_UDP_DATAGRAM;
+        int nwrite = sendto(sockfd, gMsg, nchunk, 0, &other_Addr.addr, addrLength);
+        if (nwrite <= 0) {
+#ifndef _WIN32
+            if (nwrite < 0 && errno == EINTR)
+                continue;
+            // restore the caller's data before bailing out
+            if (endiannessProblem) {
+                void *array = (void *)data;
+                byte_swap(array, theID.sz, sizeof(int));
+            }
+#endif
+            opserr << "UDP_Socket::sendID() - error sending data\n";
+            return -1;
         }
-        else {
-            sendto(sockfd, gMsg, MAX_UDP_DATAGRAM, 0, &other_Addr.addr, addrLength);
-            gMsg += MAX_UDP_DATAGRAM;
-            size -= MAX_UDP_DATAGRAM;
-        }
+        gMsg += nwrite;
+        size -= nwrite;
     }
     
 #ifndef _WIN32

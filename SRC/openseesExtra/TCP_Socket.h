@@ -41,11 +41,14 @@
 class TCP_Socket : public Channel
 {
   public:
-    TCP_Socket();        
+    TCP_Socket();
+    // noDelay defaults to 1 (TCP_NODELAY on, Nagle off): hybrid-simulation
+    // traffic is small request/response messages where Nagle + delayed-ACK
+    // adds ~40ms stalls per step (diverges from upstream OpenSees default)
     TCP_Socket(unsigned int port, bool checkEndianness = false,
-        int noDelay = 0);    
+        int noDelay = 1);
     TCP_Socket(unsigned int other_Port, const char *other_InetAddr,
-        bool checkEndianness = false, int noDelay = 0);
+        bool checkEndianness = false, int noDelay = 1);
     ~TCP_Socket();
 
     char *addToProgram();

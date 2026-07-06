@@ -31,6 +31,7 @@
 
 #include "TCP_Socket.h"
 #include <string.h>
+#include <errno.h>
 #include <Matrix.h>
 #include <Vector.h>
 #include <ID.h>
@@ -52,7 +53,7 @@ static void byte_swap(void *array, long long nArray,int size);
 //	given by the OS. 
 TCP_Socket::TCP_Socket()
     : myPort(0), connectType(0),
-    checkEndianness(false), endiannessProblem(false), noDelay(0)
+    checkEndianness(false), endiannessProblem(false), noDelay(1)
 {
     // initialize sockets
     startup_sockets();
@@ -455,6 +456,16 @@ TCP_Socket::recvMsg(int dbTag, int commitTag,
 
     while (nleft > 0) {
         nread = recv(sockfd,gMsg,nleft,0);
+        if (nread <= 0) {
+#ifndef _WIN32
+            if (nread < 0 && errno == EINTR)
+                continue;
+#endif
+            opserr << "TCP_Socket::recvMsg() - "
+                << (nread == 0 ? "peer closed the connection\n"
+                    : "error receiving data\n");
+            return -1;
+        }
         nleft -= nread;
         gMsg +=  nread;
     }
@@ -465,7 +476,7 @@ TCP_Socket::recvMsg(int dbTag, int commitTag,
 
 // void Recv(Message &):
 // 	Method to receive a message, also sets other_Addr.addr_in to that of sender
-int 
+int
 TCP_Socket::recvMsgUnknownSize(int dbTag, int commitTag,
     Message &msg, ChannelAddress *theAddress)
 {	
@@ -500,6 +511,16 @@ TCP_Socket::recvMsgUnknownSize(int dbTag, int commitTag,
         nleft = this->getBytesAvailable();
         while (nleft > 0) {
             nread = recv(sockfd,gMsg,nleft,0);
+            if (nread <= 0) {
+#ifndef _WIN32
+                if (nread < 0 && errno == EINTR)
+                    continue;
+#endif
+                opserr << "TCP_Socket::recvMsgUnknownSize() - "
+                    << (nread == 0 ? "peer closed the connection\n"
+                        : "error receiving data\n");
+                return -1;
+            }
             nleft -= nread;
             gMsg  += nread;
             if (*(gMsg-1) == '\0')
@@ -543,13 +564,21 @@ TCP_Socket::sendMsg(int dbTag, int commitTag,
 
     // if o.k. get a pointer to the data in the message and 
     // place the incoming data there
-    int nwrite, nleft;    
+    int nwrite, nleft;
     char *gMsg;
     gMsg = msg.data;
     nleft = msg.length;
 
     while (nleft > 0) {
         nwrite = send(sockfd,gMsg,nleft,0);
+        if (nwrite <= 0) {
+#ifndef _WIN32
+            if (nwrite < 0 && errno == EINTR)
+                continue;
+#endif
+            opserr << "TCP_Socket::sendMsg() - error sending data\n";
+            return -1;
+        }
         nleft -= nwrite;
 
         gMsg +=  nwrite;
@@ -592,6 +621,16 @@ TCP_Socket::recvMatrix(int dbTag, int commitTag,
 
     while (nleft > 0) {
         nread = recv(sockfd,gMsg,nleft,0);
+        if (nread <= 0) {
+#ifndef _WIN32
+            if (nread < 0 && errno == EINTR)
+                continue;
+#endif
+            opserr << "TCP_Socket::recvMatrix() - "
+                << (nread == 0 ? "peer closed the connection\n"
+                    : "error receiving data\n");
+            return -1;
+        }
         nleft -= nread;
         gMsg +=  nread;
     }
@@ -650,6 +689,19 @@ TCP_Socket::sendMatrix(int dbTag, int commitTag,
 
     while (nleft > 0) {
         nwrite = send(sockfd,gMsg,nleft,0);
+        if (nwrite <= 0) {
+#ifndef _WIN32
+            if (nwrite < 0 && errno == EINTR)
+                continue;
+            // restore the caller's data before bailing out
+            if (endiannessProblem) {
+                void *array = (void *)data;
+                byte_swap(array, theMatrix.dataSize, sizeof(double));
+            }
+#endif
+            opserr << "TCP_Socket::sendMatrix() - error sending data\n";
+            return -1;
+        }
         nleft -= nwrite;
         gMsg +=  nwrite;
     }
@@ -698,6 +750,16 @@ TCP_Socket::recvVector(int dbTag, int commitTag,
 
     while (nleft > 0) {
         nread = recv(sockfd,gMsg,nleft,0);
+        if (nread <= 0) {
+#ifndef _WIN32
+            if (nread < 0 && errno == EINTR)
+                continue;
+#endif
+            opserr << "TCP_Socket::recvVector() - "
+                << (nread == 0 ? "peer closed the connection\n"
+                    : "error receiving data\n");
+            return -1;
+        }
         nleft -= nread;
         gMsg +=  nread;
     }
@@ -755,6 +817,19 @@ TCP_Socket::sendVector(int dbTag, int commitTag,
 
     while (nleft > 0) {
         nwrite = send(sockfd,gMsg,nleft,0);
+        if (nwrite <= 0) {
+#ifndef _WIN32
+            if (nwrite < 0 && errno == EINTR)
+                continue;
+            // restore the caller's data before bailing out
+            if (endiannessProblem) {
+                void *array = (void *)data;
+                byte_swap(array, theVector.sz, sizeof(double));
+            }
+#endif
+            opserr << "TCP_Socket::sendVector() - error sending data\n";
+            return -1;
+        }
         nleft -= nwrite;
         gMsg +=  nwrite;
     }
@@ -803,6 +878,16 @@ TCP_Socket::recvID(int dbTag, int commitTag,
 
     while (nleft > 0) {
         nread = recv(sockfd,gMsg,nleft,0);
+        if (nread <= 0) {
+#ifndef _WIN32
+            if (nread < 0 && errno == EINTR)
+                continue;
+#endif
+            opserr << "TCP_Socket::recvID() - "
+                << (nread == 0 ? "peer closed the connection\n"
+                    : "error receiving data\n");
+            return -1;
+        }
         nleft -= nread;
         gMsg +=  nread;
     }
@@ -860,6 +945,19 @@ TCP_Socket::sendID(int dbTag, int commitTag,
 
     while (nleft > 0) {
         nwrite = send(sockfd,gMsg,nleft,0);
+        if (nwrite <= 0) {
+#ifndef _WIN32
+            if (nwrite < 0 && errno == EINTR)
+                continue;
+            // restore the caller's data before bailing out
+            if (endiannessProblem) {
+                void *array = (void *)data;
+                byte_swap(array, theID.sz, sizeof(int));
+            }
+#endif
+            opserr << "TCP_Socket::sendID() - error sending data\n";
+            return -1;
+        }
         nleft -= nwrite;
         gMsg +=  nwrite;
     }

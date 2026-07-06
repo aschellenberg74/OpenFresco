@@ -49,7 +49,7 @@ extern "C" {
 #endif
 
 
-#define MAX_UDP_DATAGRAM 9126
+#define MAX_UDP_DATAGRAM 1432  /* must match openseesExtra/Socket.h */
 #define MAX_INET_ADDR 28
 
 #ifdef _WIN32

@@ -57,7 +57,7 @@ static void byte_swap(void *array, long long nArray, int size);
 //	given by the OS.
 TCP_SocketSSL::TCP_SocketSSL()
     : myPort(0), connectType(0),
-    checkEndianness(false), endiannessProblem(false), noDelay(0)
+    checkEndianness(false), endiannessProblem(false), noDelay(1)
 {
     // initialize SSL library and context object
     SSL_library_init();
@@ -577,7 +577,7 @@ TCP_SocketSSL::recvMsg(int dbTag, int commitTag,
 
     while (nleft > 0) {
         nread = SSL_read(ssl, gMsg, nleft);
-        if (nread < 0) {
+        if (nread <= 0) {
             opserr << "TCP_SocketSSL::recvMsg() - could not read data\n";
             SSL_shutdown(ssl);
             SSL_free(ssl);
@@ -630,7 +630,7 @@ TCP_SocketSSL::recvMsgUnknownSize(int dbTag, int commitTag,
         nleft = SSL_pending(ssl);
         while (nleft > 0) {
             nread = SSL_read(ssl, gMsg, nleft);
-            if (nread < 0) {
+            if (nread <= 0) {
                 opserr << "TCP_SocketSSL::recvMsgUnknownSize() - could not read data\n";
                 SSL_shutdown(ssl);
                 SSL_free(ssl);
@@ -732,7 +732,7 @@ TCP_SocketSSL::recvMatrix(int dbTag, int commitTag,
 
     while (nleft > 0) {
         nread = SSL_read(ssl, gMsg, nleft);
-        if (nread < 0) {
+        if (nread <= 0) {
             opserr << "TCP_SocketSSL::recvMatrix() - could not read data\n";
             SSL_shutdown(ssl);
             SSL_free(ssl);
@@ -849,7 +849,7 @@ TCP_SocketSSL::recvVector(int dbTag, int commitTag,
 
     while (nleft > 0) {
         nread = SSL_read(ssl, gMsg, nleft);
-        if (nread < 0) {
+        if (nread <= 0) {
             opserr << "TCP_SocketSSL::recvVector() - could not read data\n";
             SSL_shutdown(ssl);
             SSL_free(ssl);
@@ -965,7 +965,7 @@ TCP_SocketSSL::recvID(int dbTag, int commitTag,
 
     while (nleft > 0) {
         nread = SSL_read(ssl, gMsg, nleft);
-        if (nread < 0) {
+        if (nread <= 0) {
             opserr << "TCP_SocketSSL::recvID() - could not read data\n";
             SSL_shutdown(ssl);
             SSL_free(ssl);

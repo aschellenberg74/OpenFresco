@@ -52,11 +52,14 @@
 class TCP_SocketSSL : public Channel
 {
 public:
-    TCP_SocketSSL();        
+    TCP_SocketSSL();
+    // noDelay defaults to 1 (TCP_NODELAY on, Nagle off): hybrid-simulation
+    // traffic is small request/response messages where Nagle + delayed-ACK
+    // adds ~40ms stalls per step (diverges from upstream OpenSees default)
     TCP_SocketSSL(unsigned int port, bool checkEndianness = false,
-        int noDelay = 0);    
+        int noDelay = 1);
     TCP_SocketSSL(unsigned int other_Port, const char *other_InetAddr,
-        bool checkEndianness = false, int noDelay = 0);
+        bool checkEndianness = false, int noDelay = 1);
     ~TCP_SocketSSL();
 
     char *addToProgram();

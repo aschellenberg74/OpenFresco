@@ -67,7 +67,10 @@ extern "C" {
 #include <OPS_Stream.h>
 #include <bool.h>
 
-#define MAX_UDP_DATAGRAM 9126
+// keep a logical datagram inside one MTU (1500 - IP/UDP headers) to avoid
+// IP fragmentation: one lost fragment would drop the whole logical message.
+// Must match the value in simApplicationClient (c/tcp_socket.c, c/udp_socket.c).
+#define MAX_UDP_DATAGRAM 1432
 #define MAX_INET_ADDR 28
 
 #ifdef _WIN32

@@ -44,7 +44,7 @@
 #include <strings.h>
 #endif
 
-#define MAX_UDP_DATAGRAM 9126
+#define MAX_UDP_DATAGRAM 1432  /* must match openseesExtra/Socket.h */
 #define MAX_INET_ADDR 28
 
 #ifdef _WIN32
@@ -200,7 +200,15 @@ void CALL_CONV tcp_setupconnectionserver(unsigned int *port, int *socketID)
     close(sockfd);
 #endif
     sockfd = newsockfd;
-    
+
+    // set TCP_NODELAY to match the OpenFresco side: the protocol is small
+    // request/response messages where Nagle + delayed-ACK adds latency
+    {
+        int noDelay = 1;
+        setsockopt(sockfd, IPPROTO_TCP, TCP_NODELAY,
+            (char *)&noDelay, sizeof(int));
+    }
+
     // get other_Port and other_InetAddr
     other_Port = ntohs(other_Addr.addr_in.sin_port);
     other_InetAddr = inet_ntoa(other_Addr.addr_in.sin_addr);
@@ -329,7 +337,15 @@ void CALL_CONV tcp_setupconnectionclient(unsigned int* other_Port,
         * socketID = -5;
         return;
     }
-    
+
+    // set TCP_NODELAY to match the OpenFresco side: the protocol is small
+    // request/response messages where Nagle + delayed-ACK adds latency
+    {
+        int noDelay = 1;
+        setsockopt(sockfd, IPPROTO_TCP, TCP_NODELAY,
+            (char *)&noDelay, sizeof(int));
+    }
+
     // add a new socket connection
     theSocket = (SocketConnection *)malloc(sizeof(SocketConnection));
     
