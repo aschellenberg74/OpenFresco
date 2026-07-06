@@ -342,7 +342,7 @@ int OPS_model()
     // ndm
     const char* ndmopt = OPS_GetString();
     if (strcmp(ndmopt, "-ndm") != 0 && strcmp(ndmopt, "-NDM") != 0) {
-        opserr << "WARNING frist option must be -ndm\n";
+        opserr << "WARNING first option must be -ndm\n";
         return -1;
     }
     int numdata = 1;
@@ -352,7 +352,7 @@ int OPS_model()
         return -1;
     }
     if (ndm != 1 && ndm != 2 && ndm != 3) {
-        opserr << "ERROR ndm msut be 1, 2 or 3\n";
+        opserr << "ERROR ndm must be 1, 2 or 3\n";
         return -1;
     }
 
@@ -624,7 +624,7 @@ int OPS_defaultUnits()
     tonf = lb / (9.80665 / 1000.0 * 4.4482216152605);
 
     ft = in * 12.0;
-    mm = in / 25.44;
+    mm = in / 25.4;
     cm = in / 2.54;
     m = in / 0.0254;
 
